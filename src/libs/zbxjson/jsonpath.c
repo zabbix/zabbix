@@ -26,27 +26,43 @@
 #include "json.h"
 #include "json_parser.h"
 #include "jsonobj.h"
-
-typedef struct
-{
-	zbx_jsonobj_t			*root;		/* the root object */
-	zbx_jsonpath_t			*path;
-	unsigned char			found;		/* set to 1 when one object was matched and */
-							/* no more matches are required             */
-	zbx_vector_jsonobj_ref_t	objects;	/* the matched objects */
-}
-zbx_jsonpath_context_t;
+#include "zbxalgo.h"
 
 typedef struct
 {
 	zbx_jsonpath_token_group_t	group;
 	int				precedence;
 }
+
 zbx_jsonpath_token_def_t;
+
+typedef struct
+{
+	zbx_jsonobj_t	*obj;
+	char		*path;
+	zbx_hashset_t	index;
+}
+zbx_jsonobj_index_t;
+
+ZBX_PTR_VECTOR_DECL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
+ZBX_PTR_VECTOR_IMPL(jsonobj_index_ptr, zbx_jsonobj_index_t *)
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+struct zbx_jsonpath_index
+{
+	zbx_vector_jsonobj_index_ptr_t	indexes;
+	pthread_mutex_t			lock;
+};
+
+static zbx_hashset_t	*jsonpath_index_get(zbx_jsonpath_index_t *index, zbx_jsonobj_t *obj,
+		zbx_jsonpath_token_t *token);
+
+#endif
 
 static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj, int path_depth);
 static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *array, int path_depth);
 static int	jsonpath_str_copy_value(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
+static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx);
 
 /* define token groups and precedence */
 static zbx_jsonpath_token_def_t	jsonpath_tokens[] = {
@@ -173,29 +189,6 @@ static void	zbx_vector_jsonobj_ref_copy(zbx_vector_jsonobj_ref_t *dst, const zbx
 		else
 			zbx_vector_jsonobj_ref_add_string(dst, src->values[i].name, src->values[i].value->data.string);
 	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free resources allocated by json object reference                 *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_vector_jsonobj_ref_clear_ext(zbx_vector_jsonobj_ref_t *refs)
-{
-	int	i;
-
-	for (i = 0; i < refs->values_num; i++)
-	{
-		zbx_jsonobj_ref_t	*ref = &refs->values[i];
-
-		zbx_free(ref->name);
-		if (0 == ref->external)
-		{
-			zbx_jsonobj_clear(ref->value);
-			zbx_free(ref->value);
-		}
-	}
-	zbx_vector_jsonobj_ref_clear(refs);
 }
 
 /******************************************************************************
@@ -1730,6 +1723,7 @@ static int	jsonpath_extract_value(zbx_jsonobj_t *obj, zbx_jsonpath_t *path, zbx_
 	ctx.found = 0;
 	ctx.root = obj;
 	zbx_vector_jsonobj_ref_create(&ctx.objects);
+	ctx.index = NULL;
 
 	if (SUCCEED == jsonpath_query_contents(&ctx, obj, 0) && 0 != ctx.objects.values_num)
 	{
@@ -1741,8 +1735,7 @@ static int	jsonpath_extract_value(zbx_jsonobj_t *obj, zbx_jsonpath_t *path, zbx_
 		ret = SUCCEED;
 	}
 
-	zbx_vector_jsonobj_ref_clear_ext(&ctx.objects);
-	zbx_vector_jsonobj_ref_destroy(&ctx.objects);
+	jsonpath_ctx_clear(&ctx);
 
 	return ret;
 }
@@ -1927,104 +1920,16 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: add matched object to the index                                   *
- *                                                                            *
- * Parameters: index   - [IN] the parent object index                         *
- *             name    - [IN] the name of objec to add to index               *
- *             obj     - [IN] the object to add to index                      *
- *             value   - [IN] the object matched by index path                *
- *                                                                            *
- ******************************************************************************/
-static void	jsonpath_index_append_result(zbx_hashset_t *index, const char *name, zbx_jsonobj_t *obj,
-		zbx_jsonobj_t *value)
+static int	jsonpath_prepare_numeric_arg(zbx_variant_t *var)
 {
-	zbx_jsonobj_index_el_t	el_local = {.value = NULL}, *el;
-	size_t			value_alloc = 0, value_offset = 0;
-	zbx_jsonobj_ref_t	ref;
-
-	jsonpath_str_copy_value(&el_local.value, &value_alloc, &value_offset, value);
-
-	if (NULL == (el = (zbx_jsonobj_index_el_t *)zbx_hashset_search(index, &el_local)))
+	if (SUCCEED != zbx_variant_convert(var, ZBX_VARIANT_DBL))
 	{
-		el = (zbx_jsonobj_index_el_t *)zbx_hashset_insert(index, &el_local, sizeof(el_local));
-		zbx_vector_jsonobj_ref_create(&el->objects);
-	}
-	else
-		zbx_free(el_local.value);
-
-	ref.name = zbx_strdup(NULL, name);
-	ref.value = obj;
-	ref.external = 0;
-	zbx_vector_jsonobj_ref_append(&el->objects, ref);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: index json object using the expression token index path           *
- *                                                                            *
- * Parameters: obj         - [IN] the object to index                         *
- *             index_token - [IN] the expression index token (relative path)  *
- *                                                                            *
- ******************************************************************************/
-static void	jsonpath_create_index(zbx_jsonobj_t *root, zbx_jsonobj_t *obj,
-		zbx_jsonpath_token_t *index_token)
-{
-	zbx_jsonpath_context_t	ctx;
-
-	if (0 != root->index_num)
-		return;
-
-	jsonobj_init_index(obj, index_token->text);
-
-	ctx.root = obj;
-	ctx.path = index_token->path;
-	zbx_vector_jsonobj_ref_create(&ctx.objects);
-
-	if (ZBX_JSON_TYPE_OBJECT == obj->type)
-	{
-		zbx_hashset_iter_t	iter;
-		zbx_jsonobj_el_t	*el;
-
-		zbx_hashset_iter_reset(&obj->data.object, &iter);
-		while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)))
-		{
-			ctx.found = 0;
-			if (SUCCEED == jsonpath_query_contents(&ctx, &el->value, 0) && 1 == ctx.objects.values_num)
-			{
-				jsonpath_index_append_result(&obj->index->objects, el->name, &el->value,
-						ctx.objects.values[0].value);
-			}
-
-			zbx_vector_jsonobj_ref_clear_ext(&ctx.objects);
-		}
-	}
-	else
-	{
-		int	i;
-
-		for (i = 0; i < obj->data.array.values_num; i++)
-		{
-			char		name[MAX_ID_LEN + 1];
-			zbx_jsonobj_t	*value = obj->data.array.values[i];
-
-			zbx_snprintf(name, sizeof(name), "%d", i);
-
-			ctx.found = 0;
-			if (SUCCEED == jsonpath_query_contents(&ctx, value, 0) && 1 == ctx.objects.values_num)
-			{
-				jsonpath_index_append_result(&obj->index->objects, name, value,
-						ctx.objects.values[0].value);
-			}
-
-			zbx_vector_jsonobj_ref_clear_ext(&ctx.objects);
-		}
+		zbx_set_json_strerror("invalid operand '%s' of type '%s'", zbx_variant_value_desc(var),
+				zbx_variant_type_desc(var));
+		return FAIL;
 	}
 
-	zbx_vector_jsonobj_ref_destroy(&ctx.objects);
-
-	root->index_num++;
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -2073,26 +1978,42 @@ static int	jsonpath_match_expression(zbx_jsonpath_context_t *ctx, const char *na
 			switch (token->type)
 			{
 				case ZBX_JSONPATH_TOKEN_OP_PLUS:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl += right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_MINUS:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl -= right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_MULT:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl *= right->data.dbl;
 					stack.values_num--;
 					break;
 				case ZBX_JSONPATH_TOKEN_OP_DIV:
-					zbx_variant_convert(left, ZBX_VARIANT_DBL);
-					zbx_variant_convert(right, ZBX_VARIANT_DBL);
+					if (SUCCEED != jsonpath_prepare_numeric_arg(left) ||
+							SUCCEED != jsonpath_prepare_numeric_arg(right))
+					{
+						ret = FAIL;
+						goto out;
+					}
 					left->data.dbl /= right->data.dbl;
 					stack.values_num--;
 					break;
@@ -2257,21 +2178,21 @@ out:
  * Purpose: query indexed object fields for jsonpath segment match            *
  *                                                                            *
  * Parameters: ctx        - [IN] the jsonpath query context                   *
- *             obj        - [IN] the json object to query                     *
+ *             index      - [IN] the indexing hashset                         *
  *             path_depth - [IN] the jsonpath segment to match                *
  *                                                                            *
  * Return value: SUCCEED - the object was queried successfully                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_indexed_expression(zbx_jsonpath_context_t *ctx,  zbx_jsonobj_t *obj, int path_depth)
+static int	jsonpath_match_indexed_expression(zbx_jsonpath_context_t *ctx, zbx_hashset_t *index, int path_depth)
 {
 	zbx_jsonpath_segment_t	*segment = &ctx->path->segments[path_depth];
 	zbx_jsonobj_index_el_t	index_local, *el;
 
 	index_local.value = segment->data.expression.value_token->text;
 
-	if (NULL != (el = (zbx_jsonobj_index_el_t *)zbx_hashset_search(&obj->index->objects, &index_local)))
+	if (NULL != (el = (zbx_jsonobj_index_el_t *)zbx_hashset_search(index, &index_local)))
 	{
 		int	i;
 
@@ -2312,15 +2233,16 @@ static int	jsonpath_query_object(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *obj
 		if (FAIL == ret || 1 != segment->detached)
 			return ret;
 	}
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 	else if (ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION == segment->type && NULL != segment->data.expression.index_token)
 	{
-		if (NULL == obj->index)
-			jsonpath_create_index(ctx->root, obj, segment->data.expression.index_token);
+		zbx_hashset_t	*index;
 
-		if (NULL != obj->index && 0 == strcmp(obj->index->path, segment->data.expression.index_token->text))
-			return jsonpath_match_indexed_expression(ctx, obj, path_depth);
+		if (NULL != (index = jsonpath_index_get(ctx->index, obj, segment->data.expression.index_token)))
+			return jsonpath_match_indexed_expression(ctx, index, path_depth);
+
 	}
-
+#endif
 	zbx_hashset_iter_reset(&obj->data.object, &iter);
 	while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)) && SUCCEED == ret &&
 			0 == ctx->found)
@@ -2467,19 +2389,20 @@ static int	jsonpath_query_array(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *arra
 			if (FAIL == ret || 1 != segment->detached)
 				return ret;
 			break;
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 		case ZBX_JSONPATH_SEGMENT_MATCH_EXPRESSION:
 			if (NULL != segment->data.expression.index_token)
 			{
-				if (NULL == array->index)
-					jsonpath_create_index(ctx->root, array, segment->data.expression.index_token);
+				zbx_hashset_t	*index;
 
-				if (NULL != array->index && 0 == strcmp(array->index->path,
-						segment->data.expression.index_token->text))
+				if (NULL != (index = jsonpath_index_get(ctx->index, array,
+						segment->data.expression.index_token)))
 				{
-					return jsonpath_match_indexed_expression(ctx, array, path_depth);
+					return jsonpath_match_indexed_expression(ctx, index, path_depth);
 				}
 			}
 			break;
+#endif
 		default:
 			break;
 	}
@@ -2692,7 +2615,7 @@ static int	jsonpath_apply_function(const zbx_vector_jsonobj_ref_t *in, zbx_jsonp
 	*definite_path = 1;
 	ret = SUCCEED;
 out:
-	zbx_vector_jsonobj_ref_clear_ext(&tmp);
+	jsonobj_clear_ref_vector(&tmp);
 	zbx_vector_jsonobj_ref_destroy(&tmp);
 
 	return ret;
@@ -2732,16 +2655,16 @@ static int	jsonpath_apply_functions(zbx_jsonpath_context_t *ctx, int path_depth,
 		ret = jsonpath_apply_function(&in, ctx->path->segments[path_depth++].data.function.type,
 				definite_path, out);
 
-		zbx_vector_jsonobj_ref_clear_ext(&in);
+		jsonobj_clear_ref_vector(&in);
 
 		if (SUCCEED != ret || path_depth == ctx->path->segments_num)
 			break;
 
 		zbx_vector_jsonobj_ref_copy(&in, out);
-		zbx_vector_jsonobj_ref_clear_ext(out);
+		jsonobj_clear_ref_vector(out);
 	}
 
-	zbx_vector_jsonobj_ref_clear_ext(&in);
+	jsonobj_clear_ref_vector(&in);
 	zbx_vector_jsonobj_ref_destroy(&in);
 
 	return ret;
@@ -2935,20 +2858,27 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 	return ret;
 }
 
+static void	jsonpath_ctx_clear(zbx_jsonpath_context_t *ctx)
+{
+	jsonobj_clear_ref_vector(&ctx->objects);
+	zbx_vector_jsonobj_ref_destroy(&ctx->objects);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: perform jsonpath query on the specified json object               *
  *                                                                            *
- * Parameters: obj    - [IN] the json object                                  *
- *             path   - [IN] the jsonpath                                     *
- *             output - [OUT] the output value                                *
+ * Parameters: obj    - [IN] json object                                  *
+ *             index  - [IN] jsonpath index (optional)                        *
+ *             path   - [IN] jsonpath                                         *
+ *             output - [OUT] output value                                    *
  *                                                                            *
  * Return value: SUCCEED - the query was performed successfully (empty result *
  *                         being counted as successful query)                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
+int	zbx_jsonobj_query_ext(zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output)
 {
 	zbx_jsonpath_context_t	ctx;
 	zbx_jsonpath_t		jsonpath;
@@ -2961,6 +2891,7 @@ int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
 	ctx.root = obj;
 	ctx.path = &jsonpath;
 	zbx_vector_jsonobj_ref_create(&ctx.objects);
+	ctx.index = index;
 
 	switch (obj->type)
 	{
@@ -2993,13 +2924,260 @@ int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
 		else
 			ret = jsonpath_format_query_result(&ctx.objects, definite_path, output);
 
-		zbx_vector_jsonobj_ref_clear_ext(&out);
+		jsonobj_clear_ref_vector(&out);
 		zbx_vector_jsonobj_ref_destroy(&out);
 	}
 
-	zbx_vector_jsonobj_ref_clear_ext(&ctx.objects);
-	zbx_vector_jsonobj_ref_destroy(&ctx.objects);
+	jsonpath_ctx_clear(&ctx);
 	zbx_jsonpath_clear(&jsonpath);
 
 	return ret;
 }
+
+int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output)
+{
+	return zbx_jsonobj_query_ext(obj, NULL, path, output);
+}
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+/* jsonobject index hashset support */
+
+static zbx_hash_t	jsonobj_index_el_hash(const void *v)
+{
+	const zbx_jsonobj_index_el_t	*el = (const zbx_jsonobj_index_el_t *)v;
+
+	return ZBX_DEFAULT_STRING_HASH_FUNC(el->value);
+}
+
+static int	jsonobj_index_el_compare(const void *v1, const void *v2)
+{
+	const zbx_jsonobj_index_el_t	*el1 = (const zbx_jsonobj_index_el_t *)v1;
+	const zbx_jsonobj_index_el_t	*el2 = (const zbx_jsonobj_index_el_t *)v2;
+
+	return strcmp(el1->value, el2->value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free resources allocated by json object index element             *
+ *                                                                            *
+ * Parameters: v  - [IN] the json index element                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	jsonobj_index_el_clear(void *v)
+{
+	zbx_jsonobj_index_el_t	*el = (zbx_jsonobj_index_el_t *)v;
+	int			i;
+
+	zbx_free(el->value);
+	for (i = 0; i < el->objects.values_num; i++)
+	{
+		zbx_free(el->objects.values[i].name);
+
+		if (0 != el->objects.values[i].external)
+		{
+			zbx_jsonobj_clear(el->objects.values[i].value);
+			zbx_free(el->objects.values[i].value);
+		}
+	}
+
+	zbx_vector_jsonobj_ref_destroy(&el->objects);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add matched object to the index                                   *
+ *                                                                            *
+ * Parameters: index   - [IN] the parent object index                         *
+ *             name    - [IN] the name of objec to add to index               *
+ *             obj     - [IN] the object to add to index                      *
+ *             value   - [IN] the object matched by index path                *
+ *                                                                            *
+ ******************************************************************************/
+static void	jsonobj_index_add_element(zbx_hashset_t *index, const char *name, zbx_jsonobj_t *obj,
+		zbx_jsonobj_t *value)
+{
+	zbx_jsonobj_index_el_t	el_local = {.value = NULL}, *el;
+	size_t			value_alloc = 0, value_offset = 0;
+	zbx_jsonobj_ref_t	ref;
+
+	jsonpath_str_copy_value(&el_local.value, &value_alloc, &value_offset, value);
+
+	if (NULL == (el = (zbx_jsonobj_index_el_t *)zbx_hashset_search(index, &el_local)))
+	{
+		el = (zbx_jsonobj_index_el_t *)zbx_hashset_insert(index, &el_local, sizeof(el_local));
+		zbx_vector_jsonobj_ref_create(&el->objects);
+	}
+	else
+		zbx_free(el_local.value);
+
+	ref.name = zbx_strdup(NULL, name);
+	ref.value = obj;
+	ref.external = 0;
+	zbx_vector_jsonobj_ref_append(&el->objects, ref);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add new json object index to jsopath index                        *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hashset_t	*jsonpath_index_add(zbx_jsonpath_index_t *index, zbx_jsonobj_t *obj,
+		zbx_jsonpath_token_t *token)
+{
+	zbx_jsonobj_index_t	*obj_index;
+	zbx_jsonpath_context_t	ctx;
+
+	obj_index = (zbx_jsonobj_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonobj_index_t));
+	obj_index->obj = obj;
+	obj_index->path = zbx_strdup(NULL, token->text);
+	zbx_hashset_create_ext(&obj_index->index, 0, jsonobj_index_el_hash, jsonobj_index_el_compare,
+			jsonobj_index_el_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	ctx.root = obj;
+	ctx.path = token->path;
+	zbx_vector_jsonobj_ref_create(&ctx.objects);
+	ctx.index = NULL;
+
+	if (ZBX_JSON_TYPE_OBJECT == obj->type)
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_jsonobj_el_t	*el;
+
+		zbx_hashset_iter_reset(&obj->data.object, &iter);
+		while (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_iter_next(&iter)))
+		{
+			ctx.found = 0;
+			if (SUCCEED == jsonpath_query_contents(&ctx, &el->value, 0) && 1 == ctx.objects.values_num)
+			{
+				jsonobj_index_add_element(&obj_index->index, el->name, &el->value,
+						ctx.objects.values[0].value);
+			}
+
+			jsonobj_clear_ref_vector(&ctx.objects);
+		}
+	}
+	else
+	{
+		int	i;
+
+		for (i = 0; i < obj->data.array.values_num; i++)
+		{
+			char		name[MAX_ID_LEN + 1];
+			zbx_jsonobj_t	*value = obj->data.array.values[i];
+
+			zbx_snprintf(name, sizeof(name), "%d", i);
+
+			ctx.found = 0;
+			if (SUCCEED == jsonpath_query_contents(&ctx, value, 0) && 1 == ctx.objects.values_num)
+				jsonobj_index_add_element(&obj_index->index, name, value, ctx.objects.values[0].value);
+
+			jsonobj_clear_ref_vector(&ctx.objects);
+		}
+	}
+
+	jsonpath_ctx_clear(&ctx);
+
+	zbx_vector_jsonobj_index_ptr_append(&index->indexes, obj_index);
+
+	return &obj_index->index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get json object index                                             *
+ *                                                                            *
+ * Parameters: index - [IN] jsonpath index, with 0-* json object indexes      *
+ *             obj   - [IN] target object                                     *
+ *             token - [IN] jsonpath token with index query                   *
+ *                                                                            *
+ * Return value: The indexed object contents by the specified query.          *
+ *                                                                            *
+ * Comments: If this object was not indexed by the specified query, then a    *
+ *           new index will be created.                                       *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_hashset_t	*jsonpath_index_get(zbx_jsonpath_index_t *index, zbx_jsonobj_t *obj,
+		zbx_jsonpath_token_t *token)
+{
+	int		i;
+	zbx_hashset_t	*objects = NULL;
+
+	if (NULL == index)
+		return NULL;
+
+	pthread_mutex_lock(&index->lock);
+
+	for (i = 0; i < index->indexes.values_num; i++)
+	{
+		if (index->indexes.values[i]->obj == obj && 0 == strcmp(index->indexes.values[i]->path, token->text))
+		{
+			objects = &index->indexes.values[i]->index;
+			break;
+		}
+	}
+
+	if (NULL == objects)
+		objects = jsonpath_index_add(index, obj, token);
+
+	pthread_mutex_unlock(&index->lock);
+
+	return objects;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free json object index                                            *
+ *                                                                            *
+ ******************************************************************************/
+static void	jsonobj_index_free(zbx_jsonobj_index_t *index)
+{
+	zbx_free(index->path);
+	zbx_hashset_destroy(&index->index);
+	zbx_free(index);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: create jsonpath index                                             *
+ *                                                                            *
+ ******************************************************************************/
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error)
+{
+	zbx_jsonpath_index_t	*index;
+	int			err;
+
+	index = (zbx_jsonpath_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonpath_index_t));
+
+	if (0 != (err = pthread_mutex_init(&index->lock, NULL)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize jsonpath index mutex: %s", zbx_strerror(err));
+		zbx_free(index);
+		return NULL;
+	}
+
+	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
+
+	pthread_mutex_init(&index->lock, NULL);
+
+	return index;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: destroy jsonpath index                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index)
+{
+	pthread_mutex_destroy(&index->lock);
+
+	zbx_vector_jsonobj_index_ptr_clear_ext(&index->indexes, jsonobj_index_free);
+	zbx_vector_jsonobj_index_ptr_destroy(&index->indexes);
+
+	zbx_free(index);
+}
+
+#endif

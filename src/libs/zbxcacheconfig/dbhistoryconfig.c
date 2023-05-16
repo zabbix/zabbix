@@ -22,6 +22,7 @@
 #include "zbxserver.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
+#include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
@@ -534,17 +535,12 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 
-	switch (src_item->value_type)
+	if (ITEM_VALUE_TYPE_LOG == src_item->value_type)
 	{
-		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
-					&src_item->itemid)))
-			{
-				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-			}
-			else
-				*dst_item->logtimefmt = '\0';
-			break;
+		if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &src_item->itemid)))
+			zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
+		else
+			*dst_item->logtimefmt = '\0';
 	}
 
 	if (ZBX_ITEM_GET_INTERFACE & mode)

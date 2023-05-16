@@ -28,7 +28,7 @@ class CWidgetFieldUrlView extends CWidgetFieldView {
 	}
 
 	public function getView(): CTextBox {
-		return (new CTextBox($this->field->getName(), $this->field->getValue(), false, CWidgetFieldUrl::MAX_LENGTH))
+		return (new CTextBox($this->field->getName(), $this->field->getValue(), false, $this->field->getMaxLength()))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired($this->isRequired());
 	}

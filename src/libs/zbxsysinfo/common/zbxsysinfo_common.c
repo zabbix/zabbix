@@ -22,7 +22,7 @@
 
 #include "../sysinfo.h"
 #include "log.h"
-#include "file.h"
+#include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
 #include "dns.h"
@@ -235,7 +235,7 @@ static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	level = LOG_LEVEL_DEBUG;
 
-	if (0 != CONFIG_LOG_REMOTE_COMMANDS)
+	if (0 != sysinfo_get_config_log_remote_commands())
 		level = LOG_LEVEL_WARNING;
 
 	return system_run_local(request, result, level);

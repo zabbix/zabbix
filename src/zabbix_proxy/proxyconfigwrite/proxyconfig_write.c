@@ -1026,8 +1026,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
 
-			zbx_db_insert_add_values_dyn(&db_insert, (const zbx_db_value_t **)values.values,
-					values.values_num);
+			zbx_db_insert_add_values_dyn(&db_insert, values.values, values.values_num);
 clean:
 			for (j = 0; j < values.values_num; j++)
 			{
@@ -2061,7 +2060,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-		const zbx_config_vault_t *config_vault, int config_timeout)
+		const zbx_config_vault_t *config_vault, int config_timeout, const char *server)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -2071,7 +2070,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update", config_tls,
-			config_timeout))
+			config_timeout, server))
 	{
 		goto out;
 	}

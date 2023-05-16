@@ -292,7 +292,7 @@ void	zbx_init_regexp_env(void)
 #endif
 }
 
-static unsigned long int compute_recursion_limit(void)
+static unsigned long int	compute_recursion_limit(void)
 {
 	if (0 == rxp_stacklimit)
 	{
@@ -396,6 +396,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	PCRE2_SIZE		*ovector = NULL;
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
+
 	pcre2_set_recursion_limit(regexp->match_ctx, compute_recursion_limit());
 	match_data = pcre2_match_data_create(count, NULL);
 

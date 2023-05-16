@@ -32,7 +32,7 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxexpr.h"
-#include "zbxcommon.h"
+#include "zbxfile.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -71,6 +71,9 @@ static ZBX_METRIC		*commands = NULL;
 static ZBX_METRIC		*commands_local = NULL;
 zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_timeout_cb = NULL;
+static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
+static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
+static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -144,9 +147,14 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 	return SUCCEED;
 }
 
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f)
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
+		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
+		zbx_get_config_int_f get_config_unsafe_user_parameters_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
+	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
+	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
+	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
 }
 
 /******************************************************************************
@@ -159,6 +167,7 @@ int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
 
+#ifdef WITH_COMMON_METRICS
 /******************************************************************************
  *                                                                            *
  * Purpose: registers a new item key as local into the system                 *
@@ -168,6 +177,7 @@ static int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_le
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
+#endif /* WITH_COMMON_METRICS */
 
 #if !defined(__MINGW32__)
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
@@ -273,10 +283,25 @@ int	sysinfo_get_config_timeout(void)
 	return get_config_timeout_cb();
 }
 
+int	sysinfo_get_config_log_remote_commands(void)
+{
+	return get_config_log_remote_commands_cb();
+}
+
+int	sysinfo_get_config_unsafe_user_parameters(void)
+{
+	return get_config_unsafe_user_parameters_cb();
+}
+
 void	zbx_init_metrics(void)
 {
+#if (defined(WITH_AGENT_METRICS) || defined(WITH_COMMON_METRICS) || defined(WITH_HTTP_METRICS) ||	\
+	defined(WITH_SPECIFIC_METRICS) || defined(WITH_SIMPLE_METRICS))
 	int	i;
 	char	error[MAX_STRING_LEN];
+#elif (defined(WITH_HOSTNAME_METRIC))
+	char	error[MAX_STRING_LEN];
+#endif
 
 	zbx_init_key_access_rules();
 
@@ -810,33 +835,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->logeventid = 0;
 }
 
-void	zbx_init_agent_result(AGENT_RESULT *result)
-{
-	memset(result, 0, sizeof(AGENT_RESULT));
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_log_free(zbx_log_t *log)
-{
-	zbx_log_clean(log);
-	zbx_free(log);
-}
-
-void	zbx_free_agent_result(AGENT_RESULT *result)
-{
-	ZBX_UNSET_UI64_RESULT(result);
-	ZBX_UNSET_DBL_RESULT(result);
-	ZBX_UNSET_STR_RESULT(result);
-	ZBX_UNSET_TEXT_RESULT(result);
-	ZBX_UNSET_LOG_RESULT(result);
-	ZBX_UNSET_MSG_RESULT(result);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize the request structure                                  *
@@ -1027,13 +1025,14 @@ void	zbx_test_parameters(void)
 	test_aliases();
 }
 
-static int	zbx_check_user_parameter(const char *param, char *error, int max_error_len)
+static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
+		int max_error_len)
 {
 	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\n", *c;
 	char		*buf = NULL;
 	size_t		buf_alloc = 128, buf_offset = 0;
 
-	if (0 != CONFIG_UNSAFE_USER_PARAMETERS)
+	if (0 != config_unsafe_user_parameters)
 		return SUCCEED;
 
 	for (c = suppressed_chars; '\0' != *c; c++)
@@ -1064,7 +1063,8 @@ static int	zbx_check_user_parameter(const char *param, char *error, int max_erro
 	return SUCCEED;
 }
 
-static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **out, char *error, int max_error_len)
+static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int config_user_parameters,
+		char **out, char *error, int max_error_len)
 {
 	const char	*pl = cmd, *pr, *tmp;
 	size_t		out_alloc = 0, out_offset = 0;
@@ -1090,8 +1090,11 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, char **o
 			{
 				tmp = get_rparam(request, num - 1);
 
-				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, error, max_error_len)))
+				if (SUCCEED != (ret = zbx_check_user_parameter(tmp, config_user_parameters, error,
+						max_error_len)))
+				{
 					break;
+				}
 
 				zbx_strcpy_alloc(out, &out_alloc, &out_offset, tmp);
 			}
@@ -1150,7 +1153,7 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	}
 
 	/* system.run is not allowed by default except for getting hostname for daemons */
-	if (1 != CONFIG_ENABLE_REMOTE_COMMANDS && 0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) &&
+	if (1 != get_config_enable_remote_commands_cb() && 0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) &&
 			0 == strcmp(request.key, "system.run"))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Remote commands are not enabled."));
@@ -1202,7 +1205,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		{
 			char	*parameters = NULL, error[MAX_STRING_LEN];
 
-			if (FAIL == replace_param(command->test_param, &request, &parameters, error, sizeof(error)))
+			if (FAIL == replace_param(command->test_param, &request, get_config_unsafe_user_parameters_cb(),
+					&parameters, error, sizeof(error)))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, error));
 				goto notsupported;
@@ -1250,13 +1254,12 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
 	int		ret = FAIL;
+	double		dbl_tmp;
 
 	assert(result);
 
 	switch (value_type)
 	{
-		double	dbl_tmp;
-
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
 			zbx_del_zeros(c);
@@ -1291,6 +1294,11 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return ret;
@@ -1520,84 +1528,6 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 	}
 
 	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: unquotes special symbols in item key parameter                    *
- *                                                                            *
- * Parameters: param - [IN/OUT] item key parameter                            *
- *                                                                            *
- * Comments:                                                                  *
- *   "param"     => param                                                     *
- *   "\"param\"" => "param"                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_unquote_key_param(char *param)
-{
-	char	*dst;
-
-	if ('"' != *param)
-		return;
-
-	for (dst = param++; '\0' != *param; param++)
-	{
-		if ('\\' == *param && '"' == param[1])
-			continue;
-
-		*dst++ = *param;
-	}
-	*--dst = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: quotes special symbols in item key parameter                      *
- *                                                                            *
- * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
- *                                                                            *
- * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
- *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_quote_key_param(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
-
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-
-	*param = (char *)zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-
-	return SUCCEED;
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -2061,7 +1991,7 @@ static void	get_fqdn(char **hostname)
 	zbx_rtrim(*hostname, " .\n\r");
 }
 
-int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname)
+int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char **hostname)
 {
 	char	*type, *transform;
 
@@ -2074,12 +2004,12 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		{
 			char	*dot;
 
-			if (NULL != (dot = strchr(hostname, '.')))
+			if (NULL != (dot = strchr(*hostname, '.')))
 				*dot = '\0';
 		}
 		else if (0 == strcmp(type, "fqdn"))
 		{
-			get_fqdn(&hostname);
+			get_fqdn(hostname);
 		}
 		else if (0 == strcmp(type, "netbios"))
 		{
@@ -2097,7 +2027,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 	{
 		if (0 == strcmp(transform, "lower"))
 		{
-			zbx_strlower(hostname);
+			zbx_strlower(*hostname);
 		}
 		else
 		{
@@ -2106,7 +2036,7 @@ int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *h
 		}
 	}
 
-	SET_STR_RESULT(result, hostname);
+	SET_STR_RESULT(result, *hostname);
 
 	return SUCCEED;
 }

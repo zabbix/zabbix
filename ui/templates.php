@@ -56,7 +56,6 @@ $fields = [
 	'add'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'update'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'clone'				=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
-	'full_clone'		=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete'			=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'delete_and_clear'	=> [T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
 	'cancel'			=> [T_ZBX_STR, O_OPT, P_SYS,		null,	null],
@@ -141,8 +140,24 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 		unset($_REQUEST['templates'][array_search($id, $_REQUEST['templates'])]);
 	}
 }
-elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
-	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
+elseif (hasRequest('templateid') && hasRequest('clone')) {
+	$_REQUEST['form'] = 'clone';
+	$warnings = [];
+
+	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+		// Reset macro type and value.
+		$macros = array_map(function($value) {
+			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+				: $value;
+		}, $macros);
+
+		$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+	}
+
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
 
 	$groups = getRequest('groups', []);
 	$groupids = [];
@@ -162,6 +177,10 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 			'preservekeys' => true
 		]);
 
+		if (count($groupids) != count($groups_allowed)) {
+			$warnings[] = _("The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template.");
+		}
+
 		foreach ($groups as $idx => $group) {
 			if (!is_array($group) && !array_key_exists($group, $groups_allowed)) {
 				unset($groups[$idx]);
@@ -171,23 +190,12 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$_REQUEST['groups'] = $groups;
 	}
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	if ($warnings) {
+		if (count($warnings) > 1) {
+			CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
+		}
 
-		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
-	}
-
-	$macros = array_map(function($macro) {
-		return array_diff_key($macro, array_flip(['hostmacroid']));
-	}, $macros);
-
-	if (hasRequest('clone')) {
-		unset($_REQUEST['templateid']);
+		array_map('CMessageHelper::addWarning', $warnings);
 	}
 }
 elseif (hasRequest('add') || hasRequest('update')) {
@@ -202,7 +210,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$input_templateid = getRequest('templateid', 0);
 		$cloneTemplateId = 0;
 
-		if (getRequest('form') === 'full_clone') {
+		if (getRequest('form') === 'clone') {
 			$cloneTemplateId = $input_templateid;
 			$input_templateid = 0;
 		}
@@ -295,7 +303,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$upd_valuemaps = [];
 		$del_valuemapids = [];
 
-		if (getRequest('form', '') === 'full_clone' || getRequest('form', '') === 'clone') {
+		if (getRequest('form', '') === 'clone') {
 			foreach ($valuemaps as &$valuemap) {
 				unset($valuemap['valuemapid']);
 			}
@@ -331,8 +339,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			throw new Exception();
 		}
 
-		// full clone
-		if ($cloneTemplateId != 0 && getRequest('form') === 'full_clone') {
+		// clone
+		if ($cloneTemplateId != 0 && getRequest('form') === 'clone') {
 
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
@@ -544,7 +552,11 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 		uncheckTableRows(null, array_keys($templates));
 	}
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+	$templates_count = count($templateids);
+	$messageSuccess = _n('Template deleted', 'Templates deleted', $templates_count);
+	$messageFailed = _n('Cannot delete template', 'Cannot delete templates', $templates_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
@@ -578,7 +590,7 @@ if (hasRequest('form')) {
 		]);
 		$data['dbTemplate'] = reset($dbTemplates);
 
-		if ($data['form'] !== 'full_clone') {
+		if ($data['form'] !== 'clone') {
 			$data['vendor'] = array_filter([
 				'name' => $data['dbTemplate']['vendor_name'],
 				'version' => $data['dbTemplate']['vendor_version']

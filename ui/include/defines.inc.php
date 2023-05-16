@@ -22,7 +22,7 @@ define('ZABBIX_VERSION',		'7.0.0alpha1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050007);
+define('ZABBIX_DB_VERSION',		6050013);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -577,6 +577,7 @@ define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
+define('ITEM_VALUE_TYPE_BINARY',	5);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
@@ -1330,11 +1331,6 @@ define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.
@@ -1863,6 +1859,7 @@ define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
 define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
+define('ZBX_STYLE_CELL_EXPRESSION', 'expression-cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');

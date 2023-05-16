@@ -24,9 +24,16 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-	return thread_args->entry(thread_args);
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_seh_handler(GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)

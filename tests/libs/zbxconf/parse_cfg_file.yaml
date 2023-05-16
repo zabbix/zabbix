@@ -32,7 +32,7 @@ files:
     Include= db.conf
     LoadModule=smarty.so
     #LoadModule=beauty.so
-  db.conf: |
+  ./db.conf: |
     DBPassword=r3ally_$tr0ng_pa$$w0rd
 ---
 test case: recursive self inclusion
@@ -65,23 +65,23 @@ in:
 files:
   1.conf: |
     Include=2.conf
-  2.conf: |
+  ./2.conf: |
     Include=3.conf
-  3.conf: |
+  ./3.conf: |
     Include=4.conf
-  4.conf: |
+  ./4.conf: |
     Include=5.conf
-  5.conf: |
+  ./5.conf: |
     Include=6.conf
-  6.conf: |
+  ./6.conf: |
     Include=7.conf
-  7.conf: |
+  ./7.conf: |
     Include=8.conf
-  8.conf: |
+  ./8.conf: |
     Include=9.conf
-  9.conf: |
+  ./9.conf: |
     Include=10.conf
-  10.conf: |
+  ./10.conf: |
 ---
 test case: too many inclusion levels
 in:

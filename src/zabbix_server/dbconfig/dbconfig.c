@@ -46,6 +46,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
 
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
 			(((zbx_thread_args_t *)args)->args);
@@ -55,7 +56,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
-	zbx_rtc_subscribe(process_type, process_num, dbconfig_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
+			&rtc);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
@@ -63,7 +65,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	sec = zbx_time();
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
-	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault);
+	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
+			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec), CONFIG_CONFSYNCER_FREQUENCY);
@@ -120,7 +123,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_vector_uint64_create(&deleted_itemids);
 
 			zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES, &deleted_itemids,
-					dbconfig_args_in->config_vault);
+					dbconfig_args_in->config_vault, dbconfig_args_in->proxyconfig_frequency);
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault);
 			zbx_dc_update_interfaces_availability();
 			nextcheck = (int)time(NULL) + CONFIG_CONFSYNCER_FREQUENCY;

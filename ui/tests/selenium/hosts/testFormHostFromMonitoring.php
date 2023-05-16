@@ -71,17 +71,7 @@ class testFormHostFromMonitoring extends testFormHost {
 	 * @dataProvider getCloneData
 	 */
 	public function testFormHostFromMonitoring_Clone($data) {
-		$this->cloneHost($data, 'Clone');
-
-		// Check that items aren't cloned from original host.
-		$this->assertItemsDBCount($data['fields']['Host name'], 0);
-	}
-
-	/**
-	 * @dataProvider getCloneData
-	 */
-	public function testFormHostFromMonitoring_FullClone($data) {
-		$this->cloneHost($data, 'Full clone');
+		$this->cloneHost($data);
 
 		// Check that items cloned from original host.
 		$this->assertItemsDBCount($data['fields']['Host name'], $data['items']);

@@ -40,8 +40,13 @@ zbx_host_template_link_type;
 typedef int (*zbx_trigger_func_t)(zbx_variant_t *, const zbx_dc_evaluate_item_t *, const char *, const char *,
 		const zbx_timespec_t *, char **);
 
+typedef void (*zbx_lld_process_agent_result_func_t)(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result,
+		zbx_timespec_t *ts, char *error);
+
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func);
+
 int	zbx_check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req,
-		const zbx_config_tls_t *config_tls, int config_timeout);
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *server);
 
 int	zbx_get_active_proxy_from_request(const struct zbx_json_parse *jp, zbx_dc_proxy_t *proxy, char **error);
 int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t *sock, char **error);
@@ -67,8 +72,9 @@ void	zbx_update_proxy_data(zbx_dc_proxy_t *proxy, char *version_str, int version
 
 int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
 int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info);
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		unsigned char proxy_status, int *more, char **error);
+int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency, int *more,
+		char **error);
 int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version);
 
 int	zbx_db_copy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templateids,
@@ -124,5 +130,8 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 		zbx_trigger_func_t eval_func_cb, int recovery);
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
+
+#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
+#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 #endif /* ZABBIX_DBWRAP_H */

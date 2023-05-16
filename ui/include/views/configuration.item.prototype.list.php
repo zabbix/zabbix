@@ -86,7 +86,7 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name']);
+			$description[] = $item['master_item']['name'];
 		}
 		else {
 			$link = ($item['master_item']['source'] === 'itemprototypes')
@@ -98,7 +98,7 @@ foreach ($data['items'] as $item) {
 					->setArgument('filter_hostids', [$item['hostid']])
 					->setArgument('context', $data['context']);
 
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			$description[] = (new CLink($item['master_item']['name'],
 				$link
 					->setArgument('form', 'update')
 					->setArgument('itemid', $item['master_item']['itemid'])
@@ -185,7 +185,7 @@ foreach ($data['items'] as $item) {
 		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$wizard,
 		$description,
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],
@@ -202,12 +202,16 @@ $itemForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'group_itemid',
 		[
-			'itemprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create items from selected prototypes as enabled?'),
+			'itemprototype.massenable' => [
+				'name' => _('Create enabled'),
+				'confirm_singular' => _('Create items from selected prototype as enabled?'),
+				'confirm_plural' => _('Create items from selected prototypes as enabled?'),
 				'csrf_token' => $csrf_token
 			],
-			'itemprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create items from selected prototypes as disabled?'),
+			'itemprototype.massdisable' => [
+				'name' => _('Create disabled'),
+				'confirm_singular' => _('Create items from selected prototype as disabled?'),
+				'confirm_plural' => _('Create items from selected prototypes as disabled?'),
 				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.itemprototype' => [
@@ -223,8 +227,10 @@ $itemForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'itemprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected item prototypes?'),
+			'itemprototype.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected item prototype?'),
+				'confirm_plural' => _('Delete selected item prototypes?'),
 				'csrf_token' => $csrf_token
 			]
 		],

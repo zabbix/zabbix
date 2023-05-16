@@ -35,7 +35,7 @@ class testFormPreprocessingCloneHost extends testFormPreprocessingClone {
 	/**
 	 * @onBefore prepareLLDPreprocessing, prepareItemPreprocessing, prepareItemPrototypePreprocessing
 	 */
-	public function testFormPreprocessingCloneHost_FullCloneHost() {
+	public function testFormPreprocessingCloneHost_CloneHost() {
 		$this->executeCloning();
 	}
 }

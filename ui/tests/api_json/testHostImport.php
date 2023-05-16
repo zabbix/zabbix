@@ -21,6 +21,9 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+/**
+ * @backup hosts, hstgrp
+ */
 class testHostImport extends CAPITest {
 
 	public function testDiscoveredHostGroupsAfterImportParentHost() {

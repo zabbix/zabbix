@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-06 12:31+0000\n"
-"Last-Translator: Sergejs <sergejs.maklakovs@zabbix.com>\n"
+"PO-Revision-Date: 2023-04-05 10:53+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -449,7 +449,7 @@ msgstr "PŘIDEJ PŘEPIS"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "ALARM ČASOVAČ"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -1259,6 +1259,10 @@ msgstr "Seznam povolených"
 msgid "Allow manual close"
 msgstr "Povolit manuální zavření"
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1278,9 +1282,17 @@ msgstr "Použito také jako popisek legendy pro agregované datové sady."
 msgid "Alternatively, you can install it manually:"
 msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
+#: include/classes/data/CItemData.php:1623
+msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Množství fyzické paměti hosta, která je odložena do odkládacího prostoru, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
+
+#: include/classes/data/CItemData.php:1643
+msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1595,6 +1607,10 @@ msgstr "Atribuce"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
+msgstr "Atribuce HTML"
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
@@ -1773,9 +1789,17 @@ msgstr "Dostupný"
 msgid "Average"
 msgstr "Střední"
 
+#: include/classes/data/CItemData.php:1715
+msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Průměrný počet nevyřízených požadavků na čtení na virtuální disk během intervalu sběru, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance diskového zařízení"
+
+#: include/classes/data/CItemData.php:1735
+msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1845,6 +1869,18 @@ msgstr "Před hodnotou"
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
 msgstr "Pod hodnotou"
+
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1979,13 +2015,29 @@ msgstr "CPU informace. Vráti řetězec nebo celé číslo"
 msgid "CPU load. Returns float"
 msgstr "CPU load. Vrátí desetinné číslo"
 
+#: include/classes/data/CItemData.php:1603
+msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
 msgstr "Čas CPU strávený čekáním na swap-in, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance CPU"
 
+#: include/classes/data/CItemData.php:1407
+msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Využití CPU v procentech během intervalu závisí na správě napájení nebo HT, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware"
+
+#: include/classes/data/CItemData.php:1399
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1607
+msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -1994,6 +2046,10 @@ msgstr "Využití procesoru v procentech během intervalu, <url> – URL služby
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Využití procesoru v procentech během intervalu, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
+
+#: include/classes/data/CItemData.php:1559
+msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
@@ -2561,6 +2617,13 @@ msgstr[2] "Skupinu hostitelů %1$s nelze smazat, protože údržba \"%2$s\" mus�
 msgid "Cannot delete host groups"
 msgstr "Nelze odstranit skupiny zařízení"
 
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
 msgstr "Není možné smazat prototypy hostů"
@@ -2843,6 +2906,13 @@ msgstr[0] "Není možné vypnout typ média"
 msgstr[1] "Není možné vypnout typ média"
 msgstr[2] "Není možné vypnout typ média"
 
+#: app/controllers/CControllerModuleDisable.php:75
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "Nelze zakázat modul"
+msgstr[1] "Nelze zakázat moduly"
+msgstr[2] "Nelze zakázat moduly"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2946,6 +3016,13 @@ msgstr[0] "Není možné povolit typ média"
 msgstr[1] "Není možné povolit typy médií"
 msgstr[2] "Není možné povolit typy médií"
 
+#: app/controllers/CControllerModuleEnable.php:99
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "Nelze povolit modul"
+msgstr[1] "Nelze povolit moduly"
+msgstr[2] "Nelze povolit moduly"
+
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
 msgid "Cannot enable module: %1$s."
@@ -2995,6 +3072,16 @@ msgstr "Nelze spustit skript."
 #: jsLoader.php:287
 msgid "Cannot expand macros."
 msgstr "Nelze rozšířit makra."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3104,10 +3191,25 @@ msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou v prototypu grafu
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr "Nelze najít položku „%1$s“ použitou na nástěnce „%2$s“."
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3124,6 +3226,11 @@ msgstr "Nelze najít šablonu „%1$s“ pro přepsání „%2$s“ pravidla zji
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Spouštěč \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."
@@ -3793,7 +3900,7 @@ msgstr "Nelze aktualizovat objevenou skupinu hostů \"%1$s\"."
 #: include/classes/api/services/CGraphGeneral.php:82
 #, c-format
 msgid "Cannot update a templated graph \"%1$s\"."
-msgstr ""
+msgstr "Nelze aktualizovat šablonu grafu \"%1$s\"."
 
 #: include/classes/api/services/CHttpTest.php:514
 #, c-format
@@ -3951,6 +4058,10 @@ msgstr "Nelze aktualizovat servisní okno"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Není možné aktualizovat typ média"
+
+#: app/controllers/CControllerModuleUpdate.php:102
+msgid "Cannot update module"
+msgstr "Nelze aktualizovat moduly"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -4390,6 +4501,15 @@ msgstr "Typ hodin"
 #: include/views/monitoring.sysmap.edit.php:423 jsLoader.php:355
 msgid "Clone"
 msgstr "Vytvořit kopii"
+
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
 
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
@@ -5282,6 +5402,14 @@ msgstr "Vytvořit skupinu hostů"
 msgid "Create host prototype"
 msgstr "Vytvořit prototyp hosta"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr "Je vytvoření hostů z vybraných prototypů zakázáno?"
@@ -5313,6 +5441,14 @@ msgstr "Vytvořit item (nejprve vyberte hosta)"
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "Vytvořit prototyp položky"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5378,6 +5514,14 @@ msgstr "Vytvořit spouštěč (nejprve vyberte šablonu)"
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "Vytvořit prototyp spouštěč"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6023,6 +6167,10 @@ msgstr "Smazat všechny prvky, které nejsou součástí importovaného souboru?
 msgid "Delete and clear"
 msgstr "Smazat a pročistit"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Smazat a vyčistit zvolené šablony? (Upozornění: tímto smažete vybrané šablony a pročistíte všechny připojené hostitele!)"
@@ -6063,9 +6211,17 @@ msgstr "Smazat prototyp grafu?"
 msgid "Delete graph?"
 msgstr "Smazat graf?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "Smazat historii vybraných položek?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6139,14 +6295,28 @@ msgstr "Odstranit vybraný konektor?"
 msgid "Delete selected connectors?"
 msgstr "Odstranit vybrané konektory?"
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Smazat vybrané korelace?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "Odstranit vybrané dashboardy?"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6157,9 +6327,17 @@ msgstr "Smazat vybraná pravidla nálezu?"
 msgid "Delete selected elements?"
 msgstr "Smazat vybrané prvky?"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "Smazat označené prototypy grafů?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6204,9 +6382,17 @@ msgstr "Smazat vybrané hostitele?"
 msgid "Delete selected image?"
 msgstr "Smazat vybraný obrázek?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "Smazat označené prototypy položek?"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6228,6 +6414,10 @@ msgstr "Smazat vybrané mapy?"
 msgid "Delete selected maps?"
 msgstr "Smazat vybrané mapy?"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "Smazat vybrané typy médií?"
@@ -6239,6 +6429,10 @@ msgstr "Smazat vybrané proxy?"
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
 msgstr "Smazat vybraný proxy?"
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
+msgstr ""
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6259,6 +6453,10 @@ msgstr "Smazat vybraný naplánovaný report?"
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
 msgstr "Smazat vybrané naplánované reporty?"
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
+msgstr ""
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6286,6 +6484,10 @@ msgstr "Smazat vybranou skupinu šablon?"
 msgid "Delete selected template groups?"
 msgstr "Smazat vybrané skupiny šablon?"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "Smazat vybrané šablony?"
@@ -6300,9 +6502,17 @@ msgstr "Smazat vybraný token?"
 msgid "Delete selected tokens?"
 msgstr "Smazat vybrané tokeny?"
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "Smazat označené prototypy spouštěčů?"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6315,6 +6525,10 @@ msgstr "Smazat vybraného uživatele?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "Smazat vybrané uživatele?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6524,6 +6738,10 @@ msgstr "Zakázat"
 msgid "Disable debug mode"
 msgstr "Zakázat ladící režim"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "Zakázat ladící mód pro vybrané skupiny?"
@@ -6552,6 +6770,11 @@ msgstr "Zakázat hostitele sledované přes vybrané proxy?"
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Zakázat hosty sledované přes vybrané proxy?"
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6582,42 +6805,83 @@ msgstr "Zakázat označený konektor?"
 msgid "Disable selected connectors?"
 msgstr "Zakázat označené konektory?"
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
 msgstr "Zakázat vybrané korelace?"
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Zakázat vybraná  pravidla nálezu?"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "Zakázat vybrané skupiny?"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "Zakázat vybrané hostitele?"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "Zakázat vybrané položky?"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
 msgstr "Zakázat označené media typy?"
 
+#: app/views/js/module.list.js.php:91
+msgid "Disable selected module?"
+msgstr "Zakázat vybraný modul?"
+
 #: app/views/administration.module.list.php:125
 msgid "Disable selected modules?"
 msgstr "Zakázat vybrané moduly?"
+
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
 
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr "Zakázat vybrané naplánované reporty?"
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "Zakázat vybrané spouštěče?"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -6756,37 +7020,73 @@ msgstr "Objevovací seznam"
 msgid "Discovery object"
 msgstr "Objekt objevování"
 
+#: include/classes/data/CItemData.php:1307
+msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1222
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
 msgstr "Zjištění clusterů VMware, <url> – URL služby VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1327
+msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1230
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
 msgstr "Zjištění datových úložišť VMware, <url> – URL služby VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1415
+msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1282
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Zjištění datových úložišť hypervisoru VMware, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1503
+msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1379
 msgid "Discovery of VMware hypervisor network interfaces, <url> - VMware service URL, <uuid> - VMware hypervisor. Returns JSON"
 msgstr "Zjištění síťových rozhraní hypervisoru VMware, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1439
+msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1306
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
 msgstr "Zjištění hypervizorů VMware, <url> – URL služby VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1751
+msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1550
 msgid "Discovery of VMware virtual machine disk devices, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Zjištění diskových zařízení virtuálního stroje VMware, <url> - URL služby VMware, <uuid> - název hostitele virtuálního stroje VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1763
+msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1562
 msgid "Discovery of VMware virtual machine file systems, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Zjištění souborových systémů virtuálního stroje VMware, <url> - URL služby VMware, <uuid> - název hostitele virtuálního stroje VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1675
+msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1494
 msgid "Discovery of VMware virtual machine network interfaces, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Zjištění síťových rozhraní virtuálního stroje VMware, <url> - URL služby VMware, <uuid> - název hostitele virtuálního stroje VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1619
+msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1438
 msgid "Discovery of VMware virtual machines, <url> - VMware service URL. Returns JSON"
@@ -7322,6 +7622,10 @@ msgstr "Povolit potvrzení"
 msgid "Enable debug mode"
 msgstr "Povolit ladící režim"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "Povolit ladící mód pro vybrané skupiny?"
@@ -7364,6 +7668,11 @@ msgstr "Povolit hosty monitorované vybranými proxy?"
 msgid "Enable internal housekeeping"
 msgstr "Povolit interní údržbu"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7393,43 +7702,84 @@ msgstr "Povolit vybraný konektor?"
 msgid "Enable selected connectors?"
 msgstr "Povolit vybrané konektory?"
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Povolit vybrané korelace?"
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "Zapnout vybraná pravidla nálezu?"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "Povolit vybrané skupiny?"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "Povolit označené hosty?"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "Povolit vybrané položky?"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
 msgstr "Povolit označené typy médií?"
 
+#: app/views/js/module.list.js.php:74
+msgid "Enable selected module?"
+msgstr "Povolit vybraný modul?"
+
 #: app/views/administration.module.list.php:124
 msgid "Enable selected modules?"
 msgstr "Povolit vybrané moduly?"
+
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
 
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr "Povolit vybrané naplánované reporty?"
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "Povolit vybrané spouštěče?"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -9260,6 +9610,11 @@ msgstr "Přehled inventáře hosta"
 msgid "Host label type"
 msgstr "Typ popisu hosta"
 
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
+msgstr ""
+
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
 msgstr "Host makra"
@@ -9325,6 +9680,16 @@ msgstr "Prototyp hosta s názvem hosta \"%1$s\" již existuje v pravidle zjišť
 #, c-format
 msgid "Host prototype with host name \"%1$s\" already exists in discovery rule \"%2$s\"."
 msgstr "Prototyp hosta se jménem \"%1$s\" už existuje v pravidle nálezu \"%2$s\"."
+
+#: include/classes/api/services/CHostPrototype.php:1127
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostPrototype.php:1124
+#, c-format
+msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
@@ -10788,6 +11153,10 @@ msgctxt "compact table header"
 msgid "Info"
 msgstr "Info"
 
+#: include/classes/data/CItemData.php:1443
+msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1429
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Informace o interních discích hypervisoru vyžadované pro vmware.datastore.perfcounter, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware. Vrátí JSON"
@@ -11908,6 +12277,10 @@ msgstr "LLD makro"
 msgid "LLD macros"
 msgstr "LLD makra"
 
+#: include/classes/api/services/CItemGeneralOld.php:700
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:59
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -12175,7 +12548,7 @@ msgstr "Ukazatel stavu spojnice"
 
 #: include/actions.inc.php:863
 msgid "Link template"
-msgstr ""
+msgstr "Připojit šablonu"
 
 #: app/controllers/CControllerPopupLldOperation.php:143
 #: app/views/popup.lldoperation.php:238 app/views/popup.massupdate.host.php:74
@@ -12995,6 +13368,10 @@ msgstr "Členové"
 msgid "Memory limit: %1$s"
 msgstr "Limit paměti: %1$s"
 
+#: include/classes/data/CItemData.php:1563
+msgid "Memory metrics of VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id, \"mode\"- consumed(default)/ballooned/overhead memory"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1433
 msgid "Memory metrics of VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id, <mode> - consumed(default)/ballooned/overhead memory"
 msgstr "Metriky paměti fondu zdrojů VMware, <url> - URL služby VMware, <rpid> - ID fondu prostředků VMware, <režim> - spotřebovaná (výchozí)/nabalená/režijní paměť"
@@ -13232,6 +13609,13 @@ msgstr[0] "Modul smazán: %1$s."
 msgstr[1] "Moduly smazány: %1$s."
 msgstr[2] "Moduly smazány: %1$s."
 
+#: app/controllers/CControllerModuleDisable.php:67
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Modul zakázán"
+msgstr[1] "Moduly zakázány"
+msgstr[2] "Moduly zakázány"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -13240,6 +13624,13 @@ msgstr[0] "Modul zakázán: %1$s."
 msgstr[1] "Moduly zakázány: %1$s."
 msgstr[2] "Moduly zakázány: %1$s."
 
+#: app/controllers/CControllerModuleEnable.php:91
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Modul povolen"
+msgstr[1] "Moduly povoleny"
+msgstr[2] "Moduly povoleny"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -13247,6 +13638,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Modul povolen: %1$s."
 msgstr[1] "Moduly povoleny: %1$s."
 msgstr[2] "Moduly povoleny: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:94
+msgid "Module updated"
+msgstr "Modul aktualizován"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13666,6 +14061,10 @@ msgstr "Časový limit sítě pro test naplánovaného reportu"
 msgid "Network timeout for script execution"
 msgstr "Časový limit sítě pro spuštění skriptu"
 
+#: include/classes/data/CItemData.php:1687
+msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance"
+msgstr "Využití sítě (kombinované rychlosti odesílání a rychlosti příjmu) během intervalu, \"url\" - URL služby VMware, \"uuid\" globální unikátní identifikátor virtuálního počítače VMware, \"instance\" - instance síťového rozhraní"
+
 #: include/classes/data/CItemData.php:1506
 msgid "Network utilization (combined transmit-rates and receive-rates) during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance"
 msgstr "Využití sítě (kombinované rychlosti odesílání a rychlosti příjmu) během intervalu, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance síťového rozhraní"
@@ -13713,6 +14112,11 @@ msgstr "Nový konektor"
 #: app/controllers/CControllerTemplateDashboardEdit.php:80
 msgid "New dashboard"
 msgstr "Nový dashboard"
+
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
 
 #: jsLoader.php:280
 msgid "New element"
@@ -14478,6 +14882,10 @@ msgstr "Listopad"
 msgid "Number of CPUs. Returns integer"
 msgstr "Počet procesorů. Vráti celé číslo"
 
+#: include/classes/data/CItemData.php:1423
+msgid "Number of available DS paths, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - Datastore name, \"partitionid\" - internal id of physical device from vmware.hv.datastore.discovery"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1290
 msgid "Number of available DS paths, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - Datastore name, <partitionid> - internal id of physical device from vmware.hv.datastore.discovery"
 msgstr "Počet dostupných cest DS, <url> - URL služby VMware, <uuid> - název hostitele hypervisoru VMware, <datastore> - název úložiště dat, <partitionid> - interní ID fyzického zařízení z vmware.hv.datastore.discovery"
@@ -14539,13 +14947,25 @@ msgstr "Počet problémů"
 msgid "Number of problems and expand most critical one"
 msgstr "Počet problémů a rozvedení toho nejkritičtějšího"
 
+#: include/classes/data/CItemData.php:1459
+msgid "Number of processor cores on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1322
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových jader na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
 
+#: include/classes/data/CItemData.php:1463
+msgid "Number of processor threads on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1326
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Počet procesorových vláken na VMware, <url> - URL VMware služby, <uuid> - VMware host jméno"
+
+#: include/classes/data/CItemData.php:1591
+msgid "Number of processors on VMware virtual machine, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1410
 msgid "Number of processors on VMware virtual machine, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -14595,6 +15015,10 @@ msgstr "Počet uživatelů (přihlášených)"
 #: include/classes/data/CItemData.php:1122
 msgid "Number of users logged in. Returns integer"
 msgstr "Počet přihlášení uživatelů. Návratová hodnota celé číslo"
+
+#: include/classes/data/CItemData.php:1555
+msgid "Number of virtual machines on VMware hypervisor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1394
 msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -15585,6 +16009,10 @@ msgstr "Přerušené operace pro příznakové problémy"
 msgid "Peak memory usage: %1$s"
 msgstr "Vrchol využití paměti: %1$s"
 
+#: include/classes/data/CItemData.php:1587
+msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1406
 msgid "Percent of time the virtual machine is unable to run because it is contending for access to the physical CPU(s), <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Procento času, kdy se virtuální počítač nemůže spustit, protože vyžaduje přístup k fyzickému CPU, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
@@ -15593,9 +16021,17 @@ msgstr "Procento času, kdy se virtuální počítač nemůže spustit, protože
 msgid "Percentage"
 msgstr "Procento"
 
+#: include/classes/data/CItemData.php:1671
+msgid "Percentage of host physical memory that has been consumed, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1490
 msgid "Percentage of host physical memory that has been consumed, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Procento fyzické paměti hostitele, která byla spotřebována, <url> – URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware"
+
+#: include/classes/data/CItemData.php:1595
+msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1414
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
@@ -15791,6 +16227,10 @@ msgstr "Typ zprávy"
 #: app/views/administration.housekeeping.edit.php:165
 msgid "PostgreSQL database server version is too old."
 msgstr "Verze databázového serveru PostgreSQL je příliš stará."
+
+#: include/classes/data/CItemData.php:1523
+msgid "Power usage , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"max\" - Maximum allowed power usage"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1370
 msgid "Power usage , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <max> - Maximum allowed power usage"
@@ -16099,6 +16539,10 @@ msgstr "Poskytnutý tajný řetězec dotazu \"%1$s\" je neplatný."
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
 msgstr "Poskytování nyní"
+
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
+msgstr ""
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
@@ -18048,7 +18492,7 @@ msgstr "Služby aktualizovány"
 
 #: include/classes/api/services/CUser.php:1714
 msgid "Session ID or token is expected."
-msgstr ""
+msgstr "Je očekáván token nebo session ID."
 
 #: include/classes/core/ZBase.php:244 include/classes/core/ZBase.php:471
 #: index_sso.php:242 index_sso.php:249
@@ -18224,6 +18668,11 @@ msgstr "Zkrácený"
 #: include/views/js/monitoring.sysmaps.js.php:106 report2.php:548
 msgid "Show"
 msgstr "Zobrazit"
+
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
 
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
@@ -19499,9 +19948,17 @@ msgstr "URL šablona je použita k načtení a zobrazení vrstvy dlaždic na geo
 msgid "The Zabbix database version does not match current requirements. Your database version: %1$s. Required version: %2$s. Please contact your system administrator."
 msgstr "Verze databáze Zabbix neodpovídá aktuálním požadavkům. Verze vaší databáze: %1$s. Požadovaná verze: %2$s. Kontaktujte svého správce systému."
 
+#: include/classes/data/CItemData.php:1719
+msgid "The average time a read from the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1526
 msgid "The average time a read from the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
 msgstr "Průměrný čas čtení z virtuálního disku, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware, <instance> - instance zařízení disku"
+
+#: include/classes/data/CItemData.php:1723
+msgid "The average time a write to the virtual disk takes, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1530
 msgid "The average time a write to the virtual disk takes, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -19531,6 +19988,10 @@ msgstr "Graf již nebyl detekován a bude smazán za %1$s (dne %2$s v %3$s)."
 #: include/html.inc.php:686
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr "Graf již není detekován a bude smazán při příštím zpracování pravidla zjišťování."
+
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
 
 #: include/html.inc.php:637
 #, c-format
@@ -19596,6 +20057,10 @@ msgstr "Přijatý JSON není platný JSON-RPC požadavek."
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
 msgstr "Požadovaná vzdálená procedura neexistuje / není dostupná"
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
+msgstr ""
 
 #: app/views/popup.token.view.php:64
 msgid "The token has expired. Please update the expiry date to use the token."
@@ -19895,6 +20360,10 @@ msgstr "Celková doba Elasticsearch: %1$s"
 #, c-format
 msgid "Total SQL time: %1$s"
 msgstr "Celkový čas SQL: %1$s"
+
+#: include/classes/data/CItemData.php:1627
+msgid "Total time elapsed, in seconds, since last operating system boot-up, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1446
 msgid "Total time elapsed, in seconds, since last operating system boot-up, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -20614,6 +21083,10 @@ msgstr "Nedostupné"
 msgid "Unblock"
 msgstr "Odblokovat"
 
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Odblokovat vybrané uživatele?"
@@ -20763,11 +21236,11 @@ msgstr "Odpojit od šablon"
 
 #: include/actions.inc.php:864
 msgid "Unlink template"
-msgstr ""
+msgstr "Odpojit šablonu"
 
 #: include/actions.inc.php:681
 msgid "Unlink templates"
-msgstr ""
+msgstr "Odpojit šablony"
 
 #: jsLoader.php:296
 msgid "Unmute"
@@ -21423,9 +21896,17 @@ msgstr "Atribut uživatelského jména"
 msgid "Users"
 msgstr "Uživatelé"
 
+#: include/classes/data/CItemData.php:1371
+msgid "VMware Distributed Virtual Switch, \"url\" - VMware service URL. Returns JSON"
+msgstr "VMWare distibuovaný virtuální switch, \"url\" - URL služby VMWare. Vrátí JSON"
+
 #: include/classes/data/CItemData.php:1255
 msgid "VMware Distributed Virtual Switch, <url> - VMware service URL. Returns JSON"
 msgstr "VMWare distibuovaný virtuální switch, <url> - URL služby VMWare. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1375
+msgid "VMware FetchDVPorts wrapper, \"url\" - VMware service URL, \"uuid\" - VMware DVSwitch global unique identifier, \"filter\" - vmware data object DistributedVirtualSwitchPortCriteria, \"mode\"- state(default)/full. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1259
 msgid "VMware FetchDVPorts wrapper, <url> - VMware service URL, <filter> - vmware data object DistributedVirtualSwitchPortCriteria, <mode> - state(default)/full. Returns JSON"
@@ -21435,33 +21916,65 @@ msgstr "VMware FetchDVPorts wrapper, <url> - URL služby VMware, <filtr> - datov
 msgid "VMware cache statistics. Valid modes are: total, free, pfree, used and pused."
 msgstr "VMware statistiky cache. Platné módy jsou: total, free, pfree, used a pused."
 
+#: include/classes/data/CItemData.php:1303
+msgid "VMware cluster alarms data, returns JSON, \"url\" - VMware service URL, \"id\" - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1252
 msgid "VMware cluster alarms data, returns JSON, <url> - VMware service URL, <id> - VMware cluster id"
 msgstr "Data alarmů clusteru VMware, vrací JSON, <url> – URL služby VMware, <id> – ID clusteru VMware"
+
+#: include/classes/data/CItemData.php:1299
+msgid "VMware cluster performance counter, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1218
 msgid "VMware cluster performance counter, <url> - VMware service URL, <id> - VMware cluster id, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Čítač výkonu clusteru VMware, <url> – URL služby VMware, <id> – ID clusteru VMware, <cesta> – cesta čítače výkonu, <instance> – instance čítače výkonu"
 
+#: include/classes/data/CItemData.php:1311
+msgid "VMware cluster property, \"url\" - VMware service URL, \"id\" - VMware cluster id, \"prop\" - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster property, <url> - VMware service URL, <id> - VMware cluster id, <prop> - property path"
 msgstr "Vlastnost clusteru VMware, <url> – URL služby VMware, <id> – ID clusteru VMware, <prop> – cesta k vlastnosti"
+
+#: include/classes/data/CItemData.php:1315
+msgid "VMware cluster status, \"url\" - VMware service URL, \"name\" - VMware cluster name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1226
 msgid "VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name"
 msgstr "VMware stav klastru, <url> - URL VMware služby, <name> - VMware jméno klastru"
 
+#: include/classes/data/CItemData.php:1319
+msgid "VMware cluster tags array, \"url\" - VMware service URL, \"id\" - VMware cluster id"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1264
 msgid "VMware cluster tags array, <url> - VMware service URL, <id> - VMware cluster id"
 msgstr "Pole tagů clusteru VMware, <url> – URL služby VMware, <id> – ID clusteru VMware"
+
+#: include/classes/data/CItemData.php:1359
+msgid "VMware datacenter alarms data, returns JSON, \"url\" - VMware service URL, \"id\" - VMware datacenter id"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1296
 msgid "VMware datacenter alarms data, returns JSON, <url> - VMware service URL, <id> - VMware datacenter id"
 msgstr "Data alarmů datacentra VMware, vrací JSON, <url> – URL služby VMware, <id> – ID datového centra VMware"
 
+#: include/classes/data/CItemData.php:1367
+msgid "VMware datacenter tags array, \"url\" - VMware service URL, \"id\" - VMware datacenter id. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1304
 msgid "VMware datacenter tags array, <url> - VMware service URL, <id> - VMware datacenter id. Returns JSON"
 msgstr "Pole tagů datového centra VMware, <url> – URL služby VMware, <id> – ID datového centra VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1363
+msgid "VMware datacenters and their IDs, \"url\" - VMware service URL. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1251
 msgid "VMware datacenters and their IDs, <url> - VMware service URL. Returns JSON"
@@ -21471,302 +21984,602 @@ msgstr "Datová centra VMware a jejich ID, <url> – URL služby VMware. Vrátí
 msgid "VMware datacenters and their IDs. Returns JSON"
 msgstr "Datová centra VMware a jejich ID. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1323
+msgid "VMware datastore alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1268
 msgid "VMware datastore alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware datastore name"
 msgstr "Data alarmů datového úložiště VMware, vrací JSON, <url> – URL služby VMware, <uuid> – název datového úložiště VMware"
+
+#: include/classes/data/CItemData.php:1431
+msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1242
 #: include/classes/data/CItemData.php:1298
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
 msgstr "VMware statistika datového úložiště kapacity v bytech nebo v procentech z celkového počtu. Vrací celé číslo, v bytech; float v procentech"
 
+#: include/classes/data/CItemData.php:1331
+msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1234
 msgid "VMware datastore hypervisors list, <url> - VMware service URL, <datastore> - datastore name"
 msgstr "Seznam hypervizorů datového úložiště VMware, <url> – URL služby VMware, <úložiště dat> – název datového úložiště"
+
+#: include/classes/data/CItemData.php:1335
+msgid "VMware datastore performance counter, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"path\" - performance counter path, \"instance\" - datastore perfcounter instance from vmware.hv.diskinfo.get"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1321
 msgid "VMware datastore performance counter, <url> - VMware service URL, <id> - VMware datastore uuid, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "Čítač výkonu datového úložiště VMware, <url> – URL služby VMware, <id> – uuid datového úložiště VMware, <cesta> – cesta čítače výkonu, <instance> – instance čítače výkonu"
 
+#: include/classes/data/CItemData.php:1339
+msgid "VMware datastore property, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"prop\" - property path"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore property, <url> - VMware service URL, <uuid> - datastore name, <prop> - property path"
 msgstr "Vlastnost datového úložiště VMware, <url> – adresa URL služby VMware, <uuid> – název úložiště dat, <prop> – cesta k vlastnosti"
+
+#: include/classes/data/CItemData.php:1343
+msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1238
 msgid "VMware datastore read statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Statistiky čtení datového úložiště VMware, <url> – adresa URL služby VMware, <datastore> – název datového úložiště, <mode> – latence/maxlatence – průměrná nebo maximální"
 
+#: include/classes/data/CItemData.php:1351
+msgid "VMware datastore tags array, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1288
 msgid "VMware datastore tags array, <url> - VMware service URL, <uuid> - VMware datastore uuid. Returns JSON"
 msgstr "Pole tagů datového úložiště VMware, <url> – URL služby VMware, <uuid> – uuid datového úložiště VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1355
+msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1246
 msgid "VMware datastore write statistics, <url> - VMware service URL, <datastore> - datastore name, <mode> - latency/maxlatency - average or maximum"
 msgstr "Statistika zápisu datového úložiště VMware, <url> – adresa URL služby VMware, <datastore> – název datového úložiště, <mode> – latence/maxlatence – průměrná nebo maximální"
 
+#: include/classes/data/CItemData.php:1379
+msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1254
 msgid "VMware event log, <url> - VMware service URL, <mode> - all (default), skip - skip processing of older data"
 msgstr "VMware event log, <url> - VMware service URL, <mode> - vše (výchozí), přeskočit - přeskočit zpracování starších dat"
+
+#: include/classes/data/CItemData.php:1483
+msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1338
 msgid "VMware hypervisor BIOS UUID, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware BIOS UUID, <url> - URL služby VMware, <uuid> - jméno hosta VMware"
 
+#: include/classes/data/CItemData.php:1535
+msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1378
 msgid "VMware hypervisor HW vendor state sensors, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Stav senzorů výrobce HW hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1387
+msgid "VMware hypervisor alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1324
 msgid "VMware hypervisor alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Data alarmů hypervisoru VMware, vrací JSON, <url> – URL služby VMware, <uuid> – název hostitele hypervisoru VMware"
 
+#: include/classes/data/CItemData.php:1495
+msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1350
 msgid "VMware hypervisor ballooned memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost balloned paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1391
+msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1262
 msgid "VMware hypervisor cluster name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware klastr jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1395
+msgid "VMware hypervisor connection state, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1275
 msgid "VMware hypervisor connection state, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Stav připojení k hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware"
+
+#: include/classes/data/CItemData.php:1411
+msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1278
 msgid "VMware hypervisor datacenter name, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns string"
 msgstr "Název datového centra hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware. Vrátí řetězec"
 
+#: include/classes/data/CItemData.php:1427
+msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1294
 msgid "VMware hypervisor datastore read statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika čtení datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore , <mode> - latence"
+
+#: include/classes/data/CItemData.php:1435
+msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1302
 msgid "VMware hypervisor datastore write statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <datastore> - datastore name, <mode> - latency"
 msgstr "VMware statistika zápisů datastore, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <datastore> - jméno datastore, <mode> - latence"
 
+#: include/classes/data/CItemData.php:1419
+msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1286
 msgid "VMware hypervisor datastores list, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Seznam datových úložišť hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervisoru VMware"
+
+#: include/classes/data/CItemData.php:1531
+msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1374
 msgid "VMware hypervisor health state rollup sensor, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
 msgstr "Senzor rollupu stavu hypervizoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware. Vrací 0 - šedá; 1 - zelená; 2 - žlutá; 3 - červená"
 
+#: include/classes/data/CItemData.php:1471
+msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1334
 msgid "VMware hypervisor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1447
+msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1310
 msgid "VMware hypervisor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1507
+msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1358
 msgid "VMware hypervisor network input statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware vstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
+
+#: include/classes/data/CItemData.php:1511
+msgid "VMware hypervisor network interface speed, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, <ifname> - interface name"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1387
 msgid "VMware hypervisor network interface speed, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <ifname> - interface name"
 msgstr "Rychlost síťového rozhraní hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware, <ifname> – název rozhraní"
 
+#: include/classes/data/CItemData.php:1515
+msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1362
 msgid "VMware hypervisor network output statistics, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <mode> - bps"
 msgstr "VMware výstupní síťové statistiky, <url> - URL VMware služby, <uuid> - VMware jméno hosta, <mode> - bps"
+
+#: include/classes/data/CItemData.php:1519
+msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1366
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware performance counter, <url> - VMware servisní URL, <uuid> - VMware jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
 
+#: include/classes/data/CItemData.php:1451
+msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1314
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware frekvence procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1455
+msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1318
 msgid "VMware hypervisor processor model, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware model procesoru, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1403
+msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1270
 msgid "VMware hypervisor processor usage in Hz, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware využití procesoru v Hz, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1527
+msgid "VMware hypervisor property , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"prop\" - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor property , <url> - VMware service URL, <uuid> - VMware hypervisor host name, <prop> - property path"
 msgstr "Vlastnost hypervisoru VMware , <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware, <prop> – cesta k vlastnosti"
 
+#: include/classes/data/CItemData.php:1475
+msgid "VMware hypervisor sensors value, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1351
 msgid "VMware hypervisor sensors value, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Hodnota senzorů hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervizoru VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1479
+msgid "VMware hypervisor serialnumber, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1355
 msgid "VMware hypervisor serialnumber, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "Sériové číslo hypervisoru VMware, <url> – adresa URL služby VMware, <uuid> – název hostitele hypervizoru VMware"
 
+#: include/classes/data/CItemData.php:1539
+msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1382
 msgid "VMware hypervisor status, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware status, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1543
+msgid "VMware hypervisor tags array, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1472
 msgid "VMware hypervisor tags array, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
 msgstr "Pole tagů hypervisoru VMware, <url> – URL služby VMware, <uuid> – název hostitele hypervisoru VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1467
+msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1330
 msgid "VMware hypervisor total memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware celková velikost paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1547
+msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1386
 msgid "VMware hypervisor uptime, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware provozní čas, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1499
+msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1354
 msgid "VMware hypervisor used memory size, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware velikost použité paměti, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1487
+msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1342
 msgid "VMware hypervisor vendor name, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware jméno výrobce, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
 
+#: include/classes/data/CItemData.php:1551
+msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1390
 msgid "VMware hypervisor version, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
 msgstr "VMware verze, <url> - URL VMware služby, <uuid> - VMware jméno hosta"
+
+#: include/classes/data/CItemData.php:1383
+msgid "VMware service full name, \"url\" - VMware service URL"
+msgstr "VMware plné jméno služby, \"url\" - URL VMware služby"
 
 #: include/classes/data/CItemData.php:1258
 msgid "VMware service full name, <url> - VMware service URL"
 msgstr "VMware plné jméno služby, <url> - URL VMware služby"
 
+#: include/classes/data/CItemData.php:1567
+msgid "VMware service version, \"url\" - VMware service URL"
+msgstr "VMware verze, \"url\" - URL VMware služby"
+
 #: include/classes/data/CItemData.php:1398
 msgid "VMware service version, <url> - VMware service URL"
 msgstr "VMware verze, <url> - URL VMware služby"
+
+#: include/classes/data/CItemData.php:1295
+msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1244
 msgid "VMware virtual center alarms data, returns JSON, <url> - VMware service URL"
 msgstr "Data alarmů virtuálního centra VMware, vrací JSON, <url> – URL služby VMware"
 
+#: include/classes/data/CItemData.php:1571
+msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "Data alarmů virtuálních strojů VMware, vrací JSON, \"url\" – URL služby VMware, \"uuid\" – globální unikátní identifikátor virtuálního stroje VMware"
+
 #: include/classes/data/CItemData.php:1500
 msgid "VMware virtual machine alarms data, returns JSON, <url> - VMware service URL, <uuid> - VMware virtual machine name"
 msgstr "Data alarmů virtuálních strojů VMware, vrací JSON, <url> – URL služby VMware, <uuid> – název virtuálního stroje VMware"
+
+#: include/classes/data/CItemData.php:1635
+msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "VMware velikost ballooned paměti virtuálního stroje \"url\" - URL VMware služby, <uuid> - globální unikátní identifikátor virtuálního stroje VMware"
 
 #: include/classes/data/CItemData.php:1454
 msgid "VMware virtual machine ballooned memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost balloned paměti virtuálního stroje <url> - URL VMware služby, <uuid> - VMware jméno hosta virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1711
+msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr "VMware použitý úložný prostor virtuálním strojem \"url\" - URL VMware služby, \"uuid\" - globální unikátní identifikátor virtuálního stroje VMware"
+
 #: include/classes/data/CItemData.php:1518
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware použitý úložný prostor virtuálním strojem, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1639
+msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1458
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost komprimované paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1575
+msgid "VMware virtual machine custom attribute value, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"name\" - custom attribute name"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1431
 msgid "VMware virtual machine custom attribute value, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <name> - custom attribute name"
 msgstr "Hodnota vlastního atributu virtuálního počítače VMware, <url> – adresa URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware, <název> – název vlastního atributu"
+
+#: include/classes/data/CItemData.php:1615
+msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1434
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
 msgstr "Název datového centra virtuálního stroje VMware, <url> – URL služby VMware, <uuid> – název hostitele virtuálního stroje VMware. Vrátí řetězec"
 
+#: include/classes/data/CItemData.php:1755
+msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1554
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika čtení disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
+
+#: include/classes/data/CItemData.php:1759
+msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1558
 msgid "VMware virtual machine disk device write statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
 msgstr "VMware statistika zápisů disků virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - instance disku, <mode> - bps/ops - bytes/operations za sekundu"
 
+#: include/classes/data/CItemData.php:1583
+msgid "VMware virtual machine disk requires consolidation, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1439
 msgid "VMware virtual machine disk requires consolidation, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Disk virtuálního počítače VMware vyžadující konsolidaci, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware"
+
+#: include/classes/data/CItemData.php:1767
+msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\"- total/free/used/pfree/pused"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1566
 msgid "VMware virtual machine file system statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <fsname> - file system name, <mode> - total/free/used/pfree/pused"
 msgstr "VMware statistika souborového systému virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <fsname> - jméno souborového systému, <mode> - total/free/used/pfree/pused"
 
+#: include/classes/data/CItemData.php:1659
+msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1478
 msgid "VMware virtual machine guest memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostitelské paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1663
+msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1482
 msgid "VMware virtual machine host memory usage, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití hostovy paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1631
+msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1450
 msgid "VMware virtual machine hypervisor name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno hypervizor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1579
+msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1402
 msgid "VMware virtual machine name, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware jméno virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1679
+msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1498
 msgid "VMware virtual machine network interface input statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika vstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
+
+#: include/classes/data/CItemData.php:1683
+msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1502
 msgid "VMware virtual machine network interface output statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - network interface instance, <mode> - bps/pps - bytes/packets per second"
 msgstr "VMware statistika výstupů síťového rozhraní virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje, <instance> - síťové rozhraní, <mode> - bps/pps - bytes/packets za sekundu"
 
+#: include/classes/data/CItemData.php:1691
+msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1510
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 msgstr "VMware VM performance counter, <url> - VMware service URL, <uuid> - VMware VM jméno hosta, <path> - performance counter cesta, <instance> - performance counter instance"
+
+#: include/classes/data/CItemData.php:1695
+msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1514
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware stav napájení virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1647
+msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1466
 msgid "VMware virtual machine private memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost privátní paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1599
+msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1418
 msgid "VMware virtual machine processor ready time ms, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware virtuální stroj, čas připravenosti procesoru ms <url> - VMware URL služby, <uuid> - VMware jméno virtuálního hostitele"
 
+#: include/classes/data/CItemData.php:1611
+msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1430
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware využití procesoru virtuálního stroje v Hz, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1699
+msgid "VMware virtual machine property, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"prop\" - property path"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1644
 msgid "VMware virtual machine property, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <prop> - property path"
 msgstr "Vlastnost virtuálního počítače VMware, <url> – URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware, <prop> – cesta k vlastnosti"
 
+#: include/classes/data/CItemData.php:1651
+msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1470
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost zdílené paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1703
+msgid "VMware virtual machine snapshot state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1555
 msgid "VMware virtual machine snapshot state, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Stav snímku virtuálního stroje VMware, <url> – URL služby VMware, <uuid> – název hostitele virtuálního stroje VMware. Vrátí JSON"
 
+#: include/classes/data/CItemData.php:1707
+msgid "VMware virtual machine state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1559
 msgid "VMware virtual machine state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "Stav virtuálního počítače VMware, <url> – URL služby VMware, <uuid> – název hostitele virtuálního počítače VMware"
+
+#: include/classes/data/CItemData.php:1655
+msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1474
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware velikost swapovací paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1739
+msgid "VMware virtual machine tags array, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1664
 msgid "VMware virtual machine tags array, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns JSON"
 msgstr "Pole tagů virtuálního počítače VMware, <url> - URL služby VMware, <uuid> - název hostitele virtuálního počítače VMware. Vrátí JSON"
+
+#: include/classes/data/CItemData.php:1743
+msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1591
 msgid "VMware virtual machine tools state, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <mode> - version or status"
 msgstr "Stav nástrojů virtuálního stroje VMware, <url> – URL služby VMware, <uuid> – název hostitele virtuálního stroje VMware, <režim> – verze nebo stav"
 
+#: include/classes/data/CItemData.php:1667
+msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1486
 msgid "VMware virtual machine total memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware celková velikost paměti virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1727
+msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1534
 msgid "VMware virtual machine uncommitted storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nevyužitý prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1731
+msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1538
 msgid "VMware virtual machine unshared storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware nezdílený prostor virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
 
+#: include/classes/data/CItemData.php:1747
+msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1546
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr "VMware čas provozu virtuálního stroje, <url> - URL VMware služby, <uuid> - VMware host jméno virtuálního stroje"
+
+#: include/classes/data/CItemData.php:1491
+msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1346
 msgid "VVMware hypervisor maintenance status, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns 0 - not in maintenance; 1 - in maintenance"
@@ -22679,6 +23492,10 @@ msgstr "Zabbix agent"
 msgid "Zabbix agent (active)"
 msgstr "Zabbix agent (aktivní)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix přijal neplatný požadavek."
@@ -22738,6 +23555,10 @@ msgstr "Zabbix server běží"
 msgid "Zabbix server name"
 msgstr "Zabbix server jméno"
 
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
+
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
 msgstr "Zabbix zachytávač"
@@ -22762,7 +23583,7 @@ msgstr "[Nesprávná hodnota pro měsíc: \"%1$s\" ]"
 #: include/views/configuration.item.edit.php:479
 #: include/views/configuration.item.prototype.edit.php:456
 msgid "[protocol://][user[:password]@]proxy.example.com[:port]"
-msgstr ""
+msgstr "[protokol://][uživatel[:heslo]@]proxy.example.com[:port]"
 
 #: include/classes/validators/CApiInputValidator.php:2346
 msgid "a DNS name is expected"
@@ -22930,6 +23751,13 @@ msgstr "vše"
 msgid "all media"
 msgstr "všechny média"
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr "byl by překročen povolený počet úrovní závislosti"
@@ -23081,6 +23909,10 @@ msgstr "atan() - Arkustangent hodnoty jako úhel vyjádřený v radiánech"
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() – Arkustangens souřadnic (vyjádřených) a souřadnic zadaných jako úhel, vyjádřený v radiánech"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "automaticky registrované zařízení"
@@ -23115,6 +23947,19 @@ msgstr "baselinewma() - Vypočítá základní linii průměrováním dat v roč
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() – Kontroluje zda hodnota patří do daného rozsahu (1 – v rozsahu, 0 – jinak)"
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"
@@ -23646,6 +24491,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr "globálně nastavené údržby"
 
+#: include/classes/api/services/CGraphGeneral.php:874
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:868
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
@@ -23671,11 +24524,19 @@ msgstr "host"
 msgid "host group"
 msgstr "skupina"
 
+#: include/classes/api/services/CHostGroup.php:795
+msgid "host group with the same UUID already exists"
+msgstr ""
+
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:336
 msgid "host pattern"
 msgstr "vzorec hosta"
+
+#: include/classes/api/services/CHostPrototype.php:1190
+msgid "host prototype with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -23908,6 +24769,14 @@ msgstr "položka \"%1$s\" na hostu \"%2$s\" není monitorována"
 msgid "item pattern"
 msgstr "vzorec položky"
 
+#: include/classes/api/services/CItemGeneral.php:486
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:480
+msgid "item with the same UUID already exists"
+msgstr ""
+
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
 msgstr "klíč je prázdný"
@@ -24068,6 +24937,11 @@ msgstr "max() - Maximální hodnota pro periodu T"
 msgid "maximum dependent items count reached"
 msgstr "maximální počet závislých položek dosažen"
 
+#: include/classes/validators/CApiInputValidator.php:1726
+#, c-format
+msgid "maximum number of array elements is %1$s"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
 #: include/classes/import/CConfigurationImport.php:2828
@@ -24217,6 +25091,11 @@ msgstr "žádné servery LDAP"
 #: include/classes/graphdraw/CPieGraphDraw.php:320
 msgid "no data"
 msgstr "žádná data"
+
+#: include/classes/api/services/CHostPrototype.php:1360
+#, c-format
+msgid "no default interface for \"%1$s\" type"
+msgstr ""
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
@@ -24541,6 +25420,10 @@ msgstr "vybrané"
 msgid "service"
 msgstr "služba"
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "krátký popis"
@@ -24667,6 +25550,18 @@ msgstr "tan() – tangens hodnoty"
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "šablona ID \"%1$s\" je použitá %2$s krát"
+
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplateGroup.php:594
+msgid "template group with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:458
+msgid "template with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1577
 #: include/classes/api/services/CItemGeneral.php:1594
@@ -24799,9 +25694,17 @@ msgstr "výraz triggeru musí obsahovat alespoň jeden /host/key odkaz"
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr "prototyp spouštěče nelze přesunout do jiné šablony nebo hosta"
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
 msgstr "spouštěc s vazbami nelze přesunout do jiné šablony nebo hosta"
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"
@@ -25032,6 +25935,10 @@ msgstr "hodnota %1$s již existuje"
 msgid "value is too long"
 msgstr "hodnota je příliš dlouhá"
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -25137,6 +26044,10 @@ msgstr "přes"
 msgctxt "week short"
 msgid "w"
 msgstr "t"
+
+#: include/classes/api/services/CHttpTest.php:440
+msgid "web scenario with the same UUID already exists"
+msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:83
 msgid "wildcard patterns with '*' may be used"

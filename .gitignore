@@ -3,6 +3,9 @@
 !/src/modules/dummy/Makefile
 *.a
 *.o
+*.gcda
+*.gcno
+/tests_results
 .cproject
 .deps
 .dirstamp
@@ -81,6 +84,7 @@ m4/conf_tests.m4
 frontend.mo
 include/common/config.h
 include/common/config.h.in
+include/common/stamp-h1
 include/stamp-h1
 misc/images/inkscape.log.txt
 misc/images/pngcrush.log.txt
@@ -188,6 +192,8 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
+tests/libs/zbxicmpping/get_interval_option
+tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_json_open_path
@@ -208,6 +214,7 @@ tests/libs/zbxserver/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/zbx_execute_agent_check
 tests/libs/zbxsysinfo/zbx_execute_agent_check_http
+tests/libs/zbxsysinfo/check_get_fqdn
 tests/libs/zbxsysinfo/common/system_localtime
 tests/libs/zbxsysinfo/common/vfs_file_exists
 tests/libs/zbxsysinfo/common/web_page_get

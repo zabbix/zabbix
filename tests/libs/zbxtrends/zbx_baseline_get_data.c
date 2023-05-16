@@ -31,8 +31,9 @@
 int	__wrap_zbx_db_is_null(const char *field);
 zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result);
 zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
-zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end,
+zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
 		double *value);
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group);
 
 int	__wrap_zbx_db_is_null(const char *field)
 {
@@ -52,7 +53,7 @@ zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
 	return NULL;
 }
 
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)
 {
 	ZBX_UNUSED(tm_start);
 	ZBX_UNUSED(table_group);
@@ -61,7 +62,8 @@ void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
 static	zbx_mock_handle_t	hout;
 static int			iteration;
 
-zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value)
+zbx_trend_state_t	__wrap_zbx_trends_get_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end,
+		double *value)
 {
 	zbx_mock_handle_t	htime;
 	zbx_timespec_t		start_exp, end_exp, start_ret = {start, 0}, end_ret = {end, 0};

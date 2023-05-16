@@ -1354,6 +1354,47 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, manager->watchdog.num_data);
 }
 
+static int	check_allowed_path(const char *allowed, const char *path, char **error)
+{
+	char	*absolute_path = NULL, *absolute_allowed = NULL;
+	int	absolute_path_len, absolute_allowed_len, ret = FAIL;
+
+	if (NULL == (absolute_path = realpath(path, NULL)))
+	{
+		*error = zbx_dsprintf(*error, "cannot resolve path %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	if (NULL == (absolute_allowed = realpath(allowed, NULL)))
+	{
+		*error = zbx_dsprintf(*error, "cannot resolve allowed path %s", zbx_strerror(errno));
+		goto out;
+	}
+
+	absolute_path_len = strlen(absolute_path);
+
+	if (absolute_path_len < (absolute_allowed_len = strlen(absolute_allowed)))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				absolute_allowed);
+		goto out;
+	}
+
+	if (0 != memcmp(absolute_allowed, absolute_path, absolute_allowed_len))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				absolute_allowed);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(absolute_path);
+	zbx_free(absolute_allowed);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: gets script media type parameters with expanded macros            *
@@ -1373,10 +1414,17 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 {
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
 	int		ret = FAIL;
+	char		*error_path = NULL;
 
 	*cmd = (char *)zbx_malloc(NULL, cmd_alloc);
 
 	zbx_snprintf_alloc(cmd, &cmd_alloc, &cmd_offset, "%s/%s", scripts_path, mediatype->exec_path);
+
+	if (FAIL == check_allowed_path(scripts_path, *cmd, &error_path))
+	{
+		*error = zbx_dsprintf(*error, "Cannot execute command \"%s\": %s", *cmd, error_path);
+		goto out;
+	}
 
 	if (0 == access(*cmd, X_OK))
 	{
@@ -1413,6 +1461,7 @@ static int	am_prepare_mediatype_exec_command(zbx_am_mediatype_t *mediatype, zbx_
 out:
 	if (SUCCEED != ret)
 		zbx_free(*cmd);
+	zbx_free(error_path);
 
 	return ret;
 }

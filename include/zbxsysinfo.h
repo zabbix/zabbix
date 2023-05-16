@@ -23,115 +23,17 @@
 #include "zbxcommon.h"
 #include "module.h"
 
-/* CHECK RESULT */
-
-#define ZBX_ISSET_UI64(res)	((res)->type & AR_UINT64)
-#define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
-#define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
-#define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
-#define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
-#define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
-#define ZBX_ISSET_META(res)	((res)->type & AR_META)
-
-#define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
-
-/* UNSET RESULT */
-
-#define ZBX_UNSET_UI64_RESULT(res)					\
-									\
-do									\
-{									\
-	(res)->type &= ~AR_UINT64;					\
-	(res)->ui64 = (zbx_uint64_t)0;					\
-}									\
-while (0)
-
-#define ZBX_UNSET_DBL_RESULT(res)					\
-									\
-do									\
-{									\
-	(res)->type &= ~AR_DOUBLE;					\
-	(res)->dbl = (double)0;						\
-}									\
-while (0)
-
-#define ZBX_UNSET_STR_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_STRING)					\
-	{								\
-		zbx_free((res)->str);					\
-		(res)->type &= ~AR_STRING;				\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_TEXT_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_TEXT)					\
-	{								\
-		zbx_free((res)->text);					\
-		(res)->type &= ~AR_TEXT;				\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_LOG_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_LOG)					\
-	{								\
-		zbx_log_free((res)->log);				\
-		(res)->log = NULL;					\
-		(res)->type &= ~AR_LOG;					\
-	}								\
-}									\
-while (0)
-
-#define ZBX_UNSET_MSG_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_MESSAGE)					\
-	{								\
-		zbx_free((res)->msg);					\
-		(res)->type &= ~AR_MESSAGE;				\
-	}								\
-}									\
-while (0)
-
-/* AR_META is always excluded */
-#define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type) 				\
-										\
-do										\
-{										\
-	if (!(exc_type & AR_UINT64))	ZBX_UNSET_UI64_RESULT(res);		\
-	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
-	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
-	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
-	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
-	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
-}										\
-while (0)
-
 /* RETRIEVE RESULT VALUE */
 
 #define ZBX_GET_UI64_RESULT(res)	((zbx_uint64_t *)get_result_value_by_type(res, AR_UINT64))
 #define ZBX_GET_DBL_RESULT(res)		((double *)get_result_value_by_type(res, AR_DOUBLE))
 #define ZBX_GET_STR_RESULT(res)		((char **)get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
+#define ZBX_GET_BIN_RESULT(res)		((char **)get_result_value_by_type(res, AR_BIN))
 #define ZBX_GET_LOG_RESULT(res)		((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)get_result_value_by_type(res, AR_MESSAGE))
 
 void	*get_result_value_by_type(AGENT_RESULT *result, int require_type);
-
-extern int	CONFIG_ENABLE_REMOTE_COMMANDS;
-extern int	CONFIG_LOG_REMOTE_COMMANDS;
-extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 
 /* collector */
 #define ZBX_MAX_COLLECTOR_HISTORY	(15 * SEC_PER_MIN + 1)
@@ -185,7 +87,9 @@ typedef enum
 }
 zbx_key_access_rule_type_t;
 
-void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f);
+void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
+		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
+		zbx_get_config_int_f get_config_unsafe_user_parameters_cb);
 
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
@@ -210,17 +114,10 @@ void	zbx_set_metrics(ZBX_METRIC *metrics);
 void	zbx_test_parameters(void);
 void	zbx_test_parameter(const char *key);
 
-void	zbx_init_agent_result(AGENT_RESULT *result);
-void	zbx_log_free(zbx_log_t *log);
-void	zbx_free_agent_result(AGENT_RESULT *result);
-
 void	zbx_init_agent_request(AGENT_REQUEST *request);
 void	zbx_free_agent_request(AGENT_REQUEST *request);
 
 int	zbx_parse_item_key(const char *itemkey, AGENT_REQUEST *request);
-
-void	zbx_unquote_key_param(char *param);
-int	zbx_quote_key_param(char **param, int forced);
 
 int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c);
 void	zbx_set_agent_result_meta(AGENT_RESULT *result, zbx_uint64_t lastlogsize, int mtime);
