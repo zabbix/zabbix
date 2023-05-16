@@ -1,0 +1,1 @@
+........S. [ZBX-22782] fixed memory leak in SNMP walk to json with broken parameters (dgoloscapov)
