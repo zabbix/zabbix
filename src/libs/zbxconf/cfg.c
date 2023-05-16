@@ -691,8 +691,8 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
-		zbx_vector_str_t *hostnames, void *data, char **error)
+int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
+		add_serveractive_host_f cb, zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
 	zbx_vector_addr_ptr_t	addrs, cluster_addrs;

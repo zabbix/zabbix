@@ -1847,6 +1847,18 @@ msgstr ""
 msgid "Below value"
 msgstr ""
 
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
 msgstr "Συσχέτιση DN"
@@ -2568,6 +2580,12 @@ msgstr[1] ""
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
 msgstr ""
+
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -5274,6 +5292,14 @@ msgstr "Δημιουργία ομάδος ξενιστή"
 msgid "Create host prototype"
 msgstr "Δημιουργία πρωτότυπου ξενιστή"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr ""
@@ -5305,6 +5331,14 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "Δημιουργία πρωτότυπου συλλέκτη"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5370,6 +5404,14 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "Δημιουργία πρωτότυπου εναύσματος"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6014,6 +6056,10 @@ msgstr ""
 msgid "Delete and clear"
 msgstr "Διαγραφή και καθαρισμός"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Διαγραφή και καθαρισμός επιλεγμένων σχεδιότυπων; (Προσοχή: όλοι οι συνδεδεμένοι ξενιστές θα καθαριστούν!)"
@@ -6054,9 +6100,17 @@ msgstr "Διαγραφή πρωτότυπου γραφήματος;"
 msgid "Delete graph?"
 msgstr "Διαγραφή γραφήματος;"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "Διαγραφή ιστορικού επιλεγμένων συλλεκτών;"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6130,13 +6184,27 @@ msgstr ""
 msgid "Delete selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr ""
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
+msgstr ""
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
@@ -6148,9 +6216,17 @@ msgstr "Διαγραφή επιλεγμένων κανόνων εντοπισμ�
 msgid "Delete selected elements?"
 msgstr "Διαγραφή επιλεγμένων στοιχείων;"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "Διαγραφή επιλεγμένων πρωτότυπων γραφημάτων;"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6195,9 +6271,17 @@ msgstr "Διαγραφή επιλεγμένων ξενιστών;"
 msgid "Delete selected image?"
 msgstr "Διαγραφή επιλεγμένης εικόνας;"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "Διαγραφή επιλεγμένων πρωτότυπων συλλεκτών;"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6219,6 +6303,10 @@ msgstr ""
 msgid "Delete selected maps?"
 msgstr "Διαγραφή επιλεγμένων χαρτών;"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "Διαγραφή επιλεγμένων τύπων μέσων;"
@@ -6229,6 +6317,10 @@ msgstr "Διαγραφή επιλεγμένων διαμεσολαβητών;"
 
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
+msgstr ""
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
 msgstr ""
 
 #: app/views/administration.regex.list.php:82
@@ -6249,6 +6341,10 @@ msgstr ""
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
+msgstr ""
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
 msgstr ""
 
 #: app/views/administration.script.list.php:203
@@ -6277,6 +6373,10 @@ msgstr ""
 msgid "Delete selected template groups?"
 msgstr ""
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "Διαγραφή επιλεγμένων σχεδιότυπων;"
@@ -6291,9 +6391,17 @@ msgstr ""
 msgid "Delete selected tokens?"
 msgstr ""
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "Διαγραφή επιλεγμένων πρωτότυπων εναυσμάτων;"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6306,6 +6414,10 @@ msgstr "Διαγραφή επιλεγμένου χρήστη;"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "Διαγραφή επιλεγμένων χρηστών;"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6515,6 +6627,10 @@ msgstr "Απενεργοποίηση"
 msgid "Disable debug mode"
 msgstr "Απενεργοποίηση τρόπου εκσφαλμάτωσης"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "Απενεργοποίηση εκσφαλμάτωσης σε επιλεγμένες ομάδες;"
@@ -6542,6 +6658,11 @@ msgstr "Απενεργοποίηση ξενιστών εποπτευόμενων
 
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
 msgstr ""
 
 #: app/views/administration.token.list.php:199
@@ -6573,8 +6694,17 @@ msgstr ""
 msgid "Disable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
+msgstr ""
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
@@ -6582,17 +6712,33 @@ msgstr ""
 msgid "Disable selected discovery rules?"
 msgstr "Απενεργοποίηση επιλεγμένων κανόνων εντοπισμού;"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "Απενεργοποίηση επιλεγμένων ομάδων;"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "Απενεργοποίηση επιλεγμένων ξενιστών;"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "Απενεργοποίηση επιλεγμένων συλλεκτών;"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6606,13 +6752,25 @@ msgstr ""
 msgid "Disable selected modules?"
 msgstr ""
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
+msgstr ""
+
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
 msgstr ""
 
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "Απενεργοποίηση επιλεγμένων εναυσμάτων;"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7351,6 +7509,10 @@ msgstr "Ενεργοποίηση επιβεβαίωσης"
 msgid "Enable debug mode"
 msgstr "Ενεργοποίηση κατάστασης αποσφαλμάτωσης"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "Ενεργοποίηση εκσφαλμάτωσης σε επιλεγμένες ομάδες;"
@@ -7393,6 +7555,11 @@ msgstr ""
 msgid "Enable internal housekeeping"
 msgstr "Ενεργοποίηση εσωτερικής τακτοποίησης"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7422,8 +7589,17 @@ msgstr ""
 msgid "Enable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
+msgstr ""
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
@@ -7431,18 +7607,34 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "Ενεργοποίηση επιλεγμένων κανόνων εντοπισμού;"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "Ενεργοποίηση επιλεγμένων ομάδων;"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "Ενεργοποίηση επιλεγμένων ξενιστών;"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "Ενεργοποίηση επιλεγμένων συλλεκτών;"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7456,13 +7648,25 @@ msgstr ""
 msgid "Enable selected modules?"
 msgstr ""
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
+msgstr ""
+
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
 msgstr ""
 
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "Ενεργοποίηση επιλεγμένων εναυσμάτων;"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -13768,6 +13972,11 @@ msgstr ""
 msgid "New dashboard"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
+
 #: jsLoader.php:280
 msgid "New element"
 msgstr "Νέο στοιχείο"
@@ -16188,6 +16397,10 @@ msgstr ""
 
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
+msgstr ""
+
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
 msgstr ""
 
 #: app/views/administration.user.list.php:303
@@ -20716,6 +20929,10 @@ msgstr ""
 msgid "Unblock"
 msgstr ""
 
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Απεμπλοκή επιλεγμένων χρηστών;"
@@ -23561,6 +23778,19 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
