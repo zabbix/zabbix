@@ -1182,7 +1182,9 @@ class CMacrosResolverGeneral {
 								if (array_key_exists('clock', $history)) {
 									$clock = $history['clock'];
 								}
-								if (array_key_exists('value', $history)) {
+
+								if (array_key_exists('value', $history)
+										&& $function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
 									$value = $history['value'];
 								}
 							}
@@ -1197,7 +1199,10 @@ class CMacrosResolverGeneral {
 
 						if (array_key_exists($function['itemid'], $history)) {
 							$clock = $history[$function['itemid']][0]['clock'];
-							$value = $history[$function['itemid']][0]['value'];
+
+							if ($function['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+								$value = $history[$function['itemid']][0]['value'];
+							}
 						}
 						break;
 				}
@@ -1439,7 +1444,7 @@ class CMacrosResolverGeneral {
 					]);
 
 					foreach ($db_items as $db_item) {
-						$value = $db_item['lastclock']
+						$value = $db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY
 							? formatHistoryValue($db_item['lastvalue'], $db_item)
 							: UNRESOLVED_MACRO_STRING;
 

@@ -21,7 +21,46 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+/**
+ * @backup triggers
+ *
+ * @onBefore prepare_trigger_data
+ * @onAfter cleanup_trigger_data
+ */
 class testTriggers extends CAPITest {
+
+	public function prepare_trigger_data(): void {
+		$result = $this->call('item.create', [
+			'hostid' => '50009',
+			'name' => 'master.item',
+			'key_' => 'master.item',
+			'type' => ITEM_TYPE_ZABBIX,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'interfaceid' => 50022,
+			'delay' => '1m'
+		]);
+		$master_itemid = reset($result['result']['itemids']);
+
+		$result = $this->call('item.create', [
+			'hostid' => '50009',
+			'name' => 'binary.item',
+			'key_' => 'binary.item',
+			'type' => ITEM_TYPE_DEPENDENT,
+			'master_itemid' => $master_itemid,
+			'value_type' => ITEM_VALUE_TYPE_BINARY
+		]);
+	}
+
+	public function cleanup_trigger_data(): void {
+		$result = $this->call('item.get', [
+			'filter' => [
+				'key_' => 'master.item'
+			]
+		]);
+		$master_itemid = reset($result['result']['itemids']);
+
+		$this->call('item.delete', [$master_itemid]);
+	}
 
 	public static function trigger_get_data() {
 		$triggerids = ['134118', '134000', '134001', '134002', '134003', '134004', '134005'];
@@ -91,6 +130,7 @@ class testTriggers extends CAPITest {
 	*/
 	public function testTrigger_Get($params, $expect) {
 		$response = $this->call('trigger.get', $params, $expect['error']);
+
 		if ($expect['error'] !== null) {
 			return;
 		}
@@ -99,5 +139,33 @@ class testTriggers extends CAPITest {
 		sort($triggerids);
 		sort($expect['triggerids']);
 		$this->assertSame($expect['triggerids'], $triggerids);
+	}
+
+	public static function trigger_create_data() {
+		return [
+			'Prohibit binary items in expression' => [
+				'params' => [
+					'description' => 'trigger.error',
+					'expression' => 'last(/API Host/binary.item)=0'
+				],
+				'error' => 'Incorrect item value type "Binary" provided for trigger function "last".'
+			],
+			'Prohibit binary items in recovery expression' => [
+				'params' => [
+					'description' => 'trigger.error',
+					'recovery_mode' => ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION,
+					'expression' => 'last(/API Host/master.item)=0',
+					'recovery_expression' => 'last(/API Host/binary.item)=0'
+				],
+				'error' => 'Incorrect item value type "Binary" provided for trigger function "last".'
+			]
+		];
+	}
+
+	/**
+	* @dataProvider trigger_create_data
+	*/
+	public function testTrigger_Create($params, $expected_error) {
+		$this->call('trigger.create', $params, $expected_error);
 	}
 }

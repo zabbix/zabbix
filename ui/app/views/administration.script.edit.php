@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,46 +21,15 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
-
-$this->addJsFile('multilineinput.js');
-
-$this->includeJsFile('administration.script.edit.js.php');
-
-$html_page = (new CHtmlPage())
-	->setTitle(_('Scripts'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT));
-
-$row_template = (new CTag('script', true))
-	->setId('parameters-row')
-	->setAttribute('type', 'text/x-jquery-tmpl')
-	->addItem(
-		(new CRow([
-			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('$(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
-		]))->addClass('form_row')
-	);
-
-$html_page->addItem($row_template);
 
 $csrf_token = CCsrfTokenHelper::get('script');
 
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
 $parameters_table = (new CTable())
@@ -70,157 +39,237 @@ $parameters_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('50%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;');
-
-foreach ($data['parameters'] as $parameter) {
-	$parameters_table->addRow([
-		(new CTextBox('parameters[name][]', $parameter['name'], false, DB::getFieldLength('script_param', 'name')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CTextBox('parameters[value][]', $parameter['value'], false, DB::getFieldLength('script_param', 'value')))
-			->setAttribute('style', 'width: 100%;')
-			->removeId(),
-		(new CButton('', _('Remove')))
-			->removeId()
-			->onClick('$(this).closest("tr").remove()')
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-remove')
-	], 'form_row');
-}
-
-$parameters_table->addRow([
-	(new CButton('parameter_add', _('Add')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addClass('element-table-add')
-]);
-
-$form_list = (new CFormList())
-	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('autofocus', 'autofocus')
-			->setAriaRequired()
-	)
-	->addRow(new CLabel(_('Scope'), 'scope'),
-		(new CRadioButtonList('scope', (int) $data['scope']))
-			->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
-			->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
-			->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
-			->setModern(true)
-			->setEnabled(!$data['actions'])
-	)
-	->addRow(new CLabel(_('Menu path'), 'menu_path'),
-		(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
-			->setId('menu-path')
-	)
-	->addRow((new CLabel(_('Type'), 'type')),
-		(new CRadioButtonList('type', (int) $data['type']))
-			->addValue(_('URL'), ZBX_SCRIPT_TYPE_URL)
-			->addValue(_('Webhook'), ZBX_SCRIPT_TYPE_WEBHOOK)
-			->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
-			->addValue(_('SSH'), ZBX_SCRIPT_TYPE_SSH)
-			->addValue(_('Telnet'), ZBX_SCRIPT_TYPE_TELNET)
-			->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
-			->setModern(true)
-	)
-	->addRow(new CLabel(_('Execute on'), 'execute_on'),
-		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
-			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-			->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
-			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-			->setModern(true)
-			->setId('execute-on')
-	)
-	->addRow(new CLabel(_('Authentication method'), 'authtype'),
-		(new CSelect('authtype'))
-			->setId('authtype')
-			->setValue($data['authtype'])
-			->setFocusableElementId('authtype')
-			->addOptions(CSelect::createOptionsFromArray([
-				ITEM_AUTHTYPE_PASSWORD => _('Password'),
-				ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
-			]))
-	)
-	->addRow((new CLabel(_('Username'), 'username'))->setAsteriskMark(),
-		(new CTextBox('username', $data['username'], false, DB::getFieldLength('scripts', 'username')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Public key file'), 'publickey'))->setAsteriskMark(),
-		(new CTextBox('publickey', $data['publickey'], false, DB::getFieldLength('scripts', 'publickey')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Private key file'), 'privatekey'))->setAsteriskMark(),
-		(new CTextBox('privatekey', $data['privatekey'], false, DB::getFieldLength('scripts', 'privatekey')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(new CLabel(_('Password'), 'password'),
-		(new CTextBox('password', $data['password'], false, DB::getFieldLength('scripts', 'password')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
-	->addRow(new CLabel(_('Key passphrase'), 'passphrase'),
-		(new CTextBox('passphrase', $data['passphrase'], false, DB::getFieldLength('scripts', 'password')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
-	->addRow(new CLabel(_('Port'), 'port'),
-		(new CTextBox('port', $data['port'], false, DB::getFieldLength('scripts', 'port')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
-	->addRow((new CLabel(_('Commands'), 'command'))->setAsteriskMark(),
-		(new CTextArea('command', $data['command']))
-			->addClass(ZBX_STYLE_MONOSPACE_FONT)
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('scripts', 'command'))
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Command'), 'commandipmi'))->setAsteriskMark(),
-		(new CTextBox('commandipmi', $data['commandipmi'], false, DB::getFieldLength('scripts', 'command')))
-			->addClass(ZBX_STYLE_MONOSPACE_FONT)
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(new CLabel(_('Parameters'), $parameters_table->getId()),
-		(new CDiv($parameters_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-		'row-webhook-parameters'
-	)
-	->addRow((new CLabel(_('URL'), 'url'))->setAsteriskMark(),
-		(new CTextBox('url', $data['url'], false, DB::getFieldLength('scripts', 'url')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(_('Open in a new window'),
-		(new CCheckBox('new_window'))
-			->setChecked($data['new_window'])
-			->setUncheckedValue(ZBX_SCRIPT_URL_NEW_WINDOW_NO)
-	)
-	->addRow((new CLabel(_('Script'), 'script'))->setAsteriskMark(),
-		(new CMultilineInput('script', $data['script'], [
-			'title' => _('JavaScript'),
-			'placeholder' => _('script'),
-			'placeholder_textarea' => 'return value',
-			'grow' => 'auto',
-			'rows' => 0,
-			'maxlength' => DB::getFieldLength('scripts', 'command')
-		]))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow((new CLabel(_('Timeout'), 'timeout'))->setAsteriskMark(),
-		(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(_('Description'),
-		(new CTextArea('description', $data['description']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('scripts', 'description'))
+	->setAttribute('style', 'width: 100%;')
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol(
+					(new CSimpleButton(_('Add')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('js-parameter-add')
+				))->setColSpan(2)
+			)
 	);
+
+$row_template = (new CTemplateTag('script-parameter-template'))
+	->addItem(
+		(new CRow([
+			(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('script_param', 'name')))
+				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{name}')
+				->removeId(),
+			(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('script_param', 'value')))
+				->setAttribute('style', 'width: 100%;')
+				->setAttribute('value', '#{value}')
+				->removeId(),
+			(new CButton('', _('Remove')))
+				->removeId()
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('js-remove')
+		]))->addClass('form_row')
+	);
+
+$form_grid = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Name'), 'name'))
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('name', $data['name'], false, DB::getFieldLength('scripts', 'name')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))
+	])
+	->addItem(([
+		new CLabel(_('Scope'), 'scope'),
+		new CFormField(
+			(new CRadioButtonList('scope', (int) $data['scope']))
+				->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
+				->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
+				->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
+				->setModern()
+				->setEnabled(!$data['actions']))
+	]))
+	->addItem([
+		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
+		(new CFormField(
+			(new CTextBox('menu_path', $data['menu_path'], false, DB::getFieldLength('scripts', 'menu_path')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('placeholder', _('<sub-menu/sub-menu/...>'))
+		))->setId('menu-path')
+	])
+	->addItem([
+		(new CLabel(_('Type'), 'type')),
+		new CFormField(
+			(new CRadioButtonList('type', (int) $data['type']))
+				->addValue(_('URL'), ZBX_SCRIPT_TYPE_URL)
+				->addValue(_('Webhook'), ZBX_SCRIPT_TYPE_WEBHOOK)
+				->addValue(_('Script'), ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+				->addValue(_('SSH'), ZBX_SCRIPT_TYPE_SSH)
+				->addValue(_('Telnet'), ZBX_SCRIPT_TYPE_TELNET)
+				->addValue(_('IPMI'), ZBX_SCRIPT_TYPE_IPMI)
+				->setModern()
+		)
+	])
+	->addItem([
+		(new CLabel(_('Execute on'), 'execute_on'))->setId('execute-on-label'),
+		(new CFormField(
+			(new CRadioButtonList('execute_on', (int) $data['execute_on']))
+				->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+				->addValue(_('Zabbix server (proxy)'), ZBX_SCRIPT_EXECUTE_ON_PROXY)
+				->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+				->setModern()
+				->setId('execute-on')
+		))->setId('execute-on')
+	])
+	->addItem([
+		(new CLabel(_('Authentication method'), 'authentication'))->setId('auth-type-label'),
+		(new CFormField(
+			(new CSelect('authtype'))
+				->setId('authtype')
+				->setValue($data['authtype'])
+				->setFocusableElementId('authentication')
+				->addOptions(CSelect::createOptionsFromArray([
+					ITEM_AUTHTYPE_PASSWORD => _('Password'),
+					ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
+				]))
+		))->setId('auth-type')
+	])
+	->addItem([
+		(new CLabel(_('Username'), 'username'))
+			->setId('username-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('username', $data['username'], false, DB::getFieldLength('scripts', 'username')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('username-field')
+	])
+	->addItem([
+		(new CLabel(_('Public key file'), 'publickey'))
+			->setId('publickey-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('publickey', $data['publickey'], false, DB::getFieldLength('scripts', 'publickey')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('publickey-field')
+	])
+	->addItem([
+		(new CLabel(_('Private key file'), 'privatekey'))
+			->setId('privatekey-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('privatekey', $data['privatekey'], false, DB::getFieldLength('scripts', 'privatekey')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('privatekey-field')
+	])
+	->addItem([
+		(new CLabel(_('Password'), 'password'))->setId('password-label'),
+		(new CFormField(
+			(new CTextBox('password', $data['password'], false, DB::getFieldLength('scripts', 'password')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))->setId('password-field')
+	])
+	->addItem([
+		(new CLabel(_('Key passphrase'), 'passphrase'))->setId('passphrase-label'),
+		(new CFormField(
+			(new CTextBox('passphrase', $data['passphrase'], false, DB::getFieldLength('scripts', 'password')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))->setId('passphrase-field')
+	])
+	->addItem([
+		(new CLabel(_('Port'), 'port'))->setId('port-label'),
+		(new CFormField(
+			(new CTextBox('port', $data['port'], false, DB::getFieldLength('scripts', 'port')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		))->setId('port-field')
+	])
+	->addItem([
+		(new CLabel(_('Commands'), 'command'))
+			->setId('commands-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextArea('command', $data['command']))
+				->addClass(ZBX_STYLE_MONOSPACE_FONT)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('scripts', 'command'))
+				->setAriaRequired()
+		))->setId('commands')
+	])
+	->addItem([
+		(new CLabel(_('Command'), 'commandipmi'))
+			->setId('command-ipmi-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('commandipmi', $data['commandipmi'], false, DB::getFieldLength('scripts', 'command')))
+				->addClass(ZBX_STYLE_MONOSPACE_FONT)
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('command-ipmi')
+	])
+	->addItem([
+		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('webhook-parameters-label'),
+		(new CFormField(
+			(new CDiv($parameters_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		))->setId('webhook-parameters')
+	])
+
+	->addItem([
+		(new CLabel(_('URL'), 'url'))
+			->setId('url-label')
+			->setAsteriskMark(),
+		(new CFormField(
+			(new CTextBox('url', $data['url'], false, DB::getFieldLength('scripts', 'url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('url')
+	])
+	->addItem([
+		(new CLabel(_('Open in a new window')))->setId('new-window-label'),
+		(new CFormField(
+			(new CCheckBox('new_window'))
+				->setChecked($data['new_window'])
+				->setUncheckedValue(ZBX_SCRIPT_URL_NEW_WINDOW_NO)
+		))->setId('new-window')
+	])
+	->addItem([
+		(new CLabel(_('Script'), 'script'))
+			->setAsteriskMark()
+			->setId('script-label'),
+		(new CFormField(
+			(new CMultilineInput('script', $data['script'], [
+				'title' => _('JavaScript'),
+				'placeholder' => _('script'),
+				'placeholder_textarea' => 'return value',
+				'grow' => 'auto',
+				'rows' => 0,
+				'maxlength' => DB::getFieldLength('scripts', 'command')
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAriaRequired()
+		))->setId('js-item-script-field')
+	])
+	->addItem([
+		(new CLabel(_('Timeout'), 'timeout'))
+			->setAsteriskMark()
+			->setId('timeout-label'),
+		(new CFormField(
+			(new CTextBox('timeout', $data['timeout'], false, DB::getFieldLength('scripts', 'timeout')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAriaRequired()
+		))->setId('timeout-field')
+	])
+	->addItem([
+		(new CLabel(_('Description'), 'description')),
+		new CFormField(
+			(new CTextArea('description', $data['description']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('scripts', 'description'))
+		)
+	]);
 
 $select_usrgrpid = (new CSelect('usrgrpid'))
 	->setId('user-group')
@@ -236,86 +285,140 @@ $select_hgstype = (new CSelect('hgstype'))
 	->addOption(new CSelectOption(0, _('All')))
 	->addOption(new CSelectOption(1, _('Selected')));
 
-$form_list
-	->addRow(new CLabel(_('Host group'), $select_hgstype->getFocusableElementId()), $select_hgstype)
-	->addRow(null,
-		(new CMultiSelect([
-			'name' => 'groupid',
-			'object_name' => 'hostGroup',
-			'multiple' => false,
-			'data' => $data['hostgroup'],
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'groupid'
+$form_grid
+	->addItem([
+		new CLabel(_('Host group'), $select_hgstype->getFocusableElementId()),
+		new CFormField($select_hgstype)
+	])
+	->addItem(
+		(new CFormField(
+			(new CMultiSelect([
+				'name' => 'groupid',
+				'object_name' => 'hostGroup',
+				'multiple' => false,
+				'data' => $data['hostgroup'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'host_groups',
+						'srcfld1' => 'groupid',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'groupid'
+					]
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		'host-group-selection'
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('host-group-selection')
 	)
-	->addRow(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()), $select_usrgrpid)
-	->addRow((new CLabel(_('Required host permissions'), 'host_access')),
-		(new CRadioButtonList('host_access', (int) $data['host_access']))
-			->addValue(_('Read'), PERM_READ)
-			->addValue(_('Write'), PERM_READ_WRITE)
-			->setModern(true)
-			->setId('host-access')
-	)
-	->addRow(_('Enable confirmation'),
-		(new CCheckBox('enable_confirmation'))
-			->setChecked($data['enable_confirmation'])
-			->setId('enable-confirmation')
-	)
-	->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
-		(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		NBSP(),
-		(new CButton('testConfirmation', _('Test confirmation')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->setId('test-confirmation')
-	]
-);
+	->addItem([
+		(new CLabel(_('User group'), $select_usrgrpid->getFocusableElementId()))->setId('usergroup-label'),
+		(new CFormField($select_usrgrpid))->setId('usergroup')
+	])
+	->addItem([
+		(new CLabel(_('Required host permissions'), 'host_access'))->setId('host-access-label'),
+		(new CFormField(
+			(new CRadioButtonList('host_access', (int) $data['host_access']))
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Write'), PERM_READ_WRITE)
+				->setModern()
+				->setId('host-access')
+		))->setId('host-access-field')
+	])
+	->addItem([
+		(new CLabel(_('Enable confirmation'), 'enable-confirmation'))->setId('enable-confirmation-label'),
+		(new CFormField(
+			(new CCheckBox('enable_confirmation'))
+				->setChecked($data['enable_confirmation'])
+				->setId('enable-confirmation')
+		))->setId('enable-confirmation-field')
+	])
+	->addItem([
+		(new CLabel(_('Confirmation text'), 'confirmation'))->setId('confirmation-label'),
+		(new CFormField([
+			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
+				->setAttribute('disabled', $data['enable_confirmation'])
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			NBSP(),
+			(new CButton('testConfirmation', _('Test confirmation')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->setAttribute('disabled', $data['enable_confirmation'])
+				->setId('test-confirmation')
+		]))->setId('confirmation-field')
+	]);
 
-$scriptView = (new CTabView())->addTab('scripts', _('Script'), $form_list);
-
-// footer
-$cancelButton = (new CRedirectButton(_('Cancel'),
-	(new CUrl('zabbix.php'))
-		->setArgument('action', 'script.list')
-		->setArgument('page', CPagerHelper::loadPage('script.list', null))
-))->setId('cancel');
-
-if ($data['scriptid'] == 0) {
-	$addButton = (new CSubmitButton(_('Add'), 'action', 'script.create'))->setId('add');
-
-	$scriptView->setFooter(makeFormFooter(
-		$addButton,
-		[$cancelButton]
-	));
+if ($data['scriptid'] === null) {
+	$buttons = [
+		[
+			'title' => _('Add'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'script_edit_popup.submit();'
+		]
+	];
 }
 else {
-	$updateButton = (new CSubmitButton(_('Update'), 'action', 'script.update'))->setId('update');
-	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
-	$deleteButton = (new CRedirectButton(_('Delete'),
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'script.delete')
-			->setArgument('scriptids[]', $data['scriptid'])
-			->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token),
-		_('Delete script?')
-	))->setId('delete');
-
-	$scriptView->setFooter(makeFormFooter(
-		$updateButton,
+	$buttons = [
 		[
-			$cloneButton,
-			$deleteButton,
-			$cancelButton
+			'title' => _('Update'),
+			'keepOpen' => true,
+			'isSubmit' => true,
+			'action' => 'script_edit_popup.submit();'
+		],
+		[
+			'title' => _('Clone'),
+			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'script_edit_popup.clone('.json_encode([
+				'title' => _('New script'),
+				'buttons' => [
+					[
+						'title' => _('Add'),
+						'class' => 'js-add',
+						'keepOpen' => true,
+						'isSubmit' => true,
+						'action' => 'script_edit_popup.submit();'
+					],
+					[
+						'title' => _('Cancel'),
+						'class' => ZBX_STYLE_BTN_ALT,
+						'cancel' => true,
+						'action' => ''
+					]
+				]
+			]).');'
+		],
+		[
+			'title' => _('Delete'),
+			'confirmation' => _('Delete script?'),
+			'class' => ZBX_STYLE_BTN_ALT,
+			'keepOpen' => true,
+			'isSubmit' => false,
+			'action' => 'script_edit_popup.delete();'
 		]
-	));
+	];
 }
 
-$form->addItem($scriptView);
+$form
+	->addItem($form_grid)
+	->addItem($row_template)
+	->addItem(
+		(new CScriptTag('script_edit_popup.init('.json_encode([
+			'script' => $data
+		]).');'))->setOnDocumentReady()
+	)
+	->addStyle('display: none;');
 
-$html_page->addItem($form)->show();
+$output = [
+	'header' => $data['scriptid'] === null ? _('New script') : _('Script'),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT),
+	'body' => $form->toString(),
+	'buttons' => $buttons,
+	'script_inline' => getPagePostJs().$this->readJsFile('administration.script.edit.js.php')
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo json_encode($output);
