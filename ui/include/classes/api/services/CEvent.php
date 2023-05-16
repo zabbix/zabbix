@@ -536,7 +536,7 @@ class CEvent extends CApiService {
 
 		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
 				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
-			$acknowledge_actions[] = 'ack.action & '.sprintf('0x%02X', $options['filter']['action']);
+			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
 		}
 
 		if (array_key_exists('action_userid', $options['filter']) && ctype_digit($options['filter']['action_userid'])) {
