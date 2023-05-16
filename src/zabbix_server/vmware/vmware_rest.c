@@ -23,7 +23,6 @@
 
 #include "zbxstr.h"
 
-extern int	CONFIG_VMWARE_TIMEOUT;
 extern char	*CONFIG_SOURCE_IP;
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -249,7 +248,7 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, CURL **easyhandle, ZBX_HTTPPAGE *page,
-		struct curl_slist **headers, char **error)
+		struct curl_slist **headers, int config_vmwware_timeout, char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
 #	define ZBX_XML_HEADER1		"Accept: application/json, text/plain, */*"
@@ -305,7 +304,7 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, CURL **ea
 			(NULL != CONFIG_SOURCE_IP && CURLE_OK != (err = curl_easy_setopt(*easyhandle,
 			opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
-			(long)CONFIG_VMWARE_TIMEOUT)) ||
+			(long)config_vmwware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
@@ -881,7 +880,7 @@ out:
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, int config_vmware_timeout)
 {
 	int				i, version, found_tags = 0, ret = FAIL;
 	char				*error = NULL;
@@ -917,7 +916,8 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 	is_new_api = (702 <= version) ? 1 : 0;
 
 	if (0 != entity_tags.values_num && (
-			SUCCEED != vmware_curl_init(service->url, is_new_api, &easyhandle, &page, &headers, &error) ||
+			SUCCEED != vmware_curl_init(service->url, is_new_api, &easyhandle, &page, &headers,
+			config_vmware_timeout, &error) ||
 			SUCCEED != vmware_service_rest_authenticate(service, is_new_api, easyhandle, &headers, &page,
 			&error)))
 	{

@@ -93,10 +93,6 @@ int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field v
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
-int	CONFIG_VMWARE_FREQUENCY		= 60;
-int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
-int	CONFIG_VMWARE_TIMEOUT		= 10;
-
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
 zbx_uint64_t	get_zbx_config_value_cache_size(void)
@@ -109,7 +105,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 	zbx_config_value_cache_size = cache_size;
 }
 
-zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;

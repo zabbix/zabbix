@@ -24,11 +24,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-extern int				CONFIG_VMWARE_FREQUENCY;
-extern int				CONFIG_VMWARE_PERF_FREQUENCY;
-
-#define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
-#define ZBX_VMWARE_PERF_UPDATE_PERIOD	CONFIG_VMWARE_PERF_FREQUENCY
 #define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 
 extern zbx_vmware_t			*vmware;
@@ -110,7 +105,7 @@ unlock:
  * Return value: count of successfully executed jobs                          *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_job_exec(zbx_vmware_job_t *job)
+static int	vmware_job_exec(zbx_vmware_job_t *job, int config_vmware_timeout, int config_vmware_frequency)
 {
 	int	ret = FAIL;
 
@@ -122,13 +117,13 @@ static int	vmware_job_exec(zbx_vmware_job_t *job)
 	switch (job->type)
 	{
 		case ZBX_VMWARE_UPDATE_CONF:
-			ret = zbx_vmware_service_update(job->service);
+			ret = zbx_vmware_service_update(job->service, config_vmware_timeout, config_vmware_frequency);
 			break;
 		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-			ret = zbx_vmware_service_update_perf(job->service);
+			ret = zbx_vmware_service_update_perf(job->service, config_vmware_timeout);
 			break;
 		case ZBX_VMWARE_UPDATE_REST_TAGS:
-			ret = zbx_vmware_service_update_tags(job->service);
+			ret = zbx_vmware_service_update_tags(job->service, config_vmware_timeout);
 			break;
 		default:
 			ret = FAIL;
@@ -149,7 +144,8 @@ out:
  *             time_now - [IN] the current time                               *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now)
+static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now,
+		int cache_update_period, int perf_update_period)
 {
 	zbx_binary_heap_elem_t	elem_new = {0, job};
 
@@ -159,13 +155,13 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 	switch (job->type)
 	{
 	case ZBX_VMWARE_UPDATE_CONF:
-		job->nextcheck = time_now + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
+		job->nextcheck = time_now + cache_update_period;
 		break;
 	case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-		job->nextcheck = time_now + ZBX_VMWARE_PERF_UPDATE_PERIOD;
+		job->nextcheck = time_now + perf_update_period;
 		break;
 	case ZBX_VMWARE_UPDATE_REST_TAGS:
-		job->nextcheck = time_now + ZBX_VMWARE_CACHE_UPDATE_PERIOD;
+		job->nextcheck = time_now + cache_update_period;
 		break;
 	}
 
@@ -193,6 +189,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_vmware_args	*args_in = (zbx_thread_vmware_args *)((zbx_thread_args_t *)args)->args;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -233,8 +230,10 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 				continue;
 			}
 
-			services_updated += vmware_job_exec(job);
-			vmware_job_schedule(vmware, job, (time_t)time_now);
+			services_updated += vmware_job_exec(job, args_in->config_vmware_timeout,
+					args_in->config_vmware_frequency);
+			vmware_job_schedule(vmware, job, (time_t)time_now, args_in->config_vmware_frequency,
+					args_in->config_vmware_perf_frequency);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)

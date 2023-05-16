@@ -326,9 +326,9 @@ int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
 
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
-int	CONFIG_VMWARE_FREQUENCY		= 60;
-int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
-int	CONFIG_VMWARE_TIMEOUT		= 10;
+static int	config_vmware_frequency		= 60;
+static int	config_vmware_perf_frequency	= 60;
+static int	config_vmware_timeout		= 10;
 
 static zbx_uint64_t	config_conf_cache_size		= 32 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_history_cache_size	= 16 * ZBX_MEBIBYTE;
@@ -336,7 +336,7 @@ static zbx_uint64_t	config_history_index_cache_size	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_trends_cache_size	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_value_cache_size		= 8 * ZBX_MEBIBYTE;
-zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_vmware_cache_size	= 8 * ZBX_MEBIBYTE;
 
 static int	config_unreachable_period	= 45;
 static int	config_unreachable_delay	= 15;
@@ -963,13 +963,13 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"StartVMwareCollectors",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE],			TYPE_INT,
 			PARM_OPT,	0,			250},
-		{"VMwareFrequency",		&CONFIG_VMWARE_FREQUENCY,		TYPE_INT,
+		{"VMwareFrequency",		&config_vmware_frequency,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
-		{"VMwarePerfFrequency",		&CONFIG_VMWARE_PERF_FREQUENCY,		TYPE_INT,
+		{"VMwarePerfFrequency",		&config_vmware_perf_frequency,		TYPE_INT,
 			PARM_OPT,	10,			SEC_PER_DAY},
-		{"VMwareCacheSize",		&CONFIG_VMWARE_CACHE_SIZE,		TYPE_UINT64,
+		{"VMwareCacheSize",		&config_vmware_cache_size,		TYPE_UINT64,
 			PARM_OPT,	256 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"VMwareTimeout",		&CONFIG_VMWARE_TIMEOUT,			TYPE_INT,
+		{"VMwareTimeout",		&config_vmware_timeout,			TYPE_INT,
 			PARM_OPT,	1,			300},
 		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
@@ -1440,6 +1440,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
 	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
+	zbx_thread_vmware_args			vmware_args = {config_vmware_frequency, config_vmware_perf_frequency,
+								config_vmware_timeout};
 
 	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1463,7 +1465,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&error))
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_VMWARE] && SUCCEED != zbx_vmware_init(&config_vmware_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize VMware cache: %s", error);
 		zbx_free(error);
@@ -1630,6 +1632,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(zbx_selfmon_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_VMWARE:
+				thread_args.args = &vmware_args;
 				zbx_thread_start(vmware_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_TASKMANAGER:

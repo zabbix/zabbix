@@ -41,7 +41,7 @@
  * creates a new service object, marks it as new, but still returns NULL object.
  *
  * The collectors check the service object list for new services or services not updated
- * during last CONFIG_VMWARE_FREQUENCY seconds. If such service is found it is marked
+ * during last config_vmware_frequency seconds. If such service is found it is marked
  * as updating.
  *
  * The service object is updated by creating a new data object, initializing it
@@ -55,20 +55,16 @@
  * As the data retrieved by VMware collector can be quite big (for example 1 Hypervisor
  * with 500 Virtual Machines will result in approximately 20 MB of data), VMware collector
  * updates performance data (which is only 10% of the structure data) separately
- * with CONFIG_VMWARE_PERF_FREQUENCY period. The performance data is stored directly
+ * with config_vmware_perf_frequency period. The performance data is stored directly
  * in VMware service object entities vector - so the structure data is not affected by
  * performance data updates.
  */
 
-extern int		CONFIG_VMWARE_FREQUENCY;
-extern zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE;
-extern int		CONFIG_VMWARE_TIMEOUT;
 extern char		*CONFIG_SOURCE_IP;
 
 #define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)
 
-#define ZBX_VMWARE_CACHE_UPDATE_PERIOD	CONFIG_VMWARE_FREQUENCY
 #define ZBX_XML_DATETIME		26
 #define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 #define zbx_xml_free_doc(xdoc)		if (NULL != xdoc)\
@@ -2749,7 +2745,7 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
-		char **error)
+		int config_vmware_timeout, char **error)
 {
 #	define ZBX_POST_VMWARE_AUTH						\
 		ZBX_POST_VSPHERE_HEADER						\
@@ -2778,7 +2774,7 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_POST, 1L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_URL, service->url)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_TIMEOUT,
-					(long)CONFIG_VMWARE_TIMEOUT)) ||
+					(long)config_vmware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
@@ -8195,7 +8191,7 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zbx_vmware_custom_query_type_t type,
-		zbx_vector_cq_value_t *cq_values)
+		zbx_vector_cq_value_t *cq_values, int cache_update_period)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_cust_query_t	*instance;
@@ -8223,7 +8219,7 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 			continue;
 
 		if (0 == (instance->state & ZBX_VMWARE_CQ_NEW) &&
-				now - instance->last_pooled > 2 * ZBX_VMWARE_CACHE_UPDATE_PERIOD)
+				now - instance->last_pooled > 2 * cache_update_period)
 		{
 			instance->state |= ZBX_VMWARE_CQ_PAUSED;
 			continue;
@@ -8538,7 +8534,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, int config_vmware_timeout, int cache_update_period)
 {
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
@@ -8579,8 +8575,10 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	zbx_vmware_lock();
 	evt_last_key = service->eventlog.last_key;
 	evt_skip_old = service->eventlog.skip_old;
-	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_DVSWITCH_FETCH_DV_PORTS, &dvs_query_values);
-	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_OBJECT_PROPERTY, &prop_query_values);
+	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_DVSWITCH_FETCH_DV_PORTS, &dvs_query_values,
+			cache_update_period);
+	vmware_service_cust_query_prep(&service->cust_queries, VMWARE_OBJECT_PROPERTY, &prop_query_values,
+			cache_update_period);
 	zbx_vmware_unlock();
 
 	zbx_vector_cq_value_sort(&prop_query_values, vmware_cq_instance_id_compare);
@@ -8597,7 +8595,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service)
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &data->error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_vmware_timeout, &data->error))
 		goto clean;
 
 	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
@@ -9439,7 +9437,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
  * Parameters: service      - [IN] the vmware service                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, int config_vmware_timeout)
 {
 #	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 
@@ -9482,7 +9480,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service)
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, &error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_vmware_timeout, &error))
 		goto clean;
 
 	/* update performance counter refresh rate for entities */
@@ -10016,7 +10014,7 @@ static int	vmware_job_compare_nextcheck(const void *d1, const void *d2)
  * Comments: This function must be called before worker threads are forked.   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_init(char **error)
+int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error)
 {
 	int		ret = FAIL;
 	zbx_uint64_t	size_reserved;
@@ -10028,9 +10026,9 @@ int	zbx_vmware_init(char **error)
 
 	size_reserved = zbx_shmem_required_size(1, "vmware cache size", "VMwareCacheSize");
 
-	CONFIG_VMWARE_CACHE_SIZE -= size_reserved;
+	*config_vmware_cache_size -= size_reserved;
 
-	if (SUCCEED != zbx_shmem_create(&vmware_mem, CONFIG_VMWARE_CACHE_SIZE, "vmware cache size", "VMwareCacheSize",
+	if (SUCCEED != zbx_shmem_create(&vmware_mem, *config_vmware_cache_size, "vmware cache size", "VMwareCacheSize",
 			0, error))
 	{
 		goto out;
