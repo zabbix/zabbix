@@ -285,7 +285,14 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 				return FAIL;
 			}
 
-			index->index = zbx_jsonpath_index_create();
+			if (NULL == (index->index = zbx_jsonpath_index_create(errmsg)))
+			{
+				zbx_jsonobj_clear(&index->obj);
+				zbx_free(index);
+				cache->type = ZBX_PREPROC_NONE;
+				return FAIL;
+			}
+
 			cache->data = (void *)index;
 		}
 
