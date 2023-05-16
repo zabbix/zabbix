@@ -1,1 +1,1 @@
-........S. [ZBX-22773] fixed LisnteIP configuration parameter being ingored by HA (kprutkovs)
+........S. [ZBX-22773] fixed ListenIP configuration parameter being ignored by HA (kprutkovs)
