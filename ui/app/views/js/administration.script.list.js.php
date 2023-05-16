@@ -118,6 +118,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
+
 			curl.setArgument('action', 'script.delete');
 
 			this.#post(target, scriptids, curl);
