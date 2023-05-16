@@ -488,18 +488,19 @@ var hintBox = {
 
 		target.observer = new MutationObserver(() => {
 			const node = target instanceof Node ? target : target[0];
+			const body = document.documentElement || document.body;
 
-			if (document.body.contains(node)) {
-				return;
+			if (!body.contains(node) || !$(node).is(':visible')) {
+				hintBox.deleteHint(target);
 			}
+		});
 
-			hintBox.deleteHint(target);
-		})
-
-		target.observer.observe(document, {
-			childList: true,
-			subtree: true
-		})
+		target.observer.observe(document.documentElement || document.body, {
+			attributes: true,
+			attributeFilter: ['style'],
+			subtree: true,
+			childList: true
+		});
 
 		return box;
 	},
