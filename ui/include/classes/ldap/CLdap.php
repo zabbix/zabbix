@@ -336,14 +336,14 @@ class CLdap {
 	}
 
 	/**
-	 * Get user data with specified attributes. Is not available for bind type BIND_DNSTRING if password is not supplied.
-	 * Mapping attribute names will be set in lower case.
+	 * Get user data with specified attributes. Not available for bind type BIND_DNSTRING if password is not supplied.
+	 * Mapped attribute names will be set to lower case.
 	 *
 	 * @param array  $attributes  Array of LDAP tree attributes names to be returned.
 	 * @param string $user        User to search attributes for.
-	 * @param string $password    User password, is required only for BIND_DNSTRING.
+	 * @param string $password    (optional) User password, required only for BIND_DNSTRING.
 	 *
-	 * @param array Associative array of user attributes.
+	 * @return array Associative array of user attributes.
 	 */
 	public function getUserAttributes(array $attributes, string $user, $password = null): array {
 		if ($attributes == [] || !$this->connect() || !$this->bind($user, $password)) {
@@ -351,8 +351,6 @@ class CLdap {
 		}
 
 		$placeholders = ['%{user}' => $user];
-		$group_key = strtolower($this->cnf['group_membership']);
-		$group_name_key = strtolower($this->cnf['group_name']);
 		$results = $this->search($this->cnf['base_dn'], $this->cnf['search_filter'], $placeholders, $attributes);
 		$user = [];
 
@@ -366,26 +364,31 @@ class CLdap {
 			return $user;
 		}
 
+		$group_key = strtolower($this->cnf['group_membership']);
+		$group_name_key = strtolower($this->cnf['group_name']);
+
 		for ($i = 0; $i < $results['count']; $i++) {
 			$key = $results[$i];
-			[$key => $value] = $results;
 
-			$user[$key] = ($key === $group_key) ? $this->getGroupPatternsFromDns($group_name_key, $value) : $value[0];
+			$user[$key] = $results[$i] === $group_key
+				? $this->getGroupPatternsFromDns($group_name_key, $results[$key])
+				: $results[$key][0];
 		}
 
 		return $user;
 	}
 
 	/**
-	 * Extract group pattern from their DN strings.
-	 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and "Group name attribute" set to "cn" will store string "zabbix-admins" in $groups array.
-	 * https://ldap.com/ldap-dns-and-rdns/
+	 * Extract the group pattern from given DN strings.
+	 * For DN string "cn=zabbix-admins,ou=Group,dc=example,dc=org" and the "Group name attribute" set to "cn",
+	 * the string "zabbix-admins" will be stored to the $groups array.
 	 *
-	 * @param string $group_name_key  Lower case group name attribute to extract value for from RDN.
+	 * @param string $group_name_key  Lower case group name attribute for which to extract value from RDN.
 	 * @param array  $group_dns       Array of DN strings.
-	 * @return array of strings with extracted groups.
+	 *
+	 * @return array Strings with the extracted groups, if any.
 	 */
-	public function getGroupPatternsFromDns($group_name_key, $group_dns): array {
+	public function getGroupPatternsFromDns(string $group_name_key, array $group_dns): array {
 		$groups = [];
 
 		foreach ($group_dns as $group_dn) {
@@ -401,8 +404,8 @@ class CLdap {
 				}
 
 				/*
-				 * For multivalued RDNs $rdn_key will be set to key of first key-value pair, as value will be set rest of string.
-				 * For example for RDN "cn=John Doe+mail=jdoe@example.com" $rdn_value will be equal "John Doe+mail=jdoe@example.com".
+				 * For multi-value RDNs $rdn_key will be set to key of first key-value pair, the rest of string as value.
+				 * For example for RDN "cn=John Doe+mail=jdoe@example.com" $rdn_value is "John Doe+mail=jdoe@example.com".
 				 */
 				[$rdn_key, $rdn_value] = explode('=', $rdn, 2);
 
@@ -410,9 +413,9 @@ class CLdap {
 					continue;
 				}
 
-				// Convert every charcode back to character. String "cn=Universit\C4\81te" will be converted back to "cn=Universitāte".
-				$groups[] = preg_replace_callback('/\\\\([0-9A-F]{2})/i', function ($m) {
-					return chr(hexdec($m[1]));
+				// Convert escaped charcodes, f.e. 'Universit\C4\81te' => 'Universitāte'.
+				$groups[] = preg_replace_callback('/\\\\([0-9A-F]{2})/i', function (array $match): string {
+					return chr(hexdec($match[1]));
 				}, $rdn_value);
 			}
 		}
