@@ -181,7 +181,7 @@ foreach ($this->data['usergroups'] as $usergroup) {
 	}
 
 	if (count($usergroup['users']) != $usergroup['user_cnt']) {
-		$users[] = ' &hellip;';
+		$users[] = [' ', HELLIP()];
 	}
 
 	$name = new CLink($usergroup['name'], (new CUrl('zabbix.php'))
@@ -214,35 +214,50 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'usrgrpids', [
-		['name' => _('Enable'), 'confirm' => _('Enable selected groups?'),
+		[
+			'name' => _('Enable'),
+			'confirm_singular' => _('Enable selected group?'),
+			'confirm_plural' => _('Enable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_ENABLED)
 				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
-		['name' => _('Disable'), 'confirm' => _('Disable selected groups?'),
+		[
+			'name' => _('Disable'),
+			'confirm_singular' => _('Disable selected group?'),
+			'confirm_plural' => _('Disable selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('users_status', GROUP_STATUS_DISABLED)
 				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
-		['name' => _('Enable debug mode'), 'confirm' => _('Enable debug mode in selected groups?'),
+		[
+			'name' => _('Enable debug mode'),
+			'confirm_singular' => _('Enable debug mode in selected group?'),
+			'confirm_plural' => _('Enable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_ENABLED)
 				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
-		['name' => _('Disable debug mode'), 'confirm' => _('Disable debug mode in selected groups?'),
+		[
+			'name' => _('Disable debug mode'),
+			'confirm_singular' => _('Disable debug mode in selected group?'),
+			'confirm_plural' => _('Disable debug mode in selected groups?'),
 			'redirect' => (new CUrl('zabbix.php'))
 				->setArgument('action', 'usergroup.massupdate')
 				->setArgument('debug_mode', GROUP_DEBUG_MODE_DISABLED)
 				->setArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token)
 				->getUrl()
 		],
-		'usergroup.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected groups?'),
+		'usergroup.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected group?'),
+			'confirm_plural' => _('Delete selected groups?'),
 			'csrf_token' => $csrf_token
 		]
 	], 'usergroup')

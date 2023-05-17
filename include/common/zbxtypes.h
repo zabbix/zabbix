@@ -71,6 +71,7 @@ typedef int	ssize_t;
 typedef long	ssize_t;
 #	endif
 
+typedef DWORD	zbx_syserror_t;
 #else	/* _WINDOWS */
 #	ifndef __UINT64_C
 #		ifdef UINT64_C
@@ -135,6 +136,8 @@ typedef long	ssize_t;
 #	endif
 
 typedef uint32_t	zbx_uint32_t;
+
+typedef int	zbx_syserror_t;
 
 #endif	/* _WINDOWS */
 

@@ -1788,9 +1788,12 @@ class CScreenProblem extends CScreenBase {
 		foreach ($items as $itemid => $item) {
 			if (array_key_exists($itemid, $history_values)) {
 				$last_value = reset($history_values[$itemid]);
-				$last_value['value'] = formatHistoryValue(str_replace(["\r\n", "\n"], [" "], $last_value['value']),
-					$item
-				);
+
+				if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+					$last_value['value'] = formatHistoryValue(str_replace(["\r\n", "\n"], [" "], $last_value['value']),
+						$item
+					);
+				}
 			}
 			else {
 				$last_value = [
@@ -1809,7 +1812,10 @@ class CScreenProblem extends CScreenBase {
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
 							: UNRESOLVED_MACRO_STRING
 					),
-					new CCol($last_value['value']),
+					new CCol($item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+						: $last_value['value']
+					),
 					new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
@@ -1829,13 +1835,19 @@ class CScreenProblem extends CScreenBase {
 					)
 				]);
 
-				$latest_values[] = (new CLinkAction($last_value['value']))
+				$latest_values[] = (new CLinkAction(
+					$item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? _('binary value')
+						: $last_value['value']
+				))
 					->addClass('hint-item')
 					->setAttribute('data-hintbox', '1');
 				$latest_values[] = ', ';
 			}
 			else {
-				$latest_values[] = $last_value['value'];
+				$latest_values[] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+					? UNRESOLVED_MACRO_STRING
+					: $last_value['value'];
 			}
 		}
 
