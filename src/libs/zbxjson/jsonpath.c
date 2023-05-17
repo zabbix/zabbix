@@ -3160,8 +3160,6 @@ zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error)
 
 	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
 
-	pthread_mutex_init(&index->lock, NULL);
-
 	return index;
 }
 
