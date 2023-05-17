@@ -1061,7 +1061,7 @@ class CService extends CApiService {
 			' FROM service_alarms sa'.
 			' WHERE '.dbConditionId('sa.serviceid', array_keys($result)).
 				' AND ('.implode(' OR ', $where_or).')'.
-			' ORDER BY sa.clock'
+			' ORDER BY sa.clock, sa.servicealarmid'
 		);
 
 		while ($db_alarm = DBfetch($db_alarms_resource)) {

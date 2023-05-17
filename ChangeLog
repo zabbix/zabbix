@@ -1,7 +1,53 @@
+Changes for 6.0.18rc1
+
+New features:
+A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
+.........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
+..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
+...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
+.........T [ZBXNEXT-8391] added healthcheck metric for container in Docker by Zabbix agent 2 template (egordymov)
+...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
+
+Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+.........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
+A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
+...G...... [ZBX-20604] fixed UserParameterDir behavior for UserParameter calls (MVekslers)
+..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
+.......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
+..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
+.........T [ZBX-21599] optimised preprocessing steps and added dashboard in the TiDB TiKV by HTTP template (aiantsen)
+.........T [ZBX-21598] optimised preprocessing steps and added dashboard in the TiDB PD by HTTP template (aiantsen)
+.........T [ZBX-21600] optimised preprocessing steps and added dashboard in the TiDB by HTTP template (aiantsen)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
+.........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
+.........T [ZBX-20202] improved tablespace handling to support Oracle multitenant architecture in Oracle by ODBC template (knaglis)
+........S. [ZBX-22713] fixed Zabbix server compilation problem for NetBSD (kprutkovs, wiper)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+..F....... [ZBX-21801] fixed helper positioning when sorting Header and Query fields in item configuration form (miks)
+..F....... [ZBX-22238] fixed non-writable hostgroup appearance in template, host and host prototype clone forms (miks)
+..F....... [ZBX-22192] fixed valid widget name being reset when other widget fields are invalid (miks)
+A......... [ZBX-21871] switched for the changes in users of user group API object to be audit logged as updates in groups of user API objects (jfreibergs, vmaksimovs)
+..F....... [ZBX-22461] fixed incorrect sortable item positioning in Safari (miks)
+A......... [ZBX-22469] fixed SLI calculation for services having multiple alarms per second (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.17
+
+6.0.17rc2 was released as 6.0.17 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.17rc2
 
 New features:
 .........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
+
+Bug fixes:
+.......PS. [ZBX-22718] fixed memory leak in json objects and identical keys (wiper)
+.......PS. [ZBX-22719] fixed replace() function in expressions (wiper)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.17rc1
@@ -2494,9 +2540,26 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.35rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34
+
+5.0.34rc1 was released as 5.0.34 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.34rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
 ...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
@@ -5275,6 +5338,7 @@ Changes for 4.0.46rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45
