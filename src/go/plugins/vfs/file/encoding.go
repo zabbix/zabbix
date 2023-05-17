@@ -38,12 +38,15 @@ import (
 func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 	log.Infof("AAAAAA")
 
+	log.Infof("BADGERL %d", bytecount)
 
-		log.Infof("BADGERL %d", bytecount)
-		for i :=0 ; i < bytecount; i++ {
+	if bytecount == 0 {
+		return inbuf
+	}
+
+	for i := 0; i < bytecount; i++ {
 		log.Infof("BADGER INBUF X: %x", inbuf[i])
-		}
-
+	}
 
 	if "" == encoder {
 		if bytecount > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
@@ -82,7 +85,6 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 		inptr := (*C.char)(unsafe.Pointer(&inbuf[bytecount-int(inbytes)]))
 		outptr := (*C.char)(unsafe.Pointer(&outbuf[bytecount-int(outbytes)]))
 
-			
 		log.Tracef("Calling C function \"call_iconv()\"")
 		_, err := C.call_iconv(cd, inptr, &inbytes, outptr, &outbytes)
 		if err == nil || err.(syscall.Errno) != syscall.E2BIG {
@@ -90,8 +92,8 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 			break
 		}
 
-		for i :=0 ; i < len(outbuf); i++ {
-		log.Infof("BADGER OUTBUF X: %x", outbuf[i])
+		for i := 0; i < len(outbuf); i++ {
+			log.Infof("BADGER OUTBUF X: %x", outbuf[i])
 		}
 
 		outbytes += C.size_t(bytecount)
@@ -101,7 +103,7 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 	}
 	outbuf = outbuf[:len(outbuf)-int(outbytes)]
 	log.Tracef("Calling C function \"iconv_close()\"")
- 	C.iconv_close(cd)
+	C.iconv_close(cd)
 	log.Infof("BADGER decode outbuf before: %v", outbuf)
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]

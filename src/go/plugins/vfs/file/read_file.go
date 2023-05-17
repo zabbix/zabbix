@@ -21,9 +21,10 @@ package file
 
 import (
 	"fmt"
+	"git.zabbix.com/ap/plugin-support/log"
+	"io"
 	"os"
 	"strings"
-	"git.zabbix.com/ap/plugin-support/log"
 )
 
 // void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
@@ -103,7 +104,6 @@ import (
 // 	if (0 >= (nbytes = read(fd, buf, count)))
 // 		return (int)nbytes;
 
-
 // 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER zbx_read 3");
 
 // 	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
@@ -170,38 +170,36 @@ import (
 // 	return (int)i;
 // }
 
-
-
-func (p *Plugin) find_CR_LF_Szbyte(encoding string)(cr []byte, lf []byte, szbyte int) {
+func (p *Plugin) find_CR_LF_Szbyte(encoding string) (cr []byte, lf []byte, szbyte int) {
 	/* default is single-byte character set */
-	cr =[]byte ("\r");
-	lf = []byte("\n");
-	szbyte = 1;
+	cr = []byte("\r")
+	lf = []byte("\n")
+	szbyte = 1
 
 	if "" != encoding {
 		if strings.EqualFold(encoding, "UNICODE") || strings.EqualFold(encoding, "UNICODELITTLE") ||
-				 strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
-				 strings.EqualFold(encoding, "UTF16") ||  strings.EqualFold(encoding, "UTF16LE") ||
-				 strings.EqualFold(encoding, "UCS-2") ||  strings.EqualFold(encoding, "UCS-2LE") {
+			strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
+			strings.EqualFold(encoding, "UTF16") || strings.EqualFold(encoding, "UTF16LE") ||
+			strings.EqualFold(encoding, "UCS-2") || strings.EqualFold(encoding, "UCS-2LE") {
 			cr = []byte("\r\n")
 			lf = []byte("\n\x00")
-			szbyte = 2;
+			szbyte = 2
 		} else if strings.EqualFold(encoding, "UNICODEBIG") || strings.EqualFold(encoding, "UNICODEFFFE") ||
-				strings.EqualFold(encoding, "UTF-16BE") || strings.EqualFold(encoding, "UTF16BE") ||
-				strings.EqualFold(encoding, "UCS-2BE") {
+			strings.EqualFold(encoding, "UTF-16BE") || strings.EqualFold(encoding, "UTF16BE") ||
+			strings.EqualFold(encoding, "UCS-2BE") {
 			cr = []byte("\x00\r")
 			lf = []byte("\x00\n")
-			szbyte = 2;
+			szbyte = 2
 		} else if strings.EqualFold(encoding, "UTF-32") || strings.EqualFold(encoding, "UTF-32LE") ||
-				strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") {
+			strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") {
 			cr = []byte("\r\x00\x00\x00")
 			lf = []byte("\n\x00\x00\x00")
-			
-			szbyte = 4;
+
+			szbyte = 4
 		} else if strings.EqualFold(encoding, "UTF-32BE") || strings.EqualFold(encoding, "UTF32BE") {
 			cr = []byte("\x00\x00\x00\r")
 			lf = []byte("\x00\x00\x00\n")
-			szbyte = 4;
+			szbyte = 4
 		}
 	}
 
@@ -209,13 +207,13 @@ func (p *Plugin) find_CR_LF_Szbyte(encoding string)(cr []byte, lf []byte, szbyte
 }
 
 func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, bStartOffset int) bool {
-		ee := true
-		for ii := 0; ii <= szbyte; ii++ {
-			if a[aStartOffset+ii] != b[bStartOffset+ii] {
-				ee = false
-			}
+	ee := true
+	for ii := 0; ii < szbyte; ii++ {
+		if a[aStartOffset+ii] != b[bStartOffset+ii] {
+			ee = false
 		}
-	return ee;
+	}
+	return ee
 }
 
 /******************************************************************************
@@ -239,14 +237,15 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
  *                                                                            *
  ******************************************************************************/
 func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
-	var i uint64
-	var szbyte int;
+	var i int
+	var szbyte int
 	//	var nbytes int64;
-	var cr []byte;
-	var lf []byte;
+	var cr []byte
+	var lf []byte
 
-	var offset int64;
+	var offset int64
 
+	buf = make([]byte, MAX_BUFFER_LEN)
 	// if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 	// 	return -1;
 
@@ -255,34 +254,40 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		return nil, 0, err
 	}
 
-	log.Infof("BADGER zbx_read 2");
+	log.Infof("BADGER zbx_read 2: offset: %s", offset)
 
 	// if (0 >= (nbytes = read(fd, buf, count)))
 	// 	return (int)nbytes;
 	nbytes, err = targetFile.Read(buf)
 	if err != nil {
-		return nil, 0, err
+		if err != io.EOF {
+			log.Infof("BADGER READ ERROR: %+v", err)
+			return nil, 0, err
+		} else {
+			log.Infof("BADGER EOF")
+		}
+
 	}
 	if 0 >= nbytes {
+		log.Infof("BADGER nbytes: %d", nbytes)
 		return buf, nbytes, nil
 	}
-	
 
-	log.Infof("BADGER zbx_read 3");
+	log.Infof("BADGER zbx_read 3")
 	// func (p *Plugin) find_CR_LF_Szbyte(encoding string)(cr string, lf string, szbyte uint64)
 	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
 
-	log.Infof("BADGER cr: ->%s<-", cr);
-	log.Infof("BADGER lf ->%s<-", lf);
-	log.Infof("BADGER szbyte ->%lu<-", szbyte);
+	log.Infof("BADGER cr: ->%d<-", cr)
+	log.Infof("BADGER lf ->%d<-", lf)
+	log.Infof("BADGER szbyte ->%lu<-", szbyte)
 	lf_found := 0
 
-	for i := 0; i <= nbytes - szbyte; i += szbyte {
+	for i = 0; i <= nbytes-szbyte; i += szbyte {
 
-	log.Infof("BADGER i ->%d<-", i);
+		log.Infof("BADGER i ->%d<-", i)
 
-	log.Infof("BADGER buf ->%d<- and ->%d<-", buf[i], buf[i+1]);
-	log.Infof("BADGER lf ->%d<- and ->%d<-", lf[0], lf[1]);
+		log.Infof("BADGER buf ->%d<- and ->%d<-", buf[i], buf[i+1])
+		log.Infof("BADGER lf ->%d<- and ->%d<-", lf[0], lf[1])
 
 		// if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		// {
@@ -291,12 +296,20 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		// 	break;
 		// }
 
-		if p.bytesCompare(buf, lf, szbyte, i, i) == true {
-			i += szbyte;
-			lf_found = 1;
-			break;
+		log.Infof("BADGER buf size: %d, lf size: %d", len(buf), len(lf))
+		for x := 0; x < szbyte; x++ {
+			log.Infof("BADGER buf val: %d", buf[x])
 		}
-			
+		for x := 0; x < szbyte; x++ {
+			log.Infof("BADGER lf val: %d", lf[x])
+		}
+
+		if p.bytesCompare(buf, lf, szbyte, i, 0) == true {
+			i += szbyte
+			lf_found = 1
+			break
+		}
+
 		// if (0 == memcmp(&buf[i], cr, szbyte))	/* CR (Mac) */
 		// {
 		// 	/* CR+LF (Windows) ? */
@@ -307,49 +320,48 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		// 	lf_found = 1;
 		// 	break;
 		// }
-		if p.bytesCompare(buf, cr, szbyte, i, i) == true {
-			if i < nbytes - szbyte && p.bytesCompare(buf, lf, szbyte, i+szbyte, i) {
+		if p.bytesCompare(buf, cr, szbyte, i, 0) == true {
+			if i < nbytes-szbyte && p.bytesCompare(buf, lf, szbyte, i+szbyte, 0) {
 				i += szbyte
 			}
 			i += szbyte
 			lf_found = 1
-			break;
+			break
 		}
 	}
 
-	log.Infof("BADGER AFTER i ->%lu<-", i);
+	log.Infof("BADGER AFTER i ->%lu<-", i)
 
-	log.Infof("BADGER AFTER nbytes ->%lu<-", nbytes);
-	log.Infof("BADGER AFTER nbytes-szbyte ->%lu<-", nbytes-szbyte);
-	log.Infof("BADGER AFTER szbyte ->%lu<-", szbyte);
+	log.Infof("BADGER AFTER nbytes ->%lu<-", nbytes)
+	log.Infof("BADGER AFTER nbytes-szbyte ->%lu<-", nbytes-szbyte)
+	log.Infof("BADGER AFTER szbyte ->%lu<-", szbyte)
 
-	if ((0 == lf_found) &&
-			(strings.EqualFold(encoding, "UNICODE") || strings.EqualFold(encoding, "UNICODELITTLE") ||
+	if (0 == lf_found) &&
+		(strings.EqualFold(encoding, "UNICODE") || strings.EqualFold(encoding, "UNICODELITTLE") ||
 			strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
 			strings.EqualFold(encoding, "UTF16") || strings.EqualFold(encoding, "UTF16LE") ||
 			strings.EqualFold(encoding, "UCS-2") || strings.EqualFold(encoding, "UCS-2LE") ||
-				strings.EqualFold(encoding, "UNICODEBIG") || strings.EqualFold(encoding, "UNICODEFFFE") ||
-				strings.EqualFold(encoding, "UTF-16BE") || strings.EqualFold(encoding, "UTF16BE") ||
-				strings.EqualFold(encoding, "UCS-2BE") ||
-				strings.EqualFold(encoding, "UTF-32") || strings.EqualFold(encoding, "UTF-32LE") ||
-				strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") ||
-				strings.EqualFold(encoding, "UTF-32BE") || strings.EqualFold(encoding, "UTF32BE"))) {
-		log.Infof("BADGER no line feed");
+			strings.EqualFold(encoding, "UNICODEBIG") || strings.EqualFold(encoding, "UNICODEFFFE") ||
+			strings.EqualFold(encoding, "UTF-16BE") || strings.EqualFold(encoding, "UTF16BE") ||
+			strings.EqualFold(encoding, "UCS-2BE") ||
+			strings.EqualFold(encoding, "UTF-32") || strings.EqualFold(encoding, "UTF-32LE") ||
+			strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") ||
+			strings.EqualFold(encoding, "UTF-32BE") || strings.EqualFold(encoding, "UTF32BE")) {
+		log.Infof("BADGER no line feed")
 		return nil, 0, fmt.Errorf("No line feed detected")
 	}
 
-	log.Infof("BADGER zbx_read 33");
+	log.Infof("BADGER zbx_read 33")
 
 	// if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
 	// 	return -1;
 
-	offset, err = targetFile.Seek(offset + int64(i), os.SEEK_SET)
+	offset, err = targetFile.Seek(offset+int64(i), os.SEEK_SET)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	
-	log.Infof("BADGER zbx_read 4; i: %d", i);
+	log.Infof("BADGER zbx_read 4; i: %d", i)
 
-	return buf, int(i), nil;
+	return buf, int(i), nil
 }

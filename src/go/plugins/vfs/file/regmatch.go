@@ -22,7 +22,7 @@ package file
 import (
 	//	"io/ioutil"
 	"bytes"
-	"io"
+	//"io"
 	//"bufio"
 	"errors"
 	"fmt"
@@ -34,6 +34,8 @@ import (
 	"strings"
 	"time"
 )
+
+const MAX_BUFFER_LEN = 65536
 
 func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
 	var startline, endline /*, curline*/ uint64
@@ -89,36 +91,66 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 
 	// log.Infof("BADGER STRATA: %v", sc2)
 
-	const MAX_BUFFER_LEN = 65536
-
 	ret := 0
 	r, err := regexp.Compile(params[1])
 	if err != nil {
 		return nil, fmt.Errorf("Cannot compile regular expression %s: %s", params[1], err)
 	}
 
-	buffer := make([]byte, MAX_BUFFER_LEN)
+	//buffer := make([]byte, MAX_BUFFER_LEN)
 
-	for {
-		elapsed := time.Since(start)
-		if elapsed.Seconds() > float64(p.options.Timeout) {
-			return nil, errors.New("Timeout while processing item.")
-		}
+	elapsed := time.Since(start)
 
-		bytesread, err := file.Read(buffer)
+	log.Infof("TOYOTA HUEVOS ALPHA, elapeed: %d, timeout: %d", elapsed.Seconds(), p.options.Timeout)
 
+	if elapsed.Seconds() > float64(p.options.Timeout) {
+		return nil, errors.New("Timeout while processing item.")
+	}
+
+	// bytesread, err := file.Read(buffer)
+
+	// if err != nil {
+	// 	if err != io.EOF {
+	// 		fmt.Println(err)
+	// 	}
+
+	// 	break
+	// }
+
+	//while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+	log.Infof("TOYOTA FILE NAME: ->%s<-", params[0])
+	f, e := os.Open(params[0])
+	if e != nil {
+		return nil, e
+	}
+	defer f.Close()
+
+	// buf, nbytes, err := p.readFile(f, encoder)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// for f:= 0; f < nbytes; f++ {
+	// 	log.Infof("TOYOTA res buf: ->%d<-", buf[f])
+	// }
+
+	initial := true
+	nbytes := 0
+	var buf []byte
+	for 0 < nbytes || initial {
+		initial = false
+
+		buf, nbytes, err = p.readFile(f, encoder)
 		if err != nil {
-			if err != io.EOF {
-				fmt.Println(err)
-			}
-
-			break
+			log.Infof("TOYOTA PRE-FINAL RES: ->%v+<-", err)
+			return nil, err
 		}
 
-		log.Infof("TOYOTA bytes read: ", bytesread)
-		log.Infof("TOYOTA bytestream to string: ", string(buffer[:bytesread]))
+		for f := 0; f < nbytes; f++ {
+			log.Infof("TOYOTA ress buf: ->%d<-", buf[f])
+		}
 
-		x := decode(encoder, buffer, bytesread)
+		x := decode(encoder, buf, nbytes)
 
 		for _, m := range bytes.Split(x, []byte("\n")) {
 			log.Infof("TOYOTA LINE X: %s", m)
@@ -128,29 +160,14 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 			ret = 1
 		}
 
-		//while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
-
-		f, e := os.Open(params[0])
-		if e != nil {
-			return nil, e
-		}
-		defer f.Close()
-		buf, nbytes, err := p.readFile(f, encoder)
-		if err != nil {
-			return nil, err
-		}
-		log.Infof("TOYOTA res buf: ->%s<-", buf)
-
-		for 0 < nbytes {
-			buf, nbytes, err = p.readFile(f, encoder)
-			if err != nil {
-				return nil, err
-			}
-			log.Infof("TOYOTA res buf: ->%s<-", buf)
-
-		}
-
 	}
+
+	//
+
+	//
+
+	log.Infof("TOYOTA FINAL RES: ->%d<-", ret)
+
 	return ret, nil
 
 	// Start reading from the file with a reader.
