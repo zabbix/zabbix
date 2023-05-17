@@ -23,34 +23,49 @@ This template has been tested on:
 
 ## Setup
 
-1. Create the Service Account in Google Cloud Console for the project you have to monitor.
->Refer the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
-2. Create and download the Service Account key in JSON format.
->Refer the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+1. Create the service account in Google Cloud Console for the project you have to monitor.
+>Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+2. Create and download the service account key in JSON format.
+>Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
 3. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API. 
->Refer the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
-4. Copy the `project_id`, `private_key_id`, `private_key`, `client_email`, values from the JSON key file, configure {$GCP.PROJECT.ID}, {$GCP.PRIVATE.KEY.ID}, {$GCP.PRIVATE.KEY}, {$GCP.CLIENT.EMAIL} macros accordingly to the template/host.
-**Notes**: 
-     >Ensure, that you're creating the Service Account using the credentials with the `Project Owner/Project IAM Admin/Service Account Admin` role.
-     >The Service Account JSON key file is able to be downloaded just once. Re-generate it if the previous key has been lost.
-     >The Service Account should have `Project Viewer` permissions or granular read-only permissions for the GCP Compute Engine API/GCP Cloud SQL. Please, refer the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts)
-     >You're able to copy and paste private_key string data from the service account json key file as it is or after new line metasymbol (\n) replacement to a real new line.
-     
-     *IMPORTANT!!!*
-     >GCP Access Token is available for the 1 hour (3600 seconds) after the generation request.
-     >To avoid the GCP token inconsistency in the Zabbix Database and in the Zabbix-server configuration cache, don't use CacheUpdateFrequency Zabbix server configuration parameter value more, than 40-45 minutes and don't set the update interval for the GCP Authorization item more, than 1 hour (maximum CacheUpdateFrequency value)
+>Refer to the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
+4. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them  to the corresponding macros `{$GCP.PROJECT.ID}`, `{$GCP.PRIVATE.KEY.ID}`, `{$GCP.PRIVATE.KEY}`, `{$GCP.CLIENT.EMAIL}` on the template/host.
+
+**Additional information**: 
+
+    Ensure, that you're creating the service account using the credentials with the `Project Owner/Project IAM Admin/service account Admin` role.
+
+    The service account JSON key file can only be downloaded once. Regenerate it if the previous key has been lost.
+
+    The service account should have `Project Viewer` permissions or granular permissions for the GCP Compute Engine API/GCP Cloud SQL. 
+
+    You can copy and paste private_key string data from the Service Account JSON key file as is or replace the new line metasymbol (\n) with an actual new line.
+
+>Please, refer to the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts)  about the service accounts management.
+       
+**IMPORTANT!!!**
+
+     GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
+
+     To avoid a GCP token inconsistency between Zabbix database and Zabbix server configuration cache, don't set Zabbix server configuration parameter CacheUpdateFrequency to a value over 45 minutes and don't set the update interval for the GCP Authorization item to more than 1 hour (maximum CacheUpdateFrequency value).
+
+Additional information about metrics and used API methods.
+
+  [Compute Engine](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute)
+  
+  [Cloud SQL](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-cloudsql)
 
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$GCP.PROJECT.ID}|<p>Google Cloud Platform Project Id</p>||
+|{$GCP.PROJECT.ID}|<p>GCP project ID.</p>||
 |{$GCP.CLIENT.EMAIL}|<p>Service account client e-mail.</p>||
 |{$GCP.PRIVATE.KEY.ID}|<p>Service account private key id.</p>||
 |{$GCP.PRIVATE.KEY}|<p>Service account private key data.</p>||
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
-|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item.</p><p>It is the access token re-generation requests frequency as well.</p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
+|{$GCP.AUTH.FREQUENCY}|<p>The update interval for the GCP Authorization item, which also equals to the access token regeneration requests frequency.</p><p>Check the template documentation notes carefully for more details.</p>|`45m`|
 |{$GCP.GCE.INST.NAME.MATCHES}|<p>The filter to include GCP Compute Engine instances by namespace.</p>|`.*`|
 |{$GCP.GCE.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.ZONE.MATCHES}|<p>The filter to include GCP Compute Engine instances by zone.</p>|`.*`|
@@ -59,30 +74,30 @@ This template has been tested on:
 |{$GCP.MYSQL.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MySQL instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.MYSQL.ZONE.MATCHES}|<p>The filter to include GCP Cloud SQL MySQL instances by zone.</p>|`.*`|
 |{$GCP.MYSQL.ZONE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MySQL instances by zone.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.MYSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL MySQL instances by type (Standalone/Replica).</p>|`.*`|
-|{$GCP.MYSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MySQL instances by type (Standalone/Replica).</p><p>To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.MYSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).</p>|`.*`|
+|{$GCP.MYSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MySQL instances by type (standalone/replica).</p><p>Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.PGSQL.INST.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL instances by namespace.</p>|`.*`|
 |{$GCP.PGSQL.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.PGSQL.ZONE.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL instances by zone.</p>|`.*`|
 |{$GCP.PGSQL.ZONE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL instances by zone.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.PGSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL instances by type (Standalone/Replica).</p>|`.*`|
-|{$GCP.PGSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL instances by type (Standalone/Replica).</p><p>To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.PGSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).</p>|`.*`|
+|{$GCP.PGSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL instances by type (standalone/replica).</p><p>Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.MSSQL.INST.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL instances by namespace.</p>|`.*`|
 |{$GCP.MSSQL.INST.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.MSSQL.ZONE.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL instances by zone.</p>|`.*`|
 |{$GCP.MSSQL.ZONE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by zone.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.MSSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL instances by type (Standalone/Replica).</p>|`.*`|
-|{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by type (Standalone/Replica).</p><p>To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.</p>|`CHANGE_IF_NEEDED`|
+|{$GCP.MSSQL.INST.TYPE.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).</p>|`.*`|
+|{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL instances by type (standalone/replica).</p><p>Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.</p>|`CHANGE_IF_NEEDED`|
 |{$GCP.GCE.QUOTA.MATCHES}|<p>The filter to include GCP Compute Engine project quotas by namespace.</p>|`.*`|
 |{$GCP.GCE.QUOTA.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine project quotas by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>The Warning quota utilization threshold.</p>|`80`|
-|{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}|<p>The Critical quota utilization threshold.</p>|`95`|
+|{$GCP.GCE.QUOTA.PUSED.MIN.WARN}|<p>GCP Compute Engine project quota warning utilization threshold.</p>|`80`|
+|{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}|<p>GCP Compute Engine project quota critical quota utilization threshold.</p>|`95`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined on the code level.</p><p>The result is a signed authorization token with 1 hour lifetime, required just once and used for the all dependent script items.</p><p>Check the documentation carefully for the details.</p>|Script|gcp.authorization|
+|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; required only once and used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
 |GCP Compute Engine: Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP: Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
 |GCP Cloud SQL: Instances get|<p>GCP Cloud SQL: Instances Get</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
@@ -92,14 +107,14 @@ This template has been tested on:
 |GCP Cloud SQL PostgreSQL: Instances count|<p>GCP Cloud SQL PostgreSQL instances count.</p>|Dependent item|gcp.gce.instances.pgsql_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.db_type =~ 'POSTGRES')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Instances total|<p>GCP Compute Engine instances total count.</p>|Dependent item|gcp.gce.instances.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[*].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Regular instances count|<p>GCP Compute Engine: Regular instances count.</p>|Dependent item|gcp.gce.instances.regular_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'regular')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Compute Engine: Container-optimized instances count|<p>GCP Compute Engine: count of instances with Container-optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Container-Optimized instances count|<p>GCP Compute Engine: count of instances with Container-Optimized OS used.</p>|Dependent item|gcp.gce.instances.cos_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.i_type == 'container-optimized')].length()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Compute Engine: Project quotas get|<p>GCP Compute Engine resource quotas available for the particular project.</p>|Dependent item|gcp.gce.quotas.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP: Authorization has failed|<p>GCP: Authorization has failed. Please, check the authorization parameters carefully and GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
+|GCP: Authorization has failed|<p>GCP: Authorization has failed. Check the authorization parametersand GCP API availability from network segment, where Zabbix-server/proxy is located.</p>|`length(last(/GCP by HTTP/gcp.auth.err.check)) > 0`|Average||
 
 ### LLD rule GCP Compute Engine: Instances discovery
 
@@ -135,18 +150,18 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data|<p>GCP Compute Engine: Get metrics for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "{#GCE.QUOTA.NAME}")].first()`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage|<p>GCP Compute Engine: The current usage value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit|<p>GCP Compute Engine: The current limit value for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limit`</p></li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used|<p>GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.p_used`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Raw data|<p>GCP Compute Engine: Get metrics for [{#GCE.QUOTA.NAME}] quota.</p>|Dependent item|gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.metric == "{#GCE.QUOTA.NAME}")].first()`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Usage|<p>GCP Compute Engine: The current usage value for [{#GCE.QUOTA.NAME}] quota.</p>|Dependent item|gcp.gce.quota.usage[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.usage`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Limit|<p>GCP Compute Engine: The current limit value for [{#GCE.QUOTA.NAME}] quota.</p>|Dependent item|gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limit`</p></li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percentage used|<p>GCP Compute Engine: Percentage usage for [{#GCE.QUOTA.NAME}] quota.</p>|Dependent item|gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.p_used`</p></li></ul>|
 
 ### Trigger prototypes for GCP Compute Engine: Project quotas discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit had been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota had been changed</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reach the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reach the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit</li></ul>|
-|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reach the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit has been changed|<p>GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed</p>|`change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0`|Info|**Manual close**: Yes|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit</li></ul>|
+|GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit|<p>GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit</p>|`last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}`|Average|**Manual close**: Yes|
 
 # GCP Compute Engine Instance by HTTP
 
@@ -170,7 +185,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined
+This template will be connected to discovered entities automatically with all required parameters pre-defined.
 
 ### Macros used
 
@@ -178,14 +193,14 @@ This template will be connected to discovered entities automatically with all re
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
-|{$GCE.DISK.NAME.MATCHES}|<p>This macro is used in disks discovery rule.</p>|`.*`|
-|{$GCE.DISK.NAME.NOT_MATCHES}|<p>This macro is used in disks discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$GCE.DISK.DEV_TYPE.MATCHES}|<p>This macro is used in disks discovery rule.</p>|`.*`|
-|{$GCE.DISK.DEV_TYPE.NOT_MATCHES}|<p>This macro is used in disks discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$GCE.DISK.STOR_TYPE.MATCHES}|<p>This macro is used in disks discovery rule.</p>|`.*`|
-|{$GCE.DISK.STOR_TYPE.NOT_MATCHES}|<p>This macro is used in disks discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$GCE.CPU.UTIL.MAX}|<p>The CPU utilization threshold.</p>|`95`|
-|{$GCE.RAM.UTIL.MAX}|<p>The RAM utilization threshold.</p>|`90`|
+|{$GCE.DISK.NAME.MATCHES}|<p>The filter to include GCP Compute Engine disks by namespace.</p>|`.*`|
+|{$GCE.DISK.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine disks by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$GCE.DISK.DEV_TYPE.MATCHES}|<p>The filter to include GCP Compute Engine disks by device type.</p>|`.*`|
+|{$GCE.DISK.DEV_TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine disks by device type.</p>|`CHANGE_IF_NEEDED`|
+|{$GCE.DISK.STOR_TYPE.MATCHES}|<p>The filter to include GCP Compute Engine disks by storage type.</p>|`.*`|
+|{$GCE.DISK.STOR_TYPE.NOT_MATCHES}|<p>The filter to exclude GCP Compute Engine disks by storage type.</p>|`CHANGE_IF_NEEDED`|
+|{$GCE.CPU.UTIL.MAX}|<p>GCP Compute Engine instance CPU utilization threshold.</p>|`95`|
+|{$GCE.RAM.UTIL.MAX}|<p>GCP Compute Engine instance RAM utilization threshold.</p>|`90`|
 
 ### Items
 
@@ -280,10 +295,10 @@ This template will be connected to discovered entities automatically with all re
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
-|{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}|<p>MySQL instance warning disk usage threshold.</p>|`80`|
-|{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}|<p>MySQL instance critical disk usage threshold.</p>|`90`|
-|{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}|<p>MySQL instance CPU usage threshold.</p>|`95`|
-|{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}|<p>MySQL instance RAM usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}|<p>GCP Cloud SQL MySQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}|<p>GCP Cloud SQL MySQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}|<p>GCP Cloud SQL MySQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}|<p>GCP Cloud SQL MySQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
@@ -335,7 +350,7 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MySQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
 |GCP Cloud SQL MySQL: Instance is in Unknown state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
 |GCP Cloud SQL MySQL: Failed to get the instance state|<p>Failed to get the instance state. Please, check the access to GCP API or service account permissions provided sufficiency.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10`|Average||
-|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average||
+|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MySQL: Instance is in Suspended state</li><li>GCP Cloud SQL MySQL: Instance is on maintenance</li><li>GCP Cloud SQL MySQL: Instance is in Failed state</li><li>GCP Cloud SQL MySQL: Instance is in Unknown state</li><li>GCP Cloud SQL MySQL: Failed to get the instance state</li></ul>|
 
 # GCP Cloud SQL MySQL Replica by HTTP
 
@@ -372,7 +387,7 @@ This template will be connected to discovered entities automatically with all re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MySQL: Replication metrics get|<p>MySQL replication metrics data in the raw format.</p>|Script|gcp.cloudsql.mysql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MySQL: Replica metrics get|<p>MySQL replication metrics data in the raw format.</p>|Script|gcp.cloudsql.mysql.repl.metrics.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |GCP Cloud SQL MySQL: Last I/O thread error number|<p>The error number of the most recent error that caused the I/O thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_io_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_io_errno`</p></li></ul>|
 |GCP Cloud SQL MySQL: Last SQL thread error number|<p>The error number of the most recent error that caused the SQL thread to stop.</p>|Dependent item|gcp.cloudsql.mysql.repl.last_sql_errno<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.last_sql_errno`</p></li></ul>|
 |GCP Cloud SQL MySQL: Replication lag|<p>Number of seconds the read replica is behind its primary (approximation).</p>|Dependent item|gcp.cloudsql.mysql.repl.replica_lag<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.replica_lag`</p></li></ul>|
@@ -411,12 +426,12 @@ This template will be connected to discovered entities automatically with all re
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
-|{$GCP.CLOUD_SQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL Databases discovery rule.</p>|`.*`|
-|{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}|<p>This macro is used in PostgreSQL Databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}|<p>PostgreSQL instance warning disk usage threshold.</p>|`80`|
-|{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}|<p>PostgreSQL instance critical disk usage threshold.</p>|`90`|
-|{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}|<p>PostgreSQL instance CPU usage threshold.</p>|`95`|
-|{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}|<p>PostgreSQL instance RAM usage threshold.</p>|`90`|
+|{$GCP.CLOUD_SQL.DB.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL PostgreSQL databases by namespace.</p>|`.*`|
+|{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL PostgreSQL databases by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}|<p>GCP Cloud SQL PostgreSQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}|<p>GCP Cloud SQL PostgreSQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}|<p>GCP Cloud SQL PostgreSQLGCP Cloud SQL PostgreSQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}|<p>GCP Cloud SQL PostgreSQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
@@ -464,7 +479,7 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL PostgreSQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
 |GCP Cloud SQL PostgreSQL: Instance is in Unknown state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
 |GCP Cloud SQL PostgreSQL: Failed to get the instance state|<p>Failed to get the instance state. Please, check the access to GCP API or service account permissions provided sufficiency.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10`|Average||
-|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average||
+|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL PostgreSQL: Instance is in Suspended state</li><li>GCP Cloud SQL PostgreSQL: Instance is on maintenance</li><li>GCP Cloud SQL PostgreSQL: Instance is in Failed state</li><li>GCP Cloud SQL PostgreSQL: Instance is in Unknown state</li><li>GCP Cloud SQL PostgreSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule GCP Cloud SQL PostgreSQL: Databases discovery
 
@@ -504,7 +519,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- GCP Cloud SQL PostgreSQL Read-Replicas versions: 14, 13, 12
+- GCP Cloud SQL PostgreSQL Read-replica versions: 14, 13, 12
 
 ## Configuration
 
@@ -566,16 +581,16 @@ This template will be connected to discovered entities automatically with all re
 |----|-----------|-------|
 |{$GCP.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`15s`|
 |{$GCP.TIME.WINDOW}|<p>Time interval for the data requests.</p><p>There are following usage types:</p><p>1. The default update interval for the most of the items.</p><p>2. The minimal time window for the data requested inside Monitoring Query Language REST API request.</p>|`5m`|
-|{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}|<p>This macro is used in Resources discovery rule.</p>|`.*`|
-|{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}|<p>This macro is used in Resources discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Databases discovery rule.</p>|`.*`|
-|{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.MSSQL.SCHEDULER.ID.MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`.*`|
-|{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}|<p>This macro is used in Schedulers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}|<p>MSSQL instance warning disk usage threshold.</p>|`80`|
-|{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}|<p>MSSQL instance critical disk usage threshold.</p>|`90`|
-|{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}|<p>MSSQL instance CPU usage threshold.</p>|`95`|
-|{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}|<p>MSSQL instance RAM usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL resources by namespace.</p>|`.*`|
+|{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL resources by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL databases by namespace.</p>|`.*`|
+|{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL databases by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$CLOUD_SQL.MSSQL.SCHEDULER.ID.MATCHES}|<p>The filter to include GCP Cloud SQL MSSQL schedulers by namespace.</p>|`.*`|
+|{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}|<p>The filter to exclude GCP Cloud SQL MSSQL schedulers by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}|<p>GCP Cloud SQL MSSQL instance warning disk usage threshold.</p>|`80`|
+|{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}|<p>GCP Cloud SQL MSSQL instance critical disk usage threshold.</p>|`90`|
+|{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}|<p>GCP Cloud SQL MSSQL instance CPU usage threshold.</p>|`95`|
+|{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}|<p>GCP Cloud SQL MSSQL instance RAM usage threshold.</p>|`90`|
 
 ### Items
 
@@ -620,9 +635,9 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: Write age operations|<p>Total number of physical database page writes. </p><p>This statistic counts physical page writes across all databases.</p>|Dependent item|gcp.cloudsql.mssql.memory.page_ops.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_write`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Audits size|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.base_audits_size`</p></li></ul>|
 |GCP Cloud SQL MSSQL: Audits successfully uploaded|<p>Tracks the size in bytes of stored SQLServer audit files on an instance.</p><p>Empty value if there are no audits enabled.</p>|Dependent item|gcp.cloudsql.mssql.audits_upload_count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mssql_success`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|GCP Cloud SQL MSSQL: Resources get|<p>MSSQL resources data in the raw format.</p>|Script|gcp.cloudsql.mssql.resources.get|
-|GCP Cloud SQL MSSQL: Databases get|<p>MSSQL databases data in the raw format.</p>|Script|gcp.cloudsql.mssql.db.get|
-|GCP Cloud SQL MSSQL: Schedulers get|<p>MSSQL schedulers data in the raw format.</p>|Script|gcp.cloudsql.mssql.schedulers.get|
+|GCP Cloud SQL MSSQL: Resources get|<p>MSSQL resources data in the raw format.</p>|Script|gcp.cloudsql.mssql.resources.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MSSQL: Databases get|<p>MSSQL databases data in the raw format.</p>|Script|gcp.cloudsql.mssql.db.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Cloud SQL MSSQL: Schedulers get|<p>MSSQL schedulers data in the raw format.</p>|Script|gcp.cloudsql.mssql.schedulers.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -638,7 +653,7 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: Instance is in Failed state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
 |GCP Cloud SQL MSSQL: Instance is in Unknown state|<p>The instance creation failed or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
 |GCP Cloud SQL MSSQL: Failed to get the instance state|<p>Failed to get the instance state. Please, check the access to GCP API or service account permissions provided sufficiency.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10`|Average||
-|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average||
+|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MSSQL: Instance is in Suspended state</li><li>GCP Cloud SQL MSSQL: Instance is on maintenance</li><li>GCP Cloud SQL MSSQL: Instance is in Failed state</li><li>GCP Cloud SQL MSSQL: Instance is in Unknown state</li><li>GCP Cloud SQL MSSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule Resources discovery
 

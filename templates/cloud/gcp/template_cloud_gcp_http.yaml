@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-16T12:53:47Z'
+  date: '2023-05-17T14:54:24Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -49,7 +49,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 GCP: Authorization has failed. 
-                Please, check the authorization parameters carefully 
+                Check the authorization parameters
                 and GCP API availability from network segment, where Zabbix-server/proxy is located.
                 
               tags:
@@ -82,7 +82,7 @@ zabbix_export:
             
             function fromHex(hex) {
                 utf8array = [];
-                if (hex.length % 2) 
+                if (hex.length % 2)
                     throw 'HEX string is broken: ' + hex;
                 for (var i = 0; i < hex.length; i += 2) {
                     utf8array.push(parseInt(hex.substr(i, 2), 16));
@@ -123,7 +123,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -131,7 +132,8 @@ zabbix_export:
             
                 if (response.access_token !== 'undefined') {
                     return response.access_token;
-                } else {
+                }
+                else {
                     throw 'No access token in the JWT exchange request.';
                 }
             }
@@ -170,9 +172,9 @@ zabbix_export:
             }
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
-            The necessary scopes are pre-defined on the code level.
-            The result is a signed authorization token with 1 hour lifetime, required just once and used for the all dependent script items.
-            Check the documentation carefully for the details.
+            The necessary scopes are pre-defined.
+            Returns a signed authorization token with 1 hour lifetime; required only once and used for all the dependent script items.
+            Check the template documentation for the details.
             
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
@@ -218,7 +220,7 @@ zabbix_export:
                       }
                       return data;
                   }
-                      
+                  
                   function getHttpData(url, token) {
                       var request = new HttpRequest();
                   
@@ -245,7 +247,8 @@ zabbix_export:
                       if (request.getStatus() !== 200) {
                           if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
-                          } else {
+                          }
+                          else {
                               throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                           }
                       }
@@ -261,30 +264,35 @@ zabbix_export:
                   
                   var sql_inst_props = getField(inst_raw, 'items').map(function (sql_inst) {
                       obj = {
-                          name: getField(sql_inst,'name'),
+                          name: getField(sql_inst, 'name'),
                           token: value,
-                          zone: getField(sql_inst,'settings.locationPreference.zone'),
-                          inst_type: getField(sql_inst,'instanceType'),
-                          tier: getField(sql_inst,'settings.tier'),
-                          project_id: getField(sql_inst,'project'),
-                          db_type: getField(sql_inst,'databaseInstalledVersion')
+                          zone: getField(sql_inst, 'settings.locationPreference.zone'),
+                          inst_type: getField(sql_inst, 'instanceType'),
+                          tier: getField(sql_inst, 'settings.tier'),
+                          project_id: getField(sql_inst, 'project'),
+                          db_type: getField(sql_inst, 'databaseInstalledVersion')
                       };
+                  
                       obj.high_availability = (sql_inst.failoverReplica) ? true : false;
+                      
                       if (obj.db_type.match(/SQLSERVER*/)) {
-                          var mssql_audit = getField(sql_inst,'settings.sqlServerAuditConfig');
+                          var mssql_audit = getField(sql_inst, 'settings.sqlServerAuditConfig');
+                  
                           obj.audited = (mssql_audit.bucket) ? true : false;
                       }
                   
                       if (obj.inst_type.match(/READ_REPLICA_INSTANCE/)) {
-                          obj.master = getField(sql_inst,'masterInstanceName');
+                          obj.master = getField(sql_inst, 'masterInstanceName');
                       }
                   
-                      if ( typeof sql_inst.ipAddresses !== 'undefined') {
+                      if (typeof sql_inst.ipAddresses !== 'undefined') {
                           var addresses = sql_inst.ipAddresses.filter(function (addr) {
                               return addr.type == 'PRIMARY';
                           });
+                  
                           obj.ip = addresses[0].ipAddress;
-                      } else obj.ip = '0.0.0.0';
+                      }
+                      else obj.ip = '0.0.0.0';
                   
                       return obj;
                   });
@@ -313,13 +321,13 @@ zabbix_export:
             - tag: component
               value: environment
         - uuid: 58329c9a5b124b1990c94f15266e6edf
-          name: 'GCP Compute Engine: Container-optimized instances count'
+          name: 'GCP Compute Engine: Container-Optimized instances count'
           type: DEPENDENT
           key: gcp.gce.instances.cos_count
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'GCP Compute Engine: count of instances with Container-optimized OS used.'
+          description: 'GCP Compute Engine: count of instances with Container-Optimized OS used.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -355,8 +363,10 @@ zabbix_export:
                   
                   function getField(data, path) {
                       var steps = path.split('.');
+                  
                       for (var i = 0; i < steps.length; i++) {
                           var step = steps[i];
+                          
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                               throw 'Required field was not found: ' + path;
                           }
@@ -391,7 +401,8 @@ zabbix_export:
                       if (request.getStatus() !== 200) {
                           if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
-                          } else {
+                          }
+                          else {
                               throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                           }
                       }
@@ -411,14 +422,14 @@ zabbix_export:
                                   name: getField(inst, 'name'),
                                   token: value,
                                   zone: keys[i].replace(/zones\//, ''),
-                                  m_type: getField(inst,'machineType').replace(/.*machineTypes\//g, ''),
-                                  state: getField(inst,'status'),
+                                  m_type: getField(inst, 'machineType').replace(/.*machineTypes\//g, ''),
+                                  state: getField(inst, 'status'),
                                   project_id: '{$GCP.PROJECT.ID}',
                                   ip: inst.networkInterfaces[0].networkIP ? inst.networkInterfaces[0].networkIP : '0.0.0.0',
-                                  integrity: getField(inst,'shieldedInstanceConfig.enableIntegrityMonitoring')
+                                  integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
                               };
                   
-                              if ( typeof inst.networkInterfaces[0].accessConfigs[0] !== 'undefined') {
+                              if (typeof inst.networkInterfaces[0].accessConfigs[0] !== 'undefined') {
                                   obj.ext_ip = inst.networkInterfaces[0].accessConfigs[0].natIP ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
                               }
                               else {
@@ -426,7 +437,8 @@ zabbix_export:
                               }
                               if (typeof inst.labels != 'undefined') {
                                   obj.i_type = inst.labels['container-vm'] ? 'container-optimized' : 'regular';
-                              } else {
+                              }
+                              else {
                                   obj.i_type = 'regular';
                               }
                               return obj;
@@ -554,8 +566,10 @@ zabbix_export:
                   
                   function getField(data, path) {
                       var steps = path.split('.');
+                  
                       for (var i = 0; i < steps.length; i++) {
                           var step = steps[i];
+                          
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                               throw 'Required field was not found: ' + path;
                           }
@@ -590,7 +604,8 @@ zabbix_export:
                       if (request.getStatus() !== 200) {
                           if (typeof (response.error && response.error.message) !== 'undefined') {
                               throw response.error.message;
-                          } else {
+                          }
+                          else {
                               throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                           }
                       }
@@ -603,11 +618,11 @@ zabbix_export:
                   };
                   var project = checkMacro('{$GCP.PROJECT.ID}'),
                       qts_raw = getHttpData('https://www.googleapis.com/compute/v1/projects/' + project, token),
-                      qts_lst = getField(qts_raw,'quotas').map(function (qt) {
+                      qts_lst = getField(qts_raw, 'quotas').map(function (qt) {
                           obj = {
-                              metric: getField(qt,'metric'),
-                              limit: getField(qt,'limit'),
-                              usage: getField(qt,'usage'),
+                              metric: getField(qt, 'metric'),
+                              limit: getField(qt, 'limit'),
+                              usage: getField(qt, 'usage'),
                               p_used: (qt.usage / qt.limit) * 100
                           };
                           return obj;
@@ -1114,7 +1129,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'GCP Compute Engine: The current limit value for the quota with the name [{#GCE.QUOTA.NAME}].'
+              description: 'GCP Compute Engine: The current limit value for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1129,16 +1144,16 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ac0d8842f0934dcead56d41f328c10d2
                   expression: 'change(/GCP by HTTP/gcp.gce.quota.limit[{#GCE.QUOTA.NAME}]) <> 0'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit had been changed'
+                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit has been changed'
                   opdata: 'Current limit: {ITEM.VALUE}'
                   priority: INFO
-                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota had been changed'
+                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
                       value: capacity
             - uuid: 6bb3700f7c5c4c51b6a435f5c7d0e315
-              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percent used'
+              name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}]: Percentage used'
               type: DEPENDENT
               key: 'gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]'
               delay: '0'
@@ -1146,12 +1161,14 @@ zabbix_export:
               trends: 90d
               value_type: FLOAT
               units: '%'
-              description: 'GCP Compute Engine Percentage usage for the quota with the name [{#GCE.QUOTA.NAME}].'
+              description: 'GCP Compute Engine: Percentage usage for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
+                - type: CHECK_NOT_SUPPORTED
+                  parameters:
+                    - ''
                 - type: JSONPATH
                   parameters:
                     - $.p_used
-                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'gcp.gce.quota.single.raw[{#GCE.QUOTA.NAME}]'
               tags:
@@ -1162,23 +1179,23 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ecce0204198d4edda88f84d4f25ba75c
                   expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.WARN:"{#GCE.QUOTA.NAME}"}'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reach the limit'
+                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: WARNING
-                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reach the limit'
+                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit'
                   manual_close: 'YES'
                   dependencies:
-                    - name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit'
+                    - name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
                       expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}'
                   tags:
                     - tag: scope
                       value: capacity
                 - uuid: bc894d5e4f694e428fcb32babe87c204
                   expression: 'last(/GCP by HTTP/gcp.gce.quota.pused[{#GCE.QUOTA.NAME}]) >= {$GCP.GCE.QUOTA.PUSED.MIN.CRIT:"{#GCE.QUOTA.NAME}"}'
-                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reach the limit'
+                  name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: AVERAGE
-                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reach the limit'
+                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1193,7 +1210,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'GCP Compute Engine: Get metrics for the quota with the name [{#GCE.QUOTA.NAME}].'
+              description: 'GCP Compute Engine: Get metrics for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1212,7 +1229,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'GCP Compute Engine: The current usage value for the quota with the name [{#GCE.QUOTA.NAME}].'
+              description: 'GCP Compute Engine: The current usage value for [{#GCE.QUOTA.NAME}] quota.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1264,8 +1281,7 @@ zabbix_export:
         - macro: '{$GCP.AUTH.FREQUENCY}'
           value: 45m
           description: |
-            The update interval for the GCP Authorization item.
-            It is the access token re-generation requests frequency as well.
+            The update interval for the GCP Authorization item, which also equals to the access token regeneration requests frequency.
             Check the template documentation notes carefully for more details.
             
         - macro: '{$GCP.CLIENT.EMAIL}'
@@ -1287,10 +1303,10 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine project quotas by namespace.'
         - macro: '{$GCP.GCE.QUOTA.PUSED.MIN.CRIT}'
           value: '95'
-          description: 'The Critical quota utilization threshold.'
+          description: 'GCP Compute Engine project quota critical quota utilization threshold.'
         - macro: '{$GCP.GCE.QUOTA.PUSED.MIN.WARN}'
           value: '80'
-          description: 'The Warning quota utilization threshold.'
+          description: 'GCP Compute Engine project quota warning utilization threshold.'
         - macro: '{$GCP.GCE.ZONE.MATCHES}'
           value: '.*'
           description: 'The filter to include GCP Compute Engine instances by zone.'
@@ -1305,12 +1321,12 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL instances by namespace.'
         - macro: '{$GCP.MSSQL.INST.TYPE.MATCHES}'
           value: '.*'
-          description: 'The filter to include GCP Cloud SQL MSSQL instances by type (Standalone/Replica).'
+          description: 'The filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).'
         - macro: '{$GCP.MSSQL.INST.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: |
-            The filter to exclude GCP Cloud SQL MSSQL instances by type (Standalone/Replica).
-            To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.
+            The filter to exclude GCP Cloud SQL MSSQL instances by type (standalone/replica).
+            Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
             
         - macro: '{$GCP.MSSQL.ZONE.MATCHES}'
           value: '.*'
@@ -1326,12 +1342,12 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MySQL instances by namespace.'
         - macro: '{$GCP.MYSQL.INST.TYPE.MATCHES}'
           value: '.*'
-          description: 'The filter to include GCP Cloud SQL MySQL instances by type (Standalone/Replica).'
+          description: 'The filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).'
         - macro: '{$GCP.MYSQL.INST.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: |
-            The filter to exclude GCP Cloud SQL MySQL instances by type (Standalone/Replica).
-            To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.
+            The filter to exclude GCP Cloud SQL MySQL instances by type (standalone/replica).
+            Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
             
         - macro: '{$GCP.MYSQL.ZONE.MATCHES}'
           value: '.*'
@@ -1347,12 +1363,12 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.'
         - macro: '{$GCP.PGSQL.INST.TYPE.MATCHES}'
           value: '.*'
-          description: 'The filter to include GCP Cloud SQL PostgreSQL instances by type (Standalone/Replica).'
+          description: 'The filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
         - macro: '{$GCP.PGSQL.INST.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: |
-            The filter to exclude GCP Cloud SQL PostgreSQL instances by type (Standalone/Replica).
-            To exclude the unnecessary type set 'CLOUD_SQL_INSTANCE' or 'READ_REPLICA_INSTANCE' as a macro value to exclude Standalone Instances or Read-Only Replicas.
+            The filter to exclude GCP Cloud SQL PostgreSQL instances by type (standalone/replica).
+            Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
             
         - macro: '{$GCP.PGSQL.ZONE.MATCHES}'
           value: '.*'
@@ -1367,7 +1383,7 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Service account private key id.'
         - macro: '{$GCP.PROJECT.ID}'
-          description: 'Google Cloud Platform Project Id'
+          description: 'GCP project ID.'
       dashboards:
         - uuid: 71df4601171e471ea74a291242028394
           name: 'Project resources'
@@ -1796,8 +1812,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+                    
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -1841,7 +1859,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -1876,6 +1895,10 @@ zabbix_export:
             }
             return JSON.stringify(arr);
           description: 'MSSQL databases data in the raw format.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -1931,6 +1954,19 @@ zabbix_export:
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
                 
+              dependencies:
+                - name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
+                - name: 'GCP Cloud SQL MSSQL: Instance is on maintenance'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
+                - name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
@@ -2407,8 +2443,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var url = 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query',
-                base_path = 'cloudsql.googleapis.com/database/',
+            var base_path = 'cloudsql.googleapis.com/database/',
                 mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
                 base_paths = [
                     base_path + 'cpu/reserved_cores',
@@ -2448,8 +2483,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -2493,7 +2530,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -2509,11 +2547,13 @@ zabbix_export:
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, ''),
                         value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                        
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
                                 obj[prefix + key] = values[i][value_types[v]];
-                            } else {
+                            }
+                            else {
                                 obj[key] = values[i][value_types[v]];
                             }
             
@@ -2523,8 +2563,9 @@ zabbix_export:
                 return obj;
             }
             
-            function single_metrics(tsd) {
+            function singleMetrics(tsd) {
                 var result = {};
+            
                 for (t in tsd) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
@@ -2538,6 +2579,7 @@ zabbix_export:
             
             
             var params = checkParams(JSON.parse(value));
+            
             if (params.audited.match(/true/)) {
                 base_paths.push(mssql_path + 'audits_size');
             };
@@ -2553,12 +2595,13 @@ zabbix_export:
                 ];
             
             var obj = {};
+            
             for (q in queries) {
                 raw = getHttpData(url, params.token, queries[q].data);
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
-            obj.base_ram_pused = (getField(obj,'base_usage') / getField(obj,'base_quota')) * 100;
+            obj.base_ram_pused = (getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100;
             
             var single_queries = [
                 { query: mssql_path + 'memory/page_operation_count' + filter }
@@ -2570,7 +2613,7 @@ zabbix_export:
             
             for (q in single_queries) {
                 raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, single_metrics(getField(raw,'timeSeriesData')));
+                Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
             }
             
             return JSON.stringify(obj);
@@ -2673,8 +2716,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+                    
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -2718,7 +2763,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -2733,26 +2779,30 @@ zabbix_export:
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
             var raw = getHttpData(url, params.token, {
-                    query:
-                        '{' + base_paths.join(';') + '}' + j_filter
-                }),
-                metrics = getField(raw,'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw,'timeSeriesData');
+                query:
+                    '{' + base_paths.join(';') + '}' + j_filter
+            }),
+                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+                time_series = getField(raw, 'timeSeriesData');
             
             for (t in time_series) {
                 data = {
-                    resource: getField(time_series[t],'labelValues.3.stringValue'),
+                    resource: getField(time_series[t], 'labelValues.3.stringValue'),
                     metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i],'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
                 }
                 arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'MSSQL resources data in the raw format.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -2789,8 +2839,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+                    
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -2834,7 +2886,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -2849,26 +2902,30 @@ zabbix_export:
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
             var raw = getHttpData(url, params.token, {
-                    query:
-                        '{' + base_paths.join(';') + '}' + j_filter
-                }),
-                metrics = getField(raw,'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw,'timeSeriesData');
+                query:
+                    '{' + base_paths.join(';') + '}' + j_filter
+            }),
+                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+                time_series = getField(raw, 'timeSeriesData');
             
             for (t in time_series) {
                 data = {
-                    scheduler: getField(time_series[t],'labelValues.3.stringValue'),
+                    scheduler: getField(time_series[t], 'labelValues.3.stringValue'),
                     metrics: {}
                 };
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i],'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
                 }
                 arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'MSSQL schedulers data in the raw format.'
+          preprocessing:
+            - type: CHECK_NOT_SUPPORTED
+              parameters:
+                - ''
           timeout: '{$GCP.DATA.TIMEOUT}'
           parameters:
             - name: project_id
@@ -3389,34 +3446,34 @@ zabbix_export:
       macros:
         - macro: '{$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'MSSQL instance CPU usage threshold.'
+          description: 'GCP Cloud SQL MSSQL instance CPU usage threshold.'
         - macro: '{$CLOUD_SQL.MSSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Databases discovery rule.'
+          description: 'The filter to include GCP Cloud SQL MSSQL databases by namespace.'
         - macro: '{$CLOUD_SQL.MSSQL.DB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Schedulers discovery rule.'
+          description: 'The filter to exclude GCP Cloud SQL MSSQL databases by namespace.'
         - macro: '{$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'MSSQL instance critical disk usage threshold.'
+          description: 'GCP Cloud SQL MSSQL instance critical disk usage threshold.'
         - macro: '{$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'MSSQL instance warning disk usage threshold.'
+          description: 'GCP Cloud SQL MSSQL instance warning disk usage threshold.'
         - macro: '{$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'MSSQL instance RAM usage threshold.'
+          description: 'GCP Cloud SQL MSSQL instance RAM usage threshold.'
         - macro: '{$CLOUD_SQL.MSSQL.RES.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Resources discovery rule.'
+          description: 'The filter to include GCP Cloud SQL MSSQL resources by namespace.'
         - macro: '{$CLOUD_SQL.MSSQL.RES.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Resources discovery rule.'
+          description: 'The filter to exclude GCP Cloud SQL MSSQL resources by namespace.'
         - macro: '{$CLOUD_SQL.MSSQL.SCHEDULER.ID.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Schedulers discovery rule.'
+          description: 'The filter to include GCP Cloud SQL MSSQL schedulers by namespace.'
         - macro: '{$CLOUD_SQL.MSSQL.SCHEDULER.ID.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Schedulers discovery rule.'
+          description: 'The filter to exclude GCP Cloud SQL MSSQL schedulers by namespace.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
@@ -3696,8 +3753,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -3741,7 +3800,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -3759,15 +3819,16 @@ zabbix_export:
             var base_raw = getHttpData(url, params.token, {
                 query: '{' + paths.join(';') + '}' + j_filter
             }),
-                keys = getField(base_raw,'timeSeriesDescriptor.pointDescriptors'),
-                values = getField(base_raw,'timeSeriesData.0.pointData.0.values'),
+                keys = getField(base_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                values = getField(base_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
             for (i in keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                
                 for (v in value_types) {
                     if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(keys[i],'key').replace(re, '')] = values[i][value_types[v]];
+                        obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
                     }
                 }
             }
@@ -4028,6 +4089,19 @@ zabbix_export:
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
                 
+              dependencies:
+                - name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
+                - name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
+                - name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
+                - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
+                - name: 'GCP Cloud SQL MySQL: Instance is on maintenance'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
+                - name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
@@ -4521,8 +4595,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -4566,7 +4642,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -4581,11 +4658,13 @@ zabbix_export:
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, ''),
                         value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                        
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
                                 obj[prefix + key] = values[i][value_types[v]];
-                            } else {
+                            }
+                            else {
                                 obj[key] = values[i][value_types[v]];
                             }
             
@@ -4605,7 +4684,6 @@ zabbix_export:
                     { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
                     { name: 'mysql_', data: { query: '{' + mysql_paths.join(';') + '}' + j_filter } }
                 ];
-            
             
             for (q in queries) {
                 raw = getHttpData(url, params.token, queries[q].data);
@@ -4814,16 +4892,16 @@ zabbix_export:
       macros:
         - macro: '{$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'MySQL instance CPU usage threshold.'
+          description: 'GCP Cloud SQL MySQL instance CPU usage threshold.'
         - macro: '{$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'MySQL instance critical disk usage threshold.'
+          description: 'GCP Cloud SQL MySQL instance critical disk usage threshold.'
         - macro: '{$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'MySQL instance warning disk usage threshold.'
+          description: 'GCP Cloud SQL MySQL instance warning disk usage threshold.'
         - macro: '{$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'MySQL instance RAM usage threshold.'
+          description: 'GCP Cloud SQL MySQL instance RAM usage threshold.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
@@ -5035,7 +5113,7 @@ zabbix_export:
             - tag: component
               value: replication
         - uuid: 470200d2cca348bb8a670a2be3a270e3
-          name: 'GCP Cloud SQL MySQL: Replication metrics get'
+          name: 'GCP Cloud SQL MySQL: Replica metrics get'
           type: SCRIPT
           key: gcp.cloudsql.mysql.repl.metrics.get
           delay: '{$GCP.TIME.WINDOW}'
@@ -5058,8 +5136,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -5103,7 +5183,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -5128,6 +5209,7 @@ zabbix_export:
             
             for (i in metric_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                
                 for (v in value_types) {
                     if (typeof metric_values[i][value_types[v]] !== 'undefined') {
                         obj[getField(metric_keys[i], 'key').replace(re, "")] = metric_values[i][value_types[v]];
@@ -5144,6 +5226,7 @@ zabbix_export:
             
             for (i in state_keys) {
                 var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
+                
                 obj[state_key] = 'undefined';
                 for (t in state_tsd) {
                     if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
@@ -5247,6 +5330,8 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: 'Indicates whether the SQL thread for executing events in the relay log is running.'
+          valuemap:
+            name: 'Thread state'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5563,6 +5648,19 @@ zabbix_export:
                 Database engine is down.
                 If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
                 
+              dependencies:
+                - name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is on maintenance'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
               tags:
                 - tag: scope
                   value: availability
@@ -5892,8 +5990,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -5937,7 +6037,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -5952,6 +6053,7 @@ zabbix_export:
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, ''),
                         value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                        
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
@@ -5970,6 +6072,7 @@ zabbix_export:
                 result = {};
                 for (t in tsd) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                    
                     for (v in value_types) {
                         if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
                             result['pgsql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
@@ -6024,7 +6127,7 @@ zabbix_export:
             ];
             for (q in single_queries) {
                 raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, single_metrics(getField(raw,'timeSeriesData')));
+                Object.assign(obj, single_metrics(getField(raw, 'timeSeriesData')));
             }
             
             return JSON.stringify(obj);
@@ -6364,8 +6467,10 @@ zabbix_export:
                 
                 function getField(data, path) {
                     var steps = path.split('.');
+                
                     for (var i = 0; i < steps.length; i++) {
                         var step = steps[i];
+                
                         if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                             throw 'Required field was not found: ' + path;
                         }
@@ -6400,7 +6505,8 @@ zabbix_export:
                     if (request.getStatus() !== 200) {
                         if (typeof (response.error && response.error.message) !== 'undefined') {
                             throw response.error.message;
-                        } else {
+                        }
+                        else {
                             throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                         }
                     }
@@ -6409,6 +6515,7 @@ zabbix_export:
                 
                 function metrics(tsd) {
                     var result = {};
+                    
                     for (i in tsd) {
                         result[getField(tsd[i], 'labelValues.4.stringValue')] = getField(tsd[i], 'pointData.0.values.0.int64Value');
                     }
@@ -6438,6 +6545,7 @@ zabbix_export:
                 
                 for (i in keys) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                    
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
@@ -6454,7 +6562,7 @@ zabbix_export:
                 
                 for (q in queries) {
                     raw = getHttpData(url, params.token, queries[q]);
-                    obj = Object.assign(obj, metrics(getField(raw,'timeSeriesData')));
+                    obj = Object.assign(obj, metrics(getField(raw, 'timeSeriesData')));
                 }
                 
                 return JSON.stringify(obj);
@@ -6729,22 +6837,22 @@ zabbix_export:
       macros:
         - macro: '{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'PostgreSQL instance CPU usage threshold.'
+          description: 'GCP Cloud SQL PostgreSQLGCP Cloud SQL PostgreSQL instance CPU usage threshold.'
         - macro: '{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}'
           value: '90'
-          description: 'PostgreSQL instance critical disk usage threshold.'
+          description: 'GCP Cloud SQL PostgreSQL instance critical disk usage threshold.'
         - macro: '{$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}'
           value: '80'
-          description: 'PostgreSQL instance warning disk usage threshold.'
+          description: 'GCP Cloud SQL PostgreSQL instance warning disk usage threshold.'
         - macro: '{$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}'
           value: '90'
-          description: 'PostgreSQL instance RAM usage threshold.'
+          description: 'GCP Cloud SQL PostgreSQL instance RAM usage threshold.'
         - macro: '{$GCP.CLOUD_SQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in PostgreSQL Databases discovery rule.'
+          description: 'The filter to include GCP Cloud SQL PostgreSQL databases by namespace.'
         - macro: '{$GCP.CLOUD_SQL.DB.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL Databases discovery rule.'
+          description: 'The filter to exclude GCP Cloud SQL PostgreSQL databases by namespace.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
@@ -7030,8 +7138,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -7041,7 +7151,7 @@ zabbix_export:
             }
             
             function checkParams(params) {
-                ['project_id','time_window','database_id', 'token'].forEach(function (field) {
+                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: ' + field + '.';
                     }
@@ -7056,6 +7166,7 @@ zabbix_export:
                 request.addHeader('Content-Type: application/json');
             
                 var response = request.post(url, JSON.stringify(body));
+            
                 if (response !== null) {
                     try {
                         response = JSON.parse(response);
@@ -7072,7 +7183,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -7097,6 +7209,7 @@ zabbix_export:
             
             for (i in common_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            
                 for (v in value_types) {
                     if (typeof common_values[i][value_types[v]] !== 'undefined') {
                         obj[getField(common_keys[i], 'key').replace(re, '')] = common_values[i][value_types[v]];
@@ -7104,16 +7217,16 @@ zabbix_export:
                 }
             }
             
-            state_raw = getHttpData(url, params.token, {
+            var state_raw = getHttpData(url, params.token, {
                 query:
                     common_path + 'state' + filter
-            });
-            
-            var state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            }),
+                state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 state_tsd = getField(state_raw, 'timeSeriesData');
             
             for (i in state_keys) {
                 var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
+                
                 obj[state_key] = 'undefined';
                 for (t in state_tsd) {
                     if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
@@ -7123,13 +7236,13 @@ zabbix_export:
                 }
             }
             
-            lag_raw = getHttpData(url, params.token, {
+            var lag_raw = getHttpData(url, params.token, {
                 query:
                     pgsql_path + 'replica_byte_lag' + '| within ' + time_window +
                     " | filter replica_name = '" + params.database_id + "'"
-            });
-            
-            var lag_tsd = getField(lag_raw, 'timeSeriesData');
+            }),
+                lag_tsd = getField(lag_raw, 'timeSeriesData');
+                
             for (t in lag_tsd) {
                 obj[getField(lag_tsd[t], 'labelValues.3.stringValue')] = getField(lag_tsd[t], 'pointData.0.values.0.int64Value');
             }
@@ -7502,7 +7615,7 @@ zabbix_export:
                 ];
             
             function checkParams(params) {
-                ['project_id','time_window','instance_id', 'token'].forEach(function (field) {
+                ['project_id', 'time_window', 'instance_id', 'token'].forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
                         throw 'Required param is not set: ' + field + '.';
                     }
@@ -7512,8 +7625,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+                    
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -7548,7 +7663,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -7580,7 +7696,7 @@ zabbix_export:
             
                 for (i in metrics) {
                     re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i],'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
                 }
                 arr.push(data);
             }
@@ -7978,8 +8094,10 @@ zabbix_export:
             
             function getField(data, path) {
                 var steps = path.split('.');
+            
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                         throw 'Required field was not found: ' + path;
                     }
@@ -7989,7 +8107,7 @@ zabbix_export:
             }
             
             function checkParams(params) {
-                ['project_id','time_window','instance_id', 'token', 'machine_type', 'integrity'].forEach(function (field) {
+                ['project_id', 'time_window', 'instance_id', 'token', 'machine_type', 'integrity'].forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
                         throw 'Required param is not set: ' + field + '.';
                     }
@@ -8023,7 +8141,8 @@ zabbix_export:
                 if (request.getStatus() !== 200) {
                     if (typeof (response.error && response.error.message) !== 'undefined') {
                         throw response.error.message;
-                    } else {
+                    }
+                    else {
                         throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
                     }
                 }
@@ -8055,6 +8174,7 @@ zabbix_export:
             }
             
             var params = checkParams(JSON.parse(value));
+            
             if (params.machine_type.match(/e2.*/)) {
                 base_paths = base_paths.concat(e2_paths);
             }
@@ -8071,11 +8191,10 @@ zabbix_export:
                 keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 values = getField(raw, 'timeSeriesData.0.pointData.0.values');
             
-            
             for (i in keys) {
                 for (v in value_types) {
                     if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(keys[i],'key').replace(re, '')] = values[i][value_types[v]];
+                        obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
                     }
                 }
             }
@@ -8092,7 +8211,7 @@ zabbix_export:
             for (t in tsd) {
                 for (v in value_types) {
                     if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
-                        obj[getField(tsd[t],'labelValues.3.stringValue')] = tsd[t].pointData[0].values[0][value_types[v]];
+                        obj[getField(tsd[t], 'labelValues.3.stringValue')] = tsd[t].pointData[0].values[0][value_types[v]];
                     }
                 }
             }
@@ -8100,6 +8219,7 @@ zabbix_export:
             var net_metrics = getHttpData(url, params.token, {
                 query: '{' + net_paths.join(';') + '}' + j_filter
             });
+            
             Object.assign(obj, nestedMap(net_metrics));
             
             if (params.integrity.match(/true/)) {
@@ -8108,8 +8228,10 @@ zabbix_export:
                 });
                 var keys = getField(integrity_metrics, 'timeSeriesDescriptor.pointDescriptors'),
                     tsd = getField(integrity_metrics, 'timeSeriesData');
+            
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, '');
+                    
                     obj[key] = 'undefined';
                     for (t in tsd) {
                         if (getField(tsd[t], 'pointData.0.values.' + i + '.int64Value') == 1) {
@@ -8625,28 +8747,28 @@ zabbix_export:
       macros:
         - macro: '{$GCE.CPU.UTIL.MAX}'
           value: '95'
-          description: 'The CPU utilization threshold.'
+          description: 'GCP Compute Engine instance CPU utilization threshold.'
         - macro: '{$GCE.DISK.DEV_TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to include GCP Compute Engine disks by device type.'
         - macro: '{$GCE.DISK.DEV_TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to exclude GCP Compute Engine disks by device type.'
         - macro: '{$GCE.DISK.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to include GCP Compute Engine disks by namespace.'
         - macro: '{$GCE.DISK.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to exclude GCP Compute Engine disks by namespace.'
         - macro: '{$GCE.DISK.STOR_TYPE.MATCHES}'
           value: '.*'
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to include GCP Compute Engine disks by storage type.'
         - macro: '{$GCE.DISK.STOR_TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in disks discovery rule.'
+          description: 'The filter to exclude GCP Compute Engine disks by storage type.'
         - macro: '{$GCE.RAM.UTIL.MAX}'
           value: '90'
-          description: 'The RAM utilization threshold.'
+          description: 'GCP Compute Engine instance RAM utilization threshold.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
