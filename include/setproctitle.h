@@ -41,7 +41,9 @@
 #endif
 
 char	**setproctitle_save_env(int argc, char **argv);
+#if !defined(HAVE_FUNCTION_SETPROCTITLE) && (defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV))
 void	setproctitle_set_status(const char *status);
+#endif
 void	setproctitle_free_env(void);
 
 #endif	/* ZABBIX_SETPROCTITLE_H */

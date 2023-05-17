@@ -234,7 +234,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			return [
 				'tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
-				'attribution' => \CHtml::encode(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION))
+				'attribution' => htmlspecialchars(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION),
+					ENT_NOQUOTES, 'UTF-8'
+				)
 			];
 		}
 
