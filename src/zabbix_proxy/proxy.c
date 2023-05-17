@@ -1632,9 +1632,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
-
-	zbx_log_exit_signal();
 out:
+	zbx_log_exit_signal();
+
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 
