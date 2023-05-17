@@ -281,7 +281,8 @@ class CScript extends CApiService {
 			}
 		}
 
-		self::checkDuplicates($scripts);
+		$this->checkUniqueness($scripts);
+		$this->checkDuplicates($scripts);
 
 		// Finally check User and Host IDs.
 		$this->checkUserGroups($scripts);
@@ -358,8 +359,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		self::checkDuplicates($scripts, $db_scripts);
-
+		$this->checkUniqueness($scripts, 'update');
 		self::addAffectedObjects($scripts, $db_scripts);
 
 		// Validate if scripts belong to actions and scope can be changed.
@@ -543,10 +543,10 @@ class CScript extends CApiService {
 				$script['host_access'] = DB::getDefault('scripts', 'host_access');
 				$script['confirmation'] = '';
 			}
-
 		}
 		unset($script);
 
+		$this->checkDuplicates($scripts, $db_scripts);
 		$this->checkUserGroups($scripts);
 		$this->checkHostGroups($scripts);
 	}
@@ -573,13 +573,12 @@ class CScript extends CApiService {
 
 		if ($method === 'create') {
 			$common_fields['scope']['default'] = ZBX_SCRIPT_SCOPE_ACTION;
-			$api_input_rules['uniq'] = [['name']];
 			$common_fields['name']['flags'] |= API_REQUIRED;
 			$common_fields['type']['flags'] = API_REQUIRED;
 			$common_fields['command']['flags'] |= API_REQUIRED;
 		}
 		else {
-			$api_input_rules['uniq'] = [['scriptid'], ['name']];
+			$api_input_rules['uniq'] = [['scriptid']];
 			$common_fields += ['scriptid' => ['type' => API_ID, 'flags' => API_REQUIRED]];
 		}
 
@@ -1295,40 +1294,120 @@ class CScript extends CApiService {
 	}
 
 	/**
-	 * Check for unique script names.
+	 * Check for unique script names within menu path in the input.
 	 *
-	 * @static
+	 * @param array  $scripts  Array of scripts.
+	 * @param string $method   API method "create" or "update". Default "create".
 	 *
-	 * @param array      $scripts
-	 * @param array|null $db_scripts
+	 * $scripts = [[
+	 *     'name' =>      (string)  Script name (optional for update method).
+	 *     'menu_path' => (string)  Script menu path (optional).
+	 * ]]
 	 *
-	 * @throws APIException if script names are not unique.
+	 * @throws APIException if script names within menu paths are not unique.
 	 */
-	private static function checkDuplicates(array $scripts, array $db_scripts = null): void {
-		$names = [];
+	private function checkUniqueness(array $scripts, string $method = 'create'): void {
+		if ($method === 'update') {
+			$scripts = array_filter($scripts, static function ($script) {
+				return (array_key_exists('name', $script) || array_key_exists('menu_path', $script));
+			});
 
-		foreach ($scripts as $script) {
-			if (!array_key_exists('name', $script)) {
-				continue;
-			}
-
-			if ($db_scripts === null || $script['name'] !== $db_scripts[$script['scriptid']]['name']) {
-				$names[] = $script['name'];
+			if (!$scripts) {
+				return;
 			}
 		}
 
-		if (!$names) {
+		foreach ($scripts as &$script) {
+			$menu_path = '';
+
+			if (array_key_exists('menu_path', $script)) {
+				$menu_path = trimPath($script['menu_path']);
+			}
+
+			// Trim preceeding and trailing slashes for comparison.
+			$menu_path = trim($menu_path, '/');
+			$script['menu_path'] = $menu_path;
+		}
+		unset($script);
+
+		$api_input_rules = $this->getValidationRules($method);
+		$api_input_rules['uniq'] = [['name', 'menu_path']];
+		$api_input_rules['fields'] = array_intersect_key($api_input_rules['fields'], array_flip(['name', 'menu_path']));
+		$api_input_rules['flags'] |= API_ALLOW_UNEXPECTED;
+
+		if (!CApiInputValidator::validate($api_input_rules, $scripts, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+	}
+
+	/**
+	 * Check for duplicate script names within menu path.
+	 *
+	 * @param array       $scripts     Array of scripts.
+	 * @param array|null  $db_scripts  Array of scripts from database.
+	 *
+	 * $scripts = [[
+	 *     'scriptid' =>  (string)  Script ID.
+	 *     'name' =>      (string)  Script name.
+	 *     'menu_path' => (string)  Script menu path (exists if scope = 1 for update method).
+	 *     'scope' =>     (string)  Script scope.
+	 * ]]
+	 *
+	 * $db_scripts = [
+	 *     <scriptid> => [
+	 *         'name' =>      (string)  Script name.
+	 *         'menu_path' => (string)  Script menu path.
+	 *         'scope' =>     (string)  Script scope.
+	 *     ]
+	 * ]
+	 *
+	 * @throws APIException if script names within menu paths have duplicates in DB.
+	 */
+	private function checkDuplicates(array $scripts, ?array $db_scripts = null): void {
+		if ($db_scripts !== null) {
+			$scripts = $this->extendFromObjects(zbx_toHash($scripts, 'scriptid'), $db_scripts, ['menu_path']);
+
+			/*
+			 * Remove unchanged scripts and continue validation only for scripts that have changed name, menu path or
+			 * scope. If scope is changed to action, menu_path will be reset to empty string and that is a change.
+			 */
+			$scripts = array_filter($scripts, static function ($script) use ($db_scripts) {
+				return ($script['name'] !== $db_scripts[$script['scriptid']]['name']
+					|| $script['menu_path'] !== $db_scripts[$script['scriptid']]['menu_path']
+					|| ($script['scope'] !== $db_scripts[$script['scriptid']]['scope']
+						&& $script['scope'] == ZBX_SCRIPT_SCOPE_ACTION));
+			});
+
+			if (!$scripts) {
+				return;
+			}
+		}
+
+		$scripts_ex = DB::select('scripts', [
+			'output' => ['scriptid', 'name', 'menu_path'],
+			'filter' => ['name' => array_column($scripts, 'name')]
+		]);
+
+		if (!$scripts_ex) {
 			return;
 		}
 
-		$duplicates = DB::select('scripts', [
-			'output' => ['name'],
-			'filter' => ['name' => $names],
-			'limit' => 1
-		]);
+		$db_scriptids = [];
 
-		if ($duplicates) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $duplicates[0]['name']));
+		foreach ($scripts_ex as $script) {
+			$name = self::getScriptNameAndPath($script);
+			$db_scriptids[$name] = $script['scriptid'];
+		}
+
+		foreach ($scripts as $script) {
+			$name = self::getScriptNameAndPath($script);
+
+			if ($db_scripts === null && array_key_exists($name, $db_scriptids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
+			}
+			elseif (array_key_exists($name, $db_scriptids) && bccomp($script['scriptid'], $db_scriptids[$name]) != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Script "%1$s" already exists.', $script['name']));
+			}
 		}
 	}
 
@@ -1437,5 +1516,36 @@ class CScript extends CApiService {
 			$db_scripts[$db_parameter['scriptid']]['parameters'][$db_parameter['script_paramid']] =
 				array_diff_key($db_parameter, array_flip(['scriptid']));
 		}
+	}
+
+	/**
+	 * Helper function to combine trimmed menu path with name.
+	 *
+	 * @param array  $script  Script data.
+	 *
+	 * $script = [
+	 *     'name' =>      (string)  Script name.
+	 *     'menu_path' => (string)  Script menu path (optional).
+	 * ]
+	 *
+	 * Example:
+	 *   $script = [
+	 *       'name' =>      'ABC'
+	 *       'menu_path' => '/a/b'
+	 *   ]
+	 * Output: a/b/ABC
+	 *
+	 * @return string
+	 */
+	private static function getScriptNameAndPath(array $script): string {
+		$menu_path = '';
+
+		if (array_key_exists('menu_path', $script)) {
+			$menu_path = trimPath($script['menu_path']);
+		}
+
+		$menu_path = trim($menu_path, '/');
+
+		return $menu_path === '' ? $script['name'] : $menu_path.'/'.$script['name'];
 	}
 }

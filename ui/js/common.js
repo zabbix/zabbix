@@ -929,25 +929,6 @@ function appendZero(val) {
 }
 
 /**
- * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
- *
- * @param {type} time   Unix timestamp to convert.
- *
- * @returns {string}
- */
-function time2str(time) {
-	var dt = new Date(time * 1000),
-		Y = dt.getFullYear(),
-		m = appendZero(dt.getMonth()+1),
-		d = appendZero(dt.getDate()),
-		H = appendZero(dt.getHours()),
-		i = appendZero(dt.getMinutes()),
-		s = appendZero(dt.getSeconds());
-
-	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
-}
-
-/**
  * Trims selected element values.
  *
  * @param array selectors
@@ -1095,3 +1076,28 @@ function uncheckTableRows(page, keepids = []) {
 		sessionStorage.removeItem(key);
 	}
 }
+
+// Fix jQuery ui.sortable vertical positioning bug.
+$.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
+	_getParentOffset: function () {
+		this.offsetParent = this.helper.offsetParent();
+
+		const pos = this.offsetParent.offset();
+
+		if (this.scrollParent[0] !== this.document[0]
+				&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
+			pos.left += this.scrollParent.scrollLeft();
+			pos.top += this.scrollParent.scrollTop();
+		}
+
+		if ((this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() === 'html' && $.ui.ie)
+				|| this.offsetParent[0] === this.document[0].body) {
+			pos = {top: 0, left: 0};
+		}
+
+		return {
+			top: pos.top + (parseInt(this.offsetParent.css('borderTopWidth'), 10) || 0),
+			left: pos.left + (parseInt(this.offsetParent.css('borderLeftWidth'), 10) || 0)
+		};
+	}
+}));

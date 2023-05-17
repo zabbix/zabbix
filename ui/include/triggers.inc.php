@@ -989,7 +989,7 @@ function make_trigger_details($trigger, $eventid) {
 			new CCol((new CDiv($trigger['recovery_expression']))->addClass(ZBX_STYLE_WORDWRAP))
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
-			? SPACE.'+'.SPACE._('Multiple PROBLEM events')
+			? ' + '._('Multiple PROBLEM events')
 			: '')
 		]);
 
@@ -1061,7 +1061,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 			case 'operator':
 				$next[$level] = ($key != $lastKey);
 				$expr = expressionLevelDraw($next, $level);
-				$expr[] = SPACE;
+				$expr[] = NBSP();
 				$expr[] = ($element['operator'] === 'and') ? _('And') : _('Or');
 				$levelDetails = [
 					'list' => $expr,
@@ -1113,9 +1113,9 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 						->onClick('javascript: copy_expression("'.$expressionId.'", '.$type.');');
 				}
 				$expr = expressionLevelDraw($next, $level);
-				$expr[] = SPACE;
+				$expr[] = NBSP();
 				$expr[] = bold($letter);
-				$expr[] = SPACE;
+				$expr[] = NBSP();
 				$expr[] = $url;
 
 				$levelDetails = [
@@ -2217,10 +2217,10 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 					->setArgument('context', 'template');
 			}
 
-			$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+			$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 		}
 		else {
-			$name = new CSpan(CHtml::encode($template['name']));
+			$name = new CSpan($template['name']);
 		}
 
 		$list[] = $name->addClass(ZBX_STYLE_GREY);
@@ -2279,10 +2279,10 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 						->setArgument('context', 'template');
 				}
 
-				$name = new CLink(CHtml::encode($template['name']), $url);
+				$name = new CLink($template['name'], $url);
 			}
 			else {
-				$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+				$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 			}
 
 			$list_item[] = $name;
@@ -2294,7 +2294,7 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 			$list_item[] = ')';
 		}
 
-		array_unshift($list, $list_item, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $list_item, [NBSP(), RARR(), NBSP()]);
 
 		$triggerid = $parent_templates['links'][$triggerid]['triggerid'];
 	}

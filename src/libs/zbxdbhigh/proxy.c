@@ -2773,7 +2773,7 @@ int	proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 void	calc_timestamp(const char *line, int *timestamp, const char *format)
 {
 	int		hh, mm, ss, yyyy, dd, MM;
-	int		hhc = 0, mmc = 0, ssc = 0, yyyyc = 0, ddc = 0, MMc = 0;
+	int		hhc = 0, mmc = 0, yyyyc = 0, ddc = 0, MMc = 0;
 	int		i, num;
 	struct tm	tm;
 	time_t		t;
@@ -2801,7 +2801,6 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
 				break;
 			case 's':
 				ss = 10 * ss + num;
-				ssc++;
 				break;
 			case 'y':
 				yyyy = 10 * yyyy + num;
