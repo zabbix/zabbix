@@ -455,7 +455,8 @@ if (array_key_exists('render_html', $data)) {
 					$('[name="tag_name_format"]', container).prop('disabled', disabled);
 				},
 				unack_by_me: () => {
-					let disabled = (container.querySelector('[name="unacknowledged"]:checked').value != 2);
+					const acknowledgement_status = container.querySelector('[name="acknowledgement_status"]:checked');
+					const disabled = acknowledgement_status.value != <?= ZBX_ACK_STATUS_ACK ?>;
 
 					if (disabled) {
 						container.querySelector('[name="acknowledged_by_me"]').disabled = true;
@@ -593,7 +594,7 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="age_state"]').change(eventHandler.age_state).trigger('change');
 		$('[name="compact_view"]', container).change(eventHandler.compact_view).trigger('change');
 		$('[name="show_tags"]', container).change(eventHandler.show_tags).trigger('change');
-		$('[name="unacknowledged"]', container).change(eventHandler.unack_by_me).trigger('change');
+		$('[name="acknowledgement_status"]', container).change(eventHandler.unack_by_me).trigger('change');
 
 		// Initialize src_url.
 		this.resetUnsavedState();

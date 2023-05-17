@@ -525,13 +525,18 @@ class CEvent extends CApiService {
 	/**
 	 * Apply filter conditions to SQL built query.
 	 *
-	 * @param array  $options
-	 * @param array  $options['filter']
-	 * @param int    $options['filter']['action']          Acknowledge action(s) that must be performed on filtered
-	 *                                                     problems.
-	 * @param int    $options['filter']['action_userid']   User which has performed acknowledge action.
-	 * @param array  $options['filter']['cause_eventid']   Cause eventids to filter by.
-	 * @param array  $sql_parts
+	 * @param array $options
+	 * @param array $sql_parts
+	 *
+	 * $options = [
+	 *     'filter' => [
+	 *         'action' =>          (int)       Acknowledge action(s) that must be performed on filtered events.
+	 *         'action_userid' =>   (int)       User which has performed acknowledge action.
+	 *         'cause_eventid' =>   (array)     Cause eventids to filter by.
+	 *     ]
+	 * ]
+	 *
+	 * @return array
 	 */
 	protected function applyFilters($options, &$sql_parts): void {
 		// Acknowledge action filter properties.
