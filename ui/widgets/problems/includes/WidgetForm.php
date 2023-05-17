@@ -126,15 +126,16 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('unacknowledged', _('Acknowledgement status'), [
-					0 => _('all'),
-					1 => _('Unacknowledged'),
-					2 => _('Acknowledged')
-				]))->setDefault(0)
+				(new CWidgetFieldRadioButtonList('acknowledgement_status', _('Acknowledgement status'), [
+					ZBX_ACK_STATUS_ALL => _('all'),
+					ZBX_ACK_STATUS_UNACK => _('Unacknowledged'),
+					ZBX_ACK_STATUS_ACK => _('Acknowledged')
+				]))->setDefault(ZBX_ACK_STATUS_ALL)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('acknowledged_by_me', _('By me')))
-					->setFlags(array_key_exists('unacknowledged', $this->values) && $this->values['unacknowledged'] != 2
+					->setFlags(array_key_exists('acknowledgement_status', $this->values)
+							&& $this->values['acknowledgement_status'] != ZBX_ACK_STATUS_ACK
 						? CWidgetField::FLAG_DISABLED
 						: 0x00
 					)

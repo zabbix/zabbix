@@ -98,7 +98,7 @@ $form
 	->show();
 
 function getAcknowledgementStatusFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['unacknowledged']);
+	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['acknowledgement_status']);
 	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
 
 	return $form->makeCustomField($acknowledgement_status_field, [

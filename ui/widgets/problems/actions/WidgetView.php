@@ -65,8 +65,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'tags' => $this->fields_values['tags'],
 				'show_symptoms' => $this->fields_values['show_symptoms'],
 				'show_suppressed' => $this->fields_values['show_suppressed'],
-				'unacknowledged' => $this->fields_values['unacknowledged'],
-				'acknowledged_by_me' => $this->fields_values['unacknowledged'] == 2
+				'acknowledgement_status' => $this->fields_values['acknowledgement_status'],
+				'acknowledged_by_me' => $this->fields_values['acknowledgement_status'] == ZBX_ACK_STATUS_ACK
 					? $this->fields_values['acknowledged_by_me']
 					: 0,
 				'show_opdata' => $this->fields_values['show_opdata']

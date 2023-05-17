@@ -130,6 +130,27 @@ static int	DBpatch_6050012(void)
 	return DBadd_field("dchecks", &field);
 }
 
+static int	DBpatch_6050013(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (0 > zbx_db_execute(
+			"update widget_field"
+			" set name='acknowledgement_status'"
+			" where name='unacknowledged'"
+			" and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type = 'problems'"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -149,5 +170,6 @@ DBPATCH_ADD(6050009, 0, 1)
 DBPATCH_ADD(6050010, 0, 1)
 DBPATCH_ADD(6050011, 0, 1)
 DBPATCH_ADD(6050012, 0, 1)
+DBPATCH_ADD(6050013, 0, 1)
 
 DBPATCH_END()

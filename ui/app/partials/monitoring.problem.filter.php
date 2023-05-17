@@ -141,10 +141,10 @@ $left_column
 	->addRow(
 		_('Acknowledgement status'),
 		(new CHorList())
-			->addItem((new CRadioButtonList('unacknowledged', (int) $data['unacknowledged']))
-				->addValue(_('all'), 0)
-				->addValue(_('Unacknowledged'), 1)
-				->addValue(_('Acknowledged'), 2)
+			->addItem((new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
+				->addValue(_('all'), ZBX_ACK_STATUS_ALL)
+				->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK)
+				->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK)
 				->setModern(true)
 			)
 			->addItem((new CCheckBox('acknowledged_by_me', 1))
@@ -407,8 +407,8 @@ if (array_key_exists('render_html', $data)) {
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
 		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
-				'unacknowledged', 'acknowledged_by_me', 'compact_view', 'show_timeline', 'details', 'highlight_row',
-				'age_state', 'age', 'tag_name_format', 'evaltype'
+				'acknowledgement_status', 'acknowledged_by_me', 'compact_view', 'show_timeline', 'details',
+				'highlight_row', 'age_state', 'age', 'tag_name_format', 'evaltype'
 			],
 			eventHandler = {
 				show: () => {

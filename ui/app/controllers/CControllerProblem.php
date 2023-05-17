@@ -43,7 +43,7 @@ abstract class CControllerProblem extends CController {
 		'show_tags' => SHOW_TAGS_3,
 		'show_symptoms' => 0,
 		'show_suppressed' => 0,
-		'unacknowledged' => 0,
+		'acknowledgement_status' => ZBX_ACK_STATUS_ALL,
 		'acknowledged_by_me' => 0,
 		'compact_view' => 0,
 		'show_timeline' => ZBX_TIMELINE_ON,

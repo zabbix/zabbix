@@ -134,7 +134,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param array  $filter['severities']            (optional)
-	 * @param int    $filter['unacknowledged']        (optional)
+	 * @param int    $filter['acknowledgement_status'] (optional)
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
@@ -272,13 +272,13 @@ class CScreenProblem extends CScreenBase {
 				$filter_options['cause_eventid'] = $filter['cause_eventid'];
 			}
 
-			if (array_key_exists('unacknowledged', $filter)) {
-				switch ($filter['unacknowledged']) {
-					case 1:
+			if (array_key_exists('acknowledgement_status', $filter)) {
+				switch ($filter['acknowledgement_status']) {
+					case ZBX_ACK_STATUS_UNACK:
 						$options['acknowledged'] = false;
 						break;
 
-					case 2:
+					case ZBX_ACK_STATUS_ACK:
 						$options['acknowledged'] = true;
 
 						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {

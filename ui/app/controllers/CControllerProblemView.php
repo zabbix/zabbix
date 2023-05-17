@@ -44,7 +44,7 @@ class CControllerProblemView extends CControllerProblem {
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'show_symptoms' =>			'in 0,1',
 			'show_suppressed' =>		'in 0,1',
-			'unacknowledged' =>			'in 0,1,2',
+			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
 			'acknowledged_by_me' =>		'in 0,1',
 			'compact_view' =>			'in 0,1',
 			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
