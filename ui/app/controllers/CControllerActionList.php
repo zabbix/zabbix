@@ -145,6 +145,8 @@ class CControllerActionList extends CController {
 
 			$action['filter'] = $db_action['filter'];
 			$action['operations'] = $db_action['operations'];
+
+			sortOperations($eventsource, $action['operations']);
 		}
 		unset($action);
 
