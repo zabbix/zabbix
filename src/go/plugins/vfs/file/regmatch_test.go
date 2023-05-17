@@ -47,3 +47,23 @@ func TestFileRegmatch(t *testing.T) {
 		}
 	}
 }
+
+func TestFileRegmatchUTF16(t *testing.T) {
+	stdOs = std.NewMockOs()
+
+	impl.options.Timeout = 3
+	fmt.Println("AAAAAAAAAAAAAAAA")
+
+	stdOs.(std.MockOs).MockFile("test_error_utf16le.txt", []byte{0x6200, 0x6100, 0x6400, 0x6700, 0x6500, 0x7200, 0x0a00, 0x6500, 0x7200, 0x7200, 0x6f00, 0x7200, 0x0a00, 0x6200, 0x6100, 0x6400, 0x6700, 0x6500, 0x7200, 0x3200, 0x0a00})
+	if result, err := impl.Export("vfs.file.regmatch", []string{"test_error_utf16le.txt", "error", "UTF16LE", "", ""}, nil); err != nil {
+		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
+	} else {
+		if match, ok := result.(int); !ok {
+			t.Errorf("vfs.file.regmatch returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if match != 1 {
+				t.Errorf("vfs.file.regmatch returned invalid result")
+			}
+		}
+	}
+}
