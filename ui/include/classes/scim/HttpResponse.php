@@ -23,7 +23,7 @@ namespace SCIM;
 
 use Throwable;
 
-class ScimHttpResponse {
+class HttpResponse {
 
 	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
 	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';

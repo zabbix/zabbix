@@ -32,11 +32,6 @@ class testScimServiceProviderConfig extends CAPIScimTest {
 		'userdirectoryid' => [
 			'saml' => null
 		],
-		'userid' => [
-			'admin' => null,
-			'user' => null,
-			'guest_user' => null
-		],
 		'tokenids' => [
 			'superadmin' => null
 		],
@@ -253,9 +248,6 @@ class testScimServiceProviderConfig extends CAPIScimTest {
 	 * Delete all created data after test.
 	 */
 	public static function clearData(): void {
-		// Delete users.
-		CDataHelper::call('user.delete', array_values(self::$data['userid']));
-
 		// Delete userdirectories.
 		CDataHelper::call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 
