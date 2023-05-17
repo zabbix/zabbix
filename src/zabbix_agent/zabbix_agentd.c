@@ -1148,7 +1148,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
+#ifdef _M_X64
+	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
+		zabbix_log(LOG_LEVEL_TRACE, "failed to register vectored exception handler");
+#endif /* _M_X64 */
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{

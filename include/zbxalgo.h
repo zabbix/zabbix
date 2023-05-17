@@ -336,6 +336,7 @@ typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
 
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
+ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
 ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)

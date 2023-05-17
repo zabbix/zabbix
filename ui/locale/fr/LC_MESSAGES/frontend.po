@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-01 18:15+0000\n"
+"PO-Revision-Date: 2023-05-08 14:49+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -23424,7 +23424,7 @@ msgstr "atan2() - L'arctangente des coordonnées d'ordonnée (exprue) et d'absci
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - L'arctangente des coordonnées d'ordonnée (value) et d'abscisse spécifiées sous forme d'angle, exprimées en radians"
 
 #: include/events.inc.php:63
 msgid "autoregistered host"
