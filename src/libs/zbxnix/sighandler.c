@@ -143,9 +143,6 @@ void	zbx_log_exit_signal(void)
 {
 	int	zbx_log_level_temp;
 
-	if (-1 == siginfo_exit.sig)
-		return;
-
 	switch (siginfo_exit.sig)
 	{
 		case -1:
