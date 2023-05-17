@@ -193,7 +193,7 @@ class testEscalations extends CIntegrationTest {
 	/**
 	 * @backup actions,alerts,history_uint,history,problem,events
 	 */
-	public function TtestEscalations_disabledAction() {
+	public function testEscalations_disabledAction() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
@@ -219,7 +219,7 @@ class testEscalations extends CIntegrationTest {
 	/**
 	 * @backup alerts,triggers,history_uint,history,problem,events
 	 */
-	public function TtestEscalations_disabledTrigger() {
+	public function testEscalations_disabledTrigger() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('trigger.update', [
 			'triggerid' => self::$triggerid,
@@ -251,7 +251,7 @@ class testEscalations extends CIntegrationTest {
 	 *
 	 * @backup alerts,history,history_uint,maintenances,events,problem
 	 */
-	public function TtestEscalations_checkScenario1() {
+	public function testEscalations_checkScenario1() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 		// Create maintenance period
@@ -306,7 +306,7 @@ class testEscalations extends CIntegrationTest {
 	 *
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
-	public function TtestEscalations_checkScenario2() {
+	public function testEscalations_checkScenario2() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
@@ -368,7 +368,7 @@ class testEscalations extends CIntegrationTest {
 	 *
 	 * @backup actions,alerts,history_uint,maintenances
 	 */
-	public function TtestEscalations_checkScenario3() {
+	public function testEscalations_checkScenario3() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
@@ -440,7 +440,7 @@ class testEscalations extends CIntegrationTest {
 	 *
 	 * @backup actions,alerts,events,problem,history_uint,hosts,users
 	 */
-	public function TtestEscalations_checkScenario4() {
+	public function testEscalations_checkScenario4() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$response = $this->call('action.update', [
 			'actionid' => self::$trigger_actionid,
@@ -581,7 +581,7 @@ class testEscalations extends CIntegrationTest {
 	 *
 	 * @backup alerts,actions
 	 */
-	public function TtestEscalations_checkScenario5() {
+	public function testEscalations_checkScenario5() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 
@@ -803,7 +803,7 @@ class testEscalations extends CIntegrationTest {
 	 *testEscalations_checkUnfinishedAlerts
 	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
 	 */
-	public function TtestEscalations_checkUnfinishedAlerts() {
+	public function testEscalations_checkUnfinishedAlerts() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
 
@@ -1060,7 +1060,7 @@ HEREDOC;
 	/**
 	 * @backup actions, alerts, history_uint
 	 */
-	public function TtestEscalations_triggerDependency() {
+	public function testEscalations_triggerDependency() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		// Create trigger
 		$response = $this->call('trigger.create', [
