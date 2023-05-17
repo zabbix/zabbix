@@ -86,19 +86,17 @@ class testFormServicesServices extends CWebTest {
 		// Check layout at Service tab.
 		$hidden_fields = [];
 		foreach ($service_labels as $label => $visible) {
-			$this->assertEquals($visible, $form->query("xpath://div[@id='service-tab']//label[text()=".
-					CXPathHelper::escapeQuotes($label)."]")->one(false)->isDisplayed()
-			);
+				$this->assertEquals($visible, $form->getField($label)->isDisplayed());
 			if (!$visible) {
 				$hidden_fields[] = $label;
 			}
 		}
 
-		// Check advanced configuration default value.
-		$this->assertFalse($form->query('id:advanced_configuration')->asCheckbox()->one()->isChecked());
+		// Check advanced configuration default closed state.
+		$form->checkValue(['Advanced configuration' => false]);
 
-		// Set "Advanced configuration" to true and check that corresponding fields are now visible.
-		$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+		// Open "Advanced configuration" block and check that corresponding fields are now visible.
+		$form->fill(['Advanced configuration' => true]);
 
 		foreach ($hidden_fields as $label) {
 			$this->assertTrue($form->getLabel($label)->isDisplayed());
@@ -386,7 +384,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Non-numeric weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => 'abc'
 					],
 					'error' => 'Incorrect value "abc" for "weight" field.'
@@ -397,7 +395,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Negative weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => '-2'
 					],
 					'error' => 'Incorrect value for field "weight": value must be no less than "0".'
@@ -408,7 +406,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Excessive weight',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Weight' => '9999999'
 					],
 					'error' => 'Incorrect value for field "weight": value must be no greater than "1000000".'
@@ -419,7 +417,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Non-numeric N in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -437,7 +435,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Negative N in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -455,7 +453,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'N more than 100% in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -473,7 +471,7 @@ class testFormServicesServices extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'W is equal to 0 in additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -499,7 +497,7 @@ class testFormServicesServices extends CWebTest {
 					'fields' => [
 						'Name' => 'Max sort order, weight, etc',
 						'Sort order (0->999)' => '999',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Increase by',
 						'id:propagation_value_number' => '5',
 						'Weight' => '1000000'
@@ -511,7 +509,7 @@ class testFormServicesServices extends CWebTest {
 					'fields' => [
 						'Name' => 'Intermediate values in sort order',
 						'Sort order (0->999)' => '10',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'OK',
 						'Weight' => '5'
@@ -522,7 +520,7 @@ class testFormServicesServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Fixed status',
-						'id:advanced_configuration' => true,
+						'Advanced configuration' => true,
 						'Status propagation rule' => 'Fixed status',
 						'id:propagation_value_status' => 'Not classified',
 						'Weight' => '0'
@@ -533,7 +531,7 @@ class testFormServicesServices extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Service with multiple additional rules',
-						'id:advanced_configuration' => true
+						'Advanced configuration' => true
 					],
 					'additional_rules' => [
 						[
@@ -648,7 +646,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: Non-numeric N in additional rules'
+						'Name' => 'Update rule: Non-numeric N in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -666,7 +665,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: Negative N in additional rules'
+						'Name' => 'Update rule: Negative N in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -684,7 +684,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: N more than 100% in additional rules'
+						'Name' => 'Update rule: N more than 100% in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -702,7 +703,8 @@ class testFormServicesServices extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Update rule: W is equal to 0 in additional rules'
+						'Name' => 'Update rule: W is equal to 0 in additional rules',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -719,7 +721,8 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Update additional rule'
+						'Name' => 'Update additional rule',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'High - If at least 50% of child services have Average status or above',
 					'additional_rules' => [
@@ -739,7 +742,8 @@ class testFormServicesServices extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Remove additional rule'
+						'Name' => 'Remove additional rule',
+						'Advanced configuration' => true
 					],
 					'existing_rule' => 'Disaster - If weight of child services with Warning status or below is less than 33%'
 				]
@@ -883,6 +887,13 @@ class testFormServicesServices extends CWebTest {
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
 			$form->invalidate();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$form->checkValue(['Advanced configuration' => false]);
+				$form->fill(['Advanced configuration' => true]);
+			}
 			$form->checkValue($data['fields']);
 
 			// Check that added/updated rules are present, and that removed rules are missing in configuration form.
@@ -1035,7 +1046,7 @@ class testFormServicesServices extends CWebTest {
 			'Name' => 'Updated name',
 			'Parent services' => 'Parent for deletion from row',
 			'Sort order (0->999)' => '85',
-			'id:advanced_configuration' => true,
+			'Advanced configuration' => true,
 			'Status propagation rule' => 'Increase by',
 			'id:propagation_value_number' => '4',
 			'Weight' => '9'
