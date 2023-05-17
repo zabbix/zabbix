@@ -76,7 +76,8 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 		switch (cache->type)
 		{
 			case ZBX_PREPROC_JSONPATH:
-				zbx_jsonobj_clear((zbx_jsonobj_t *)cache->data);
+				zbx_jsonobj_clear(&((zbx_pp_cache_jsonpath_t *)cache->data)->obj);
+				zbx_jsonpath_index_free(((zbx_pp_cache_jsonpath_t *)cache->data)->index);
 				break;
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->data);

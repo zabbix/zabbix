@@ -22,7 +22,6 @@
 
 #include "log.h"
 #include "zbxserialize.h"
-#include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxvariant.h"
 #include "zbxtime.h"
@@ -302,7 +301,7 @@ static int	preprocessor_pack_step(zbx_packed_field_t *fields, const zbx_pp_step_
  * Return value: The number of bytes parsed.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t *value)
+static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t *value)
 {
 	const unsigned char	*offset = data;
 	zbx_uint32_t		value_len;
@@ -314,22 +313,24 @@ static int	preprocesser_unpack_variant(const unsigned char *data, zbx_variant_t 
 		case ZBX_VARIANT_UI64:
 			offset += zbx_deserialize_uint64(offset, &value->data.ui64);
 			break;
-
 		case ZBX_VARIANT_DBL:
 			offset += zbx_deserialize_double(offset, &value->data.dbl);
 			break;
-
 		case ZBX_VARIANT_STR:
 			offset += zbx_deserialize_str(offset, &value->data.str, value_len);
 			break;
-
 		case ZBX_VARIANT_ERR:
 			offset += zbx_deserialize_str(offset, &value->data.err, value_len);
 			break;
-
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
+		case ZBX_VARIANT_NONE:
+		case ZBX_VARIANT_DBL_VECTOR:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return (int)(offset - data);
@@ -363,7 +364,7 @@ static int	preprocessor_unpack_history(const unsigned char *data, zbx_pp_history
 			zbx_timespec_t	ts;
 
 			offset += zbx_deserialize_int(offset, &index);
-			offset += preprocesser_unpack_variant(offset, &value);
+			offset += preprocessor_unpack_variant(offset, &value);
 			offset += zbx_deserialize_int(offset, &ts.sec);
 			offset += zbx_deserialize_int(offset, &ts.ns);
 
@@ -684,9 +685,9 @@ void	zbx_preprocessor_unpack_test_result(zbx_vector_pp_result_ptr_t *results, zb
 	for (int i = 0; i < results_num; i++)
 	{
 		result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
-		offset += preprocesser_unpack_variant(offset, &result->value);
+		offset += preprocessor_unpack_variant(offset, &result->value);
 		offset += zbx_deserialize_char(offset, &result->action);
-		offset += preprocesser_unpack_variant(offset, &result->value_raw);
+		offset += preprocessor_unpack_variant(offset, &result->value_raw);
 		zbx_vector_pp_result_ptr_append(results, result);
 	}
 
@@ -869,6 +870,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, zbx_uint64_t hostid, unsigne
 		{
 			if (value_len < (len = strlen(result->log->value)))
 				value_len = len;
+		}
+
+		if (0 != ZBX_ISSET_BIN(result))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 		}
 
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)

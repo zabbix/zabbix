@@ -22,6 +22,7 @@
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "log.h"
+#include "zbxtime.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
@@ -50,7 +51,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
 				tls_arg1, tls_arg2)))
 		{
-			zbx_socket_timeout_set(s, timeout);
+			zbx_socket_set_deadline(s, timeout);
 			break;
 		}
 

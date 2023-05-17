@@ -25,16 +25,13 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
-		$element['name'] = CHtml::encode($element['name']);
-
 		// is activated
 		if (str_in_array($id, $subfilter)) {
 			$output[] = (new CSpan([
 				(new CLinkAction($element['name']))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.json_encode($subfilterName.'['.$id.']').', null, true);'
-					)),
+					),
 				' ',
 				new CSup($element['count'])
 			]))
@@ -53,14 +50,13 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 			}
 			else {
 				$link = (new CLinkAction($element['name']))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", '.
 							json_encode($subfilterName.'['.$id.']').', '.
 							json_encode($id).', '.
 							'true'.
 						');'
-					));
+					);
 
 				$output[] = (new CSpan([
 					$link,
@@ -89,7 +85,6 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 	$i = 0;
 	foreach ($data as $tag_hash => $tag) {
 		$element_name = ($tag['value'] === '') ? $tag['tag'] : $tag['tag'].': '.$tag['value'];
-		$element_name = CHtml::encode($element_name);
 
 		$tag['tag'] = json_encode($tag['tag']);
 		$tag['value'] = json_encode($tag['value']);
@@ -100,11 +95,10 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 
 			$output[] = (new CSpan([
 				(new CLinkAction($element_name))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][tag]", null, false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][value]", null, true);'
-					)),
+					),
 				' ',
 				new CSup($tag['count'])
 			]))
@@ -123,11 +117,10 @@ function prepareTagsSubfilterOutput(array $data, array &$subfilter): array {
 			}
 			else {
 				$link = (new CLinkAction($element_name))
-					->onClick(CHtml::encode(
-						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					->onClick('javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][tag]", '.$tag['tag'].', false);'.
 						'create_var("zbx_filter", "subfilter_tags['.$i.'][value]", '.$tag['value'].', true);'
-					));
+					);
 
 				$output[] = (new CSpan([
 					$link,
@@ -148,7 +141,7 @@ function makeItemSubfilter(array &$filter_data, array $items, string $context) {
 	$table_subfilter = (new CTableInfo())
 		->addRow([
 			new CTag('h4', true, [
-				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+				_('Subfilter'), NBSP(), (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
 			])
 		], ZBX_STYLE_HOVER_NOBG);
 

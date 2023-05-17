@@ -156,8 +156,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Trigger overview')]);
-		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts', 'Tags',
-				'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups', 'Hosts',
+				'Problem tags', 'Show suppressed problems', 'Hosts location'], $form->getLabels()->asText()
 		);
 
 		$default_values = [
@@ -192,7 +192,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		// Check possible values of radio buttons.
 		$radio_buttons = [
 			'Show' => ['Recent problems', 'Problems', 'Any'],
-			'Tags' => ['And/Or', 'Or'],
+			'Problem tags' => ['And/Or', 'Or'],
 			'Hosts location' => ['Left', 'Top']
 		];
 
@@ -416,7 +416,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Filter triggers by 2 tags with Or operator',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'Street', 'operator' => 'Exists'],
@@ -499,7 +499,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'Filter by 2 tags without value',
-						'Tags' => 'Or'
+						'Problem tags' => 'Or'
 					],
 					'tags' => [
 						['name' => 'server', 'operator' => 'Contains', 'value' => ''],
@@ -637,7 +637,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Any',
 			'Host groups' => ['Another group to check Overview'],
 			'Hosts' => ['4_Host_to_check_Monitoring_Overview'],
-			'Tags' => 'Or',
+			'Problem tags' => 'Or',
 			'Show suppressed problems' => 'true',
 			'Hosts location' => 'Top'
 		]);
@@ -853,7 +853,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 			'Show' => 'Recent problems',
 			'Host groups' => '',
 			'Hosts' => '',
-			'Tags' => 'And/Or',
+			'Problem tags' => 'And/Or',
 			'Show suppressed problems' => false,
 			'Hosts location' => 'Left'
 		];

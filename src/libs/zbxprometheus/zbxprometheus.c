@@ -1675,7 +1675,7 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 	zbx_hashset_create_ext(&prom->hints, 100, prometheus_hint_hash, prometheus_hint_compare, prometheus_hint_clear,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	if (0 != pthread_rwlock_init(&prom->index_lock, NULL))
+	if (0 != pthread_mutex_init(&prom->index_lock, NULL))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot initialize prometheus cache: %s", zbx_strerror(errno));
 		goto out;
@@ -1729,24 +1729,14 @@ void	zbx_prometheus_clear(zbx_prometheus_t *prom)
 	zbx_vector_prometheus_row_clear_ext(&prom->rows, prometheus_row_free);
 	zbx_vector_prometheus_row_destroy(&prom->rows);
 
-	pthread_rwlock_destroy(&prom->index_lock);
+	pthread_mutex_destroy(&prom->index_lock);
 }
 
-static void	prometheus_wrlock(zbx_prometheus_t *prom)
+static void	prometheus_lock(zbx_prometheus_t *prom)
 {
-	if (0 != pthread_rwlock_wrlock(&prom->index_lock))
+	if (0 != pthread_mutex_lock(&prom->index_lock))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot lock prometheus cache for writing: %s", zbx_strerror(errno));
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-}
-
-static void	prometheus_rdlock(zbx_prometheus_t *prom)
-{
-	if (0 != pthread_rwlock_rdlock(&prom->index_lock))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot lock prometheus cache for reading: %s", zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot lock prometheus cache: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
@@ -1754,7 +1744,7 @@ static void	prometheus_rdlock(zbx_prometheus_t *prom)
 
 static void	prometheus_unlock(zbx_prometheus_t *prom)
 {
-	if (0 != pthread_rwlock_unlock(&prom->index_lock))
+	if (0 != pthread_mutex_unlock(&prom->index_lock))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot unlock prometheus cache: %s", zbx_strerror(errno));
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -1773,7 +1763,7 @@ static	zbx_prometheus_label_index_t	*prometheus_get_index(zbx_prometheus_t *prom
 	int				i;
 	zbx_prometheus_label_index_t	*label_index = NULL;
 
-	prometheus_rdlock(prom);
+	prometheus_lock(prom);
 
 	for (i = 0; i < prom->indexes.values_num; i++)
 	{
@@ -1791,7 +1781,7 @@ static	zbx_prometheus_label_index_t	*prometheus_get_index(zbx_prometheus_t *prom
 
 static void	prometheus_add_index(zbx_prometheus_t *prom, zbx_prometheus_label_index_t *index)
 {
-	prometheus_wrlock(prom);
+	prometheus_lock(prom);
 	zbx_vector_prometheus_label_index_append(&prom->indexes, index);
 	prometheus_unlock(prom);
 }

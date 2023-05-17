@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,14 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_HISTORY_H
-#define ZABBIX_PP_HISTORY_H
 
-#include "zbxpreproc.h"
-#include "zbxtime.h"
-#include "zbxvariant.h"
+class CHtmlEntity {
 
-void	pp_history_free(zbx_pp_history_t *history);
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+	/**
+	 * @var string
+	 */
+	private $entity = '';
 
-#endif
+	public function __construct(string $entity) {
+		$this->entity = $entity;
+	}
+
+	public function toString(): string {
+		return $this->entity;
+	}
+}
