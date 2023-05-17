@@ -93,7 +93,7 @@ class ScimHttpResponse {
 		elseif ($this->class === 'users') {
 			$this->setResponseData($this->prepareUsersResponse());
 		}
-		else {
+		elseif ($this->class === 'groups') {
 			$this->setResponseData($this->prepareGroupsResponse());
 		}
 
