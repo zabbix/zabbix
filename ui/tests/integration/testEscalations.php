@@ -34,9 +34,13 @@ class testEscalations extends CIntegrationTest {
 	private static $triggerid;
 	private static $maint_start_tm;
 	private static $trigger_actionid;
+	private static $scriptid_problem;
+	private static $scriptid_recovery;
 
 	const TRAPPER_ITEM_NAME = 'trap';
 	const HOST_NAME = 'test_actions';
+	const COMMAND_PROBLEM = 'echo "problem"';
+	const COMMAND_RECOVERY = 'echo "recovery"';
 
 	/**
 	 * @inheritdoc
@@ -160,6 +164,27 @@ class testEscalations extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'DebugLevel' => 4,
 				'LogFileSize' => 20
+			]
+		];
+	}
+
+	/**
+	 * Component configuration provider for remote command related tests.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProviderRemote() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 20,
+				'Timeout' => 30
+			],
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::HOST_NAME,
+				'ServerActive' => '127.0.0.1',
+				'AllowKey' => 'system.run[*]',
+				'LogRemoteCommands' => 1
 			]
 		];
 	}
@@ -901,6 +926,137 @@ HEREDOC;
 	}
 
 	/**
+	 * Test active remote commands
+	 *testEscalations_checkActiveCommands
+	 * @required-components server, agent
+	 * @configurationDataProvider serverConfigurationProviderRemote
+	 * @backup actions, alerts, history_uint, media_type, users, media, events, problem
+	 */
+	public function testEscalations_checkActiveCommands() {
+		$this->clearLog(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache();
+
+		// Create remote commands
+		$response = $this->call('script.create', [
+			'name' => 'Test remote command problem',
+			'command' => self::COMMAND_PROBLEM,
+			'execute_on' => 0,
+			'scope' => 1,
+			'type' => 0
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		self::$scriptid_problem = $response['result']['scriptids'][0];
+
+		$response = $this->call('script.create', [
+			'name' => 'Test remote command recovery',
+			'command' => self::COMMAND_RECOVERY,
+			'execute_on' => 0,
+			'scope' => 1,
+			'type' => 0
+		]);
+		$this->assertArrayHasKey('scriptids', $response['result']);
+		self::$scriptid_recovery = $response['result']['scriptids'][0];
+
+		// Create active item
+		$response = $this->call('item.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Agent variant',
+			'key_' => 'agent.variant',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'value_type' => ITEM_VALUE_TYPE_UINT64,
+			'delay' => '1s'
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+
+		// Create action
+		$response = $this->call('action.create', [
+			'esc_period' => '1h',
+			'eventsource' => 0,
+			'status' => 0,
+			'filter' => [
+				'conditions' => [
+					[
+						'conditiontype' => CONDITION_TYPE_TRIGGER,
+						'operator' => CONDITION_OPERATOR_EQUAL,
+						'value' => self::$triggerid
+					]
+				],
+				'evaltype' => 0
+			],
+			'name' => 'Remote command action',
+			'operations' => [
+				[
+					'esc_period' => 0,
+					'esc_step_from' => 1,
+					'esc_step_to' => 1,
+					'operationtype' => OPERATION_TYPE_COMMAND,
+					'opcommand' => [
+						'scriptid' => self::$scriptid_problem
+					],
+					'opcommand_hst' => [
+						[
+							'hostid'=> self::$hostid
+						]
+					]
+				]
+			],
+			'pause_suppressed' => 0,
+			'recovery_operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_COMMAND,
+					'opcommand' => [
+						'scriptid' => self::$scriptid_recovery
+					],
+					'opcommand_hst' => [
+						[
+							'hostid'=> self::$hostid
+						]
+					]
+				]
+			]
+		]);
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+		$actionid = $response['result']['actionids'];
+
+		$response = $this->call('action.update', [
+			'actionid' => self::$trigger_actionid,
+			'status' => 1
+		]);
+
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 8);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, "Executing command '".self::COMMAND_PROBLEM."'",
+				true, 10, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_agent_commands(), ret 0 parsed 1',
+				true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => $actionid
+		], 5, 2);
+		$this->assertCount(1, $response['result']);
+
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 200);
+		$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, "Executing command '".self::COMMAND_RECOVERY."'",
+				true, 10, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_agent_commands(), ret 0 parsed 1',
+				true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => $actionid
+		], 5, 2);
+		$this->assertCount(2, $response['result']);
+	}
+
+	/**
 	 * @backup actions, alerts, history_uint
 	 */
 	public function testEscalations_triggerDependency() {
@@ -944,4 +1100,5 @@ HEREDOC;
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 0);
 	}
+
 }
