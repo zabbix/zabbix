@@ -645,7 +645,6 @@ typedef enum
 }
 zbx_synced_new_config_t;
 
-
 #define ZBX_ITEM_GET_INTERFACE		0x0001
 #define ZBX_ITEM_GET_HOST		0x0002
 #define ZBX_ITEM_GET_HOSTNAME		0x0004
@@ -658,6 +657,9 @@ zbx_synced_new_config_t;
 #define ZBX_ITEM_GET_SYNC_EXPORT	(ZBX_ITEM_GET_HOSTNAME)
 
 #define ZBX_ITEM_GET_PROCESS		0
+
+typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
+typedef struct zbx_um_cache zbx_um_cache_t;
 
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
@@ -699,7 +701,8 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t hostid, int *errcodes, size_t num);
-void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision);
+void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shared_handle_t **um_handle,
+		zbx_uint64_t *revision);
 void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num);
@@ -742,7 +745,9 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
 void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
+#endif
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
@@ -1070,8 +1075,23 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error);
+int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
+/* shared user macro handle can be used to share user macro handle between threads   */
+/* without locking configuration cache to update user macro handle reference counter */
+struct zbx_dc_um_shared_handle
+{
+	zbx_um_cache_t		*um_cache;
+	zbx_uint64_t		refcount;
+};
+
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_update(zbx_dc_um_shared_handle_t *handle);
+int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx_dc_um_shared_handle_t *new_handle);
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
+void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
@@ -1173,6 +1193,6 @@ zbx_maintenance_type_t;
 
 #define ZBX_RECALC_TIME_PERIOD_HISTORY	1
 #define ZBX_RECALC_TIME_PERIOD_TRENDS	2
-void	zbx_recalc_time_period(int *ts_from, int table_group);
+void	zbx_recalc_time_period(time_t *ts_from, int table_group);
 
 #endif

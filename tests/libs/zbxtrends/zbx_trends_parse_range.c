@@ -30,7 +30,7 @@
 int	__wrap_zbx_db_is_null(const char *field);
 zbx_db_row_t	__wrap_zbx_db_fetch(zbx_db_result_t result);
 zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...);
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group);
 
 int	__wrap_zbx_db_is_null(const char *field)
 {
@@ -50,7 +50,7 @@ zbx_db_result_t	__wrap_zbx_db_select(const char *fmt, ...)
 	return NULL;
 }
 
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
+void	__wrap_zbx_recalc_time_period(time_t *tm_start, int table_group)
 {
 	ZBX_UNUSED(tm_start);
 	ZBX_UNUSED(table_group);
@@ -58,8 +58,9 @@ void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
 
 void	zbx_mock_test_entry(void **state)
 {
+	time_t		start, end;
 	const char	*param;
-	int		expected_ret, returned_ret, start, end;
+	int		expected_ret, returned_ret;
 	char		*error = NULL;
 	zbx_timespec_t	ts_from, ts_start, ts_end, ts;
 

@@ -66,9 +66,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'preservekeys' => true
 		];
 
-		$is_template_dashboard = $this->hasInput('templateid');
 		$is_dynamic = ($this->hasInput('dynamic_hostid')
-			&& ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
+			&& ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM)
 		);
 
 		$tmp_items = [];
@@ -102,11 +101,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 		 * overwritten. Host name can be attached to item name with delimiter when user is in normal dashboards.
 		 */
 		if ($this->getInput('name', '') === '') {
-			if (!$is_template_dashboard || ($this->hasInput('dynamic_hostid') && $tmp_items)) {
+			if (!$this->isTemplateDashboard() || ($this->hasInput('dynamic_hostid') && $tmp_items)) {
 				$options['output'] = array_merge($options['output'], ['name']);
 			}
 
-			if (!$is_template_dashboard) {
+			if (!$this->isTemplateDashboard()) {
 				$options['selectHosts'] = ['name'];
 			}
 		}
@@ -206,7 +205,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					case ITEM_VALUE_TYPE_STR:
 					case ITEM_VALUE_TYPE_TEXT:
 					case ITEM_VALUE_TYPE_LOG:
-						$value = formatHistoryValue($last_value, $items[$itemid], false);
+					case ITEM_VALUE_TYPE_BINARY:
+						$value = $value_type == ITEM_VALUE_TYPE_BINARY
+							? italic(_('binary value'))
+							: formatHistoryValue($last_value, $items[$itemid], false);
 
 						if (array_key_exists(Widget::SHOW_CHANGE_INDICATOR, $show) && $prev_value !== null
 								&& $last_value !== $prev_value) {
@@ -225,12 +227,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($this->getInput('name', '') === '') {
-				if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+				if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 					// Resolve original item name when user is in normal dashboards or template dashboards view mode.
 					$name = $items[$itemid]['name'];
 				}
 
-				if (!$is_template_dashboard) {
+				if (!$this->isTemplateDashboard()) {
 					$name = $items[$itemid]['hosts'][0]['name'].NAME_DELIMITER.$name;
 				}
 			}
@@ -244,7 +246,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items[$itemid]['name'] = $this->fields_values['description'];
 
 				// Do not resolve macros if using template dashboard. Template dashboards only have edit mode.
-				if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+				if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 					$items = CMacrosResolverHelper::resolveWidgetItemNames($items);
 				}
 

@@ -21,9 +21,15 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+
+/**
+ * @backup history_bin
+ */
 class testHistory extends CAPITest {
 
 	public static function history_get_data() {
+		$binary_itemid = 58740;
+
 		return [
 			// Test item history of value_type == ITEM_VALUE_TYPE_STR ('history' => 1).
 			[
@@ -229,6 +235,32 @@ class testHistory extends CAPITest {
 				],
 				'expected_result' => null,
 				'expected_error' => 'Invalid parameter "/filter/value/1": a character string, integer or floating point value is expected.'
+			],
+			'Verify binary type NOT returned with wrong history/value type' => [
+				'api_request' => [
+					'output' => ['value'],
+					'history' => ITEM_VALUE_TYPE_FLOAT,
+					'itemids' => [$binary_itemid],
+					'limit' => 1
+				],
+				'expected_result' => [],
+				'expected_error' => false
+			],
+			'Verify binary type returned as base64' => [
+				'api_request' => [
+					'output' => ['value'],
+					'history' => ITEM_VALUE_TYPE_BINARY,
+					'itemids' => [$binary_itemid],
+					'sortorder' => 'DESC',
+					'sortfield' => 'clock',
+					'limit' => 1
+				],
+				'expected_result' => [
+					[
+						'value' => base64_encode('This should be binary')
+					]
+				],
+				'expected_error' => false
 			]
 		];
 	}
@@ -244,6 +276,43 @@ class testHistory extends CAPITest {
 		}
 		else {
 			$this->assertSame($expected_error, $result['error']['data']);
+		}
+	}
+
+	public static function history_clear_data() {
+		$binary_itemid = 58740;
+
+		return [
+			[
+				'api_request' => ['999999'], // Non-existing itemid.
+				'expected_result' => null,
+				'expected_error' => 'No permissions to referred object or it does not exist!'
+			],
+			[
+				'api_request' => [$binary_itemid],
+				'expected_result' => [
+					'itemids' => [$binary_itemid]
+				],
+				'expected_error' => false
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider history_clear_data
+	 */
+	public function testHistory_Clear($api_request, $expected_result, $expected_error) {
+		$result = $this->call('history.clear', $api_request, $expected_error);
+
+		if ($expected_error === false) {
+			$this->assertSame($expected_result, $result['result']);
+		}
+		else {
+			$this->assertSame($expected_error, $result['error']['data']);
+
+			$this->assertEquals(0, CDBHelper::getCount(
+				'SELECT 1 FROM history_bin WHERE '.dbConditionId('itemid', $api_request), 1
+			));
 		}
 	}
 }

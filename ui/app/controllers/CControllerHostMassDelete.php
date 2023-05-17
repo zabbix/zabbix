@@ -49,6 +49,7 @@ class CControllerHostMassDelete extends CController {
 	protected function doAction(): void {
 		$output = [];
 		$hostids = $this->getInput('hostids');
+		$hosts_count = count($hostids);
 		$result = API::Host()->delete($hostids);
 
 		if (!$result) {
@@ -62,7 +63,7 @@ class CControllerHostMassDelete extends CController {
 		}
 
 		if ($result) {
-			$success = ['title' => _('Host deleted')];
+			$success = ['title' => _n('Host deleted', 'Hosts deleted', $hosts_count)];
 
 			if ($messages = get_and_clear_messages()) {
 				$success['messages'] = array_column($messages, 'message');
@@ -71,7 +72,7 @@ class CControllerHostMassDelete extends CController {
 			$output['success'] = $success;
 		}
 		else {
-			CMessageHelper::setErrorTitle(_('Cannot delete host'));
+			CMessageHelper::setErrorTitle(_n('Cannot delete host', 'Cannot delete hosts', $hosts_count));
 
 			$output['error'] = [
 				'title' => CMessageHelper::getTitle(),

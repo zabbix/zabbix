@@ -1,3 +1,4 @@
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,21 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LLD_H
-#define ZABBIX_LLD_H
 
-#include "zbxalgo.h"
-#include "zbxtime.h"
+class CHtmlEntity {
 
-void	zbx_lld_process_value(zbx_uint64_t itemid, zbx_uint64_t hostid, const char *value, const zbx_timespec_t *ts, unsigned char meta,
-		zbx_uint64_t lastlogsize, int mtime, const char *error);
+	/**
+	 * @var string
+	 */
+	private $entity = '';
 
-void	zbx_lld_process_agent_result(zbx_uint64_t itemid, zbx_uint64_t hostid, AGENT_RESULT *result, zbx_timespec_t *ts, char *error);
+	public function __construct(string $entity) {
+		$this->entity = $entity;
+	}
 
-int	zbx_lld_get_queue_size(zbx_uint64_t *size, char **error);
-
-int	zbx_lld_get_diag_stats(zbx_uint64_t *items_num, zbx_uint64_t *values_num, char **error);
-
-int	zbx_lld_get_top_items(int limit, zbx_vector_uint64_pair_t *items, char **error);
-
-#endif	/* ZABBIX_LLD_H */
+	public function toString(): string {
+		return $this->entity;
+	}
+}

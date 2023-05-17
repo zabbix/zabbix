@@ -17,14 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_HISTORY_H
-#define ZABBIX_PP_HISTORY_H
+#ifndef ZABBIX_LLD_AUDIT_H
+#define ZABBIX_LLD_AUDIT_H
 
-#include "zbxpreproc.h"
-#include "zbxtime.h"
-#include "zbxvariant.h"
+#include "lld.h"
 
-void	pp_history_free(zbx_pp_history_t *history);
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
+		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid);
 
 #endif

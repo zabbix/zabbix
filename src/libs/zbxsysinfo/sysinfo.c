@@ -167,6 +167,7 @@ int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
 
+#ifdef WITH_COMMON_METRICS
 /******************************************************************************
  *                                                                            *
  * Purpose: registers a new item key as local into the system                 *
@@ -176,6 +177,7 @@ static int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_le
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
+#endif /* WITH_COMMON_METRICS */
 
 #if !defined(__MINGW32__)
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
@@ -833,33 +835,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->logeventid = 0;
 }
 
-void	zbx_init_agent_result(AGENT_RESULT *result)
-{
-	memset(result, 0, sizeof(AGENT_RESULT));
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_log_free(zbx_log_t *log)
-{
-	zbx_log_clean(log);
-	zbx_free(log);
-}
-
-void	zbx_free_agent_result(AGENT_RESULT *result)
-{
-	ZBX_UNSET_UI64_RESULT(result);
-	ZBX_UNSET_DBL_RESULT(result);
-	ZBX_UNSET_STR_RESULT(result);
-	ZBX_UNSET_TEXT_RESULT(result);
-	ZBX_UNSET_LOG_RESULT(result);
-	ZBX_UNSET_MSG_RESULT(result);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize the request structure                                  *
@@ -1279,13 +1254,12 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 {
 	zbx_uint64_t	value_uint64;
 	int		ret = FAIL;
+	double		dbl_tmp;
 
 	assert(result);
 
 	switch (value_type)
 	{
-		double	dbl_tmp;
-
 		case ITEM_VALUE_TYPE_UINT64:
 			zbx_trim_integer(c);
 			zbx_del_zeros(c);
@@ -1320,6 +1294,11 @@ int	zbx_set_agent_result_type(AGENT_RESULT *result, int value_type, char *c)
 			add_log_result(result, c);
 			ret = SUCCEED;
 			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return ret;
@@ -1549,84 +1528,6 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 	}
 
 	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: unquotes special symbols in item key parameter                    *
- *                                                                            *
- * Parameters: param - [IN/OUT] item key parameter                            *
- *                                                                            *
- * Comments:                                                                  *
- *   "param"     => param                                                     *
- *   "\"param\"" => "param"                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_unquote_key_param(char *param)
-{
-	char	*dst;
-
-	if ('"' != *param)
-		return;
-
-	for (dst = param++; '\0' != *param; param++)
-	{
-		if ('\\' == *param && '"' == param[1])
-			continue;
-
-		*dst++ = *param;
-	}
-	*--dst = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: quotes special symbols in item key parameter                      *
- *                                                                            *
- * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
- *                                                                            *
- * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
- *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_quote_key_param(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
-
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-
-	*param = (char *)zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-
-	return SUCCEED;
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)

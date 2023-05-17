@@ -32,7 +32,7 @@ class CWidgetFieldMultiSelectUserView extends CWidgetFieldMultiSelectView {
 	}
 
 	protected function getPopupParameters(): array {
-		return [
+		return $this->popup_parameters + [
 			'srctbl' => 'users',
 			'srcfld1' => 'userid',
 			'srcfld2' => 'fullname'
