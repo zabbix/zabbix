@@ -112,7 +112,6 @@ class CAction extends CApiService {
 			'usrgrpids'						=> null,
 			'userids'						=> null,
 			'scriptids'						=> null,
-			'nopermissions'					=> null,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -135,7 +134,7 @@ class CAction extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// conditions are checked here by sql, operations after, by api queries
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
@@ -307,7 +306,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// check hosts, templates
 			$hosts = [];
 			$hostIds = [];
