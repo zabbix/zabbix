@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-11T07:44:28Z'
+  date: '2023-05-18T13:29:44Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -40,25 +40,29 @@ zabbix_export:
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
+                    ['endpoint_name', 'pod_filter_labels', 'pod_filter_annotations', 'node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined') {
+                            throw 'Parameter can be empty but not removed: "' + field + '".';
+                        }
+                    });
             
                     Kube.params = params;
                 },
             
                 apiRequest: function (query) {
                     const request = new HttpRequest();
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
                     request.addHeader('Content-Type: application/json');
                     request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                    const url = Kube.params.api_url + query;
-                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+                    const url = Kube.params.api_url + encodeURI(query);
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + Kube.params.http_proxy + ' ' + url);
             
                     response = request.get(url);
                     Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
                     Zabbix.log(5, response);
-            
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
             
                     try {
                         response = JSON.parse(response);
@@ -66,7 +70,6 @@ zabbix_export:
                     catch (error) {
                         throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
                     }
-            
                     return {
                         status: request.getStatus(),
                         response: response
@@ -101,7 +104,6 @@ zabbix_export:
                             };
                         });
                     }
-            
                     return filtered;
                 },
             
@@ -131,8 +133,8 @@ zabbix_export:
                     }
             
                     result.response.items.forEach(function (filternode) {
-                        if (Kube.filter(filternode.metadata.name, filternode.metadata.labels, filterNodeLabels)
-                            && Kube.filter(filternode.metadata.name, filternode.metadata.annotations, filterNodeAnnotations)) {
+                        if (Kube.filter(Kube.getField(filternode, 'metadata.name'), Kube.getField(filternode, 'metadata.labels'), filterNodeLabels)
+                            && Kube.filter(Kube.getField(filternode, 'metadata.name'), Kube.getField(filternode, 'metadata.annotations'), filterNodeAnnotations)) {
                             Zabbix.log(4, '[ Kubernetes ] Filtered node "' + filternode.metadata.name + '"');
             
                             output.push({
@@ -176,7 +178,7 @@ zabbix_export:
                             pod.status.hostIP = 'none';
                         };
             
-                        pod.spec.containers.forEach(function (container) {
+                        Kube.getField(pod, 'spec.containers').forEach(function (container) {
                             var limits = container.resources.limits,
                                 requests = container.resources.requests;
             
@@ -226,10 +228,10 @@ zabbix_export:
             
                     endpointIPs = [];
                     endpoints.response.items.forEach(function (ep) {
-                        if (ep.metadata.name !== Kube.params.endpoint_name) {
+                        if (Kube.getField(ep, 'metadata.name') !== Kube.params.endpoint_name) {
                             return;
                         }
-                        if (!Array.isArray(ep.subsets)) {
+                        if (!Array.isArray(Kube.getField(ep, 'subsets'))) {
                             return;
                         }
                         endpointIPs = ep.subsets;
@@ -300,12 +302,12 @@ zabbix_export:
                             roles.push(splitLabel[1]);
                         }
                     });
-                    var internalIPs = nodes[idx].filternode.status.addresses.filter(function (addr) {
+                    var internalIPs = Kube.getField(nodes[idx].filternode, 'status.addresses').filter(function (addr) {
                         return addr.type === 'InternalIP';
                     });
                     var internalIP = internalIPs.length && internalIPs[0].address;
             
-                    var Hostname = nodes[idx].filternode.status.addresses.filter(function (addr) {
+                    var Hostname = Kube.getField(nodes[idx].filternode, 'status.addresses').filter(function (addr) {
                         return addr.type === 'Hostname';
                     });
                     var Hostname = Hostname.length && Hostname[0].address;
@@ -326,11 +328,8 @@ zabbix_export:
                     });
             
                     endpointIPs.forEach(function (agent) {
-                        if (typeof agent.addresses !== 'object' || typeof agent.addresses === 'undefined') {
-                            return 'Required field addresses in array endpointIPs was not found';
-                        }
-                        for (k in agent.addresses) {
-                            if (agent.addresses[k].ip === internalIP) {
+                        for (k in Kube.getField(agent, 'addresses')) {
+                            if (Kube.getField(agent.addresses[k], 'ip') === internalIP) {
                                 endpointpod = Kube.getField(agent.addresses[k], 'targetRef.name')
                             }
                             for (k in agent.notReadyAddresses) {
@@ -378,6 +377,8 @@ zabbix_export:
               value: '{$KUBE.NODE.FILTER.LABELS}'
             - name: node_filter_annotations
               value: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
+            - name: http_proxy
+              value: '{$KUBE.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -1607,6 +1608,8 @@ zabbix_export:
           description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
         - macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token.'
+        - macro: '{$KUBE.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
         - macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable nodes.'
@@ -1619,18 +1622,6 @@ zabbix_export:
         - macro: '{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered node by role.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable cluster nodes.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered cluster nodes.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable nodes hosts by role.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered cluster nodes by role.'
         - macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable pods by namespace.'
@@ -1638,16 +1629,16 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered pods by namespace.'
         - macro: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
-          description: 'Annotations to filter nodes (regex in values are supported).'
+          description: 'Annotations to filter nodes (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.NODE.FILTER.LABELS}'
-          description: 'Labels to filter nodes (regex in values are supported).'
+          description: 'Labels to filter nodes (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.NODES.ENDPOINT.NAME}'
           value: zabbix-zabbix-helm-chrt-agent
           description: 'Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".'
         - macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
-          description: 'Annotations to filter pods (regex in values are supported).'
+          description: 'Annotations to filter pods (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.POD.FILTER.LABELS}'
-          description: 'Labels to filter Pods (regex in values are supported).'
+          description: 'Labels to filter Pods (regex in values are supported). See the template''s README.md for details.'
       valuemaps:
         - uuid: 785b20f8979341c4b470870ec8f50414
           name: 'Node conditions'

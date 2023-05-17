@@ -51,19 +51,12 @@ Get the generated service account token using the command
 Then set it to the macro `{$KUBE.API.TOKEN}`.  
 Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
 
-Set up the macros to filter the metrics of discovered nodes:
+Set up the macros to filter the metrics of discovered nodes and host creation based on host prototypes:
 
 - {$KUBE.LLD.FILTER.NODE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
 - {$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}
-
-Set up the macros to filter host creation based on host prototypes:
-
-- {$KUBE.LLD.FILTER.NODE_HOST.MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}
 
 Set up macros to filter pod metrics by namespace:
 
@@ -72,12 +65,19 @@ Set up macros to filter pod metrics by namespace:
 
 **Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable pods.
 
-You can use `{$KUBE.NODE.FILTER.LABELS}`, `{$KUBE.POD.FILTER.LABELS}`, `{$KUBE.NODE.FILTER.ANNOTATIONS}` and `{$KUBE.POD.FILTER.ANNOTATIONS}` macros for advanced filtering nodes and pods by labels and annotations. Macro values are specified separated by commas and must have the key/value form with support for regular expressions in the value.
+You can use the `{$KUBE.NODE.FILTER.LABELS}`, `{$KUBE.POD.FILTER.LABELS}`, `{$KUBE.NODE.FILTER.ANNOTATIONS}` and `{$KUBE.POD.FILTER.ANNOTATIONS}` macros for advanced filtering of nodes and pods by labels and annotations.
+
+Notes about labels and annotations filters:
+
+- Macro values should be specified separated by commas and must have the key/value form with support for regular expressions in the value (`key1: value, key2: regexp`).
+- ECMAScript syntax is used for regular expressions.
+- Filters are applied if such a label key exists for the entity that is being filtered (it means that if you specify a key in a filter, entities which do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
+- You can also use the exclamation point symbol (`!`) to invert the filter (`!key: value`).
 
 For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the nodes 5-25 without the "ingress" role will be discovered.
 
 
-See documentation for details:
+See the Kubernetes documentation for details about labels and annotations:
 
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/>
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>
@@ -92,19 +92,16 @@ See documentation for details:
 |----|-----------|-------|
 |{$KUBE.API.ENDPOINT.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}|<p>Filter of discoverable nodes by role.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}|<p>Filter to exclude discovered node by role.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}|<p>Filter of discoverable cluster nodes.</p>|`.*`|
-|{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}|<p>Filter to exclude discovered cluster nodes.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}|<p>Filter of discoverable nodes hosts by role.</p>|`.*`|
-|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}|<p>Filter to exclude discovered cluster nodes by role.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.NODE.FILTER.ANNOTATIONS}|<p>Annotations to filter nodes (regex in values are supported).</p>||
-|{$KUBE.NODE.FILTER.LABELS}|<p>Labels to filter nodes (regex in values are supported).</p>||
-|{$KUBE.POD.FILTER.ANNOTATIONS}|<p>Annotations to filter pods (regex in values are supported).</p>||
-|{$KUBE.POD.FILTER.LABELS}|<p>Labels to filter Pods (regex in values are supported).</p>||
+|{$KUBE.NODE.FILTER.ANNOTATIONS}|<p>Annotations to filter nodes (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.NODE.FILTER.LABELS}|<p>Labels to filter nodes (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.POD.FILTER.ANNOTATIONS}|<p>Annotations to filter pods (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.POD.FILTER.LABELS}|<p>Labels to filter Pods (regex in values are supported). See the template's README.md for details.</p>||
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}|<p>Filter of discoverable pods by namespace.</p>|`.*`|
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered pods by namespace.</p>|`CHANGE_IF_NEEDED`|
 
