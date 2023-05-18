@@ -38,6 +38,7 @@ my %c = (
 	"t_double"	=>	"ZBX_TYPE_FLOAT",
 	"t_id"		=>	"ZBX_TYPE_ID",
 	"t_image"	=>	"ZBX_TYPE_BLOB",
+	"t_bin"		=>	"ZBX_TYPE_BLOB",
 	"t_integer"	=>	"ZBX_TYPE_INT",
 	"t_longtext"	=>	"ZBX_TYPE_LONGTEXT",
 	"t_nanosec"	=>	"ZBX_TYPE_INT",
@@ -79,8 +80,7 @@ $c{"before"} = "/*
 #define ZBX_TYPE_LONGTEXT_LEN	0
 #define ZBX_TYPE_TEXT_LEN	65535
 
-
-const zbx_db_table_t\ttables[] = {
+static zbx_db_table_t\ttables[] = {
 ";
 
 my %mysql = (
@@ -94,6 +94,7 @@ my %mysql = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint unsigned",
 	"t_image"	=>	"longblob",
+	"t_bin"		=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"longtext",
 	"t_nanosec"	=>	"integer",
@@ -115,6 +116,7 @@ my %oracle = (
 	"t_double"	=>	"BINARY_DOUBLE",
 	"t_id"		=>	"number(20)",
 	"t_image"	=>	"blob",
+	"t_bin"		=>	"blob",
 	"t_integer"	=>	"number(10)",
 	"t_longtext"	=>	"nclob",
 	"t_nanosec"	=>	"number(10)",
@@ -136,6 +138,7 @@ my %postgresql = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"bytea",
+	"t_bin"		=>	"bytea",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
@@ -157,6 +160,7 @@ my %sqlite3 = (
 	"t_double"	=>	"DOUBLE PRECISION",
 	"t_id"		=>	"bigint",
 	"t_image"	=>	"longblob",
+	"t_bin"		=>	"longblob",
 	"t_integer"	=>	"integer",
 	"t_longtext"	=>	"text",
 	"t_nanosec"	=>	"integer",
@@ -992,7 +996,7 @@ sub process()
 sub c_append_changelog_tables()
 {
 	print "
-const zbx_db_table_changelog_t\tchangelog_tables[] =
+static const zbx_db_table_changelog_t\tchangelog_tables[] =
 {\n";
 
 	while (my ($object, $table) = each(%table_types)) {
@@ -1046,15 +1050,17 @@ sub main()
 		$szcol3 = 0;
 		$szcol4 = 0;
 		$sql_suffix="\";\n";
-		$fkeys_prefix = "const char\t*const db_schema_fkeys[] =\n{\n";
-		$fkeys_suffix = "\tNULL\n};\n";
 
-		print "#if defined(HAVE_SQLITE3)\nconst char\t*const db_schema = \"\\\n";
+		print "#if defined(HAVE_SQLITE3)\nstatic const char\t*db_schema = \"\\\n";
 		%output = %sqlite3;
 		process();
 		print "#else\t/* HAVE_SQLITE3 */\n";
-		print "const char\t*const db_schema = NULL;\n";
+		print "static const char\t*db_schema = NULL;\n";
 		print "#endif\t/* not HAVE_SQLITE3 */\n";
+		print "\nzbx_db_table_t\t*zbx_dbschema_get_tables(void)\n{\n\treturn tables;\n}\n";
+		print "\nconst zbx_db_table_changelog_t\t*zbx_dbschema_get_changelog_tables(void)\n" .
+				"{\n\treturn changelog_tables;\n}\n";
+		print "\nconst char\t*zbx_dbschema_get_schema(void)\n{\n\treturn db_schema;\n}\n";
 	}
 }
 

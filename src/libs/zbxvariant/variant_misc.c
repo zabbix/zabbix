@@ -29,14 +29,13 @@
  *                                                                            *
  * Parameters: value         - [IN/OUT] the value to convert                  *
  *             value_type    - [IN] the target value type                     *
- *             dbl_precision - [IN] double precision option                   *
  *             errmsg        - [OUT] the error message                        *
  *                                                                            *
  * Return value: SUCCEED - Value conversion was successful.                   *
  *               FAIL    - Otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, int dbl_precision, char **errmsg)
+int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
 {
 	int	ret;
 
@@ -47,7 +46,7 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 		case ITEM_VALUE_TYPE_FLOAT:
 			if (SUCCEED == (ret = zbx_variant_convert(value, ZBX_VARIANT_DBL)))
 			{
-				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl, dbl_precision)))
+				if (FAIL == (ret = zbx_validate_value_dbl(value->data.dbl)))
 				{
 					char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -62,8 +61,10 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, in
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_BIN:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			*errmsg = zbx_dsprintf(NULL, "Unknown value type \"%d\"", value_type);
 			THIS_SHOULD_NEVER_HAPPEN;

@@ -26,20 +26,22 @@
  * @var array $data
  */
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['groups']['groupids']
-);
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
+	: null;
 
 (new CWidgetFormView($data))
 	->addField($groupids)
-	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
+	->addField(array_key_exists('exclude_groupids', $data['fields'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
 			$data['captions']['groups']['exclude_groupids']
 		)
+		: null
 	)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldTextBoxView($data['fields']['problem'])
@@ -53,11 +55,12 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 	->addField(
 		new CWidgetFieldTagsView($data['fields']['tags'])
 	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['show_type'])
+	->addField(array_key_exists('show_type', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['show_type'])
+		: null
 	)
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
+		new CWidgetFieldRadioButtonListView($data['fields']['layout']),
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['show_opdata'])
@@ -65,8 +68,9 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['hide_empty_groups'])
+	->addField(array_key_exists('hide_empty_groups', $data['fields'])
+		? new CWidgetFieldCheckBoxView($data['fields']['hide_empty_groups'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['ext_ack'])

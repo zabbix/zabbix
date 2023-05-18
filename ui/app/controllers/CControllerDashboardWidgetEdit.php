@@ -76,12 +76,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
@@ -109,7 +103,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		$deprecated_types = [];
 
 		/** @var CWidget $widget */
-		foreach (APP::ModuleManager()->getWidgets($this->hasInput('templateid')) as $widget) {
+		foreach (APP::ModuleManager()->getWidgets() as $widget) {
 			if (!$widget->isDeprecated()) {
 				$known_types[$widget->getId()] = $widget->getDefaultName();
 			}
@@ -121,9 +115,9 @@ class CControllerDashboardWidgetEdit extends CController {
 		natcasesort($known_types);
 		natcasesort($deprecated_types);
 
-		$form = $this->widget->getForm($this->getInput('fields', []),
-			$this->hasInput('templateid') ? $this->getInput('templateid') : null
-		);
+		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
+
+		$form = $this->widget->getForm($this->getInput('fields', []), $templateid);
 
 		// Transforms corrupted data to default values.
 		$form->validate();
@@ -133,6 +127,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'type' => $this->getInput('type'),
 			'known_types' => $known_types,
 			'deprecated_types' => $deprecated_types,
+			'templateid' => $templateid,
 			'fields' => $form->getFields(),
 			'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
 			'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
@@ -140,6 +135,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
 			'captions' => $this->getCaptions($form),
+			'url' => $this->widget->getUrl(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

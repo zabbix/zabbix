@@ -32,7 +32,7 @@ unsigned char	get_program_type(void)
 	return program_type;
 }
 
-int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -73,6 +73,16 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 };
 
+int	get_config_forks(unsigned char process_type)
+{
+	return CONFIG_FORKS[process_type];
+}
+
+void	set_config_forks(unsigned char process_type, int forks)
+{
+	CONFIG_FORKS[process_type] = forks;
+}
+
 int	CONFIG_LISTEN_PORT		= 0;
 char	*CONFIG_LISTEN_IP		= NULL;
 char	*CONFIG_SOURCE_IP		= NULL;
@@ -87,16 +97,21 @@ int	CONFIG_VMWARE_FREQUENCY		= 60;
 int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
 int	CONFIG_VMWARE_TIMEOUT		= 10;
 
-zbx_uint64_t	CONFIG_CONF_CACHE_SIZE		= 8 * 0;
-zbx_uint64_t	CONFIG_HISTORY_CACHE_SIZE	= 16 * 0;
-zbx_uint64_t	CONFIG_HISTORY_INDEX_CACHE_SIZE	= 4 * 0;
-zbx_uint64_t	CONFIG_TRENDS_CACHE_SIZE	= 4 * 0;
-zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE		= 8 * 0;
+static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
+
+zbx_uint64_t	get_zbx_config_value_cache_size(void)
+{
+	return zbx_config_value_cache_size;
+}
+
+void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
+{
+	zbx_config_value_cache_size = cache_size;
+}
+
 zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
-int	CONFIG_UNREACHABLE_PERIOD	= 45;
-int	CONFIG_UNREACHABLE_DELAY	= 15;
 int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 
@@ -106,12 +121,6 @@ char	*CONFIG_JAVA_GATEWAY		= NULL;
 int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
-
-int	CONFIG_LOG_SLOW_QUERIES		= 0;	/* ms; 0 - disable */
-
-/* how often Zabbix server sends configuration data to proxy, in seconds */
-int	CONFIG_PROXYCONFIG_FREQUENCY	= 0;
-int	CONFIG_PROXYDATA_FREQUENCY	= 1;	/* 1s */
 
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
@@ -154,8 +163,6 @@ int	CONFIG_BUFFER_SEND		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND	= 20;
 
-int	CONFIG_DOUBLE_PRECISION		= ZBX_DB_DBL_PRECISION_ENABLED;
-
 char	**CONFIG_ALIASES		= NULL;
 char	**CONFIG_USER_PARAMETERS	= NULL;
 #if defined(_WINDOWS)
@@ -196,7 +203,7 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	zbx_log_level = LOG_LEVEL_INFORMATION;
+	*zbx_plog_level = LOG_LEVEL_INFORMATION;
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

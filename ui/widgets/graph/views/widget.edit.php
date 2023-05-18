@@ -26,16 +26,26 @@
  * @var array $data
  */
 
+if (array_key_exists('itemid', $data['fields'])) {
+	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid'],
+		$data['captions']['items']['itemid'])
+	)->setPopupParameter('numeric', true);
+
+	if (!$data['fields']['itemid']->isTemplateDashboard()) {
+		$field_itemid->setPopupParameter('with_simple_graph_items', true);
+	}
+}
+else {
+	$field_itemid = null;
+}
+
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
+	->addField($field_itemid)
 	->addField(array_key_exists('graphid', $data['fields'])
 		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'], $data['captions']['graphs']['graphid'])
-		: null
-	)
-	->addField(array_key_exists('itemid', $data['fields'])
-		? new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid'])
 		: null
 	)
 	->addField(

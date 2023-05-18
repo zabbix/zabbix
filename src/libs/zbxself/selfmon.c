@@ -51,8 +51,6 @@ ZBX_SHMEM_FUNC_IMPL(__sm, sm_mem)
 
 #endif
 
-extern unsigned char	program_type;
-
 static void	sm_sync_lock(void *data)
 {
 	zbx_mutex_t	*mutex = (zbx_mutex_t *)data;

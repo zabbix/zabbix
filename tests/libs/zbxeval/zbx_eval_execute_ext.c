@@ -112,7 +112,7 @@ static void	mock_read_callbacks(const char *path)
 	}
 }
 
-static int 	callback_cb(const char *name, size_t len, int args_num, const zbx_variant_t *args, void *data,
+static int 	callback_cb(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
 		const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
 {
 	int	i;

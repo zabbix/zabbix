@@ -51,17 +51,15 @@ class CWidget extends CModule {
 
 		$form = new $form_class($values, $templateid);
 
-		if ($templateid === null) {
-			$refresh_rates = self::getRefreshRates();
+		$refresh_rates = self::getRefreshRates();
 
-			$form->addField(
-				(new CWidgetFieldSelect('rf_rate', _('Refresh interval'),
-					[
-						-1 => _('Default').' ('.$refresh_rates[$this->getDefaultRefreshRate()].')'
-					] + $refresh_rates
-				))->setDefault(-1)
-			);
-		}
+		$form->addField(
+			(new CWidgetFieldSelect('rf_rate', _('Refresh interval'),
+				[
+					-1 => _('Default').' ('.$refresh_rates[$this->getDefaultRefreshRate()].')'
+				] + $refresh_rates
+			))->setDefault(-1)
+		);
 
 		return $form
 			->addFields()
@@ -141,10 +139,6 @@ class CWidget extends CModule {
 		return array_key_exists($this->manifest['widget']['refresh_rate'], self::getRefreshRates())
 			? (int) $this->manifest['widget']['refresh_rate']
 			: self::DEFAULT_REFRESH_RATE;
-	}
-
-	public function hasTemplateSupport(): bool {
-		return (bool) $this->manifest['widget']['template_support'];
 	}
 
 	public function usesTimeSelector(array $fields_values): bool {

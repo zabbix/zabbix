@@ -123,6 +123,17 @@ class CUrl {
 		return $this;
 	}
 
+	/**
+	 * Returns true if the specified argument is present in $this->arguments.
+	 *
+	 * @param $key string  The name of the argument.
+	 *
+	 * @return bool
+	 */
+	public function hasArgument($key) {
+		return array_key_exists($key, $this->arguments) ;
+	}
+
 	public function toString() {
 		return $this->getUrl();
 	}

@@ -92,7 +92,7 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #else
 #	include "zbxnix.h"
 #endif
-#include "active.h"
+#include "active_checks/active_checks.h"
 #include "listener.h"
 
 #if defined(ZABBIX_SERVICE)
@@ -732,7 +732,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
 }
 
-static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
 	int	i, forks, new_forks;
 
@@ -747,7 +747,7 @@ static int	add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_st
 
 	for (i = 0; i < new_forks; i++, forks++)
 	{
-		zbx_vector_ptr_create(&config_active_args[forks].addrs);
+		zbx_vector_addr_ptr_create(&config_active_args[forks].addrs);
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
 		config_active_args[forks].hostname = zbx_strdup(NULL, 0 < hostnames->values_num ?
@@ -1077,9 +1077,9 @@ static void	zbx_on_exit(int ret)
 
 	zbx_free_service_resources(ret);
 
-#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
-	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+	zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);	/* deinitialize crypto library from parent thread */
 #endif
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_setproctitle_deinit();
@@ -1140,7 +1140,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
+#ifdef _M_X64
+	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
+		zabbix_log(LOG_LEVEL_TRACE, "failed to register vectored exception handler");
+#endif /* _M_X64 */
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1210,7 +1213,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			zbx_free_service_resources(FAIL);
@@ -1399,7 +1403,6 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
 #if defined(_WINDOWS) || defined(__MINGW32__)
@@ -1418,6 +1421,7 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
+
 
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
@@ -1443,6 +1447,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();

@@ -4,4 +4,5 @@ noinst_LIBRARIES = libzbxavailability.a
 
 libzbxavailability_a_SOURCES = \
 	availability.c \
-	avail_protocol.c
+	avail_protocol.c \
+	avail_manager.c

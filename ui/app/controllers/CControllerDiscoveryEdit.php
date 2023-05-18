@@ -21,49 +21,48 @@
 
 class CControllerDiscoveryEdit extends CController {
 
+	/**
+	 * @var mixed
+	 */
 	private $drule = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'druleid'             => 'db drules.druleid',
-			'name'                => 'db drules.name',
-			'proxy_hostid'        => 'db drules.proxy_hostid',
-			'iprange'             => 'db drules.iprange',
-			'delay'               => 'db drules.delay',
-			'status'              => 'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
-			'uniqueness_criteria' => 'string',
-			'host_source'         => 'string',
-			'name_source'         => 'string',
-			'dchecks'             => 'array',
-			'form_refresh'        => 'int32'
+			'druleid' =>	'db drules.druleid'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY)) {
 			return false;
 		}
 
-		if ($this->hasInput('druleid') && !$this->hasInput('form_refresh')) {
+		if ($this->hasInput('druleid')) {
 			$drules = API::DRule()->get([
 				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status'],
 				'druleids' => $this->getInput('druleid'),
 				'selectDChecks' => [
 					'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
 					'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
-					'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source'
+					'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'
 				],
 				'editable' => true
 			]);
@@ -77,6 +76,7 @@ class CControllerDiscoveryEdit extends CController {
 			$name_source = DB::getDefault('dchecks', 'name_source');
 
 			$drule = $drules[0];
+
 			if ($drule['dchecks']) {
 				[['host_source' => $host_source, 'name_source' => $name_source]] = $drule['dchecks'];
 
@@ -102,12 +102,9 @@ class CControllerDiscoveryEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
-		$this->getInputs($this->drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks',
-			'uniqueness_criteria', 'host_source', 'name_source'
-		]);
-
+	protected function doAction(): void {
 		$this->drule += [
+			'druleid' => null,
 			'name' => DB::getDefault('drules', 'name'),
 			'dchecks' => [],
 			'iprange' => '192.168.0.1-254',
@@ -120,11 +117,11 @@ class CControllerDiscoveryEdit extends CController {
 		];
 
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
+		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
 
 		$data = [
-			'druleid' => $this->getInput('druleid', 0),
 			'drule' => $this->drule,
-			'form_refresh' => $this->getInput('form_refresh', 0)
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$data['proxies'] = API::Proxy()->get([
@@ -155,7 +152,8 @@ class CControllerDiscoveryEdit extends CController {
 		$dcheck['name'] = discovery_check2str(
 			$db_dcheck['type'],
 			array_key_exists('key_', $db_dcheck) ? $db_dcheck['key_'] : '',
-			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : ''
+			array_key_exists('ports', $db_dcheck) ? $db_dcheck['ports'] : '',
+			array_key_exists('allow_redirect', $db_dcheck) ? $db_dcheck['allow_redirect'] : 0
 		);
 
 		switch($db_dcheck['type']) {
@@ -186,6 +184,13 @@ class CControllerDiscoveryEdit extends CController {
 					$dcheck += [
 						'snmpv3_privprotocol' => $db_dcheck['snmpv3_privprotocol'],
 						'snmpv3_privpassphrase' => $db_dcheck['snmpv3_privpassphrase']
+					];
+				}
+				break;
+			case SVC_ICMPPING:
+				if ($db_dcheck['allow_redirect'] == 1) {
+					$dcheck += [
+						'allow_redirect' => $db_dcheck['allow_redirect']
 					];
 				}
 				break;

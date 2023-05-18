@@ -26,18 +26,19 @@
  * @var array $data
  */
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['groups']['groupids']
-);
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
+	: null;
 
 (new CWidgetFormView($data))
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['show'])
 	)
 	->addField($groupids)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])

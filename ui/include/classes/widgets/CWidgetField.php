@@ -21,7 +21,8 @@
 
 namespace Zabbix\Widgets;
 
-use CApiInputValidator;
+use CApiInputValidator,
+	DB;
 
 abstract class CWidgetField {
 
@@ -39,6 +40,8 @@ abstract class CWidgetField {
 	protected $value;
 	protected $default;
 
+	protected int $max_length;
+
 	protected ?string $action = null;
 
 	protected int $flags = 0x00;
@@ -46,6 +49,8 @@ abstract class CWidgetField {
 	protected array $validation_rules = [];
 	protected ?array $strict_validation_rules = null;
 	protected array $ex_validation_rules = [];
+
+	private $templateid = null;
 
 	/**
 	 * @param string      $name   Field name in form.
@@ -110,6 +115,18 @@ abstract class CWidgetField {
 		return $this;
 	}
 
+	public function getMaxLength(): int {
+		return $this->max_length;
+	}
+
+	public function setMaxLength(int $max_length): self {
+		$this->max_length = $max_length;
+
+		$this->validation_rules['length'] = $this->max_length;
+
+		return $this;
+	}
+
 	/**
 	 * Get additional flags, which can be used in configuration form.
 	 */
@@ -124,6 +141,23 @@ abstract class CWidgetField {
 		$this->flags = $flags;
 
 		return $this;
+	}
+
+	/**
+	 * @return int|string|null
+	 */
+	public function getTemplateId() {
+		return $this->templateid;
+	}
+
+	public function setTemplateId($templateid): self {
+		$this->templateid = $templateid;
+
+		return $this;
+	}
+
+	public function isTemplateDashboard(): bool {
+		return $this->templateid !== null;
 	}
 
 	/**
@@ -195,7 +229,12 @@ abstract class CWidgetField {
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_STR:
-				$this->validation_rules = ['type' => API_STRING_UTF8, 'length' => 255];
+				$this->max_length = DB::getFieldLength('widget_field', 'value_str');
+
+				$this->validation_rules = [
+					'type' => API_STRING_UTF8,
+					'length' => $this->max_length
+				];
 				break;
 
 			case ZBX_WIDGET_FIELD_TYPE_ACTION:

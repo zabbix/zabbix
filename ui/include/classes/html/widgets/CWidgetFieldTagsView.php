@@ -34,7 +34,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			$tags = [CWidgetFieldTags::DEFAULT_TAG];
 		}
 
-		$tags_table = (new CTable())
+		$view = (new CTable())
 			->setId('tags_table_'.$this->field->getName())
 			->addClass('table-tags')
 			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
@@ -42,12 +42,12 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		$i = 0;
 
 		foreach ($tags as $tag) {
-			$tags_table->addItem($this->getRowTemplate($tag, $i));
+			$view->addItem($this->getRowTemplate($tag, $i));
 
 			$i++;
 		}
 
-		$tags_table->addRow(
+		$view->addRow(
 			(new CCol(
 				(new CButton('tags_add', _('Add')))
 					->addClass(ZBX_STYLE_BTN_LINK)
@@ -56,7 +56,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			))->setColSpan(3)
 		);
 
-		return $tags_table;
+		return $view;
 	}
 
 	public function getJavaScript(): string {

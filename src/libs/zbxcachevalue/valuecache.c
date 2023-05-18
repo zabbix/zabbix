@@ -69,9 +69,6 @@ zbx_rwlock_t	vc_lock = ZBX_RWLOCK_NULL;
 /* value cache state, after initialization value cache is always disabled */
 static int	vc_state = ZBX_VC_DISABLED;
 
-/* the value cache size */
-extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
-
 ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 
 #define VC_STRPOOL_INIT_SIZE	(1000)
@@ -626,6 +623,15 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 		case ITEM_VALUE_TYPE_LOG:
 			for (i = 0; i < vector->values_num; i++)
 				vc_history_logfree(vector->values[i].value.log);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_history_record_clear(vector);
@@ -1133,6 +1139,14 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 			for (i = first; i <= last; i++)
 				freed += vc_item_logfree(values[i].value.log);
 			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	item->values_total -= (last - first + 1);
@@ -2364,12 +2378,12 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
  * Purpose: initializes value cache                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_init(char **error)
+int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 {
 	zbx_uint64_t	size_reserved;
 	int		ret = FAIL;
 
-	if (0 == CONFIG_VALUE_CACHE_SIZE)
+	if (0 == value_cache_size)
 		return SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2379,13 +2393,13 @@ int	zbx_vc_init(char **error)
 
 	size_reserved = zbx_shmem_required_size(1, "value cache size", "ValueCacheSize");
 
-	if (SUCCEED != zbx_shmem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1,
+	if (SUCCEED != zbx_shmem_create(&vc_mem, value_cache_size, "value cache size", "ValueCacheSize", 1,
 			error))
 	{
 		goto out;
 	}
 
-	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
+	value_cache_size -= size_reserved;
 
 	vc_cache = (zbx_vc_cache_t *)__vc_shmem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
 
@@ -2417,7 +2431,7 @@ int	zbx_vc_init(char **error)
 	}
 
 	/* the free space request should be 5% of cache size, but no more than 128KB */
-	vc_cache->min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
+	vc_cache->min_free_request = (value_cache_size / 100) * 5;
 	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
 		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
 
