@@ -480,7 +480,8 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  ****************************************************************************************************/
 static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
-	const char	*c = NULL, *error = NULL;
+	const char	*error = NULL;
+	char		*c = NULL;
 	zbx_regmatch_t	match;
 	zbx_regexp_t	*regexp = NULL;
 
@@ -496,7 +497,7 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 
 		if (ZBX_REGEXP_MATCH == (r = regexp_exec(string, regexp, 0, 1, &match)))
 		{
-			c = (const char *)string + match.rm_so;
+			c = (char *)string + match.rm_so;
 
 			if (NULL != len)
 				*len = match.rm_eo - match.rm_so;

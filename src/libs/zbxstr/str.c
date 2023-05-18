@@ -953,7 +953,7 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	const char	*p;
 
 	if (NULL == needle || '\0' == *needle)
-		return (const char *)haystack;
+		return (char *)haystack;
 
 	if (NULL == haystack || '\0' == *haystack)
 		return NULL;
@@ -966,7 +966,7 @@ char	*zbx_strcasestr(const char *haystack, const char *needle)
 	for (p = haystack; p <= &haystack[sz_h - sz_n]; p++)
 	{
 		if (0 == zbx_strncasecmp(p, needle, sz_n))
-			return (const char *)p;
+			return (char *)p;
 	}
 
 	return NULL;
