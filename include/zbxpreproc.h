@@ -70,7 +70,8 @@ ZBX_PTR_VECTOR_DECL(pp_task_ptr, zbx_pp_task_t *)
 
 typedef struct
 {
-	int	workers_num;
+	int		workers_num;
+	const char	*config_source_ip;
 }
 zbx_thread_pp_manager_args;
 
@@ -88,7 +89,7 @@ void	zbx_pp_test_task_get_data(zbx_pp_task_t *task, zbx_ipc_client_t **client, z
 void	zbx_pp_tasks_clear(zbx_vector_pp_task_ptr_t *tasks);
 
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, char **error);
+		void *finished_data, const char *config_source_ip, char **error);
 void	zbx_pp_manager_free(zbx_pp_manager_t *manager);
 zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_t itemid, zbx_variant_t *value,
 		zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);

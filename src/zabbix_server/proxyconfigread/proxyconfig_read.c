@@ -75,7 +75,7 @@ static void	key_path_free(void *data)
 }
 
 static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_json *j,
-		const zbx_config_vault_t *config_vault)
+		const zbx_config_vault_t *config_vault, const char *config_source_ip)
 {
 	int		i;
 	zbx_kvs_t	kvs;
@@ -93,7 +93,7 @@ static void	get_macro_secrets(const zbx_vector_ptr_t *keys_paths, struct zbx_jso
 		zbx_hashset_iter_t	iter;
 
 		keys_path = (zbx_keys_path_t *)keys_paths->values[i];
-		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, config_vault, &error))
+		if (FAIL == zbx_vault_kvs_get(keys_path->path, &kvs, config_vault, config_source_ip, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
 			zbx_free(error);
@@ -899,7 +899,7 @@ out:
 
 static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
 		const zbx_dc_revision_t *dc_revision, struct zbx_json *j, zbx_proxyconfig_status_t *status,
-		const zbx_config_vault_t *config_vault, char **error)
+		const zbx_config_vault_t *config_vault, const char *config_source_ip, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1063,7 +1063,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 	}
 
 	if (0 != keys_paths.values_num)
-		get_macro_secrets(&keys_paths, j, config_vault);
+		get_macro_secrets(&keys_paths, j, config_vault, config_source_ip);
 
 	if (0 == flags && 0 == removed_hostids.values_num && 0 == del_macro_hostids.values_num)
 		*status = ZBX_PROXYCONFIG_STATUS_EMPTY;
@@ -1102,7 +1102,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
-		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, char **error)
+		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip, char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
@@ -1145,7 +1146,7 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 	if (proxy_config_revision != dc_revision.config)
 	{
 		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision, j, status,
-				config_vault, error)))
+				config_vault, config_source_ip, error)))
 		{
 			goto out;
 		}
@@ -1172,7 +1173,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_vault_t *config_vault, int config_timeout)
+		const zbx_config_vault_t *config_vault, int config_timeout, const char *config_source_ip)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1217,7 +1218,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
-	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, &error))
+	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, config_source_ip, &error))
 	{
 		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",

@@ -22,8 +22,6 @@
 
 #include "module.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
 int	zbx_get_remote_zabbix_stats(const char *ip, unsigned short port, AGENT_RESULT *result);
 int	zbx_get_remote_zabbix_stats_queue(const char *ip, unsigned short port, const char *from, const char *to,
 		AGENT_RESULT *result);

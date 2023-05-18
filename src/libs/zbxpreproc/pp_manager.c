@@ -104,17 +104,18 @@ void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: workers_num   - [IN] number of workers to create               *
- *             finished_cb   - [IN] callback to call after finishing          *
- *                                  task (optional)                           *
- *             finished_data - [IN] callback data (optional)                  *
- *             error         - [OUT]                                          *
+ * Parameters: workers_num      - [IN] number of workers to create            *
+ *             finished_cb      - [IN] callback to call after finishing       *
+ *                                     task (optional)                        *
+ *             finished_data    - [IN] callback data (optional)               *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, char **error)
+		void *finished_data, const char *config_source_ip, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -142,7 +143,7 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 	for (i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
-				error))
+				config_source_ip, error))
 		{
 			goto out;
 		}
@@ -1098,22 +1099,24 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 #define PP_MANAGER_DELAY_SEC	0
 #define PP_MANAGER_DELAY_NS	5e8
 
-	zbx_ipc_service_t		service;
-	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
-	int				ret;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec;
-	zbx_timespec_t			timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_pp_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
-	zbx_pp_manager_t		*manager;
-	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
-					processing_num = 0;
+	zbx_ipc_service_t			service;
+	char					*error = NULL;
+	zbx_ipc_client_t			*client;
+	zbx_ipc_message_t			*message;
+	double					time_stat, time_idle = 0, time_flush;
+	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_pp_manager_args		*pp_args = ((zbx_thread_args_t *)args)->args;
+	zbx_pp_manager_t			*manager;
+	zbx_vector_pp_task_ptr_t		tasks;
+	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
+						processing_num = 0;
+
+	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1133,7 +1136,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
-			(void *)&service, &error)))
+			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
@@ -1150,7 +1153,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
+		double	time_now = zbx_time();
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1166,9 +1169,13 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
+		int	ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		sec = zbx_time();
+
+		double	sec = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
