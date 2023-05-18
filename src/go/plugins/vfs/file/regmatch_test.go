@@ -23,6 +23,8 @@ import (
 	"os"
 	"reflect"
 	"testing"
+	"fmt"
+	"io/ioutil"
 )
 
 func TestFileRegmatch(t *testing.T) {
@@ -35,6 +37,21 @@ func TestFileRegmatch(t *testing.T) {
 		t.Errorf("failed to created file: %s", err1.Error())
 		return
 	}
+
+   file, err := os.Open("/tmp/zbx_vfs_file_regmatch_test.dat")
+    if err != nil {
+		t.Errorf("failed to created file: %s", err.Error())
+    }
+    defer func() {
+        if err = file.Close(); err != nil {
+         t.Errorf("failed to created file: %s", err.Error())
+        }
+    }()
+	b, err := ioutil.ReadAll(file)
+	if err != nil {
+		fmt.Print("ERRX:", err.Error())
+	}
+	fmt.Print(b)
 
 	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/zbx_vfs_file_regmatch_test.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
@@ -60,11 +77,11 @@ func TestFileRegmatchUTF16(t *testing.T) {
 
 	f1 := []byte{0x62, 0x00, 0x61, 0x00, 0x64, 0x00, 0x67, 0x00, 0x65, 0x00, 0x72, 0x00, 0x0a, 0x00, 0x65, 0x00, 0x72, 0x00, 0x72, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x0a, 0x00, 0x62, 0x00, 0x61, 0x00, 0x64, 0x00, 0x67, 0x00, 0x65, 0x00, 0x72, 0x00, 0x32, 0x00, 0x0a, 0x00}
 
-	if err1 := os.WriteFile("/tmp/vfs.file.regmatch_test_error_utf16le.dat", f1, 0644); err1 != nil {
+	if err1 := os.WriteFile("/tmp/vfs_file_regmatch_test_error_utf16le.dat", f1, 0644); err1 != nil {
 		t.Errorf("failed to created file: %s", err1.Error())
 	}
 
-	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/vfs.file.regmatch_test_error_utf16le.dat", "error", "UTF16LE", "", ""}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/vfs_file_regmatch_test_error_utf16le.dat", "error", "UTF16LE", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
 	} else {
 		if match, ok := result.(int); !ok {
