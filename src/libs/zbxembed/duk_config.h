@@ -3102,6 +3102,8 @@ typedef struct duk_hthread duk_context;
 
 /* __OVERRIDE_DEFINES__ */
 
+#pragma GCC diagnostic ignored "-Wnull-dereference" /* added by zabbix */
+
 int    zbx_es_check_timeout(void *);
 
 #define DUK_USE_EXEC_TIMEOUT_CHECK     zbx_es_check_timeout
