@@ -1119,7 +1119,7 @@ zabbix_export:
               error_handler_params: '0'
             - type: REGEX
               parameters:
-                - '{$JENKINS.PING.REPLY}$'
+                - '{$JENKINS.PING.REPLY}'
                 - '1'
               error_handler: CUSTOM_VALUE
               error_handler_params: '0'
