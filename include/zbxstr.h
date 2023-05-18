@@ -69,7 +69,7 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 #define ZBX_NULL2STR(str)	(NULL != str ? str : "(null)")
 #define ZBX_NULL2EMPTY_STR(str)	(NULL != (str) ? (str) : "")
 
-const char	*zbx_strcasestr(const char *haystack, const char *needle);
+char	*zbx_strcasestr(const char *haystack, const char *needle);
 int	zbx_strncasecmp(const char *s1, const char *s2, size_t n);
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
