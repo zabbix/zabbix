@@ -353,20 +353,20 @@ out:
  * Purpose: get table data from database                                      *
  *                                                                            *
  * Parameters: table_name - [IN] table name -                                 *
- *             key_name   - [IN] the key field name used to select rows       *
+ *             key_name   - [IN] key field name used to select rows           *
  *                               (all rows selected when NULL)                *
- *             key_ids    - [IN] the key values used to select rows (optional)*
+ *             key_ids    - [IN] key values used to select rows (optional)    *
  *             condition  - [IN] custom condition to apply when selecting rows*
  *                               (optional)                                   *
  *             join       - [IN] custom join to apply when selecting rows     *
  *                               (optional)                                   *
- *             ids_filter - [IN] the key values used to filter rows           *
+ *             ids_filter - [IN] key values used to filter rows               *
  *                               (optional)                                   *
- *             filter_name- [IN] the filter field name used to filter rows    *
+ *             filter_name- [IN] filter field name used to filter rows        *
  *                               (optional)                                   *
- *             recids     - [OUT] the selected record identifiers, sorted     *
- *             j          - [OUT] the output json                             *
- *             error      - [OUT] the error message                           *
+ *             recids     - [OUT] selected record identifiers, sorted         *
+ *             j          - [OUT] output json                                 *
+ *             error      - [OUT] error message                               *
  *                                                                            *
  * Return value: SUCCEED - the data was read successfully                     *
  *               FAIL    - otherwise                                          *
