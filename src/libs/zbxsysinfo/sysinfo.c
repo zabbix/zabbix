@@ -74,6 +74,7 @@ static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
+static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -149,12 +150,14 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
-		zbx_get_config_int_f get_config_unsafe_user_parameters_f)
+		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
+		get_config_source_ip_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
 	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
 	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
+	get_config_source_ip_cb = get_config_source_ip_f;
 }
 
 /******************************************************************************
@@ -281,6 +284,11 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 int	sysinfo_get_config_timeout(void)
 {
 	return get_config_timeout_cb();
+}
+
+const char	*sysinfo_get_config_source_ip(void)
+{
+	return get_config_source_ip_cb();
 }
 
 int	sysinfo_get_config_log_remote_commands(void)

@@ -35,6 +35,7 @@ typedef struct
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	char			*config_file;
 	int			config_timeout;
+	const char		*config_source_ip;
 }
 zbx_thread_activechk_args;
 

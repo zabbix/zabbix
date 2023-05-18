@@ -18,6 +18,7 @@
 **/
 
 #include "test_get_value_telnet.h"
+#include "zbxmocktest.h"
 
 #include "../../../src/zabbix_server/poller/checks_telnet.h"
 
@@ -31,7 +32,7 @@ int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error)
 	int		ret;
 
 	zbx_init_agent_result(&result);
-	ret = get_value_telnet(item, 0, &result);
+	ret = get_value_telnet(item, 0, get_zbx_config_source_ip(), &result);
 
 	if (NULL != result.msg && '\0' != *(result.msg))
 	{

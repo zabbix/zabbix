@@ -168,8 +168,9 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			NULL != buffer ? curl_write_cb : curl_ignore_cb)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
-			(NULL != CONFIG_SOURCE_IP &&
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
+			(NULL != sysinfo_get_config_source_ip() &&
+			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE,
+					sysinfo_get_config_source_ip()))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT,
 					(long)sysinfo_get_config_timeout())) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
@@ -392,8 +393,8 @@ static int	get_http_page(const char *host, const char *path, const char *port, c
 		goto out;
 	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, hostname, port_num, sysinfo_get_config_timeout(),
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), hostname, port_num,
+			sysinfo_get_config_timeout(), ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		char	*request = NULL;
 
