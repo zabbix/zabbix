@@ -1179,39 +1179,6 @@ fail:
 	return FAIL;
 }
 
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert Prometheus format metrics to JSON format                  *
- *                                                                            *
- * Parameters: value  - [IN/OUT] value to process                             *
- *             params - [IN] operation parameters                             *
- *             errmsg - [OUT]                                                 *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	char	*value_out = NULL, *err = NULL;
-
-	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-		return FAIL;
-
-	if (FAIL == zbx_prometheus_to_json(value->data.str, params, &value_out, &err))
-	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
-		zbx_free(err);
-		return FAIL;
-	}
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
-
-	return SUCCEED;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: convert CSV format metrics to JSON format                         *

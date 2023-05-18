@@ -27,6 +27,7 @@
 #include "zbxself.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxregexp.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -117,6 +118,8 @@ static void	*pp_worker_entry(void *args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+
+	zbx_init_regexp_env();
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
@@ -213,14 +216,16 @@ static void	*pp_worker_entry(void *args)
 int	pp_worker_init(zbx_pp_worker_t *worker, int id, zbx_pp_queue_t *queue, zbx_timekeeper_t *timekeeper,
 		const char *config_source_ip, char **error)
 {
-	int	err, ret = FAIL;
+	int		err, ret = FAIL;
+	pthread_attr_t	attr;
 
 	worker->id = id;
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
 	worker->config_source_ip = config_source_ip;
 
-	if (0 != (err = pthread_create(&worker->thread, NULL, pp_worker_entry, (void *)worker)))
+	zbx_pthread_init_attr(&attr);
+	if (0 != (err = pthread_create(&worker->thread, &attr, pp_worker_entry, (void *)worker)))
 	{
 		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
 		goto out;

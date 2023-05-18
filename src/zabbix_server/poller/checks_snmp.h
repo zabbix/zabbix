@@ -21,7 +21,6 @@
 #define ZABBIX_CHECKS_SNMP_H
 
 #include "config.h"
-#include "module.h"
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_NETSNMP
