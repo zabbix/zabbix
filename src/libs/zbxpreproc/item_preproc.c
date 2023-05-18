@@ -1118,18 +1118,19 @@ int	item_preproc_throttle_timed_value(zbx_variant_t *value, const zbx_timespec_t
  *                                                                            *
  * Purpose: executes script passed with params                                *
  *                                                                            *
- * Parameters: es       - [IN] execution environment                          *
- *             value    - [IN/OUT] value to process                           *
- *             params   - [IN] script to execute                              *
- *             bytecode - [IN] precompiled bytecode, can be NULL              *
- *             errmsg   - [OUT]                                               *
+ * Parameters: es               - [IN] execution environment                  *
+ *             value            - [IN/OUT] value to process                   *
+ *             params           - [IN] script to execute                      *
+ *             bytecode         - [IN] precompiled bytecode, can be NULL      *
+ *             config_source_ip - [IN]                                        *
+ *             errmsg           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - the value was calculated successfully              *
  *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, zbx_variant_t *bytecode,
-		char **errmsg)
+		const char *config_source_ip, char **errmsg)
 {
 	char	*code, *output = NULL, *error = NULL;
 	int	size;
@@ -1139,7 +1140,7 @@ int	item_preproc_script(zbx_es_t *es, zbx_variant_t *value, const char *params, 
 
 	if (SUCCEED != zbx_es_is_env_initialized(es))
 	{
-		if (SUCCEED != zbx_es_init_env(es, errmsg))
+		if (SUCCEED != zbx_es_init_env(es, config_source_ip, errmsg))
 			return FAIL;
 	}
 
@@ -1176,39 +1177,6 @@ fail:
 	}
 
 	return FAIL;
-}
-
-
-/******************************************************************************
- *                                                                            *
- * Purpose: convert Prometheus format metrics to JSON format                  *
- *                                                                            *
- * Parameters: value  - [IN/OUT] value to process                             *
- *             params - [IN] operation parameters                             *
- *             errmsg - [OUT]                                                 *
- *                                                                            *
- * Return value: SUCCEED - the value was processed successfully               *
- *               FAIL - otherwise                                             *
- *                                                                            *
- ******************************************************************************/
-int	item_preproc_prometheus_to_json(zbx_variant_t *value, const char *params, char **errmsg)
-{
-	char	*value_out = NULL, *err = NULL;
-
-	if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
-		return FAIL;
-
-	if (FAIL == zbx_prometheus_to_json(value->data.str, params, &value_out, &err))
-	{
-		*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
-		zbx_free(err);
-		return FAIL;
-	}
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
-
-	return SUCCEED;
 }
 
 /******************************************************************************

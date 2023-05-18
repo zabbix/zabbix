@@ -30,6 +30,7 @@ typedef struct
 	zbx_config_tls_t		*zbx_config_tls;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	int				config_timeout;
+	const char			*config_source_ip;
 	const zbx_events_funcs_t	*events_cbs;
 }
 zbx_thread_discoverer_args;

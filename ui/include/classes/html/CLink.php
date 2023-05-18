@@ -87,7 +87,7 @@ class CLink extends CTag {
 				$url .= CCsrfTokenHelper::CSRF_TOKEN_NAME.'='.$this->csrf_token;
 			}
 			$confirm_script = ($this->confirm_message !== '')
-				? 'Confirm('.CHtml::encode(json_encode($this->confirm_message)).') && '
+				? 'Confirm('.json_encode($this->confirm_message).') && '
 				: '';
 			$this->onClick("javascript: return ".$confirm_script."redirect('".$url."', 'post', '".
 				CCsrfTokenHelper::CSRF_TOKEN_NAME."', true)"

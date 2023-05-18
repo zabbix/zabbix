@@ -34,7 +34,7 @@ void	scriptitem_es_engine_destroy(void)
 		zbx_es_destroy(&es_engine);
 }
 
-int	get_value_script(zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_script(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	char		*error = NULL, *script_bin = NULL, *output = NULL;
 	int		script_bin_sz, timeout_seconds, ret = NOTSUPPORTED;
@@ -45,7 +45,8 @@ int	get_value_script(zbx_dc_item_t *item, AGENT_RESULT *result)
 		return ret;
 	}
 
-	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, &error))
+	if (SUCCEED != zbx_es_is_env_initialized(&es_engine) && SUCCEED != zbx_es_init_env(&es_engine, config_source_ip,
+			&error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot initialize scripting environment: %s", error));
 		return ret;

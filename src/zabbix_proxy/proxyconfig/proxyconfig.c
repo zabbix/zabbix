@@ -124,7 +124,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
 		if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault);
+			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault, args->config_source_ip);
 
 		zbx_dc_update_interfaces_availability();
 	}
@@ -244,6 +244,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -252,7 +253,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg);
 #endif
 
-	zbx_rtc_subscribe(process_type, process_num, proxyconfig_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
+			&rtc);
 
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 

@@ -71,10 +71,24 @@ void	zbx_variant_clear(zbx_variant_t *value)
 		case ZBX_VARIANT_ERR:
 			zbx_free(value->data.err);
 			break;
-		case ZBX_VARIANT_DBL_VECTOR:
-			zbx_vector_dbl_destroy(value->data.dbl_vector);
-			zbx_free(value->data.dbl_vector);
+		case ZBX_VARIANT_VECTOR:
+			if (NULL != value->data.vector)
+			{
+				if (0 < value->data.vector->values_num)
+					zbx_vector_var_clear_ext(value->data.vector);
+
+				zbx_vector_var_destroy(value->data.vector);
+			}
+
+			zbx_free(value->data.vector);
 			break;
+		case ZBX_VARIANT_NONE:
+		case ZBX_VARIANT_DBL:
+		case ZBX_VARIANT_UI64:
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	value->type = ZBX_VARIANT_NONE;
@@ -127,10 +141,10 @@ void	zbx_variant_set_error(zbx_variant_t *value, char *error)
 	value->type = ZBX_VARIANT_ERR;
 }
 
-void	zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vector)
+void	zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
 {
-	value->data.dbl_vector = dbl_vector;
-	value->type = ZBX_VARIANT_DBL_VECTOR;
+	value->data.vector = vector;
+	value->type = ZBX_VARIANT_VECTOR;
 }
 
 /******************************************************************************
@@ -146,7 +160,8 @@ void	zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vect
  ******************************************************************************/
 void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 {
-	zbx_vector_dbl_t	*dbl_vector;
+	int			i;
+	zbx_vector_var_t	*var_vector;
 
 	switch (source->type)
 	{
@@ -168,12 +183,16 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 		case ZBX_VARIANT_ERR:
 			zbx_variant_set_error(value, zbx_strdup(NULL, source->data.err));
 			break;
-		case ZBX_VARIANT_DBL_VECTOR:
-			dbl_vector = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
-			zbx_vector_dbl_create(dbl_vector);
-			zbx_vector_dbl_append_array(dbl_vector, source->data.dbl_vector->values,
-					source->data.dbl_vector->values_num);
-			zbx_variant_set_dbl_vector(value, dbl_vector);
+		case ZBX_VARIANT_VECTOR:
+			var_vector = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+			zbx_vector_var_create(var_vector);
+			zbx_vector_var_reserve(var_vector, source->data.vector->values_num);
+			var_vector->values_num = source->data.vector->values_num;
+
+			for (i = 0; i < source->data.vector->values_num; i++)
+				zbx_variant_copy(&(var_vector->values[i]), &(source->data.vector->values[i]));
+
+			zbx_variant_set_vector(value, var_vector);
 			break;
 	}
 }
@@ -224,7 +243,7 @@ static int	variant_to_ui64(zbx_variant_t *value)
 
 			/* uint64_t(double(UINT64_MAX)) conversion results in 0, to avoid      */
 			/* conversion issues require floating value to be less than UINT64_MAX */
-			if (ZBX_MAX_UINT64 <= value->data.dbl)
+			if ((double)ZBX_MAX_UINT64 <= value->data.dbl)
 				return FAIL;
 
 			zbx_variant_set_ui64(value, (zbx_uint64_t)(value->data.dbl));
@@ -359,8 +378,8 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 			return buffer;
 		case ZBX_VARIANT_ERR:
 			return value->data.err;
-		case ZBX_VARIANT_DBL_VECTOR:
-			zbx_snprintf(buffer, sizeof(buffer), "double vector[0:%d]", value->data.dbl_vector->values_num);
+		case ZBX_VARIANT_VECTOR:
+			zbx_snprintf(buffer, sizeof(buffer), "var vector[0:%d]", value->data.vector->values_num);
 			return buffer;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -384,8 +403,8 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 			return "binary";
 		case ZBX_VARIANT_ERR:
 			return "error";
-		case ZBX_VARIANT_DBL_VECTOR:
-			return "double vector";
+		case ZBX_VARIANT_VECTOR:
+			return "vector";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -462,20 +481,26 @@ static int	variant_compare_error(const zbx_variant_t *value1, const zbx_variant_
  * Purpose: compare two variant values when at least one contains error       *
  *                                                                            *
  ******************************************************************************/
-static int	variant_compare_dbl_vector(const zbx_variant_t *value1, const zbx_variant_t *value2)
+static int	variant_compare_vector(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
-	if (ZBX_VARIANT_DBL_VECTOR == value1->type)
+	if (ZBX_VARIANT_VECTOR == value1->type)
 	{
 		int	i;
 
-		if (ZBX_VARIANT_DBL_VECTOR != value2->type)
+		if (ZBX_VARIANT_VECTOR != value2->type)
 			return 1;
 
-		ZBX_RETURN_IF_NOT_EQUAL(value1->data.dbl_vector->values_num, value2->data.dbl_vector->values_num);
+		ZBX_RETURN_IF_NOT_EQUAL(value1->data.vector->values_num, value2->data.vector->values_num);
 
-		for (i = 0; i < value1->data.dbl_vector->values_num; i++)
+		for (i = 0; i < value1->data.vector->values_num; i++)
 		{
-			ZBX_RETURN_IF_NOT_EQUAL(value1->data.dbl_vector->values[i], value2->data.dbl_vector->values[i]);
+			int	ret;
+
+			if (0 != (ret = zbx_variant_compare(&value1->data.vector->values[i],
+					&value2->data.vector->values[i])))
+			{
+				return ret;
+			}
 		}
 
 		return 0;
@@ -606,8 +631,8 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_BIN == value1->type || ZBX_VARIANT_BIN == value2->type)
 		return variant_compare_bin(value1, value2);
 
-	if (ZBX_VARIANT_DBL_VECTOR == value1->type || ZBX_VARIANT_DBL_VECTOR == value2->type)
-		return variant_compare_dbl_vector(value1, value2);
+	if (ZBX_VARIANT_VECTOR == value1->type || ZBX_VARIANT_VECTOR == value2->type)
+		return variant_compare_vector(value1, value2);
 
 	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
 		return  variant_compare_ui64(value1, value2);
@@ -621,3 +646,39 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	/* at this point at least one of the values is string data, other can be uint64, floating or string */
 	return variant_compare_str(value1, value2);
 }
+
+int	zbx_vector_var_get_type(zbx_vector_var_t *v)
+{
+	int 	i, type = ITEM_VALUE_TYPE_NONE;
+
+	for (i = 0; i < v->values_num; i++)
+	{
+		if (ZBX_VARIANT_UI64 == v->values[i].type)
+		{
+			if (ITEM_VALUE_TYPE_NONE == type)
+				type = ITEM_VALUE_TYPE_UINT64;
+			else if (ITEM_VALUE_TYPE_UINT64 != type)
+				return ITEM_VALUE_TYPE_STR;
+		}
+		else if (ZBX_VARIANT_DBL == v->values[i].type)
+		{
+			if (ITEM_VALUE_TYPE_NONE == type)
+				type = ITEM_VALUE_TYPE_FLOAT;
+			else if (ITEM_VALUE_TYPE_FLOAT != type)
+				return ITEM_VALUE_TYPE_STR;
+		}
+		else
+			return ITEM_VALUE_TYPE_STR;
+	}
+
+	return type;
+}
+
+void	zbx_vector_var_clear_ext(zbx_vector_var_t *v)
+{
+	int	i;
+
+	for (i = 0; i < v->values_num; i++)
+		zbx_variant_clear(&v->values[i]);
+}
+

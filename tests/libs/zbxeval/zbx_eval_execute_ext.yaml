@@ -150,6 +150,111 @@ out:
   result: SUCCEED
   value: 2
 ---
+test case: Expression 'count(last_foreach(/*/key),"gt",2)'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"gt",2)'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2, 3, 4]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'count(last_foreach(/*/key),"gt",2)' - no data
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"gt",2)'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: []
+out:
+  result: SUCCEED
+  value: 0
+---
+test case: Expression 'count(last_foreach(/*/key),"eq","2")'
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"eq","2")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2, 3, 2]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'count(last_foreach(/*/key),"eq")' - pattern not provided with operator
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"eq")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2, 3, 4]
+out:
+  result: FAIL
+---
+test case: Expression 'count(last_foreach(/*/key),"eq","aa")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"eq","aa")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["aa", "bb", "cc"]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'count(last_foreach(/*/key),"like","aa")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"like","aa")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["aa", "bb", "cc"]
+out:
+  result: SUCCEED
+  value: 1
+---
+test case: Expression 'count(last_foreach(/*/key),"regexp","aa.")' - DBG
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"regexp","aa.")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: ["aaa", "aab", "aca"]
+out:
+  result: SUCCEED
+  value: 2
+---
+test case: Expression 'count(last_foreach(/*/key),"like","2")' - operation incompatible with numeric values
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"like","2")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2, 3, 4]
+out:
+  result: FAIL
+---
+test case: Expression 'count(last_foreach(/*/key),"x","2")' - unsupported operator
+in:
+  rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR_STR,ZBX_EVAL_PARSE_VAR,ZBX_EVAL_PARSE_ITEM_QUERY]
+  expression: 'count(last_foreach(/*/key),"x","2")'
+  callbacks:
+  - name: last_foreach
+    args_num: 1
+    retval: [1, 2, 3, 4]
+out:
+  result: FAIL
+---
 test case: Expression 'count(last_foreach(/*/key)) - no items'
 in:
   rules: [ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_ITEM_QUERY]

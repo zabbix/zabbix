@@ -81,19 +81,37 @@ $form_grid->addItem([
 ]);
 
 // Item.
+$parameters = [
+	'srctbl' => 'items',
+	'srcfld1' => 'itemid',
+	'dstfrm' => $form->getName(),
+	'dstfld1' => 'item',
+	'value_types' => [
+		ITEM_VALUE_TYPE_FLOAT,
+		ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_LOG,
+		ITEM_VALUE_TYPE_UINT64,
+		ITEM_VALUE_TYPE_TEXT
+	]
+];
+
+if ($data['templateid'] === '') {
+	$parameters['real_hosts'] = 1;
+}
+else {
+	$parameters += [
+		'hostid' => $data['templateid'],
+		'hide_host_filter' => true
+	];
+}
+
 $item_select = (new CPatternSelect([
 	'name' => 'item',
 	'object_name' => 'items',
 	'data' => $data['item'] === '' ? '' : [$data['item']],
 	'multiple' => false,
 	'popup' => [
-		'parameters' => [
-			'srctbl' => 'items',
-			'srcfld1' => 'itemid',
-			'real_hosts' => 1,
-			'dstfrm' => $form->getName(),
-			'dstfld1' => 'item'
-		]
+		'parameters' => $parameters
 	],
 	'add_post_js' => false
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);

@@ -22,8 +22,6 @@
 
 #include "module.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
 int	web_page_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	web_page_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	web_page_regexp(AGENT_REQUEST *request, AGENT_RESULT *result);

@@ -47,7 +47,9 @@ ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
+
+ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
+
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
 int	CONFIG_BUFFER_SIZE		= 100;
@@ -685,9 +687,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP && SUCCEED != zbx_is_supported_ip(CONFIG_SOURCE_IP))
+	if (NULL != zbx_config_source_ip && SUCCEED != zbx_is_supported_ip(zbx_config_source_ip))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", zbx_config_source_ip);
 		err = 1;
 	}
 
@@ -756,6 +758,7 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		config_active_args[forks].config_timeout = zbx_config_timeout;
 		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].config_source_ip = zbx_config_source_ip;
 	}
 
 	return SUCCEED;
@@ -877,7 +880,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	1024,			32767},
 		{"ListenIP",			&CONFIG_LISTEN_IP,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
+		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
 			PARM_OPT,	0,			5},
@@ -1077,9 +1080,9 @@ static void	zbx_on_exit(int ret)
 
 	zbx_free_service_resources(ret);
 
-#if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
-	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+	zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);	/* deinitialize crypto library from parent thread */
 #endif
 	zbx_config_tls_free(zbx_config_tls);
 	zbx_setproctitle_deinit();
@@ -1140,7 +1143,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef _WINDOWS
 	DWORD		res;
 
-	AddVectoredExceptionHandler(1, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_exception_filter);
+#ifdef _M_X64
+	if (NULL == AddVectoredExceptionHandler(0, (PVECTORED_EXCEPTION_HANDLER)&zbx_win_veh_handler))
+		zabbix_log(LOG_LEVEL_TRACE, "failed to register vectored exception handler");
+#endif /* _M_X64 */
 #endif
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
@@ -1210,7 +1216,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
 	{
-		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
+		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT,
+				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			zbx_free_service_resources(FAIL);
@@ -1399,9 +1406,9 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
-			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
+			get_zbx_config_source_ip);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif
@@ -1418,6 +1425,7 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
+
 
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
@@ -1443,6 +1451,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
+
+	zbx_init_library_cfg(program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();

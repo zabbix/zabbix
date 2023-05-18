@@ -79,7 +79,6 @@ package zbxlib
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 int CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
-char *CONFIG_SOURCE_IP = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
@@ -93,7 +92,7 @@ ZBX_METRIC	parameters_common_local[] = {NULL};
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
-char	*strerror_from_system(unsigned long error)
+char	*strerror_from_system(zbx_syserror_t error)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
