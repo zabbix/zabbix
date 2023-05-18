@@ -1,6 +1,3 @@
-//go:build linux && amd64
-// +build linux,amd64
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -23,19 +20,23 @@
 package file
 
 import (
+	"os"
 	"reflect"
 	"testing"
-
-	"git.zabbix.com/ap/plugin-support/std"
 )
 
 func TestFileRegmatch(t *testing.T) {
-	stdOs = std.NewMockOs()
 
 	impl.options.Timeout = 3
 
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a})
-	if result, err := impl.Export("vfs.file.regmatch", []string{"text.txt", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
+	d1 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
+
+	if err1 := os.WriteFile("/tmp/zbx_vfs_file_regmatch_test.dat", d1, 0644); err1 != nil {
+		t.Errorf("failed to created file: %s", err1.Error())
+		return
+	}
+
+	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/zbx_vfs_file_regmatch_test.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
 	} else {
 		if match, ok := result.(int); !ok {
@@ -49,13 +50,21 @@ func TestFileRegmatch(t *testing.T) {
 }
 
 func TestFileRegmatchUTF16(t *testing.T) {
-	stdOs = std.NewMockOs()
 
 	impl.options.Timeout = 3
-	fmt.Println("AAAAAAAAAAAAAAAA")
 
-	stdOs.(std.MockOs).MockFile("test_error_utf16le.txt", []byte{0x6200, 0x6100, 0x6400, 0x6700, 0x6500, 0x7200, 0x0a00, 0x6500, 0x7200, 0x7200, 0x6f00, 0x7200, 0x0a00, 0x6200, 0x6100, 0x6400, 0x6700, 0x6500, 0x7200, 0x3200, 0x0a00})
-	if result, err := impl.Export("vfs.file.regmatch", []string{"test_error_utf16le.txt", "error", "UTF16LE", "", ""}, nil); err != nil {
+	/* file with 3 lines, encoded in utf16le:
+	   badger
+	   error
+	   badger2 */
+
+	f1 := []byte{0x62, 0x00, 0x61, 0x00, 0x64, 0x00, 0x67, 0x00, 0x65, 0x00, 0x72, 0x00, 0x0a, 0x00, 0x65, 0x00, 0x72, 0x00, 0x72, 0x00, 0x6f, 0x00, 0x72, 0x00, 0x0a, 0x00, 0x62, 0x00, 0x61, 0x00, 0x64, 0x00, 0x67, 0x00, 0x65, 0x00, 0x72, 0x00, 0x32, 0x00, 0x0a, 0x00}
+
+	if err1 := os.WriteFile("/tmp/vfs.file.regmatch_test_error_utf16le.dat", f1, 0644); err1 != nil {
+		t.Errorf("failed to created file: %s", err1.Error())
+	}
+
+	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/vfs.file.regmatch_test_error_utf16le.dat", "error", "UTF16LE", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
 	} else {
 		if match, ok := result.(int); !ok {
