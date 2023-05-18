@@ -638,6 +638,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
 			else if (0 == strcmp(tmp1, "text"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			else if (0 == strcmp(tmp1, "bin"))
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_BIN_COUNTER));
 			else if (0 == strcmp(tmp1, "not supported"))
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
 			else

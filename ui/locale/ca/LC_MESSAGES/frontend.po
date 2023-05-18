@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-04-28 20:15+0000\n"
+"PO-Revision-Date: 2023-05-06 07:50+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -1845,6 +1845,18 @@ msgstr "Abans del valor"
 msgid "Below value"
 msgstr "Per sota del valor"
 
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
 msgstr "Enllaçar DN"
@@ -2565,6 +2577,12 @@ msgstr[1] "No es poden esborrar els grups d'equips %1$s perquè el manteniment \
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
 msgstr "No es poden pas esborrar els grups d'equips"
+
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+msgstr[1] ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -5286,6 +5304,14 @@ msgstr "Creeu un grup d'equips"
 msgid "Create host prototype"
 msgstr "Creeu un prototip d'equip"
 
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
+
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
 msgstr "Voleu crear equips a partir dels prototips escollits com a desactivats?"
@@ -5317,6 +5343,14 @@ msgstr "Crea un element (tria primer la plantilla)"
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "Crear un prototip d'element"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5382,6 +5416,14 @@ msgstr "Crea trigger (escull primer la plantilla)"
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "Crear un prototip de trigger"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6026,6 +6068,10 @@ msgstr "Vols esborrar tots els elements que no són presents al fitxer d'importa
 msgid "Delete and clear"
 msgstr "Esborra i neteja"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Vols esborrar i netejar les plantilles seleccionades? (Avís: tots els equips enllaçats s'esborraran!)"
@@ -6066,9 +6112,17 @@ msgstr "Vols esborrar el prototip de gràfic?"
 msgid "Delete graph?"
 msgstr "Vols esborrar el gràfic?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "Vols esborrar l'historial dels elements triats?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6142,14 +6196,28 @@ msgstr "Esborrar el connector escollit?"
 msgid "Delete selected connectors?"
 msgstr "Esborrar els connectors escollits?"
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Vols esborrar les correlacions triades?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "Vols esborrar els taulers de control triats?"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6160,9 +6228,17 @@ msgstr "Vols esborrar les regles de descobriment triades?"
 msgid "Delete selected elements?"
 msgstr "Vols esborrar els elements triats?"
 
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "Vols esborrar els prototips de gràfics triats?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6207,9 +6283,17 @@ msgstr "Esborrar els equips escollits?"
 msgid "Delete selected image?"
 msgstr "Vols esborrar la imatge triada?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
 msgstr "Vols esborrar els prototips d'elements triats?"
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
+msgstr ""
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6231,6 +6315,10 @@ msgstr "Vols esborrar el mapa triat?"
 msgid "Delete selected maps?"
 msgstr "Vols esborrar els mapes triats?"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr "Vols esborrar els tipus de suports triats?"
@@ -6242,6 +6330,10 @@ msgstr "Vols esborrar els servidors intermediaris triats?"
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
 msgstr "Vols esborrar el servidor intermediari triat?"
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
+msgstr ""
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6262,6 +6354,10 @@ msgstr "Vols esborrar l'informe programat triat?"
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
 msgstr "Vols esborrar els informes programats triats?"
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
+msgstr ""
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6289,6 +6385,10 @@ msgstr "Vols esborrar el grup de plantilles triat?"
 msgid "Delete selected template groups?"
 msgstr "Vols esborrar els grup de plantilles triat?"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "Vols esborrar les plantilles triades?"
@@ -6303,9 +6403,17 @@ msgstr "Vols esborrar el token triat?"
 msgid "Delete selected tokens?"
 msgstr "Vols esborrar els tokens triats?"
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
 msgstr "Voleu suprimir els prototips de triggers escollits?"
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
+msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6318,6 +6426,10 @@ msgstr "Vols esborrar l'usuari triat?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "Vols esborrar els usuaris triats?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6527,6 +6639,10 @@ msgstr "Desactivar"
 msgid "Disable debug mode"
 msgstr "Desactiva el mode de depuració"
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "Vols desactivar el mode de depuració als grups triats?"
@@ -6555,6 +6671,11 @@ msgstr "Vols desactivar els equips supervisats pels servidors intermediaris tria
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
 msgstr "Vols desactivar els equips supervisats pels servidors intermediaris triats?"
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
+msgstr ""
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6585,26 +6706,51 @@ msgstr "Desactivar el connector escollit?"
 msgid "Disable selected connectors?"
 msgstr "Desactivar els connectors escollits?"
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
 msgstr "Vols desactivar les correlacions triades?"
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Vols desactivar les regles de descobriment triades?"
 
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
 msgstr "Vols desactivar els grups triats?"
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr "Vols desactivar els equips triats?"
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
 msgstr "Vols desactivar els elements triats?"
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6618,13 +6764,25 @@ msgstr "Vols desactivar el mòdul triat?"
 msgid "Disable selected modules?"
 msgstr "Vols desactivar els mòduls triats?"
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr "Vols desactivar els informes programats triats?"
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
 msgstr "Vols desactivar els triggers triats?"
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7362,6 +7520,10 @@ msgstr "Activa la confirmació"
 msgid "Enable debug mode"
 msgstr "Activa el mode de depuració"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "Vols activar el mode de depuració als grups triats?"
@@ -7404,6 +7566,11 @@ msgstr "Vols habilitar els equips supervisats pel servidor intermediari triat?"
 msgid "Enable internal housekeeping"
 msgstr "Activa la neteja interna"
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7433,27 +7600,52 @@ msgstr "Activar el connector escollit?"
 msgid "Enable selected connectors?"
 msgstr "Activar els connectors escollits?"
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
 msgstr "Vols activar les correlacions triades?"
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "Vols activar les regles de descoberta triades?"
 
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
 msgstr "Vols activar els grups triats?"
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
+msgstr ""
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
 msgid "Enable selected hosts?"
 msgstr "Vols activar els equips triats?"
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
 msgstr "Vols activar els elements triats?"
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
+msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7467,13 +7659,25 @@ msgstr "Vols activar el mòdul triat?"
 msgid "Enable selected modules?"
 msgstr "Vols activar els mòduls triats?"
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr "Vols activar els informes programats triats?"
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
 msgstr "Vols activar els triggers triats?"
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -13775,6 +13979,11 @@ msgstr "Nou connector"
 msgid "New dashboard"
 msgstr "Nou quadre de comandament"
 
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
+
 #: jsLoader.php:280
 msgid "New element"
 msgstr "Nou element"
@@ -16195,6 +16404,10 @@ msgstr "La cadena de cerca secreta donada \"%1$s\" no és vàlida."
 #: app/views/administration.user.list.php:301
 msgid "Provision now"
 msgstr "Aprovisionar ara"
+
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
+msgstr ""
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
@@ -20718,6 +20931,10 @@ msgstr "No disponible"
 msgid "Unblock"
 msgstr "Desbloqueja"
 
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Vols desbloquejar els usuaris triats?"
@@ -23534,7 +23751,7 @@ msgstr "atan2() - L'arctangent de les coordenades ordenades (exprue) i abscisses
 
 #: app/controllers/CControllerPopupTriggerExpr.php:367
 msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
-msgstr ""
+msgstr "atan2() - L'arctangent de les coordenades ordenades (value) i abscisses especificades com a angle, expressat en radians"
 
 #: include/events.inc.php:63
 msgid "autoregistered host"
@@ -23570,6 +23787,19 @@ msgstr "baselinewma() - Calcula la línia de base fent la mitjana de períodes d
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
 msgstr "between() - Comprova si un valor pertany a l'interval donat (1 - dins l'interval, 0 - en cas contrari)"
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
 msgid "bitand() - Bitwise AND"

@@ -31,6 +31,7 @@
 #include "zbxembed.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbxparam.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbx_availability_constants.h"

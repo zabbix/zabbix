@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F....... [ZBXNEXT-8386] changed Data collection->Discovery configuration form to modal window (esekace)
+A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
+A.F....PS. [ZBXNEXT-8211] added support for new binary item value type (arimdjonoks, jfreibergs)
 ..F....... [ZBXNEXT-8390] added state filter for items in monitoring latest data (dfofanovs)
 ...G...PS. [ZBXNEXT-8273] fixed failures to read relative paths based on current working directory from Include directives in Zabbix Agent config (dgoloscapov)
 ..F.....S. [ZBXNEXT-8355] added various improvements for aggregation functions (dfofanovs, dgoloscapov)
@@ -32,6 +35,14 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+.........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
+A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
+..F....... [ZBX-22598] fixed singular and plural forms in success and error messages and in confirm messages (dpetra)
+.......PS. [ZBX-22336] added support of log level control for threaded components (wiper)
+.......PS. [ZBX-22446] fixed possible preprocessing manager crash on server/proxy shutdown (wiper)
+...G...... [ZBX-20604] fixed UserParameterDir behavior for UserParameter calls (MVekslers)
+.......PS. [ZBX-22741] fixed memory leak in preprocessing cache with bad snmp data (wiper)
 ..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
 .......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
 ..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
@@ -167,6 +178,7 @@ A......... [ZBX-19202] fixed template dashboard availability to users without pe
 Changes for 6.4.3rc1
 
 New features:
+A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
 ...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
 .........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
 ..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
@@ -174,6 +186,13 @@ New features:
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+.........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
+A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
+.......PS. [ZBX-22336] added support of log level control for threaded components (wiper)
+.......PS. [ZBX-22446] fixed possible preprocessing manager crash on server/proxy shutdown (wiper)
+...G...... [ZBX-20604] fixed UserParameterDir behavior for UserParameter calls (MVekslers)
+.......PS. [ZBX-22741] fixed memory leak in preprocessing cache with bad snmp data (wiper)
 ..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
 .......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
 ..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
@@ -1349,6 +1368,7 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.18rc1
 
 New features:
+A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
 .........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
 ..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
 ...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
@@ -1356,6 +1376,10 @@ New features:
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+.........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
+A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
+...G...... [ZBX-20604] fixed UserParameterDir behavior for UserParameter calls (MVekslers)
 ..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
 .......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
 ..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
@@ -3888,6 +3912,8 @@ Changes for 5.0.35rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
 
