@@ -13,6 +13,7 @@ COMMON_SRC_FILES = \
 
 JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
@@ -44,34 +45,40 @@ JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 zbx_item_preproc_SOURCES = \
-	zbx_item_preproc.c
+	zbx_item_preproc.c \
+	configcache_mock.c
 	
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@
-zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@
+zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
 zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
 
 item_preproc_xpath_SOURCES = \
 	item_preproc_xpath.c \
+	configcache_mock.c \
 	$(COMMON_SRC_FILES) 
 
 item_preproc_xpath_LDADD = $(JSON_LIBS)
 
 item_preproc_xpath_LDADD += @SERVER_LIBS@
-item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@
+item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
 item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
 
 item_preproc_csv_to_json_SOURCES = \
 	item_preproc_csv_to_json.c \
+	configcache_mock.c \
 	$(COMMON_SRC_FILES)
 
 item_preproc_csv_to_json_LDADD = $(JSON_LIBS)
 
 item_preproc_csv_to_json_LDADD += @SERVER_LIBS@
-item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@
+item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
 item_preproc_csv_to_json_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
 

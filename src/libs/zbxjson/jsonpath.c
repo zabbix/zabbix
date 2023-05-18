@@ -3144,15 +3144,21 @@ static void	jsonobj_index_free(zbx_jsonobj_index_t *index)
  * Purpose: create jsonpath index                                             *
  *                                                                            *
  ******************************************************************************/
-zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void)
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error)
 {
 	zbx_jsonpath_index_t	*index;
+	int			err;
 
 	index = (zbx_jsonpath_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonpath_index_t));
 
-	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
+	if (0 != (err = pthread_mutex_init(&index->lock, NULL)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize jsonpath index mutex: %s", zbx_strerror(err));
+		zbx_free(index);
+		return NULL;
+	}
 
-	pthread_mutex_init(&index->lock, NULL);
+	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
 
 	return index;
 }

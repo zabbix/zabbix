@@ -174,14 +174,14 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
 		$this->zbxTestClickButtonText('Create discovery rule');
-		$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$this->fillInFields($data);
 
 		if (array_key_exists('error_in_checks', $data)) {
 			foreach ($data['error_in_checks'] as $error) {
 				$this->zbxTestTextPresentInMessageDetails($error);
 			}
-			COverlayDialogElement::find()->waitUntilVisible()->all()->last()->query('button:Cancel')
+			COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('button:Cancel')
 					->waitUntilClickable()->one()->click();
 
 			return;
@@ -565,7 +565,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					->one()->click();
 
 			// Check the results in frontend.
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
+			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		}
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
@@ -646,7 +646,9 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					$button = ($action === 'Add') ? 'Add' : 'Update';
 					$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]/button[text()="'.$button.'"]')
 							->waitUntilClickable()->one()->click();
+
 					if (!array_key_exists('error_in_checks', $data)) {
+						$dialog->waitUntilNotVisible();
 						$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@id="dcheckList"]'.
 								'//td[contains(text(), "'.$check['type'].'")]')
 						);
