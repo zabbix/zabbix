@@ -86,7 +86,8 @@ class testFormServicesServices extends CWebTest {
 		// Check layout at Service tab.
 		$hidden_fields = [];
 		foreach ($service_labels as $label => $visible) {
-				$this->assertEquals($visible, $form->getField($label)->isDisplayed());
+			$this->assertEquals($visible, $form->getField($label)->isDisplayed());
+
 			if (!$visible) {
 				$hidden_fields[] = $label;
 			}
