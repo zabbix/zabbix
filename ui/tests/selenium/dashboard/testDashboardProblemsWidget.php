@@ -87,7 +87,7 @@ class testDashboardProblemsWidget extends CWebTest {
 								['type' => 0, 'name' => 'tag_name_format', 'value' => 1],
 								['type' => 0, 'name' => 'tags.operator.0', 'value' => 1],
 								['type' => 0, 'name' => 'tags.operator.1', 'value' => 1],
-								['type' => 0, 'name' => 'unacknowledged', 'value' => 1],
+								['type' => 0, 'name' => 'acknowledgement_status', 'value' => 1],
 								['type' => 1, 'name' => 'problem', 'value' => 'test2'],
 								['type' => 1, 'name' => 'tags.value.0', 'value' => '2'],
 								['type' => 1, 'name' => 'tags.value.1', 'value' => '33'],
