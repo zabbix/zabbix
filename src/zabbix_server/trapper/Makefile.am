@@ -32,11 +32,11 @@ libzbxtrapper_proxy_a_SOURCES = \
 libzbxtrapper_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \
 	$(TLS_CFLAGS)
-	
+
 libzbxtrapper_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server \
-        $(TLS_CFLAGS)
-	
+	$(TLS_CFLAGS)
+
 libzbxtrapper_proxy_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_proxy \
 	$(TLS_CFLAGS)
