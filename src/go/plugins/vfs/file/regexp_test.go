@@ -90,7 +90,7 @@ func TestFileRegexpOutput(t *testing.T) {
 
 func TestFileRegexp(t *testing.T) {
 	d1 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
-	if err1 := os.WriteFile("/tmp/zbx_regexp_test1.dat", d1, 0644); err1 != nil {
+	if err1 := os.WriteFile("/tmp/zbx_regexp_test2.dat", d1, 0644); err1 != nil {
 		t.Errorf("failed to created file: %s", err1.Error())
 	}
 
