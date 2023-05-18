@@ -534,7 +534,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
 					],
 					'details' => 'Invalid parameter "posts": JSON is expected.'
@@ -551,7 +551,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
 					],
 					'details' => 'Invalid parameter "posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
@@ -568,7 +568,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
 					'details' => 'Invalid parameter "posts": XML is expected.'
@@ -969,7 +969,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '{"request": "active checks", "host": "host"}'],
 						'Headers' => [
 							[
