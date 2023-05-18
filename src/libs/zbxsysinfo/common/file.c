@@ -414,7 +414,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	flen = 0;
 
-	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+	while (0 < (nbytes = read(f, read_buf, sizeof(read_buf))))
 	{
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 		{
