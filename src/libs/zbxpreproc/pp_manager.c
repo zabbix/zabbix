@@ -20,7 +20,6 @@
 #include "pp_manager.h"
 #include "pp_worker.h"
 #include "pp_queue.h"
-#include "pp_item.h"
 #include "pp_task.h"
 #include "preproc_snmp.h"
 #include "zbxpreproc.h"
@@ -32,12 +31,10 @@
 #include "zbxcachehistory.h"
 #include "zbxprof.h"
 #include "pp_protocol.h"
-#include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"
 #include "log.h"
-#include "module.h"
 #include "pp_cache.h"
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"
@@ -154,7 +151,7 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 	}
 
 	zbx_hashset_create_ext(&manager->items, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC,
-			(zbx_clean_func_t)pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
+			(zbx_clean_func_t)zbx_pp_item_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC,
 			ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	/* wait for threads to start */
@@ -223,6 +220,8 @@ void	zbx_pp_manager_free(zbx_pp_manager_t *manager)
 	zbx_hashset_destroy(&manager->items);
 
 	zbx_timekeeper_free(manager->timekeeper);
+
+	zbx_dc_um_shared_handle_release(manager->um_handle);
 
 #ifdef HAVE_NETSNMP
 	preproc_shutdown_snmp();
@@ -305,9 +304,15 @@ zbx_pp_task_t	*zbx_pp_manager_create_task(zbx_pp_manager_t *manager, zbx_uint64_
 		return NULL;
 
 	if (ZBX_PP_PROCESS_PARALLEL == item->preproc->mode)
-		return pp_task_value_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
+	{
+		return pp_task_value_create(item->itemid, item->preproc, manager->um_handle, value, ts, value_opt,
+				NULL);
+	}
 	else
-		return pp_task_value_seq_create(item->itemid, item->preproc, value, ts, value_opt, NULL);
+	{
+		return pp_task_value_seq_create(item->itemid, item->preproc, manager->um_handle, value, ts, value_opt,
+				NULL);
+	}
 }
 
 /******************************************************************************
@@ -345,6 +350,7 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *                                                                            *
  * Parameters: manager        - [IN] manager                                  *
  *             preproc        - [IN] master item preprocessing data           *
+ *             um_handle      - [IN] shared user macro cache handle           *
  *             exclude_itemid - [IN] dependent itemid to exclude, can be 0    *
  *             value          - [IN] value                                    *
  *             ts             - [IN] value timestamp                          *
@@ -355,7 +361,8 @@ static zbx_pp_item_t	*pp_manager_get_cacheable_dependent_item(zbx_pp_manager_t *
  *                                                                            *
  ******************************************************************************/
 static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_preproc_t *preproc,
-		zbx_uint64_t exclude_itemid, const zbx_variant_t *value, zbx_timespec_t ts, zbx_pp_cache_t *cache)
+		zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t exclude_itemid, const zbx_variant_t *value,
+		zbx_timespec_t ts, zbx_pp_cache_t *cache)
 {
 	int	queued_num = 0;
 
@@ -381,9 +388,15 @@ static void	pp_manager_queue_dependents(zbx_pp_manager_t *manager, zbx_pp_item_p
 			continue;
 
 		if (ZBX_PP_PROCESS_PARALLEL == item->preproc->mode)
-			new_task = pp_task_value_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
+		{
+			new_task = pp_task_value_create(item->itemid, item->preproc, um_handle, NULL, ts, NULL,
+					cache);
+		}
 		else
-			new_task = pp_task_value_seq_create(item->itemid, item->preproc, NULL, ts, NULL, cache);
+		{
+			new_task = pp_task_value_seq_create(item->itemid, item->preproc, um_handle, NULL, ts,
+					NULL, cache);
+		}
 
 		pp_task_queue_push_immediate(&manager->queue, new_task);
 		queued_num++;
@@ -426,13 +439,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 		d_dep->cache = pp_cache_create(item->preproc, &d->result);
 		zbx_variant_set_none(&value);
 
-		d_dep->primary = pp_task_value_create(item->itemid, item->preproc, &value, d->ts, NULL, d_dep->cache);
+		d_dep->primary = pp_task_value_create(item->itemid, item->preproc, d->um_handle, &value, d->ts,
+				NULL, d_dep->cache);
 
 		pp_task_queue_push_immediate(&manager->queue, dep_task);
 		pp_task_queue_notify(&manager->queue);
 	}
 	else
-		pp_manager_queue_dependents(manager, d->preproc, 0, &d->result, d->ts, NULL);
+		pp_manager_queue_dependents(manager, d->preproc, d->um_handle, 0, &d->result, d->ts, NULL);
 }
 
 /******************************************************************************
@@ -452,7 +466,7 @@ static zbx_pp_task_t	*pp_manager_queue_dependent_task_result(zbx_pp_manager_t *m
 	zbx_pp_task_value_t	*dp = (zbx_pp_task_value_t *)PP_TASK_DATA(task_value);
 
 	pp_manager_queue_value_task_result(manager, d->primary);
-	pp_manager_queue_dependents(manager, d->preproc, task_value->itemid, &dp->result, dp->ts, d->cache);
+	pp_manager_queue_dependents(manager, d->preproc, dp->um_handle, task_value->itemid, &dp->result, dp->ts, d->cache);
 
 	d->primary = NULL;
 	pp_task_free(task);
@@ -594,7 +608,7 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "itemid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64
 				" type:%u value_type:%u mode:%u flags:%u",
-				item->itemid, item->hostid, item->revision, item->preproc->type,
+				item->itemid, item->preproc->hostid, item->revision, item->preproc->type,
 				item->preproc->value_type, item->preproc->mode, item->preproc->flags);
 
 		zabbix_log(LOG_LEVEL_TRACE, "  preprocessing steps:");
@@ -616,42 +630,12 @@ void	zbx_pp_manager_dump_items(zbx_pp_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get manager configuration revision                                *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	zbx_pp_manager_get_revision(const zbx_pp_manager_t *manager)
-{
-	return manager->revision;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: set manager configuration revision                                *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pp_manager_set_revision(zbx_pp_manager_t *manager, zbx_uint64_t revision)
-{
-	manager->revision = revision;
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: get item configuration data for reading and updates               *
  *                                                                            *
  ******************************************************************************/
-zbx_hashset_t	*zbx_pp_manager_items(zbx_pp_manager_t *manager)
+zbx_hashset_t  *zbx_pp_manager_items(zbx_pp_manager_t *manager)
 {
 	return &manager->items;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get number of pending preprocessing tasks                         *
- *                                                                            *
- ******************************************************************************/
-zbx_uint64_t	zbx_pp_manager_get_pending_num(zbx_pp_manager_t *manager)
-{
-	return manager->queue.pending_num;
 }
 
 /******************************************************************************
@@ -701,15 +685,15 @@ static void	preprocessor_sync_configuration(zbx_pp_manager_t *manager)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	old_revision = revision = zbx_pp_manager_get_revision(manager);
-	zbx_dc_config_get_preprocessable_items(zbx_pp_manager_items(manager), &revision);
-	zbx_pp_manager_set_revision(manager, revision);
+	old_revision = revision = manager->revision;
+	zbx_dc_config_get_preprocessable_items(&manager->items, &manager->um_handle, &revision);
+	manager->revision = revision;
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE) && revision != old_revision)
 		zbx_pp_manager_dump_items(manager);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() item config size:%d revision:" ZBX_FS_UI64 "->" ZBX_FS_UI64, __func__,
-			zbx_pp_manager_items(manager)->num_data, old_revision, revision);
+			manager->items.num_data, old_revision, revision);
 }
 
 /******************************************************************************
@@ -923,7 +907,7 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	preproc = zbx_pp_item_preproc_create(0, 0, 0);
+	preproc = zbx_pp_item_preproc_create(0, 0, 0, 0);
 	zbx_preprocessor_unpack_test_request(preproc, &value, &ts, message->data);
 	zbx_pp_manager_queue_test(manager, preproc, &value, ts, client);
 	zbx_pp_item_preproc_release(preproc);
@@ -933,7 +917,7 @@ static void	preprocessor_add_test_request(zbx_pp_manager_t *manager, zbx_ipc_cli
 
 static void	preprocessor_reply_queue_size(zbx_pp_manager_t *manager, zbx_ipc_client_t *client)
 {
-	zbx_uint64_t	pending_num = zbx_pp_manager_get_pending_num(manager);
+	zbx_uint64_t	pending_num = manager->queue.pending_num;
 
 	zbx_ipc_client_send(client, ZBX_IPC_PREPROCESSOR_QUEUE, (unsigned char *)&pending_num, sizeof(pending_num));
 }
@@ -1261,3 +1245,25 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 #undef PP_MANAGER_DELAY_NS
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change worker log level                                           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction)
+{
+	if (0 > worker_num || manager->workers_num < worker_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for preprocessing worker #%d:"
+				" no such instance", worker_num);
+		return;
+	}
+
+	for (int i = 0; i < manager->workers_num; i++)
+	{
+		if (0 != worker_num && worker_num != i + 1)
+			continue;
+
+		zbx_change_component_log_level(&manager->workers[i].logger, direction);
+	}
+}

@@ -78,7 +78,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
-		$this->zbxTestTextPresent('Item prototypes deleted');
+		$this->zbxTestTextPresent('Item prototype deleted');
 
 		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -118,7 +118,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
-		$this->zbxTestTextPresent('Item prototypes deleted');
+		$this->zbxTestTextPresent('Item prototype deleted');
 
 		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
