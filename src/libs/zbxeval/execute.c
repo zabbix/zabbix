@@ -1842,7 +1842,8 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	len_utf8 = zbx_strlen_utf8(str->data.str);
+	if (0 == (len_utf8 = zbx_strlen_utf8(str->data.str)))
+		goto out;
 
 	if (num->data.ui64 * len_utf8 >= MAX_STRING_LEN)
 	{
@@ -1851,12 +1852,9 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
 		return FAIL;
 	}
 
-	if (0 != len_utf8)
-	{
-		for (i = num->data.ui64; i > 0; i--)
-			strval = zbx_strdcat(strval, str->data.str);
-	}
-
+	for (i = num->data.ui64; i > 0; i--)
+		strval = zbx_strdcat(strval, str->data.str);
+out:
 	if (NULL == strval)
 		strval = zbx_strdup(NULL, "");
 
