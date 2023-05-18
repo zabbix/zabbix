@@ -177,11 +177,11 @@ static int	DBpatch_6050014(void)
 			"update widget_field"
 			" set name='acknowledgement_status'"
 			" where name='unacknowledged'"
-			" and widgetid in ("
-				"select widgetid"
-				" from widget"
-				" where type = 'problems'"
-			")"))
+				" and widgetid in ("
+					"select widgetid"
+					" from widget"
+					" where type='problems'"
+				")"))
 	{
 		return FAIL;
 	}
