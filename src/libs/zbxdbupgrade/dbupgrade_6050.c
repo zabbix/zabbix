@@ -173,7 +173,7 @@ static int	DBpatch_6050014(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (0 > zbx_db_execute(
+	if (ZBX_DB_OK > zbx_db_execute(
 			"update widget_field"
 			" set name='acknowledgement_status'"
 			" where name='unacknowledged'"
