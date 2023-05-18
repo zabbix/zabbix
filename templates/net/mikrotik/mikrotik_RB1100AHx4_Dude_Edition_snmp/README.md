@@ -66,6 +66,11 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
+|Mikrotik: SNMP walk wireless interfaces||SNMP agent|net.if.wireless.walk|
+|Mikrotik: SNMP walk system CPUs|<p>MIB: HOST-RESOURCES-MIB</p><p>Discovering system CPUs.</p>|SNMP agent|system.cpu.walk|
+|Mikrotik: SNMP walk CPU temperature sensors|<p>MIB: MIKROTIK-MIB</p><p>Discovering CPU temperature sensors.</p>|SNMP agent|sensor.cpu.temp.walk|
+|Mikrotik: SNMP walk temperature sensors|<p>MIB: MIKROTIK-MIB</p><p>Discovering temperature sensors.</p>|SNMP agent|sensor.temp.walk|
+|Mikrotik: SNMP walk mounted filesystems|<p>MIB: HOST-RESOURCES-MIB</p><p>Discovering mounted filesystems.</p>|SNMP agent|vfs.fs.walk|
 |Mikrotik: Used memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p>|SNMP agent|vm.memory.used[hrStorageUsed.Memory]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Mikrotik: Total memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in</p><p>units of hrStorageAllocationUnits. This object is</p><p>writable to allow remote configuration of the size of</p><p>the storage area in those cases where such an</p><p>operation makes sense and is possible on the</p><p>underlying system. For example, the amount of main</p><p>memory allocated to a buffer pool might be modified or</p><p>the amount of disk space allocated to virtual memory</p><p>might be modified.</p>|SNMP agent|vm.memory.total[hrStorageSize.Memory]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Mikrotik: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[memoryUsedPercentage.Memory]|
@@ -85,6 +90,7 @@ Refer to the vendor documentation.
 |Mikrotik: ICMP ping||Simple check|icmpping|
 |Mikrotik: ICMP loss||Simple check|icmppingloss|
 |Mikrotik: ICMP response time||Simple check|icmppingsec|
+|Mikrotik: SNMP walk network interfaces|<p>Discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
 
 ### Triggers
 
@@ -105,13 +111,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU discovery|<p>HOST-RESOURCES-MIB::hrProcessorTable discovery</p>|SNMP agent|hrProcessorLoad.discovery|
+|CPU discovery|<p>HOST-RESOURCES-MIB::hrProcessorTable discovery.</p>|Dependent item|hrProcessorLoad.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for CPU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|#{#SNMPINDEX}: CPU utilization|<p>MIB: HOST-RESOURCES-MIB</p><p>The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.</p>|SNMP agent|system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]|
+|#{#SNMPINDEX}: CPU utilization|<p>MIB: HOST-RESOURCES-MIB</p><p>The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.</p>|Dependent item|system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}`</p></li></ul>|
 
 ### Trigger prototypes for CPU discovery
 
@@ -123,13 +129,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature CPU discovery|<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|SNMP agent|mtxrHlProcessorTemperature.discovery|
+|Temperature CPU discovery|<p>MIKROTIK-MIB::mtxrHlProcessorTemperature</p><p>Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|Dependent item|mtxrHlProcessorTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Temperature CPU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p>|SNMP agent|sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
+|CPU: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p>|Dependent item|sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 
 ### Trigger prototypes for Temperature CPU discovery
 
@@ -143,13 +149,13 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Temperature sensor discovery|<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|SNMP agent|mtxrHlTemperature.discovery|
+|Temperature sensor discovery|<p>MIKROTIK-MIB::mtxrHlTemperature</p><p>Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.</p>|Dependent item|mtxrHlTemperature.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Temperature sensor discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Device: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlTemperature Device temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p><p></p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p>|SNMP agent|sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.1`</p></li></ul>|
+|Device: Temperature|<p>MIB: MIKROTIK-MIB</p><p>mtxrHlTemperature Device temperature in Celsius (degrees C).</p><p>Might be missing in entry models (RB750, RB450G..).</p><p></p><p>Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP</p>|Dependent item|sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `0.1`</p></li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
 
 ### Trigger prototypes for Temperature sensor discovery
 
@@ -163,16 +169,16 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|LTE modem discovery|<p>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex</p>|SNMP agent|mtxrLTEModem.discovery|
+|LTE modem discovery|<p>MIKROTIK-MIB::mtxrLTEModemInterfaceIndex.</p>|Dependent item|mtxrLTEModem.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for LTE modem discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSSI Received Signal Strength Indicator.</p>|SNMP agent|lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRP Reference Signal Received Power.</p>|SNMP agent|lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRQ Reference Signal Received Quality.</p>|SNMP agent|lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): LTE modem SINR|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.</p>|SNMP agent|lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]|
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSSI Received Signal Strength Indicator.</p>|Dependent item|lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRP Reference Signal Received Power.</p>|Dependent item|lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalRSRQ Reference Signal Received Quality.</p>|Dependent item|lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): LTE modem SINR|<p>MIB: MIKROTIK-MIB</p><p>mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.</p>|Dependent item|lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}`</p></li></ul>|
 
 ### Trigger prototypes for LTE modem discovery
 
@@ -187,32 +193,32 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AP channel discovery|<p>MIKROTIK-MIB::mtxrWlAp</p>|SNMP agent|mtxrWlAp.discovery|
+|AP channel discovery|<p>MIKROTIK-MIB::mtxrWlAp.</p>|Dependent item|mtxrWlAp.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for AP channel discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}({#IFALIAS}): SSID|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApSsid Service Set Identifier.</p>|SNMP agent|ssid.name[mtxrWlApSsid.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): AP band|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApBand</p>|SNMP agent|ssid.band[mtxrWlApBand.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): AP noise floor|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApNoiseFloor</p>|SNMP agent|ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): AP registered clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</p>|SNMP agent|ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): AP authenticated clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApAuthClientCount Number of authentication clients.</p>|SNMP agent|ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]|
+|Interface {#IFNAME}({#IFALIAS}): SSID|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApSsid Service Set Identifier.</p>|Dependent item|ssid.name[mtxrWlApSsid.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP band|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApBand</p>|Dependent item|ssid.band[mtxrWlApBand.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP noise floor|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApNoiseFloor</p>|Dependent item|ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `15m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP registered clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</p>|Dependent item|ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP authenticated clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlApAuthClientCount Number of authentication clients.</p>|Dependent item|ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}`</p></li></ul>|
 
 ### LLD rule CAPsMAN AP channel discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CAPsMAN AP channel discovery|<p>MIKROTIK-MIB::mtxrWlCMChannel</p>|SNMP agent|mtxrWlCMChannel.discovery|
+|CAPsMAN AP channel discovery|<p>MIKROTIK-MIB::mtxrWlCMChannel.</p>|Dependent item|mtxrWlCMChannel.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for CAPsMAN AP channel discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}({#IFALIAS}): AP channel|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMChannel</p>|SNMP agent|ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): AP state|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMState Wireless interface state.</p>|SNMP agent|ssid.state[mtxrWlCMState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): AP registered clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</p>|SNMP agent|ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): AP authenticated clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMAuthClientCount Number of authentication clients.</p>|SNMP agent|ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]|
+|Interface {#IFNAME}({#IFALIAS}): AP channel|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMChannel</p>|Dependent item|ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP state|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMState Wireless interface state.</p>|Dependent item|ssid.state[mtxrWlCMState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP registered clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.</p>|Dependent item|ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): AP authenticated clients|<p>MIB: MIKROTIK-MIB</p><p>mtxrWlCMAuthClientCount Number of authentication clients.</p>|Dependent item|ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}`</p></li></ul>|
 
 ### Trigger prototypes for CAPsMAN AP channel discovery
 
@@ -224,14 +230,14 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Storage discovery|<p>HOST-RESOURCES-MIB::hrStorage discovery with storage filter</p>|SNMP agent|storage.discovery|
+|Storage discovery|<p>HOST-RESOURCES-MIB::hrStorage discovery with storage filter.</p>|Dependent item|storage.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Storage discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Disk-{#SNMPINDEX}: Used space|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p>|SNMP agent|vfs.fs.used[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
-|Disk-{#SNMPINDEX}: Total space|<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in</p><p>units of hrStorageAllocationUnits. This object is</p><p>writable to allow remote configuration of the size of</p><p>the storage area in those cases where such an</p><p>operation makes sense and is possible on the</p><p>underlying system. For example, the amount of main</p><p>memory allocated to a buffer pool might be modified or</p><p>the amount of disk space allocated to virtual memory</p><p>might be modified.</p>|SNMP agent|vfs.fs.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Disk-{#SNMPINDEX}: Used space|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p>|Dependent item|vfs.fs.used[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Disk-{#SNMPINDEX}: Total space|<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in</p><p>units of hrStorageAllocationUnits. This object is</p><p>writable to allow remote configuration of the size of</p><p>the storage area in those cases where such an</p><p>operation makes sense and is possible on the</p><p>underlying system. For example, the amount of main</p><p>memory allocated to a buffer pool might be modified or</p><p>the amount of disk space allocated to virtual memory</p><p>might be modified.</p>|Dependent item|vfs.fs.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1024`</p></li></ul>|
 |Disk-{#SNMPINDEX}: Space utilization|<p>The space utilization expressed in % for Disk-{#SNMPINDEX}.</p>|Calculated|vfs.fs.pused[hrStorageSize.{#SNMPINDEX}]|
 
 ### Trigger prototypes for Storage discovery
@@ -245,21 +251,21 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interfaces discovery|<p>Discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.discovery|
+|Network interfaces discovery|<p>Discovering interfaces from IF-MIB.</p>|Dependent item|net.if.discovery<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Network interfaces discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Interface {#IFNAME}({#IFALIAS}): Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>- The testing(3) state indicates that no operational packet scan be passed</p><p>- If ifAdminStatus is down(2) then ifOperStatus should be down(2)</p><p>- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic</p><p>- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)</p><p>- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state</p><p>- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</p>|SNMP agent|net.if.status[ifOperStatus.{#SNMPINDEX}]|
-|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in[ifHCInOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out[ifHCOutOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in.errors[ifInErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out.errors[ifOutErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded|<p>MIB: IF-MIB</p><p>The number of outbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded|<p>MIB: IF-MIB</p><p>The number of inbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in.discards[ifInDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Interface type|<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p>|SNMP agent|net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|Interface {#IFNAME}({#IFALIAS}): Speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.</p>|SNMP agent|net.if.speed[ifHighSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>- The testing(3) state indicates that no operational packet scan be passed</p><p>- If ifAdminStatus is down(2) then ifOperStatus should be down(2)</p><p>- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic</p><p>- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)</p><p>- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state</p><p>- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</p>|Dependent item|net.if.status[ifOperStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits received|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in[ifHCInOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Bits sent|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out[ifHCOutOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in.errors[ifInErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out.errors[ifOutErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded|<p>MIB: IF-MIB</p><p>The number of outbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded|<p>MIB: IF-MIB</p><p>The number of inbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|Dependent item|net.if.in.discards[ifInDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `3m`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Interface type|<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p>|Dependent item|net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Interface {#IFNAME}({#IFALIAS}): Speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.</p>|Dependent item|net.if.speed[ifHighSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>SNMP walk value: `1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}`</p></li><li><p>Custom multiplier: `1000000`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Network interfaces discovery
 
