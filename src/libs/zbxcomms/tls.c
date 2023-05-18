@@ -39,14 +39,74 @@
 
 #include "zbxmutexs.h"
 
-static zbx_mutex_t	*crypto_mutexes = NULL;
+#ifdef _WINDOWS
+typedef zbx_mutex_t tls_mutex_t;
+
+int	tls_mutex_create(tls_mutex_t *mutex, char **error)
+{
+	return zbx_mutex_create(mutex, NULL, &error);
+}
+
+void	tls_mutex_destroy(tls_mutex_t *mutex)
+{
+	zbx_mutex_destroy(mutex);
+}
+
+void	tls_mutex_lock(tls_mutex_t mutex)
+{
+	zbx_mutex_lock(mutex);
+}
+
+void	tls_mutex_unlock(tls_mutex_t mutex)
+{
+	zbx_mutex_unlock(mutex);
+}
+
+#else
+typedef pthread_mutex_t * tls_mutex_t;
+
+int	tls_mutex_create(tls_mutex_t *mutex, char **error)
+{
+	*mutex = (pthread_mutex_t *)zbx_malloc(NULL, sizeof(pthread_mutex_t));
+
+	if (0 != pthread_mutex_init(*mutex, NULL))
+	{
+		*error = zbx_dsprintf(*error, "cannot create mutex: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+void	tls_mutex_destroy(tls_mutex_t *mutex)
+{
+	pthread_mutex_destroy(*mutex);
+	zbx_free(*mutex);
+}
+
+void	tls_mutex_lock(tls_mutex_t mutex)
+{
+	pthread_mutex_lock(mutex);
+}
+
+void	tls_mutex_unlock(tls_mutex_t mutex)
+{
+	pthread_mutex_unlock(mutex);
+}
+
+#endif
+
+static tls_mutex_t	*crypto_mutexes = NULL;
 
 static void	zbx_openssl_locking_cb(int mode, int n, const char *file, int line)
 {
+	ZBX_UNUSED(file);
+	ZBX_UNUSED(line);
+
 	if (0 != (mode & CRYPTO_LOCK))
-		__zbx_mutex_lock(file, line, *(crypto_mutexes + n));
+		tls_mutex_lock(*(crypto_mutexes + n));
 	else
-		__zbx_mutex_unlock(file, line, *(crypto_mutexes + n));
+		tls_mutex_unlock(*(crypto_mutexes + n));
 }
 
 static void	zbx_openssl_thread_setup(void)
@@ -55,7 +115,7 @@ static void	zbx_openssl_thread_setup(void)
 
 	num_locks = CRYPTO_num_locks();
 
-	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(zbx_mutex_t))))
+	if (NULL == (crypto_mutexes = zbx_malloc(crypto_mutexes, num_locks * sizeof(tls_mutex_t))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate mutexes for OpenSSL library");
 		exit(EXIT_FAILURE);
@@ -67,7 +127,7 @@ static void	zbx_openssl_thread_setup(void)
 	{
 		char	*error = NULL;
 
-		if (SUCCEED != zbx_mutex_create(crypto_mutexes + i, NULL, &error))
+		if (SUCCEED != tls_mutex_create(crypto_mutexes + i, &error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot create mutex #%d for OpenSSL library: %s", i, error);
 			zbx_free(error);
@@ -89,7 +149,7 @@ static void	zbx_openssl_thread_cleanup(void)
 	num_locks = CRYPTO_num_locks();
 
 	for (i = 0; i < num_locks; i++)
-		zbx_mutex_destroy(crypto_mutexes + i);
+		tls_mutex_destroy(crypto_mutexes + i);
 
 	zbx_free(crypto_mutexes);
 }
@@ -3711,16 +3771,12 @@ out1:
 #	define ZBX_TLS_READ(ctx, buf, len)	gnutls_record_recv(ctx, buf, len)
 #	define ZBX_TLS_WRITE_FUNC_NAME		"gnutls_record_send"
 #	define ZBX_TLS_READ_FUNC_NAME		"gnutls_record_recv"
-#	define ZBX_TLS_WANT_WRITE(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
-#	define ZBX_TLS_WANT_READ(res)		(GNUTLS_E_INTERRUPTED == (res) || GNUTLS_E_AGAIN == (res) ? SUCCEED : FAIL)
 #	define ZBX_TLS_ERROR(s, res)		res
 #elif defined(HAVE_OPENSSL)
 #	define ZBX_TLS_WRITE(ctx, buf, len)	SSL_write(ctx, buf, (int)(len))
 #	define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
 #	define ZBX_TLS_WRITE_FUNC_NAME		"SSL_write"
 #	define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
-#	define ZBX_TLS_WANT_WRITE(res)		FAIL
-#	define ZBX_TLS_WANT_READ(res)		FAIL
 #	define ZBX_TLS_ERROR(s, res)		(size_t)SSL_get_error(s, (int)res)
 /* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */

@@ -21,7 +21,6 @@
 #define ZABBIX_CHECKS_SNMP_H
 
 #include "config.h"
-#include "module.h"
 #include "zbxcacheconfig.h"
 
 extern char	*CONFIG_SOURCE_IP;

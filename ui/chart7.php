@@ -64,18 +64,18 @@ CArrayHelper::sort($items, ['sortorder']);
 /*
  * Permissions
  */
-$dbItems = API::Item()->get([
-	'itemids' => zbx_objectValues($items, 'itemid'),
+$db_items = API::Item()->get([
+	'output' => ['value_type'],
+	'itemids' => array_column($items, 'itemid'),
 	'filter' => [
 		'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 	],
-	'output' => ['itemid'],
 	'webitems' => true,
 	'preservekeys' => true
 ]);
 
 foreach ($items as $item) {
-	if (!isset($dbItems[$item['itemid']])) {
+	if (!array_key_exists('itemid', $item) || !array_key_exists($item['itemid'], $db_items)) {
 		access_deny();
 	}
 }
@@ -125,7 +125,9 @@ $graph->setWidth(getRequest('width', 400));
 $graph->setHeight(getRequest('height', 300));
 
 foreach ($items as $item) {
-	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+	if ($db_items[$item['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+	}
 }
 $graph->draw();
 
