@@ -26,7 +26,7 @@ import (
 	//"bufio"
 	"errors"
 	"fmt"
-	"git.zabbix.com/ap/plugin-support/log"
+	//"git.zabbix.com/ap/plugin-support/log"
 	"math"
 	"os"
 	"regexp"
@@ -38,10 +38,10 @@ import (
 const MAX_BUFFER_LEN = 65536
 
 func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
-	var startline, endline /*, curline*/ uint64
+	var startline, endline, curline uint64
 
 	start := time.Now()
-	log.Infof("BADGER: %s", strings.Join(params, ", "))
+	fmt.Printf("BADGER: %s", strings.Join(params, ", "))
 
 	if len(params) > 5 {
 		return nil, errors.New("Too many parameters.")
@@ -84,55 +84,26 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	}
 	defer file.Close()
 
-	// sc2, err := ioutil.ReadFile(params[0])
-	// if err != nil {
-	// 	return nil, fmt.Errorf("Cannot badger")
-	// }
-
-	// log.Infof("BADGER STRATA: %v", sc2)
-
 	ret := 0
 	r, err := regexp.Compile(params[1])
 	if err != nil {
 		return nil, fmt.Errorf("Cannot compile regular expression %s: %s", params[1], err)
 	}
 
-	//buffer := make([]byte, MAX_BUFFER_LEN)
-
 	elapsed := time.Since(start)
 
-	log.Infof("TOYOTA HUEVOS ALPHA, elapeed: %d, timeout: %d", elapsed.Seconds(), p.options.Timeout)
+	fmt.Printf("TOYOTA HUEVOS ALPHA, elapsed: %f, timeout: %d", elapsed.Seconds(), p.options.Timeout)
 
 	if elapsed.Seconds() > float64(p.options.Timeout) {
 		return nil, errors.New("Timeout while processing item.")
 	}
 
-	// bytesread, err := file.Read(buffer)
-
-	// if err != nil {
-	// 	if err != io.EOF {
-	// 		fmt.Println(err)
-	// 	}
-
-	// 	break
-	// }
-
-	//while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
-	log.Infof("TOYOTA FILE NAME: ->%s<-", params[0])
+	fmt.Printf("TOYOTA FILE NAME: ->%s<-", params[0])
 	f, e := os.Open(params[0])
 	if e != nil {
 		return nil, e
 	}
 	defer f.Close()
-
-	// buf, nbytes, err := p.readFile(f, encoder)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// for f:= 0; f < nbytes; f++ {
-	// 	log.Infof("TOYOTA res buf: ->%d<-", buf[f])
-	// }
 
 	initial := true
 	nbytes := 0
@@ -140,64 +111,40 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	for 0 < nbytes || initial {
 		initial = false
 
-		buf, nbytes, err = p.readFile(f, encoder)
-		if err != nil {
-			log.Infof("TOYOTA PRE-FINAL RES: ->%v+<-", err)
-			return nil, err
+		elapsed := time.Since(start)
+		if elapsed.Seconds() > float64(p.options.Timeout) {
+			return nil, errors.New("Timeout while processing item.")
 		}
 
-		for f := 0; f < nbytes; f++ {
-			log.Infof("TOYOTA ress buf: ->%d<-", buf[f])
+		curline++
+		if curline >= startline {
+			buf, nbytes, err = p.readFile(f, encoder)
+			if err != nil {
+				fmt.Printf("TOYOTA PRE-FINAL RES: ->%v+<-", err)
+				return nil, err
+			}
+
+			for f := 0; f < nbytes; f++ {
+				fmt.Printf("TOYOTA ress buf: ->%d<-", buf[f])
+			}
+
+			fmt.Printf("CALLING DECODE, nbytes: %d", nbytes)
+			x := decode(encoder, buf, nbytes)
+
+			for _, m := range bytes.Split(x, []byte("\n")) {
+				fmt.Printf("TOYOTA LINE X: %s", m)
+			}
+
+			if match := r.Match(x); match {
+				ret = 1
+			}
 		}
-
-		x := decode(encoder, buf, nbytes)
-
-		for _, m := range bytes.Split(x, []byte("\n")) {
-			log.Infof("TOYOTA LINE X: %s", m)
+		if curline >= endline {
+			break
 		}
-
-		if match := r.Match(x); match {
-			ret = 1
-		}
-
 	}
 
-	//
-
-	//
-
-	log.Infof("TOYOTA FINAL RES: ->%d<-", ret)
+	fmt.Printf("TOYOTA FINAL RES: ->%d<-", ret)
 
 	return ret, nil
-
-	// Start reading from the file with a reader.
-	// scanner := bufio.NewScanner(file)
-	// curline = 0
-	// ret := 0
-	// r, err := regexp.Compile(params[1])
-	// if err != nil {
-	// 	return nil, fmt.Errorf("Cannot compile regular expression %s: %s", params[1], err)
-	// }
-
-	// for scanner.Scan() {
-	// 	elapsed := time.Since(start)
-	// 	if elapsed.Seconds() > float64(p.options.Timeout) {
-	// 		return nil, errors.New("Timeout while processing item.")
-	// 	}
-
-	// 	curline++
-	// 	if curline >= startline {
-	// 		a := scanner.Bytes()
-	// 		log.Infof("ALPHA: %v", a)
-	// 		x := decode(encoder, a)
-	// 		log.Infof("BADGER: %v", x)
-	// 		if match := r.Match(x); match {
-	// 			ret = 1
-	// 		}
-	// 	}
-	// 	if curline >= endline {
-	// 		break
-	// 	}
-	// }
-	// return ret, nil
 }

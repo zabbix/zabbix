@@ -20,7 +20,10 @@
 package file
 
 import (
-	"bufio"
+	//	"bufio"
+	"bytes"
+	"os"
+	//"git.zabbix.com/ap/plugin-support/log"
 	"errors"
 	"fmt"
 	"math"
@@ -80,30 +83,55 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	file, err := stdOs.Open(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
-	}
-	defer file.Close()
+	f, e := os.Open(params[0])
+	fmt.Printf("STRATA 2 type: %T\n", f)
 
-	// Start reading from the file with a reader.
-	scanner := bufio.NewScanner(file)
-	curline = 0
-	for scanner.Scan() {
+	if e != nil {
+		fmt.Printf("FAILED!!! XX: +i%v\n", e)
+		return nil, e
+	}
+	defer f.Close()
+
+	initial := true
+	nbytes := 0
+	var buf []byte
+
+	for 0 < nbytes || initial {
+
 		elapsed := time.Since(start)
+
 		if elapsed.Seconds() > float64(p.options.Timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
+		initial = false
 		curline++
+		buf, nbytes, err = p.readFile(f, encoder)
+		if err != nil {
+			fmt.Printf("FORD PRE-FINAL RES: ->%v+<-\n", err)
+			return nil, err
+		}
+
+		for f := 0; f < nbytes; f++ {
+			fmt.Printf("FORD ress buf: ->%x<-\n", buf[f])
+		}
+
+		fmt.Printf("LAMBDA decode: %d\n", nbytes)
+		x := decode(encoder, buf, nbytes)
 		if curline >= startline {
-			if out, ok := zbxregexp.ExecuteRegex(decode(encoder, scanner.Bytes(), len(scanner.Bytes())), rx, []byte(output)); ok {
+			for _, m := range bytes.Split(x, []byte("\n")) {
+				fmt.Printf("FORD LINE X: %s\n", m)
+			}
+			fmt.Printf("NEXT")
+			if out, ok := zbxregexp.ExecuteRegex(x, rx, []byte(output)); ok {
 				return out, nil
 			}
 		}
-		if curline >= endline {
-			break
-		}
+
+	 	if curline >= endline {
+	 		break
+	 	}
+
 	}
 	return "", nil
 }

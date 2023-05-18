@@ -1,6 +1,3 @@
-//go:build linux && amd64
-// +build linux,amd64
-
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -23,11 +20,10 @@
 package file
 
 import (
+	"os"
 	"reflect"
 	"regexp"
 	"testing"
-
-	"git.zabbix.com/ap/plugin-support/std"
 	"zabbix.com/pkg/zbxregexp"
 )
 
@@ -71,38 +67,43 @@ func TestExecuteRegex(t *testing.T) {
 }
 
 func TestFileRegexpOutput(t *testing.T) {
-	stdOs = std.NewMockOs()
-
+	d1 := []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a}
 	impl.options.Timeout = 3
 
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a})
-	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(ф)", "iso-8859-5", "", "", "group 0: \\0 group 1: \\1 group 4: \\4"}, nil); err != nil {
+	if err1 := os.WriteFile("/tmp/zbx_regexp_test.dat", d1, 0644); err1 != nil {
+		t.Errorf("failed to created file: %s", err1.Error())
+		return
+	}
+
+	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test.dat", "(ф)", "iso-8859-5", "", "", "group 0: \\0 group 1: \\1 group 4: \\4"}, nil); err != nil {
 		t.Errorf("vfs.file.regexp returned error %s", err.Error())
 	} else {
 		if contents, ok := result.(string); !ok {
 			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
 		} else {
 			if contents != "group 0: ф group 1: ф group 4: " {
-				t.Errorf("vfs.file.regexp returned invalid result")
+				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
 			}
 		}
 	}
 }
 
 func TestFileRegexp(t *testing.T) {
-	stdOs = std.NewMockOs()
+	d1 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
+	if err1 := os.WriteFile("/tmp/zbx_regexp_test1.dat", d1, 0644); err1 != nil {
+		t.Errorf("failed to created file: %s", err1.Error())
+	}
 
 	impl.options.Timeout = 3
 
-	stdOs.(std.MockOs).MockFile("text.txt", []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a})
-	if result, err := impl.Export("vfs.file.regexp", []string{"text.txt", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
+	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test2.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regexp returned error %s", err.Error())
 	} else {
 		if contents, ok := result.(string); !ok {
 			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
 		} else {
-			if contents != "августа" {
-				t.Errorf("vfs.file.regexp returned invalid result")
+			if contents != "августа\r\n" {
+				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
 			}
 		}
 	}
