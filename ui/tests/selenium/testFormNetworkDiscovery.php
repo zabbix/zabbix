@@ -621,7 +621,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 					->one()->click();
 
 			// Check the results in frontend.
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Discovery rule updated');
+			$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
 		}
 
 		$this->assertEquals($old_drules, CDBHelper::getHash($sql_drules));
