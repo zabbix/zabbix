@@ -229,14 +229,10 @@ class CControllerHostEdit extends CController {
 			];
 		}
 
-		foreach ($data['host']['macros'] as &$macro) {
-			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$macro['allow_revert'] = true;
-			}
-		}
-
 		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {
+			$secret_macro_reset = false;
+
 			foreach ($data['host']['macros'] as &$macro) {
 				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
 					$macro = [
@@ -246,11 +242,22 @@ class CControllerHostEdit extends CController {
 
 					unset($macro['allow_revert']);
 
-					$data['warnings'][] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+					$secret_macro_reset = true;
 				}
 			}
 			unset($macro);
+
+			if ($secret_macro_reset) {
+				$data['warnings'][] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+			}
 		}
+
+		foreach ($data['host']['macros'] as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+				$macro['allow_revert'] = true;
+			}
+		}
+		unset($macro);
 
 		order_result($data['host']['valuemaps'], 'name');
 		$data['host']['valuemaps'] = array_values($data['host']['valuemaps']);
