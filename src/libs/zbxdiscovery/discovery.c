@@ -644,6 +644,7 @@ int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error)
  * Purpose: unpack worker usage statistics                                    *
  *                                                                            *
  * Parameters: usage - [OUT] the worker usage statistics                      *
+ *             count - [OUT]                                                  *
  *             data  - [IN] the input data                                    *
  *                                                                            *
  ******************************************************************************/
@@ -701,6 +702,7 @@ int	zbx_discovery_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **er
  *          used in IPC                                                       *
  * Parameters: data    - [OUT] memory buffer for packed data                  *
  *             usage   - [IN] the worker usage statistics                     *
+ *             count   - [IN]                                                 *
  *                                                                            *
  ******************************************************************************/
 zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)

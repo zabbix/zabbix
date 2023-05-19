@@ -105,8 +105,8 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
  *                                                                            *
  * Purpose: queue the job to be processed                                     *
  *                                                                            *
- * Parameters: queue     - [IN]                                               *
- *             net_check - [IN]                                               *
+ * Parameters: queue - [IN]                                                   *
+ *             job   - [IN]                                                   *
  *                                                                            *
 *******************************************************************************/
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job)

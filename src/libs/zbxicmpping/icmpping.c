@@ -24,7 +24,6 @@
 #include "log.h"
 #include "zbxcomms.h"
 #include "zbxexec.h"
-#include "zbxip.h"
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxthreads.h"
@@ -113,8 +112,8 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  *                                                                            *
  * Purpose: execute external program and return stdout and stderr values      *
  *                                                                            *
- * Parameters: fping         - [IN] the location of fping program             *
- *             value         - [OUT] stdout and stderr values                 *
+ * Parameters: fping         - [IN] location of fping program                 *
+ *             out           - [OUT] stdout and stderr values                 *
  *             error         - [OUT] error string if function fails           *
  *             max_error_len - [IN] length of error buffer                    *
  *                                                                            *

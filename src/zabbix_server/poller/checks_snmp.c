@@ -1101,7 +1101,7 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *                                                                            *
  * Purpose: retrieve information by walking an OID tree                       *
  *                                                                            *
- * Parameters: ss            - [IN] SNMP session handle                       *
+ * Parameters: ssp           - [IN] SNMP session handle                       *
  *             item          - [IN] configuration of Zabbix item              *
  *             OID           - [IN] OID of table with values of interest      *
  *             error         - [OUT] a buffer to store error message          *
