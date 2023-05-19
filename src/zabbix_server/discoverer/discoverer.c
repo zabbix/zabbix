@@ -1677,6 +1677,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
+#ifdef HAVE_NETSNMP
+	zbx_init_library_mt_snmp();
+#endif
+
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in->workers_num, &error))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager");
@@ -1686,9 +1690,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
 			discoverer_args_in->config_timeout, ZBX_IPC_SERVICE_DISCOVERER);
 
-#ifdef HAVE_NETSNMP
-	zbx_init_library_mt_snmp();
-#endif
 	zbx_vector_uint64_pair_create(&revisions);
 	zbx_vector_uint64_create(&del_druleids);
 	zbx_hashset_create(&incomplete_druleids, 1, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
