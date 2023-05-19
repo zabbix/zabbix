@@ -1429,6 +1429,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
 						.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+						.config_timeout = zbx_config_timeout,
 						zbx_config_source_ip};
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args	ipmi_manager_args = {zbx_config_timeout, config_unavailable_delay,
@@ -2036,7 +2037,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		return FAIL;
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_db_check_character_set();
@@ -2223,7 +2224,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			zbx_set_exiting_with_fail();
 			break;
 		}
@@ -2235,6 +2235,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 	}
+
+	zbx_log_exit_signal();
 
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);

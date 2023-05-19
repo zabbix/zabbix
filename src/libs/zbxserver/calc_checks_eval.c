@@ -813,8 +813,8 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
  ******************************************************************************/
 static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
 {
-	zbx_dc_item_t	*dci1 = *(zbx_dc_item_t **)d1;
-	zbx_dc_item_t	*dci2 = *(zbx_dc_item_t **)d2;
+	zbx_dc_item_t	*dci1 = *(zbx_dc_item_t * const *)d1;
+	zbx_dc_item_t	*dci2 = *(zbx_dc_item_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(dci1->itemid, dci2->itemid);
 
@@ -823,8 +823,8 @@ static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
 
 static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
 {
-	zbx_uint64_t		itemid = **(zbx_uint64_t **)d1;
-	zbx_dc_item_t		*dci = *(zbx_dc_item_t **)d2;
+	zbx_uint64_t		itemid = **(zbx_uint64_t * const *)d1;
+	zbx_dc_item_t		*dci = *(zbx_dc_item_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(itemid, dci->itemid);
 
@@ -1252,6 +1252,10 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 			zbx_variant_set_dbl(&result, values->values[0].value.dbl);
 			break;
 		case ITEM_VALUE_TYPE_NONE:
+			return;
+		case ITEM_VALUE_TYPE_BIN:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
 			return;
 	}
 
@@ -2108,8 +2112,8 @@ zbx_macro_index_t;
 
 static int	macro_index_compare(const void *d1, const void *d2)
 {
-	const int	*i1 = *(const int **)d1;
-	const int	*i2 = *(const int **)d2;
+	const int	*i1 = *(const int * const *)d1;
+	const int	*i2 = *(const int * const *)d2;
 
 	return *i1 - *i2;
 }
