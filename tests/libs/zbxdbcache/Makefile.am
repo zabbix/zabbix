@@ -149,7 +149,8 @@ zbx_vc_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 zbx_vc_add_values_SOURCES = \
 	zbx_vc_common.c \
@@ -168,7 +169,8 @@ zbx_vc_add_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 zbx_vc_get_value_SOURCES = \
 	zbx_vc_common.c \
@@ -187,7 +189,8 @@ zbx_vc_get_value_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
@@ -195,7 +198,8 @@ dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests \
 	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 dc_check_maintenance_period_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
@@ -203,7 +207,8 @@ dc_check_maintenance_period_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests \
 	$(TLS_CFLAGS) \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
 dc_maintenance_match_tags_LDADD = $(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
@@ -231,7 +236,8 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	$(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
 dc_expand_user_macros_in_func_params_SOURCES = \
@@ -256,6 +262,7 @@ um_cache_sync_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
+
 um_cache_sync_SOURCES = \
 	um_cache_sync.c \
 	um_cache_mock.c \
@@ -271,7 +278,8 @@ um_cache_resolve_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/libs \
 	$(CMOCKA_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(YAML_CFLAGS)
 um_cache_resolve_SOURCES = \
 	um_cache_resolve.c \
 	um_cache_mock.c \
