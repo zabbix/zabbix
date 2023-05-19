@@ -60,7 +60,7 @@ $form_grid = (new CFormGrid())
 		)
 	])
 	->addItem([
-		new CLabel(_('Linked map')),
+		new CLabel(_('Linked map'), 'sysmapid_ms'),
 		new CFormField($multiselect)
 	]);
 
