@@ -1,1 +1,1 @@
-.......PS. [ZBX-22314] fixed OpenSSL compiling in a non-standard location (askolmeisters)
+.......PS. [ZBX-22314] fixed OpenSSL, yaml, cmocka compiling in a non-standard location (askolmeisters)
