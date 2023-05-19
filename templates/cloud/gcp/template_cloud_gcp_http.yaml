@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-17T14:54:24Z'
+  date: '2023-05-19T00:24:26Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -49,8 +49,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 GCP: Authorization has failed. 
-                Check the authorization parameters
-                and GCP API availability from network segment, where Zabbix-server/proxy is located.
+                Check the authorization parameters and GCP API availability from network segment, where Zabbix-server/proxy is located.
                 
               tags:
                 - tag: scope
@@ -81,9 +80,10 @@ zabbix_export:
             }
             
             function fromHex(hex) {
-                utf8array = [];
+                var utf8array = [];
+            
                 if (hex.length % 2)
-                    throw 'HEX string is broken: ' + hex;
+                    throw 'Invalid length of a hex string!';
                 for (var i = 0; i < hex.length; i += 2) {
                     utf8array.push(parseInt(hex.substr(i, 2), 16));
                 }
@@ -130,7 +130,7 @@ zabbix_export:
                 }
             
             
-                if (response.access_token !== 'undefined') {
+                if (typeof response.access_token !== 'undefined') {
                     return response.access_token;
                 }
                 else {
@@ -140,7 +140,7 @@ zabbix_export:
             
             function checkParams(params) {
                 ['pkey_id', 'private_key', 'email'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
@@ -195,26 +195,19 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'GCP Cloud SQL: Instances Get'
+          description: 'GCP Cloud SQL: Instances Get.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
                 - |
                   var token = value;
                   
-                  function checkMacro(macro) {
-                      if (macro.match(/^\{\$.*\}$/) || macro === '') {
-                          throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
-                      }
-                      return macro;
-                  }
-                  
                   function getField(data, path) {
                       var steps = path.split('.');
                       for (var i = 0; i < steps.length; i++) {
                           var step = steps[i];
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
+                              throw 'Required field "' + path + '" is not present in data received.';
                           }
                           data = data[step];
                       }
@@ -255,14 +248,19 @@ zabbix_export:
                       return response;
                   };
                   
-                  var project = checkMacro('{$GCP.PROJECT.ID}'),
-                      inst_raw = getHttpData('https://sqladmin.googleapis.com/sql/v1beta4/projects/' + project + '/instances', token);
+                  var project = '{$GCP.PROJECT.ID}';
+                  
+                  if (!project || project === '{' + '$GCP.PROJECT.ID}') {
+                      throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  }
+                  
+                  var inst_raw = getHttpData('https://sqladmin.googleapis.com/sql/v1beta4/projects/' + project + '/instances', token);
                   
                   if (Object.keys(inst_raw).length === 0) {
                       return '[]';
                   }
                   
-                  var sql_inst_props = getField(inst_raw, 'items').map(function (sql_inst) {
+                  return JSON.stringify(getField(inst_raw, 'items').map(function (sql_inst) {
                       obj = {
                           name: getField(sql_inst, 'name'),
                           token: value,
@@ -274,20 +272,20 @@ zabbix_export:
                       };
                   
                       obj.high_availability = (sql_inst.failoverReplica) ? true : false;
-                      
+                  
                       if (obj.db_type.match(/SQLSERVER*/)) {
                           var mssql_audit = getField(sql_inst, 'settings.sqlServerAuditConfig');
                   
                           obj.audited = (mssql_audit.bucket) ? true : false;
                       }
                   
-                      if (obj.inst_type.match(/READ_REPLICA_INSTANCE/)) {
+                      if (obj.inst_type === 'READ_REPLICA_INSTANCE') {
                           obj.master = getField(sql_inst, 'masterInstanceName');
                       }
                   
-                      if (typeof sql_inst.ipAddresses !== 'undefined') {
+                      if (Array.isArray(sql_inst.ipAddresses)) {
                           var addresses = sql_inst.ipAddresses.filter(function (addr) {
-                              return addr.type == 'PRIMARY';
+                              return addr.type === 'PRIMARY';
                           });
                   
                           obj.ip = addresses[0].ipAddress;
@@ -295,9 +293,7 @@ zabbix_export:
                       else obj.ip = '0.0.0.0';
                   
                       return obj;
-                  });
-                  
-                  return JSON.stringify(sql_inst_props);
+                  }));
           master_item:
             key: gcp.authorization
           tags:
@@ -351,9 +347,7 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var token = value,
-                      arr = [];
-                  
+                  var token = value;
                   function checkMacro(macro) {
                       if (!macro || macro.match(/^\{\$.*\}$/)) {
                           throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
@@ -366,14 +360,29 @@ zabbix_export:
                   
                       for (var i = 0; i < steps.length; i++) {
                           var step = steps[i];
-                          
+                  
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
+                              throw 'Required field "' + path + '" is not present in data received.';
                           }
                           data = data[step];
                       }
                       return data;
                   }
+                  
+                  function getFieldBool(data, path) {
+                      var steps = path.split('.');
+                  
+                      for (var i = 0; i < steps.length; i++) {
+                          var step = steps[i];
+                  
+                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                              return false;
+                          }
+                          data = data[step];
+                      }
+                      return true;
+                  }
+                  
                   
                   function getHttpData(url, token) {
                       var request = new HttpRequest();
@@ -409,10 +418,16 @@ zabbix_export:
                       return response;
                   };
                   
-                  var project = checkMacro('{$GCP.PROJECT.ID}'),
-                      result = getHttpData('https://compute.googleapis.com/compute/v1/projects/' + project + '/aggregated/instances', token),
+                  var project = '{$GCP.PROJECT.ID}';
+                  
+                  if (!project || project === '{' + '$GCP.PROJECT.ID}') {
+                      throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  }
+                  
+                  var result = getHttpData('https://compute.googleapis.com/compute/v1/projects/' + project + '/aggregated/instances', token),
                       vms_raw = getField(result, 'items'),
-                      keys = Object.keys(vms_raw);
+                      keys = Object.keys(vms_raw),
+                      arr = [];
                   
                   for (var i in keys) {
                       if (typeof vms_raw[keys[i]].instances !== 'undefined') {
@@ -425,18 +440,19 @@ zabbix_export:
                                   m_type: getField(inst, 'machineType').replace(/.*machineTypes\//g, ''),
                                   state: getField(inst, 'status'),
                                   project_id: '{$GCP.PROJECT.ID}',
-                                  ip: inst.networkInterfaces[0].networkIP ? inst.networkInterfaces[0].networkIP : '0.0.0.0',
+                                  ip: getField(inst, 'networkInterfaces.0.networkIP'),
                                   integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
                               };
                   
-                              if (typeof inst.networkInterfaces[0].accessConfigs[0] !== 'undefined') {
-                                  obj.ext_ip = inst.networkInterfaces[0].accessConfigs[0].natIP ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
+                              if (getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP')) {
+                                  obj.ext_ip = inst.networkInterfaces[0].accessConfigs[0].natIP;
                               }
                               else {
                                   obj.ext_ip = '0.0.0.0';
                               }
-                              if (typeof inst.labels != 'undefined') {
-                                  obj.i_type = inst.labels['container-vm'] ? 'container-optimized' : 'regular';
+                  
+                              if (getFieldBool(inst, 'labels.container-vm')) {
+                                  obj.i_type = 'container-optimized';
                               }
                               else {
                                   obj.i_type = 'regular';
@@ -571,7 +587,7 @@ zabbix_export:
                           var step = steps[i];
                           
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
+                              throw 'Required field "' + path + '" is not present in data received.'
                           }
                           data = data[step];
                       }
@@ -668,7 +684,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: E
           lifetime: 7d
-          description: 'GCP Cloud SQL: MSSQL instances discovery'
+          description: 'GCP Cloud SQL: MSSQL instances discovery.'
           host_prototypes:
             - uuid: edc6ab9314ed410b8a3cf6bfedff51ab
               host: '{#GCP.PROJECT.ID}-{#CLOUD_SQL.INSTANCE.NAME}'
@@ -687,10 +703,10 @@ zabbix_export:
                   description: 'GCP Cloud SQL MSSQL Audit Enabled Definition. Required for metrics filtration.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token'
+                  description: 'Google Cloud Platform Authorization Token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP Project Id'
+                  description: 'GCP Project Id.'
               tags:
                 - tag: audit
                   value: '{#MSSQL.AUDITED}'
@@ -813,10 +829,10 @@ zabbix_export:
                   description: 'GCP Cloud SQL Instance High Availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token'
+                  description: 'Google Cloud Platform Authorization Token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP Project Id'
+                  description: 'GCP Project Id.'
               tags:
                 - tag: db-version
                   value: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
@@ -935,10 +951,10 @@ zabbix_export:
                   description: 'GCP Cloud SQL Instance High Availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token'
+                  description: 'Google Cloud Platform Authorization Token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP Project Id'
+                  description: 'GCP Project Id.'
               tags:
                 - tag: db-version
                   value: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
@@ -1044,7 +1060,7 @@ zabbix_export:
               macros:
                 - macro: '{$GCE.INSTANCE.ZONE}'
                   value: '{#GCE.INSTANCE.ZONE}'
-                  description: 'Instance zone (location)'
+                  description: 'Instance zone (location).'
                 - macro: '{$GCE.INTEGRITY.STATE}'
                   value: '{#GCE.INTEGRITY.STATE}'
                   description: 'Instance integrity metrics status.'
@@ -1053,10 +1069,10 @@ zabbix_export:
                   description: 'Instance machine type.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token'
+                  description: 'Google Cloud Platform Authorization Token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP project id'
+                  description: 'GCP project id.'
               tags:
                 - tag: instance-type
                   value: '{#GCE.INSTANCE.TYPE}'
@@ -1147,7 +1163,7 @@ zabbix_export:
                   name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] limit has been changed'
                   opdata: 'Current limit: {ITEM.VALUE}'
                   priority: INFO
-                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed'
+                  description: 'GCP Compute Engine: The limit for the `{#GCE.QUOTA.NAME}` quota has been changed.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1182,7 +1198,7 @@ zabbix_export:
                   name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: WARNING
-                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit'
+                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is close to reaching the limit.'
                   manual_close: 'YES'
                   dependencies:
                     - name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
@@ -1195,7 +1211,7 @@ zabbix_export:
                   name: 'GCP Compute Engine: Quota [{#GCE.QUOTA.NAME}] usage is critically close to reaching the limit'
                   opdata: 'Usage: {#GCE.QUOTA.USAGE} | Limit: {#GCE.QUOTA.LIMIT} | Percentage {ITEM.VALUE}%'
                   priority: AVERAGE
-                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit'
+                  description: 'GCP Compute Engine: The usage percentage for the `{#GCE.QUOTA.NAME}` quota is critically close to reaching the limit.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1652,7 +1668,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Total number of logins started from the connection pool since the last restart of SQL Server service.'
+          description: 'Total number of login operations started from the connection pool since the last restart of SQL Server service.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1803,11 +1819,10 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
-                obj = {},
                 arr = [],
                 base_paths = [
-                    base_path + 'log_bytes_flushed_count',
-                    base_path + 'transaction_count'
+                    'log_bytes_flushed_count',
+                    'transaction_count'
                 ];
             
             function getField(data, path) {
@@ -1815,9 +1830,9 @@ zabbix_export:
             
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
-                    
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -1830,6 +1845,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -1874,10 +1892,7 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query:
-                    '{' + base_paths.join(';') + '}' + j_filter
-            }),
+            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -1894,7 +1909,7 @@ zabbix_export:
                 arr.push(data);
             }
             return JSON.stringify(arr);
-          description: 'MSSQL databases data in the raw format.'
+          description: 'MSSQL databases data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -1952,19 +1967,19 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Database engine is down.
-                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
+                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
                 - name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
+                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
-                - name: 'GCP Cloud SQL MSSQL: Instance is on maintenance'
-                  expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
               tags:
@@ -2134,7 +2149,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
-                Please, check the access to GCP API or service account permissions provided sufficiency.
+                Check access permissions to GCP API or service account.
                 
               tags:
                 - tag: scope
@@ -2149,12 +2164,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+            - uuid: dd395fd3003f4fce847cd72309cdf7ec
+              expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
+              name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
+              priority: INFO
+              description: 'The instance is down for maintenance.'
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 3c080bba511e44aab1139b66f00451ee
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
               name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state.
+                The instance is in Suspended state. 
                 It is not available, for example due to problems with billing. 
                 
               tags:
@@ -2165,16 +2188,8 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The state of the instance is unknown.
                 
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: dd395fd3003f4fce847cd72309cdf7ec
-              expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
-              name: 'GCP Cloud SQL MSSQL: Instance is on maintenance'
-              priority: INFO
-              description: 'The instance is down for maintenance.'
               tags:
                 - tag: scope
                   value: availability
@@ -2183,7 +2198,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
               priority: INFO
               description: |
-                The instance has been stopped by owner. 
+                The instance has been stopped by the owner. 
                 It is not currently running, but it's ready to be restarted.
                 
               tags:
@@ -2311,7 +2326,7 @@ zabbix_export:
           trends: 90d
           description: |
             Total number of physical database page reads. 
-            This statistic counts physical page reads across all databases.
+            This metric counts physical page reads across all databases.
             
           preprocessing:
             - type: JSONPATH
@@ -2331,7 +2346,7 @@ zabbix_export:
           trends: 90d
           description: |
             Total number of physical database page writes. 
-            This statistic counts physical page writes across all databases.
+            This metric counts physical page writes across all databases.
             
           preprocessing:
             - type: JSONPATH
@@ -2445,41 +2460,41 @@ zabbix_export:
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
                 mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
+                obj = {},
                 base_paths = [
-                    base_path + 'cpu/reserved_cores',
-                    base_path + 'cpu/usage_time',
-                    base_path + 'cpu/utilization',
-                    base_path + 'disk/read_ops_count',
-                    base_path + 'disk/write_ops_count',
-                    base_path + 'memory/quota',
-                    base_path + 'memory/total_usage',
-                    base_path + 'memory/usage',
-                    base_path + 'network/connections',
-                    base_path + 'network/received_bytes_count',
-                    base_path + 'network/sent_bytes_count | map ignore [destination]'
-                ],
+                    'cpu/reserved_cores',
+                    'cpu/usage_time',
+                    'cpu/utilization',
+                    'disk/read_ops_count',
+                    'disk/write_ops_count',
+                    'memory/quota',
+                    'memory/total_usage',
+                    'memory/usage',
+                    'network/connections',
+                    'network/received_bytes_count',
+                    'network/sent_bytes_count | map ignore [destination]'
+                ].map(function (path) { return base_path + path; }),
                 mssql_paths = [
-                    base_path + 'disk/bytes_used',
-                    base_path + 'disk/utilization',
-                    base_path + 'disk/quota',
-                    mssql_path + 'connections/connection_reset_count',
-                    mssql_path + 'connections/login_attempt_count',
-                    mssql_path + 'connections/logout_count',
-                    mssql_path + 'connections/processes_blocked',
-                    mssql_path + 'memory/buffer_cache_hit_ratio',
-                    mssql_path + 'memory/checkpoint_page_count',
-                    mssql_path + 'memory/lazy_write_count',
-                    mssql_path + 'memory/memory_grants_pending',
-                    mssql_path + 'memory/page_life_expectancy',
-                    mssql_path + 'memory/free_list_stall_count',
-                    mssql_path + 'transactions/batch_request_count',
-                    mssql_path + 'transactions/forwarded_record_count',
-                    mssql_path + 'transactions/full_scan_count',
-                    mssql_path + 'transactions/page_split_count',
-                    mssql_path + 'transactions/probe_scan_count',
-                    mssql_path + 'transactions/sql_compilation_count',
-                    mssql_path + 'transactions/sql_recompilation_count'
-                ];
+                    'connections/connection_reset_count',
+                    'connections/login_attempt_count',
+                    'connections/logout_count',
+                    'connections/processes_blocked',
+                    'memory/buffer_cache_hit_ratio',
+                    'memory/checkpoint_page_count',
+                    'memory/lazy_write_count',
+                    'memory/memory_grants_pending',
+                    'memory/page_life_expectancy',
+                    'memory/free_list_stall_count',
+                    'transactions/batch_request_count',
+                    'transactions/forwarded_record_count',
+                    'transactions/full_scan_count',
+                    'transactions/page_split_count',
+                    'transactions/probe_scan_count',
+                    'transactions/sql_compilation_count',
+                    'transactions/sql_recompilation_count'
+                ].map(function (path) { return mssql_path + path; }).concat(
+                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
+                value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
             function getField(data, path) {
                 var steps = path.split('.');
@@ -2488,19 +2503,39 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
                 return data;
             }
             
+            function getFieldBool(data, path) {
+                var steps = path.split('.');
+            
+                for (var i = 0; i < steps.length; i++) {
+                    var step = steps[i];
+            
+                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                        return false;
+                    }
+                    data = data[step];
+                }
+                return true;
+            }
+            
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+                ['project_id', 'time_window', 'database_id', 'token', 'audited'].forEach(function (field) {
                     if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
+                if (params.audited !== 'true' && params.audited !== 'false') {
+                    throw 'Incorrect audit definition type. Valid definitions: true/false';
+                }
                 return params;
             }
             
@@ -2538,16 +2573,14 @@ zabbix_export:
                 return response;
             };
             
-            
             function rawMap(raw, prefix) {
                 var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                     values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
                     re = /(^t_\d+\.value\.)/g;
             
                 for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, ''),
-                        value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                        
+                    var key = getField(keys[i], 'key').replace(re, '');
+            
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
@@ -2567,20 +2600,19 @@ zabbix_export:
                 var result = {};
             
                 for (t in tsd) {
-                    var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                     for (v in value_types) {
-                        if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
+                        if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
                             result['mssql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
+                            break;
                         }
                     }
                 }
                 return result;
             }
             
-            
             var params = checkParams(JSON.parse(value));
             
-            if (params.audited.match(/true/)) {
+            if (params.audited === 'true') {
                 base_paths.push(mssql_path + 'audits_size');
             };
             
@@ -2594,20 +2626,18 @@ zabbix_export:
                     { name: 'mssql_', data: { query: '{' + mssql_paths.join(';') + '}' + j_filter } }
                 ];
             
-            var obj = {};
-            
             for (q in queries) {
                 raw = getHttpData(url, params.token, queries[q].data);
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
-            obj.base_ram_pused = (getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100;
+            obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
             
             var single_queries = [
                 { query: mssql_path + 'memory/page_operation_count' + filter }
             ];
             
-            if (params.audited.match(/true/)) {
+            if (params.audited === 'true') {
                 single_queries.push({ query: mssql_path + 'audits_upload_count' + filter });
             }
             
@@ -2617,7 +2647,7 @@ zabbix_export:
             }
             
             return JSON.stringify(obj);
-          description: 'MSSQL metrics data in the raw format.'
+          description: 'MSSQL metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -2705,13 +2735,12 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var base_path = 'cloudsql.googleapis.com/database/sqlserver/',
-                obj = {},
+            var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
                 arr = [],
                 base_paths = [
-                    base_path + 'transactions/deadlock_count',
-                    base_path + 'transactions/lock_wait_count',
-                    base_path + 'transactions/lock_wait_time'
+                    'deadlock_count',
+                    'lock_wait_count',
+                    'lock_wait_time'
                 ];
             
             function getField(data, path) {
@@ -2719,9 +2748,9 @@ zabbix_export:
             
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
-                    
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -2734,6 +2763,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -2778,10 +2810,7 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query:
-                    '{' + base_paths.join(';') + '}' + j_filter
-            }),
+            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -2798,7 +2827,7 @@ zabbix_export:
                 arr.push(data);
             }
             return JSON.stringify(arr);
-          description: 'MSSQL resources data in the raw format.'
+          description: 'MSSQL resources data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -2826,25 +2855,17 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/schedulers/',
-                obj = {},
                 arr = [],
-                base_paths = [
-                    base_path + 'active_workers',
-                    base_path + 'current_tasks',
-                    base_path + 'current_workers',
-                    base_path + 'pending_disk_io',
-                    base_path + 'runnable_tasks',
-                    base_path + 'work_queue'
-                ];
+                base_paths = ['active_workers', 'current_tasks', 'current_workers', 'pending_disk_io', 'runnable_tasks', 'work_queue'];
             
             function getField(data, path) {
                 var steps = path.split('.');
             
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
-                    
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -2857,6 +2878,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -2901,10 +2925,7 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query:
-                    '{' + base_paths.join(';') + '}' + j_filter
-            }),
+            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -2921,7 +2942,7 @@ zabbix_export:
                 arr.push(data);
             }
             return JSON.stringify(arr);
-          description: 'MSSQL schedulers data in the raw format.'
+          description: 'MSSQL schedulers data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -3017,7 +3038,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Total number of probe scans that are used to find at most one single qualified row in an index or base table directly.'
+          description: 'Total number of probe scans that are used to find at least one single qualified row in an index or base table directly.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3088,7 +3109,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Total number of log bytes flushed for the database with the name [{#DB.NAME}].'
+              description: 'Total number of log bytes flushed  for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3108,7 +3129,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format for the database with the name {#DB.NAME}.'
+              description: 'Data in raw format for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3127,7 +3148,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of transactions started for the database with the name [{#DB.NAME}].'
+              description: 'Total number of transactions started for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3173,7 +3194,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of lock requests that resulted in a deadlock for the resource with the name {#RESOURCE.NAME}.'
+              description: 'Total number of lock requests that resulted in a deadlock for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3192,7 +3213,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of lock requests that required the caller to wait for the resource with the name [{#RESOURCE.NAME}].'
+              description: 'Total number of lock requests that required the caller to wait for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3212,7 +3233,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: s
-              description: 'Total time lock requests were waiting for locks for the resource with the name [{#RESOURCE.NAME}].'
+              description: 'Total time lock requests were waiting for locks for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3232,7 +3253,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format for the resource with the name [{#RESOURCE.NAME}].'
+              description: 'Data in raw format for the [{#RESOURCE.NAME}] resource.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3279,7 +3300,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers that are active associated with a scheduler with id [{#SCHEDULER.ID}].
+                Current number of active workers associated with the scheduler with ID [{#SCHEDULER.ID}].
                 An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
                 
               preprocessing:
@@ -3301,7 +3322,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of current tasks associated with a scheduler with id [{#SCHEDULER.ID}].
+                Current number of current tasks associated with the scheduler with ID [{#SCHEDULER.ID}].
                 This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
                 
               preprocessing:
@@ -3323,7 +3344,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers associated with a scheduler with id [{#SCHEDULER.ID}].
+                Current number of workers associated with the scheduler with ID [{#SCHEDULER.ID}].
                 It includes workers that are not assigned any task.
                 
               preprocessing:
@@ -3345,7 +3366,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of pending I/Os that are waiting to be completed associated with a scheduler with id [{#SCHEDULER.ID}].
+                Current number of pending I/Os waiting to be completed that are associated with the scheduler with ID [{#SCHEDULER.ID}]. 
                 Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. 
                 The count is incremented when the request is inserted. 
                 This count is decremented when the request is completed. 
@@ -3370,7 +3391,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format associated with a scheduler with id [{#SCHEDULER.ID}].'
+              description: 'Data in raw format associated with the scheduler with ID [{#SCHEDULER.ID}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3389,7 +3410,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Current number of workers, with tasks assigned to them, that are waiting to be scheduled on the runnable queue associated with a scheduler with id [{#SCHEDULER.ID}].'
+              description: 'Current number of workers that are associated with the scheduler with ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3409,7 +3430,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of tasks in the pending queue associated with a scheduler with id [{#SCHEDULER.ID}].
+                Current number of tasks in the pending queue associated with the scheduler with ID [{#SCHEDULER.ID}].
                 These tasks are waiting for a worker to pick them up.
                 
               preprocessing:
@@ -3481,9 +3502,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: 4233430037fc4570b3a5eb3f23ef02e6
@@ -3684,8 +3705,8 @@ zabbix_export:
           units: B
           description: |
             Total number of bytes sent to the remote availability replica. 
-            Before compression for async replica. 
-            Actual number of bytes for sync replica which has no compression.
+            For an async replica, returns the number of bytes before compression. 
+            For a sync replica without compression, returns the actual number of bytes.
             
           preprocessing:
             - type: JSONPATH
@@ -3721,7 +3742,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Total amount of log records received by the replica.'
+          description: 'Total size of log records received by the replica.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3742,13 +3763,13 @@ zabbix_export:
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/replication/',
                 obj = {},
-                paths = [
-                    base_path + 'bytes_sent_to_replica_count | map ignore [replica_name]',
-                    base_path + 'resent_message_count | map ignore [replica_name]',
-                    base_path + 'log_apply_pending_queue',
-                    base_path + 'log_bytes_received_count',
-                    base_path + 'recovery_queue',
-                    base_path + 'redone_bytes_count'
+                base_paths = [
+                    'bytes_sent_to_replica_count | map ignore [replica_name]',
+                    'resent_message_count | map ignore [replica_name]',
+                    'log_apply_pending_queue',
+                    'log_bytes_received_count',
+                    'recovery_queue',
+                    'redone_bytes_count'
                 ];
             
             function getField(data, path) {
@@ -3758,7 +3779,7 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -3771,6 +3792,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -3808,7 +3832,6 @@ zabbix_export:
                 return response;
             };
             
-            
             var params = checkParams(JSON.parse(value)),
                 time_window = params.time_window,
                 project = params.project_id,
@@ -3816,16 +3839,14 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var base_raw = getHttpData(url, params.token, {
-                query: '{' + paths.join(';') + '}' + j_filter
-            }),
+            var base_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 keys = getField(base_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 values = getField(base_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
             for (i in keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                
+            
                 for (v in value_types) {
                     if (typeof values[i][value_types[v]] !== 'undefined') {
                         obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
@@ -3834,7 +3855,7 @@ zabbix_export:
             }
             
             return JSON.stringify(obj);
-          description: 'MSSQL Replica metrics data in the raw format.'
+          description: 'MSSQL Replica metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -3860,7 +3881,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Current amount of log records in ytes in the log files of the replica that have not been redone.'
+          description: 'Current size of log records in bytes in the replica''s log files that have not been redone.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3881,7 +3902,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Total amount of log records redone.'
+          description: 'Total size in bytes of redone log records.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -3899,8 +3920,8 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of Always On messages resent. 
-            A resent message is a message that was attempted to be sent but was unable to complete and must be attempted to be sent again.
+            Total count of Always On messages to resend.  
+            This includes messages that were attempted to be sent but failed and require resending.
             
           preprocessing:
             - type: JSONPATH
@@ -3932,9 +3953,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: f50d9889ca3c4f6b91dd9e40902e37fb
@@ -4087,19 +4108,19 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Database engine is down.
-                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
+                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
                 - name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
                 - name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
+                - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
+                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
-                - name: 'GCP Cloud SQL MySQL: Instance is on maintenance'
-                  expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
               tags:
@@ -4402,7 +4423,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
-                Please, check the access to GCP API or service account permissions provided sufficiency.
+                Check access permissions to GCP API or service account.
                 
               tags:
                 - tag: scope
@@ -4417,12 +4438,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+            - uuid: fae15d1ab46c418ebfdfdd73fb698b51
+              expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
+              name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
+              priority: INFO
+              description: 'The instance is down for maintenance.'
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 347215d307c8465cad41198f12b5ff68
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
               name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state.
+                The instance is in Suspended state. 
                 It is not available, for example due to problems with billing. 
                 
               tags:
@@ -4433,16 +4462,8 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The state of the instance is unknown.
                 
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: fae15d1ab46c418ebfdfdd73fb698b51
-              expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
-              name: 'GCP Cloud SQL MySQL: Instance is on maintenance'
-              priority: INFO
-              description: 'The instance is down for maintenance.'
               tags:
                 - tag: scope
                   value: availability
@@ -4451,7 +4472,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
               priority: INFO
               description: |
-                The instance has been stopped by owner. 
+                The instance has been stopped by the owner. 
                 It is not currently running, but it's ready to be restarted.
                 
               tags:
@@ -4562,36 +4583,34 @@ zabbix_export:
                 mysql_path = 'cloudsql.googleapis.com/database/mysql/',
                 obj = {},
                 base_paths = [
-                    base_path + 'cpu/reserved_cores',
-                    base_path + 'cpu/usage_time',
-                    base_path + 'cpu/utilization',
-                    base_path + 'disk/read_ops_count',
-                    base_path + 'disk/write_ops_count',
-                    base_path + 'memory/quota',
-                    base_path + 'memory/total_usage',
-                    base_path + 'memory/usage',
-                    base_path + 'network/connections',
-                    base_path + 'network/received_bytes_count',
-                    base_path + 'network/sent_bytes_count  | map ignore [destination]'
-                ],
+                    'cpu/reserved_cores',
+                    'cpu/usage_time',
+                    'cpu/utilization',
+                    'disk/read_ops_count',
+                    'disk/write_ops_count',
+                    'memory/quota',
+                    'memory/total_usage',
+                    'memory/usage',
+                    'network/connections',
+                    'network/received_bytes_count',
+                    'network/sent_bytes_count  | map ignore [destination]'
+                ].map(function (path) { return base_path + path; }),
                 mysql_paths = [
-                    base_path + 'disk/bytes_used',
-                    base_path + 'disk/utilization',
-                    base_path + 'disk/quota',
-                    mysql_path + 'innodb_buffer_pool_pages_dirty',
-                    mysql_path + 'innodb_buffer_pool_pages_free',
-                    mysql_path + 'innodb_buffer_pool_pages_total',
-                    mysql_path + 'innodb_data_fsyncs',
-                    mysql_path + 'innodb_os_log_fsyncs',
-                    mysql_path + 'innodb_pages_read',
-                    mysql_path + 'innodb_pages_written',
-                    mysql_path + 'queries',
-                    mysql_path + 'questions',
-                    mysql_path + 'received_bytes_count',
-                    mysql_path + 'sent_bytes_count',
-                    mysql_path + 'open_tables',
-                    mysql_path + 'open_table_definitions'
-                ];
+                    'innodb_buffer_pool_pages_dirty',
+                    'innodb_buffer_pool_pages_free',
+                    'innodb_buffer_pool_pages_total',
+                    'innodb_data_fsyncs',
+                    'innodb_os_log_fsyncs',
+                    'innodb_pages_read',
+                    'innodb_pages_written',
+                    'queries',
+                    'questions',
+                    'received_bytes_count',
+                    'sent_bytes_count',
+                    'open_tables',
+                    'open_table_definitions'
+                ].map(function (path) { return mysql_path + path; }).concat(
+                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; }));
             
             function getField(data, path) {
                 var steps = path.split('.');
@@ -4600,7 +4619,7 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -4613,6 +4632,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -4658,7 +4680,7 @@ zabbix_export:
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, ''),
                         value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                        
+            
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
@@ -4690,7 +4712,7 @@ zabbix_export:
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
-            obj.base_ram_pused = (getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100;
+            obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
             
             return JSON.stringify(obj);
           description: 'MySQL Metrics in raw format.'
@@ -4851,7 +4873,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Delta count of statements executed by the server.'
+          description: 'Delta of statements executed by the server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -4868,7 +4890,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Delta count of statements executed by the server sent by the client.'
+          description: 'Delta of statements executed by the server sent by the client.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -4909,9 +4931,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: 5932cc56f6f146db8fac121b3817a407
@@ -5121,18 +5143,17 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var common_path = 'cloudsql.googleapis.com/database/replication/',
+            var base_path = 'cloudsql.googleapis.com/database/replication/',
                 mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
                 raw_metrics,
                 obj = {},
-                mon_paths = [
-                    common_path + 'network_lag',
-                    common_path + 'replica_lag',
-                    mysql_path + 'last_io_errno',
-                    mysql_path + 'last_sql_errno',
-                    mysql_path + 'slave_io_running',
-                    mysql_path + 'slave_sql_running'
-                ];
+                base_paths = ['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }),
+                mysql_paths = [
+                    'last_io_errno',
+                    'last_sql_errno',
+                    'slave_io_running',
+                    'slave_sql_running'].map(function (path) { return mysql_path + path; }).concat(
+                        ['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }));
             
             function getField(data, path) {
                 var steps = path.split('.');
@@ -5141,7 +5162,7 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -5154,6 +5175,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -5198,18 +5222,15 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query:
-                    '{' + mon_paths.join(';') + '}' + j_filter
-            });
+            var metric_raw = getHttpData(url, params.token, { query: '{' + mysql_paths.join(';') + '}' + j_filter });
             
-            var metric_keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                metric_values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
+            var metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
             for (i in metric_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                
+            
                 for (v in value_types) {
                     if (typeof metric_values[i][value_types[v]] !== 'undefined') {
                         obj[getField(metric_keys[i], 'key').replace(re, "")] = metric_values[i][value_types[v]];
@@ -5217,16 +5238,13 @@ zabbix_export:
                 }
             }
             
-            var state_raw = getHttpData(url, params.token, {
-                query:
-                    common_path + 'state' + filter
-            }),
+            var state_raw = getHttpData(url, params.token, { query: base_path + 'state' + filter }),
                 state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 state_tsd = getField(state_raw, 'timeSeriesData');
             
             for (i in state_keys) {
                 var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
-                
+            
                 obj[state_key] = 'undefined';
                 for (t in state_tsd) {
                     if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
@@ -5237,7 +5255,7 @@ zabbix_export:
             }
             
             return JSON.stringify(obj);
-          description: 'MySQL replication metrics data in the raw format.'
+          description: 'MySQL replication metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -5400,9 +5418,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: 76eda12212f045388bef22cb382eff6b
@@ -5646,19 +5664,19 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Database engine is down.
-                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric  report 0.
+                If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.
                 
               dependencies:
                 - name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
+                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is on maintenance'
-                  expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
               tags:
@@ -5828,7 +5846,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
-                Please, check the access to GCP API or service account permissions provided sufficiency.
+                Check access permissions to GCP API or service account.
                 
               tags:
                 - tag: scope
@@ -5843,12 +5861,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
+            - uuid: aad6fb2d86c84e33868aacbf160c3d65
+              expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
+              priority: INFO
+              description: 'The instance is down for maintenance.'
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 959072ed00c4461196bef71618799b82
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
               name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state.
+                The instance is in Suspended state. 
                 It is not available, for example due to problems with billing. 
                 
               tags:
@@ -5859,16 +5885,8 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The state of the instance is unknown.
                 
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: aad6fb2d86c84e33868aacbf160c3d65
-              expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is on maintenance'
-              priority: INFO
-              description: 'The instance is down for maintenance.'
               tags:
                 - tag: scope
                   value: availability
@@ -5877,7 +5895,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
               priority: INFO
               description: |
-                The instance has been stopped by owner. 
+                The instance has been stopped by the owner. 
                 It is not currently running, but it's ready to be restarted.
                 
               tags:
@@ -5986,7 +6004,8 @@ zabbix_export:
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
                 pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
-                obj = {};
+                obj = {},
+                value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
             function getField(data, path) {
                 var steps = path.split('.');
@@ -5995,7 +6014,7 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -6008,6 +6027,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -6051,9 +6073,8 @@ zabbix_export:
                     re = /(^t_\d+\.value(_|\.)|_sum$)/g;
             
                 for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, ''),
-                        value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                        
+                    var key = getField(keys[i], 'key').replace(re, '');
+            
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             if (prefix) {
@@ -6068,11 +6089,9 @@ zabbix_export:
                 return obj;
             }
             
-            function single_metrics(tsd) {
+            function singleMetrics(tsd) {
                 result = {};
                 for (t in tsd) {
-                    var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                    
                     for (v in value_types) {
                         if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
                             result['pgsql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
@@ -6089,26 +6108,24 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
                 base_paths = [
-                    base_path + 'cpu/reserved_cores',
-                    base_path + 'cpu/usage_time',
-                    base_path + 'cpu/utilization',
-                    base_path + 'disk/read_ops_count',
-                    base_path + 'disk/write_ops_count',
-                    base_path + 'memory/quota',
-                    base_path + 'memory/total_usage',
-                    base_path + 'memory/usage',
-                    base_path + 'network/received_bytes_count',
-                    base_path + 'network/sent_bytes_count | map ignore [destination]'
-                ],
+                    'cpu/reserved_cores',
+                    'cpu/usage_time',
+                    'cpu/utilization',
+                    'disk/read_ops_count',
+                    'disk/write_ops_count',
+                    'memory/quota',
+                    'memory/total_usage',
+                    'memory/usage',
+                    'network/received_bytes_count',
+                    'network/sent_bytes_count | map ignore [destination]'
+                ].map(function (path) { return base_path + path; }),
                 pgsql_paths = [
-                    base_path + 'disk/bytes_used',
-                    base_path + 'disk/utilization',
-                    base_path + 'disk/quota',
-                    pgsql_path + 'transaction_id_utilization ' + filter,
-                    pgsql_path + 'temp_bytes_written_count' + filter + ' | sum',
-                    pgsql_path + 'temp_files_written_count' + filter + ' | sum',
-                    pgsql_path + 'num_backends' + filter + ' | sum'
-                ],
+                    'transaction_id_utilization ' + filter,
+                    'temp_bytes_written_count' + filter + ' | sum',
+                    'temp_files_written_count' + filter + ' | sum',
+                    'num_backends' + filter + ' | sum'
+                ].map(function (path) { return pgsql_path + path; }).concat(
+                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
                 queries = [
                     { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
                     { name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + '| within ' + time_window + '| join' } }
@@ -6119,19 +6136,18 @@ zabbix_export:
                 obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
-            obj.base_ram_pused = (getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100;
+            obj.base_ram_pused = Math.floor((getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100);
             
-            single_queries = [
-                { query: pgsql_path + 'transaction_id_count' + filter },
-                { query: pgsql_path + 'vacuum/oldest_transaction_age' + filter }
-            ];
+            var single_paths = ['transaction_id_count', 'vacuum/oldest_transaction_age'],
+                single_queries = single_paths.map(function (path) { return { query: pgsql_path + path + filter }; });
+            
             for (q in single_queries) {
                 raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, single_metrics(getField(raw, 'timeSeriesData')));
+                Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
             }
             
             return JSON.stringify(obj);
-          description: 'PostgreSQL metrics data in the raw format.'
+          description: 'PostgreSQL metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -6303,7 +6319,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'Total amount of data (in bytes) written to temporary files by the queries.'
+          description: 'Total data size (in bytes) written to temporary files by the queries.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6337,7 +6353,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Delta count of transaction ID assigned.'
+          description: 'Delta count of assigned transaction IDs.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6354,7 +6370,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'Delta count of transaction ID frozen.'
+          description: 'Delta count of frozen transaction IDs.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -6365,7 +6381,7 @@ zabbix_export:
             - tag: component
               value: transactions
         - uuid: 004042d342d0478ea8f826466353454d
-          name: 'GCP Cloud SQL PostgreSQL: Transaction id utilization'
+          name: 'GCP Cloud SQL PostgreSQL: Transaction ID utilization'
           type: DEPENDENT
           key: gcp.cloudsql.pgsql.transaction_id_utilization
           delay: '0'
@@ -6403,7 +6419,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
-          description: 'Databases discovery for the particular PostgreSQL instance'
+          description: 'Databases discovery for the particular PostgreSQL instance.'
           item_prototypes:
             - uuid: 997bdb03ba0b437ca2705f28dcc651ed
               name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Buffer cache blocks read.'
@@ -6412,7 +6428,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of buffer cache blocks read by the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Number of buffer cache blocks read by the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6431,7 +6447,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of disk blocks read by the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Number of disk blocks read by the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6461,9 +6477,11 @@ zabbix_export:
                             throw 'Required param is not set: ' + field + '.';
                         }
                     });
+                    if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                        throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                    }
                     return params;
                 }
-                
                 
                 function getField(data, path) {
                     var steps = path.split('.');
@@ -6472,7 +6490,7 @@ zabbix_export:
                         var step = steps[i];
                 
                         if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
+                            throw 'Required field "' + path + '" is not present in data received.';
                         }
                         data = data[step];
                     }
@@ -6513,9 +6531,9 @@ zabbix_export:
                     return response;
                 };
                 
-                function metrics(tsd) {
+                function singleMetrics(tsd) {
                     var result = {};
-                    
+                
                     for (i in tsd) {
                         result[getField(tsd[i], 'labelValues.4.stringValue')] = getField(tsd[i], 'pointData.0.values.0.int64Value');
                     }
@@ -6528,24 +6546,16 @@ zabbix_export:
                     filter = ' | within ' + time_window + " | filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
                     j_filter = filter + ' | join',
                     url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
-                    common_paths = [
-                        base_path + 'deadlock_count',
-                        base_path + 'tuples_returned_count',
-                        base_path + 'tuples_fetched_count',
+                    common_paths = ['deadlock_count', 'tuples_returned_count', 'tuples_fetched_count'];
                 
-                    ];
-                
-                var common_raw = getHttpData(url, params.token, {
-                    query:
-                        '{' + common_paths.join(';') + '}' + j_filter
-                }),
+                var common_raw = getHttpData(url, params.token, { query: '{' + common_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                     keys = getField(common_raw, 'timeSeriesDescriptor.pointDescriptors'),
                     values = getField(common_raw, 'timeSeriesData.0.pointData.0.values'),
                     re = /(^t_\d+\.value\.)/g;
                 
                 for (i in keys) {
                     var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
-                    
+                
                     for (v in value_types) {
                         if (typeof values[i][value_types[v]] !== 'undefined') {
                             obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
@@ -6553,16 +6563,12 @@ zabbix_export:
                     }
                 }
                 
-                var queries = [
-                    { query: base_path + 'transaction_count' + filter },
-                    { query: base_path + 'blocks_read_count' + filter },
-                    { query: base_path + 'tuples_processed_count' + filter },
-                    { query: base_path + 'tuple_size' + filter }
-                ];
+                var single_paths = ['transaction_count', 'blocks_read_count', 'tuples_processed_count', 'tuple_size'],
+                    single_queries = single_paths.map(function (path) { return { query: base_path + path + filter }; });
                 
-                for (q in queries) {
-                    raw = getHttpData(url, params.token, queries[q]);
-                    obj = Object.assign(obj, metrics(getField(raw, 'timeSeriesData')));
+                for (q in single_queries) {
+                    raw = getHttpData(url, params.token, single_queries[q]);
+                    obj = Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
                 }
                 
                 return JSON.stringify(obj);
@@ -6595,7 +6601,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of deadlocks detected in the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Number of deadlocks detected in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6614,7 +6620,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of committed transactions in the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Delta count of number of committed transactions to the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6633,7 +6639,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of rolled back transactions in the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Delta count of number of rolled back transactions in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6652,7 +6658,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of rows fetched as a result of queries of the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Total number of rows fetched as a result of queries to the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6728,7 +6734,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Total number of rows scanned while processing the queries of the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Total number of rows scanned while processing the queries of the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6747,7 +6753,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Number of live tuples(rows) in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6766,7 +6772,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Number of live tuples(rows) in the database with the name [{#PGSQL.DB.NAME}].'
+              description: 'Number of live tuples(rows) in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6837,7 +6843,7 @@ zabbix_export:
       macros:
         - macro: '{$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}'
           value: '95'
-          description: 'GCP Cloud SQL PostgreSQLGCP Cloud SQL PostgreSQL instance CPU usage threshold.'
+          description: 'GCP Cloud SQL PostgreSQL instance CPU usage threshold.'
         - macro: '{$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}'
           value: '90'
           description: 'GCP Cloud SQL PostgreSQL instance critical disk usage threshold.'
@@ -6860,9 +6866,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: 21636cfe7d2f4de28d07af09c9812075
@@ -7126,15 +7132,10 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var common_path = 'cloudsql.googleapis.com/database/replication/',
+            var base_path = 'cloudsql.googleapis.com/database/replication/',
                 pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
                 obj = {},
-                mon_paths = [
-                    common_path + 'network_lag',
-                    common_path + 'replica_lag',
-                    common_path + 'log_archive_failure_count',
-                    common_path + 'log_archive_success_count'
-                ];
+                base_paths = ['network_lag', 'replica_lag', 'log_archive_failure_count', 'log_archive_success_count'];
             
             function getField(data, path) {
                 var steps = path.split('.');
@@ -7143,7 +7144,7 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -7156,6 +7157,9 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -7198,35 +7202,29 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var common_raw = getHttpData(url, params.token, {
-                query:
-                    '{' + mon_paths.join(';') + '}' + j_filter
-            });
+            var metric_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter });
             
-            var common_keys = getField(common_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                common_values = getField(common_raw, 'timeSeriesData.0.pointData.0.values'),
+            var metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
-            for (i in common_keys) {
+            for (i in metric_keys) {
                 var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
                 for (v in value_types) {
-                    if (typeof common_values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(common_keys[i], 'key').replace(re, '')] = common_values[i][value_types[v]];
+                    if (typeof metric_values[i][value_types[v]] !== 'undefined') {
+                        obj[getField(metric_keys[i], 'key').replace(re, '')] = metric_values[i][value_types[v]];
                     }
                 }
             }
             
-            var state_raw = getHttpData(url, params.token, {
-                query:
-                    common_path + 'state' + filter
-            }),
+            var state_raw = getHttpData(url, params.token, { query: base_path + 'state' + filter }),
                 state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 state_tsd = getField(state_raw, 'timeSeriesData');
             
             for (i in state_keys) {
                 var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
-                
+            
                 obj[state_key] = 'undefined';
                 for (t in state_tsd) {
                     if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
@@ -7236,19 +7234,15 @@ zabbix_export:
                 }
             }
             
-            var lag_raw = getHttpData(url, params.token, {
-                query:
-                    pgsql_path + 'replica_byte_lag' + '| within ' + time_window +
-                    " | filter replica_name = '" + params.database_id + "'"
-            }),
+            var lag_raw = getHttpData(url, params.token, { query: pgsql_path + 'replica_byte_lag' + '| within ' + time_window + " | filter replica_name = '" + params.database_id + "'" }),
                 lag_tsd = getField(lag_raw, 'timeSeriesData');
-                
+            
             for (t in lag_tsd) {
                 obj[getField(lag_tsd[t], 'labelValues.3.stringValue')] = getField(lag_tsd[t], 'pointData.0.values.0.int64Value');
             }
             
             return JSON.stringify(obj);
-          description: 'PostgreSQL replica metrics data in the raw format.'
+          description: 'PostgreSQL replica metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -7412,9 +7406,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: acb71f4a818d43e0b045ba87c2daa989
@@ -7607,19 +7601,17 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'compute.googleapis.com/instance/disk/',
-                mon_paths = [
-                    base_path + 'read_ops_count',
-                    base_path + 'read_bytes_count',
-                    base_path + 'write_bytes_count',
-                    base_path + 'write_ops_count'
-                ];
+                base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
             
             function checkParams(params) {
                 ['project_id', 'time_window', 'instance_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
                 return params;
             }
             
@@ -7628,9 +7620,9 @@ zabbix_export:
             
                 for (var i = 0; i < steps.length; i++) {
                     var step = steps[i];
-                    
+            
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
@@ -7678,10 +7670,7 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query:
-                    '{' + mon_paths.join(';') + '}' + j_filter
-            }),
+            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData'),
                 arr = [];
@@ -7807,7 +7796,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 Failed to get the instance state. 
-                Please, check the access to GCP API or service account permissions provided sufficiency.
+                Check access permissions to GCP API or service account.
                 
               manual_close: 'YES'
               tags:
@@ -7940,7 +7929,7 @@ zabbix_export:
           units: '%'
           description: |
             Memory usage Percentage. 
-            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
+            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7971,8 +7960,8 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The total amount of memory in the VM. 
-            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
+            Total VM memory size. 
+            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7994,7 +7983,7 @@ zabbix_export:
           units: B
           description: |
             Memory currently used in the VM. 
-            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
+            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8016,7 +8005,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory read into the guest from its own swap space. 
-            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
+            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8038,7 +8027,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory written from the guest to its own swap space. 
-            This metric is only available for VMs that belong to the e2 family, empty value for different instance type.
+            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8064,32 +8053,32 @@ zabbix_export:
                 re = /(^t_\d+\.value\.)/g,
                 obj = {},
                 base_paths = [
-                    base_path + 'instance/uptime_total',
-                    base_path + 'firewall/dropped_packets_count',
-                    base_path + 'firewall/dropped_bytes_count',
-                    base_path + 'instance/cpu/guest_visible_vcpus',
-                    base_path + 'instance/cpu/reserved_cores',
-                    base_path + 'instance/cpu/usage_time',
-                    base_path + 'instance/cpu/utilization',
-                    base_path + 'mirroring/mirrored_bytes_count',
-                    base_path + 'mirroring/mirrored_packets_count'
+                    'instance/uptime_total',
+                    'firewall/dropped_packets_count',
+                    'firewall/dropped_bytes_count',
+                    'instance/cpu/guest_visible_vcpus',
+                    'instance/cpu/reserved_cores',
+                    'instance/cpu/usage_time',
+                    'instance/cpu/utilization',
+                    'mirroring/mirrored_bytes_count',
+                    'mirroring/mirrored_packets_count'
                 ],
                 e2_paths = [
-                    base_path + 'instance/cpu/scheduler_wait_time',
-                    base_path + 'instance/memory/balloon/ram_size',
-                    base_path + 'instance/memory/balloon/ram_used',
-                    base_path + 'instance/memory/balloon/swap_in_bytes_count',
-                    base_path + 'instance/memory/balloon/swap_out_bytes_count',
+                    'instance/cpu/scheduler_wait_time',
+                    'instance/memory/balloon/ram_size',
+                    'instance/memory/balloon/ram_used',
+                    'instance/memory/balloon/swap_in_bytes_count',
+                    'instance/memory/balloon/swap_out_bytes_count',
                 ],
                 net_paths = [
-                    base_path + 'instance/network/received_packets_count',
-                    base_path + 'instance/network/received_bytes_count',
-                    base_path + 'instance/network/sent_bytes_count',
-                    base_path + 'instance/network/sent_packets_count'
+                    'instance/network/received_packets_count',
+                    'instance/network/received_bytes_count',
+                    'instance/network/sent_bytes_count',
+                    'instance/network/sent_packets_count'
                 ],
                 integrity_paths = [
-                    base_path + 'instance/integrity/late_boot_validation_status',
-                    base_path + 'instance/integrity/early_boot_validation_status'
+                    'instance/integrity/late_boot_validation_status',
+                    'instance/integrity/early_boot_validation_status'
                 ];
             
             function getField(data, path) {
@@ -8099,11 +8088,30 @@ zabbix_export:
                     var step = steps[i];
             
                     if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
+                        throw 'Required field "' + path + '" is not present in data received.';
                     }
                     data = data[step];
                 }
                 return data;
+            }
+            
+            function getFieldBool(data, path) {
+                var steps = path.split('.');
+            
+                for (var i = 0; i < steps.length; i++) {
+                    var step = steps[i];
+            
+                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                        return false;
+                    }
+                    data = data[step];
+                }
+                return true;
+            }
+            
+            function queryMap(array, path, filter) {
+                var query_params = '{' + array.map(function (element) { return path + element; }).join(';') + '}';
+                return {query: query_params + filter}
             }
             
             function checkParams(params) {
@@ -8112,6 +8120,12 @@ zabbix_export:
                         throw 'Required param is not set: ' + field + '.';
                     }
                 });
+                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                }
+                if (params.integrity !== 'true' && params.integrity !== 'false') {
+                    throw 'Incorrect integrity state definition type. Valid definitions: true/false';
+                }
                 return params;
             }
             
@@ -8159,9 +8173,9 @@ zabbix_export:
                     result[id] = {};
                     for (t in ltsd) {
                         for (v in value_types) {
-                            if (typeof ltsd[t].pointData[0].values[i][value_types[v]] !== 'undefined') {
+                            if (getFieldBool(ltsd[t], 'pointData.0.values.' + [i] + '.' + [value_types[v]])) {
                                 ['stringValue', 'boolValue'].forEach(function (type) {
-                                    if (typeof ltsd[t].labelValues[4][type] !== 'undefined') {
+                                    if (getFieldBool(ltsd[t], 'labelValues.4.' + [type])) {
                                         result[id][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
                                     }
                                 });
@@ -8185,9 +8199,7 @@ zabbix_export:
                 j_filter = filter + ' | join',
                 url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
             
-            var raw = getHttpData(url, params.token, {
-                query: '{' + base_paths.join(';') + '}' + j_filter
-            }),
+            var raw = getHttpData(url, params.token, queryMap(base_paths, base_path, j_filter)),
                 keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 values = getField(raw, 'timeSeriesData.0.pointData.0.values');
             
@@ -8200,38 +8212,33 @@ zabbix_export:
             }
             
             if (params.machine_type.match(/e2.*/)) {
-                obj.ram_pused = (obj.ram_used / obj.ram_size) * 100;
+                obj.ram_pused = Math.floor((getField(obj,'ram_used') / getField(obj,'ram_size')) * 100);
             }
             
-            var mirr_raw = getHttpData(url, params.token, {
-                query: base_path + 'mirroring/dropped_packets_count' + filter
-            }),
+            var mirr_raw = getHttpData(url, params.token, { query: base_path + 'mirroring/dropped_packets_count' + filter }),
                 tsd = getField(mirr_raw, 'timeSeriesData');
             
             for (t in tsd) {
                 for (v in value_types) {
-                    if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
-                        obj[getField(tsd[t], 'labelValues.3.stringValue')] = tsd[t].pointData[0].values[0][value_types[v]];
+                    if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
+                        obj[getField(tsd[t], 'labelValues.3.stringValue')] = getField(tsd[t], 'pointData.0.values.0.' + [value_types[v]]);
                     }
                 }
             }
             
-            var net_metrics = getHttpData(url, params.token, {
-                query: '{' + net_paths.join(';') + '}' + j_filter
-            });
+            var net_metrics = getHttpData(url, params.token, queryMap(net_paths, base_path, j_filter));
             
             Object.assign(obj, nestedMap(net_metrics));
             
-            if (params.integrity.match(/true/)) {
-                integrity_metrics = getHttpData(url, params.token, {
-                    query: '{' + integrity_paths.join(';') + '}' + j_filter
-                });
+            if (params.integrity === 'true') {
+                integrity_metrics = getHttpData(url, params.token, queryMap(integrity_paths, base_path, j_filter));
+            
                 var keys = getField(integrity_metrics, 'timeSeriesDescriptor.pointDescriptors'),
                     tsd = getField(integrity_metrics, 'timeSeriesData');
             
                 for (i in keys) {
                     var key = getField(keys[i], 'key').replace(re, '');
-                    
+            
                     obj[key] = 'undefined';
                     for (t in tsd) {
                         if (getField(tsd[t], 'pointData.0.values.' + i + '.int64Value') == 1) {
@@ -8296,7 +8303,7 @@ zabbix_export:
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-            The value is empty when load-balancing is not using.
+            The value is empty when load-balancing is not used.
             
           preprocessing:
             - type: JSONPATH
@@ -8339,7 +8346,7 @@ zabbix_export:
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-            The value is empty when load-balancing is not using.
+            The value is empty when load-balancing is not used.
             
           preprocessing:
             - type: JSONPATH
@@ -8384,7 +8391,7 @@ zabbix_export:
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-            The value is empty when load-balancing is not using.
+            The value is empty when load-balancing is not used.
             
           preprocessing:
             - type: JSONPATH
@@ -8427,7 +8434,7 @@ zabbix_export:
           description: |
             Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
-            The value is empty when load-balancing is not using.
+            The value is empty when load-balancing is not used.
             
           preprocessing:
             - type: JSONPATH
@@ -8577,7 +8584,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
           lifetime: 7d
-          description: 'GCP Compute Engine: Physical disks discovery'
+          description: 'GCP Compute Engine: Physical disks discovery.'
           item_prototypes:
             - uuid: dda10a0535c04fdb92092efeff020b2c
               name: 'GCP Compute Engine: Disk [{#GCE.DISK.NAME}]: Read bytes'
@@ -8587,7 +8594,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Count of bytes read from disk with the name [{#GCE.DISK.NAME}].'
+              description: 'Count of bytes read from [{#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8610,7 +8617,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Count of read IO operations on disk with the name [{#GCE.DISK.NAME}].'
+              description: 'Count of read IO operations from [{#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8634,7 +8641,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Count of bytes written to disk with the name [{#GCE.DISK.NAME}].'
+              description: 'Count of bytes written to {#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8657,7 +8664,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Count of write IO operations on disk with the name [{#GCE.DISK.NAME}].'
+              description: 'Count of write IO operations to [{#GCE.DISK.NAME}] disk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -8776,9 +8783,9 @@ zabbix_export:
           value: 5m
           description: |
             Time interval for the data requests.
-            There are following usage types:
-            1. The default update interval for the most of the items.
-            2. The minimal time window for the data requested inside Monitoring Query Language REST API request.
+            Supported usage type:
+            1. The default update interval for most of the items.
+            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
             
       dashboards:
         - uuid: b8b09f6833ec4ea78c4ac7d15cdb0cc5
