@@ -142,7 +142,7 @@ $left_column
 		_('Acknowledgement status'),
 		(new CHorList())
 			->addItem((new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
-				->addValue(_('all'), ZBX_ACK_STATUS_ALL)
+				->addValue(_('All'), ZBX_ACK_STATUS_ALL)
 				->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK)
 				->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK)
 				->setModern(true)

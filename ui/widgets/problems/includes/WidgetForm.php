@@ -127,7 +127,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('acknowledgement_status', _('Acknowledgement status'), [
-					ZBX_ACK_STATUS_ALL => _('all'),
+					ZBX_ACK_STATUS_ALL => _('All'),
 					ZBX_ACK_STATUS_UNACK => _('Unacknowledged'),
 					ZBX_ACK_STATUS_ACK => _('Acknowledged')
 				]))->setDefault(ZBX_ACK_STATUS_ALL)
