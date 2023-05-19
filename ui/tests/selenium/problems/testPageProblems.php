@@ -41,7 +41,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('show_10'));
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
-			'Show suppressed problems', 'Show unacknowledged only', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
+			'Show suppressed problems', 'Acknowledgement status', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
 			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
@@ -57,7 +57,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertNotVisibleId('age_state_0');
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Show unacknowledged only', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
+			'Acknowledgement status', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
 			'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
@@ -440,8 +440,8 @@ class testPageProblems extends CLegacyWebTest {
 		// Add tag
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
 		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
-		// Check Show unacknowledged only
-		$this->zbxTestCheckboxSelect('unacknowledged_0');
+		// Check Acknowledgement status.
+		$this->zbxTestCheckboxSelect('acknowledgement_status_1');
 		// Check Show details
 		$this->zbxTestCheckboxSelect('details_0');
 
