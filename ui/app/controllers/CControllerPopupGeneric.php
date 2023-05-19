@@ -1678,9 +1678,7 @@ class CControllerPopupGeneric extends CController {
 				$hostids = $this->getInput('hostids', []);
 				$context = $this->getInput('context', '');
 
-
-				if (($this->hasInput('hostids') && !$this->hasInput('context'))
-					|| (!$this->hasInput('hostids') && !$this->groupids)) {
+				if ($context === '' || (!$hostids && !$this->groupids && !$this->template_groupids)) {
 					break;
 				}
 
@@ -1697,17 +1695,11 @@ class CControllerPopupGeneric extends CController {
 						: API::Template()->get($options + ['templateids' => $hostids]);
 				}
 				else {
-					$hosts = API::Host()->get([
-							'output' => ['name'],
-							'groupids' => $this->groupids,
-							'preservekeys' => true,
-							'limit' => $limit
-						]) + API::Template()->get([
-							'output' => ['name'],
-							'groupids' => $this->groupids,
-							'preservekeys' => true,
-							'limit' => $limit
-						]);
+					$options['limit'] = $limit;
+
+					$hosts = $context === 'host'
+						? API::Host()->get($options + ['groupids' => $this->groupids])
+						: API::Template()->get($options + ['groupids' => $this->template_groupids]);
 
 					$hostids = array_keys($hosts);
 				}
