@@ -1026,22 +1026,19 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	char	*params = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%s' cache:%p", __func__,
-			step->type, ZBX_NULL2EMPTY_STR(step->params), zbx_variant_value_desc(value), (void *)cache);
+			step->type, step->params, zbx_variant_value_desc(value), (void *)cache);
 
-	if (NULL != step->params)
+	params = zbx_strdup(NULL, step->params);
+
+	if (NULL != um_handle)
 	{
-		params = zbx_strdup(NULL, step->params);
+		char	*error = NULL;
 
-		if (NULL != um_handle)
+		if (SUCCEED != zbx_dc_expand_user_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
+				&error))
 		{
-			char	*error = NULL;
-
-			if (SUCCEED != zbx_dc_expand_user_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
-					&error))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
-				zbx_free(error);
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
+			zbx_free(error);
 		}
 	}
 
