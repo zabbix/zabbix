@@ -143,7 +143,7 @@ class CHttpRequest {
 	}
 
 	/**
-	 * Get argument passed in $_GET. Return null when argument not set.
+	 * Get argument passed in $_GET. Returns default value when argument not set.
 	 *
 	 * @param string $name     Argument's name.
 	 * @param mixed  $default  Default value to return when requested argument not set.

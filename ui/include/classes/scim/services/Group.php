@@ -31,12 +31,7 @@ use SCIM\ScimApiService;
 
 class Group extends ScimApiService {
 
-	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
-	private const SCIM_PATCH_SCEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
-
-	protected array $data = [
-		'schemas' => [self::SCIM_GROUP_SCHEMA]
-	];
+	public const SCIM_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 
 	/**
 	 * Returns information on specific group or all groups if no specific information is requested.
@@ -56,7 +51,7 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$db_scim_group) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+				self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 			}
 
 			$users = $this->getUsersByGroupIds([$options['id']]);
@@ -117,7 +112,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -148,7 +143,7 @@ class Group extends ScimApiService {
 		[$scim_groupid] = DB::insert('scim_group', [['name' => $options['displayName']]]);
 
 		if (!$scim_groupid) {
-			self::exception(self::SCIM_INTERNAL_ERROR, 'Cannot create group '.$options['displayName'].'.');
+			self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot create group '.$options['displayName'].'.');
 		}
 
 		$group = [
@@ -169,7 +164,7 @@ class Group extends ScimApiService {
 				]]);
 
 				if (!$user_group) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot add user '.$memberid.' to group '.$options['displayName'].'.'
 					);
 				}
@@ -197,11 +192,11 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
@@ -225,7 +220,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 		$db_scim_group = $db_scim_groups[0];
 
@@ -236,7 +231,7 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$scim_groupid) {
-				self::exception(self::SCIM_INTERNAL_ERROR,
+				self::exception(ZBX_API_ERROR_INTERNAL,
 					'Cannot update group '.$db_scim_group['name'].' to group '.$options['displayName'].'.'
 				);
 			}
@@ -264,7 +259,7 @@ class Group extends ScimApiService {
 				]]);
 
 				if (!$scim_user_group) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot add user '.$userid.' to group '.$options['displayName'].'.'
 					);
 				}
@@ -314,11 +309,11 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
@@ -350,7 +345,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 
 		$db_users = [];
@@ -369,7 +364,7 @@ class Group extends ScimApiService {
 				]);
 
 				if (!$scim_groupid) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot update group '.$db_scim_groups[0]['name'].' to group '.$operation['value'].'.'
 					);
 				}
@@ -477,11 +472,11 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_PATCH_SCEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(ScimApiService::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		foreach ($options['Operations'] as &$operation) {
@@ -526,7 +521,7 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -616,7 +611,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (count($users) !== count($userids)) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 
 		return $users;

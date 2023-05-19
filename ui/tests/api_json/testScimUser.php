@@ -1318,7 +1318,7 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Not authorized.',
-					'status' => 200
+					'status' => 403
 				]
 			]
 		];
@@ -1375,7 +1375,7 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Not authorized.',
-					'status' => 200
+					'status' => 403
 				]
 			]
 		];
@@ -1432,7 +1432,7 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Not authorized.',
-					'status' => 200
+					'status' => 403
 				]
 			]
 		];
@@ -1489,7 +1489,7 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Not authorized.',
-					'status' => 200
+					'status' => 403
 				]
 			]
 		];
@@ -1546,7 +1546,7 @@ class testScimUser extends CAPIScimTest {
 				'expected_error' => [
 					'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
 					'detail' => 'Not authorized.',
-					'status' => 200
+					'status' => 403
 				]
 			]
 		];

@@ -21,22 +21,30 @@
 
 namespace SCIM;
 
-use Throwable;
+use APIException;
+use CApiClientResponse;
+use SCIM\services\User;
+use SCIM\services\Group;
 
 class HttpResponse {
 
-	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
-	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
-	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
+	protected $http_codes = [
+		ZBX_API_ERROR_INTERNAL		=> 500,
+		ZBX_API_ERROR_PARAMETERS	=> 400,
+		ZBX_API_ERROR_NO_ENTITY		=> 404,
+		ZBX_API_ERROR_PERMISSIONS	=> 403,
+		ZBX_API_ERROR_NO_AUTH		=> 403,
+		ZBX_API_ERROR_NO_METHOD		=> 405
+	];
+
+	public const SCHEMA_ERROR = 'urn:ietf:params:scim:api:messages:2.0:Error';
+	public const SCHEMA_LIST = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
 
 	/** @var array $response_data  Array of response data to be sent. */
 	protected array $response_data = [];
 
-	/** @var Throwable $exception */
-	protected $exception = null;
-
 	/** @var int $response_code  HTTP response status code. */
-	protected $response_code = 200;
+	protected $http_code = 200;
 
 	/** @var string $class  Name of the class that response is received from */
 	protected string $class;
@@ -47,32 +55,40 @@ class HttpResponse {
 	/** @var array $request_data Array of request data that was sent */
 	protected array $request_data;
 
-	public function __construct(string $class = '', string $method = '', array $request_data = [], array $response_data = []) {
-		$this->class = $class;
+	public function setRequestDetails(string $api, string $method, array $input) {
+		$this->class = $api;
 		$this->method = $method;
-		$this->request_data = $request_data;
-		$this->response_data = $response_data;
+		$this->request_data = $input;
 	}
 
-	public function setResponseData(array $data) {
-		$this->response_data = $data;
+	public function setResponse(CApiClientResponse $response) {
+		if ($response->errorCode) {
+			$this->setException(new APIException($response->errorCode, $response->errorMessage));
+		}
+		else {
+			$this->response_data = $response->data;
+
+			switch ($this->class) {
+				case 'users':
+					$this->response_data = $this->prepareUsersResponse();
+					break;
+
+				case 'groups':
+					$this->response_data = $this->prepareGroupsResponse();
+					break;
+			}
+		}
 
 		return $this;
 	}
 
-	public function getResponseData(): array {
-		return $this->response_data;
-	}
-
-	public function setException(Throwable $e) {
-		$this->exception = $e;
-		$this->setResponseCode($e->getCode());
-
-		return $this;
-	}
-
-	public function setResponseCode($response_code) {
-		$this->response_code = $response_code;
+	public function setException(APIException $e) {
+		$this->http_code = $this->http_codes[$e->getCode()];
+		$this->response_data = [
+			'schemas' => [HttpResponse::SCHEMA_ERROR],
+			'detail' => $e->getMessage(),
+			'status' => $this->http_code
+		];
 
 		return $this;
 	}
@@ -83,23 +99,8 @@ class HttpResponse {
 	 * @return void
 	 */
 	public function send(): void {
-		if ($this->exception instanceof Throwable) {
-			$this->setResponseData([
-				'schemas' => ['urn:ietf:params:scim:api:messages:2.0:Error'],
-				'detail' => $this->exception->getMessage(),
-				'status' => $this->exception->getCode()
-			]);
-		}
-		elseif ($this->class === 'users') {
-			$this->setResponseData($this->prepareUsersResponse());
-		}
-		elseif ($this->class === 'groups') {
-			$this->setResponseData($this->prepareGroupsResponse());
-		}
-
-		header('Content-Type: application/json', true, $this->response_code);
-		echo json_encode($this->getResponseData());
-		exit;
+		header('Content-Type: application/json', true, $this->http_code);
+		echo json_encode($this->response_data);
 	}
 
 	/**
@@ -109,13 +110,13 @@ class HttpResponse {
 	 */
 	private function prepareUsersResponse(): array {
 		if ($this->method === 'delete' ) {
-			return ['schemas'	=> [self::SCIM_USER_SCHEMA]];
+			return ['schemas'	=> [User::SCIM_SCHEMA]];
 		}
 
 		if (array_key_exists('userName', $this->request_data) || array_key_exists('id', $this->request_data)) {
 			if ($this->response_data === []) {
 				return [
-					'schemas' => [self::SCIM_USER_SCHEMA],
+					'schemas' => [User::SCIM_SCHEMA],
 					'totalResults' => 0,
 					'Resources' => $this->response_data
 				];
@@ -135,7 +136,7 @@ class HttpResponse {
 		}
 
 		return [
-			'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+			'schemas' => [HttpResponse::SCHEMA_LIST],
 			'totalResults' => $total_users,
 			'startIndex' => array_key_exists('startIndex', $this->request_data)
 				? max($this->request_data['startIndex'], 1)
@@ -147,19 +148,19 @@ class HttpResponse {
 
 	private function prepareGroupsResponse(): array {
 		if ($this->method === 'delete' ) {
-			return ['schemas'	=> [self::SCIM_GROUP_SCHEMA]];
+			return ['schemas'	=> [Group::SCIM_SCHEMA]];
 		}
 
 		if (array_key_exists('id', $this->request_data) || array_key_exists('displayName', $this->request_data)) {
 			if ($this->response_data === []) {
 				return [
-					'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+					'schemas' => [HttpResponse::SCHEMA_LIST],
 					'Resources' => []
 				];
 			}
 
 			$data = [
-				'schemas' => [self::SCIM_GROUP_SCHEMA],
+				'schemas' => [Group::SCIM_SCHEMA],
 				'id' => $this->response_data['id'],
 				'displayName' => $this->response_data['displayName'],
 				'members' => []
@@ -175,7 +176,7 @@ class HttpResponse {
 
 		$total_groups = count($this->response_data);
 		$data = [
-			'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
+			'schemas' => [HttpResponse::SCHEMA_LIST],
 			'totalResults' => $total_groups,
 			'Resources' => []
 		];
@@ -208,7 +209,7 @@ class HttpResponse {
 	 */
 	private function wrapUserData(array $user_data): array {
 		$data = [
-			'schemas'	=> [self::SCIM_USER_SCHEMA],
+			'schemas'	=> [User::SCIM_SCHEMA],
 			'id' 		=> $user_data['userid'],
 		];
 

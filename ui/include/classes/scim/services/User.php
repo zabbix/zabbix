@@ -32,8 +32,7 @@ use SCIM\ScimApiService;
 
 class User extends ScimApiService {
 
-	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
-	private const SCIM_PATCH_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
+	public const SCIM_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
 
 	/**
 	 * Returns information on specific user or all users if no specific information is requested.
@@ -60,7 +59,7 @@ class User extends ScimApiService {
 			]);
 
 			if ($users && $users[0]['userdirectoryid'] != $userdirectoryid) {
-				self::exception(self::SCIM_ERROR_BAD_REQUEST,
+				self::exception(ZBX_API_ERROR_PARAMETERS,
 					'User with username '.$options["userName"].' already exists.'
 				);
 			}
@@ -85,7 +84,7 @@ class User extends ScimApiService {
 			]);
 
 			if (!$users) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+				self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 			}
 
 			$user = $users[0];
@@ -135,7 +134,7 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -172,7 +171,7 @@ class User extends ScimApiService {
 			$user = APIRPC::User()->updateProvisionedUser($user_data);
 		}
 		else {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST,
+			self::exception(ZBX_API_ERROR_PARAMETERS,
 				'User with username '.$options['userName'].' already exists.'
 			);
 		}
@@ -194,11 +193,11 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
@@ -295,11 +294,11 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
@@ -310,7 +309,7 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 	}
 
@@ -413,11 +412,11 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(ScimApiService::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
@@ -428,7 +427,7 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 
 		$db_user = $db_user[0];
@@ -473,7 +472,7 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
@@ -486,7 +485,7 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_users) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 	}
 

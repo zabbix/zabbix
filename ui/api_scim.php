@@ -48,16 +48,9 @@ try {
 }
 catch (Throwable $e) {
 	$response = new HttpResponse();
+	$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage()); // TODO wasn't here meant http response error?
 
-	if (!$e->getCode() || $e instanceof APIException) {
-		$e = new Exception($e->getMessage(), 500);
-	}
-
-	if ($e->getCode() == ZBX_API_ERROR_PARAMETERS && strpos($e->getMessage(), 'No permissions') !== false) {
-		$e = new Exception($e->getMessage(), 403);
-	}
-
-	$response->setException($e);
+	$response->setException($exception);
 }
 
 $response->send();

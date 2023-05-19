@@ -111,7 +111,7 @@ class CLocalApiClient extends CApiClient {
 
 				// check permissions
 				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
-					$response->errorCode = ZBX_API_ERROR_PARAMETERS;
+					$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 					$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 
 					return $response;

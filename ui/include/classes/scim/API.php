@@ -22,7 +22,7 @@
 namespace SCIM;
 
 use CJsonRpc;
-use Exception;
+use APIException;
 use CApiClientResponse;
 use CHttpRequest;
 use SCIM\clients\ScimApiClient;
@@ -38,21 +38,19 @@ class API {
 	 * @return HttpResponse
 	 */
 	public function execute(ScimApiClient $client, CHttpRequest $request): HttpResponse {
+		$response = new HttpResponse();
 		$endpoint = strtolower($request->getPathInfoSegment(0));
 		$method = strtolower($request->method());
-		$data = $this->getRequestData($request);
+		$input = $this->getRequestData($request);
+		$response->setRequestDetails($endpoint, $method, $input);
+		$response->setResponse(
+			$client->callMethod($endpoint, $method, $input, [
+				'type' => CJsonRpc::AUTH_TYPE_HEADER,
+				'auth' => $request->getAuthBearerValue()
+			])
+		);
 
-		/** @var CApiClientResponse $response */
-		$response = $client->callMethod($endpoint, $method, $data, [
-			'type' => CJsonRpc::AUTH_TYPE_HEADER,
-			'auth' => $request->getAuthBearerValue()
-		]);
-
-		if ($response->errorCode !== null) {
-			throw new Exception($response->errorMessage, $response->errorCode);
-		}
-
-		return new HttpResponse($endpoint, $method, $data, $response->data);
+		return $response;
 	}
 
 	/**
@@ -64,7 +62,7 @@ class API {
 	 * @throws Exception
 	 */
 	public function getRequestData(CHttpRequest $request): array {
-		$data = $request->body() === '' ? [] : json_decode($request->body(), true);
+		$data = (array) json_decode($request->body(), true);
 		$filter = $request->getUrlArgument('filter', '');
 
 		if ($request->getPathInfoSegment(1) !== '') {
@@ -72,6 +70,10 @@ class API {
 		}
 
 		if ($filter !== '') {
+			if (strtolower($request->method()) === 'get') {
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported'); // TODO this again is not correct error code
+			}
+
 			$value = null;
 
 			switch (strtolower($request->getPathInfoSegment(0))) {
@@ -87,7 +89,7 @@ class API {
 			}
 
 			if ($value === null) {
-				throw new Exception('This filter is not supported', 400);
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported'); // TODO this again is not correct error code
 			}
 
 			$data[$key] = $value;
