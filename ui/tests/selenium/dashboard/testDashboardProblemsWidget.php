@@ -129,7 +129,7 @@ class testDashboardProblemsWidget extends CWebTest {
 		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Show', 'Host groups',
 				'Exclude host groups', 'Hosts', 'Problem', 'Severity', 'Problem tags', 'Show tags', 'Tag name',
 				'Tag display priority', 'Show operational data', 'Show symptoms', 'Show suppressed problems',
-				'Show unacknowledged only', 'Sort entries by', 'Show timeline', 'Show lines'],
+				'Acknowledgement status', 'Sort entries by', 'Show timeline', 'Show lines'],
 				$form->getLabels()->asText()
 		);
 
@@ -164,7 +164,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Show operational data' => ['value' => 'None', 'enabled' => true],
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],
-			'Show unacknowledged only' => ['value' => false, 'enabled' => true],
+			'id:acknowledgement_status' => ['value' => 'all', 'enabled' => true],
 			'Sort entries by' => ['value' => 'Time (descending)', 'enabled' => true],
 			'Show timeline' => ['value' => true, 'enabled' => true],
 			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3]
@@ -330,7 +330,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Tag display priority' => 'tag, tag2, tag4',
 						'Show operational data' => 'Separately',
 						'Show suppressed problems' => true,
-						'Show unacknowledged only' => true,
+						'Acknowledgement status' => 'Unacknowledged',
 						'Sort entries by' => 'Severity (ascending)'
 					],
 					'tag_fields' => [
@@ -389,7 +389,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Show operational data' => 'With problem name',
 						'Show symptoms' => true,
 						'Show suppressed problems' => true,
-						'Show unacknowledged only' => true,
+						'Acknowledgement status' => 'Unacknowledged',
 						'Sort entries by' => 'Problem (ascending)'
 					]
 				]
@@ -433,7 +433,7 @@ class testDashboardProblemsWidget extends CWebTest {
 						'Show tags' => 'None',
 						'Show operational data' => 'None',
 						'Show suppressed problems' => false,
-						'Show unacknowledged only' => false,
+						'Acknowledgement status' => 'all',
 						'Sort entries by' => 'Time (descending)',
 						'Show timeline' => false,
 						'Show lines' => 1
