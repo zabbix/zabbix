@@ -2036,6 +2036,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
+		zbx_free(ha_config);
+
 		return FAIL;
 	}
 
