@@ -1253,6 +1253,10 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 			break;
 		case ITEM_VALUE_TYPE_NONE:
 			return;
+		case ITEM_VALUE_TYPE_BIN:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return;
 	}
 
 	zbx_vector_var_append(results_vector, result);
