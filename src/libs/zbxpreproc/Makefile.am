@@ -26,7 +26,8 @@ libzbxpreproc_a_SOURCES = \
 	pp_protocol.h
 
 libzbxpreproc_a_CFLAGS = \
-	 $(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)
 
 libzbxpreprocbase_a_SOURCES = \
 	pp_history.c \

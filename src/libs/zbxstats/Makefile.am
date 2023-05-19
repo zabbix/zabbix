@@ -4,3 +4,6 @@ noinst_LIBRARIES = libzbxstats.a
 
 libzbxstats_a_SOURCES = \
 	stats.c
+
+libzbxstats_a_CFLAGS = \
+	$(TLS_CFLAGS)
