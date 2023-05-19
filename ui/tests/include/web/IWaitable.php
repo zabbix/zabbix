@@ -31,6 +31,13 @@ interface IWaitable {
 	public function getReadyCondition();
 
 	/**
+	 * Condition describing state when object is not ready.
+	 *
+	 * @return callable
+	 */
+	public function getNotReadyCondition();
+
+	/**
 	 * Condition describing state when object is present.
 	 *
 	 * @return callable
