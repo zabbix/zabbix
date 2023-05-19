@@ -80,9 +80,7 @@ else {
 	]);
 }
 
-$form
-	->addItem($form_grid)
-	->addItem((new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady());
+$form->addItem($form_grid);
 
 $output = [
 	'body' => $form->toString(),
