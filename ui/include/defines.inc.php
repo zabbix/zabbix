@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.34rc1');
-define('ZABBIX_API_VERSION',	'5.0.34');
+define('ZABBIX_VERSION',		'5.0.35rc1');
+define('ZABBIX_API_VERSION',	'5.0.35');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1155,11 +1155,6 @@ define('EXPRESSION_FUNCTION_UNKNOWN',		'#ERROR_FUNCTION#');
 define('EXPRESSION_UNSUPPORTED_VALUE_TYPE',	'#ERROR_VALUE_TYPE#');
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.
@@ -1617,6 +1612,7 @@ define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
 define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
+define('ZBX_STYLE_CELL_EXPRESSION', 'expression-cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_CHECKBOX_RADIO', 'checkbox-radio');

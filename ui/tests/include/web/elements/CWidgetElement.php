@@ -33,20 +33,31 @@ class CWidgetElement extends CElement {
 	 * @return integer
 	 */
 	public function getRefreshInterval() {
-		$action = $this->query('class:btn-widget-action')->one();
-		$settings = json_decode($action->getAttribute('data-menu-popup'));
+		$this->getHeader()->hoverMouse();
+		$this->query('xpath:.//button[contains(@class, "btn-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 
-		return $settings->data->currentRate;
+		return $aria_label[1];
 	}
 
 	/**
 	 * Get header of widget.
 	 *
+	 * @return CElement
+	 */
+	public function getHeader() {
+		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
+				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one();
+	}
+
+	/**
+	 * Get header text of widget.
+	 *
 	 * @return string
 	 */
 	public function getHeaderText() {
-		return $this->query('xpath:.//div[contains(@class, "dashbrd-grid-widget-head") or'.
-				' contains(@class, "dashbrd-grid-iterator-head")]/h4')->one()->getText();
+		return $this->getHeader()->getText();
 	}
 
 	/**
@@ -74,8 +85,19 @@ class CWidgetElement extends CElement {
 	 * @return CFormElement
 	 */
 	public function edit() {
-		$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->waitUntilPresent()->click(true);
-		return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+		// Edit can sometimes fail so we have to retry this operation.
+		for ($i = 0; $i < 4; $i++) {
+			$this->query('xpath:.//button[@class="btn-widget-edit"]')->one()->waitUntilPresent()->click(true);
+
+			try {
+				return $this->query('xpath://div[@data-dialogueid="widgetConfg"]//form')->waitUntilVisible()->asForm()->one();
+			}
+			catch (\Exception $e) {
+				if ($i === 1) {
+					throw $e;
+				}
+			}
+		}
 	}
 
 	/**

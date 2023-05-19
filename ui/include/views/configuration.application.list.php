@@ -97,7 +97,7 @@ foreach ($data['applications'] as $application) {
 		$name[] = $application['name'];
 	}
 	elseif ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $application['discoveryRule']) {
-		$name = [(new CLink(CHtml::encode($application['discoveryRule']['name']),
+		$name = [(new CLink($application['discoveryRule']['name'],
 						'disc_prototypes.php?parent_discoveryid='.$application['discoveryRule']['itemid']))
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_ORANGE)

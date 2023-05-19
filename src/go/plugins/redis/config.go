@@ -41,6 +41,9 @@ type PluginOptions struct {
 
 	// Sessions stores pre-defined named sets of connections settings.
 	Sessions map[string]Session `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

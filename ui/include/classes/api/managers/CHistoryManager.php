@@ -77,11 +77,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));

@@ -77,7 +77,7 @@ foreach ($this->data['groups'] as $group) {
 		$n++;
 
 		if ($n > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = ' &hellip;';
+			$hostsOutput[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -105,7 +105,7 @@ foreach ($this->data['groups'] as $group) {
 		$n++;
 
 		if ($n > $this->data['config']['max_in_table']) {
-			$hostsOutput[] = ' &hellip;';
+			$hostsOutput[] = [' ', HELLIP()];
 
 			break;
 		}
