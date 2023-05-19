@@ -150,18 +150,18 @@ class CControllerDashboardWidgetEdit extends CController {
 
 		// Prepare data for CMultiSelect controls.
 		$ids = [
-			'action' => [],
-			'graph' => [],
 			'group' => [],
 			'host' => [],
 			'item' => [],
-			'media_type' => [],
-			'prototype_graph' => [],
+			'graph' => [],
 			'prototype_item' => [],
+			'prototype_graph' => [],
 			'service' => [],
 			'sla' => [],
-			'sysmap' => [],
-			'user' => []
+			'user' => [],
+			'action' => [],
+			'media_type' => [],
+			'sysmap' => []
 		];
 
 		foreach ($form->getFields() as $field) {
@@ -427,18 +427,18 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		$inaccessible_resources = [
-			'actions' => _('Inaccessible action'),
-			'graphs' => _('Inaccessible graph'),
-			'graph_prototypes' => _('Inaccessible graph prototype'),
 			'groups' => _('Inaccessible group'),
 			'hosts' => _('Inaccessible host'),
 			'items' => _('Inaccessible item'),
+			'graphs' => _('Inaccessible graph'),
 			'item_prototypes' => _('Inaccessible item prototype'),
-			'maps' => _('Inaccessible map'),
-			'media_types' => _('Inaccessible media type'),
+			'graph_prototypes' => _('Inaccessible graph prototype'),
 			'services' => _('Inaccessible service'),
 			'slas' => _('Inaccessible SLA'),
-			'users' => _('Inaccessible user')
+			'users' => _('Inaccessible user'),
+			'actions' => _('Inaccessible action'),
+			'media_types' => _('Inaccessible media type'),
+			'maps' => _('Inaccessible map')
 		];
 
 		foreach ($captions as $resource_type => &$fields_captions) {
