@@ -20,10 +20,8 @@
 package file
 
 import (
-	//	"bufio"
 	"bytes"
 	"os"
-	//"git.zabbix.com/ap/plugin-support/log"
 	"errors"
 	"fmt"
 	"math"
@@ -128,9 +126,9 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 			}
 		}
 
-	 	if curline >= endline {
-	 		break
-	 	}
+		if curline >= endline {
+			break
+		}
 
 	}
 	return "", nil

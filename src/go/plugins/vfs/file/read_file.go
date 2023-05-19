@@ -21,7 +21,6 @@ package file
 
 import (
 	"fmt"
-	//	"git.zabbix.com/ap/plugin-support/log"
 	"io"
 	"os"
 	"strings"
@@ -73,38 +72,12 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
 	return ee
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Read one text line from a file descriptor into buffer             *
- *                                                                            *
- * Parameters: fd       - [IN] file descriptor to read from                   *
- *             buf      - [OUT] buffer to read into                           *
- *             count    - [IN] buffer size in bytes                           *
- *             encoding - [IN] pointer to a text string describing encoding.  *
- *                        See function zbx_find_cr_lf_szbyte() for supported  *
- *                        encodings.                                          *
- *                        "" (empty string) means a single-byte character set.*
- *                                                                            *
- * Return value: On success, the number of bytes read is returned (0 (zero)   *
- *               indicates end of file).                                      *
- *               On error, -1 is returned and errno is set appropriately.     *
- *                                                                            *
- * Comments: Reading stops after a newline. If the newline is read, it is     *
- *           stored into the buffer.                                          *
- *                                                                            *
- ******************************************************************************/
 func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
-	var i int
-	var szbyte int
-	//	var nbytes int64;
-	var cr []byte
-	var lf []byte
-
+	var i, szbyte int
 	var offset int64
+	var cr, lf []byte
 
 	buf = make([]byte, MAX_BUFFER_LEN)
-	// if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
-	// 	return -1;
 
 	offset, err = targetFile.Seek(0, os.SEEK_CUR)
 	if err != nil {
