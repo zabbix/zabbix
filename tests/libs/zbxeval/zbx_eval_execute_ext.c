@@ -72,23 +72,27 @@ static void	mock_read_callbacks(const char *path)
 			}
 			else
 			{
-				zbx_vector_dbl_t	*values;
+				zbx_vector_var_t	*values;
 
-				values = (zbx_vector_dbl_t *)zbx_malloc(NULL, sizeof(zbx_vector_dbl_t));
-				zbx_vector_dbl_create(values);
+				values = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
+				zbx_vector_var_create(values);
 
 				while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(hdata, &hvalue))))
 				{
+					zbx_variant_t	tmp;
+
 					if (ZBX_MOCK_SUCCESS != err)
 						fail_msg("cannot read callback retval contents");
 
 					if (ZBX_MOCK_SUCCESS != zbx_mock_string(hvalue, &value))
 						fail_msg("cannot read callback retval");
 
-					zbx_vector_dbl_append(values, atof(value));
+					zbx_variant_set_str(&tmp, zbx_strdup(NULL, value));
+					zbx_variant_convert(&tmp, ZBX_VARIANT_DBL);
+					zbx_vector_var_append(values, tmp);
 				}
 
-				zbx_variant_set_dbl_vector(&cb->retval, values);
+				zbx_variant_set_vector(&cb->retval, values);
 			}
 		}
 		else if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hcb, "error", &hdata))
@@ -134,6 +138,7 @@ static int 	callback_cb(const char *name, size_t len, int args_num, zbx_variant_
 				return FAIL;
 			}
 			zbx_variant_copy(value, &cb->retval);
+
 			return SUCCEED;
 		}
 	}

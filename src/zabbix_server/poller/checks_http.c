@@ -22,7 +22,7 @@
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL
-int	get_value_http(const zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	char	*out = NULL, *error = NULL;
 	int	ret;
@@ -31,7 +31,7 @@ int	get_value_http(const zbx_dc_item_t *item, AGENT_RESULT *result)
 			item->posts, item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
 			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
 			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
-			item->status_codes, item->output_format, &out, &error)))
+			item->status_codes, item->output_format, config_source_ip, &out, &error)))
 	{
 		SET_TEXT_RESULT(result, out);
 		out = NULL;

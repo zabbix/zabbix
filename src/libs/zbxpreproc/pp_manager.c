@@ -31,17 +31,17 @@
 #include "zbxcachehistory.h"
 #include "zbxprof.h"
 #include "pp_protocol.h"
-#include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"
 #include "log.h"
-#include "module.h"
 #include "pp_cache.h"
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxrtc.h"
+#include "zbx_rtc_constants.h"
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
@@ -106,17 +106,18 @@ void	zbx_init_library_preproc(zbx_flush_value_func_t flush_value_cb)
  *                                                                            *
  * Purpose: create preprocessing manager                                      *
  *                                                                            *
- * Parameters: workers_num   - [IN] number of workers to create               *
- *             finished_cb   - [IN] callback to call after finishing          *
- *                                  task (optional)                           *
- *             finished_data - [IN] callback data (optional)                  *
- *             error         - [OUT]                                          *
+ * Parameters: workers_num      - [IN] number of workers to create            *
+ *             finished_cb      - [IN] callback to call after finishing       *
+ *                                     task (optional)                        *
+ *             finished_data    - [IN] callback data (optional)               *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT]                                       *
  *                                                                            *
  * Return value: The created manager or NULL on error.                        *
  *                                                                            *
  ******************************************************************************/
 zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t finished_cb,
-		void *finished_data, char **error)
+		void *finished_data, const char *config_source_ip, char **error)
 {
 	int			i, ret = FAIL, started_num = 0;
 	time_t			time_start;
@@ -144,7 +145,7 @@ zbx_pp_manager_t	*zbx_pp_manager_create(int workers_num, zbx_pp_notify_cb_t fini
 	for (i = 0; i < workers_num; i++)
 	{
 		if (SUCCEED != pp_worker_init(&manager->workers[i], i + 1, &manager->queue, manager->timekeeper,
-				error))
+				config_source_ip, error))
 		{
 			goto out;
 		}
@@ -1095,27 +1096,85 @@ static void	preprocessor_finished_task_cb(void *data)
 	zbx_ipc_service_alert((zbx_ipc_service_t *)data);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change worker log level                                           *
+ *                                                                            *
+ ******************************************************************************/
+static void	pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction)
+{
+	if (0 > worker_num || manager->workers_num < worker_num)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for preprocessing worker #%d:"
+				" no such instance", worker_num);
+		return;
+	}
+
+	for (int i = 0; i < manager->workers_num; i++)
+	{
+		if (0 != worker_num && worker_num != i + 1)
+			continue;
+
+		zbx_change_component_log_level(&manager->workers[i].logger, direction);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level for the specified worker(s)                      *
+ *                                                                            *
+ * Parameters: manager   - [IN] preprocessing manager                         *
+ *             direction - [IN] 1) increase, -1) decrease                     *
+ *             data      - [IN] rtc data in json format                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_change_loglevel(zbx_pp_manager_t *manager, int direction, const char *data)
+{
+	char	*error = NULL;
+	pid_t	pid;
+	int	proc_type, proc_num;
+
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	if (0 != pid)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot change log level for preprocessing worker by pid");
+		return;
+	}
+
+	pp_manager_change_worker_loglevel(manager, proc_num, direction);
+}
+
 ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 {
 #define PP_MANAGER_DELAY_SEC	0
 #define PP_MANAGER_DELAY_NS	5e8
 
-	zbx_ipc_service_t		service;
-	char				*error = NULL;
-	zbx_ipc_client_t		*client;
-	zbx_ipc_message_t		*message;
-	int				ret;
-	double				time_stat, time_idle = 0, time_now, time_flush, sec;
-	zbx_timespec_t			timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_thread_pp_manager_args	*pp_args = ((zbx_thread_args_t *)args)->args;
-	zbx_pp_manager_t		*manager;
-	zbx_vector_pp_task_ptr_t	tasks;
-	zbx_uint64_t			pending_num, finished_num, processed_num = 0, queued_num = 0,
-					processing_num = 0;
+	zbx_ipc_service_t			service;
+	char					*error = NULL;
+	zbx_ipc_client_t			*client;
+	zbx_ipc_message_t			*message;
+	double					time_stat, time_idle = 0, time_flush;
+	zbx_timespec_t				timeout = {PP_MANAGER_DELAY_SEC, PP_MANAGER_DELAY_NS};
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_thread_pp_manager_args		*pp_args = ((zbx_thread_args_t *)args)->args;
+	zbx_pp_manager_t			*manager;
+	zbx_vector_pp_task_ptr_t		tasks;
+	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
+	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
+						processing_num = 0;
+
+	const zbx_thread_pp_manager_args	*pp_manager_args_in = (const zbx_thread_pp_manager_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1135,12 +1194,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 	}
 
 	if (NULL == (manager = zbx_pp_manager_create(pp_args->workers_num, preprocessor_finished_task_cb,
-			(void *)&service, &error)))
+			(void *)&service, pp_manager_args_in->config_source_ip, &error)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize preprocessing manager: %s", error);
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
 
@@ -1152,7 +1214,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		time_now = zbx_time();
+		double	time_now = zbx_time();
 
 		if (STAT_INTERVAL < time_now - time_stat)
 		{
@@ -1168,9 +1230,13 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
-		ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
+		int	ret = zbx_ipc_service_recv(&service, &timeout, &client, &message);
+
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-		sec = zbx_time();
+
+		double	sec = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (ZBX_IPC_RECV_IMMEDIATE != ret)
@@ -1198,7 +1264,15 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 				case ZBX_IPC_PREPROCESSOR_USAGE_STATS:
 					preprocessor_reply_usage_stats(manager, pp_args->workers_num, client);
 					break;
-			}
+				case ZBX_RTC_LOG_LEVEL_INCREASE:
+					preprocessor_change_loglevel(manager, 1, (const char *)message->data);
+					break;
+				case ZBX_RTC_LOG_LEVEL_DECREASE:
+					preprocessor_change_loglevel(manager, -1, (const char *)message->data);
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
+					goto out;			}
 
 			zbx_ipc_message_free(message);
 		}
@@ -1233,7 +1307,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 			time_flush = sec;
 		}
 	}
-
+out:
 	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_pp_task_ptr_destroy(&tasks);
@@ -1245,27 +1319,4 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 #undef STAT_INTERVAL
 #undef PP_MANAGER_DELAY_SEC
 #undef PP_MANAGER_DELAY_NS
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change worker log level                                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction)
-{
-	if (0 > worker_num || manager->workers_num < worker_num)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot change log level for preprocessing worker #%d:"
-				" no such instance", worker_num);
-		return;
-	}
-
-	for (int i = 0; i < manager->workers_num; i++)
-	{
-		if (0 != worker_num && worker_num != i + 1)
-			continue;
-
-		zbx_change_component_log_level(&manager->workers[i].logger, direction);
-	}
 }

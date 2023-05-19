@@ -23,5 +23,6 @@
 #include "zbxkvs.h"
 
 int	zbx_cyberark_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *path, long timeout, zbx_kvs_t *kvs, char **error);
+		const char *ssl_key_file, const char *config_source_ip, const char *path, long timeout, zbx_kvs_t *kvs,
+		char **error);
 #endif

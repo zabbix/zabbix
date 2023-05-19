@@ -1678,10 +1678,10 @@ static int	jsonpath_query_next_segment(zbx_jsonpath_context_t *ctx, const char *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	jsonpath_match_name(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *parent, int path_depth)
+static int	jsonpath_match_name(zbx_jsonpath_context_t *ctx, const zbx_jsonobj_t *parent, int path_depth)
 {
 	const zbx_jsonpath_segment_t	*segment = &ctx->path->segments[path_depth];
-	const zbx_jsonpath_list_node_t	*node;
+	zbx_jsonpath_list_node_t	*node;
 	zbx_jsonobj_el_t		el_local, *el;
 
 	/* object contents can match only name list */
@@ -1690,7 +1690,7 @@ static int	jsonpath_match_name(zbx_jsonpath_context_t *ctx, zbx_jsonobj_t *paren
 
 	for (node = segment->data.list.values; NULL != node; node = node->next)
 	{
-		el_local.name = (char *)node->data;
+		el_local.name = node->data;
 		if (NULL != (el = (zbx_jsonobj_el_t *)zbx_hashset_search(&parent->data.object, &el_local)))
 		{
 			if (FAIL == jsonpath_query_next_segment(ctx, el->name, &el->value, path_depth))
@@ -3144,15 +3144,21 @@ static void	jsonobj_index_free(zbx_jsonobj_index_t *index)
  * Purpose: create jsonpath index                                             *
  *                                                                            *
  ******************************************************************************/
-zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void)
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error)
 {
 	zbx_jsonpath_index_t	*index;
+	int			err;
 
 	index = (zbx_jsonpath_index_t *)zbx_malloc(NULL, sizeof(zbx_jsonpath_index_t));
 
-	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
+	if (0 != (err = pthread_mutex_init(&index->lock, NULL)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot initialize jsonpath index mutex: %s", zbx_strerror(err));
+		zbx_free(index);
+		return NULL;
+	}
 
-	pthread_mutex_init(&index->lock, NULL);
+	zbx_vector_jsonobj_index_ptr_create(&index->indexes);
 
 	return index;
 }

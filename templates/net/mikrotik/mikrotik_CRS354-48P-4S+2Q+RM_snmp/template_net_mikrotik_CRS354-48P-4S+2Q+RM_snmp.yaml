@@ -100,6 +100,57 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: 9aa7461f98fa4a5db662b35466b0b102
+          name: 'Mikrotik: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
+          key: net.if.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: c5ff7db372af4f2b92dfe19d45ee1b9d
+          name: 'Mikrotik: SNMP walk wireless interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.14.1.1.2,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.7,1.3.6.1.4.1.14988.1.1.16.1.1.2,1.3.6.1.4.1.14988.1.1.16.1.1.4,1.3.6.1.4.1.14988.1.1.16.1.1.3,1.3.6.1.4.1.14988.1.1.16.1.1.7,1.3.6.1.4.1.14988.1.1.1.3.1.4,1.3.6.1.4.1.14988.1.1.1.3.1.8,1.3.6.1.4.1.14988.1.1.1.3.1.9,1.3.6.1.4.1.14988.1.1.1.3.1.6,1.3.6.1.4.1.14988.1.1.1.3.1.11,1.3.6.1.4.1.14988.1.1.1.7.1.5,1.3.6.1.4.1.14988.1.1.1.7.1.4,1.3.6.1.4.1.14988.1.1.1.7.1.2,1.3.6.1.4.1.14988.1.1.1.7.1.3]'
+          key: net.if.wireless.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 958d90a20a5b42aca9858e6ee7e236bb
+          name: 'Mikrotik: SNMP walk CPU temperature sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.11]'
+          key: sensor.cpu.temp.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: MIKROTIK-MIB
+            Discovering CPU temperature sensors.
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 686390022e2449d4a41e07f409381f28
+          name: 'Mikrotik: SNMP walk temperature sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.14988.1.1.3.10]'
+          key: sensor.temp.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: MIKROTIK-MIB
+            Discovering temperature sensors.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 93d399db31b64d36bfe87a1f99195663
           name: 'Mikrotik: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -133,6 +184,20 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: eae8e0a3cf144efc8decc672413bf511
+          name: 'Mikrotik: SNMP walk system CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.2.1.25.3.3.1.2]'
+          key: system.cpu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            Discovering system CPUs.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 38a1523e8ce54611842e76fd4f614c15
           name: 'Mikrotik: System description'
           type: SNMP_AGENT
@@ -380,6 +445,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: e1fc1f83c9754629ba9c77af9edcaabe
+          name: 'Mikrotik: SNMP walk mounted filesystems'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.3,1.3.6.1.2.1.25.2.3.1.4,1.3.6.1.2.1.25.2.3.1.2,1.3.6.1.2.1.25.2.3.1.6,1.3.6.1.2.1.25.2.3.1.5]'
+          key: vfs.fs.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            Discovering mounted filesystems.
+          tags:
+            - tag: component
+              value: raw
         - uuid: b319b01c532f453aa0b39c6cac9c06e8
           name: 'Mikrotik: Total memory'
           type: SNMP_AGENT
@@ -480,23 +559,29 @@ zabbix_export:
       discovery_rules:
         - uuid: 95a34c80dcd848e3b5ccad0f57a06532
           name: 'CPU discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
+          type: DEPENDENT
           key: hrProcessorLoad.discovery
-          delay: 1h
-          description: 'HOST-RESOURCES-MIB::hrProcessorTable discovery'
+          delay: '0'
+          description: 'HOST-RESOURCES-MIB::hrProcessorTable discovery.'
           item_prototypes:
             - uuid: a1d0f17280d543bb825830f808dad88a
               name: '#{#SNMPINDEX}: CPU utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The average, over the last minute, of the percentage of time that this processor was not idle. Implementations may approximate this one minute smoothing period if necessary.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.25.3.3.1.2.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
@@ -522,22 +607,31 @@ zabbix_export:
                   item:
                     host: 'MikroTik CRS354-48P-4S2QRM by SNMP'
                     key: 'system.cpu.util[hrProcessorLoad.{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.2.1.25.3.3.1.1
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 84b79932cea04e7fa9dc64fe119a2825
           name: 'Temperature CPU discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.11]'
+          type: DEPENDENT
           key: mtxrHlProcessorTemperature.discovery
-          delay: 1h
+          delay: '0'
           description: |
             MIKROTIK-MIB::mtxrHlProcessorTemperature
             Since temperature of CPU is not available on all Mikrotik hardware, this is done to avoid unsupported items.
           item_prototypes:
             - uuid: 13f73255283f4f6b923edae51f98f5f6
               name: 'CPU: Temperature'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.value[mtxrHlProcessorTemperature.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: °C
@@ -546,9 +640,18 @@ zabbix_export:
                 mtxrHlProcessorTemperature Processor temperature in Celsius (degrees C).
                 Might be missing in entry models (RB750, RB450G..).
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.3.11.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '0.1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.cpu.temp.walk
               tags:
                 - tag: component
                   value: temperature
@@ -598,22 +701,32 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.cpu.temp.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.14988.1.1.3.11
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 2ed1bdac264e4d05b1873e69c17cc288
           name: 'Temperature sensor discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.14988.1.1.3.10]'
+          type: DEPENDENT
           key: mtxrHlTemperature.discovery
-          delay: 1h
+          delay: '0'
           description: |
             MIKROTIK-MIB::mtxrHlTemperature
             Since temperature sensor is not available on all Mikrotik hardware, this is done to avoid unsupported items.
           item_prototypes:
             - uuid: 1d1fbc3838c341cc9b874721a824deef
               name: 'Device: Temperature'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.value[mtxrHlTemperature.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: °C
@@ -624,9 +737,18 @@ zabbix_export:
                 
                 Reference: http://wiki.mikrotik.com/wiki/Manual:SNMP
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.3.10.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '0.1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
@@ -676,12 +798,23 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.temp.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.14988.1.1.3.10
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 1250fe89b2b645adb6d8a444e286c34a
           name: 'LTE modem discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: mtxrLTEModem.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -691,19 +824,26 @@ zabbix_export:
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.LTEMODEM.MATCHES}'
                 formulaid: A
-          description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex'
+          description: 'MIKROTIK-MIB::mtxrLTEModemInterfaceIndex.'
           item_prototypes:
             - uuid: 65bd1f9096914fa5952a842f869376e3
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRP'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'lte.modem.rsrp[mtxrLTEModemSignalRSRP.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: dbm
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSRP Reference Signal Received Power.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.16.1.1.4.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -724,15 +864,22 @@ zabbix_export:
                       value: performance
             - uuid: da6ebd895cb7465d964de43bb1f97125
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSRQ'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'lte.modem.rsrq[mtxrLTEModemSignalRSRQ.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: db
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSRQ Reference Signal Received Quality.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.16.1.1.3.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -753,15 +900,22 @@ zabbix_export:
                       value: performance
             - uuid: 817d4b9c195c4b74a986dee3f509d56f
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem RSSI'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: dbm
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalRSSI Received Signal Strength Indicator.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.16.1.1.2.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -782,15 +936,22 @@ zabbix_export:
                       value: performance
             - uuid: 3031a59f08914941ae9f7fc8f494b132
               name: 'Interface {#IFNAME}({#IFALIAS}): LTE modem SINR'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'lte.modem.sinr[mtxrLTEModemSignalSINR.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: db
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrLTEModemSignalSINR Signal to Interference & Noise Ratio.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.16.1.1.7.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -832,12 +993,28 @@ zabbix_export:
                   item:
                     host: 'MikroTik CRS354-48P-4S2QRM by SNMP'
                     key: 'lte.modem.rssi[mtxrLTEModemSignalRSSI.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.wireless.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFNAME}'
+                - 1.3.6.1.4.1.14988.1.1.14.1.1.2
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: e8d513955f9b4f819c408cf3aac35ec1
           name: 'AP channel discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7]'
+          type: DEPENDENT
           key: mtxrWlAp.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -847,17 +1024,24 @@ zabbix_export:
               - macro: '{#IFADMINSTATUS}'
                 value: ^1$
                 formulaid: A
-          description: 'MIKROTIK-MIB::mtxrWlAp'
+          description: 'MIKROTIK-MIB::mtxrWlAp.'
           item_prototypes:
             - uuid: 22665dbacc9d48d985d7ca4e463319b5
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.authclient[mtxrWlApAuthClientCount.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApAuthClientCount Number of authentication clients.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.3.1.11.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -867,9 +1051,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 18664eb3c8dd4e768f9de382ee8bba85
               name: 'Interface {#IFNAME}({#IFALIAS}): AP band'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.band[mtxrWlApBand.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
@@ -877,9 +1061,15 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrWlApBand
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.3.1.8.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -889,9 +1079,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: a6badb125d8d412a8d9142882ab4b956
               name: 'Interface {#IFNAME}({#IFALIAS}): SSID'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.name[mtxrWlApSsid.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
@@ -899,9 +1089,15 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrWlApSsid Service Set Identifier.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.3.1.4.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -911,18 +1107,24 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: bb2ad51473f04db188bd4e335591b94b
               name: 'Interface {#IFNAME}({#IFALIAS}): AP noise floor'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.noise[mtxrWlApNoiseFloor.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApNoiseFloor
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.3.1.9.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 15m
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -932,13 +1134,20 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 8afb3efbe69e4541bc74760ab4ba3130
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.regclient[mtxrWlApClientCount.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlApClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.3.1.6.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -946,12 +1155,31 @@ zabbix_export:
                   value: network
                 - tag: interface
                   value: '{#IFNAME}'
+          master_item:
+            key: net.if.wireless.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFNAME}'
+                - 1.3.6.1.4.1.14988.1.1.14.1.1.2
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 829a233a44aa4cd2880732ad863d2d27
           name: 'CAPsMAN AP channel discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFNAME},1.3.6.1.4.1.14988.1.1.14.1.1.2,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: mtxrWlCMChannel.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -961,17 +1189,24 @@ zabbix_export:
               - macro: '{#IFNAME}'
                 value: '{$IFNAME.WIFI.MATCHES}'
                 formulaid: A
-          description: 'MIKROTIK-MIB::mtxrWlCMChannel'
+          description: 'MIKROTIK-MIB::mtxrWlCMChannel.'
           item_prototypes:
             - uuid: b2a8832875e14a0f9639de640f260e92
               name: 'Interface {#IFNAME}({#IFALIAS}): AP authenticated clients'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.authclient[mtxrWlCMAuthClientCount.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMAuthClientCount Number of authentication clients.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.7.1.3.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -981,9 +1216,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 7e4ba0da31a24287b12f07940f449131
               name: 'Interface {#IFNAME}({#IFALIAS}): AP channel'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.channel[mtxrWlCMChannel.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
@@ -991,9 +1226,15 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrWlCMChannel
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.7.1.5.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -1003,13 +1244,20 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 30511ea997e740d2a6313005e7f56a71
               name: 'Interface {#IFNAME}({#IFALIAS}): AP registered clients'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.regclient[mtxrWlCMRegClientCount.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: MIKROTIK-MIB
                 mtxrWlCMRegClientCount Client established connection to AP, but didn't finish all authentication procedures for full connection.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.7.1.2.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -1019,9 +1267,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 01e691a3d2fb401484af4e768cab09b7
               name: 'Interface {#IFNAME}({#IFALIAS}): AP state'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'ssid.state[mtxrWlCMState.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
@@ -1029,9 +1277,15 @@ zabbix_export:
                 MIB: MIKROTIK-MIB
                 mtxrWlCMState Wireless interface state.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.14988.1.1.1.7.1.4.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.wireless.walk
               tags:
                 - tag: component
                   value: interface
@@ -1050,12 +1304,28 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: net.if.wireless.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFNAME}'
+                - 1.3.6.1.4.1.14988.1.1.14.1.1.2
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 71bd3db236e245299334bf7b03e3b7da
           name: 'Network interfaces discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: net.if.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1105,10 +1375,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 4ef7919acd4a45ed93214a6a940c8f39
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -1118,9 +1387,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1130,18 +1408,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: f28824308896450f8e9b2842dd103db6
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1151,22 +1437,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: ae10194c5e7f465b902f0cb20f7b8776
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1176,10 +1467,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: b07c109994db4a5eaa065589c54edcc1
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -1189,9 +1479,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1201,18 +1500,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 90b82a51bd104a79804213b1b566fb5a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1222,22 +1529,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 65dfa7a917a24279823f3c5bac76c1d9
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1247,10 +1559,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: b19861fbf90c474c99f644c6880cf813
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
-              delay: 5m
+              delay: '0'
               history: 7d
               trends: '0'
               units: bps
@@ -1258,12 +1569,18 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1273,9 +1590,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: cf3c4275cfe1466ab07d672031bac4af
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -1289,6 +1606,13 @@ zabbix_export:
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1317,10 +1641,9 @@ zabbix_export:
                       value: availability
             - uuid: 91c1bbf2dd264ee3a0f741d4398cf02a
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: 1h
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -1331,9 +1654,15 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1455,12 +1784,37 @@ zabbix_export:
                   item:
                     host: 'MikroTik CRS354-48P-4S2QRM by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 0cad2cd6715f44d6a912a63cdc15926b
           name: 'Storage discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4,{#STORAGE_TYPE},1.3.6.1.2.1.25.2.3.1.2]'
+          type: DEPENDENT
           key: storage.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: OR
             conditions:
@@ -1470,7 +1824,7 @@ zabbix_export:
               - macro: '{#STORAGE_TYPE}'
                 value: .+hrStorageFixedDisk
                 formulaid: B
-          description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter'
+          description: 'HOST-RESOURCES-MIB::hrStorage discovery with storage filter.'
           item_prototypes:
             - uuid: 00bc5ff9329240978654621ee37af739
               name: 'Disk-{#SNMPINDEX}: Space utilization'
@@ -1488,9 +1842,9 @@ zabbix_export:
                   value: '{#FSNAME}'
             - uuid: 435c8ca87deb4fbfad0df451c9b3dc57
               name: 'Disk-{#SNMPINDEX}: Total space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
@@ -1505,9 +1859,15 @@ zabbix_export:
                 the amount of disk space allocated to virtual memory
                 might be modified.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+              master_item:
+                key: vfs.fs.walk
               tags:
                 - tag: component
                   value: storage
@@ -1515,18 +1875,24 @@ zabbix_export:
                   value: '{#FSNAME}'
             - uuid: 5c7b4cf01d2d4b8f9cb5022a54b4593d
               name: 'Disk-{#SNMPINDEX}: Used space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+              master_item:
+                key: vfs.fs.walk
               tags:
                 - tag: component
                   value: storage
@@ -1596,6 +1962,23 @@ zabbix_export:
                   item:
                     host: 'MikroTik CRS354-48P-4S2QRM by SNMP'
                     key: 'vfs.fs.used[hrStorageSize.{#SNMPINDEX}]'
+          master_item:
+            key: vfs.fs.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#FSNAME}'
+                - 1.3.6.1.2.1.25.2.3.1.3
+                - '0'
+                - '{#ALLOC_UNITS}'
+                - 1.3.6.1.2.1.25.2.3.1.4
+                - '0'
+                - '{#STORAGE_TYPE}'
+                - 1.3.6.1.2.1.25.2.3.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: network

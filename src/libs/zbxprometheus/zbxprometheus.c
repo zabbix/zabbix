@@ -1643,6 +1643,15 @@ static void	prometheus_filter_rows(zbx_vector_prometheus_row_t *rows, zbx_promet
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, rows_out->values_num);
 }
 
+static void	prometheus_hint_clear(void *d)
+{
+	zbx_prometheus_hint_t	*hint = (zbx_prometheus_hint_t *)d;
+
+	zbx_free(hint->metric);
+	zbx_free(hint->help);
+	zbx_free(hint->type);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse prometheus input and initialize cache                       *
@@ -1663,6 +1672,9 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 	zbx_vector_prometheus_row_create(&prom->rows);
 	zbx_vector_prometheus_label_index_create(&prom->indexes);
 
+	zbx_hashset_create_ext(&prom->hints, 100, prometheus_hint_hash, prometheus_hint_compare, prometheus_hint_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
 	if (0 != pthread_mutex_init(&prom->index_lock, NULL))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot initialize prometheus cache: %s", zbx_strerror(errno));
@@ -1672,7 +1684,7 @@ int	zbx_prometheus_init(zbx_prometheus_t *prom, const char *data, char **error)
 	if (SUCCEED != prometheus_filter_init(&filter, NULL, error))
 		goto out;
 
-	if (FAIL == prometheus_parse_rows(&filter, data, &prom->rows, NULL, error))
+	if (FAIL == prometheus_parse_rows(&filter, data, &prom->rows, &prom->hints, error))
 		goto out;
 
 	ret = SUCCEED;
@@ -1709,6 +1721,8 @@ static void	prometheus_label_index_free(zbx_prometheus_label_index_t *label_inde
  ******************************************************************************/
 void	zbx_prometheus_clear(zbx_prometheus_t *prom)
 {
+	zbx_hashset_destroy(&prom->hints);
+
 	zbx_vector_prometheus_label_index_clear_ext(&prom->indexes, prometheus_label_index_free);
 	zbx_vector_prometheus_label_index_destroy(&prom->indexes);
 
@@ -2040,48 +2054,27 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts filtered prometheus data to json to be used with LLD     *
+ * Purpose: converts filtered prometheus rows to json to be used with LLD     *
  *                                                                            *
- * Parameters: data        - [IN] the prometheus data                         *
- *             filter_data - [IN] the filter in text format                   *
- *             value       - [OUT] the converted data                         *
- *             error       - [OUT] the error message                          *
+ * Parameters: rows  - [IN] filtered prometheus rows                          *
+ *             hints - [IN] prometheus hints                                  *
+ *             value - [OUT] the converted data                               *
  *                                                                            *
  * Return value: SUCCEED - the data was converted successfully                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error)
+static void	prometheus_to_json(zbx_vector_prometheus_row_t *rows, zbx_hashset_t *hints, char **value)
 {
-	zbx_prometheus_filter_t		filter;
-	char				*errmsg = NULL;
-	int				ret = FAIL, i, j;
-	zbx_vector_prometheus_row_t	rows;
-	zbx_hashset_t			hints;
-	zbx_prometheus_hint_t		*hint, hint_local;
-	zbx_hashset_iter_t		iter;
-	struct zbx_json			json;
+	int			i, j;
+	struct zbx_json		json;
+	zbx_prometheus_hint_t	*hint, hint_local;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zbx_json_initarray(&json, (size_t)rows->values_num * 100);
 
-	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
+	for (i = 0; i < rows->values_num; i++)
 	{
-		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
-		zbx_free(errmsg);
-		goto out;
-	}
-
-	zbx_vector_prometheus_row_create(&rows);
-	zbx_hashset_create(&hints, 100, prometheus_hint_hash, prometheus_hint_compare);
-
-	if (FAIL == prometheus_parse_rows(&filter, data, &rows, &hints, error))
-		goto cleanup;
-
-	zbx_json_initarray(&json, (size_t)rows.values_num * 100);
-
-	for (i = 0; i < rows.values_num; i++)
-	{
-		zbx_prometheus_row_t	*row = rows.values[i];
+		zbx_prometheus_row_t	*row =rows->values[i];
 		char			*hint_type;
 
 		zbx_json_addobject(&json, NULL);
@@ -2104,7 +2097,7 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 		}
 
 		hint_local.metric = row->metric;
-		hint = (zbx_prometheus_hint_t *)zbx_hashset_search(&hints, &hint_local);
+		hint = (zbx_prometheus_hint_t *)zbx_hashset_search(hints, &hint_local);
 
 #define ZBX_PROMETHEUS_TYPE_UNTYPED	"untyped"
 
@@ -2121,23 +2114,96 @@ int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **val
 
 	*value = zbx_strdup(NULL, json.buffer);
 	zbx_json_free(&json);
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): output:%s", __func__, *value);
-	ret = SUCCEED;
-cleanup:
-	zbx_hashset_iter_reset(&hints, &iter);
-	while (NULL != (hint = (zbx_prometheus_hint_t *)zbx_hashset_iter_next(&iter)))
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts cached prometheus data to json to be used with LLD       *
+ *                                                                            *
+ * Parameters: prom        - [IN] the prometheus cache                        *
+ *             filter_data - [IN] the filter in text format                   *
+ *             value       - [OUT] the converted data                         *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the data was converted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, char **value, char **error)
+{
+	zbx_vector_prometheus_row_t	rows;
+	zbx_prometheus_filter_t		filter;
+	char				*errmsg = NULL;
+	int				ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
 	{
-		zbx_free(hint->metric);
-		zbx_free(hint->help);
-		zbx_free(hint->type);
+		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
 	}
+
+	zbx_vector_prometheus_row_create(&rows);
+
+	prometheus_filter_rows(&prom->rows, &filter, &rows);
+
+	prometheus_to_json(&rows, &prom->hints, value);
+	zbx_vector_prometheus_row_destroy(&rows);
+	prometheus_filter_clear(&filter);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: converts filtered prometheus data to json to be used with LLD     *
+ *                                                                            *
+ * Parameters: data        - [IN] the prometheus data                         *
+ *             filter_data - [IN] the filter in text format                   *
+ *             value       - [OUT] the converted data                         *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - the data was converted successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error)
+{
+	zbx_prometheus_filter_t		filter;
+	char				*errmsg = NULL;
+	int				ret = FAIL;
+	zbx_vector_prometheus_row_t	rows;
+	zbx_hashset_t			hints;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (FAIL == prometheus_filter_init(&filter, filter_data, &errmsg))
+	{
+		*error = zbx_dsprintf(*error, "pattern error: %s", errmsg);
+		zbx_free(errmsg);
+		goto out;
+	}
+
+	zbx_vector_prometheus_row_create(&rows);
+	zbx_hashset_create_ext(&hints, 100, prometheus_hint_hash, prometheus_hint_compare, prometheus_hint_clear,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	if (FAIL != (ret = prometheus_parse_rows(&filter, data, &rows, &hints, error)))
+		prometheus_to_json(&rows, &hints, value);
+
 	zbx_hashset_destroy(&hints);
 
 	zbx_vector_prometheus_row_clear_ext(&rows, prometheus_row_free);
 	zbx_vector_prometheus_row_destroy(&rows);
 	prometheus_filter_clear(&filter);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:%s", __func__, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*value));
 	return ret;
 }
 

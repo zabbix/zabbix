@@ -39,8 +39,6 @@
 #endif
 #define ZBX_HTTPAUTH_NTLM		CURLAUTH_NTLM
 
-extern char	*CONFIG_SOURCE_IP;
-
 typedef struct
 {
 	CURL			*handle;
@@ -186,7 +184,7 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_SSL_VERIFYHOST, 0L, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERFUNCTION, curl_header_cb, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
-	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, env->config_source_ip, err);
 
 	duk_push_pointer(ctx, request);
 	duk_put_prop_string(ctx, -2, "\xff""\xff""d");

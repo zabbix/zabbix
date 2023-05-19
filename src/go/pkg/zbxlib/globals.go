@@ -27,11 +27,12 @@ ZBX_PROPERTY_DECL(int, config_timeout, 3)
 ZBX_PROPERTY_DECL(int, config_enable_remote_commands, 1)
 ZBX_PROPERTY_DECL(int, config_log_remote_commands, 0)
 ZBX_PROPERTY_DECL(int, config_unsafe_user_parameters, 0)
+ZBX_PROPERTY_DECL(const char*, config_source_ip, NULL)
 
 void	init_globals(void)
 {
 	zbx_init_library_sysinfo(get_config_timeout, get_config_enable_remote_commands,
-			get_config_log_remote_commands, get_config_unsafe_user_parameters);
+			get_config_log_remote_commands, get_config_unsafe_user_parameters, get_config_source_ip);
 }
 */
 import "C"

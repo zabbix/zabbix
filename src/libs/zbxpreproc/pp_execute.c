@@ -270,6 +270,12 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 	{
 		zbx_pp_cache_jsonpath_t	*index;
 
+		if (NULL != cache->error)
+		{
+			*errmsg = zbx_strdup(NULL, cache->error);
+			return FAIL;
+		}
+
 		if (NULL == (index = (zbx_pp_cache_jsonpath_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -279,13 +285,20 @@ static int	pp_excute_jsonpath_query(zbx_pp_cache_t *cache, zbx_variant_t *value,
 
 			if (SUCCEED != zbx_jsonobj_open(value->data.str, &index->obj))
 			{
-				*errmsg = zbx_strdup(*errmsg, zbx_json_strerror());
+				cache->error = zbx_strdup(NULL, zbx_json_strerror());
+				*errmsg = zbx_strdup(NULL, cache->error);
+				zbx_free(index);
+				return FAIL;
+			}
+
+			if (NULL == (index->index = zbx_jsonpath_index_create(errmsg)))
+			{
+				zbx_jsonobj_clear(&index->obj);
 				zbx_free(index);
 				cache->type = ZBX_PREPROC_NONE;
 				return FAIL;
 			}
 
-			index->index = zbx_jsonpath_index_create();
 			cache->data = (void *)index;
 		}
 
@@ -627,22 +640,26 @@ static int	pp_throttle_timed_value(zbx_variant_t *value, zbx_timespec_t ts, cons
  *                                                                            *
  * Purpose: execute 'script' step                                             *
  *                                                                            *
- * Parameters: ctx           - [IN] worker specific execution context         *
- *             value         - [IN/OUT] input/output value                    *
- *             params        - [IN] step parameters                           *
- *             history_value - [IN/OUT] script bytecode                       *
+ * Parameters: ctx              - [IN] worker specific execution context      *
+ *             value            - [IN/OUT] input/output value                 *
+ *             params           - [IN] step parameters                        *
+ *             history_value    - [IN/OUT] script bytecode                    *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
 static int	pp_execute_script(zbx_pp_context_t *ctx, zbx_variant_t *value, const char *params,
-		zbx_variant_t *history_value)
+		zbx_variant_t *history_value, const char *config_source_ip)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED == item_preproc_script(pp_context_es_engine(ctx), value, params, history_value, &errmsg))
+	if (SUCCEED == item_preproc_script(pp_context_es_engine(ctx), value, params, history_value, config_source_ip,
+			&errmsg))
+	{
 		return SUCCEED;
+	}
 
 	zbx_variant_clear(value);
 	zbx_variant_set_error(value, errmsg);
@@ -696,6 +713,12 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 	{
 		zbx_prometheus_t	*prom_cache;
 
+		if (NULL != cache->error)
+		{
+			err = zbx_strdup(NULL, cache->error);
+			goto out;
+		}
+
 		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
 		{
 			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
@@ -703,10 +726,10 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
 
-			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &err))
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &cache->error))
 			{
 				zbx_free(prom_cache);
-				cache->type = ZBX_PREPROC_NONE;
+				err = zbx_strdup(NULL, cache->error);
 				goto out;
 			}
 
@@ -715,6 +738,9 @@ static int	pp_execute_prometheus_query(zbx_pp_cache_t *cache, zbx_variant_t *val
 
 		ret = zbx_prometheus_pattern_ex(prom_cache, pattern, request, output, &value_out, &err);
 	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
 out:
 	zbx_free(pattern);
 
@@ -726,9 +752,6 @@ out:
 		zbx_free(err);
 		return FAIL;
 	}
-
-	zbx_variant_clear(value);
-	zbx_variant_set_str(value, value_out);
 
 	return SUCCEED;
 }
@@ -760,20 +783,92 @@ static int	pp_execute_prometheus_pattern(zbx_pp_cache_t *cache, zbx_variant_t *v
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: execute 'prometheus to json' conversion                           *
+ *                                                                            *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
+ *             params - [IN] step parameters                                  *
+ *             errmsg - [OUT] error message                                   *
+ *                                                                            *
+ * Result value: SUCCEED - the preprocessing step was executed successfully.  *
+ *               FAIL    - otherwise.                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	pp_execute_prometheus_to_json_conversion(zbx_pp_cache_t *cache, zbx_variant_t *value,
+		const char *params, char **errmsg)
+{
+	char	*value_out = NULL, *err = NULL;
+	int	ret = FAIL;
+
+	if (NULL == cache || ZBX_PREPROC_PROMETHEUS_PATTERN != cache->type)
+	{
+		if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+			goto out;
+
+		ret = zbx_prometheus_to_json(value->data.str, params, &value_out, &err);
+	}
+	else
+	{
+		zbx_prometheus_t	*prom_cache;
+
+		if (NULL != cache->error)
+		{
+			err = zbx_strdup(NULL, cache->error);
+			goto out;
+		}
+
+		if (NULL == (prom_cache = (zbx_prometheus_t *)cache->data))
+		{
+			if (FAIL == item_preproc_convert_value(value, ZBX_VARIANT_STR, errmsg))
+				goto out;
+
+			prom_cache = (zbx_prometheus_t *)zbx_malloc(NULL, sizeof(zbx_prometheus_t));
+
+			if (SUCCEED != zbx_prometheus_init(prom_cache, value->data.str, &cache->error))
+			{
+				zbx_free(prom_cache);
+				err = zbx_strdup(NULL, cache->error);
+				goto out;
+			}
+
+			cache->data = (void *)prom_cache;
+		}
+
+		ret = zbx_prometheus_to_json_ex(prom_cache, params, &value_out, &err);
+	}
+
+	zbx_variant_clear(value);
+	zbx_variant_set_str(value, value_out);
+out:
+	if (FAIL == ret)
+	{
+		if (NULL == *errmsg)
+			*errmsg = zbx_dsprintf(*errmsg, "cannot convert Prometheus data to JSON: %s", err);
+
+		zbx_free(err);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: execute 'prometheus to json' step                                 *
  *                                                                            *
- * Parameters: value  - [IN/OUT] value to process                             *
+ * Parameters: cache  - [IN] preprocessing cache                              *
+ *             value  - [IN/OUT] value to process                             *
  *             params - [IN] step parameters                                  *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
  *                                                                            *
  ******************************************************************************/
-static int	pp_execute_prometheus_to_json(zbx_variant_t *value, const char *params)
+static int	pp_execute_prometheus_to_json(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params)
 {
 	char	*errmsg = NULL;
 
-	if (SUCCEED == item_preproc_prometheus_to_json(value, params, &errmsg))
+	if (SUCCEED == pp_execute_prometheus_to_json_conversion(cache, value, params, &errmsg))
 		return SUCCEED;
 
 	zbx_variant_clear(value);
@@ -906,16 +1001,17 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  *                                                                            *
  * Purpose: execute preprocessing step                                        *
  *                                                                            *
- * Parameters: ctx           - [IN] worker specific execution context         *
- *             cache         - [IN] preprocessing cache                       *
- *             um_handle     - [IN] shared user macro cache handle            *
- *             hostid        - [IN] item host identifier                      *
- *             value_type    - [IN] item value type                           *
- *             value         - [IN/OUT] input/output value                    *
- *             ts            - [IN] value timestamp                           *
- *             step          - [IN] step to execute                           *
- *             history_value - [IN/OUT] last value                            *
- *             history_ts    - [IN/OUT] last value timestamp                  *
+ * Parameters: ctx              - [IN] worker specific execution context      *
+ *             cache            - [IN] preprocessing cache                    *
+ *             um_handle        - [IN] shared user macro cache handle         *
+ *             hostid           - [IN] item host identifier                   *
+ *             value_type       - [IN] item value type                        *
+ *             value            - [IN/OUT] input/output value                 *
+ *             ts               - [IN] value timestamp                        *
+ *             step             - [IN] step to execute                        *
+ *             history_value    - [IN/OUT] last value                         *
+ *             history_ts       - [IN/OUT] last value timestamp               *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -923,7 +1019,8 @@ static int	pp_execute_snmp_to_json(zbx_variant_t *value, const char *params)
  ******************************************************************************/
 int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shared_handle_t *um_handle,
 		zbx_uint64_t hostid, unsigned char value_type, zbx_variant_t *value, zbx_timespec_t ts,
-		zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts)
+		const zbx_pp_step_t *step, zbx_variant_t *history_value, zbx_timespec_t *history_ts,
+		const char *config_source_ip)
 {
 	int	ret;
 	char	*params = NULL;
@@ -1004,13 +1101,13 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = pp_throttle_timed_value(value, ts, params, history_value, history_ts);
 			goto out;
 		case ZBX_PREPROC_SCRIPT:
-			ret = pp_execute_script(ctx, value, params, history_value);
+			ret = pp_execute_script(ctx, value, params, history_value, config_source_ip);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_PATTERN:
 			ret = pp_execute_prometheus_pattern(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_PROMETHEUS_TO_JSON:
-			ret = pp_execute_prometheus_to_json(value, params);
+			ret = pp_execute_prometheus_to_json(cache, value, params);
 			goto out;
 		case ZBX_PREPROC_CSV_TO_JSON:
 			ret = pp_execute_csv_to_json(value, params);
@@ -1045,20 +1142,22 @@ out:
  *                                                                            *
  * Purpose: execute preprocessing steps                                       *
  *                                                                            *
- * Parameters: ctx             - [IN] worker specific execution context       *
- *             preproc         - [IN] item preprocessing data                 *
- *             cache           - [IN] preprocessing cache                     *
- *             um_handle       - [IN] shared user macro cache handle          *
- *             value_in        - [IN]                                         *
- *             ts              - [IN] value timestamp                         *
- *             value_out       - [OUT]                                        *
- *             results_out     - [OUT] results for each step (optional)       *
- *             results_num_out - [OUT] number of results (optional)           *
+ * Parameters: ctx              - [IN] worker specific execution context      *
+ *             preproc          - [IN] item preprocessing data                *
+ *             cache            - [IN] preprocessing cache                    *
+ *             um_handle        - [IN] shared user macro cache handle         *
+ *             value_in         - [IN]                                        *
+ *             ts               - [IN] value timestamp                        *
+ *             config_source_ip - [IN]                                        *
+ *             value_out        - [OUT]                                       *
+ *             results_out      - [OUT] results for each step (optional)      *
+ *             results_num_out  - [OUT] number of results (optional)          *
  *                                                                            *
  ******************************************************************************/
 void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_cache_t *cache,
 		zbx_dc_um_shared_handle_t *um_handle, zbx_variant_t *value_in, zbx_timespec_t ts,
-		zbx_variant_t *value_out, zbx_pp_result_t **results_out, int *results_num_out)
+		const char *config_source_ip, zbx_variant_t *value_out, zbx_pp_result_t **results_out,
+		int *results_num_out)
 {
 	zbx_pp_result_t		*results;
 	zbx_pp_history_t	*history;
@@ -1110,7 +1209,7 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 		zbx_pp_history_pop(preproc->history, i, &history_value, &history_ts);
 
 		if (SUCCEED != pp_execute_step(ctx, cache, um_handle, preproc->hostid, preproc->value_type, value_out,
-				ts, preproc->steps + i, &history_value, &history_ts))
+				ts, preproc->steps + i, &history_value, &history_ts, config_source_ip))
 		{
 			zbx_variant_copy(&value_raw, value_out);
 			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(value_out, preproc->steps + i)))
