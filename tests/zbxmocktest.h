@@ -40,6 +40,7 @@ int	get_config_forks(unsigned char process_type);
 void	set_config_forks(unsigned char process_type, int forks);
 
 int	get_zbx_config_timeout(void);
+const char	*get_zbx_config_source_ip(void);
 int	get_zbx_config_enable_remote_commands(void);
 int	get_zbx_config_log_remote_commands(void);
 int	get_zbx_config_unsafe_user_parameters(void);

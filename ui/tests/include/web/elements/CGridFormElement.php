@@ -40,9 +40,14 @@ class CGridFormElement extends CFormElement {
 
 		foreach ($this->query('xpath', implode('|', $selectors))->all() as $grid) {
 			$has_label = false;
-			foreach ($grid->query('xpath:./*')->all() as $element) {
+			foreach ($grid->query('xpath:./*|./fieldset/legend/..|./fieldset/*')->all() as $element) {
 				if ($element->getTagName() === 'label') {
 					$labels[] = $element;
+
+					$has_label = true;
+				}
+				elseif ($element->getTagName() === 'fieldset') {
+					$labels[] = $element->asFieldset();
 
 					$has_label = true;
 				}
@@ -74,6 +79,10 @@ class CGridFormElement extends CFormElement {
 	 * @return CElement|CNullElement
 	 */
 	public function getFieldByLabelElement($label) {
+		if ($label instanceof CFieldsetElement) {
+			return $label;
+		}
+
 		if (($element = CElementQuery::getInputElement($label, './'.self::TABLE_FORM_FIELD))->isValid()) {
 			return $element;
 		}
@@ -109,6 +118,15 @@ class CGridFormElement extends CFormElement {
 	 * @return CElementCollection
 	 */
 	protected function findLabels($name) {
-		return $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.CXPathHelper::escapeQuotes($name).']')->all();
+		$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/label[text()='.
+				CXPathHelper::escapeQuotes($name).']|.//div[contains(@class, "form-grid")]/fieldset/label[text()='.
+				CXPathHelper::escapeQuotes($name).']')->all();
+
+		if ($labels->isEmpty()) {
+			$labels = $this->query('xpath:.//div[contains(@class, "form-grid")]/fieldset/legend/button/span[text()='.
+					CXPathHelper::escapeQuotes($name).']/../../..')->asFieldset()->all();
+		}
+
+		return $labels;
 	}
 }

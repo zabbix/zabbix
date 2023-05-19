@@ -36,6 +36,12 @@
 
 typedef struct
 {
+	const char *config_source_ip;
+}
+zbx_thread_vmware_args;
+
+typedef struct
+{
 	char		*name;
 	zbx_uint64_t	value;
 }
@@ -571,9 +577,9 @@ void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	zbx_vmware_service_update(zbx_vmware_service_t *service);
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service);
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service);
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip);
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip);
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);

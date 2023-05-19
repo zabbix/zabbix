@@ -18,6 +18,7 @@
 **/
 
 #include "dbupgrade.h"
+
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
 #include "log.h"
@@ -170,12 +171,31 @@ static int	DBpatch_6050013(void)
 
 static int	DBpatch_6050014(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from widget_field"
+			" where name='adv_conf' and widgetid in ("
+				"select widgetid"
+				" from widget"
+				" where type in ('clock', 'item')"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050015(void)
+{
 	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
-static int	DBpatch_6050015(void)
+static int	DBpatch_6050016(void)
 {
 	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR,
 			ZBX_NOTNULL | ZBX_PROXY, 0};
@@ -183,28 +203,28 @@ static int	DBpatch_6050015(void)
 	return DBmodify_field_type("httptest", &field, NULL);
 }
 
-static int	DBpatch_6050016(void)
+static int	DBpatch_6050017(void)
 {
 	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
 
-static int	DBpatch_6050017(void)
+static int	DBpatch_6050018(void)
 {
 	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
 
 	return DBmodify_field_type("items", &field, NULL);
 }
 
-static int	DBpatch_6050018(void)
+static int	DBpatch_6050019(void)
 {
 	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("connector", &field, NULL);
 }
 
-static int	DBpatch_6050019(void)
+static int	DBpatch_6050020(void)
 {
 	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -237,5 +257,6 @@ DBPATCH_ADD(6050016, 0, 1)
 DBPATCH_ADD(6050017, 0, 1)
 DBPATCH_ADD(6050018, 0, 1)
 DBPATCH_ADD(6050019, 0, 1)
+DBPATCH_ADD(6050020, 0, 1)
 
 DBPATCH_END()
