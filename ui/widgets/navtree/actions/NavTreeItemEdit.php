@@ -71,7 +71,7 @@ class NavTreeItemEdit extends CController {
 			]);
 
 			if ($sysmaps) {
-				$sysmap = reset($sysmaps);
+				$sysmap = $sysmaps[0];
 				$sysmap = [
 					'id' => $sysmap['sysmapid'],
 					'name' => $sysmap['name']
