@@ -838,10 +838,10 @@ static void	am_push_alert(zbx_am_alertpool_t *alertpool, zbx_am_alert_t *alert)
  ******************************************************************************/
 static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 {
-	zbx_am_mediatype_t		*mediatype;
-	zbx_am_alertpool_t		*alertpool;
-	zbx_am_alert_t			*alert;
-	zbx_binary_heap_elem_t		*elem;
+	zbx_am_mediatype_t	*mediatype;
+	zbx_am_alertpool_t	*alertpool;
+	zbx_am_alert_t		*alert;
+	zbx_binary_heap_elem_t	*elem;
 
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
 		return NULL;
@@ -2233,7 +2233,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 
 	zbx_vector_ptr_t	view;
 	zbx_am_alertpool_t	*alertpool;
-	const zbx_am_alert_t		*alert;
+	const zbx_am_alert_t	*alert;
 	int			i, sources_num;
 	zbx_hashset_t		sources;
 	zbx_hashset_iter_t	iter;

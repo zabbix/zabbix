@@ -940,13 +940,13 @@ const char	*zbx_truncate_value(const char *val, const size_t char_max, char *buf
 #	undef ZBX_SUFFIX
 }
 
-/***************************************************************************************
- *                                                                                     *
- *  Note, that although the input 'string' was const, the return is not, as the caller *
- *  owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
- *  We may need to find a way how to silence the resulting '-Wcast-qual warning.'      *
- *                                                                                     *
- ***************************************************************************************/
+/************************************************************************************************
+ *                                                                                              *
+ * Comments: Note, that although the input 'string' was const, the return is not, as the caller *
+ *           owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
+ *           We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
+ *                                                                                              *
+ ************************************************************************************************/
 char	*zbx_strcasestr(const char *haystack, const char *needle)
 {
 	size_t		sz_h, sz_n;
