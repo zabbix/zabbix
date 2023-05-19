@@ -62,7 +62,7 @@ get_interval_option_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_execute
 
 get_interval_option_LDADD = $(ICMPPING_LIBS)
-get_interval_option_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+get_interval_option_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 get_interval_option_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -70,4 +70,5 @@ get_interval_option_CFLAGS = \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
+
 endif
