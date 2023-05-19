@@ -189,10 +189,10 @@ class testFormConnectors extends CWebTest {
 				'maxlength' => '128'
 			],
 			'Username' => [
-				'maxlength' => '64'
+				'maxlength' => '255'
 			],
 			'Password' => [
-				'maxlength' => '64'
+				'maxlength' => '255'
 			],
 			'id:max_records' => [
 				'maxlength' => '10'
