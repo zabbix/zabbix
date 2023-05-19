@@ -149,17 +149,17 @@ if ($data['preselect_required']) {
 
 // Output table rows.
 switch ($data['popup_type']) {
+	case 'hosts':
+	case 'template_groups':
+	case 'host_groups':
+	case 'proxies':
+	case 'host_templates':
+	case 'templates':
+	case 'drules':
+	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
-	case 'drules':
-	case 'hosts':
-	case 'host_groups':
-	case 'host_templates':
-	case 'template_groups':
-	case 'proxies':
-	case 'roles':
 	case 'sysmaps':
-	case 'templates':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -848,19 +848,19 @@ $types = [
 	'hosts',
 	'host_templates',
 	'host_groups',
+	'template_groups',
 	'items',
 	'item_prototypes',
 	'media_types',
 	'proxies',
 	'roles',
+	'templates',
 	'users',
 	'usrgrp',
 	'sla',
-	'sysmaps',
-	'templates',
-	'template_groups',
+	'valuemaps',
 	'template_valuemaps',
-	'valuemaps'
+	'sysmaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {
