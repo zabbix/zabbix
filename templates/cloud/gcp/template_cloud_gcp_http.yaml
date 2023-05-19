@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-19T00:24:26Z'
+  date: '2023-05-19T06:16:23Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -5997,7 +5997,7 @@ zabbix_export:
           name: 'GCP Cloud SQL PostgreSQL: Metrics get'
           type: SCRIPT
           key: gcp.cloudsql.pgsql.metrics.get
-          delay: 5m
+          delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -6463,7 +6463,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Metrics raw'
               type: SCRIPT
               key: 'gcp.cloudsql.pgsql.db.metrics.get[{#PGSQL.DB.NAME}]'
-              delay: 5m
+              delay: '{$GCP.TIME.WINDOW}'
               history: '0'
               trends: '0'
               value_type: TEXT
@@ -7127,7 +7127,7 @@ zabbix_export:
           name: 'GCP Cloud SQL PostgreSQL: Replica metrics get'
           type: SCRIPT
           key: gcp.cloudsql.pgsql.repl.metrics.get
-          delay: 5m
+          delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -7595,7 +7595,7 @@ zabbix_export:
           name: 'GCP Compute Engine: Disks get'
           type: SCRIPT
           key: gcp.gce.disks.get
-          delay: 5m
+          delay: '{$GCP.TIME.WINDOW}'
           history: '0'
           trends: '0'
           value_type: TEXT
