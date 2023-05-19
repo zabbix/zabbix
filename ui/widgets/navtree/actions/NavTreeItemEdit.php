@@ -80,7 +80,8 @@ class NavTreeItemEdit extends CController {
 			else {
 				$sysmap = [
 					'id' => $sysmapid,
-					'name' => _('Inaccessible map')
+					'name' => _('Inaccessible map'),
+					'inaccessible' => true
 				];
 			}
 		}
