@@ -48,13 +48,15 @@ void	*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size)
 	return value_bin;
 }
 
-zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data)
+zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void ** const data)
 {
 	zbx_uint32_t	size;
 
 	memcpy(&size, bin, sizeof(zbx_uint32_t));
+
 	if (NULL != data)
-		*data = ((unsigned char *)bin) + sizeof(size);
+		*data = (const unsigned char *)bin + sizeof(size);
+
 	return size;
 }
 
