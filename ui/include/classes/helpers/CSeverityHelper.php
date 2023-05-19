@@ -169,7 +169,7 @@ class CSeverityHelper {
 	public static function makeSeverityCell(int $severity, $text = null, bool $force_normal = false,
 			bool $return_as_div = false) {
 		if ($text === null) {
-			$text = CHtml::encode(self::getName($severity));
+			$text = self::getName($severity);
 		}
 
 		if ($force_normal) {

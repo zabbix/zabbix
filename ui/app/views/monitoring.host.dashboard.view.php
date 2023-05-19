@@ -183,21 +183,21 @@ if (count($data['dashboard']['pages']) > 1
 	$widget
 		->addItem($dashboard)
 		->show();
-
-	(new CScriptTag('
-		view.init('.json_encode([
-			'host' => $data['host'],
-			'dashboard' => $data['dashboard'],
-			'widget_defaults' => $data['widget_defaults'],
-			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode
-		]).');
-	'))
-		->setOnDocumentReady()
-		->show();
 }
 else {
 	$widget
 		->addItem(new CTableInfo())
 		->show();
 }
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'host' => $data['host'],
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'time_period' => $data['time_period'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

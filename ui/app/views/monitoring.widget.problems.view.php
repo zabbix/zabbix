@@ -58,7 +58,7 @@ $table = (new CTableInfo())
 		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
 		[
 			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
-			' &bullet; ',
+			' ', BULLET(), ' ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,

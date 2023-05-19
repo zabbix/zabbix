@@ -624,7 +624,7 @@ switch ($data['popup_type']) {
 				$mappings_table[] = new CDiv($mapping['newvalue']);
 			}
 
-			$hellip = (count($valuemap['mappings']) > 3) ? '&hellip;' : null;
+			$hellip = (count($valuemap['mappings']) > 3) ? HELLIP() : null;
 			$table->addRow([$check_box, $name, [
 				(new CDiv($mappings_table))->addClass(ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE), $hellip
 			]]);
