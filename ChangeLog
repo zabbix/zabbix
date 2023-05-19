@@ -44,6 +44,7 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-22314] fixed OpenSSL, yaml, cmocka compiling in a non-standard location (askolmeisters)
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 ........S. [ZBX-22773] fixed ListenIP configuration parameter being ignored by HA (kprutkovs)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for jenkins template (egordymov)
