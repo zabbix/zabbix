@@ -188,6 +188,49 @@ static int	DBpatch_6050014(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050015(void)
+{
+	const zbx_db_field_t	field = {"http_user", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("httptest", &field, NULL);
+}
+
+static int	DBpatch_6050016(void)
+{
+	const zbx_db_field_t	field = {"http_password", "", NULL, NULL, 255, ZBX_TYPE_CHAR,
+			ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("httptest", &field, NULL);
+}
+
+static int	DBpatch_6050017(void)
+{
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("items", &field, NULL);
+}
+
+static int	DBpatch_6050018(void)
+{
+	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0};
+
+	return DBmodify_field_type("items", &field, NULL);
+}
+
+static int	DBpatch_6050019(void)
+{
+	const zbx_db_field_t	field = {"username", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("connector", &field, NULL);
+}
+
+static int	DBpatch_6050020(void)
+{
+	const zbx_db_field_t	field = {"password", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("connector", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -209,5 +252,11 @@ DBPATCH_ADD(6050011, 0, 1)
 DBPATCH_ADD(6050012, 0, 1)
 DBPATCH_ADD(6050013, 0, 1)
 DBPATCH_ADD(6050014, 0, 1)
+DBPATCH_ADD(6050015, 0, 1)
+DBPATCH_ADD(6050016, 0, 1)
+DBPATCH_ADD(6050017, 0, 1)
+DBPATCH_ADD(6050018, 0, 1)
+DBPATCH_ADD(6050019, 0, 1)
+DBPATCH_ADD(6050020, 0, 1)
 
 DBPATCH_END()
