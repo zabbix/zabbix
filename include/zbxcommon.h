@@ -799,8 +799,9 @@ void	zbx_set_log_level(int level);
 const char	*zbx_get_log_component_name(void);
 
 #ifndef _WINDOWS
-int		zabbix_increase_log_level(void);
-int		zabbix_decrease_log_level(void);
+void		zabbix_increase_log_level(void);
+void		zabbix_decrease_log_level(void);
+void		zabbix_report_log_level_change(void);
 const char	*zabbix_get_log_level_string(void);
 
 typedef struct

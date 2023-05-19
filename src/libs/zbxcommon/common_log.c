@@ -19,12 +19,19 @@
 
 #include "zbxcommon.h"
 
+#define LOG_LEVEL_DEC_FAIL	-2
+#define LOG_LEVEL_DEC_SUCCEED	-1
+#define LOG_LEVEL_UNCHANGED	0
+#define LOG_LEVEL_INC_SUCCEED	1
+#define LOG_LEVEL_INC_FAIL	2
+
 #define LOG_COMPONENT_NAME_LEN	64
 
 static int			log_level = LOG_LEVEL_WARNING;
 static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
 static zbx_log_func_t		log_func_callback = NULL;
 
+static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
 static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
 
 void	zbx_init_library_common(zbx_log_func_t log_func)
@@ -84,24 +91,74 @@ const char	*zabbix_get_log_level_string(void)
 	return zabbix_get_log_level_ref_string(*plog_level);
 }
 
-int	zabbix_increase_log_level(void)
+void	zabbix_increase_log_level(void)
 {
 	if (LOG_LEVEL_TRACE == *plog_level)
-		return FAIL;
+	{
+		log_level_change = LOG_LEVEL_INC_FAIL;
+		return;
+	}
+
+	log_level_change = LOG_LEVEL_INC_SUCCEED;
 
 	*plog_level = *plog_level + 1;
 
-	return SUCCEED;
+	return;
 }
 
-int	zabbix_decrease_log_level(void)
+void	zabbix_decrease_log_level(void)
 {
 	if (LOG_LEVEL_EMPTY == *plog_level)
-		return FAIL;
+	{
+		log_level_change = LOG_LEVEL_DEC_FAIL;
+		return;
+	}
+
+	log_level_change = LOG_LEVEL_DEC_SUCCEED;
 
 	*plog_level = *plog_level - 1;
 
-	return SUCCEED;
+	return;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: log last loglevel change result                                   *
+ *                                                                            *
+ * Comments: With consequent fast changes only the last attempt result would  *
+ *           be logged.                                                       *
+ *                                                                            *
+ ******************************************************************************/
+void	 zabbix_report_log_level_change(void)
+{
+	int	change;
+
+	if (0 == log_level_change)
+		return;
+
+	/* reset log level change history to avoid recursion */
+	change = log_level_change;
+	log_level_change = LOG_LEVEL_UNCHANGED;
+
+	switch (change)
+	{
+		case LOG_LEVEL_DEC_FAIL:
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
+					" minimum level has been already set");
+			break;
+		case LOG_LEVEL_DEC_SUCCEED:
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
+					zabbix_get_log_level_string());
+			break;
+		case LOG_LEVEL_INC_SUCCEED:
+			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
+					zabbix_get_log_level_string());
+			break;
+		case LOG_LEVEL_INC_FAIL:
+			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
+					" maximum level has been already set");
+			break;
+	}
 }
 
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component)
