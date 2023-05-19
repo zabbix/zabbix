@@ -122,11 +122,19 @@ static void	get_source_ip_option(const char *fping, const char **option, unsigne
  ******************************************************************************/
 static int	get_fping_out(const char *fping, char **out, char *error, size_t max_error_len)
 {
-	FILE	*f;
-	size_t	buf_size = 0, offset = 0;
-	char	tmp[MAX_STRING_LEN], *buffer = NULL;
+	FILE		*f;
+	size_t		buf_size = 0, offset = 0;
+	char		tmp[MAX_STRING_LEN], *buffer = NULL;
+	sigset_t	mask, orig_mask;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1", fping);
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGINT);
+	sigaddset(&mask, SIGQUIT);
+
+	if (0 > zbx_sigmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
 
 	if (NULL == (f = popen(tmp, "r")))
 	{
@@ -145,6 +153,9 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 	}
 
 	pclose(f);
+
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
 
 	if (NULL == buffer)
 	{
