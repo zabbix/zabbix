@@ -34,37 +34,18 @@ class CControllerServiceUpdate extends CController {
 			'sortorder' =>					'required|db services.sortorder|ge 0|le 999',
 			'algorithm' =>					'required|db services.algorithm|in '.implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE]),
 			'description' =>				'db services.description',
-			'advanced_configuration' =>		'in 1',
 			'status_rules' =>				'array',
-			'propagation_rule' =>			'in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
+			'propagation_rule' =>			'required|db services.propagation_rule|in '.implode(',', array_keys(CServiceHelper::getStatusPropagationNames())),
 			'propagation_value_number' =>	'int32',
 			'propagation_value_status' =>	'int32',
-			'weight' =>						'string',
+			'weight' =>						'required|db services.weight|ge 0|le 1000000',
 			'tags' =>						'array',
 			'child_serviceids' =>			'array_db services.serviceid'
 		];
 
 		$ret = $this->validateInput($fields);
 
-		if ($ret && $this->hasInput('advanced_configuration')) {
-			$fields = [
-				'propagation_rule' => 'required'
-			];
-
-			if ($this->getInput('weight', '') !== '') {
-				$fields['weight'] = 'int32|ge 0|le 1000000';
-			}
-
-			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
-
-			foreach ($validator->getAllErrors() as $error) {
-				info($error);
-			}
-
-			$ret = !$validator->isErrorFatal() && !$validator->isError();
-		}
-
-		if ($ret && $this->hasInput('advanced_configuration')) {
+		if ($ret) {
 			$fields = [];
 
 			switch ($this->getInput('propagation_rule')) {
@@ -130,9 +111,26 @@ class CControllerServiceUpdate extends CController {
 			'status_rules' => []
 		];
 
-		$fields = ['serviceid', 'name', 'algorithm', 'sortorder', 'description'];
+		$fields = ['serviceid', 'name', 'algorithm', 'sortorder', 'description', 'status_rules', 'propagation_rule',
+			'weight'
+		];
 
 		$this->getInputs($service, $fields);
+
+		switch ($service['propagation_rule']) {
+			case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
+			case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
+				$service['propagation_value'] = $this->getInput('propagation_value_number', 0);
+				break;
+
+			case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
+				$service['propagation_value'] = $this->getInput('propagation_value_status', 0);
+				break;
+
+			default:
+				$service['propagation_value'] = 0;
+				break;
+		}
 
 		foreach ($this->getInput('tags', []) as $tag) {
 			if ($tag['tag'] === '' && $tag['value'] === '') {
@@ -156,32 +154,6 @@ class CControllerServiceUpdate extends CController {
 
 		foreach ($this->getInput('child_serviceids', []) as $serviceid) {
 			$service['children'][] = ['serviceid' => $serviceid];
-		}
-
-		if ($this->hasInput('advanced_configuration')) {
-			$this->getInputs($service, ['status_rules', 'propagation_rule']);
-
-			switch ($this->getInput('propagation_rule', DB::getDefault('services', 'propagation_rule'))) {
-				case ZBX_SERVICE_STATUS_PROPAGATION_INCREASE:
-				case ZBX_SERVICE_STATUS_PROPAGATION_DECREASE:
-					$service['propagation_value'] = $this->getInput('propagation_value_number', 0);
-					break;
-
-				case ZBX_SERVICE_STATUS_PROPAGATION_FIXED:
-					$service['propagation_value'] = $this->getInput('propagation_value_status', 0);
-					break;
-
-				default:
-					$service['propagation_value'] = 0;
-					break;
-			}
-
-			$service['weight'] = $this->getInput('weight', '') !== '' ? $this->getInput('weight') : 0;
-		}
-		else {
-			$service['propagation_rule'] = DB::getDefault('services', 'propagation_rule');
-			$service['propagation_value'] = DB::getDefault('services', 'propagation_value');
-			$service['weight'] = DB::getDefault('services', 'weight');
 		}
 
 		$result = API::Service()->update($service);

@@ -295,7 +295,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 
 	xpathCtx = xmlXPathNewContext(doc);
 
-	if (NULL == (xpathObj = xmlXPathEvalExpression((xmlChar *)params, xpathCtx)))
+	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)params, xpathCtx)))
 	{
 		if (NULL != (pErr = xmlGetLastError()))
 			*errmsg = zbx_dsprintf(*errmsg, "cannot parse xpath: %s", pErr->message);
@@ -380,8 +380,8 @@ out:
  ******************************************************************************/
 static int	compare_xml_nodes_by_name(const void *d1, const void *d2)
 {
-	zbx_xml_node_t	*p1 = *(zbx_xml_node_t **)d1;
-	zbx_xml_node_t	*p2 = *(zbx_xml_node_t **)d2;
+	zbx_xml_node_t	*p1 = *(zbx_xml_node_t * const *)d1;
+	zbx_xml_node_t	*p2 = *(zbx_xml_node_t * const *)d2;
 
 	return strcmp(p1->name, p2->name);
 }
@@ -1055,7 +1055,7 @@ int	zbx_xml_xpath_check(const char *xpath, char *error, size_t errlen)
 	ctx = xmlXPathNewContext(NULL);
 	xmlSetStructuredErrorFunc(&err, &libxml_handle_error_xpath_check);
 
-	p = xmlXPathCtxtCompile(ctx, (xmlChar *)xpath);
+	p = xmlXPathCtxtCompile(ctx, (const xmlChar *)xpath);
 	xmlSetStructuredErrorFunc(NULL, NULL);
 
 	if (NULL == p)

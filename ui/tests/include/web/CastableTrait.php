@@ -321,4 +321,15 @@ trait CastableTrait {
 	public function asMainMenu($options = []) {
 		return $this->cast(CMainMenuElement::class, $options);
 	}
+
+	/**
+	 * Cast object to Fieldset element.
+	 *
+	 * @param array $options    additional casting options
+	 *
+	 * @return CFieldsetElement
+	 */
+	public function asFieldset($options = []) {
+		return $this->cast(CFieldsetElement::class, $options);
+	}
 }

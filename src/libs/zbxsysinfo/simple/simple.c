@@ -73,9 +73,10 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	}
 
 #if defined(LDAP_OPT_SOCKET_BIND_ADDRESSES) && defined(HAVE_LDAP_SOURCEIP)
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != sysinfo_get_config_source_ip())
 	{
-		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES, CONFIG_SOURCE_IP)))
+		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES,
+				sysinfo_get_config_source_ip())))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set source ip address [%s]",
 					ldap_err2string(ldapErr));
@@ -133,8 +134,8 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
-			NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
@@ -212,9 +213,10 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 	}
 #endif
 
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != sysinfo_get_config_source_ip())
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE,
+				sysinfo_get_config_source_ip())))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set source interface option [%d]: %s",
 					__func__, (int)opt, curl_easy_strerror(err));
@@ -240,7 +242,8 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 
 	*value_int = 0;
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED,
+			NULL, NULL))
 	{
 		if (SUCCEED == zbx_telnet_test_login(&s))
 			*value_int = 1;

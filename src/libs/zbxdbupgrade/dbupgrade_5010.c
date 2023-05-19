@@ -794,8 +794,8 @@ static zbx_vector_char_t	*sort_dimensions;
 
 static int	DBpatch_block_compare_func(const void *d1, const void *d2)
 {
-	const sciitem_block_t	*i1 = *(const sciitem_block_t **)d1;
-	const sciitem_block_t	*i2 = *(const sciitem_block_t **)d2;
+	const sciitem_block_t	*i1 = *(const sciitem_block_t * const *)d1;
+	const sciitem_block_t	*i2 = *(const sciitem_block_t * const *)d2;
 	zbx_vector_char_t	*diff1, *diff2;
 	int			unsized_a, unsized_b;
 

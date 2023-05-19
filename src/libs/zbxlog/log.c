@@ -199,7 +199,7 @@ static void	rotate_log(const char *filename)
 }
 
 #ifndef _WINDOWS
-static sigset_t	orig_mask;
+static ZBX_THREAD_LOCAL sigset_t	orig_mask;
 
 static void	lock_log(void)
 {
@@ -247,6 +247,9 @@ static void	unlock_log(void)
 
 void	zbx_handle_log(void)
 {
+#ifndef _WINDOWS
+	zabbix_report_log_level_change();
+#endif
 	if (LOG_TYPE_FILE != log_type)
 		return;
 
@@ -347,12 +350,15 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
+#else
+	zabbix_report_log_level_change();
 #endif
 
 #ifndef ZBX_ZABBIX_LOG_CHECK
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 #endif
+
 	if (LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;

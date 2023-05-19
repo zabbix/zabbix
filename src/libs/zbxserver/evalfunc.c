@@ -1178,7 +1178,8 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 #define COUNT_ALL	0
 #define COUNT_UNIQUE	1
 
-int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata, char **error)
+int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error)
 {
 	pdata->numeric_search = (ITEM_VALUE_TYPE_UINT64 == value_type || ITEM_VALUE_TYPE_FLOAT == value_type);
 
@@ -1292,7 +1293,8 @@ int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char valu
 			}
 		}
 	}
-	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op && OP_NE != pdata->op)
+	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op &&
+			OP_NE != pdata->op && ITEM_VALUE_TYPE_NONE != value_type)
 	{
 		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
 		return FAIL;
@@ -1329,6 +1331,49 @@ void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, cha
 		{
 			zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4), values->values[i]);
 			count_one_str(count, pdata->op, buf, pattern, &pdata->regexps);
+		}
+	}
+}
+
+void	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int *count)
+{
+	int	i;
+	char	buf[ZBX_MAX_UINT64_LEN];
+
+	for (i = 0; i < values->values_num; i++)
+	{
+		zbx_variant_t	value;
+
+		value = values->values[i];
+
+		switch (value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				if (0 != pdata->numeric_search)
+				{
+					count_one_ui64(count, pdata->op, value.data.ui64, pdata->pattern_ui64, pdata->pattern2_ui64);
+				}
+				else
+				{
+					zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64, value.data.ui64);
+					count_one_str(count, pdata->op, buf, pattern, &pdata->regexps);
+				}
+				break;
+			case ZBX_VARIANT_DBL:
+				if (0 != pdata->numeric_search)
+				{
+					count_one_dbl(count, pdata->op, value.data.dbl, pdata->pattern_dbl);
+				}
+				else
+				{
+					zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4), value.data.dbl);
+					count_one_str(count, pdata->op, buf, pattern, &pdata->regexps);
+				}
+				break;
+			case ZBX_VARIANT_STR:
+				count_one_str(count, pdata->op, value.data.str, pattern, &pdata->regexps);
+				break;
 		}
 	}
 }

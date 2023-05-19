@@ -503,13 +503,17 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
  *                                                                                                  *
  * Return value: pointer to the matched substring or null                                           *
  *                                                                                                  *
+ * Comments:     Note, that although the input 'string' was const, the return is not, as the caller *
+ *               owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
+ *               We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
+ *                                                                                                  *
  ****************************************************************************************************/
 static char	*zbx_regexp(const char *string, const char *pattern, int flags, int *len)
 {
+	const char	*error = NULL;
 	char		*c = NULL;
 	zbx_regmatch_t	match;
 	zbx_regexp_t	*regexp = NULL;
-	const char*	error = NULL;
 
 	if (NULL != len)
 		*len = FAIL;
@@ -535,6 +539,13 @@ static char	*zbx_regexp(const char *string, const char *pattern, int flags, int 
 	return c;
 }
 
+/*************************************************************************************************
+ *                                                                                               *
+ *  Comments: Note, that although the input 'string' was const, the return is not, as the caller *
+ *            owns it and can modify it. This is similar to strstr() and strcasestr() functions. *
+ *            We may need to find a way how to silence the resulting '-Wcast-qual' warning.      *
+ *                                                                                               *
+ *************************************************************************************************/
 char	*zbx_regexp_match(const char *string, const char *pattern, int *len)
 {
 	return zbx_regexp(string, pattern, ZBX_REGEXP_MULTILINE, len);
@@ -953,7 +964,7 @@ static int	regexp_match_ex_regsub(const char *string, const char *pattern, int c
  **********************************************************************************/
 static int	regexp_match_ex_substring(const char *string, const char *pattern, int case_sensitive)
 {
-	char	*ptr = NULL;
+	const char	*ptr = NULL;
 
 	switch (case_sensitive)
 	{

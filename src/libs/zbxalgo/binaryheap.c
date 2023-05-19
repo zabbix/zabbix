@@ -205,12 +205,12 @@ void	zbx_binary_heap_destroy(zbx_binary_heap_t *heap)
 	heap->mem_free_func = NULL;
 }
 
-int	zbx_binary_heap_empty(zbx_binary_heap_t *heap)
+int	zbx_binary_heap_empty(const zbx_binary_heap_t *heap)
 {
 	return (0 == heap->elems_num ? SUCCEED : FAIL);
 }
 
-zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap)
+zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(const zbx_binary_heap_t *heap)
 {
 	if (0 == heap->elems_num)
 	{

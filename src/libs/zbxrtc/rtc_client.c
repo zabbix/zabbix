@@ -269,7 +269,7 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 {
 	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(unsigned char) + sizeof(int) + sizeof(int) +
 				sizeof(zbx_uint32_t) * (zbx_uint32_t)msgs_num);
-	unsigned char		data[size], *ptr = data;
+	unsigned char		*data, *ptr;
 	char			*error = NULL;
 
 	if (FAIL == zbx_ipc_async_socket_open(rtc, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
@@ -278,6 +278,8 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
+
+	ptr = data = (unsigned char *)zbx_malloc(NULL, size);
 
 	ptr += zbx_serialize_value(ptr, proc_type);
 	ptr += zbx_serialize_value(ptr, proc_num);
@@ -297,6 +299,8 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs
 		zabbix_log(LOG_LEVEL_CRIT, "cannot flush RTC notification subscribe request");
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_free(data);
 }
 
 /******************************************************************************

@@ -538,8 +538,8 @@ static const char	*socket_error(zbx_socket_t *s, int socket_errno)
 
 static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, const char *smtp_helo,
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
-		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout, char *error,
-		size_t max_error_len)
+		const char *mailsubject, const char *mailbody, unsigned char content_type, int timeout,
+		const char *config_source_ip, char *error, size_t max_error_len)
 {
 #define OK_220	"220"
 #define OK_251	"251"
@@ -551,8 +551,8 @@ static int	send_email_plain(const char *smtp_server, unsigned short smtp_port, c
 	const char	*response;
 
 	/* connect to and receive an initial greeting from SMTP server */
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, smtp_server, smtp_port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
-			NULL))
+	if (FAIL == zbx_tcp_connect(&s, config_source_ip, smtp_server, smtp_port, timeout, ZBX_TCP_SEC_UNENCRYPTED,
+			NULL, NULL))
 	{
 		zbx_snprintf(error, max_error_len, "cannot connect to SMTP server \"%s\": %s",
 				smtp_server, zbx_socket_strerror());
@@ -722,8 +722,8 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t *to_mails, const char *inreplyto,
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
 		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
-		const char *username, const char *password, unsigned char content_type, int timeout, char *error,
-		size_t max_error_len)
+		const char *username, const char *password, unsigned char content_type, int timeout,
+		const char *config_source_ip, char *error, size_t max_error_len)
 {
 #ifdef HAVE_SMTP_AUTHENTICATION
 	int			ret = FAIL, i;
@@ -861,9 +861,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		goto error;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != config_source_ip)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, config_source_ip)))
 			goto error;
 	}
 
@@ -911,6 +911,7 @@ out:
 	ZBX_UNUSED(password);
 	ZBX_UNUSED(content_type);
 	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(config_source_ip);
 
 	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
 	return FAIL;
@@ -935,7 +936,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, char *error, size_t max_error_len)
+		unsigned char content_type, int timeout, const char *config_source_ip, char *error,
+		size_t max_error_len)
 {
 	int			ret = FAIL;
 	zbx_vector_ptr_t	from_mails, to_mails;
@@ -959,13 +961,13 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	if (SMTP_SECURITY_NONE == smtp_security && SMTP_AUTHENTICATION_NONE == smtp_authentication)
 	{
 		ret = send_email_plain(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto,
-				mailsubject, mailbody, content_type, timeout, error, max_error_len);
+				mailsubject, mailbody, content_type, timeout, config_source_ip, error, max_error_len);
 	}
 	else
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
 				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				username, password, content_type, timeout, error, max_error_len);
+				username, password, content_type, timeout, config_source_ip, error, max_error_len);
 	}
 
 clean:
