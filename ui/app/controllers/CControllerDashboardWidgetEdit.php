@@ -438,7 +438,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'users' => _('Inaccessible user'),
 			'actions' => _('Inaccessible action'),
 			'media_types' => _('Inaccessible media type'),
-			'maps' => _('Inaccessible map')
+			'sysmaps' => _('Inaccessible map')
 		];
 
 		foreach ($captions as $resource_type => &$fields_captions) {
