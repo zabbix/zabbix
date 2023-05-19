@@ -74,13 +74,16 @@ parse_cfg_file_LDADD = \
 
 parse_cfg_file_LDADD += \
 	@SERVER_LIBS@ \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) \
+	$(YAML_LIBS)
 
 parse_cfg_file_LDFLAGS = \
 	@SERVER_LDFLAGS@ \
-	$(CMOCKA_LDFLAGS)
+	$(CMOCKA_LDFLAGS) \
+	$(YAML_LDFLAGS)
 
 parse_cfg_file_CFLAGS = \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 endif

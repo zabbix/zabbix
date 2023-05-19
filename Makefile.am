@@ -182,10 +182,10 @@ COMMON_WRAP_FUNCS = \
 tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lyaml"
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS)"
 
 tests: tests_build
-	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH); \
+	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
 clean: clean-recursive

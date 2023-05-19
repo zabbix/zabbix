@@ -2283,11 +2283,24 @@ echo "
 
 if test "x$found_cmocka" != "xno"; then
 
-echo "  cmocka gateway details:
+echo "  cmocka library details:
     Compiler flags:      ${CMOCKA_CFLAGS}
     Linker flags:        ${CMOCKA_LDFLAGS}
     Libraries:           ${CMOCKA_LIBS}
     Library location:    ${CMOCKA_LIBRARY_PATH}"
+
+fi
+
+echo "
+  yaml support:          ${found_yaml}"
+
+if test "x$found_yaml" != "xno"; then
+
+echo "  yaml library details:
+    Compiler flags:      ${YAML_CFLAGS}
+    Linker flags:        ${YAML_LDFLAGS}
+    Libraries:           ${YAML_LIBS}
+    Library location:    ${YAML_LIBRARY_PATH}"
 
 fi
 

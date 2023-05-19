@@ -12,7 +12,7 @@ endif
 COMMON_SRC = \
 	../../zbxmocktest.h
 
-COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
+COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
@@ -58,7 +58,7 @@ COMMON_LIB = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 if SERVER
 SERVER_COMMON_LIB = \
@@ -117,7 +117,7 @@ DBselect_uint64_LDADD = \
 
 DBselect_uint64_LDADD += @SERVER_LIBS@
 
-DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBselect_uint64_CFLAGS = $(COMMON_FLAGS)
 
@@ -131,7 +131,7 @@ DBadd_condition_alloc_LDADD = \
 
 DBadd_condition_alloc_LDADD += @SERVER_LIBS@
 
-DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 
@@ -170,7 +170,7 @@ DBadd_condition_alloc_LDADD = \
 
 DBadd_condition_alloc_LDADD += @PROXY_LIBS@
 
-DBadd_condition_alloc_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS)
+DBadd_condition_alloc_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 

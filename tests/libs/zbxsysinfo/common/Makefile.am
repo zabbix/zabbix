@@ -55,9 +55,9 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(CMOCKA_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
-COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
+COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 system_localtime_SOURCES = \
 	system_localtime.c \
@@ -72,7 +72,7 @@ system_localtime_LDADD = \
 
 system_localtime_LDADD += @AGENT_LIBS@
 
-system_localtime_LDFLAGS = @AGENT_LDFLAGS@ $(system_localtime_WRAP_FUNCS) $(CMOCKA_LDFLAGS)
+system_localtime_LDFLAGS = @AGENT_LDFLAGS@ $(system_localtime_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 system_localtime_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -99,7 +99,7 @@ web_page_get_LDADD = \
 
 web_page_get_LDADD += @AGENT_LIBS@
 
-web_page_get_LDFLAGS = @AGENT_LDFLAGS@ $(web_page_get_WRAP_FUNCS) $(CMOCKA_LDFLAGS)
+web_page_get_LDFLAGS = @AGENT_LDFLAGS@ $(web_page_get_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 web_page_get_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -112,7 +112,7 @@ vfs_file_exists_LDADD = \
 
 vfs_file_exists_LDADD += @AGENT_LIBS@
 
-vfs_file_exists_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
+vfs_file_exists_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 vfs_file_exists_CFLAGS = $(COMMON_COMPILER_FLAGS) -I$(top_srcdir)/src/libs/zbxsysinfo/common/
 
