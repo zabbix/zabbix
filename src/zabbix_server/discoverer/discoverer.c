@@ -110,7 +110,8 @@ extern unsigned char			program_type;
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
 #define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
 
-static zbx_discoverer_manager_t 	dmanager;
+static zbx_discoverer_manager_t		dmanager;
+static const char			*source_ip;
 
 static zbx_hash_t	discoverer_check_count_hash(const void *data)
 {
@@ -235,7 +236,6 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  *             ip               - [IN]                                        *
  *             port             - [IN]                                        *
  *             config_timeout   - [IN]                                        *
- *             config_source_ip - [IN]                                        *
  *             value            - [OUT]                                       *
  *             value_alloc      - [IN/OUT]                                    *
  *                                                                            *
@@ -243,7 +243,7 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  *                                                                            *
  ******************************************************************************/
 static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, int config_timeout,
-		const char *config_source_ip char **value, size_t *value_alloc)
+		char **value, size_t *value_alloc)
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
@@ -371,8 +371,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, config_timeout, config_source_ip,
-							&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+					if (SUCCEED == get_value_agent(&item, config_timeout, source_ip, &result) &&
+							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}
@@ -397,7 +397,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout,
-							config_source_ip) && NULL !=
+							source_ip) && NULL !=
 							(pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
@@ -1668,6 +1668,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
 #endif
+	source_ip = discoverer_args_in->config_source_ip;
+
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);

@@ -1288,8 +1288,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_log_remote_commands};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
-								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER], zbx_config_source_ip,
-								&events_cbs};
+								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
+								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&events_cbs, &listen_sock, config_startup_time,
 								config_proxydata_frequency};
