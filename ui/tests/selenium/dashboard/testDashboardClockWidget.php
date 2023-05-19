@@ -253,17 +253,23 @@ class testDashboardClockWidget extends CWebTest {
 		foreach (['Analog' => false, 'Digital' => true] as $type => $status) {
 			$form->fill(['Clock type' => $type]);
 
-			// Check Show and Advanced configuration checkboxes visibility and values. (Only Time is checked by default).
-			foreach (['show_1' => false, 'show_2' => true, 'show_3' => false, 'adv_conf' => false] as $id => $checked) {
+			// Check "Advanced configuration" visibility.
+			$form->getField('Advanced configuration')->isVisible($status);
+
+			// Check Show checkboxes visibility and values. (Only Time is checked by default).
+			foreach (['show_1' => false, 'show_2' => true, 'show_3' => false] as $id => $checked) {
 				$checkbox = $form->query('id', $id)->asCheckbox()->one();
 				$this->assertTrue($checkbox->isVisible($status));
 				$this->assertTrue($checkbox->isChecked($checked));
 			}
 
 			if ($status) {
+				// Check that advanced configuration is closed.
+				$form->checkValue(['Advanced configuration' => false]);
+
 				$this->assertTrue($form->isRequired('Show'));
 
-				// Set Advanced configuration=true to check its fields.
+				// Open "Advanced configuration" block to check its fields.
 				$form->fill(['Advanced configuration' => true]);
 
 				// Check that only Background color and Time fields are visible (because only Time checkbox is checked).
@@ -290,6 +296,7 @@ class testDashboardClockWidget extends CWebTest {
 				// Check Advanced config fields depending on Time type.
 				foreach (['Local time', 'Server time', 'Host time'] as $type) {
 					$form->fill(['Time type' => CFormElement::RELOADABLE_FILL($type)]);
+					$form->fill(['Advanced configuration' => true]);
 
 					// Check that with Host time 'Time zone' and 'Format' fields disappear.
 					if ($type === 'Host time') {
@@ -985,7 +992,15 @@ class testDashboardClockWidget extends CWebTest {
 
 			// Check that widget updated.
 			$dashboard->edit();
-			$dashboard->getWidgets()->last()->edit()->checkValue($data['fields']);
+			$widget = $dashboard->getWidgets()->last()->edit();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$widget->checkValue(['Advanced configuration' => false]);
+				$widget->fill(['Advanced configuration' => true]);
+			}
+			$widget->checkValue($data['fields']);
 
 			// Check that widget is saved in DB.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT *'.
@@ -1115,7 +1130,8 @@ class testDashboardClockWidget extends CWebTest {
 				'id:show_1' => true,
 				'id:show_2' => false,
 				'id:show_3' => false,
-				'Advanced configuration' => true
+				'Advanced configuration' => true,
+				'Background color' => '001819'
 			]);
 		}
 

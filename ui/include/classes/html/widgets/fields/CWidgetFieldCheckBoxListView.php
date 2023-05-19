@@ -23,36 +23,33 @@ use Zabbix\Widgets\Fields\CWidgetFieldCheckBoxList;
 
 class CWidgetFieldCheckBoxListView extends CWidgetFieldView {
 
-	private array $classes = [];
+	protected int $columns = 1;
 
 	public function __construct(CWidgetFieldCheckBoxList $field) {
 		$this->field = $field;
 	}
 
-	public function getView(): CList {
-		$view = (new CList())->addClass(ZBX_STYLE_LIST_CHECK_RADIO);
-
-		foreach ($this->classes as $class) {
-			$view->addClass($class);
-		}
+	public function getView(): CCheckBoxList {
+		$options = [];
 
 		foreach ($this->field->getValues() as $key => $label) {
-			$view->addItem(
-				(new CCheckBox($this->field->getName().'[]', $key))
-					->setLabel($label)
-					->setId($this->field->getName().'_'.$key)
-					->setChecked(in_array($key, $this->field->getValue()))
-					->setEnabled(!$this->isDisabled())
-			);
+			$options[] = [
+				'name' => $this->field->getName().'[]',
+				'id' => $this->field->getName().'_'.$key,
+				'label' => $label,
+				'value' => $key,
+				'checked' => in_array($key, $this->field->getValue())
+			];
 		}
 
-		return $view;
+		return (new CCheckBoxList())
+			->setOptions($options)
+			->setEnabled(!$this->isDisabled())
+			->setColumns($this->columns);
 	}
 
-	public function addClass(?string $class): self {
-		if ($class !== null) {
-			$this->classes[] = $class;
-		}
+	public function setColumns(int $columns): self {
+		$this->columns = $columns;
 
 		return $this;
 	}

@@ -85,7 +85,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 
 int	CONFIG_LISTEN_PORT		= 0;
 char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
@@ -174,6 +173,12 @@ static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)
 {
 	return zbx_config_timeout;
+}
+
+static const char	*zbx_config_source_ip = "127.0.0.1";
+const char	*get_zbx_config_source_ip(void)
+{
+	return zbx_config_source_ip;
 }
 
 static int	zbx_config_enable_remote_commands = 0;

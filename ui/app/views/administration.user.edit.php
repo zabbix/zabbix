@@ -172,8 +172,7 @@ if ($data['change_password']) {
 		$current_password->setAttribute('autofocus', 'autofocus');
 	}
 
-	if ($data['action'] === 'userprofile.edit'
-			|| CWebUser::$data['userid'] == $data['userid'] && CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
+	if (CWebUser::$data['userid'] == $data['userid']) {
 		$user_form_list
 			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
 	}
@@ -196,8 +195,11 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
-		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
+	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
+
+	if ($change_password_enabled && $data['action'] === 'user.edit') {
+		$change_password_enabled = $data['db_user']['username'] !== ZBX_GUEST_USER;
+	}
 
 	$hint = !$change_password_enabled
 		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))

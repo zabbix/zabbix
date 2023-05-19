@@ -231,18 +231,19 @@ static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *
  *                                                                            *
  * Purpose: check if service is available                                     *
  *                                                                            *
- * Parameters: dcheck         - [IN] service type                             *
- *             ip             - [IN]                                          *
- *             port           - [IN]                                          *
- *             config_timeout - [IN]                                          *
- *             value          - [OUT]                                         *
- *             value_alloc    - [IN/OUT]                                      *
+ * Parameters: dcheck           - [IN] service type                           *
+ *             ip               - [IN]                                        *
+ *             port             - [IN]                                        *
+ *             config_timeout   - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
+ *             value            - [OUT]                                       *
+ *             value_alloc      - [IN/OUT]                                    *
  *                                                                            *
  * Return value: SUCCEED - service is UP, FAIL - service not discovered       *
  *                                                                            *
  ******************************************************************************/
-static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, int config_timeout, char **value,
-		size_t *value_alloc)
+static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, int config_timeout,
+		const char *config_source_ip char **value, size_t *value_alloc)
 {
 	int		ret = SUCCEED;
 	const char	*service = NULL;
@@ -370,8 +371,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 				{
 					item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
 
-					if (SUCCEED == get_value_agent(&item, config_timeout, &result) &&
-							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+					if (SUCCEED == get_value_agent(&item, config_timeout, config_source_ip,
+							&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}
@@ -395,8 +396,9 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, i
 						item.snmpv3_contextname = dcheck->snmpv3_contextname;
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout) &&
-							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, config_timeout,
+							config_source_ip) && NULL !=
+							(pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}

@@ -495,7 +495,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 	else if (0 == strcmp(tmp, "java"))			/* zabbix["java",...] */
 	{
 		if (SUCCEED != get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
-				config_comms->config_timeout))
+				config_comms->config_timeout, config_comms->config_source_ip))
 		{
 			tmp1 = get_rparam(&request, 2);
 			/* the default error code "NOTSUPPORTED" renders nodata() trigger function nonfunctional */

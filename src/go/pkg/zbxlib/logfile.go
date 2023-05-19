@@ -181,7 +181,7 @@ static void free_log_result(log_result_t *result)
 	zbx_free(result);
 }
 
-int	process_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host, const char *key,
+int	process_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host, const char *key,
 		const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
@@ -368,7 +368,8 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	log.Tracef("Calling C function \"process_log_check()\"")
 	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_expression_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
-		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p, (C.int)(agent.Options.Timeout))
+		&cmtimeSent, &cerrmsg, cprepVec, ctlsConfig_p, (C.int)(agent.Options.Timeout),
+		(C.CString)(agent.Options.SourceIP))
 
 	log.Tracef("Calling C function \"free_prep_vec()\"")
 	C.free_prep_vec(cprepVec)
