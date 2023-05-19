@@ -206,6 +206,7 @@
 #define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
 #define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
 #define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
+#define ZBX_PROTO_TAG_WAIT			"wait"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

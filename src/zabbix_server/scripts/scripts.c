@@ -38,6 +38,7 @@
 
 #define REMOTE_COMMAND_SENT		1
 #define REMOTE_COMMAND_RESULT_OOM	2
+#define REMOTE_COMMAND_RESULT_WAIT	4
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
@@ -53,8 +54,9 @@ typedef struct
 	int			commands_num;
 	zbx_hashset_t		commands;
 	zbx_hashset_t		results;
-	zbx_hashset_t		strpool;
+	zbx_hashset_t		strpool; ///<- not use strpool
 	zbx_uint64_t		strpool_sz;
+
 }
 zbx_remote_commands_t;
 
@@ -66,6 +68,8 @@ typedef struct
 	zbx_uint64_t	hostid;
 	char		*command;
 	unsigned char	flag;
+	/////<--add result here
+
 }
 zbx_rc_command_t;
 
@@ -362,7 +366,7 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 
 	if (NULL != remote_commands_mem)
 	{
-		zbx_hashset_iter_t		iter_comands;
+		zbx_hashset_iter_t	iter_comands;
 		zbx_rc_command_t	*command;
 
 		commands_lock();
@@ -370,12 +374,19 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 
 		while (NULL != (command = (zbx_rc_command_t *)zbx_hashset_iter_next(&iter_comands)))
 		{
-			if (0 == command->flag && hostid == command->hostid)
+			if (0 == (command->flag & REMOTE_COMMAND_SENT) && hostid == command->hostid)
 			{
+				int	wait = 0;
+
 				zbx_json_addobject(json, NULL);
 				zbx_json_addstring(json, ZBX_PROTO_TAG_COMMAND, command->command,
 						ZBX_JSON_TYPE_STRING);
 				zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, command->id);
+
+				if (0 != (command->flag & REMOTE_COMMAND_RESULT_WAIT))
+					wait = 1;
+
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
 				zbx_json_close(json);
 
 				command->flag |= REMOTE_COMMAND_SENT;
@@ -413,6 +424,13 @@ static int active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	if (2 > CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
+	{
+		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, increase number"
+				" of trappers up to 2");
+		goto out;
+	}
+
 	*error = '\0';
 	commands_lock();
 
@@ -429,6 +447,9 @@ static int active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 	pcmd->flag = 0;
 	pcmd->hostid = host->hostid;
 	pcmd->command = remote_commands_shared_strdup(command);
+
+	if (NULL != result)
+		pcmd->flag |= REMOTE_COMMAND_RESULT_WAIT;
 
 	if (NULL == pcmd->command)
 	{

@@ -37,6 +37,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxalgo.h"
+#include "zbxparam.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -516,7 +517,7 @@ commands:
 		p = NULL;
 		while (NULL != (p = zbx_json_next(&jp_data, p)))
 		{
-			size_t offset = 0;
+			size_t	offset = 0;
 
 			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
 			{
@@ -533,7 +534,27 @@ commands:
 				continue;
 			}
 
-			zbx_snprintf_alloc(&key_orig, &key_orig_alloc, &offset, "system.run[%s,nowait]", command);
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
+					'\0' == *tmp)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_WAIT);
+				continue;
+			}
+
+			if (SUCCEED != (ret = zbx_quote_key_param(&command, 0)))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Invalid command \"%s\"", command);
+				continue;
+			}
+
+			if (0 == atoi(tmp))
+			{
+				zbx_snprintf_alloc(&key_orig, &key_orig_alloc, &offset, "system.run[%s,nowait]",
+						command);
+			}
+			else
+				zbx_snprintf_alloc(&key_orig, &key_orig_alloc, &offset, "system.run[%s,wait]",command);
 
 			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ID, tmp, sizeof(tmp), NULL) ||
 							SUCCEED != zbx_is_uint64(tmp, &command_id))
@@ -990,13 +1011,16 @@ commands:
 		{
 			el = &buffer.commands[i];
 
+			if (NULL == el->value)
+				continue;
+
 			zbx_json_addobject(&json, NULL);
 			zbx_json_adduint64(&json, ZBX_PROTO_TAG_ID, el->id);
 
-			if (NULL != el->value && 1 == atoi(el->value))
-				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
-			else
+			if (ITEM_STATE_NOTSUPPORTED == el->state)
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_ERROR, el->value, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
 
 			zbx_json_close(&json);
 		}

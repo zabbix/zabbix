@@ -157,7 +157,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				}
 			}
 
-			///!!!AKDBGif !ok || r.RemoteCommand != -1 {
 			if !ok {
 				// create and register new exporter task
 				task = &exporterTask{
@@ -167,10 +166,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 					client:   c,
 					output:   sink,
 				}
-
-				///if r.RemoteCommand == 1 {
-				///	r.RemoteCommand = -1
-				///}
 
 				if scheduling == false && (firstActiveChecksRefreshed == true || p.forceActiveChecksOnStart != 0) {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)

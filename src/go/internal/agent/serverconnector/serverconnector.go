@@ -39,6 +39,7 @@ import (
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
+	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxcomms"
@@ -78,6 +79,7 @@ type activeChecksRequest struct {
 type CommandRequest struct {
 	Id      uint64 `json:"id"`
 	Command string `json:"command"`
+	Wait    int    `json:"wait"`
 }
 
 type activeChecksResponse struct {
@@ -344,9 +346,16 @@ commands:
 		var commandItem plugin.Request
 		var dummyMtime int
 		var dummyLastlogsize uint64
+		var keyParams []string
 
 		commandItem.Itemid = response.Commands[i].Id
-		commandItem.Key = fmt.Sprintf("system.run[%s, nowait]", response.Commands[i].Command)
+		keyParams = append(keyParams, response.Commands[i].Command)
+		if response.Commands[i].Wait == 0 {
+			keyParams = append(keyParams, "nowait")
+		} else {
+			keyParams = append(keyParams, "wait")
+		}
+		commandItem.Key = itemutil.MakeKey("system.run", keyParams)
 		commandItem.Delay = "1"
 		commandItem.RemoteCommand = 1
 		commandItem.LastLogsize = &dummyLastlogsize
