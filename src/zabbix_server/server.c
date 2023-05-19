@@ -2023,7 +2023,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
 		zbx_free(error);
-		return FAIL;
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_db_check_character_set();
