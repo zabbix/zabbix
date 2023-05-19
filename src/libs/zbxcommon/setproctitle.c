@@ -55,7 +55,7 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static const char	*empty_str = "";
+static char	*empty_str = "";
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -109,7 +109,7 @@ char	**zbx_setproctitle_init(int argc, char **argv)
 		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
 		/* overwritten and their argv[] pointers will point to wrong strings. */
 		if (argc_ext_copied_first < i)
-			argv[i] = (char *)empty_str;
+			argv[i] = empty_str;
 	}
 
 	argc_ext_copied_last = i - 1;
@@ -137,7 +137,7 @@ char	**zbx_setproctitle_init(int argc, char **argv)
 
 			/* environment variables can be overwritten by status messages in argv[0] */
 			/* and environ[] pointers will point to wrong strings */
-			environ[i] = (char *)empty_str;
+			environ[i] = empty_str;
 		}
 
 		environ_ext_copied = i;

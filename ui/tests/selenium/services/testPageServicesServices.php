@@ -1487,7 +1487,7 @@ class testPageServicesServices extends CWebTest {
 		$form->getField('Status calculation rule')->fill($data['parent']['Status calculation rule']);
 
 		if (array_key_exists('Additional rules', $data['parent'])) {
-			$form->query('id:advanced_configuration')->asCheckbox()->one()->set(true);
+			$form->fill(['Advanced configuration' => true]);
 
 			// Remove the additional rules from previous test cases.
 			$form->getFieldContainer('Additional rules')->query('button:Remove')->all(false)->click();
@@ -1527,6 +1527,7 @@ class testPageServicesServices extends CWebTest {
 
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$form = $this->query('id:service-form')->asForm()->one();
+				$form->fill(['Advanced configuration' => true]);
 
 				$form->fill($child_service['fields']);
 				$form->submit();

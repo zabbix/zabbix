@@ -1297,6 +1297,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args = {
 							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+							.config_timeout = zbx_config_timeout,
 							zbx_config_source_ip};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
@@ -1634,7 +1635,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			zbx_set_exiting_with_fail();
 			break;
 		}
@@ -1647,6 +1647,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 out:
+	zbx_log_exit_signal();
+
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 

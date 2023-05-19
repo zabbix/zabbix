@@ -83,7 +83,7 @@ const char	*zbx_variant_type_desc(const zbx_variant_t *value);
 int		zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2);
 
 void		*zbx_variant_data_bin_create(const void *data, zbx_uint32_t size);
-zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, void **data);
+zbx_uint32_t	zbx_variant_data_bin_get(const void *bin, const void ** const data);
 
 int		zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg);
 

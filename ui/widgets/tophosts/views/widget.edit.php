@@ -26,16 +26,13 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\{
-	CWidgetFieldColumnsList,
-	CWidgetFieldSelect
-};
-
-$form = (new CWidgetFormView($data));
+$form = new CWidgetFormView($data);
 
 $groupids = array_key_exists('groupids', $data['fields'])
 	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
 	: null;
+
+$column = $form->registerField(new CWidgetFieldSelectView($data['fields']['column']));
 
 $form
 	->addField($groupids)
@@ -52,15 +49,17 @@ $form
 		? new CWidgetFieldTagsView($data['fields']['tags'])
 		: null
 	)
-	->addItem(
-		getColumnsField($form, $data['fields']['columns'])
+	->addField(
+		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['order'])
 	)
-	->addItem(
-		getColumnField($form, $data['fields']['column'])
-	)
+	->addItem([
+		$column->getLabel(),
+		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add item column')))
+			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
+	])
 	->addField(array_key_exists('count', $data['fields'])
 		? new CWidgetFieldIntegerBoxView($data['fields']['count'])
 		: null
@@ -70,22 +69,3 @@ $form
 		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();
-
-function getColumnsField(CWidgetFormView $form, CWidgetFieldColumnsList $field): array {
-	$columns = new CWidgetFieldColumnsListView($field);
-
-	return $form->makeCustomField($columns, [
-		$columns->getLabel(),
-		(new CFormField($columns->getView()))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	]);
-}
-
-function getColumnField(CWidgetFormView $form, CWidgetFieldSelect $field): array {
-	$column = new CWidgetFieldSelectView($field);
-
-	return $form->makeCustomField($column, [
-		$column->getLabel(),
-		(new CFormField($field->getValues() ? $column->getView() : _('Add item column')))
-			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
-	]);
-}

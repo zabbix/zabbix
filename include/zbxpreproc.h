@@ -71,6 +71,7 @@ ZBX_PTR_VECTOR_DECL(pp_task_ptr, zbx_pp_task_t *)
 typedef struct
 {
 	int		workers_num;
+	int		config_timeout;
 	const char	*config_source_ip;
 }
 zbx_thread_pp_manager_args;
@@ -117,7 +118,6 @@ ZBX_PTR_VECTOR_DECL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
 void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences);
 
 void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t *worker_usage);
-void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction);
 
 void zbx_preproc_stats_ext_get(struct zbx_json *json, const void *arg);
 zbx_uint64_t	zbx_preprocessor_get_queue_size(void);
