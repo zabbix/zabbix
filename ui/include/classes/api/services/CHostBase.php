@@ -668,6 +668,7 @@ abstract class CHostBase extends CApiService {
 	 *                   Second array contains the child templates indexed by parent template.
 	 */
 	private static function getParentTemplates(array $_templateids, array $del_links, ?array $ins_hosts): array {
+		$processed_templateids = $_templateids;
 		$children_templates = [];
 		$parent_templates = [];
 
@@ -695,10 +696,11 @@ abstract class CHostBase extends CApiService {
 					}
 				}
 
-				if (!array_key_exists($link['templateid'], $children_templates)) {
+				if (!array_key_exists($link['templateid'], $processed_templateids)) {
 					$_templateids[$link['templateid']] = true;
 				}
 
+				$processed_templateids[$link['templateid']] = true;
 				$children_templates[$link['templateid']][] = $link['hostid'];
 				$parent_templates[$link['hostid']][] = $link['templateid'];
 			}
