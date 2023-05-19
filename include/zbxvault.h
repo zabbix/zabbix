@@ -34,9 +34,10 @@ typedef struct
 zbx_config_vault_t;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error);
-int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault, char **error);
+int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip, char **error);
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
-		char **error);
+		const char *config_source_ip, char **error);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
 

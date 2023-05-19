@@ -75,7 +75,7 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 				$host->fill([
 					'values' => $zbx_data['host'],
 					'context' => $zbx_data['hostgroup']

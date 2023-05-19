@@ -172,7 +172,7 @@ class Group extends ScimApiService {
 
 		$users = [];
 
-		if (array_key_exists('memebers', $options)) {
+		if (array_key_exists('members', $options)) {
 			$scim_group_members = array_column($options['members'], 'value');
 
 			$users = $this->verifyUserids($scim_group_members, $userdirectoryid);
@@ -264,6 +264,7 @@ class Group extends ScimApiService {
 		}
 
 		$scim_group_members = array_column($options['members'], 'value');
+		$this->verifyUserids($scim_group_members, $userdirectoryid);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
 			'output' => ['userid'],
@@ -320,6 +321,7 @@ class Group extends ScimApiService {
 	private function validatePut($options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -397,7 +399,9 @@ class Group extends ScimApiService {
 
 					case 'remove':
 						if (!$do_replace) {
-							$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							if (array_key_exists('value', $operation)) {
+								$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							}
 
 							if (!$del_userids) {
 								// Empty 'value' array for 'remove' operation should act as 'replace' operation.
@@ -454,6 +458,8 @@ class Group extends ScimApiService {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
+		$db_users = $del_userids ? [] : $db_users;
+
 		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
 
 		return $this->data;
@@ -466,15 +472,14 @@ class Group extends ScimApiService {
 	 */
 	private function validatePatch(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
-			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
 				'op' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'displayName'], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['replace', 'Replace'])],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])]
 				]],
-				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
-
 				'value' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 										'value' =>		['type' => API_ID]

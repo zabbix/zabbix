@@ -35,13 +35,16 @@
  ******************************************************************************/
 ZBX_THREAD_ENTRY(httppoller_thread, args)
 {
-	int			sleeptime = -1, httptests_count = 0, old_httptests_count = 0;
-	double			sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t			last_stat_time, nextcheck = 0;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int					sleeptime = -1, httptests_count = 0, old_httptests_count = 0,
+						server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	double					total_sec = 0.0, old_total_sec = 0.0;
+	time_t					last_stat_time, nextcheck = 0;
+	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
+
+	const zbx_thread_httppoller_args	*httppoller_args_in = (const zbx_thread_httppoller_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -58,7 +61,8 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		sec = zbx_time();
+		double	sec = zbx_time();
+
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (0 != sleeptime)
@@ -70,7 +74,8 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 
 		if ((int)sec >= nextcheck)
 		{
-			httptests_count += process_httptests((int)sec, &nextcheck);
+			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
+					&nextcheck);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

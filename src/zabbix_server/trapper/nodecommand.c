@@ -218,27 +218,28 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: executing command                                                 *
- *                                                                            *
- * Parameters:  scriptid       - [IN] the id of a script to be executed       *
- *              hostid         - [IN] the host the script will be executed on *
- *              eventid        - [IN] the id of an event                      *
- *              user           - [IN] the user who executes the command       *
- *              clientip       - [IN] the IP of client                        *
- *              config_timeout - [IN]                                         *
- *              result         - [OUT] the result of a script execution       *
- *              debug          - [OUT] the debug data (optional)              *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- * Comments: either 'hostid' or 'eventid' must be > 0, but not both           *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: executing command                                                   *
+ *                                                                              *
+ * Parameters:  scriptid         - [IN] the id of a script to be executed       *
+ *              hostid           - [IN] the host the script will be executed on *
+ *              eventid          - [IN] the id of an event                      *
+ *              user             - [IN] the user who executes the command       *
+ *              clientip         - [IN] the IP of client                        *
+ *              config_timeout   - [IN]                                         *
+ *              config_source_ip - [IN]                                         *
+ *              result           - [OUT] the result of a script execution       *
+ *              debug            - [OUT] the debug data (optional)              *
+ *                                                                              *
+ * Return value:  SUCCEED - processed successfully                              *
+ *                FAIL - an error occurred                                      *
+ *                                                                              *
+ * Comments: either 'hostid' or 'eventid' must be > 0, but not both             *
+ *                                                                              *
+ ********************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, int config_timeout, char **result, char **debug)
+		const char *clientip, int config_timeout, const char *config_source_ip, char **result, char **debug)
 {
 	int			ret = FAIL, scope = 0, i, macro_type;
 	zbx_dc_host_t		host;
@@ -442,8 +443,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
-			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, result, error,
-					sizeof(error), debug);
+			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, config_source_ip,
+					result, error, sizeof(error), debug);
 		}
 		else
 			ret = execute_remote_script(&script, &host, result, error, sizeof(error));
@@ -497,7 +498,8 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout)
+int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp, int config_timeout,
+		const char *config_source_ip)
 {
 	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
 				clientip[MAX_STRING_LEN];
@@ -595,8 +597,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout, &result,
-			&debug)))
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout,
+			config_source_ip, &result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);

@@ -76,7 +76,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	}
 
 	public function getTemplates(): array {
-		$value = ['color' => '#{color}'] +  CWidgetFieldGraphDataSet::getDefaults();
+		$value = ['color' => '#{color}'] + CWidgetFieldGraphDataSet::getDefaults();
 
 		return [
 			new CTemplateTag('dataset-pattern-item-tmpl',
@@ -189,7 +189,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		}
 		else {
 			$item_rows = [];
-			foreach($value['itemids'] as $i => $itemid) {
+			foreach ($value['itemids'] as $i => $itemid) {
 				$item_name = array_key_exists($itemid, $value['item_names'])
 					? $value['item_names'][$itemid]
 					: '';

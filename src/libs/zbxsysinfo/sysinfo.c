@@ -74,6 +74,7 @@ static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
+static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -149,12 +150,14 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
-		zbx_get_config_int_f get_config_unsafe_user_parameters_f)
+		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
+		get_config_source_ip_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
 	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
 	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
+	get_config_source_ip_cb = get_config_source_ip_f;
 }
 
 /******************************************************************************
@@ -281,6 +284,11 @@ void	zbx_set_metrics(ZBX_METRIC *metrics)
 int	sysinfo_get_config_timeout(void)
 {
 	return get_config_timeout_cb();
+}
+
+const char	*sysinfo_get_config_source_ip(void)
+{
+	return get_config_source_ip_cb();
 }
 
 int	sysinfo_get_config_log_remote_commands(void)
@@ -833,34 +841,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->timestamp = 0;
 	log->severity = 0;
 	log->logeventid = 0;
-}
-
-void	zbx_init_agent_result(AGENT_RESULT *result)
-{
-	memset(result, 0, sizeof(AGENT_RESULT));
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_log_free(zbx_log_t *log)
-{
-	zbx_log_clean(log);
-	zbx_free(log);
-}
-
-void	zbx_free_agent_result(AGENT_RESULT *result)
-{
-	ZBX_UNSET_UI64_RESULT(result);
-	ZBX_UNSET_DBL_RESULT(result);
-	ZBX_UNSET_STR_RESULT(result);
-	ZBX_UNSET_TEXT_RESULT(result);
-	ZBX_UNSET_BIN_RESULT(result);
-	ZBX_UNSET_LOG_RESULT(result);
-	ZBX_UNSET_MSG_RESULT(result);
 }
 
 /******************************************************************************
@@ -1556,84 +1536,6 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 	}
 
 	return NULL;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: unquotes special symbols in item key parameter                    *
- *                                                                            *
- * Parameters: param - [IN/OUT] item key parameter                            *
- *                                                                            *
- * Comments:                                                                  *
- *   "param"     => param                                                     *
- *   "\"param\"" => "param"                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_unquote_key_param(char *param)
-{
-	char	*dst;
-
-	if ('"' != *param)
-		return;
-
-	for (dst = param++; '\0' != *param; param++)
-	{
-		if ('\\' == *param && '"' == param[1])
-			continue;
-
-		*dst++ = *param;
-	}
-	*--dst = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: quotes special symbols in item key parameter                      *
- *                                                                            *
- * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
- *                                                                            *
- * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
- *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_quote_key_param(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
-
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-
-	*param = (char *)zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-
-	return SUCCEED;
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)

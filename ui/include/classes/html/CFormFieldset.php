@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -17,15 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_ITEM_H
-#define ZABBIX_PP_ITEM_H
 
-#include "pp_history.h"
-#include "zbxcommon.h"
-#include "zbxpreproc.h"
+class CFormFieldset extends CTag {
 
-void	pp_item_clear(zbx_pp_item_t *item);
+	protected ?string $caption;
 
-zbx_pp_item_preproc_t	*pp_item_preproc_copy(zbx_pp_item_preproc_t *preproc);
+	public function __construct(string $caption = null, $body = null) {
+		parent::__construct('fieldset', true, $body);
 
-#endif
+		$this->caption = $caption;
+	}
+
+	protected function makeLegend(): string {
+		return $this->caption !== null
+			? (new CTag('legend', true, new CSpan($this->caption)))->toString()
+			: '';
+	}
+
+	protected function bodyToString(): string {
+		return $this->makeLegend().parent::bodyToString();
+	}
+}
