@@ -27,4 +27,5 @@ libzbxpreproc_a_SOURCES = \
 	pp_worker.h
 
 libzbxpreproc_a_CFLAGS = \
-	 $(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)

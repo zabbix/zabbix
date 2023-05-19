@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libzbxavailability.a
 
+libzbxavailability_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libzbxavailability_a_SOURCES = \
 	availability.c \
 	avail_protocol.c

@@ -17,4 +17,6 @@ libzbxlld_a_SOURCES = \
 	lld_worker.c \
 	lld_worker.h
 
-libzbxlld_a_CFLAGS = $(LIBXML2_CFLAGS)
+libzbxlld_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)
