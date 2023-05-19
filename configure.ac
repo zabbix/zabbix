@@ -1244,7 +1244,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([USE_TESTS], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1935,6 +1935,7 @@ dnl *                                                               *
 dnl *****************************************************************
 
 m4_ifdef([CONF_TESTS],[CONF_TESTS])
+AM_CONDITIONAL([TESTS],[test "x$found_cmocka" = "xyes"])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -2277,7 +2278,18 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
-  IPv6 support:          ${have_ipv6}"
+  IPv6 support:          ${have_ipv6}
+  cmocka support:        ${found_cmocka}"
+
+if test "x$found_cmocka" != "xno"; then
+
+echo "  cmocka gateway details:
+    Compiler flags:      ${CMOCKA_CFLAGS}
+    Linker flags:        ${CMOCKA_LDFLAGS}
+    Libraries:           ${CMOCKA_LIBS}
+    Library location:    ${CMOCKA_LIBRARY_PATH}"
+
+fi
 
 echo
 echo "***********************************************************"

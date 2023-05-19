@@ -29,9 +29,10 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
+COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
 
 zbx_trends_parse_range_SOURCES = \
 	zbx_trends_parse_range.c \
@@ -42,7 +43,7 @@ zbx_trends_parse_range_LDADD = \
 
 zbx_trends_parse_range_LDADD += @SERVER_LIBS@
 
-zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
+zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) \
 	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=zbx_db_select \
 	-Wl,--wrap=zbx_db_is_null \
@@ -51,7 +52,7 @@ zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=DBis_null \
 	-Wl,--wrap=zbx_recalc_time_period
 
-zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS) $(CMOCKA_CFLAGS)
 
 # zbx_baseline_get_data
 
@@ -65,7 +66,7 @@ zbx_baseline_get_data_LDADD = \
 
 zbx_baseline_get_data_LDADD += @SERVER_LIBS@
 
-zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ \
+zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) \
 	-Wl,--wrap=zbx_db_fetch \
 	-Wl,--wrap=zbx_db_select \
 	-Wl,--wrap=zbx_db_is_null \

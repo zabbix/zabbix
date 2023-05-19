@@ -38,9 +38,10 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS)
 
-COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
+COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS)
 
 zbx_tcp_recv_ext_SOURCES = \
 	zbx_tcp_recv_ext.c \
@@ -51,7 +52,7 @@ zbx_tcp_recv_ext_LDADD = \
 
 zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@
 
-zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@
+zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tcp_recv_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -65,7 +66,7 @@ zbx_tcp_recv_ext_zlib_LDADD = \
 
 zbx_tcp_recv_ext_zlib_LDADD += @AGENT_LIBS@
 
-zbx_tcp_recv_ext_zlib_LDFLAGS = @AGENT_LDFLAGS@
+zbx_tcp_recv_ext_zlib_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tcp_recv_ext_zlib_CFLAGS = $(COMMON_COMPILER_FLAGS)
 endif
@@ -79,6 +80,6 @@ zbx_tcp_recv_raw_ext_LDADD = \
 
 zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
 
-zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@
+zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
