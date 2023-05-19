@@ -52,7 +52,7 @@ zbx_trends_parse_range_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLA
 	-Wl,--wrap=DBis_null \
 	-Wl,--wrap=zbx_recalc_time_period
 
-zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS) $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+zbx_trends_parse_range_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 # zbx_baseline_get_data
 

@@ -34,7 +34,8 @@ prometheus_filter_init_SOURCES = \
 
 prometheus_filter_init_CFLAGS = \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 prometheus_filter_init_LDADD = $(PROMETHEUS_LIBS) @SERVER_LIBS@
 prometheus_filter_init_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
