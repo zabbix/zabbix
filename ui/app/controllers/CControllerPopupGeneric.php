@@ -1238,93 +1238,39 @@ class CControllerPopupGeneric extends CController {
 		}
 
 		switch ($this->source_table) {
-			case 'actions':
-				$options += ['output' => ['name']];
-
-				$records = API::Action()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'api_methods':
-				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
-				$api_methods = CRoleHelper::getApiMethods($user_type);
-				$api_mask_methods = CRoleHelper::getApiMaskMethods($user_type);
-				$modified_disableids = [];
-
-				foreach ($this->disableids as $disableid) {
-					if (array_key_exists($disableid, $api_mask_methods)) {
-						$modified_disableids = array_merge($modified_disableids, $api_mask_methods[$disableid]);
-					}
-					else if (!in_array($disableid, $modified_disableids)) {
-						$modified_disableids[] = $disableid;
-					}
-				}
-
-				$this->disableids = $modified_disableids;
-
-				foreach ($api_methods as $api_method) {
-					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];
-				}
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'dashboard':
+			case 'usrgrp':
 				$options += [
-					'output' => ['dashboardid', 'name']
+					'output' => API_OUTPUT_EXTEND
 				];
 
-				$records = API::Dashboard()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
-				break;
+				if ($this->hasInput('group_status')) {
+					$options['status'] = $this->getInput('group_status');
+				}
 
-			case 'dchecks':
-				$records = API::DRule()->get([
-					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports', 'allow_redirect'],
-					'output' => ['druleid', 'name']
-				]);
-
+				$records = API::UserGroup()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
 
-			case 'drules':
-				$records = API::DRule()->get([
-					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
-					'preservekeys' => true
-				]);
-
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['druleid' => 'id']);
-				break;
-
-			case 'graphs':
-			case 'graph_prototypes':
+			case 'users':
 				$options += [
-					'output' => API_OUTPUT_EXTEND,
-					'selectHosts' => ['hostid', 'name'],
-					'hostids' => $this->hostids ? $this->hostids : null
+					'output' => ['username', 'name', 'surname', 'type', 'theme', 'lang']
 				];
 
-				if ($this->source_table === 'graph_prototypes') {
-					$options['selectDiscoveryRule'] = ['hostid'];
-
-					$records = (!$this->host_preselect_required || $this->hostids)
-						? API::GraphPrototype()->get($options)
-						: [];
-				}
-				else {
-					$records = (!$this->host_preselect_required || $this->hostids)
-						? API::Graph()->get($options)
-						: [];
-				}
-
-				CArrayHelper::sort($records, ['name']);
+				$records = API::User()->get($options);
+				CArrayHelper::sort($records, ['username']);
 				break;
 
-			case 'help_items':
-				$records = CItemData::getByType($this->page_options['itemtype']);
+			case 'templates':
+				$options += [
+					'output' => ['templateid', 'name'],
+					'groupids' => $this->template_groupids ? $this->template_groupids : null
+				];
+				$records = (!$this->template_group_preselect_required || $this->template_groupids)
+					? API::Template()->get($options)
+					: [];
+
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['templateid' => 'id']);
 				break;
 
 			case 'hosts':
@@ -1349,6 +1295,21 @@ class CControllerPopupGeneric extends CController {
 						'monitored_hosts' => true
 					];
 				}
+
+				$records = (!$this->group_preselect_required || $this->groupids)
+					? API::Host()->get($options)
+					: [];
+
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['hostid' => 'id']);
+				break;
+
+			case 'host_templates':
+				$options += [
+					'output' => ['hostid', 'name'],
+					'groupids' => $this->groupids ? $this->groupids : null,
+					'templated_hosts' => true
+				];
 
 				$records = (!$this->group_preselect_required || $this->groupids)
 					? API::Host()->get($options)
@@ -1393,19 +1354,113 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
 
-			case 'host_templates':
+			case 'template_groups':
 				$options += [
-					'output' => ['hostid', 'name'],
-					'groupids' => $this->groupids ? $this->groupids : null,
-					'templated_hosts' => true
+					'output' => ['groupid', 'name'],
+					'with_triggers' => $this->hasInput('with_triggers')
 				];
 
-				$records = (!$this->group_preselect_required || $this->groupids)
-					? API::Host()->get($options)
-					: [];
+				if ($this->hasInput('templated_hosts')) {
+					$options['with_templates'] = true;
+				}
+
+				if ($this->hasInput('with_httptests')) {
+					$options['with_httptests'] = true;
+				}
+
+				if ($this->hasInput('with_items')) {
+					$options['with_items'] = true;
+				}
+
+				$records = API::TemplateGroup()->get($options);
+				if ($this->hasInput('enrich_parent_groups')) {
+					$records = enrichParentTemplateGroups($records);
+				}
 
 				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['hostid' => 'id']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
+				break;
+
+			case 'help_items':
+				$records = CItemData::getByType($this->page_options['itemtype']);
+				break;
+
+			case 'triggers':
+				$options += [
+					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
+					'selectHosts' => ['name'],
+					'selectDependencies' => ['triggerid', 'expression', 'description'],
+					'expandDescription' => true
+				];
+
+				if ($this->hostids) {
+					$options['hostids'] = $this->hostids;
+				}
+				elseif ($this->groupids) {
+					$options['groupids'] = $this->groupids;
+				}
+
+				if ($this->hasInput('with_monitored_triggers')) {
+					$options['monitored'] = true;
+				}
+
+				if ($this->hasInput('normal_only')) {
+					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+				}
+
+				if (!$this->host_preselect_required || $this->hostids) {
+					$records = API::Trigger()->get($options);
+				}
+				else {
+					$records = [];
+				}
+
+				CArrayHelper::sort($records, ['description']);
+				break;
+
+			case 'template_triggers':
+				$options += [
+					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
+					'selectHosts' => ['name'],
+					'selectDependencies' => ['triggerid', 'expression', 'description'],
+					'expandDescription' => true
+				];
+
+				if ($this->templateids) {
+					$options['templateids'] = $this->templateids;
+				}
+				elseif ($this->groupids) {
+					$options['groupids'] = $this->groupids;
+				}
+
+				if (!$this->template_preselect_required || $this->templateids) {
+					$records = API::Trigger()->get($options);
+				}
+				else {
+					$records = [];
+				}
+
+				CArrayHelper::sort($records, ['description']);
+				break;
+
+			case 'trigger_prototypes':
+				$options += [
+					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
+					'selectHosts' => ['name'],
+					'selectDependencies' => ['triggerid', 'expression', 'description'],
+					'expandDescription' => true
+				];
+
+				if ($this->page_options['parent_discoveryid']) {
+					$options['discoveryids'] = [$this->page_options['parent_discoveryid']];
+				}
+				elseif ($this->hostids) {
+					$options['hostids'] = $this->hostids;
+				}
+
+				$records = API::TriggerPrototype()->get($options);
+
+				CArrayHelper::sort($records, ['description']);
 				break;
 
 			case 'items':
@@ -1455,10 +1510,78 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name']);
 				break;
 
-			case 'media_types':
-				$options += ['output' => ['name']];
+			case 'template_items':
+				$options += [
+					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
+					'selectHosts' => ['name']
+				];
 
-				$records = API::MediaType()->get($options);
+				if ($this->page_options['parent_discoveryid']) {
+					$options['discoveryids'] = $this->page_options['parent_discoveryid'];
+				}
+				elseif ($this->templateids) {
+					$options['templateids'] = $this->templateids;
+				}
+
+				$records = !$this->template_preselect_required || $this->templateids
+					? API::Item()->get($options + ['webitems' => true])
+					: [];
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'graphs':
+			case 'graph_prototypes':
+				$options += [
+					'output' => API_OUTPUT_EXTEND,
+					'selectHosts' => ['hostid', 'name'],
+					'hostids' => $this->hostids ? $this->hostids : null
+				];
+
+				if ($this->source_table === 'graph_prototypes') {
+					$options['selectDiscoveryRule'] = ['hostid'];
+
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::GraphPrototype()->get($options)
+						: [];
+				}
+				else {
+					$records = (!$this->host_preselect_required || $this->hostids)
+						? API::Graph()->get($options)
+						: [];
+				}
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'sysmaps':
+				$records = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'preservekeys' => true
+				]);
+
+				$records = CArrayHelper::renameObjectsKeys($records, ['sysmapid' => 'id']);
+
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'drules':
+				$records = API::DRule()->get([
+					'output' => ['druleid', 'name'],
+					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'preservekeys' => true
+				]);
+
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['druleid' => 'id']);
+				break;
+
+			case 'dchecks':
+				$records = API::DRule()->get([
+					'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports', 'allow_redirect'],
+					'output' => ['druleid', 'name']
+				]);
+
 				CArrayHelper::sort($records, ['name']);
 				break;
 
@@ -1483,191 +1606,57 @@ class CControllerPopupGeneric extends CController {
 				$records = CArrayHelper::renameObjectsKeys($records, ['roleid' => 'id']);
 				break;
 
-			case 'sla':
-				$options += $this->hasInput('enabled_only')
-					? [
-						'output' => ['slaid', 'name'],
-						'filter' => [
-							'status' => ZBX_SLA_STATUS_ENABLED
-						]
-					]
-					: [
-						'output' => ['slaid', 'name', 'status']
-					];
+			case 'api_methods':
+				$user_type = $this->getInput('user_type', USER_TYPE_ZABBIX_USER);
+				$api_methods = CRoleHelper::getApiMethods($user_type);
+				$api_mask_methods = CRoleHelper::getApiMaskMethods($user_type);
+				$modified_disableids = [];
 
-				$records = API::Sla()->get($options);
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['slaid' => 'id']);
-				break;
-
-			case 'sysmaps':
-				$records = API::Map()->get([
-					'output' => ['sysmapid', 'name'],
-					'preservekeys' => true
-				]);
-
-				$records = CArrayHelper::renameObjectsKeys($records, ['sysmapid' => 'id']);
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'templates':
-				$options += [
-					'output' => ['templateid', 'name'],
-					'groupids' => $this->template_groupids ? $this->template_groupids : null
-				];
-				$records = (!$this->template_group_preselect_required || $this->template_groupids)
-					? API::Template()->get($options)
-					: [];
-
-				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['templateid' => 'id']);
-				break;
-
-			case 'template_groups':
-				$options += [
-					'output' => ['groupid', 'name'],
-					'with_triggers' => $this->hasInput('with_triggers')
-				];
-
-				if ($this->hasInput('templated_hosts')) {
-					$options['with_templates'] = true;
+				foreach ($this->disableids as $disableid) {
+					if (array_key_exists($disableid, $api_mask_methods)) {
+						$modified_disableids = array_merge($modified_disableids, $api_mask_methods[$disableid]);
+					}
+					else if (!in_array($disableid, $modified_disableids)) {
+						$modified_disableids[] = $disableid;
+					}
 				}
 
-				if ($this->hasInput('with_httptests')) {
-					$options['with_httptests'] = true;
-				}
+				$this->disableids = $modified_disableids;
 
-				if ($this->hasInput('with_items')) {
-					$options['with_items'] = true;
-				}
-
-				$records = API::TemplateGroup()->get($options);
-				if ($this->hasInput('enrich_parent_groups')) {
-					$records = enrichParentTemplateGroups($records);
+				foreach ($api_methods as $api_method) {
+					$records[$api_method] = ['id' => $api_method, 'name' => $api_method];
 				}
 
 				CArrayHelper::sort($records, ['name']);
-				$records = CArrayHelper::renameObjectsKeys($records, ['groupid' => 'id']);
 				break;
 
-			case 'template_items':
-				$options += [
-					'output' => ['itemid', 'name', 'key_', 'flags', 'type', 'value_type', 'status'],
-					'selectHosts' => ['name']
-				];
+			case 'valuemap_names':
+				/**
+				 * Show list of value maps with unique names for defined hosts or templates.
+				 *
+				 * hostids           (required) Array of host or template ids to get value maps from.
+				 * context           (required) Define context for inherited value maps: host, template
+				 * with_inherited    Include value maps from inherited templates.
+				 */
+				$records = [];
+				$hostids = $this->getInput('hostids', []);
+				$context = $this->getInput('context', '');
 
-				if ($this->page_options['parent_discoveryid']) {
-					$options['discoveryids'] = $this->page_options['parent_discoveryid'];
-				}
-				elseif ($this->templateids) {
-					$options['templateids'] = $this->templateids;
-				}
-
-				$records = !$this->template_preselect_required || $this->templateids
-					? API::Item()->get($options + ['webitems' => true])
-					: [];
-
-				CArrayHelper::sort($records, ['name']);
-				break;
-
-			case 'template_triggers':
-				$options += [
-					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
-					'selectHosts' => ['name'],
-					'selectDependencies' => ['triggerid', 'expression', 'description'],
-					'expandDescription' => true
-				];
-
-				if ($this->templateids) {
-					$options['templateids'] = $this->templateids;
-				}
-				elseif ($this->groupids) {
-					$options['groupids'] = $this->groupids;
+				if (!$hostids || $context === '') {
+					break;
 				}
 
-				if (!$this->template_preselect_required || $this->templateids) {
-					$records = API::Trigger()->get($options);
-				}
-				else {
-					$records = [];
+				if ($this->hasInput('with_inherited')) {
+					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
 				}
 
-				CArrayHelper::sort($records, ['description']);
-				break;
-
-			case 'triggers':
-				$options += [
-					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
-					'selectHosts' => ['name'],
-					'selectDependencies' => ['triggerid', 'expression', 'description'],
-					'expandDescription' => true
-				];
-
-				if ($this->hostids) {
-					$options['hostids'] = $this->hostids;
-				}
-				elseif ($this->groupids) {
-					$options['groupids'] = $this->groupids;
-				}
-
-				if ($this->hasInput('with_monitored_triggers')) {
-					$options['monitored'] = true;
-				}
-
-				if ($this->hasInput('normal_only')) {
-					$options['filter']['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-				}
-
-				if (!$this->host_preselect_required || $this->hostids) {
-					$records = API::Trigger()->get($options);
-				}
-				else {
-					$records = [];
-				}
-
-				CArrayHelper::sort($records, ['description']);
-				break;
-
-			case 'trigger_prototypes':
-				$options += [
-					'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
-					'selectHosts' => ['name'],
-					'selectDependencies' => ['triggerid', 'expression', 'description'],
-					'expandDescription' => true
-				];
-
-				if ($this->page_options['parent_discoveryid']) {
-					$options['discoveryids'] = [$this->page_options['parent_discoveryid']];
-				}
-				elseif ($this->hostids) {
-					$options['hostids'] = $this->hostids;
-				}
-
-				$records = API::TriggerPrototype()->get($options);
-
-				CArrayHelper::sort($records, ['description']);
-				break;
-
-			case 'users':
-				$options += [
-					'output' => ['username', 'name', 'surname', 'type', 'theme', 'lang']
-				];
-
-				$records = API::User()->get($options);
-				CArrayHelper::sort($records, ['username']);
-				break;
-
-			case 'usrgrp':
-				$options += [
-					'output' => API_OUTPUT_EXTEND
-				];
-
-				if ($this->hasInput('group_status')) {
-					$options['status'] = $this->getInput('group_status');
-				}
-
-				$records = API::UserGroup()->get($options);
+				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'hostids' => $hostids
+				]), ['valuemapid' => 'id']);
+				// Remove value maps with duplicate names.
+				$records = array_column($records, null, 'name');
+				$records = array_column($records, null, 'id');
 				CArrayHelper::sort($records, ['name']);
 				break;
 
@@ -1743,33 +1732,44 @@ class CControllerPopupGeneric extends CController {
 				CArrayHelper::sort($records, ['name', 'hostname']);
 				break;
 
-			case 'valuemap_names':
-				/**
-				 * Show list of value maps with unique names for defined hosts or templates.
-				 *
-				 * hostids           (required) Array of host or template ids to get value maps from.
-				 * context           (required) Define context for inherited value maps: host, template
-				 * with_inherited    Include value maps from inherited templates.
-				 */
-				$records = [];
-				$hostids = $this->getInput('hostids', []);
-				$context = $this->getInput('context', '');
+			case 'dashboard':
+				$options += [
+					'output' => ['dashboardid', 'name']
+				];
 
-				if (!$hostids || $context === '') {
-					break;
-				}
+				$records = API::Dashboard()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['dashboardid' => 'id']);
+				break;
 
-				if ($this->hasInput('with_inherited')) {
-					$hostids = CTemplateHelper::getParentTemplatesRecursive($hostids, $context);
-				}
+			case 'sla':
+				$options += $this->hasInput('enabled_only')
+					? [
+						'output' => ['slaid', 'name'],
+						'filter' => [
+							'status' => ZBX_SLA_STATUS_ENABLED
+						]
+					]
+					: [
+						'output' => ['slaid', 'name', 'status']
+					];
 
-				$records = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-					'output' => ['valuemapid', 'name'],
-					'hostids' => $hostids
-				]), ['valuemapid' => 'id']);
-				// Remove value maps with duplicate names.
-				$records = array_column($records, null, 'name');
-				$records = array_column($records, null, 'id');
+				$records = API::Sla()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				$records = CArrayHelper::renameObjectsKeys($records, ['slaid' => 'id']);
+				break;
+
+			case 'actions':
+				$options += ['output' => ['name']];
+
+				$records = API::Action()->get($options);
+				CArrayHelper::sort($records, ['name']);
+				break;
+
+			case 'media_types':
+				$options += ['output' => ['name']];
+
+				$records = API::MediaType()->get($options);
 				CArrayHelper::sort($records, ['name']);
 				break;
 		}
