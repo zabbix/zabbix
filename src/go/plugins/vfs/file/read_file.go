@@ -120,7 +120,7 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		}
 
 		fmt.Printf("BADGER buf size: %d, lf size: %d\n", len(buf), len(lf))
-		for x := 0; x < szbyte; x++ {
+		for x := i; x < szbyte; x++ {
 			fmt.Printf("BADGER buf val: %d\n", buf[x])
 		}
 		for x := 0; x < szbyte; x++ {
