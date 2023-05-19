@@ -115,7 +115,7 @@ zbx_eval_serialize_LDADD = $(COMMON_LIB_FILES)
 
 zbx_eval_serialize_LDADD += @SERVER_LIBS@
 
-zbx_eval_serialize_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_eval_serialize_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_serialize_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -167,7 +167,7 @@ zbx_eval_get_constant_LDADD = $(COMMON_LIB_FILES)
 
 zbx_eval_get_constant_LDADD += @SERVER_LIBS@
 
-zbx_eval_get_constant_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_eval_get_constant_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_get_constant_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -180,7 +180,7 @@ zbx_eval_prepare_filter_LDADD = $(COMMON_LIB_FILES)
 
 zbx_eval_prepare_filter_LDADD += @SERVER_LIBS@
 
-zbx_eval_prepare_filter_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_eval_prepare_filter_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_prepare_filter_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -193,7 +193,7 @@ zbx_eval_get_group_filter_LDADD = $(COMMON_LIB_FILES)
 
 zbx_eval_get_group_filter_LDADD += @SERVER_LIBS@
 
-zbx_eval_get_group_filter_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_eval_get_group_filter_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_get_group_filter_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -206,8 +206,8 @@ zbx_eval_parse_query_LDADD = $(COMMON_LIB_FILES)
 
 zbx_eval_parse_query_LDADD += @SERVER_LIBS@
 
-zbx_eval_parse_query_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_eval_parse_query_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_eval_parse_query_CFLAGS = $(COMMON_COMPILER_FLAGS)
-endif
 
+endif

@@ -79,5 +79,4 @@ zbx_baseline_get_data_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAG
 
 zbx_baseline_get_data_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-
 endif
