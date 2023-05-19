@@ -586,6 +586,8 @@ class CConfigurationExportBuilder {
 		$simple_trigger_prototypes = [];
 
 		foreach ($discoveryRules as $discoveryRule) {
+			CArrayHelper::sort($discoveryRule['lld_macro_paths'], ['lld_macro']);
+
 			foreach ($discoveryRule['triggerPrototypes'] as $i => $trigger_prototype) {
 				if (count($trigger_prototype['items']) == 1) {
 					$simple_trigger_prototypes[] = $trigger_prototype;
@@ -609,7 +611,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => $discoveryRule['filter'],
+				'filter' => $this->formatDiscoveryRuleFilterConditions($discoveryRule),
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
@@ -637,7 +639,7 @@ class CConfigurationExportBuilder {
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
-				'overrides' => $discoveryRule['overrides']
+				'overrides' => $this->formatDiscoveryRuleFilterConditions($discoveryRule['overrides'])
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
@@ -678,6 +680,36 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format the conditions of a discovery rule filter, override filter.
+	 *
+	 * @param array $filters
+	 *
+	 * @return array
+	 */
+	protected function formatDiscoveryRuleFilterConditions(array $filter_object): array {
+		if (!$filter_object || !array_key_exists('filter', $filter_object)) {
+			return [];
+		}
+
+		switch ($filter_object['filter']['evaltype']) {
+			case CONDITION_EVAL_TYPE_AND_OR:
+				CArrayHelper::sort($filter_object['filter']['conditions'], ['macro']);
+				break;
+
+			case CONDITION_EVAL_TYPE_AND:
+				CArrayHelper::sort($filter_object['filter']['conditions'], ['macro']);
+				break;
+
+			case CONDITION_EVAL_TYPE_EXPRESSION:
+				CArrayHelper::sort($filter_object['filter']['conditions'], ['formulaid']);
+				break;
+		}
+
+		return $filter_object;
+	}
+
+
+	/**
 	 * Format preprocessing steps.
 	 *
 	 * @param array $preprocessing_steps
@@ -711,6 +743,8 @@ class CConfigurationExportBuilder {
 		order_result($httptests, 'name');
 
 		foreach ($httptests as $httptest) {
+			CArrayHelper::sort($httptest['variables'], ['name', 'value']);
+
 			$result[] = [
 				'uuid' => $httptest['uuid'],
 				'name' => $httptest['name'],
@@ -750,6 +784,8 @@ class CConfigurationExportBuilder {
 		order_result($httpsteps, 'no');
 
 		foreach ($httpsteps as $httpstep) {
+			CArrayHelper::sort($httpstep['variables'], ['name', 'value']);
+
 			$result[] = [
 				'name' => $httpstep['name'],
 				'url' => $httpstep['url'],
@@ -1064,6 +1100,8 @@ class CConfigurationExportBuilder {
 		CArrayHelper::sort($items, ['key_']);
 
 		foreach ($items as $item) {
+			CArrayHelper::sort($item['parameters'], ['name']);
+
 			$data = [
 				'uuid' => $item['uuid'],
 				'name' => $item['name'],
@@ -1322,7 +1360,9 @@ class CConfigurationExportBuilder {
 	protected function formatWidgetFields(array $fields) {
 		$result = [];
 
-		CArrayHelper::sort($fields, ['type']);
+		CArrayHelper::sort($fields, ['type', 'name', 'value_int', 'value_str', 'value_groupid', 'value_hostid',
+			'value_itemid', 'value_graphid', 'value_sysmapid', 'value_serviceid', 'value_slaid'
+		]);
 
 		foreach ($fields as $field) {
 			$result[] = [
@@ -1345,7 +1385,17 @@ class CConfigurationExportBuilder {
 	protected function formatGraphItems(array $graphItems) {
 		$result = [];
 
-		CArrayHelper::sort($graphItems, ['sortorder']);
+		usort($graphItems, static function (array $a, array $b): int {
+			foreach (['host', 'key'] as $field) {
+				$cmp = strnatcasecmp($a['itemid'][$field], $b['itemid'][$field]);
+
+				if ($cmp != 0) {
+					return $cmp;
+				}
+			}
+
+			return strnatcasecmp($a['calc_fnc'], $b['calc_fnc']);
+		});
 
 		foreach ($graphItems as $graphItem) {
 			$result[] = [
