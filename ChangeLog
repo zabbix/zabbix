@@ -6705,6 +6705,7 @@ Changes for 4.0.46rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 
 --------------------------------------------------------------------------------
