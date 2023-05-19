@@ -202,8 +202,7 @@ dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(TLS_CFLAGS) \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(YAML_CFLAGS)
 
 dc_check_maintenance_period_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
@@ -212,8 +211,7 @@ dc_check_maintenance_period_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(TLS_CFLAGS) \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(YAML_CFLAGS)
 
 dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
 dc_maintenance_match_tags_LDADD = $(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
