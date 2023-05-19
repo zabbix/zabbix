@@ -614,19 +614,19 @@ static zbx_am_alertpool_t	*am_get_alertpool(zbx_am_t *manager, zbx_uint64_t medi
 {
 	zbx_am_alertpool_t	*alertpool, alertpool_local;
 
-	alertpool_local.mediatypeid = mediatypeid;
 	alertpool_local.id = alertpoolid;
+	alertpool_local.mediatypeid = mediatypeid;
 
 	if (NULL == (alertpool = (zbx_am_alertpool_t *)zbx_hashset_search(&manager->alertpools, &alertpool_local)))
 	{
+		zbx_binary_heap_create(&(alertpool_local.queue), am_alert_queue_compare, ZBX_BINARY_HEAP_OPTION_EMPTY);
+
+		alertpool_local.location = ZBX_AM_LOCATION_NOWHERE;
+		alertpool_local.refcount = 0;
+		alertpool_local.alerts_num = 0;
+
 		alertpool = (zbx_am_alertpool_t *)zbx_hashset_insert(&manager->alertpools, &alertpool_local,
 				sizeof(alertpool_local));
-
-		zbx_binary_heap_create(&alertpool->queue, am_alert_queue_compare, ZBX_BINARY_HEAP_OPTION_EMPTY);
-
-		alertpool->location = ZBX_AM_LOCATION_NOWHERE;
-		alertpool->refcount = 0;
-		alertpool->alerts_num = 0;
 	}
 
 	return alertpool;
@@ -1317,6 +1317,8 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 		if (NULL == (media = (zbx_am_media_t *)zbx_hashset_search(&manager->watchdog, &medias[i]->mediaid)))
 		{
 			media_local.mediaid = medias[i]->mediaid;
+			media_local.mediatypeid = 0;
+			media_local.sendto = NULL;
 			media = (zbx_am_media_t *)zbx_hashset_insert(&manager->watchdog, &media_local,
 					sizeof(media_local));
 			media->sendto = NULL;

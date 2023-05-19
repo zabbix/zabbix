@@ -1,6 +1,15 @@
 Changes for 7.0.0alpha1
 
 New features:
+..F.I..... [ZBXNEXT-8425] increased the maximum length for username and password fields used in HTTP authentication from 64 to 255 characters (jfreibergs, kprutkovs)
+.........T [ZBXNEXT-8199] added google cloud platform template (igorbach)
+...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
+........S. [ZBXNEXT-8402] implemented support of non-numeric vectors in aggregated calculations (dgoloscapov, wiper)
+..F.I..... [ZBXNEXT-8245] converted advanced configuration from checkbox to collapsible block (agriscenko, ashubin)
+.........T [ZBXNEXT-8286] updated Linux, Windows, Mikrotik, Cisco and TP-LINK by SNMP templates to utilize the new SNMP LLD method (knaglis)
+.......PS. [ZBXNEXT-8323] added preprocessing cache support for prometheus to json step (wiper)
+..F....... [ZBXNEXT-8387] changed Alerts->Scripts configuration form to modal window (esekace)
+.......P.. [ZBXNEXT-8357] improved proxy history housekeeping when data older than ProxyOfflineBuffer is being constantly received (vso)
 ..F....... [ZBXNEXT-8386] changed Data collection->Discovery configuration form to modal window (esekace)
 A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
 A.F....PS. [ZBXNEXT-8211] added support for new binary item value type (arimdjonoks, jfreibergs)
@@ -35,6 +44,19 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+.........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
+........S. [ZBX-22773] fixed ListenIP configuration parameter being ignored by HA (kprutkovs)
+.........T [ZBX-22475] fixed regex in preprocessing parameter for jenkins template (egordymov)
+.........T [ZBX-21910] fixed js script in kubernetes nodes template (egordymov)
+........S. [ZBX-22799] fixed slow retrieval of configuration for Zabbix proxy (vso)
+..F....... [ZBX-22740] fixed ability to change password in user edit form for user with internal access type while using non-internal authentication (dpetra)
+........S. [ZBX-22782] fixed memory leak in SNMP walk to json with broken parameters (dgoloscapov)
+...G...... [ZBX-22494] fixed false positives in exception logging of Zabbix agent and exception logging improvement (kprutkovs)
+........S. [ZBX-22675] fixed slow housekeeping of problem table (vso)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+........S. [ZBX-14557] expanded the range of possible forecast return values to double precision (kprutkovs)
+..F....... [ZBX-22401] fixed clicking item value in data overview widget results in an error (agriscenko)
+.........T [ZBX-22029] fixed preprocessing step in pods discovery for k8s kubelet template (egordymov)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 .........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
 A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
@@ -178,6 +200,10 @@ A......... [ZBX-19202] fixed template dashboard availability to users without pe
 Changes for 6.4.3rc1
 
 New features:
+.........T [ZBXNEXT-8199] added google cloud platform template (igorbach)
+...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
+.........T [ZBXNEXT-8286] updated Linux, Windows, Mikrotik, Cisco and TP-LINK by SNMP templates to utilize the new SNMP LLD method (knaglis)
+.......P.. [ZBXNEXT-8357] improved proxy history housekeeping when data older than ProxyOfflineBuffer is being constantly received (vso)
 A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
 ...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
 .........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
@@ -186,6 +212,18 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
+........S. [ZBX-22773] fixed ListenIP configuration parameter being ignored by HA (kprutkovs)
+.........T [ZBX-22475] fixed regex in preprocessing parameter for jenkins template (egordymov)
+.........T [ZBX-21910] fixed js script in kubernetes nodes template (egordymov)
+........S. [ZBX-22799] fixed slow retrieval of configuration for Zabbix proxy (vso)
+..F....... [ZBX-22740] fixed ability to change password in user edit form for user with internal access type while using non-internal authentication (dpetra)
+........S. [ZBX-22782] fixed memory leak in SNMP walk to json with broken parameters (dgoloscapov)
+...G...... [ZBX-22494] fixed false positives in exception logging of Zabbix agent and exception logging improvement (kprutkovs)
+........S. [ZBX-22675] fixed slow housekeeping of problem table (vso)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+..F....... [ZBX-22401] fixed clicking item value in data overview widget results in an error (agriscenko)
+.........T [ZBX-22029] fixed preprocessing step in pods discovery for k8s kubelet template (egordymov)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 .........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
 A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
@@ -1368,6 +1406,9 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.18rc1
 
 New features:
+.........T [ZBXNEXT-8199] added google cloud platform monitoring template (igorbach)
+...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
+.......P.. [ZBXNEXT-8357] improved proxy history housekeeping when data older than ProxyOfflineBuffer is being constantly received (vso)
 A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
 .........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
 ..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
@@ -1376,6 +1417,13 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
+.........T [ZBX-22475] fixed regex in preprocessing parameter for jenkins template (egordymov)
+.........T [ZBX-21910] fixed js script in kubernetes nodes template (egordymov)
+........S. [ZBX-22773] made NodeAddress use ListenIP and ListenPort if not specified (kprutkovs)
+.......PS. [ZBX-21613] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+.........T [ZBX-22029] fixed preprocessing step in pods discovery for k8s kubelet template (egordymov)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 .........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
 A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
@@ -3910,8 +3958,11 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.35rc1
 
 New features:
+...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+...G...... [ZBX-22797] fixed Zabbix agent 2 postgresql memory leak (esneiders)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 ..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
@@ -6705,6 +6756,7 @@ Changes for 4.0.46rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 
 --------------------------------------------------------------------------------
