@@ -51,7 +51,7 @@ if err != nil {
 fmt.Printf("read %d bytes: ->%q<-\n", count, data[:count])
 
 
-
+fmt.Printf("HELLO WORLD")
 
 	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/zbx_vfs_file_regmatch_test.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
