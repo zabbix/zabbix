@@ -96,12 +96,14 @@ if (isset($_REQUEST['yaxismax']) && zbx_empty($_REQUEST['yaxismax'])) {
 check_fields($fields);
 
 $gitems = [];
+
 foreach (getRequest('items', []) as $item) {
 	$gitem = json_decode($item, true);
 
-	if ((array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid']))
-			&& (array_key_exists('type', $gitem) && ctype_digit($gitem['type']))
-			&& (array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype']))) {
+	if ($gitem
+			&& array_key_exists('itemid', $gitem) && ctype_digit($gitem['itemid'])
+			&& array_key_exists('type', $gitem) && ctype_digit($gitem['type'])
+			&& array_key_exists('drawtype', $gitem) && ctype_digit($gitem['drawtype'])) {
 		$gitems[] = $gitem;
 	}
 }

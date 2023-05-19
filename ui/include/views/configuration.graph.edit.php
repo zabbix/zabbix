@@ -464,9 +464,17 @@ foreach ($data['items'] as $n => $item) {
 		$item['gitemid'] = '';
 	}
 
+	if (!array_key_exists('calc_fnc', $item)) {
+		$item['calc_fnc'] = CALC_FNC_AVG;
+	}
+
+	if (!array_key_exists('color', $item)) {
+		$item['color'] = '';
+	}
+
 	insert_js('loadItem('.$n.', '.json_encode($item['gitemid']).', '.$item['itemid'].', '.
-		json_encode($name).', '.$item['type'].', '.$item['calc_fnc'].', '.$item['drawtype'].', '.
-		$item['yaxisside'].', \''.$item['color'].'\', '.$item['flags'].');',
+		json_encode($name).', '.$item['type'].', '.json_encode($item['calc_fnc']).', '.$item['drawtype'].', '.
+		json_encode($item['yaxisside']).', '.json_encode($item['color']).', '.json_encode($item['flags']).');',
 		true
 	);
 }
