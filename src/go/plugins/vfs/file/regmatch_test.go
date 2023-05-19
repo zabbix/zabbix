@@ -24,7 +24,7 @@ import (
 	"reflect"
 	"testing"
 	"fmt"
-	"io/ioutil"
+	//"io/ioutil"
 )
 
 func TestFileRegmatch(t *testing.T) {
@@ -42,16 +42,16 @@ func TestFileRegmatch(t *testing.T) {
     if err != nil {
 		t.Errorf("failed to created file: %s", err.Error())
     }
-    defer func() {
-        if err = file.Close(); err != nil {
-         t.Errorf("failed to created file: %s", err.Error())
-        }
-    }()
-	b, err := ioutil.ReadAll(file)
-	if err != nil {
-		fmt.Print("ERRX:", err.Error())
-	}
-	fmt.Print(b)
+
+data := make([]byte, 100)
+count, err := file.Read(data)
+if err != nil {
+ t.Errorf("failed to created file: %s", err.Error())
+}
+fmt.Printf("read %d bytes: ->%q<-\n", count, data[:count])
+
+
+
 
 	if result, err := impl.Export("vfs.file.regmatch", []string{"/tmp/zbx_vfs_file_regmatch_test.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
 		t.Errorf("vfs.file.regmatch returned error %s", err.Error())
