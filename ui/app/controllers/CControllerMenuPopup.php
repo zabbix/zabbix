@@ -58,13 +58,12 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'history':
-			case 'item':
 				$rules = [
-					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string'
+					'itemid' => 'required|db items.itemid'
 				];
 				break;
 
+			case 'item':
 			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
