@@ -88,6 +88,7 @@ func TestFileRegexpOutput(t *testing.T) {
 	}
 }
 
+// августа\r\n
 func TestFileRegexp(t *testing.T) {
 	d1 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
 	if err1 := os.WriteFile("/tmp/zbx_regexp_test2.dat", d1, 0644); err1 != nil {
@@ -107,4 +108,63 @@ func TestFileRegexp(t *testing.T) {
 			}
 		}
 	}
+}
+
+// 1) item configured to skip first line
+// 2) item configured not to skip first line
+// 3) item configured not not match
+func TestFileRegexp2(t *testing.T) {
+
+	// выхухоль
+	//
+	// badger
+	//
+	// выхухоль2
+	// encoded in iso-8859-5
+	d1 := []byte{0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a,
+		0x62, 0x61, 0x64, 0x67, 0x65, 0x72, 0x0a, 0x0a, 0xd2, 0xeb,
+		0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0a}
+
+	if err1 := os.WriteFile("/tmp/zbx_regexp_test3.dat", d1, 0644); err1 != nil {
+		t.Errorf("failed to created file: %s", err1.Error())
+	}
+
+	impl.options.Timeout = 3
+
+	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "хух", "iso-8859-5", "2", ""}, nil); err != nil {
+		t.Errorf("vfs.file.regexp returned error %s", err.Error())
+	} else {
+		if contents, ok := result.(string); !ok {
+			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if contents != "выхухоль2\n" {
+				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+			}
+		}
+	}
+
+	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "хух", "iso-8859-5", "1", ""}, nil); err != nil {
+		t.Errorf("vfs.file.regexp returned error %s", err.Error())
+	} else {
+		if contents, ok := result.(string); !ok {
+			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if contents != "выхухоль\n" {
+				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+			}
+		}
+	}
+
+	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "выхухоль2\n", "iso-8859-5", "", "2"}, nil); err != nil {
+		t.Errorf("vfs.file.regexp returned error %s", err.Error())
+	} else {
+		if contents, ok := result.(string); !ok {
+			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+		} else {
+			if contents != "" {
+				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+			}
+		}
+	}
+
 }
