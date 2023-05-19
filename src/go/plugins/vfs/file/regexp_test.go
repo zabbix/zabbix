@@ -67,104 +67,68 @@ func TestExecuteRegex(t *testing.T) {
 }
 
 func TestFileRegexpOutput(t *testing.T) {
-	d1 := []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a}
-	impl.options.Timeout = 3
-
-	if err1 := os.WriteFile("/tmp/zbx_regexp_test.dat", d1, 0644); err1 != nil {
-		t.Errorf("failed to created file: %s", err1.Error())
-		return
-	}
-
-	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test.dat", "(ф)", "iso-8859-5", "", "", "group 0: \\0 group 1: \\1 group 4: \\4"}, nil); err != nil {
-		t.Errorf("vfs.file.regexp returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "group 0: ф group 1: ф group 4: " {
-				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
-			}
-		}
-	}
-}
-
-// августа\r\n
-func TestFileRegexp(t *testing.T) {
-	d1 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
-	if err1 := os.WriteFile("/tmp/zbx_regexp_test2.dat", d1, 0644); err1 != nil {
-		t.Errorf("failed to created file: %s", err1.Error())
-	}
 
 	impl.options.Timeout = 3
 
-	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test2.dat", "(а)", "iso-8859-5", "", ""}, nil); err != nil {
-		t.Errorf("vfs.file.regexp returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+	type testCase struct {
+		fileContents      []byte
+		targetSearch      string
+		targetEncoding    string
+		lineStart         string
+		lineEnd           string
+		targetStringGroup string
+		targetContents    string
+	}
+
+	filename := "/tmp/zbx_regexp_test.dat"
+	tests := []*testCase{
+		&testCase{fileContents: []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a}, targetSearch: "(ф)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "group 0: \\0 group 1: \\1 group 4: \\4", targetContents: "group 0: ф group 1: ф group 4: "},
+
+		// августа\r\n
+		&testCase{fileContents: []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}, targetSearch: "(а)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: "августа\r\n"},
+
+		// выхухоль
+		//
+		// badger
+		//
+		// выхухоль2
+		&testCase{fileContents: []byte{0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a,
+			0x62, 0x61, 0x64, 0x67, 0x65, 0x72, 0x0a, 0x0a, 0xd2, 0xeb,
+			0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0a},
+			targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
+
+		&testCase{fileContents: []byte{0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a,
+			0x62, 0x61, 0x64, 0x67, 0x65, 0x72, 0x0a, 0x0a, 0xd2, 0xeb,
+			0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0a}, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
+
+		&testCase{fileContents: []byte{0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a,
+			0x62, 0x61, 0x64, 0x67, 0x65, 0x72, 0x0a, 0x0a, 0xd2, 0xeb,
+			0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0}, targetSearch: "выхухоль2\n", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
+
+		//&testCase{fileContents: []byte{}, targetSearch: "", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: ""},
+		//&testCase{fileContents: []byte{}, targetSearch: "", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: ""},
+
+	}
+
+	for _, c := range tests {
+
+		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
+			t.Errorf("failed to created file: %s", err1.Error())
+			return
+		}
+
+		defer os.Remove(filename)
+
+		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			t.Errorf("vfs.file.regexp returned error %s", err.Error())
 		} else {
-			if contents != "августа\r\n" {
-				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+			if contents, ok := result.(string); !ok {
+				t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+			} else {
+				if contents != c.targetContents {
+					t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+				}
 			}
 		}
 	}
-}
-
-// 1) item configured to skip first line
-// 2) item configured not to skip first line
-// 3) item configured not not match
-func TestFileRegexp2(t *testing.T) {
-
-	// выхухоль
-	//
-	// badger
-	//
-	// выхухоль2
-	// encoded in iso-8859-5
-	d1 := []byte{0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a,
-		0x62, 0x61, 0x64, 0x67, 0x65, 0x72, 0x0a, 0x0a, 0xd2, 0xeb,
-		0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0a}
-
-	if err1 := os.WriteFile("/tmp/zbx_regexp_test3.dat", d1, 0644); err1 != nil {
-		t.Errorf("failed to created file: %s", err1.Error())
-	}
-
-	impl.options.Timeout = 3
-
-	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "хух", "iso-8859-5", "2", ""}, nil); err != nil {
-		t.Errorf("vfs.file.regexp returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "выхухоль2\n" {
-				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
-			}
-		}
-	}
-
-	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "хух", "iso-8859-5", "1", ""}, nil); err != nil {
-		t.Errorf("vfs.file.regexp returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "выхухоль\n" {
-				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
-			}
-		}
-	}
-
-	if result, err := impl.Export("vfs.file.regexp", []string{"/tmp/zbx_regexp_test3.dat", "выхухоль2\n", "iso-8859-5", "", "2"}, nil); err != nil {
-		t.Errorf("vfs.file.regexp returned error %s", err.Error())
-	} else {
-		if contents, ok := result.(string); !ok {
-			t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
-		} else {
-			if contents != "" {
-				t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
-			}
-		}
-	}
-
 }
