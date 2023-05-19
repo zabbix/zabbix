@@ -40,25 +40,6 @@ const MAX_BUFFER_LEN = 65536
 func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error) {
 	var startline, endline, curline uint64
 
-
-
-   file2, err := os.Open("/tmp/zbx_vfs_file_regmatch_test.dat")
-    if err != nil {
-	return nil, errors.New("FAILED TO CREATE FILE")
-    }
-
-
-data := make([]byte, 100)
-count, err := file2.Read(data)
-if err != nil {
-	return nil, errors.New("FAILED TO CREATE FILE 2")
-}
-fmt.Printf("read %d bytes: ->%q<-\n", count, data[:count])
-
-
-
-
-
 	start := time.Now()
 	fmt.Printf("BADGER: %s", strings.Join(params, ", "))
 
@@ -96,12 +77,6 @@ fmt.Printf("read %d bytes: ->%q<-\n", count, data[:count])
 	if startline > endline {
 		return nil, errors.New("Start line parameter must not exceed end line.")
 	}
-
-	file, err := stdOs.Open(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
-	}
-	defer file.Close()
 
 	ret := 0
 	r, err := regexp.Compile(params[1])
