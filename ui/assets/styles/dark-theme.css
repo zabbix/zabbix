@@ -4227,6 +4227,7 @@ input {
 textarea {
   margin: 0;
   padding: 4px 5px;
+  min-height: 24px;
   overflow: auto;
   resize: vertical;
   font-family: Arial, Tahoma, Verdana, sans-serif;
