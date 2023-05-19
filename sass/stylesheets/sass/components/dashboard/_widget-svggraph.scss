@@ -120,6 +120,7 @@ form.dashboard-widget-svggraph {
 			@extend %cursor-drag;
 			overflow: hidden;
 			line-height: 24px;
+			text-align: left;
 			text-overflow: ellipsis;
 		}
 

@@ -283,14 +283,15 @@ void	zbx_es_destroy(zbx_es_t *es)
  *                                                                            *
  * Purpose: initializes embedded scripting engine environment                 *
  *                                                                            *
- * Parameters: es    - [IN] the embedded scripting engine                     *
- *             error - [OUT] the error message                                *
+ * Parameters: es               - [IN] embedded scripting engine              *
+ *             config_source_ip - [IN]                                        *
+ *             error            - [OUT] error message                         *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_init_env(zbx_es_t *es, char **error)
+int	zbx_es_init_env(zbx_es_t *es, const char *config_source_ip, char **error)
 {
 	volatile int	ret = FAIL;
 
@@ -298,6 +299,8 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
+
+	es->env->config_source_ip = config_source_ip;
 
 	if (0 != setjmp(es->env->loc))
 	{
@@ -699,20 +702,21 @@ void	zbx_es_debug_disable(zbx_es_t *es)
  *                                                                            *
  * Purpose: executes command (script in form of a text)                       *
  *                                                                            *
- * Parameters: command       - [IN] the command in form of a text             *
- *             param         - [IN] the script parameters                     *
- *             timeout       - [IN] the timeout for the execution (seconds)   *
- *             result        - [OUT] the result of an execution               *
- *             error         - [OUT] the error message                        *
- *             max_error_len - [IN] the maximum length of an error            *
- *             debug         - [OUT] the debug data (optional)                *
+ * Parameters: command          - [IN] command in form of a text              *
+ *             param            - [IN] script parameters                      *
+ *             timeout          - [IN] timeout for the execution (seconds)    *
+ *             config_source_ip - [IN]                                        *
+ *             result           - [OUT] result of an execution                *
+ *             error            - [OUT] error message                         *
+ *             max_error_len    - [IN] maximum length of an error             *
+ *             debug            - [OUT] debug data (optional)                 *
  *                                                                            *
  * Return value: SUCCEED                                                      *
  *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_es_execute_command(const char *command, const char *param, int timeout, char **result,
-		char *error, size_t max_error_len, char **debug)
+int	zbx_es_execute_command(const char *command, const char *param, int timeout, const char *config_source_ip,
+		char **result, char *error, size_t max_error_len, char **debug)
 {
 	int		size, ret = SUCCEED;
 	char		*code = NULL, *errmsg = NULL;
@@ -721,7 +725,7 @@ int	zbx_es_execute_command(const char *command, const char *param, int timeout, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_es_init(&es);
-	if (FAIL == zbx_es_init_env(&es, &errmsg))
+	if (FAIL == zbx_es_init_env(&es, config_source_ip, &errmsg))
 	{
 		zbx_snprintf(error, max_error_len, "cannot initialize scripting environment: %s", errmsg);
 		zbx_free(errmsg);

@@ -165,12 +165,14 @@ $http_authentication_form_list->addRow(new CLabel(_('HTTP authentication'), 'lab
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+		(new CTextBox('http_user', $this->data['http_user'], false, DB::getFieldLength('httptest', 'http_user')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+		(new CTextBox('http_password', $this->data['http_password'], false,
+			DB::getFieldLength('httptest', 'http_password')
+		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)

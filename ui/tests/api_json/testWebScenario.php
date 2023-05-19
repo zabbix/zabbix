@@ -535,7 +535,29 @@ class testWebScenario extends CAPITest {
 				'httptest' => [
 					[
 						'httptestid' => '15001',
-						'name' => 'Апи скрипт обнавлён утф-8'
+						'name' => 'Апи скрипт обновлён утф-8'
+					]
+				],
+				'expected_error' => null
+			],
+			'Accept full-length username' => [
+				'httptest' => [
+					[
+						'httptestid' => '15001',
+						'name' => 'accept.username',
+						'authentication' => ZBX_HTTP_AUTH_BASIC,
+						'http_user' => str_repeat('z', 255)
+					]
+				],
+				'expected_error' => null
+			],
+			'Accept full-length password' => [
+				'httptest' => [
+					[
+						'httptestid' => '15001',
+						'name' => 'accept.password',
+						'authentication' => ZBX_HTTP_AUTH_BASIC,
+						'http_password' => str_repeat('z', 255)
 					]
 				],
 				'expected_error' => null
@@ -576,32 +598,60 @@ class testWebScenario extends CAPITest {
 		$result = $this->call('httptest.update', $httptests, $expected_error);
 
 		if ($expected_error === null) {
-			foreach ($result['result']['httptestids'] as $key => $id) {
-				$dbResult = DBSelect('select * from httptest where httptestid='.zbx_dbstr($id));
-				$dbRow = DBFetch($dbResult);
-				$this->assertEquals($dbRow['name'], $httptests[$key]['name']);
-				$this->assertEquals($dbRow['httptestid'], $httptests[$key]['httptestid']);
-				$this->assertEquals($dbRow['delay'], 60);
-				$this->assertEquals($dbRow['status'], 0);
-				$this->assertEquals($dbRow['agent'], 'Zabbix');
-				$this->assertEquals($dbRow['authentication'], 0);
-				$this->assertEquals($dbRow['http_user'], '');
-				$this->assertEquals($dbRow['http_password'], '');
-				$this->assertEquals($dbRow['hostid'], 50009);
-				$this->assertEquals($dbRow['templateid'], 0);
-				$this->assertEquals($dbRow['http_proxy'], '');
-				$this->assertEquals($dbRow['retries'], 1);
-				$this->assertEquals($dbRow['ssl_cert_file'], '');
-				$this->assertEquals($dbRow['ssl_key_file'], '');
-				$this->assertEquals($dbRow['ssl_key_password'], '');
-				$this->assertEquals($dbRow['verify_peer'], 0);
-				$this->assertEquals($dbRow['verify_host'], 0);
+			foreach ($result['result']['httptestids'] as $id) {
+				$dbRow = DBFetch(DBSelect('SELECT * FROM httptest WHERE '.dbConditionId('httptestid', [$id])));
+				$httptest = [];
+
+				foreach ($httptests as $_httptest) {
+					if (bccomp($_httptest['httptestid'], $id) == 0) {
+						$httptest = $_httptest;
+						break;
+					};
+				}
+
+				$matches = [
+					'name' => $httptest['name'],
+					'httptestid' => $httptest['httptestid'],
+					'delay' => '60',
+					'status' => '0',
+					'agent' => 'Zabbix',
+					'hostid' => '50009',
+					'templateid' => '0',
+					'http_proxy' => '',
+					'retries' => '1',
+					'ssl_cert_file' => '',
+					'ssl_key_password' => '',
+					'verify_peer' => '0',
+					'verify_host' => '0'
+				];
+
+				$optional_fields = [
+					'authentication' => '0',
+					'http_user' => '',
+					'http_password' => ''
+				];
+				foreach ($optional_fields as $field => $expected_value) {
+					if (array_key_exists($field, $httptest)) {
+						$matches[$field] = $expected_value;
+					}
+				}
+
+				$dbRow = array_intersect_key($dbRow, $matches);
+				$matches = array_intersect_key($httptest, $matches) + $matches;
+
+				ksort($matches);
+				ksort($dbRow);
+
+				$this->assertEquals($dbRow, $matches, 'Post-update mismatch');
 			}
 		}
 		else {
 			foreach ($httptests as $httptest) {
 				if (array_key_exists('name', $httptest) && $httptest['name'] !== 'Api web scenario'){
-					$this->assertEquals(0, CDBHelper::getCount('select * from httptest where name='.zbx_dbstr($httptest['name'])));
+					$this->assertEquals(
+						CDBHelper::getCount('SELECT * FROM httptest WHERE '.dbConditionString('name', [$httptest['name']])),
+						0, 'Update on '.$httptest['name'].' should have failed'
+					);
 				}
 			}
 		}
@@ -735,7 +785,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with long http_password',
 					'authentication' => '1',
 					'http_user' => 'admin',
-					'http_password' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
+					'http_password' => str_repeat('z', 256),
 					'steps' => [
 						[
 							'name' => 'Homepage',
@@ -767,7 +817,7 @@ class testWebScenario extends CAPITest {
 					'name' => 'Api web with long http_password',
 					'authentication' => '2',
 					'http_user' => 'admin',
-					'http_password' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65',
+					'http_password' => str_repeat('z', 256),
 					'steps' => [
 						[
 							'name' => 'Homepage',
@@ -796,18 +846,18 @@ class testWebScenario extends CAPITest {
 			],
 			[
 				'httptest' => [
-					'name' => 'Api web with long http_user',
+					'name' => 'Api web with overly long http_user',
 					'authentication' => '1',
-					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65'
+					'http_user' => str_repeat('z', 256)
 				],
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],
 			// Check web user name used for NTLM authentication .
 			[
 				'httptest' => [
-					'name' => 'Api web with long http_user',
+					'name' => 'Api web with overly long http_user',
 					'authentication' => '2',
-					'http_user' => 'Phasellus imperdiet sapien sed justo elementum, quis maximuslpi65'
+					'http_user' => str_repeat('z', 256)
 				],
 				'expected_error' => 'Invalid parameter "/1/http_user": value is too long.'
 			],

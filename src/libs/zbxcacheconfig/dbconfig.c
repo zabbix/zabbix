@@ -726,7 +726,7 @@ static void	DCupdate_item_queue(ZBX_DC_ITEM *item, unsigned char old_poller_type
 		return;
 
 	elem.key = item->itemid;
-	elem.data = (const void *)item;
+	elem.data = (void *)item;
 
 	if (ZBX_LOC_QUEUE != item->location)
 	{
@@ -751,7 +751,7 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 		proxy->nextcheck = proxy->proxy_config_nextcheck;
 
 	elem.key = proxy->hostid;
-	elem.data = (const void *)proxy;
+	elem.data = (void *)proxy;
 
 	if (ZBX_LOC_QUEUE != proxy->location)
 	{
@@ -1900,7 +1900,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault)
+void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1931,7 +1932,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 
 		}
-		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, &error))
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
 					error);
@@ -5645,7 +5646,7 @@ static void	dc_drule_queue(zbx_dc_drule_t *drule)
 	zbx_binary_heap_elem_t	elem;
 
 	elem.key = drule->druleid;
-	elem.data = (const void *)drule;
+	elem.data = (void *)drule;
 
 	if (ZBX_LOC_QUEUE != drule->location)
 	{
@@ -5911,7 +5912,7 @@ static void	dc_httptest_queue(zbx_dc_httptest_t *httptest)
 	zbx_binary_heap_elem_t	elem;
 
 	elem.key = httptest->httptestid;
-	elem.data = (const void *)httptest;
+	elem.data = (void *)httptest;
 
 	if (ZBX_LOC_QUEUE != httptest->location)
 	{

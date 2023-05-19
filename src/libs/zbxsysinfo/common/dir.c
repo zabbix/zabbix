@@ -102,8 +102,8 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 {
 	const zbx_file_descriptor_t	*fa, *fb;
 
-	fa = *((zbx_file_descriptor_t **)file_a);
-	fb = *((zbx_file_descriptor_t **)file_b);
+	fa = *((zbx_file_descriptor_t * const *)file_a);
+	fb = *((zbx_file_descriptor_t * const *)file_b);
 
 	return (fa->st_ino != fb->st_ino || fa->st_dev != fb->st_dev);
 }

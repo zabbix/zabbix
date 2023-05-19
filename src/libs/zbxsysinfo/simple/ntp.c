@@ -18,6 +18,7 @@
 **/
 
 #include "ntp.h"
+#include "../sysinfo.h"
 
 #include "zbxcomms.h"
 #include "log.h"
@@ -150,7 +151,7 @@ int	check_ntp(char *host, unsigned short port, int timeout, int *value_int)
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_udp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout)))
+	if (SUCCEED == (ret = zbx_udp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout)))
 	{
 		make_packet(&data);
 
