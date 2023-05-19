@@ -49,6 +49,7 @@ require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 require_once dirname(__FILE__).'/elements/CInputGroupElement.php';
 require_once dirname(__FILE__).'/elements/CHostInterfaceElement.php';
 require_once dirname(__FILE__).'/elements/CFilterTabElement.php';
+require_once dirname(__FILE__).'/elements/CFieldsetElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -580,12 +581,12 @@ class CElementQuery implements IWaitable {
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
 				'/div[contains(@class, "multiselect-control")]',
-				'/div/div[contains(@class, "multiselect-control")]' // TODO: remove after fix DEV-1071.
+				'/div/div[contains(@class, "multiselect-control")]' // TODO: remove after fix DEV-2510.
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
 				'/ul/li/ul[contains(@class, "radio-list-control")]',
-				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
+				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-2510 and DEV-2511.
 			],
 			'CCheckboxListElement'		=> [
 				'/ul[contains(@class, "checkbox-list")]',
@@ -596,7 +597,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
-				'/div/table', // TODO: remove after fix DEV-1071.
+				'/div/table', // TODO: remove after fix DEV-2510.
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [
@@ -605,7 +606,8 @@ class CElementQuery implements IWaitable {
 			],
 			'CColorPickerElement'		=> '/div[contains(@class, "color-picker")]',
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
+			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
+			'CFieldsetElement'			=> '/fieldset'
 		];
 
 		if ($class !== null) {

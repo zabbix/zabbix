@@ -322,7 +322,7 @@ void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data)
  *          by zbx_hashset_insert[_ext]() and zbx_hashset_search() functions  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data)
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data)
 {
 	int			slot;
 	ZBX_HASHSET_ENTRY_T	*data_entry, *iter_entry;
@@ -330,7 +330,7 @@ void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data)
 	if (0 == hs->num_slots)
 		return;
 
-	data_entry = (ZBX_HASHSET_ENTRY_T *)((const char *)data - ZBX_HASHSET_ENTRY_OFFSET);
+	data_entry = (ZBX_HASHSET_ENTRY_T *)((char *)data - ZBX_HASHSET_ENTRY_OFFSET);
 
 	slot = data_entry->hash % hs->num_slots;
 	iter_entry = hs->slots[slot];

@@ -792,6 +792,24 @@ class testConnector extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(abc, 0, 123) already exists.'
+			],
+			'Test connector.create: overly long username' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'username' => str_repeat('z', 256)
+				],
+				'expected_error' => 'Invalid parameter "/1/username": value is too long.'
+			],
+			'Test connector.create: overly long password' => [
+				'connector' => [
+					'name' => 'API create connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'password' => str_repeat('z', 256)
+				],
+				'expected_error' => 'Invalid parameter "/1/password": value is too long.'
 			]
 		];
 	}
@@ -820,6 +838,24 @@ class testConnector extends CAPITest {
 						'name' => 'API create second connector',
 						'url' => 'http://localhost/'
 					]
+				],
+				'expected_error' => null
+			],
+			'Test connector.create: longest username' => [
+				'connector' => [
+					'name' => 'API longest username connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'username' => str_repeat('z', 255)
+				],
+				'expected_error' => null
+			],
+			'Test connector.create: longest password' => [
+				'connector' => [
+					'name' => 'API longest password connector',
+					'url' => 'http://localhost/',
+					'authtype' => ZBX_HTTP_AUTH_BASIC,
+					'password' => str_repeat('z', 255)
 				],
 				'expected_error' => null
 			]

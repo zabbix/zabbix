@@ -72,6 +72,7 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 			&error);
 
 	zbx_dc_config_get_items_by_itemids(&item, &itemid, &errcode, 1);
+
 	if (SUCCEED != errcode)
 		goto out;
 

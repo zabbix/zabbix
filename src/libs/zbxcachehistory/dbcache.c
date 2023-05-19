@@ -4477,7 +4477,7 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:
-		case ZBX_VARIANT_DBL_VECTOR:
+		case ZBX_VARIANT_VECTOR:
 		case ZBX_VARIANT_ERR:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -4581,7 +4581,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
  ******************************************************************************/
 static void	hc_queue_item(zbx_hc_item_t *item)
 {
-	zbx_binary_heap_elem_t	elem = {item->itemid, (const void *)item};
+	zbx_binary_heap_elem_t	elem = {item->itemid, (void *)item};
 
 	zbx_binary_heap_insert(&cache->history_queue, &elem);
 }
