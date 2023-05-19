@@ -194,6 +194,7 @@ dc_maintenance_match_tags_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests \
+	$(TLS_CFLAGS) \
 	$(CMOCKA_CFLAGS)
 
 dc_check_maintenance_period_CFLAGS = \
@@ -201,6 +202,7 @@ dc_check_maintenance_period_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/tests \
+	$(TLS_CFLAGS) \
 	$(CMOCKA_CFLAGS)
 
 dc_maintenance_match_tags_SOURCES = dc_maintenance_match_tags.c
@@ -214,13 +216,14 @@ dc_check_maintenance_period_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_
 is_item_processed_by_server_SOURCES = is_item_processed_by_server.c
 is_item_processed_by_server_LDADD = $(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 is_item_processed_by_server_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-is_item_processed_by_server_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+is_item_processed_by_server_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
 dc_item_poller_type_update_SOURCES = dc_item_poller_type_update.c
 dc_item_poller_type_update_LDADD = $(CACHE_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 dc_item_poller_type_update_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 dc_item_poller_type_update_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src/libs/zbxcacheconfig \
-	-I@top_srcdir@/src/libs/zbxcachehistory -I@top_srcdir@/src/libs/zbxcachevalue $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	-I@top_srcdir@/src/libs/zbxcachehistory -I@top_srcdir@/src/libs/zbxcachevalue $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 
 dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -228,7 +231,8 @@ dc_expand_user_macros_in_func_params_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
-	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	$(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 
 dc_expand_user_macros_in_func_params_SOURCES = \
 	dc_expand_user_macros_in_func_params.c
@@ -239,7 +243,7 @@ dc_expand_user_macros_in_func_params_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS
 	-Wl,--wrap=zbx_hashset_search
 
 dc_function_calculate_nextcheck_CFLAGS = \
-	-I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	-I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 dc_function_calculate_nextcheck_SOURCES = \
 	dc_function_calculate_nextcheck.c
 dc_function_calculate_nextcheck_LDADD = \
@@ -250,7 +254,8 @@ um_cache_sync_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/libs \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 um_cache_sync_SOURCES = \
 	um_cache_sync.c \
 	um_cache_mock.c \
@@ -265,7 +270,8 @@ um_cache_sync_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
 um_cache_resolve_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/libs \
-	$(CMOCKA_CFLAGS)
+	$(CMOCKA_CFLAGS) \
+	$(TLS_CFLAGS)
 um_cache_resolve_SOURCES = \
 	um_cache_resolve.c \
 	um_cache_mock.c \
@@ -281,7 +287,8 @@ um_cache_resolve_cont_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src/libs \
 	$(CMOCKA_CFLAGS) \
-	$(YAML_CFLAGS)
+	$(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 um_cache_resolve_cont_SOURCES = \
 	um_cache_resolve_cont.c \
 	um_cache_mock.c \

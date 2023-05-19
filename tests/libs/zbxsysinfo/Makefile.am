@@ -144,10 +144,10 @@ check_service_test_LDADD = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-check_service_test_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
+check_service_test_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 check_service_test_LDFLAGS = @SERVER_LDFLAGS@ \
-	-Wl,--wrap=tcp_expect $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-check_service_test_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	-Wl,--wrap=tcp_expect $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+check_service_test_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif
 
 if AGENT

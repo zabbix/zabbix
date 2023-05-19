@@ -39,7 +39,7 @@ POLLER_LIBS = \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_poller_test_SOURCES = \
 	../../../src/zabbix_server/poller/checks_ssh.c \
@@ -54,10 +54,10 @@ zbx_poller_test_SOURCES = \
 
 zbx_poller_test_LDADD = $(POLLER_LIBS)
 zbx_poller_test_LDADD += @SERVER_LIBS@
-zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) \
+zbx_poller_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=ssh_run \
 	-Wl,--wrap=telnet_run
 
 zbx_poller_test_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif

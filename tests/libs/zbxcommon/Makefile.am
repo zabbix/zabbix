@@ -119,7 +119,9 @@ COMMON_LIB_FILES = \
 
 COMMON_COMPILER_FLAGS = \
 	-I@top_srcdir@/tests \
-	$(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 zbx_function_find_SOURCES = \
 	zbx_function_find.c \

@@ -57,7 +57,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
 
-COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
+COMMON_COMPILER_FLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 
 system_localtime_SOURCES = \
 	system_localtime.c \

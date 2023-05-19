@@ -50,11 +50,11 @@ zbx_tcp_recv_ext_SOURCES = \
 zbx_tcp_recv_ext_LDADD = \
 	$(COMMON_LIB_FILES)
 
-zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@
+zbx_tcp_recv_ext_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 
-zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tcp_recv_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-zbx_tcp_recv_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_tcp_recv_ext_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 if SERVER
 zbx_tcp_recv_ext_zlib_SOURCES = \
@@ -64,11 +64,11 @@ zbx_tcp_recv_ext_zlib_SOURCES = \
 zbx_tcp_recv_ext_zlib_LDADD = \
 	$(COMMON_LIB_FILES)
 
-zbx_tcp_recv_ext_zlib_LDADD += @AGENT_LIBS@
+zbx_tcp_recv_ext_zlib_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 
-zbx_tcp_recv_ext_zlib_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tcp_recv_ext_zlib_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-zbx_tcp_recv_ext_zlib_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_tcp_recv_ext_zlib_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 endif
 
 zbx_tcp_recv_raw_ext_SOURCES = \
@@ -78,8 +78,8 @@ zbx_tcp_recv_raw_ext_SOURCES = \
 zbx_tcp_recv_raw_ext_LDADD = \
 	$(COMMON_LIB_FILES)
 
-zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@
+zbx_tcp_recv_raw_ext_LDADD += @AGENT_LIBS@ $(TLS_LIBS)
 
-zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tcp_recv_raw_ext_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_tcp_recv_raw_ext_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)

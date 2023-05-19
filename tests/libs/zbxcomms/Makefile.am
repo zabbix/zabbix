@@ -53,13 +53,13 @@ zbx_tcp_check_allowed_peers_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 zbx_tcp_check_allowed_peers_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(COMMON_LIB_FILES) $(TLS_LIBS)
 
 zbx_tcp_check_allowed_peers_LDADD += @AGENT_LIBS@
 
-zbx_tcp_check_allowed_peers_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_tcp_check_allowed_peers_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-zbx_tcp_check_allowed_peers_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_tcp_check_allowed_peers_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 else
 zbx_tcp_check_allowed_peers_ipv4_SOURCES = \
 	zbx_tcp_check_allowed_peers_ipv4.c \
