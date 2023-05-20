@@ -804,7 +804,7 @@ static int	zbx_snmp_print_oid(char *buffer, size_t buffer_len, const oid *objid,
 }
 
 static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *objid, size_t objid_len,
-		size_t root_string_len, size_t root_numeric_len)
+		size_t root_string_len, size_t root_numeric_len, char *root_oid)
 {
 	oid	parsed_oid[MAX_OID_LEN];
 	size_t	parsed_oid_len = MAX_OID_LEN;
@@ -875,7 +875,19 @@ static int	zbx_snmp_choose_index(char *buffer, size_t buffer_len, const oid *obj
 
 	if (NULL == strchr(printed_oid, '"') && NULL == strchr(printed_oid, '\''))
 	{
-		zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+		if (0 != strncmp(printed_oid, root_oid, strlen(root_oid)))
+		{
+			size_t	offset = 0;
+			char	*sep;
+
+			if (NULL != (sep = strstr(printed_oid, "::")))
+				offset = sep - printed_oid + 2;
+
+			zbx_strlcpy(buffer, printed_oid + offset, buffer_len);
+		}
+		else
+			zbx_strlcpy(buffer, printed_oid + root_string_len + 1, buffer_len);
+
 		return SUCCEED;
 	}
 
@@ -1018,7 +1030,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	struct snmp_pdu		*pdu, *response;
 	oid			anOID[MAX_OID_LEN], rootOID[MAX_OID_LEN];
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
-	char			oid_index[MAX_STRING_LEN];
+	char			oid_index[MAX_STRING_LEN], root_oid[MAX_STRING_LEN];
 	struct variable_list	*var;
 	int			status, level, running, num_vars, check_oid_increase = 1, ret = SUCCEED;
 	AGENT_RESULT		snmp_result;
@@ -1056,6 +1068,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	}
 
 	root_numeric_len = strlen(oid_index);
+
+	zbx_strlcpy(root_oid, oid_index, sizeof(root_oid));
 
 	/* copy rootOID to anOID */
 	memcpy(anOID, rootOID, rootOID_len * sizeof(oid));
@@ -1182,8 +1196,9 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 					break;
 				}
 
+
 				if (SUCCEED != zbx_snmp_choose_index(oid_index, sizeof(oid_index), var->name,
-						var->name_length, root_string_len, root_numeric_len))
+						var->name_length, root_string_len, root_numeric_len, root_oid))
 				{
 					zbx_snprintf(error, max_error_len, "zbx_snmp_choose_index():"
 							" cannot choose appropriate index while walking for"

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2023-04-10 20:41+0000\n"
+"PO-Revision-Date: 2023-05-01 18:18+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -18673,7 +18673,7 @@ msgstr "Taille de la mémoire compressée d'une machine virtuelle VMware, <url> 
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Nom du datacenter de la machine virtuelle VMware, \"url\" - URL du service VMware, \"uuid\" - Identifiant unique global de la machine virtuelle VMware"
 
 #: include/classes/items/CHelpItems.php:967
 msgid "VMware virtual machine datacenter name, <url> - VMware service URL, <uuid> - VMware virtual machine host name. Returns string"
