@@ -4,3 +4,6 @@ noinst_LIBRARIES = libzbxdbsyncer.a
 
 libzbxdbsyncer_a_SOURCES = \
 	dbsyncer.c
+
+libzbxdbsyncer_a_CFLAGS = \
+	$(TLS_CFLAGS)

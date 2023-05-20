@@ -9,3 +9,6 @@ libzbxdiscoverer_a_SOURCES = \
 	discoverer_queue.h \
 	discoverer_job.c \
 	discoverer_job.h
+
+libzbxdiscoverer_a_CFLAGS = \
+	$(TLS_CFLAGS)

@@ -10,3 +10,5 @@ libzbxreporter_a_SOURCES = \
 	report_protocol.c \
 	report_protocol.h
 
+libzbxreporter_a_CFLAGS = \
+	$(TLS_CFLAGS)

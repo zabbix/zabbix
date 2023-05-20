@@ -180,7 +180,7 @@ $item_form_list
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name')),
 		(new CTextBox('username', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)
 	// Append publickey to form list.
@@ -197,7 +197,7 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))->setLabel(_('Password')),
 		(new CTextBox('password', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	);
 
