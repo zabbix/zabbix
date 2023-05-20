@@ -66,14 +66,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 		}
 
-		$data['vars'] = [];
+		$data['vars'] = $this->getValueData($item);
 
 		if ($this->hasInput('with_config')) {
 			$data['vars']['config'] = $this->getConfig($item);
-		}
-
-		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
-			$data['vars'] += $this->getValueData($item);
 		}
 
 		$this->setResponse(new CControllerResponseData($data));
@@ -193,15 +189,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'arc' => $this->fields_values['value_arc'] == 1
 				? [
 					'show' => true,
-					'size' => $this->fields_values['value_arc_size'],
-					'needle' => $this->fields_values['needle_show'] == 1
-						? [
-							'show' => true,
-							'color' => $this->fields_values['needle_color']
-						]
-						: [
-							'show' => false
-						]
+					'size' => $this->fields_values['value_arc_size']
 				]
 				: [
 					'show' => false
@@ -225,13 +213,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'arc' => $this->fields_values['th_show_arc'] == 1
 				? [
 					'show' => true,
-					'size' => $this->fields_values['th_arc_size'],
+					'size' => $this->fields_values['th_arc_size']
 				]
 				: [
 					'show' => false
 				],
 			'data' => []
 		];
+
+		$config['needle'] = $this->fields_values['needle_show'] == 1
+			? [
+				'show' => true,
+				'color' => $this->fields_values['needle_color']
+			]
+			: [
+				'show' => false
+			];
 
 		foreach ($this->fields_values['thresholds'] as $threshold) {
 			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold['threshold_value']);
@@ -247,15 +244,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getValueData(array $item): array {
+		$no_data = [
+			'value' => null,
+			'value_text' => _('No data'),
+			'units_text' => ''
+		];
+
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+			return $no_data;
+		}
+
 		$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		$history = Manager::History()->getLastValues([$item], 1, $history_period);
 
 		if (!$history) {
-			return [
-				'value' => null,
-				'value_text' => _('No data.'),
-				'units_text' => ''
-			];
+			return $no_data;
 		}
 
 		$value = $history[$item['itemid']][0]['value'];
