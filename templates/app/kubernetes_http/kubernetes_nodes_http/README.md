@@ -7,7 +7,14 @@ The template to monitor Kubernetes nodes that work without any external scripts.
 It works without external scripts and uses the script item to make HTTP requests to the Kubernetes API.
 Install the Zabbix Helm Chart (https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
+Change the values according to the environment in the file $HOME/zabbix_values.yaml.
+
+For example: 
+
+ -  ## Enables use of **Zabbix proxy**
+    enabled: false
+
+Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -35,7 +42,7 @@ This template has been tested on:
 
 Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.0) in your Kubernetes cluster.
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>/api`.
+Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -44,19 +51,12 @@ Get the generated service account token using the command
 Then set it to the macro `{$KUBE.API.TOKEN}`.  
 Set `{$KUBE.NODES.ENDPOINT.NAME}` with Zabbix agent's endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-zabbix-helm-chrt-agent`.
 
-Set up the macros to filter the metrics of discovered nodes:
+Set up the macros to filter the metrics of discovered nodes and host creation based on host prototypes:
 
 - {$KUBE.LLD.FILTER.NODE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
 - {$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}
-
-Set up the macros to filter host creation based on host prototypes:
-
-- {$KUBE.LLD.FILTER.NODE_HOST.MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}
-- {$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}
 
 Set up macros to filter pod metrics by namespace:
 
@@ -65,12 +65,19 @@ Set up macros to filter pod metrics by namespace:
 
 **Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable pods.
 
-You can use `{$KUBE.NODE.FILTER.LABELS}`, `{$KUBE.POD.FILTER.LABELS}`, `{$KUBE.NODE.FILTER.ANNOTATIONS}` and `{$KUBE.POD.FILTER.ANNOTATIONS}` macros for advanced filtering nodes and pods by labels and annotations. Macro values are specified separated by commas and must have the key/value form with support for regular expressions in the value.
+You can use the `{$KUBE.NODE.FILTER.LABELS}`, `{$KUBE.POD.FILTER.LABELS}`, `{$KUBE.NODE.FILTER.ANNOTATIONS}` and `{$KUBE.POD.FILTER.ANNOTATIONS}` macros for advanced filtering of nodes and pods by labels and annotations.
+
+Notes about labels and annotations filters:
+
+- Macro values should be specified separated by commas and must have the key/value form with support for regular expressions in the value (`key1: value, key2: regexp`).
+- ECMAScript syntax is used for regular expressions.
+- Filters are applied if such a label key exists for the entity that is being filtered (it means that if you specify a key in a filter, entities which do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
+- You can also use the exclamation point symbol (`!`) to invert the filter (`!key: value`).
 
 For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the nodes 5-25 without the "ingress" role will be discovered.
 
 
-See documentation for details:
+See the Kubernetes documentation for details about labels and annotations:
 
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/>
 - <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>
@@ -83,21 +90,18 @@ See documentation for details:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.ENDPOINT.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api</p>|`https://localhost:6443/api`|
+|{$KUBE.API.ENDPOINT.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.MATCHES}|<p>Filter of discoverable nodes by role.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}|<p>Filter to exclude discovered node by role.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}|<p>Filter of discoverable cluster nodes.</p>|`.*`|
-|{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}|<p>Filter to exclude discovered cluster nodes.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}|<p>Filter of discoverable nodes hosts by role.</p>|`.*`|
-|{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}|<p>Filter to exclude discovered cluster nodes by role.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.NODE.FILTER.ANNOTATIONS}|<p>Annotations to filter nodes (regex in values are supported).</p>||
-|{$KUBE.NODE.FILTER.LABELS}|<p>Labels to filter nodes (regex in values are supported).</p>||
-|{$KUBE.POD.FILTER.ANNOTATIONS}|<p>Annotations to filter pods (regex in values are supported).</p>||
-|{$KUBE.POD.FILTER.LABELS}|<p>Labels to filter Pods (regex in values are supported).</p>||
+|{$KUBE.NODE.FILTER.ANNOTATIONS}|<p>Annotations to filter nodes (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.NODE.FILTER.LABELS}|<p>Labels to filter nodes (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.POD.FILTER.ANNOTATIONS}|<p>Annotations to filter pods (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.POD.FILTER.LABELS}|<p>Labels to filter Pods (regex in values are supported). See the template's README.md for details.</p>||
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}|<p>Filter of discoverable pods by namespace.</p>|`.*`|
 |{$KUBE.LLD.FILTER.POD.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered pods by namespace.</p>|`CHANGE_IF_NEEDED`|
 
@@ -107,7 +111,6 @@ See documentation for details:
 |----|-----------|----|-----------------------|
 |Kubernetes: Get nodes|<p>Collecting and processing cluster nodes data via Kubernetes API.</p>|Script|kube.nodes|
 |Get nodes check|<p>Data collection check.</p>|Dependent item|kube.nodes.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Node LLD|<p>Generation of data for node discovery rules.</p>|Dependent item|kube.nodes.lld<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Triggers
 
@@ -119,13 +122,13 @@ See documentation for details:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node discovery||Dependent item|kube.node.discovery|
+|Node discovery||Dependent item|kube.node.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes..filternode`</p></li></ul>|
 
 ### Item prototypes for Node discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node [{#NAME}]: Get data|<p>Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.</p>|Dependent item|kube.node.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items[?(@.metadata.name == "{#NAME}")].first()`</p></li></ul>|
+|Node [{#NAME}]: Get data|<p>Collecting and processing cluster by node [{#NAME}] data via Kubernetes API.</p>|Dependent item|kube.node.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes..[?(@.metadata.name == "{#NAME}")].first()`</p></li></ul>|
 |Node [{#NAME}] Addresses: External IP|<p>Typically the IP address of the node that is externally routable (available from outside the cluster).</p>|Dependent item|kube.node.addresses.external_ip[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Addresses: Internal IP|<p>Typically the IP address of the node that is routable only within the cluster.</p>|Dependent item|kube.node.addresses.internal_ip[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Allocatable: CPU|<p>Allocatable CPU.</p><p></p><p>'Allocatable' on a Kubernetes node is defined as the amount of compute resources that are available for pods. The scheduler does not over-subscribe 'Allocatable'. 'CPU', 'memory' and 'ephemeral-storage' are supported as of now.</p>|Dependent item|kube.node.allocatable.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.allocatable.cpu`</p></li></ul>|
@@ -147,10 +150,10 @@ See documentation for details:
 |Node [{#NAME}] Info: Operating system|<p>Node operating system.</p>|Dependent item|kube.node.info.operatingsystem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.nodeInfo.operatingSystem`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Info: OS image|<p>Node OS image.</p>|Dependent item|kube.node.info.osversion[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.nodeInfo.kernelVersion`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 |Node [{#NAME}] Info: Roles|<p>Node roles.</p>|Dependent item|kube.node.info.roles[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.roles`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-|Node [{#NAME}] Limits: CPU|<p>Node CPU limits.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.limits.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods[*].containers.limits.cpu.sum()`</p></li></ul>|
-|Node [{#NAME}] Limits: Memory|<p>Node Memory limits.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.limits.memory[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods[*].containers.limits.memory.sum()`</p></li></ul>|
-|Node [{#NAME}] Requests: CPU|<p>Node CPU requests.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.requests.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods[*].containers.requests.cpu.sum()`</p></li></ul>|
-|Node [{#NAME}] Requests: Memory|<p>Node Memory requests.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.requests.memory[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pods[*].containers.requests.memory.sum()`</p></li></ul>|
+|Node [{#NAME}] Limits: CPU|<p>Node CPU limits.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.limits.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NAME}] Limits: Memory|<p>Node Memory limits.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.limits.memory[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NAME}] Requests: CPU|<p>Node CPU requests.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.requests.cpu[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NAME}] Requests: Memory|<p>Node Memory requests.</p><p></p><p>https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/</p>|Dependent item|kube.node.requests.memory[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |Node [{#NAME}] Uptime|<p>Node uptime.</p>|Dependent item|kube.node.uptime[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metadata.creationTimestamp`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `return Math.floor((Date.now() - new Date(value)) / 1000);`</p></li></ul>|
 |Node [{#NAME}] Used: Pods|<p>Current number of pods on the node.</p>|Dependent item|kube.node.used.pods[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status.podsCount`</p></li></ul>|
 
@@ -174,23 +177,17 @@ See documentation for details:
 |Node [{#NAME}]: Has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Kubernetes nodes by HTTP/kube.node.uptime[{#NAME}])<10`|Info||
 |Node [{#NAME}] Used: Kubelet too many pods|<p>Kubelet is running at capacity.</p>|`last(/Kubernetes nodes by HTTP/kube.node.used.pods[{#NAME}])/ last(/Kubernetes nodes by HTTP/kube.node.capacity.pods[{#NAME}]) > 0.9`|Warning||
 
-### LLD rule Cluster node discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Cluster node discovery||Dependent item|kube.node_host.discovery|
-
 ### LLD rule Pod discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Pods`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Pod discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node [{#NODE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|Node [{#NODE}] Pod [{#POD}]: Get data|<p>Collecting and processing cluster by node [{#NODE}] data via Kubernetes API.</p>|Dependent item|kube.pod.get[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Pods[?(@.name == "{#POD}")].first()`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Containers ready|<p>All containers in the Pod are ready.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.containers_ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "ContainersReady")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Initialized|<p>All init containers have started successfully.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.initialized[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Initialized")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Node [{#NODE}] Pod [{#POD}] Conditions: Ready|<p>The Pod is able to serve requests and should be added to the load balancing pools of all matching Services.</p><p></p><p>https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle/#pod-conditions</p>|Dependent item|kube.pod.conditions.ready[{#POD}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conditions[?(@.type == "Ready")].status.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|

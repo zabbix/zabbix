@@ -80,7 +80,7 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |Name|Description|Default|
 |----|-----------|-------|
 |{$PHP_FPM.PORT}|<p>The port of the PHP-FPM status host or container.</p>|`80`|
-|{$PHP_FPM.HOST}|<p>The hostname or an IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
+|{$PHP_FPM.HOST}|<p>The hostname or IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
 |{$PHP_FPM.STATUS.PAGE}|<p>The path of the PHP-FPM status page.</p>|`status`|
 |{$PHP_FPM.PING.PAGE}|<p>The path of the PHP-FPM ping page.</p>|`ping`|
 |{$PHP_FPM.PING.REPLY}|<p>The expected reply to the ping.</p>|`pong`|
@@ -125,7 +125,7 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes</p>|`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PHP-FPM: Process is not running</li></ul>|
 |PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
 |PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
-|PHP-FPM: Manager  changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
+|PHP-FPM: Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
 |PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0`|Warning||
 
 ## Feedback
