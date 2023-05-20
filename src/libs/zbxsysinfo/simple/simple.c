@@ -58,12 +58,11 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
-	char	*attrs[2] = {"namingContexts", NULL };
-	char	*attr	 = NULL;
-	char	**valRes = NULL;
-	int	ldapErr = 0;
-
-	zbx_alarm_on(timeout);
+	struct timeval	tm;
+	char		*attrs[2] = {"namingContexts", NULL };
+	char		*attr	 = NULL;
+	char		**valRes = NULL;
+	int		ldapErr = 0;
 
 	*value_int = 0;
 
@@ -85,6 +84,14 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		}
 	}
 #endif
+	tm.tv_sec = timeout;
+	tm.tv_usec = 0;
+
+	if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_NETWORK_TIMEOUT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set network timeout [%s]", ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
@@ -109,7 +116,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	*value_int = 1;
 lbl_ret:
-	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);

@@ -28,10 +28,12 @@ class CControllerDiscoveryCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'name' =>					'required|db drules.name|not_empty',
-			'proxy_hostid'  =>			'db drules.proxy_hostid',
+			'proxy_hostid' =>			'db drules.proxy_hostid',
 			'iprange' =>				'required|db drules.iprange|not_empty|flags '.P_CRLF,
 			'delay' =>					'required|db drules.delay|not_empty',
-			'status' =>					'db drules.status|in '.DRULE_STATUS_ACTIVE,
+			'status' =>					'db drules.status|in '.implode(',', [DRULE_STATUS_ACTIVE, DRULE_STATUS_DISABLED]),
+			'concurrency_max_type' =>	'in '.implode(',', [ZBX_DISCOVERY_CHECKS_ONE, ZBX_DISCOVERY_CHECKS_UNLIMITED, ZBX_DISCOVERY_CHECKS_CUSTOM]),
+			'concurrency_max' =>		'db drules.concurrency_max|ge '.ZBX_DISCOVERY_CHECKS_UNLIMITED.'|le '.ZBX_DISCOVERY_CHECKS_MAX,
 			'uniqueness_criteria' =>	'string',
 			'dchecks' =>				'required|array'
 		];
@@ -70,6 +72,12 @@ class CControllerDiscoveryCreate extends CController {
 
 			$drule['dchecks'][$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 		}
+
+		$concurrency_max_type = $this->getInput('concurrency_max_type', ZBX_DISCOVERY_CHECKS_UNLIMITED);
+
+		$drule['concurrency_max'] = $concurrency_max_type == ZBX_DISCOVERY_CHECKS_CUSTOM
+			? $this->getInput('concurrency_max', ZBX_DISCOVERY_CHECKS_UNLIMITED)
+			: $concurrency_max_type;
 
 		$result = API::DRule()->create($drule);
 

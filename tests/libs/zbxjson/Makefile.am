@@ -25,25 +25,27 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 zbx_json_open_path_SOURCES = \
 	zbx_json_open_path.c \
 	../../zbxmocktest.h
 
 zbx_json_open_path_LDADD = $(JSON_LIBS)
+zbx_json_open_path_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 if SERVER
 zbx_json_open_path_LDADD += @SERVER_LIBS@
-zbx_json_open_path_LDFLAGS = @SERVER_LDFLAGS@
+zbx_json_open_path_LDFLAGS += @SERVER_LDFLAGS@
 else
 if PROXY
 zbx_json_open_path_LDADD += @PROXY_LIBS@
-zbx_json_open_path_LDFLAGS = @PROXY_LDFLAGS@
+zbx_json_open_path_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_json_open_path_CFLAGS = -I@top_srcdir@/tests
+zbx_json_open_path_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 # zbx_json_decodevalue
 
@@ -53,18 +55,19 @@ zbx_json_decodevalue_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_json_decodevalue_LDADD = $(JSON_LIBS)
+zbx_json_decodevalue_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 if SERVER
 zbx_json_decodevalue_LDADD += @SERVER_LIBS@
-zbx_json_decodevalue_LDFLAGS = @SERVER_LDFLAGS@
+zbx_json_decodevalue_LDFLAGS += @SERVER_LDFLAGS@
 else
 if PROXY
 zbx_json_decodevalue_LDADD += @PROXY_LIBS@
-zbx_json_decodevalue_LDFLAGS = @PROXY_LDFLAGS@
+zbx_json_decodevalue_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_json_decodevalue_CFLAGS = -I@top_srcdir@/tests
+zbx_json_decodevalue_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 # zbx_json_decodevalue_dyn
 
@@ -74,36 +77,38 @@ zbx_json_decodevalue_dyn_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_json_decodevalue_dyn_LDADD = $(JSON_LIBS)
+zbx_json_decodevalue_dyn_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 if SERVER
 zbx_json_decodevalue_dyn_LDADD += @SERVER_LIBS@
-zbx_json_decodevalue_dyn_LDFLAGS = @SERVER_LDFLAGS@
+zbx_json_decodevalue_dyn_LDFLAGS += @SERVER_LDFLAGS@
 else
 if PROXY
 zbx_json_decodevalue_dyn_LDADD += @PROXY_LIBS@
-zbx_json_decodevalue_dyn_LDFLAGS = @PROXY_LDFLAGS@
+zbx_json_decodevalue_dyn_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_json_decodevalue_dyn_CFLAGS = -I@top_srcdir@/tests
+zbx_json_decodevalue_dyn_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 zbx_jsonpath_compile_SOURCES = \
 	zbx_jsonpath_compile.c \
 	../../zbxmocktest.h
 
 zbx_jsonpath_compile_LDADD = $(JSON_LIBS)
+zbx_jsonpath_compile_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 if SERVER
 zbx_jsonpath_compile_LDADD += @SERVER_LIBS@
-zbx_jsonpath_compile_LDFLAGS = @SERVER_LDFLAGS@
+zbx_jsonpath_compile_LDFLAGS += @SERVER_LDFLAGS@
 else
 if PROXY
 zbx_jsonpath_compile_LDADD += @PROXY_LIBS@
-zbx_jsonpath_compile_LDFLAGS = @PROXY_LDFLAGS@
+zbx_jsonpath_compile_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_jsonpath_compile_CFLAGS = -I@top_srcdir@/tests
+zbx_jsonpath_compile_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 # zbx_jsonobj_query
 
@@ -112,15 +117,16 @@ zbx_jsonobj_query_SOURCES = \
 	../../zbxmocktest.h
 
 zbx_jsonobj_query_LDADD = $(JSON_LIBS)
+zbx_jsonobj_query_LDFLAGS = $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 if SERVER
 zbx_jsonobj_query_LDADD += @SERVER_LIBS@
-zbx_jsonobj_query_LDFLAGS = @SERVER_LDFLAGS@
+zbx_jsonobj_query_LDFLAGS += @SERVER_LDFLAGS@
 else
 if PROXY
 zbx_jsonobj_query_LDADD += @PROXY_LIBS@
-zbx_jsonobj_query_LDFLAGS = @PROXY_LDFLAGS@
+zbx_jsonobj_query_LDFLAGS += @PROXY_LDFLAGS@
 endif
 endif
 
-zbx_jsonobj_query_CFLAGS = -I@top_srcdir@/tests
+zbx_jsonobj_query_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)

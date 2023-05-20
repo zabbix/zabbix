@@ -69,7 +69,6 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zbx_free(error);
 	}
 
-
 	/* zabbix[triggers] */
 	zbx_json_adduint64(json, "triggers", zbx_dc_get_trigger_count());
 

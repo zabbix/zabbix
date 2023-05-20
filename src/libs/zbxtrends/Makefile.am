@@ -2,7 +2,9 @@
 
 noinst_LIBRARIES = \
 	libzbxtrends.a
-	
+
+libzbxtrends_a_CFLAGS = \
+	$(TLS_CFLAGS)	
 
 libzbxtrends_a_SOURCES = \
 	baseline.c \

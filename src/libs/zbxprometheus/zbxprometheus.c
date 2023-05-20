@@ -1207,9 +1207,9 @@ static int	prometheus_register_hint(zbx_hashset_t *hints, const char *data, char
 
 	if (NULL == (hint = (zbx_prometheus_hint_t *)zbx_hashset_search(hints, &hint_local)))
 	{
+		hint_local.type = NULL;
+		hint_local.help = NULL;
 		hint = zbx_hashset_insert(hints, &hint_local, sizeof(hint_local));
-		hint->type = NULL;
-		hint->help = NULL;
 	}
 	else
 		zbx_free(metric);
