@@ -618,13 +618,8 @@ a.link-action {
 			&.high-bg,
 			&.disaster-bg {
 				&::before {
-					min-height: 20px;
 					box-shadow: inset 0 -1px 0 0 $table-border-color;
-				}
-
-				&::after {
-					top: 1px;
-					transform: scale(.8);
+					font-size: 22px;
 				}
 			}
 

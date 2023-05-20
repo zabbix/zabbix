@@ -7187,11 +7187,8 @@ z-select a.focusable.btn-icon:focus,
 .list-table.compact-view td {
   box-shadow: inset 0 -1px 0 0 #333333; }
   .list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before {
-    min-height: 20px;
-    box-shadow: inset 0 -1px 0 0 #333333; }
-  .list-table.compact-view td.na-bg::after, .list-table.compact-view td.normal-bg::after, .list-table.compact-view td.info-bg::after, .list-table.compact-view td.warning-bg::after, .list-table.compact-view td.average-bg::after, .list-table.compact-view td.high-bg::after, .list-table.compact-view td.disaster-bg::after {
-    top: 1px;
-    transform: scale(0.8); }
+    box-shadow: inset 0 -1px 0 0 #333333;
+    font-size: 22px; }
 
 .filter-highlight-row-cb {
   display: none; }
