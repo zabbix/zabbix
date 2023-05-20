@@ -62,13 +62,11 @@ class CWidgetGauge extends CWidget {
 			this.gauge.setSize(this.#getGaugeContainerSize());
 		}
 
-		if ('value' in response) {
-			this.gauge.setValue({
-				value: response.value,
-				value_text: response.value_text,
-				units_text: response.units_text
-			});
-		}
+		this.gauge.setValue({
+			value: response.value,
+			value_text: response.value_text,
+			units_text: response.units_text
+		});
 	}
 
 	getActionsContextMenu({can_paste_widget}) {
