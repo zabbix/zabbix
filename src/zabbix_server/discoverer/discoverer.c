@@ -38,6 +38,10 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 
+#ifdef HAVE_LDAP
+#	include <ldap.h>
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	dcheckid;
@@ -1491,11 +1495,46 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 		worker->stop = 1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize libraries, called before creating worker threads       *
+ *                                                                            *
+ ******************************************************************************/
+static void	discoverer_libs_init(void)
+{
+#ifdef HAVE_NETSNMP
+	zbx_init_library_mt_snmp();
+#endif
+#ifdef HAVE_LIBCURL
+	curl_global_init(CURL_GLOBAL_DEFAULT);
+#endif
+#ifdef HAVE_LDAP
+	ldap_get_option(NULL, 0, NULL);
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: release libraries resources                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	discoverer_libs_destroy(void)
+{
+#ifdef HAVE_NETSNMP
+	zbx_shutdown_library_mt_snmp();
+#endif
+#ifdef HAVE_LIBCURL
+	curl_global_cleanup();
+#endif
+}
+
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int workers_num, char **error)
 {
 	int		i, err, ret = FAIL, started_num = 0;
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
+
+	discoverer_libs_init();
 
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 
@@ -1608,6 +1647,8 @@ static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 	zbx_hashset_destroy(&manager->results);
 
 	pthread_mutex_destroy(&manager->results_lock);
+
+	discoverer_libs_destroy();
 }
 
 /******************************************************************************
@@ -1634,7 +1675,6 @@ static void	discoverer_reply_usage_stats(zbx_discoverer_manager_t *manager, zbx_
 	zbx_free(data);
 	zbx_vector_dbl_destroy(&usage);
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1680,10 +1720,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_free(error);
 		exit(EXIT_FAILURE);
 	}
-
-#ifdef HAVE_NETSNMP
-	zbx_init_library_mt_snmp();
-#endif
 
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in->workers_num, &error))
 	{

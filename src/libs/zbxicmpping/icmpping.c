@@ -295,8 +295,8 @@ out:
  *           "safe limits".                                                   *
  *                                                                            *
  ******************************************************************************/
-static int	get_interval_option(const char *fping, ZBX_FPING_HOST *hosts, int hosts_count, int *value, char *error,
-		size_t max_error_len)
+static int	get_interval_option(const char *fping, const ZBX_FPING_HOST *hosts, int hosts_count, int *value,
+		char *error, size_t max_error_len)
 {
 	char		*out = NULL;
 	unsigned int	intervals[] = {0, 1, 10};
@@ -833,8 +833,8 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 	{
 		if (FPING_UNINITIALIZED_VALUE == packet_interval)
 		{
-			int		hsts_count = 1;
-			ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
+			int			hsts_count = 1;
+			const ZBX_FPING_HOST	h = {.addr = "127.0.0.1"}, *hsts = &h;
 
 			if (0 == rdns)
 			{

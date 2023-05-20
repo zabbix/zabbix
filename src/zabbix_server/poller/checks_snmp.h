@@ -33,6 +33,7 @@
 #define ZBX_SNMP_STR_UNDEFINED	255
 
 void	zbx_init_library_mt_snmp(void);
+void	zbx_shutdown_library_mt_snmp(void);
 int	get_value_snmp(const zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type, int config_timeout,
 		const char *config_source_ip);
 void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,

@@ -118,7 +118,7 @@ typedef void*	zbx_snmp_sess_t;
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
-pthread_rwlock_t			snmp_exec_rwlock;
+static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
 
 #define	SNMP_MT_EXECLOCK					\
@@ -2493,6 +2493,23 @@ static void	zbx_init_snmp(void)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
+static void	zbx_shutdown_snmp(void)
+{
+	sigset_t	mask, orig_mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGUSR2);
+	sigaddset(&mask, SIGHUP);
+	sigaddset(&mask, SIGQUIT);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
+
+	snmp_shutdown(progname);
+	zbx_snmp_init_done = 0;
+
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Initialize snmp and load mibs files for multithread environment   *
@@ -2513,6 +2530,23 @@ void	zbx_init_library_mt_snmp(void)
 		else
 			snmp_rwlock_init_done = 1;
 	}
+}
+
+void	zbx_shutdown_library_mt_snmp(void)
+{
+	if (1 == snmp_rwlock_init_done)
+	{
+		int	err;
+
+		pthread_rwlock_wrlock(&snmp_exec_rwlock);
+
+		if (0 != (err = pthread_rwlock_destroy(&snmp_exec_rwlock)))
+			zabbix_log(LOG_LEVEL_WARNING, "cannot destroy snmp execute mutex: %s", zbx_strerror(err));
+		else
+			snmp_rwlock_init_done = 0;
+	}
+
+	zbx_shutdown_snmp();
 }
 
 void	get_values_snmp(const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
@@ -2594,23 +2628,6 @@ out:
 	SNMP_MT_UNLOCK;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-static void	zbx_shutdown_snmp(void)
-{
-	sigset_t	mask, orig_mask;
-
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGTERM);
-	sigaddset(&mask, SIGUSR2);
-	sigaddset(&mask, SIGHUP);
-	sigaddset(&mask, SIGQUIT);
-	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
-
-	snmp_shutdown(progname);
-	zbx_snmp_init_done = 0;
-
-	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
 /******************************************************************************
