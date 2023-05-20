@@ -125,6 +125,7 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 	FILE		*f;
 	size_t		buf_size = 0, offset = 0;
 	char		tmp[MAX_STRING_LEN], *buffer = NULL;
+	int		ret = FAIL;
 	sigset_t	mask, orig_mask;
 
 	zbx_snprintf(tmp, sizeof(tmp), "%s 2>&1", fping);
@@ -139,7 +140,7 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 	if (NULL == (f = popen(tmp, "r")))
 	{
 		zbx_strlcpy(error, zbx_strerror(errno), max_error_len);
-		return FAIL;
+		goto out;
 	}
 
 	while (NULL != zbx_fgets(tmp, sizeof(tmp), f))
@@ -154,18 +155,19 @@ static int	get_fping_out(const char *fping, char **out, char *error, size_t max_
 
 	pclose(f);
 
-	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore sigprocmask");
-
 	if (NULL == buffer)
 	{
 		zbx_strlcpy(error, "Can't obtain the program output", max_error_len);
-		return FAIL;
+		goto out;
 	}
 
 	*out = buffer;
+	ret = SUCCEED;
+out:
+	if (0 > zbx_sigmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
