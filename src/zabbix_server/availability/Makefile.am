@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libavailability.a
 
+libavailability_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libavailability_a_SOURCES = \
 	avail_manager.c \
 	avail_manager.h

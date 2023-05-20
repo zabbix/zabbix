@@ -50,7 +50,7 @@ zbx_item_preproc_SOURCES = \
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@
-zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) 
+zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
