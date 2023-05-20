@@ -293,7 +293,6 @@ class testPageMonitoringWeb extends CWebTest {
 				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->query('id:http_step')->asForm()->one()
 						->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
-				COverlayDialogElement::find()->one()->waitUntilNotVisible();
 			}
 
 			$this->query('button:Update')->one()->waitUntilClickable()->click();
