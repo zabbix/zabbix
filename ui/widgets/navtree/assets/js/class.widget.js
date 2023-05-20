@@ -882,7 +882,9 @@ class CWidgetNavTree extends CWidget {
 									method: 'POST',
 									data: {
 										name: form_inputs.name.value.trim(),
-										sysmapid: form_inputs.sysmapid.value,
+										sysmapid: typeof form_inputs.sysmapid !== 'undefined'
+											? form_inputs.sysmapid.value
+											: '0',
 										add_submaps: form_inputs.add_submaps.checked ? 1 : 0,
 										depth: depth
 									},
