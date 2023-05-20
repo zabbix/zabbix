@@ -664,7 +664,8 @@ typedef struct zbx_um_cache zbx_um_cache_t;
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
-void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
+void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);

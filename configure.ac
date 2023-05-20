@@ -1244,7 +1244,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([USE_TESTS], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1591,6 +1591,9 @@ if test "x$want_gnutls" = "xyes"; then
 	TLS_CFLAGS="$GNUTLS_CFLAGS"
 	TLS_LDFLAGS="$GNUTLS_LDFLAGS"
 	TLS_LIBS="$GNUTLS_LIBS"
+	AC_SUBST(TLS_CFLAGS)
+	AC_SUBST(TLS_LDFLAGS)
+	AC_SUBST(TLS_LIBS)
 fi
 
 dnl Check for OpenSSL libssl and libcrypto [by default - skip]
@@ -1941,6 +1944,9 @@ case "x$ARCH" in
 		;;
 esac
 
+found_cmocka="no"
+found_yaml="no"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
@@ -1948,6 +1954,7 @@ dnl *                                                               *
 dnl *****************************************************************
 
 m4_ifdef([CONF_TESTS],[CONF_TESTS])
+AM_CONDITIONAL([TESTS],[test "x$found_cmocka" = "xyes"])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -2292,7 +2299,31 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
-  IPv6 support:          ${have_ipv6}"
+  IPv6 support:          ${have_ipv6}
+  cmocka support:        ${found_cmocka}"
+
+if test "x$found_cmocka" != "xno"; then
+
+echo "  cmocka library details:
+    Compiler flags:      ${CMOCKA_CFLAGS}
+    Linker flags:        ${CMOCKA_LDFLAGS}
+    Libraries:           ${CMOCKA_LIBS}
+    Library location:    ${CMOCKA_LIBRARY_PATH}"
+
+fi
+
+echo "
+  yaml support:          ${found_yaml}"
+
+if test "x$found_yaml" != "xno"; then
+
+echo "  yaml library details:
+    Compiler flags:      ${YAML_CFLAGS}
+    Linker flags:        ${YAML_LDFLAGS}
+    Libraries:           ${YAML_LIBS}
+    Library location:    ${YAML_LIBRARY_PATH}"
+
+fi
 
 echo
 echo "***********************************************************"

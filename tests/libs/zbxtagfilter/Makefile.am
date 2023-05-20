@@ -22,9 +22,9 @@ tagfilter_match_tags_LDADD = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-tagfilter_match_tags_LDADD += @SERVER_LIBS@
+tagfilter_match_tags_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 
-tagfilter_match_tags_LDFLAGS = @SERVER_LDFLAGS@
+tagfilter_match_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-tagfilter_match_tags_CFLAGS = -I@top_srcdir@/tests
+tagfilter_match_tags_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 endif

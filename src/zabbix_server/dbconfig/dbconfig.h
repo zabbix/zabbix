@@ -29,6 +29,7 @@ typedef struct
 	int			config_timeout;
 	int			proxyconfig_frequency;
 	int			proxydata_frequency;
+	const char		*config_source_ip;
 }
 zbx_thread_dbconfig_args;
 

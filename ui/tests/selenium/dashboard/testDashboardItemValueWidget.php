@@ -1029,6 +1029,13 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$saved_form->checkValue(['Advanced configuration' => false]);
+				$saved_form->fill(['Advanced configuration' => true]);
+			}
 			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
 			// As form is quite complex, show_header field should be checked separately.
