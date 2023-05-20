@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha1
 
 New features:
+A.F....PS. [ZBXNEXT-2732] improved network discovery by implementing concurrent checks within single discovery rule (asestakovs, ddauksa, MVekslers)
 ..F.I..... [ZBXNEXT-8425] increased the maximum length for username and password fields used in HTTP authentication from 64 to 255 characters (jfreibergs, kprutkovs)
 .........T [ZBXNEXT-8199] added google cloud platform template (igorbach)
 ...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
@@ -44,6 +45,8 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 .........T [ZBXNEXT-8208] added storage accounts in azure template (egordymov)
 
 Bug fixes:
+........S. [ZBX-22793] fixed LogSlowQueries not taken into account by server (dgoloscapov)
+.......PS. [ZBX-22336] added support of log level control for threaded components (wiper)
 .......PS. [ZBX-22314] fixed OpenSSL, yaml, cmocka compiling in a non-standard location (askolmeisters)
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 ........S. [ZBX-22773] fixed ListenIP configuration parameter being ignored by HA (kprutkovs)
