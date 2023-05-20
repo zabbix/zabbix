@@ -118,48 +118,7 @@ class CControllerDashboardWidgetEdit extends CController {
 	 * @return array
 	 */
 	private function getCaptions($form) {
-		$captions = ['simple' => [], 'ms' => []];
-
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldSelectResource) {
-				$resource_type = $field->getResourceType();
-				$id = $field->getValue();
-
-				if (!array_key_exists($resource_type, $captions['simple'])) {
-					$captions['simple'][$resource_type] = [];
-				}
-
-				if ($id != 0) {
-					switch ($resource_type) {
-						case WIDGET_FIELD_SELECT_RES_SYSMAP:
-							$captions['simple'][$resource_type][$id] = _('Inaccessible map');
-							break;
-					}
-				}
-			}
-		}
-
-		foreach ($captions['simple'] as $resource_type => &$list) {
-			if (!$list) {
-				continue;
-			}
-
-			switch ($resource_type) {
-				case WIDGET_FIELD_SELECT_RES_SYSMAP:
-					$maps = API::Map()->get([
-						'sysmapids' => array_keys($list),
-						'output' => ['sysmapid', 'name']
-					]);
-
-					if ($maps) {
-						foreach ($maps as $map) {
-							$list[$map['sysmapid']] = $map['name'];
-						}
-					}
-					break;
-			}
-		}
-		unset($list);
+		$captions = [];
 
 		// Prepare data for CMultiSelect controls.
 		$ids = [
@@ -170,7 +129,8 @@ class CControllerDashboardWidgetEdit extends CController {
 			'prototype_item' => [],
 			'prototype_graph' => [],
 			'service' => [],
-			'sla' => []
+			'sla' => [],
+			'sysmap' => []
 		];
 
 		foreach ($form->getFields() as $field) {
@@ -206,15 +166,19 @@ class CControllerDashboardWidgetEdit extends CController {
 				$key = 'slas';
 				$var = 'sla';
 			}
+			elseif ($field instanceof CWidgetFieldMsSysmap) {
+				$key = 'sysmaps';
+				$var = 'sysmap';
+			}
 			else {
 				continue;
 			}
 
 			$field_name = $field->getName();
-			$captions['ms'][$key][$field_name] = [];
+			$captions[$key][$field_name] = [];
 
 			foreach ($field->getValue() as $id) {
-				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
+				$captions[$key][$field_name][$id] = ['id' => $id];
 				$ids[$var][$id][] = $field_name;
 			}
 		}
@@ -228,7 +192,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_groups as $groupid => $group) {
 				foreach ($ids['group'][$groupid] as $field_name) {
-					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
+					$captions['groups'][$field_name][$groupid]['name'] = $group['name'];
 				}
 			}
 		}
@@ -242,7 +206,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_hosts as $hostid => $host) {
 				foreach ($ids['host'][$hostid] as $field_name) {
-					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
+					$captions['hosts'][$field_name][$hostid]['name'] = $host['name'];
 				}
 			}
 		}
@@ -258,7 +222,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_items as $itemid => $item) {
 				foreach ($ids['item'][$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] += [
+					$captions['items'][$field_name][$itemid] += [
 						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -276,7 +240,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_graphs as $graphid => $graph) {
 				foreach ($ids['graph'][$graphid] as $field_name) {
-					$captions['ms']['graphs'][$field_name][$graphid] += [
+					$captions['graphs'][$field_name][$graphid] += [
 						'name' => $graph['name'],
 						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -294,7 +258,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_item_prototypes as $itemid => $item) {
 				foreach ($ids['prototype_item'][$itemid] as $field_name) {
-					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
+					$captions['item_prototypes'][$field_name][$itemid] += [
 						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -315,7 +279,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				$host_names = array_column($graph['hosts'], 'name', 'hostid');
 
 				foreach ($ids['prototype_graph'][$graphid] as $field_name) {
-					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
+					$captions['graph_prototypes'][$field_name][$graphid] += [
 						'name' => $graph['name'],
 						'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
 					];
@@ -332,7 +296,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_services as $serviceid => $service) {
 				foreach ($ids['service'][$serviceid] as $field_name) {
-					$captions['ms']['services'][$field_name][$serviceid] += [
+					$captions['services'][$field_name][$serviceid] += [
 						'name' => $service['name']
 					];
 				}
@@ -348,8 +312,24 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_slas as $slaid => $sla) {
 				foreach ($ids['sla'][$slaid] as $field_name) {
-					$captions['ms']['slas'][$field_name][$slaid] += [
+					$captions['slas'][$field_name][$slaid] += [
 						'name' => $sla['name']
+					];
+				}
+			}
+		}
+
+		if ($ids['sysmap']) {
+			$db_sysmaps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($ids['sysmap']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_sysmaps as $sysmapid => $sysmap) {
+				foreach ($ids['sysmap'][$sysmapid] as $field_name) {
+					$captions['sysmaps'][$field_name][$sysmapid] += [
+						'name' => $sysmap['name']
 					];
 				}
 			}
@@ -363,10 +343,11 @@ class CControllerDashboardWidgetEdit extends CController {
 			'item_prototypes' => _('Inaccessible item prototype'),
 			'graph_prototypes' => _('Inaccessible graph prototype'),
 			'services' => _('Inaccessible service'),
-			'slas' => _('Inaccessible SLA')
+			'slas' => _('Inaccessible SLA'),
+			'sysmaps' => _('Inaccessible map')
 		];
 
-		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
+		foreach ($captions as $resource_type => &$fields_captions) {
 			foreach ($fields_captions as &$field_captions) {
 				$n = 0;
 

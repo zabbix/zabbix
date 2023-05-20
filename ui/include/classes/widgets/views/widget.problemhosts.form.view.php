@@ -36,8 +36,7 @@ $scripts = [];
 $jq_templates = [];
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['groups']['groupids'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
@@ -45,17 +44,13 @@ $scripts[] = $field_groupids->getPostJS();
 
 // Exclude host groups.
 $field_exclude_groupids = CWidgetHelper::getGroup($fields['exclude_groupids'],
-	$data['captions']['ms']['groups']['exclude_groupids'],
-	$form->getName()
+	$data['captions']['groups']['exclude_groupids'], $form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['exclude_groupids']), $field_exclude_groupids);
 $scripts[] = $field_exclude_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
-	$form->getName()
-);
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['hosts']['hostids'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 

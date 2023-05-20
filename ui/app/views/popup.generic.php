@@ -156,6 +156,7 @@ switch ($data['popup_type']) {
 	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
+	case 'sysmaps':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -311,33 +312,6 @@ switch ($data['popup_type']) {
 			}
 		}
 		unset($trigger);
-		break;
-
-	case 'sysmaps':
-		foreach ($data['table_records'] as $sysmap) {
-			if ($data['multiselect']) {
-				$check_box = new CCheckBox('item['.$sysmap['sysmapid'].']', $sysmap['sysmapid']);
-			}
-
-			if ($data['multiselect']) {
-				$js_action = "javascript: addValue(".zbx_jsvalue($options['reference']).', '.
-						zbx_jsvalue($sysmap['sysmapid']).', '.$options['parentid'].');';
-			}
-			else {
-				$values = [
-					$options['dstfld1'] => $sysmap[$options['srcfld1']],
-					$options['dstfld2'] => $sysmap[$options['srcfld2']]
-				];
-				$js_action = 'javascript: addValues('.zbx_jsvalue($options['dstfrm']).', '.
-						zbx_jsvalue($values).');';
-			}
-
-			$name = (new CLink($sysmap['name'], 'javascript:void(0);'))
-						->setId('spanid'.$sysmap['sysmapid'])
-						->onClick($js_action.$js_action_onclick);
-
-			$table->addRow([$data['multiselect'] ? $check_box : null, $name]);
-		}
 		break;
 
 	case 'help_items':
@@ -698,7 +672,8 @@ $types = [
 	'users',
 	'usrgrp',
 	'sla',
-	'valuemaps'
+	'valuemaps',
+	'sysmaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {

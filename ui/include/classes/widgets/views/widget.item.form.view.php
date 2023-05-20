@@ -37,9 +37,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $scripts = [];
 
-$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-	$form->getName()
-);
+$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 $scripts[] = $field_itemid->getPostJS();
 

@@ -164,7 +164,7 @@ class CWidgetNavTree extends CWidget {
 						root.appendChild(this._makeTreeItem({
 							id: this._getNextId(),
 							name: item.name,
-							sysmapid: item.sysmapid,
+							sysmapid: item.id,
 							parent: id
 						}));
 					}

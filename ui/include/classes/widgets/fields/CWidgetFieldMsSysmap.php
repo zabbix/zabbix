@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,30 +19,11 @@
 **/
 
 
-/**
- * @var CView $this
- */
-?>
+class CWidgetFieldMsSysmap extends CWidgetFieldMs {
 
-window.navtreeitem_edit_popup = new class {
-	init() {
-		jQuery('#sysmapname').on('change', (e) => {
-			const name_input = document.getElementById('name');
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
-			if (name_input.value === '') {
-				name_input.value = e.target.value;
-			}
-		});
-
-		document.getElementById('select').addEventListener('click', () => {
-			return PopUp('popup.generic', {
-				srctbl: 'sysmaps',
-				srcfld1: 'sysmapid',
-				srcfld2: 'name',
-				dstfrm: 'widget_dialogue_form',
-				dstfld1: 'sysmapid',
-				dstfld2: 'sysmapname'
-			}, {dialogue_class: 'modal-popup-generic'});
-		});
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 	}
-};
+}

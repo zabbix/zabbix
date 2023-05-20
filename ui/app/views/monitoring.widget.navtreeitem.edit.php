@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var $data
  */
 
 $form = (new CForm('post'))
@@ -28,6 +29,22 @@ $form = (new CForm('post'))
 	->setId('widget-dialogue-form')
 	->setName('widget_dialogue_form')
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+
+$multiselect = (new CMultiSelect([
+	'name' => 'sysmapid',
+	'object_name' => 'sysmaps',
+	'multiple' => false,
+	'data' => $data['sysmap'] ? [$data['sysmap']] : [],
+	'add_post_js' => false,
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'sysmaps',
+			'srcfld1' => 'sysmapid',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'sysmapid'
+		]
+	]
+]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
 
 $form_list = (new CFormList())
 	->addRow(
@@ -37,12 +54,10 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 			->setAriaRequired()
 	)
-	->addRow(_('Linked map'), [
-		new CVar('sysmapid', $data['sysmap']['sysmapid']),
-		(new CTextBox('sysmapname', $data['sysmap']['name'], true))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('select', _('Select')))->addClass(ZBX_STYLE_BTN_GREY)
-	]);
+	->addRow(
+		new CLabel(_('Linked map'), 'sysmapid_ms'),
+		$multiselect
+	);
 
 if ($data['depth'] >= WIDGET_NAVIGATION_TREE_MAX_DEPTH) {
 	$form_list->addRow(null, _('Cannot add submaps. Max depth reached.'));
@@ -54,13 +69,11 @@ else {
 	]);
 }
 
-$form
-	->addItem($form_list)
-	->addItem((new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady());
+$form->addItem($form_list);
 
 $output = [
 	'body' => $form->toString(),
-	'script_inline' => $this->readJsFile('monitoring.widget.navtreeitem.edit.js.php')
+	'script_inline' => $multiselect->getPostJs()
 ];
 
 if (($messages = getMessages()) !== null) {
