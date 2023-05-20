@@ -61,7 +61,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($this->hasInput('current_sysmapid')) {
 			$sysmapid = $this->getInput('current_sysmapid');
 		}
-		elseif (array_key_exists('sysmapid', $this->fields_values)) {
+		elseif (array_key_exists(0, $this->fields_values['sysmapid'])) {
 			$sysmapid = $this->fields_values['sysmapid'][0];
 		}
 
