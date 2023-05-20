@@ -34,12 +34,15 @@ class Group extends ScimApiService {
 	public const SCIM_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 
 	/**
-	 * Returns information on specific group or all groups if no specific information is requested.
+	 * Return all groups information.
+	 * When filter 'id' or 'displayName' is defined will return information for single group.
+	 * If group not found, for filter 'id', will return ZBX_API_ERROR_NO_ENTITY error.
 	 *
-	 * @param array $options        Array with data from request.
-	 * @param array $options['id']  Optional. SCIM group id.
+	 * @param array  $options
+	 * @param string $options['id']           (optional) SCIM group id.
+	 * @param string $options['displayName']  (optional) SCIM group display name.
 	 *
-	 * @return array                Returns group data necessary for GET request SCIM response.
+	 * @return array  Array of groups data when no filters are defined. Single group data for defined filter.
 	 */
 	public function get(array $options = []): array {
 		$this->validateGet($options);
@@ -62,7 +65,8 @@ class Group extends ScimApiService {
 				'users' => $users[$options['id']]
 			];
 		}
-		elseif (array_key_exists('displayName', $options)) {
+
+		if (array_key_exists('displayName', $options)) {
 			$db_scim_group = DB::select('scim_group', [
 				'output' => ['name', 'scim_groupid'],
 				'filter' => ['name' => $options['displayName']]
@@ -80,22 +84,21 @@ class Group extends ScimApiService {
 				'users' => $users
 			];
 		}
-		else {
-			$db_scim_groups = DB::select('scim_group', [
-				'output' => ['name'],
-				'preservekeys' => true
-			]);
 
-			if ($db_scim_groups) {
-				$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
+		$db_scim_groups = DB::select('scim_group', [
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
 
-				foreach ($groups_users as $groupid => $users) {
-					$db_scim_groups[$groupid]['users'] = $users;
-				}
+		if ($db_scim_groups) {
+			$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
+
+			foreach ($groups_users as $groupid => $users) {
+				$db_scim_groups[$groupid]['users'] = $users;
 			}
-
-			return $db_scim_groups;
 		}
+
+		return $db_scim_groups;
 	}
 
 	/**
@@ -117,15 +120,14 @@ class Group extends ScimApiService {
 	}
 
 	/**
-	 * Receives information on new SCIM group and its members. Creates new entries in 'scim_group' and
-	 * 'user_scim_group' tables, updates users' user groups mapping based on the SCIM groups and SAML settings.
+	 * Create group, assign users to new group when 'members' is passed in request.
 	 *
-	 * @param array  $options                        Array with data from request.
+	 * @param array  $options
 	 * @param string $options['displayName']         SCIM group name.
 	 * @param array  $options['members']             Array with SCIM group members.
 	 * @param string $options['members'][]['value']  Userid.
 	 *
-	 * @return array                                 Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for created group.
 	 */
 	public function post(array $options): array {
 		$this->validatePost($options);
@@ -137,6 +139,7 @@ class Group extends ScimApiService {
 
 		if ($db_scim_groups) {
 			$options['id'] = $db_scim_groups[0]['scim_groupid'];
+
 			return $this->put($options);
 		}
 
@@ -204,12 +207,12 @@ class Group extends ScimApiService {
 	 * Receives new information on the SCIM group and its members. Updates 'user_scim_group' table, updates users'
 	 * user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
-	 * @param array  $options                        Array with data from request.
+	 * @param array  $options
 	 * @param string $options['id']                  SCIM group id.
 	 * @param array  $options['members']             Array with SCIM group members.
 	 * @param string $options['members'][]['value']  Userid.
 	 *
-	 * @return array                                 Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for updated group.
 	 */
 	public function put(array $options): array {
 		$this->validatePut($options);
@@ -320,7 +323,8 @@ class Group extends ScimApiService {
 	/**
 	 * Receives new information on the SCIM group members. Updates 'user_scim_group' table, updates users'
 	 * user groups mapping based on the remaining SCIM groups and SAML settings.
-	 * @param array  $options                                      Array with data from request.
+	 *
+	 * @param array  $options
 	 * @param string $options['id']                                SCIM group id.
 	 * @param array  $options['Operations']                        List of operations that need to be performed.
 	 * @param string $options['Operations'][]['op']                Operation that needs to be performed -'add',
@@ -332,7 +336,7 @@ class Group extends ScimApiService {
 	 *                                                             omitted, in this case all members should be removed.
 	 * @param string $options['Operations'][]['value'][]['value']  User id on which operation should be performed.
 	 *
-	 * @return array  Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for updated group.
 	 *
 	 * @throws APIException
 	 */
@@ -349,7 +353,6 @@ class Group extends ScimApiService {
 		}
 
 		$db_users = [];
-		$db_users_new = [];
 		$db_users_delete = [];
 		$new_userids = [];
 		$del_userids = [];
@@ -412,7 +415,7 @@ class Group extends ScimApiService {
 				$new_userids = array_diff($new_userids, array_column($db_userids, 'userid'));
 			}
 
-			$db_users_new = $this->verifyUserids($new_userids, $userdirectoryid);
+			$db_users = $this->verifyUserids($new_userids, $userdirectoryid);
 			$db_users_delete = $this->verifyUserids($del_userids, $userdirectoryid);
 		}
 
@@ -436,14 +439,14 @@ class Group extends ScimApiService {
 			DB::insertBatch('user_scim_group', $values);
 		}
 
-		foreach (array_column(array_merge($db_users_new, $db_users_delete), 'userid') as $db_userid) {
+		foreach (array_column(array_merge($db_users, $db_users_delete), 'userid') as $db_userid) {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
 		return [
 			'id' => $options['id'],
 			'displayName' => $db_scim_groups[0]['name'],
-			'users' => isset($db_users_new) ? $db_users_new : []
+			'users' => $db_users
 		];
 	}
 
@@ -488,10 +491,10 @@ class Group extends ScimApiService {
 	 * Deletes SCIM group from 'scim_group' table. Deletes the users that belong to this group from 'user_scim_group'
 	 * table. Updates users' user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
-	 * @param array  $options       Array with data from request.
-	 * @param string $options['id]  SCIM group's ID.
+	 * @param array  $options
+	 * @param string $options['id]  SCIM group to be deleted.
 	 *
-	 * @return array                Returns schema parameter in the array if the deletion was successful.
+	 * @return array  Deleted group id.
 	 */
 	public function delete(array $options): array {
 		$this->validateDelete($options);
@@ -596,7 +599,7 @@ class Group extends ScimApiService {
 	/**
 	 * Verifies if provided users exist in the database.
 	 *
-	 * @param array $userids           User ids.
+	 * @param array  $userids          User ids.
 	 * @param string $userdirectoryid  User directory id to which users belong to.
 	 *
 	 * @return array  Returns array with users' id and username.

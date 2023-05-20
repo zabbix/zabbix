@@ -76,7 +76,8 @@ class User extends ScimApiService {
 
 			return $user;
 		}
-		elseif (array_key_exists('id', $options)) {
+
+		if (array_key_exists('id', $options)) {
 			$users = APIRPC::User()->get([
 				'output' => ['userid', 'username', 'userdirectoryid'],
 				'userids' => $options['id'],
@@ -92,38 +93,25 @@ class User extends ScimApiService {
 
 			return $user;
 		}
-		else {
-			$userids = APIRPC::User()->get([
-				'output' => ['userid'],
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			]);
-			$total_users = count($userids);
 
-			$users = [];
-			if ($total_users != 0) {
-				$userids = array_column($userids, 'userid');
+		$users = APIRPC::User()->get([
+			'output' => ['userid', 'username'],
+			'filter' => ['userdirectoryid' => $userdirectoryid]
+		]);
 
-				$users = $userids
-					? APIRPC::User()->get([
-						'output' => ['userid', 'username', 'userdirectoryid'],
-						'userids' => $userids
-					])
-					: [];
-
-				foreach ($users as &$user) {
-					$this->addScimUserAttributes($user);
-				}
-				unset($user);
-			}
-
-			return $users;
+		foreach ($users as &$user) {
+			$user['userdirectoryid'] = $userdirectoryid;
+			$this->addScimUserAttributes($user);
 		}
+		unset($user);
+
+		return $users;
 	}
 
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
 	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -145,7 +133,7 @@ class User extends ScimApiService {
 	 * @param array  $options              Array with different attributes that might be set up in SAML settings.
 	 * @param string $options['userName']  Users user name based on which user will be searched.
 	 *
-	 * @return array                       Returns SCIM data that is necessary for POST request response.
+	 * @return array  Created or updated user data.
 	 */
 	public function post(array $options): array {
 		$this->validatePost($options);
@@ -184,7 +172,7 @@ class User extends ScimApiService {
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
 	private function validatePost(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
@@ -208,9 +196,9 @@ class User extends ScimApiService {
 	 * @param array  $options
 	 * @param string $options['id']
 	 * @param string $options['userName']
-	 * @param bool   $options['active']  True of false, but sent as string.
+	 * @param bool   $options['active']    True of false, but sent as string.
 	 *
-	 * @return array          Returns SCIM data that is necessary for PUT request response.
+	 * @return array  Array of updated user data.
 	 */
 	public function put(array $options): array {
 		// In order to comply with Azure SCIM without flag "aadOptscim062020", attribute active value is transformed to
@@ -274,12 +262,9 @@ class User extends ScimApiService {
 
 	/**
 	 * @param array $options
+	 * @param array $db_user
 	 *
-	 * @returns array                Returns user data from the database.
-	 *          ['userid']
-	 *          ['userdirectoryid']
-	 *
-	 * @throws APIException if input is invalid or user cannot be modified.
+	 * @throws APIException
 	 */
 	private function validatePut(array &$options, ?array &$db_user): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
@@ -316,7 +301,7 @@ class User extends ScimApiService {
 	/**
 	 * Updates user in the database with newly received information.
 	 *
-	 * @param array  $options                                      Array with data from request.
+	 * @param array  $options
 	 * @param string $options['id']                                User id.
 	 * @param array  $options['Operations']                        List of operations that need to be performed.
 	 * @param string $options['Operations'][]['op']                Operation that needs to be performed -'add',
@@ -329,7 +314,7 @@ class User extends ScimApiService {
 	 *                                                             performed. If operation is 'remove' this can be
 	 *                                                             omitted.
 	 *
-	 * @return array  Returns array with data necessary for SCIM response.
+	 * @return array  Array of updated user data.
 	 *
 	 * @throws APIException
 	 */
@@ -394,7 +379,7 @@ class User extends ScimApiService {
 	 * @param array $options
 	 * @param array $db_user
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
 	private function validatePatch(array &$options, array &$db_user = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
@@ -507,6 +492,7 @@ class User extends ScimApiService {
 			}
 		}
 
+		// Property 'name' in SCIM response is required for Okta SCIM to work correctly.
 		$user['name'] = array_key_exists('name', $options) ? $options['name'] : ['givenName' => '', 'familyName' => ''];
 		$user['active'] = array_key_exists('active', $options) ? $options['active'] : true;
 
