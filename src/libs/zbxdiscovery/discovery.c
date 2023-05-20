@@ -651,12 +651,12 @@ int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error)
 static void	discovery_unpack_usage_stats(zbx_vector_dbl_t *usage, int *count, const unsigned char *data)
 {
 	const unsigned char	*offset = data;
-	int			usage_num;
+	int			usage_num, i;
 
 	offset += zbx_deserialize_value(offset, &usage_num);
 	zbx_vector_dbl_reserve(usage, (size_t)usage_num);
 
-	for (int i = 0; i < usage_num; i++)
+	for (i = 0; i < usage_num; i++)
 	{
 		double	busy;
 
@@ -709,6 +709,7 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len;
+	int		i;
 
 	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int) + sizeof(int));
 
@@ -716,7 +717,7 @@ zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vect
 
 	ptr += zbx_serialize_value(ptr, usage->values_num);
 
-	for (int i = 0; i < usage->values_num; i++)
+	for (i = 0; i < usage->values_num; i++)
 		ptr += zbx_serialize_value(ptr, usage->values[i]);
 
 	(void)zbx_serialize_value(ptr, count);
@@ -744,6 +745,7 @@ void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
 {
 	zbx_vector_dbl_t	usage;
 	char			*error = NULL;
+	int			i;
 
 	zbx_vector_dbl_create(&usage);
 
@@ -761,7 +763,7 @@ void	zbx_discovery_get_worker_info(zbx_process_info_t *info)
 
 	info->busy_min = info->busy_max = info->busy_avg = usage.values[0];
 
-	for (int i = 1; i < usage.values_num; i++)
+	for (i = 1; i < usage.values_num; i++)
 	{
 		if (usage.values[i] < info->busy_min)
 			info->busy_min = usage.values[i];
