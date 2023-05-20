@@ -230,6 +230,17 @@ class CControllerHostEdit extends CController {
 		}
 
 		// Reset Secret text macros and set warning for cloned host.
+		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+			foreach ($data['host']['macros'] as &$macro) {
+				if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+					$macro['deny_revert'] = true;
+
+					unset($macro['allow_revert']);
+				}
+			}
+			unset($macro);
+		}
+
 		if ($data['host']['hostid'] === null) {
 			$secret_macro_reset = false;
 
@@ -253,7 +264,8 @@ class CControllerHostEdit extends CController {
 		}
 
 		foreach ($data['host']['macros'] as &$macro) {
-			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+					&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 				$macro['allow_revert'] = true;
 			}
 		}

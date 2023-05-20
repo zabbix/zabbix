@@ -149,6 +149,15 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	$secret_macro_reset = false;
 
 	foreach ($macros as &$macro) {
+		if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+			$macro['deny_revert'] = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	foreach ($macros as &$macro) {
 		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
 			$macro = [
 				'type' => ZBX_MACRO_TYPE_TEXT,
@@ -406,7 +415,8 @@ if (hasRequest('form')) {
 			$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
 			foreach ($data['host_prototype']['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+						&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 					$macro['allow_revert'] = true;
 				}
 			}
