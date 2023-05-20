@@ -2815,21 +2815,12 @@ div.dashboard-widget-tophosts z-bar-gauge {
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
-  color: #1f2c33; }
+  color: #000000; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action {
-  color: #f2f2f2; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:hover, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:focus {
-    color: #4796c4; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.red {
-    color: #e45959; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.orange {
-    color: #f24f1d; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.yellow {
-    color: #e99003; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.green {
-    color: #59db8f; }
+  border-bottom-color: #000000; }
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
+  color: #ffffff;
+  background-color: #4f4f4f; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #2b2b2b; }
@@ -2837,9 +2828,18 @@ div.dashboard-widget-tophosts z-bar-gauge {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #2b2b2b; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
-  color: #ffffff;
-  background-color: rgba(31, 44, 51, 0.5); }
+.list-table.compact-view .link-action {
+  color: #f2f2f2; }
+  .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
+    color: #4796c4; }
+  .list-table.compact-view .link-action.red {
+    color: #e45959; }
+  .list-table.compact-view .link-action.orange {
+    color: #f24f1d; }
+  .list-table.compact-view .link-action.yellow {
+    color: #e99003; }
+  .list-table.compact-view .link-action.green {
+    color: #59db8f; }
 
 .menu-main > li {
   line-height: 16px; }

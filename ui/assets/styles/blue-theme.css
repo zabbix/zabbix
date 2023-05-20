@@ -2805,18 +2805,9 @@ div.dashboard-widget-tophosts z-bar-gauge {
   color: #1f2c33; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
   border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action {
-  color: #1f2c33; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:hover, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:focus {
-    color: #0275b8; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.red {
-    color: #e33734; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.orange {
-    color: #f24f1d; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.yellow {
-    color: #e99003; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.green {
-    color: #429e47; }
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
+  color: #ffffff;
+  background-color: rgba(31, 44, 51, 0.5); }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
@@ -2824,9 +2815,18 @@ div.dashboard-widget-tophosts z-bar-gauge {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
-  color: #ffffff;
-  background-color: rgba(31, 44, 51, 0.5); }
+.list-table.compact-view .link-action {
+  color: #1f2c33; }
+  .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
+    color: #0275b8; }
+  .list-table.compact-view .link-action.red {
+    color: #e33734; }
+  .list-table.compact-view .link-action.orange {
+    color: #f24f1d; }
+  .list-table.compact-view .link-action.yellow {
+    color: #e99003; }
+  .list-table.compact-view .link-action.green {
+    color: #429e47; }
 
 .menu-main > li {
   line-height: 16px; }

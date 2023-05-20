@@ -2772,21 +2772,12 @@ div.dashboard-widget-tophosts z-bar-gauge {
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup {
-  color: #1f2c33; }
+  color: #f8f8f8; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-alt {
-  border-bottom-color: #1f2c33; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action {
-  color: #ffffff; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:hover, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action:focus {
-    color: #ffffff; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.red {
-    color: #ff5050; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.orange {
-    color: #ff7800; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.yellow {
-    color: #ffa20d; }
-  .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .link-action.green {
-    color: #23d545; }
+  border-bottom-color: #f8f8f8; }
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
+  color: #000000;
+  background-color: rgba(248, 248, 248, 0.5); }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #000000; }
@@ -2794,9 +2785,18 @@ div.dashboard-widget-tophosts z-bar-gauge {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #000000; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
-  color: #ffffff;
-  background-color: rgba(31, 44, 51, 0.5); }
+.list-table.compact-view .link-action {
+  color: #ffffff; }
+  .list-table.compact-view .link-action:hover, .list-table.compact-view .link-action:focus {
+    color: #ffffff; }
+  .list-table.compact-view .link-action.red {
+    color: #ff5050; }
+  .list-table.compact-view .link-action.orange {
+    color: #ff7800; }
+  .list-table.compact-view .link-action.yellow {
+    color: #ffa20d; }
+  .list-table.compact-view .link-action.green {
+    color: #23d545; }
 
 .menu-main > li {
   line-height: 16px; }

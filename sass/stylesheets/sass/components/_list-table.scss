@@ -453,31 +453,13 @@
 					border-bottom-color: $compact-view-color;
 				}
 
-				.link-action {
-					color: $font-color;
-
-					&:hover,
-					&:focus {
-						color: $link-hover-color;
-					}
-
-					&.red {
-						color: $negative-color;
-					}
-
-					&.orange {
-						color: $orange;
-					}
-
-					&.yellow {
-						color: $warning-color;
-					}
-
-					&.green {
-						color: $positive-color;
-					}
+				.tag {
+					color: $compact-view-tag-color;
+					background-color: $compact-view-tag-bg-color;
 				}
+			}
 
+			&:not(.row-selected):not(:hover) {
 				.btn-icon,
 				.icon {
 					background-color: $ui-bg-color;
@@ -488,11 +470,31 @@
 					margin-bottom: 0;
 					border: 1px solid $ui-bg-color;
 				}
+			}
+		}
 
-				.tag {
-					color: $compact-view-tag-color;
-					background-color: rgba($compact-view-color, .5);
-				}
+		.link-action {
+			color: $font-color;
+
+			&:hover,
+			&:focus {
+				color: $link-hover-color;
+			}
+
+			&.red {
+				color: $negative-color;
+			}
+
+			&.orange {
+				color: $orange;
+			}
+
+			&.yellow {
+				color: $warning-color;
+			}
+
+			&.green {
+				color: $positive-color;
 			}
 		}
 	}
