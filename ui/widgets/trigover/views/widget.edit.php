@@ -26,9 +26,7 @@
  * @var array $data
  */
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['ms']['groups']['groupids']
-);
+$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids']);
 
 (new CWidgetFormView($data))
 	->addField(
@@ -36,7 +34,7 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 	)
 	->addField($groupids)
 	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 	)
 	->addField(

@@ -28,12 +28,10 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectSlaView($data['fields']['slaid'], $data['captions']['ms']['slas']['slaid'])
+		new CWidgetFieldMultiSelectSlaView($data['fields']['slaid'], $data['captions']['slas']['slaid'])
 	)
 	->addField(
-		new CWidgetFieldMultiSelectServiceView($data['fields']['serviceid'],
-			$data['captions']['ms']['services']['serviceid']
-		)
+		new CWidgetFieldMultiSelectServiceView($data['fields']['serviceid'], $data['captions']['services']['serviceid'])
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_periods'])

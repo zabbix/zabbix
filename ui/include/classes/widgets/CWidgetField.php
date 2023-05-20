@@ -204,16 +204,13 @@ abstract class CWidgetField {
 			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_SERVICE:
 			case ZBX_WIDGET_FIELD_TYPE_SLA:
 			case ZBX_WIDGET_FIELD_TYPE_USER:
 			case ZBX_WIDGET_FIELD_TYPE_ACTION:
 			case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
 				$this->validation_rules = ['type' => API_IDS];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				$this->validation_rules = ['type' => API_ID];
 				break;
 
 			default:

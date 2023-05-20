@@ -159,6 +159,7 @@ switch ($data['popup_type']) {
 	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
+	case 'sysmaps':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -362,50 +363,6 @@ switch ($data['popup_type']) {
 			}
 		}
 		unset($trigger);
-		break;
-
-	case 'sysmaps':
-		foreach ($data['table_records'] as $sysmap) {
-			if ($data['multiselect']) {
-				$check_box = new CCheckBox('item['.$sysmap['sysmapid'].']', $sysmap['sysmapid']);
-			}
-
-			$name = (new CLink($sysmap['name']))->setId('spanid'.$sysmap['sysmapid']);
-
-			if ($data['multiselect']) {
-				$name
-					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-sysmapid', $sysmap['sysmapid'])
-					->setAttribute('data-parentid', $options['parentid'])
-					->onClick('
-						addValue(this.dataset.reference, this.dataset.sysmapid, this.dataset.parentid ?? null);
-						popup_generic.closePopup(event);
-					');
-			}
-			else {
-				$values = [];
-
-				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-					$values[$options['dstfld1']] = $sysmap[$options['srcfld1']];
-				}
-				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-					$values[$options['dstfld2']] = $sysmap[$options['srcfld2']];
-				}
-				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-					$values[$options['dstfld3']] = $sysmap[$options['srcfld3']];
-				}
-
-				$name
-					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-values', json_encode($values))
-					->onClick('
-						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
-						popup_generic.closePopup(event);
-					');
-			}
-
-			$table->addRow([$data['multiselect'] ? $check_box : null, $name]);
-		}
 		break;
 
 	case 'help_items':
@@ -900,7 +857,8 @@ $types = [
 	'usrgrp',
 	'sla',
 	'valuemaps',
-	'template_valuemaps'
+	'template_valuemaps',
+	'sysmaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {
