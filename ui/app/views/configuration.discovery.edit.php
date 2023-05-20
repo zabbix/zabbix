@@ -1,4 +1,4 @@
-<?php declare(strict_types=0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -78,6 +78,22 @@ $form_grid
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		)
+	])
+	->addItem([
+		new CLabel(_('Maximum concurrent checks'), 'concurrency_max_type'),
+		(new CFormField([
+			(new CDiv(
+				(new CRadioButtonList('concurrency_max_type', (int) $data['concurrency_max_type']))
+					->addValue(_('One'), ZBX_DISCOVERY_CHECKS_ONE)
+					->addValue(_('Unlimited'), ZBX_DISCOVERY_CHECKS_UNLIMITED)
+					->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
+					->setModern()
+			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+				->setAriaRequired()
+		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 
 $form_grid->addItem([

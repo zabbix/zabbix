@@ -166,7 +166,6 @@ dnl *****************************************************************
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
-AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_SEARCH_LIBS(dlopen, dl)
 
@@ -1574,6 +1573,16 @@ if test "x$have_ipcservice" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
+dnl Check multhithread SSL libs requirements [by default - skip]
+mt_required="no"
+if test "x$server" = "xyes"; then
+	mt_required="yes"
+fi
+
+if test "x$proxy" = "xyes"; then
+	mt_required="yes"
+fi
+
 dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
@@ -1597,7 +1606,7 @@ if test "x$want_gnutls" = "xyes"; then
 fi
 
 dnl Check for OpenSSL libssl and libcrypto [by default - skip]
-LIBOPENSSL_CHECK_CONFIG([no])
+LIBOPENSSL_CHECK_CONFIG([no], [$mt_required])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-gnutls or --with-openssl).])
@@ -1605,6 +1614,8 @@ if test "x$want_openssl" = "xyes"; then
 
 	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
+	elif test "x$accept_openssl_version" != "xyes" -a "$mt_required" = "yes"; then
+		AC_MSG_ERROR([OpenSSL library version requirement for server or proxy not met (>= 1.1.0)])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
