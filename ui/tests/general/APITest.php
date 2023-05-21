@@ -19,9 +19,12 @@
 **/
 
 
-use PHPUnit\Framework\TestCase;
+require_once __DIR__.'/../include/CTest.php';
+require_once __DIR__.'/../../include/classes/api/clients/CApiClient.php';
+require_once __DIR__.'/../../include/classes/api/clients/CLocalApiClient.php';
+require_once __DIR__.'/../../include/classes/api/wrappers/CApiWrapper.php';
 
-class APITest extends TestCase {
+class APITest extends CTest {
 
 	protected function setUp(): void {
 		API::setWrapper(null);

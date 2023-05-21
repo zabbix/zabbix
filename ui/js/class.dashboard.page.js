@@ -726,7 +726,11 @@ class CDashboardPage extends CBaseComponent {
 			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
-		this._dashboard_grid.style.height = `${height}px`;
+		this._dashboard_grid.style.height = '';
+
+		if (num_rows !== 0) {
+			this._dashboard_grid.style.height = `${height}px`;
+		}
 	}
 
 	_getNumOccupiedRows() {

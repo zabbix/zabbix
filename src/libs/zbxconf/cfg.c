@@ -22,6 +22,12 @@
 #include "common.h"
 #include "log.h"
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include <shlwapi.h>
+#else
+#include <libgen.h>
+#endif
+
 extern unsigned char	program_type;
 
 char	*CONFIG_FILE		= NULL;
@@ -299,6 +305,52 @@ out:
 }
 #endif
 
+static char	*expand_include_path(char *raw_path)
+{
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	wchar_t	*wraw_path;
+
+	wraw_path = zbx_utf8_to_unicode(raw_path);
+
+	if (TRUE == PathIsRelativeW(wraw_path))
+	{
+		wchar_t	*wconfig_path, dir_buf[_MAX_DIR];
+		char	*dir_utf8, *result = NULL;
+
+		zbx_free(wraw_path);
+
+		wconfig_path = zbx_utf8_to_unicode(CONFIG_FILE);
+		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
+
+		zbx_free(wconfig_path);
+
+		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
+		result = zbx_dsprintf(result, "%s%s", dir_utf8, raw_path);
+
+		zbx_free(raw_path);
+		zbx_free(dir_utf8);
+
+		return result;
+	}
+
+	zbx_free(wraw_path);
+#else
+	if ('/' != *raw_path)
+	{
+		char	*cfg_file, *path;
+
+		cfg_file = zbx_strdup(NULL, CONFIG_FILE);
+		path = zbx_dsprintf(NULL, "%s/%s", dirname(cfg_file), raw_path);
+		zbx_free(cfg_file);
+
+		zbx_free(raw_path);
+
+		return path;
+	}
+#endif
+	return raw_path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
@@ -321,6 +373,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
+
+	path = expand_include_path(path);
 
 	if (0 != zbx_stat(path, &sb))
 	{

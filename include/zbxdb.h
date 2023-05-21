@@ -239,8 +239,11 @@ struct zbx_db_version_info_t
 	char			*ext_lic;
 	zbx_db_ext_err_code_t	ext_err_code;
 
-	int				history_compressed_chunks;
-	int				trends_compressed_chunks;
+	int			history_compressed_chunks;
+	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 #if defined(HAVE_POSTGRESQL)

@@ -1,6 +1,116 @@
+Changes for 6.0.18rc1
+
+New features:
+.........T [ZBXNEXT-8199] added google cloud platform monitoring template (igorbach)
+...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
+.......P.. [ZBXNEXT-8357] improved proxy history housekeeping when data older than ProxyOfflineBuffer is being constantly received (vso)
+A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF-8 Byte order mark (epulke)
+.........T [ZBXNEXT-8209] added azure cosmosdb for mongodb template (egordymov)
+..F....... [ZBXNEXT-8078] removed unnecessary new line for each element in array for export .yaml templates (rdetlavs)
+...G...PS. [ZBXNEXT-8273] implemented reading of relative Include paths in config based on current directory of the config (dgoloscapov)
+.........T [ZBXNEXT-8391] added healthcheck metric for container in Docker by Zabbix agent 2 template (egordymov)
+...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
+
+Bug fixes:
+.........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
+.........T [ZBX-22475] fixed regex in preprocessing parameter for jenkins template (egordymov)
+.........T [ZBX-21910] fixed js script in kubernetes nodes template (egordymov)
+........S. [ZBX-22773] made NodeAddress use ListenIP and ListenPort if not specified (kprutkovs)
+.......PS. [ZBX-21613] fixed broken database upgrade if started more than one Zabbix server at the same time on one database (vso)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+.........T [ZBX-22029] fixed preprocessing step in pods discovery for k8s kubelet template (egordymov)
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+.........T [ZBX-22141] fixed attaching multiple templates with proc.get item key to one host and fixed spelling in description (egordymov)
+A......... [ZBX-22285] fixed honoring of the excludeSearch parameter in API (jfreibergs)
+...G...... [ZBX-20604] fixed UserParameterDir behavior for UserParameter calls (MVekslers)
+..F....... [ZBX-22732] fixed description of ATAN2 mathematical function (dpetra)
+.......PS. [ZBX-22664] fixed user macros with regex context being resynced without any changes (wiper)
+..F....... [ZBX-22661] fixed templated dashboard display in Monitoring Hosts Dashboards (dpetra)
+.........T [ZBX-21599] optimised preprocessing steps and added dashboard in the TiDB TiKV by HTTP template (aiantsen)
+.........T [ZBX-21598] optimised preprocessing steps and added dashboard in the TiDB PD by HTTP template (aiantsen)
+.........T [ZBX-21600] optimised preprocessing steps and added dashboard in the TiDB by HTTP template (aiantsen)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+..F....... [ZBX-22714] fixed signature for mqtt.get key in Standard items popup (dpetra)
+.........T [ZBX-21397] fixed preprocessing step in discovery for k8s kubelet template (egordymov)
+.........T [ZBX-20202] improved tablespace handling to support Oracle multitenant architecture in Oracle by ODBC template (knaglis)
+........S. [ZBX-22713] fixed Zabbix server compilation problem for NetBSD (kprutkovs, wiper)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+..F....... [ZBX-21801] fixed helper positioning when sorting Header and Query fields in item configuration form (miks)
+..F....... [ZBX-22238] fixed non-writable hostgroup appearance in template, host and host prototype clone forms (miks)
+..F....... [ZBX-22192] fixed valid widget name being reset when other widget fields are invalid (miks)
+A......... [ZBX-21871] switched for the changes in users of user group API object to be audit logged as updates in groups of user API objects (jfreibergs, vmaksimovs)
+..F....... [ZBX-22461] fixed incorrect sortable item positioning in Safari (miks)
+A......... [ZBX-22469] fixed SLI calculation for services having multiple alarms per second (averza)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.17
+
+6.0.17rc2 was released as 6.0.17 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.17rc2
+
+New features:
+.........T [ZBXNEXT-8334] added Event-Driven Ansible media (akotsegubov)
+
+Bug fixes:
+.......PS. [ZBX-22718] fixed memory leak in json objects and identical keys (wiper)
+.......PS. [ZBX-22719] fixed replace() function in expressions (wiper)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.17rc1
+
+Bug fixes:
+...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
+...G...... [ZBX-22373] updated go.mod/sum to allow mixing session and key parameter for Zabbix agent 2 items (esneiders)
+..F....... [ZBX-22241] fixed minimum severity filter usage for map element link triggers (miks)
+A......... [ZBX-22194] fixed inability to import a template with trigger dependency on a host trigger (jfreibergs, vmaksimovs)
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
+.........T [ZBX-21583] optimised preprocessing steps and added two graphs and dashboard in the Hadoop by HTTP template (aiantsen)
+A........T [ZBX-19375] prevented the ability to set a duplicate value for the uuid parameter when updating any of template entities; added possibility to update the uuid parameter for the Service API; fixed duplicate UUIDs in Proxmox VE by HTTP template (aiantsen, vmaksimovs)
+.........T [ZBX-21603] optimised preprocessing steps in the Zookeeper by HTTP template (aiantsen)
+.........T [ZBX-21589] optimised SQL queries and preprocessing steps (aiantsen)
+........S. [ZBX-22492] removed limitation for size of logged messages in JS (dgoloscapov)
+.........T [ZBX-22641] updated deprecated ports in Kubernetes templates, updated target tags, added notes about binding address options for Scheduler and Cluster Manager components (drasikhov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16
+
+6.0.16rc1 was released as 6.0.16 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 6.0.16rc1
+
+Bug fixes:
+...G...... [ZBX-22306] fixed the crash in Zabbix agent 2 when running out of available file descriptors (vso)
+..F....... [ZBX-21013] hid the option "Create new groups" for unprivileged users in the Import form (Sasha)
+...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in the Zabbix agent 2 configuration (kprutkovs)
+........S. [ZBX-22627] fixed loss of preprocessing result when step with delta is used (dgoloscapov, wiper)
+.......PS. [ZBX-22304] fixed duplication in web scenario error messages when curl cannot resolve host (mprihodko)
+.........T [ZBX-21577] added an extra master item prototype to the Elasticsearch Cluster by HTTP template to reduce preprocessing worker utilization (ztielidze)
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
+A.F....... [ZBX-20699] fixed the inability to import host prototypes containing SNMPv3 interface; allowed to supply conditional parameters with default values to hostprototype.create and hostprototype.update API methods when the parameters have no effect; added audit logging of changes to host prototypes when unlinking a template; fixed the inability to remove group links or group prototypes from a host prototype of a linked template (jfreibergs, vmaksimovs)
+..F....... [ZBX-22432] fixed different severity paddings in trigger popups and maps triggers (dfofanovs)
+..F....... [ZBX-22210] fixed selected count when using filter and filtered parameter is changed in a popup (esekace)
+..F....... [ZBX-22533] fixed debug section overlapping with 'Add new widget' placeholder in the dashboard (esekace)
+..F....... [ZBX-22331] fixed messages when updating graph prototype discovery (ddauksa)
+..F....... [ZBX-22455] added a check for numeric value in value mapping (esekace)
+..F....... [ZBX-22206] fixed incorrect padding in multiselect popup contrast dark and light stylesheets (dfofanovs)
+..F....... [ZBX-18527] fixed the markup for Type of calculation expression field (dpetra)
+A.F.I..PS. [ZBX-22363] added support for item and item_preproc table fields to be either nvarchar or nclob (agriscenko, vso)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.15
+
+6.0.15rc2 was released as 6.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.15rc2
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.15rc1
@@ -2440,9 +2550,39 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.35rc1
+
+New features:
+...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
+
+Bug fixes:
+...G...... [ZBX-22797] fixed Zabbix agent 2 postgresql memory leak (esneiders)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34
+
+5.0.34rc1 was released as 5.0.34 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.34rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
+........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
+...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
+..F....... [ZBX-22241] fixed map link color and drawing style selection when multiple triggers are in problem state (miks)
+..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
+..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
+...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in configuration of Zabbix agent 2 (kprutkovs)
+..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
+..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.33
@@ -5206,9 +5346,24 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
+Changes for 4.0.46rc1
+
+New features:
+
+Bug fixes:
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.45
+
+4.0.45rc2 was released as 4.0.45 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 4.0.45rc2
 
 Bug fixes:
+........S. [ZBX-22622] fixed alert script path validation (vso)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45rc1
