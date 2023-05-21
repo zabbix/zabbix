@@ -354,6 +354,15 @@ function PopUp(action, parameters, {
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
+			// Close all hintboxes.
+			for (let i = overlays_stack.length - 1; i >= 0; i--) {
+				const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+				if (overlay.type === 'hintbox') {
+					hintBox.deleteHint(overlay.element);
+				}
+			}
+
 			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
 					content: resp.errors
