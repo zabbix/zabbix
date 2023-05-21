@@ -5279,6 +5279,10 @@ msgstr "Počet zhodných riadkov pri monitorovaní súboru denníka s podporou r
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Počet zhodných riadkov v monitorovaní súboru denníka. Vráti integer"
 
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
 msgstr ""
@@ -13222,6 +13226,10 @@ msgstr ""
 msgid "Max zoom level"
 msgstr "Maximálna úroveň priblíženia"
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Maximálny počet otvorených súborov podporovaný OS. Vráti celé číslo"
@@ -14170,6 +14178,11 @@ msgstr "Nový proxy"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "Nový regulárny výraz"
+
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"

@@ -5084,6 +5084,10 @@ msgstr "ログローテーションに対応したログの一致行数。整数
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "ログの一致行数。整数値を返す。"
 
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
 msgstr "コネクタキュー内にキューイングされた値の数。"
@@ -12977,6 +12981,10 @@ msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用�
 msgid "Max zoom level"
 msgstr "最大ズームレベル"
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "OSがサポートしている最大ファイルオープン数。整数値を返す。"
@@ -13903,6 +13911,11 @@ msgstr "新規プロキシ"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "正規表現の作成"
+
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
