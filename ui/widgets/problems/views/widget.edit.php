@@ -76,7 +76,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addFieldsGroup(getAcknowledgementStatusFieldsGroupViews($data['fields']))
+	->addItem(getAcknowledgementStatusFieldsGroupViews($data['fields']))
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
@@ -95,13 +95,16 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getAcknowledgementStatusFieldsGroupViews(array $fields): CWidgetFieldsGroupView {
+function getAcknowledgementStatusFieldsGroupViews(array $fields): array {
 	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['acknowledgement_status']);
 	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
 
-	return (new CWidgetFieldsGroupView(_('Acknowledgement status')))->addItem([
-		$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$acknowledged_by_me_field->getView()
-	]);
+	return [
+		new CLabel(_('Acknowledgement status')),
+		new CFormField(new CHorList([
+			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getView()
+		]))
+	];
 }
