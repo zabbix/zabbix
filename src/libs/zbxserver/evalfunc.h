@@ -34,7 +34,6 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 
 int	zbx_is_trigger_function(const char *name, size_t len);
 
-void	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, int limit,
-		zbx_eval_count_pattern_data_t *pdata, zbx_vector_history_record_t *values, int *count);
-
+int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata,
+		zbx_vector_history_record_t *records, int limit, int *count, char **error);
 #endif

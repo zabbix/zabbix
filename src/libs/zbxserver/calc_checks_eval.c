@@ -1582,40 +1582,39 @@ err:
 	return ret;
 }
 
-static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dcitem,
-		zbx_vector_history_record_t *values, int seconds, int count, const zbx_timespec_t *ts,
-		zbx_vector_var_t *results_vector, char **error)
+static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dcitem, int seconds, int count,
+		const zbx_timespec_t *ts, zbx_vector_var_t *results_vector, char **error)
 {
-	int				ret = SUCCEED;
+	int				ret = FAIL;
 	zbx_eval_count_pattern_data_t	pdata;
+	zbx_vector_history_record_t	values;
 
-	zbx_vector_expression_create(&pdata.regexps);
+	zbx_history_record_vector_create(&values);
 
-	if (FAIL == zbx_validate_count_pattern(operator, pattern, dcitem->value_type, &pdata, error))
-	{
-		ret = FAIL;
+	sleep(10);
+
+	if (FAIL == zbx_init_count_pattern(operator, pattern, dcitem->value_type, &pdata, error))
 		goto out;
-	}
 
-	if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, values, seconds, count, ts) &&
-			0 < values->values_num)
+	if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts))
 	{
-		int	result = 0;
+		zbx_variant_t	v;
+		int		result = 0;
 
-		zbx_execute_count_with_pattern(pattern, dcitem->value_type, ZBX_MAX_UINT31_1, &pdata, values, &result);
-
-		if (0 != result)
+		if (FAIL == zbx_execute_count_with_pattern(pattern, dcitem->value_type, &pdata, &values,
+				ZBX_MAX_UINT31_1, &result, error))
 		{
-			zbx_variant_t	v;
-
-			zbx_variant_set_dbl(&v, (double)result);
-			zbx_vector_var_append(results_vector, v);
+			goto out;
 		}
+
+		zbx_variant_set_dbl(&v, (double)result);
+		zbx_vector_var_append(results_vector, v);
 	}
 
+	ret = SUCCEED;
 out:
-	zbx_regexp_clean_expressions(&pdata.regexps);
-	zbx_vector_expression_destroy(&pdata.regexps);
+	zbx_clear_count_pattern(&pdata);
+	zbx_history_record_vector_destroy(&values, dcitem->value_type);
 
 	return ret;
 }
@@ -1645,7 +1644,6 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 {
 	zbx_expression_query_many_t	*data;
 	int				ret = FAIL, item_func, count, seconds, i;
-	zbx_vector_history_record_t	values;
 	zbx_vector_var_t		*results_var_vector;
 	double				result;
 	char				*operator = NULL, *pattern = NULL;
@@ -1781,11 +1779,9 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 		if (ITEM_VALUE_TYPE_NONE == dcitem->value_type)
 			continue;
 
-		zbx_history_record_vector_create(&values);
-
 		if (ZBX_VALUE_FUNC_COUNT == item_func)
 		{
-			if (FAIL == (ret = evaluate_count_many(operator, pattern, dcitem, &values, seconds, count, ts,
+			if (FAIL == (ret = evaluate_count_many(operator, pattern, dcitem, seconds, count, ts,
 					results_var_vector, error)))
 			{
 				zbx_vector_var_destroy(results_var_vector);
@@ -1793,24 +1789,31 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 				goto out;
 			}
 		}
-		else if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts)
-				&& 0 < values.values_num)
+		else
 		{
-			if (ZBX_VALUE_FUNC_LAST == item_func)
-			{
-				var_vector_append_history_record(&values, dcitem->value_type, results_var_vector);
-			}
-			else
-			{
-				zbx_variant_t	v;
+			zbx_vector_history_record_t	values;
 
-				evaluate_history_func(&values, dcitem->value_type, item_func, &result);
-				zbx_variant_set_dbl(&v, result);
-				zbx_vector_var_append(results_var_vector, v);
+			zbx_history_record_vector_create(&values);
+
+			if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts)
+					&& 0 < values.values_num)
+			{
+				if (ZBX_VALUE_FUNC_LAST == item_func)
+				{
+					var_vector_append_history_record(&values, dcitem->value_type, results_var_vector);
+				}
+				else
+				{
+					zbx_variant_t	v;
+
+					evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+					zbx_variant_set_dbl(&v, result);
+					zbx_vector_var_append(results_var_vector, v);
+				}
 			}
+
+			zbx_history_record_vector_destroy(&values, dcitem->value_type);
 		}
-
-		zbx_history_record_vector_destroy(&values, dcitem->value_type);
 	}
 
 	zbx_variant_set_vector(value, results_var_vector);

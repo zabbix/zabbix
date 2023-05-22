@@ -2730,11 +2730,9 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 			pattern = arg_pattern->data.str;
 		}
 
-		zbx_vector_expression_create(&pdata.regexps);
-
 		value_type = zbx_vector_var_get_type(arg_vector->data.vector);
 
-		if (FAIL == zbx_validate_count_pattern(operator, pattern, value_type, &pdata, error))
+		if (FAIL == zbx_init_count_pattern(operator, pattern, value_type, &pdata, error))
 		{
 			ret = FAIL;
 		}
@@ -2742,13 +2740,14 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
 		{
 			int	result = 0;
 
-			zbx_count_var_vector_with_pattern(&pdata, pattern, arg_vector->data.vector, &result);
+			if (FAIL != (ret = zbx_count_var_vector_with_pattern(&pdata, pattern, arg_vector->data.vector,
+					ZBX_MAX_UINT31_1, &result, error)))
+			{
+				zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)result);
+			}
 
-			zbx_variant_set_ui64(&ret_value, (zbx_uint64_t)result);
+			zbx_clear_count_pattern(&pdata);
 		}
-
-		zbx_regexp_clean_expressions(&pdata.regexps);
-		zbx_vector_expression_destroy(&pdata.regexps);
 	}
 	else
 	{
