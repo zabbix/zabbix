@@ -24,10 +24,9 @@ window.navtreeitem_edit_popup = new class {
 
 	init() {
 		const $sysmap = jQuery('#sysmapid');
+		const name_input = document.getElementById('name');
 
 		$sysmap.on('change', () => {
-			const name_input = document.getElementById('name');
-
 			if (name_input.value === '') {
 				const sysmaps = $sysmap.multiSelect('getData');
 
