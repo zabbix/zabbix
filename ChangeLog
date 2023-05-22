@@ -256,7 +256,6 @@ A......... [ZBX-21871] switched to logging the changes in users of user group AP
 ..F....... [ZBX-22461] fixed incorrect sortable item positioning in Safari (miks)
 A......... [ZBX-22469] fixed SLI calculation for services having multiple alarms per second (averza)
 
-
 --------------------------------------------------------------------------------
 Changes for 6.4.2
 
