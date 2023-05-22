@@ -1137,9 +1137,11 @@ static void	correlation_execute_operations(const zbx_correlation_t *correlation,
 				if (0 != old_eventid)
 				{
 					recovery_local.eventid = old_eventid;
-					recovery_local.c_eventid = event->eventid;
-					recovery_local.correlationid = correlation->correlationid;
 					recovery_local.objectid = old_objectid;
+					recovery_local.r_event = NULL;
+					recovery_local.correlationid = correlation->correlationid;
+					recovery_local.c_eventid = event->eventid;
+					recovery_local.userid = 0;
 					recovery_local.ts.sec = event->clock;
 					recovery_local.ts.ns = event->ns;
 
@@ -2221,6 +2223,9 @@ static void	recover_event(zbx_uint64_t eventid, int source, int object, zbx_uint
 	recovery_local.correlationid = 0;
 	recovery_local.c_eventid = 0;
 	recovery_local.userid = 0;
+	recovery_local.ts.sec = 0;
+	recovery_local.ts.ns = 0;
+
 	zbx_hashset_insert(&event_recovery, &recovery_local, sizeof(recovery_local));
 }
 

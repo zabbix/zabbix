@@ -42,20 +42,21 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a
-
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_item_preproc_SOURCES = \
 	zbx_item_preproc.c \
 	configcache_mock.c
-	
+
 zbx_item_preproc_LDADD = $(JSON_LIBS)
 
 zbx_item_preproc_LDADD += @SERVER_LIBS@
-zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ \
+zbx_item_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
-zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
+zbx_item_preproc_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 
 item_preproc_xpath_SOURCES = \
 	item_preproc_xpath.c \
@@ -65,10 +66,11 @@ item_preproc_xpath_SOURCES = \
 item_preproc_xpath_LDADD = $(JSON_LIBS)
 
 item_preproc_xpath_LDADD += @SERVER_LIBS@
-item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@ \
+item_preproc_xpath_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLD_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
-item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
+item_preproc_xpath_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
 
 item_preproc_csv_to_json_SOURCES = \
 	item_preproc_csv_to_json.c \
@@ -78,9 +80,10 @@ item_preproc_csv_to_json_SOURCES = \
 item_preproc_csv_to_json_LDADD = $(JSON_LIBS)
 
 item_preproc_csv_to_json_LDADD += @SERVER_LIBS@
-item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@ \
+item_preproc_csv_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
-item_preproc_csv_to_json_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@
+item_preproc_csv_to_json_CFLAGS = -I@top_srcdir@/tests -I@top_srcdir@/src @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS) $(TLS_CFLAGS)
 
 endif

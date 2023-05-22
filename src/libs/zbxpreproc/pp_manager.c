@@ -1206,6 +1206,9 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 
 	zbx_vector_pp_task_ptr_create(&tasks);
 
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
+
 	/* initialize statistics */
 	time_stat = zbx_time();
 	time_flush = time_stat;
@@ -1272,7 +1275,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;			}
+					goto out;
+			}
 
 			zbx_ipc_message_free(message);
 		}

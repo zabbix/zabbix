@@ -46,12 +46,16 @@ zbx_history_get_values_WRAP = \
 	-Wl,--wrap=zbx_clean_events \
 	-Wl,--wrap=zbx_recalc_time_period
 
-zbx_history_get_values_LDADD = $(HISTORY_LIBS) @SERVER_LIBS@
+zbx_history_get_values_LDADD = $(HISTORY_LIBS) @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 
 zbx_history_get_values_LDFLAGS = @SERVER_LDFLAGS@ \
-	$(zbx_history_get_values_WRAP)
+	$(zbx_history_get_values_WRAP) \
+	$(CMOCKA_LDFLAGS) \
+	$(YAML_LDFLAGS)
 
 zbx_history_get_values_CFLAGS = \
 	-I@top_srcdir@/src/libs/zbxalgo \
-	-I@top_srcdir@/tests
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 endif

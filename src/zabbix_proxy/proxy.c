@@ -62,6 +62,7 @@
 #include "zbxipcservice.h"
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
+#include "zbxdiscovery.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -107,25 +108,23 @@ const char	*help_message[] = {
 	"",
 	"      Log level control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (configuration syncer, data sender, discoverer,",
-	"                                 history syncer, housekeeper, http poller,",
+	"                                 (availability manager, configuration syncer, data sender,",
+	"                                 discovery manager, history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
-	"                                 java poller, poller, preprocessing manager,",
+	"                                 java poller, odbc poller, poller, preprocessing manager,",
 	"                                 self-monitoring, snmp trapper, task manager, trapper,",
-	"                                 unreachable poller, vmware collector,",
-	"                                 availability manager, odbc poller)",
+	"                                 unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., poller,3)",
 	"        pid                      Process identifier",
 	"",
 	"      Profiling control targets:",
 	"        process-type             All processes of specified type",
-	"                                 (configuration syncer, data sender, discoverer,",
-	"                                 history syncer, housekeeper, http poller,",
+	"                                 (availability manager, configuration syncer, data sender,",
+	"                                 discovery manager, history syncer, housekeeper, http poller,",
 	"                                 icmp pinger, ipmi manager, ipmi poller,",
-	"                                 java poller, poller, preprocessing manager,",
-	"                                 self-monitoring, snmp trapper, task manager, ",
-	"                                 trapper, unreachable poller, vmware collector,",
-	"                                 availability manager, odbc poller)",
+	"                                 java poller, odbc poller, poller, preprocessing manager,",
+	"                                 self-monitoring, snmp trapper, task manager, trapper,",
+	"                                 unreachable poller, vmware collector)",
 	"        process-type,N           Process type and number (e.g., history syncer,1)",
 	"        pid                      Process identifier",
 	"        scope                    Profiling scope",
@@ -210,7 +209,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_PROXYPOLLER */
 	0, /* ZBX_PROCESS_TYPE_ESCALATOR */
 	4, /* ZBX_PROCESS_TYPE_HISTSYNCER */
-	1, /* ZBX_PROCESS_TYPE_DISCOVERER */
+	5, /* ZBX_PROCESS_TYPE_DISCOVERER */
 	0, /* ZBX_PROCESS_TYPE_ALERTER */
 	0, /* ZBX_PROCESS_TYPE_TIMER */
 	1, /* ZBX_PROCESS_TYPE_HOUSEKEEPER */
@@ -237,7 +236,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER */
 	1, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
-	0 /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
+	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
+	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -391,10 +391,10 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPPOLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER]))
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER]))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER];
+		*local_process_type = ZBX_PROCESS_TYPE_DISCOVERYMANAGER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER];
 	}
 	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER]))
 	{
@@ -548,6 +548,9 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIPOLLER])
 		CONFIG_FORKS[ZBX_PROCESS_TYPE_IPMIMANAGER] = 1;
+
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER])
+		CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER] = 1;
 
 	if (NULL == zbx_config_vault.url)
 		zbx_config_vault.url = zbx_strdup(zbx_config_vault.url, "https://127.0.0.1:8200");
@@ -752,7 +755,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartDBSyncers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTSYNCER],		TYPE_INT,
 			PARM_OPT,	1,			100},
 		{"StartDiscoverers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],		TYPE_INT,
-			PARM_OPT,	0,			250},
+			PARM_OPT,	0,			1000},
 		{"StartHTTPPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartPingers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PINGER],			TYPE_INT,
@@ -1204,7 +1207,7 @@ static void	proxy_db_init(void)
 	zbx_stat_t	db_stat;
 #endif
 
-	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, program_type, config_log_slow_queries, &error))
+	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database: %s", error);
 		zbx_free(error);
@@ -1286,6 +1289,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_config_log_remote_commands};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
+								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
 								zbx_config_source_ip, &events_cbs};
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 								&events_cbs, &listen_sock, config_startup_time,
@@ -1475,11 +1479,18 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
+	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
+		zbx_discoverer_init();
+
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
 	{
 		/* skip threaded components */
-		if (ZBX_PROCESS_TYPE_PREPROCESSOR == i)
-			continue;
+		switch (i)
+		{
+			case ZBX_PROCESS_TYPE_PREPROCESSOR:
+			case ZBX_PROCESS_TYPE_DISCOVERER:
+				continue;
+		}
 
 		threads_num += CONFIG_FORKS[i];
 	}
@@ -1502,9 +1513,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "proxy #0 started [main process]");
 
 	zbx_register_stats_data_func(zbx_preproc_stats_ext_get, NULL);
+	zbx_register_stats_data_func(zbx_discovery_stats_ext_get, NULL);
 	zbx_register_stats_data_func(zbx_proxy_stats_ext_get, &config_comms);
 	zbx_register_stats_ext_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_get_worker_info);
+	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_get_worker_info);
 	zbx_diag_init(diag_add_section_info);
 
 	thread_args.info.program_type = program_type;
@@ -1562,7 +1575,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				thread_args.args = &httppoller_args;
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
-			case ZBX_PROCESS_TYPE_DISCOVERER:
+			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;

@@ -22,9 +22,18 @@ parse_cfg_file_LDADD = \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
 
-parse_cfg_file_LDADD += @SERVER_LIBS@
+parse_cfg_file_LDADD += \
+	@SERVER_LIBS@ \
+	$(CMOCKA_LIBS) \
+	$(YAML_LIBS)
 
-parse_cfg_file_LDFLAGS = @SERVER_LDFLAGS@
+parse_cfg_file_LDFLAGS = \
+	@SERVER_LDFLAGS@ \
+	$(CMOCKA_LDFLAGS) \
+	$(YAML_LDFLAGS)
 
-parse_cfg_file_CFLAGS = -I@top_srcdir@/tests
+parse_cfg_file_CFLAGS = \
+	-I@top_srcdir@/tests \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 endif

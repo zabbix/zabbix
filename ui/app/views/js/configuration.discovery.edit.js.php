@@ -45,6 +45,8 @@ window.drule_edit_popup = new class {
 
 		this._addRadioButtonValues(drule);
 		this._initActionButtons();
+		this._updateForm();
+		this.overlay.recoverFocus();
 	}
 
 	_initActionButtons() {
@@ -60,6 +62,25 @@ window.drule_edit_popup = new class {
 				this._editCheck(e.target.closest('tr'));
 			}
 		});
+
+		const max_sessions = this.form.querySelector('#concurrency_max_type');
+
+		max_sessions.onchange = () => {
+			this._updateForm();
+		};
+
+		max_sessions.dispatchEvent(new Event('change'));
+	}
+
+	_updateForm() {
+		const concurrency_max_type = this.form.querySelector('[name="concurrency_max_type"]:checked').value;
+		const concurrency_max = this.form.querySelector('#concurrency_max');
+		const is_custom = concurrency_max_type == <?= ZBX_DISCOVERY_CHECKS_CUSTOM ?>;
+
+		concurrency_max.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !is_custom);
+		if (is_custom) {
+			concurrency_max.focus();
+		}
 	}
 
 	_updateCheck(row, input) {
@@ -178,6 +199,7 @@ window.drule_edit_popup = new class {
 		if (row !== null) {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
 			this._addInputFields(input);
+
 
 		}
 		else {
@@ -340,7 +362,6 @@ window.drule_edit_popup = new class {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 
 				}
-
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);

@@ -9,3 +9,6 @@ libzbxhousekeeper_a_SOURCES = \
 	history_compress.h \
 	trigger_housekeeper.c \
 	trigger_housekeeper.h
+
+libzbxhousekeeper_a_CFLAGS = \
+	$(TLS_CFLAGS)

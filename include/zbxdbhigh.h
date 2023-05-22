@@ -76,9 +76,9 @@
 #define ZBX_ITEM_LOGTIMEFMT_LEN_MAX		(ZBX_ITEM_LOGTIMEFMT_LEN + 1)
 #define ZBX_ITEM_IPMI_SENSOR_LEN		128
 #define ZBX_ITEM_IPMI_SENSOR_LEN_MAX		(ZBX_ITEM_IPMI_SENSOR_LEN + 1)
-#define ZBX_ITEM_USERNAME_LEN			64
+#define ZBX_ITEM_USERNAME_LEN			255
 #define ZBX_ITEM_USERNAME_LEN_MAX		(ZBX_ITEM_USERNAME_LEN + 1)
-#define ZBX_ITEM_PASSWORD_LEN			64
+#define ZBX_ITEM_PASSWORD_LEN			255
 #define ZBX_ITEM_PASSWORD_LEN_MAX		(ZBX_ITEM_PASSWORD_LEN + 1)
 #define ZBX_ITEM_PUBLICKEY_LEN			64
 #define ZBX_ITEM_PUBLICKEY_LEN_MAX		(ZBX_ITEM_PUBLICKEY_LEN + 1)
@@ -479,7 +479,7 @@ zbx_config_dbhigh_t	*zbx_config_dbhigh_new(void);
 void			zbx_config_dbhigh_free(zbx_config_dbhigh_t *config_dbhigh);
 
 void	zbx_init_library_dbhigh(const zbx_config_dbhigh_t *config_dbhigh);
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error);
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error);
 void	zbx_db_deinit(void);
 
 void	zbx_db_init_autoincrement_options(void);

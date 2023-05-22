@@ -56,7 +56,9 @@ const char	*get_process_type_string(unsigned char proc_type)
 		case ZBX_PROCESS_TYPE_HISTSYNCER:
 			return "history syncer";
 		case ZBX_PROCESS_TYPE_DISCOVERER:
-			return "discoverer";
+			return "discovery worker";
+		case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+			return "discovery manager";
 		case ZBX_PROCESS_TYPE_ALERTER:
 			return "alerter";
 		case ZBX_PROCESS_TYPE_TIMER:

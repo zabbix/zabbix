@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <setjmp.h>
+#include <stdint.h>
 #include <cmocka.h>
 #include "zbxtypes.h"
 

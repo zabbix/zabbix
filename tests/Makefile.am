@@ -8,10 +8,18 @@ noinst_LIBRARIES = \
 	libzbxmocktest.a \
 	libzbxmockdata.a
 
+libzbxmocktest_a_CFLAGS = \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
+
 libzbxmocktest_a_SOURCES = \
 	zbxmocklog.c \
 	zbxmocktest.c \
 	zbxmocktest.h
+
+libzbxmockdata_a_CFLAGS = \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 libzbxmockdata_a_SOURCES = \
 	zbxmockdb.c \

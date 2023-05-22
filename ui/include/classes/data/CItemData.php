@@ -362,6 +362,7 @@ final class CItemData {
 		ITEM_TYPE_INTERNAL => [
 			'zabbix[boottime]',
 			'zabbix[connector_queue]',
+			'zabbix[discovery_queue]',
 			'zabbix[host,,items]',
 			'zabbix[host,,items_unsupported]',
 			'zabbix[host,,maintenance]',
@@ -1801,6 +1802,10 @@ final class CItemData {
 			],
 			'zabbix[connector_queue]' => [
 				'description' => _('Count of values enqueued in the connector queue.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			'zabbix[discovery_queue]' => [
+				'description' => _('Count of network checks enqueued in the discovery queue.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			],
 			'zabbix[host,,items]' => [
