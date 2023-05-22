@@ -62,6 +62,5 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	fmt.Printf("OMEGA decode, nbytes: %d", buf.Bytes())
 	outbuf := decode(encoder, buf.Bytes(), len(buf.Bytes()))
 
-	return string(bytes.TrimRight(outbuf, "\n\r")), nil
-
+	return string(outbuf), nil
 }

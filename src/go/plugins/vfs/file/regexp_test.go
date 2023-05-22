@@ -70,7 +70,7 @@ func TestFileRegexpOutput(t *testing.T) {
 
 	impl.options.Timeout = 3
 
-	filename := "/tmp/zbx_regexp_test.dat"
+	filename := "/tmp/zbx_vfs_file_regexp_test.dat"
 
 	type testCase struct {
 		fileContents      []byte

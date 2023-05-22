@@ -20,7 +20,7 @@
 package file
 
 import (
-	"fmt"
+	//	"fmt"
 	"os"
 	"reflect"
 	"testing"
@@ -33,17 +33,14 @@ func TestFileRegmatch(t *testing.T) {
 	filename := "/tmp/zbx_vfs_file_regmatch_test.dat"
 
 	type testCase struct {
-		fileContents      []byte
-		targetSearch      string
-		targetEncoding    string
-		lineStart         string
-		lineEnd           string
-		targetStringGroup string
-		targetContents    string
-		match             int
+		fileContents   []byte
+		targetSearch   string
+		targetEncoding string
+		lineStart      string
+		lineEnd        string
+		match          int
 	}
 
-	fmt.Printf("XXXXXXXXXXXXXXXXXXX")
 	//августа\r\n
 	fileContents_1_ISO_8859_5 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
 
