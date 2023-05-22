@@ -111,39 +111,18 @@ class CControllerMediatypeEdit extends CController {
 				['name' => 'Message', 'value' => '{ALERT.MESSAGE}']
 			],
 			'description' => '',
-			'form_refresh' => 0,
 			'content_type' => $email_defaults['content_type'],
 			'message_templates' => [],
 			'providers' => CMediatypeHelper::getEmailProviders()
 		];
+
 		$message_templates = [];
 
-		// get values from the database
 		if ($this->hasInput('mediatypeid')) {
-			$data['mediatypeid'] = $this->mediatype['mediatypeid'];
-			$data['type'] = $this->mediatype['type'];
-			$data['name'] = $this->mediatype['name'];
-			$data['smtp_server'] = $this->mediatype['smtp_server'];
-			$data['smtp_port'] = $this->mediatype['smtp_port'];
-			$data['smtp_helo'] = $this->mediatype['smtp_helo'];
-			$data['smtp_email'] = $this->mediatype['smtp_email'];
-			$data['smtp_security'] = $this->mediatype['smtp_security'];
-			$data['smtp_verify_peer'] = $this->mediatype['smtp_verify_peer'];
-			$data['smtp_verify_host'] = $this->mediatype['smtp_verify_host'];
-			$data['smtp_authentication'] = $this->mediatype['smtp_authentication'];
-			$data['exec_path'] = $this->mediatype['exec_path'];
-			$data['content_type'] = $this->mediatype['content_type'];
-			$data['description'] = $this->mediatype['description'];
-			$data['provider'] = $this->mediatype['provider'];
-			$message_templates = $this->mediatype['message_templates'];
+			$data = array_merge($data, $this->mediatype);
+		}
 
-			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
-			$data['passwd'] = $this->mediatype['passwd'];
-			$data['status'] = $this->mediatype['status'];
-			$data['maxsessions'] = $this->mediatype['maxsessions'];
-			$data['maxattempts'] = $this->mediatype['maxattempts'];
-			$data['attempt_interval'] = $this->mediatype['attempt_interval'];
-
+		if ($this->hasInput('mediatypeid')) {
 			switch ($data['type']) {
 				case MEDIA_TYPE_EMAIL:
 					$data['smtp_username'] = $this->mediatype['username'];

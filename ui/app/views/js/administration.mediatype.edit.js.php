@@ -456,7 +456,6 @@ window.mediatype_edit_popup = new class {
 
 				provider.onchange = (e) => {
 					const change = typeof e.detail === 'undefined' ? true : e.detail.change;
-
 					this._loadProviderFields(change, parseInt(provider.value));
 				};
 

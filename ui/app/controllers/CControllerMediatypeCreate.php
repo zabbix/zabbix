@@ -28,7 +28,7 @@ class CControllerMediatypeCreate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'name' =>					'db media_type.name|not_empty',
+			'name' =>					'required|db media_type.name|not_empty',
 			'smtp_server' =>			'db media_type.smtp_server',
 			'smtp_port' =>				'db media_type.smtp_port',
 			'smtp_helo' =>				'db media_type.smtp_helo',
@@ -64,7 +64,7 @@ class CControllerMediatypeCreate extends CController {
 		if ($ret && $this->getInput('type') == MEDIA_TYPE_EMAIL) {
 			$email_validator = new CEmailValidator();
 
-			if (!$email_validator->validate($this->getInput('smtp_email'))) {
+			if (!$email_validator->validate($this->getInput('smtp_email', ''))) {
 				error($email_validator->getError());
 				$ret = false;
 			}
@@ -89,23 +89,36 @@ class CControllerMediatypeCreate extends CController {
 	}
 
 	protected function doAction() {
-		$mediatype = [];
+		$db_defaults = DB::getDefaults('media_type');
 
-		$this->getInputs($mediatype, ['type', 'name', 'maxsessions', 'maxattempts', 'attempt_interval',
-			'description'
-		]);
-		$mediatype['status'] = $this->hasInput('status') ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED;
-		$mediatype['message_templates'] = $this->getInput('message_templates', []);
+		$mediatype = [
+			'type' =>  $this->getInput('type', MEDIA_TYPE_EMAIL),
+			'name' => $this->getInput('name', ''),
+			'maxsessions' => $this->getInput('maxsessions',  $db_defaults['maxsessions']),
+			'maxattempts' =>  $this->getInput('maxattempts', $db_defaults['maxattempts']),
+			'attempt_interval' => $this->getInput('attempt_interval', $db_defaults['attempt_interval']),
+			'description' => $this->getInput('description', ''),
+			'status' => $this->hasInput('status') ? MEDIA_TYPE_STATUS_ACTIVE : MEDIA_TYPE_STATUS_DISABLED,
+			'message_templates' => $this->getInput('message_templates', [])
+		];
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd', 'content_type', 'provider'
+				$mediatype['provider'] = $this->getInput('provider', CMediatypeHelper::EMAIL_PROVIDER_SMTP);
+
+				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security',
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'content_type', 'provider'
 				]);
 
+				$smtp_email = $this->getInput('smtp_email', '');
+
+				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
+				$mediatype['smtp_email'] = $smtp_email;
+				$mediatype['passwd'] = $this->getInput('passwd', '');
+
 				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
-					preg_match('/.*<(?<email>.*[^>])>$/i', $this->getInput('smtp_email'), $match);
-					$clean_email = $match ? $match['email'] : $this->getInput('smtp_email');
+					preg_match('/.*<(?<email>.*[^>])>$/i', $smtp_email, $match);
+					$clean_email = $match ? $match['email'] : $smtp_email;
 
 					$domain = substr($clean_email, strrpos($clean_email, '@') + 1);
 
@@ -131,8 +144,7 @@ class CControllerMediatypeCreate extends CController {
 
 			case MEDIA_TYPE_EXEC:
 				$mediatype['parameters'] = [];
-
-				$this->getInputs($mediatype, ['exec_path']);
+				$mediatype['exec_path'] = $this->getInput('exec_path', '');
 
 				foreach (array_values($this->getInput('parameters_exec', [])) as $sortorder => $parameter) {
 					$mediatype['parameters'][] = ['sortorder' => $sortorder, 'value' => $parameter['value']];
@@ -140,16 +152,18 @@ class CControllerMediatypeCreate extends CController {
 				break;
 
 			case MEDIA_TYPE_SMS:
-				$this->getInputs($mediatype, ['gsm_modem']);
+				$mediatype['gsm_modem'] = $this->getInput('gsm_modem', '');
 				$mediatype['maxsessions'] = 1;
 				break;
 
 			case MEDIA_TYPE_WEBHOOK:
 				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
 				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
-				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-					'event_menu_name'
-				]);
+				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu']);
+
+				$mediatype['event_menu_name'] = $this->getInput('event_menu_name', '');
+				$mediatype['event_menu_url'] = $this->getInput('event_menu_url', '');
+
 				$parameters = $this->getInput('parameters_webhook', []);
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
