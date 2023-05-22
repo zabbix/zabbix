@@ -31,19 +31,14 @@ $csrf_token = CCsrfTokenHelper::get('mediatype');
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('media-type-form')
-	->addVar('form', 1)
 	->addVar('mediatypeid', $data['mediatypeid'])
-	->addItem((new CVar('status', MEDIA_TYPE_STATUS_DISABLED))->removeId())
 	->disablePasswordAutofill()
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Create form grid.
 $mediatype_form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Name'), 'name'))
-			->setId('name-label')
-			->setAsteriskMark(),
+		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
 			(new CTextBox('name', $data['name'], false, DB::getFieldLength('media_type', 'name')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -52,7 +47,7 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('name-field')
 	])
 	->addItem([
-		(new CLabel(_('Type'), 'label-type'))->setId('type-label'),
+		(new CLabel(_('Type'), 'label-type')),
 		(new CFormField(
 			(new CSelect('type'))
 				->setId('type')
@@ -82,7 +77,7 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('smtp-server-field')
 	])
 	->addItem([
-		(new CLabel(_('SMTP server port')))->setId('smtp-port-label'),
+		(new CLabel(_('SMTP server port'), 'smtp_port'))->setId('smtp-port-label'),
 		(new CFormField(
 			(new CNumericBox(
 				'smtp_port', $data['smtp_port'], 5, false, false, false)
@@ -216,7 +211,7 @@ $mediatype_form_grid
 	]);
 
 // Create password field.
-if ($data['passwd'] !== '' && !$data['change_passwd']) {
+if ($data['change_passwd']) {
 	// Disabling 'passwd' field prevents stored passwords autofill by browser.
 	$passwd_field = [
 		(new CButton('chPass_btn', _('Change password'))),
@@ -228,7 +223,7 @@ if ($data['passwd'] !== '' && !$data['change_passwd']) {
 	];
 }
 else {
-	$passwd_field = (new CPassBox('passwd', $data['passwd']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$passwd_field = (new CPassBox('passwd', ''))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // MEDIA_TYPE_WEBHOOK
@@ -332,6 +327,8 @@ $mediatype_form_grid
 		(new CFormField(
 			(new CCheckBox('show_event_menu', $data['show_event_menu']))
 				->setChecked($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
+				->setAttribute('value', ZBX_EVENT_MENU_SHOW)
+				->setUncheckedValue(0)
 		))->setId('webhook_event_menu_field')
 	])
 	->addItem([
@@ -361,7 +358,7 @@ $mediatype_form_grid
 		))->setId('webhook_event_menu_url_field')
 	])
 	->addItem([
-		(new CLabel(_('Description'))),
+		(new CLabel(_('Description'), 'description')),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
 				->setAttribute('maxlength', DB::getFieldLength('media_type', 'description'))
@@ -369,7 +366,7 @@ $mediatype_form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Enabled')),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 		)
@@ -564,4 +561,3 @@ if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 }
 
 echo json_encode($output);
-

@@ -29,37 +29,7 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeid' =>			'db media_type.mediatypeid',
-			'type' =>					'db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'name' =>					'db media_type.name',
-			'smtp_server' =>			'db media_type.smtp_server',
-			'smtp_port' =>				'db media_type.smtp_port',
-			'smtp_helo' =>				'db media_type.smtp_helo',
-			'smtp_email' =>				'db media_type.smtp_email',
-			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_CONNECTION_SECURITY_NONE.','.SMTP_CONNECTION_SECURITY_STARTTLS.','.SMTP_CONNECTION_SECURITY_SSL_TLS,
-			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
-			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
-			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
-			'exec_path' =>				'db media_type.exec_path',
-			'gsm_modem' =>				'db media_type.gsm_modem',
-			'smtp_username' =>			'db media_type.username',
-			'passwd' =>					'db media_type.passwd',
-			'parameters_exec' =>		'array',
-			'parameters_webhook' =>		'array',
-			'script' => 				'db media_type.script',
-			'timeout' => 				'db media_type.timeout',
-			'process_tags' =>			'in '.ZBX_MEDIA_TYPE_TAGS_DISABLED.','.ZBX_MEDIA_TYPE_TAGS_ENABLED,
-			'show_event_menu' =>		'in '.ZBX_EVENT_MENU_HIDE.','.ZBX_EVENT_MENU_SHOW,
-			'event_menu_url' =>			'db media_type.event_menu_url',
-			'event_menu_name' =>		'db media_type.event_menu_name',
-			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
-			'maxsessions' =>			'db media_type.maxsessions',
-			'maxattempts' =>			'db media_type.maxattempts',
-			'attempt_interval' =>		'db media_type.attempt_interval',
-			'description' =>			'db media_type.description',
-			'content_type' =>			'db media_type.content_type|in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_templates' =>		'array',
-			'provider' =>				'int32| in '.implode(',', array_keys(CMediatypeHelper::getEmailProviders()))
+			'mediatypeid' =>	'db media_type.mediatypeid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -200,17 +170,9 @@ class CControllerMediatypeEdit extends CController {
 					$data['parameters_webhook'] = array_values($data['parameters_webhook']);
 					break;
 			}
-
-			$data['change_passwd'] = $this->hasInput('passwd');
 		}
 
-		// overwrite with input variables
-		$this->getInputs($data, ['type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
-			'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_path', 'gsm_modem',
-			'smtp_username', 'passwd', 'status', 'maxsessions', 'maxattempts', 'attempt_interval', 'maxsessionsType',
-			'form_refresh', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
-			'event_menu_name', 'description', 'provider'
-		]);
+		$data['change_passwd'] = $data['passwd'] !== '';
 
 		if ($message_templates) {
 			CArrayHelper::sort($message_templates, ['recovery']);

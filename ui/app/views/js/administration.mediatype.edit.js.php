@@ -294,12 +294,15 @@ window.mediatype_edit_popup = new class {
 	 */
 	_populateMessageTemplates(list) {
 		for (const key in list) {
-			if (!Object.prototype.hasOwnProperty.call(list, key)) continue;
-			const template = list[key];
-			const messageTemplate = this._getMessageTemplate(template.eventsource, template.recovery);
+			if (!Object.prototype.hasOwnProperty.call(list, key)) {
+				continue;
+			}
 
-			template.message_type = messageTemplate.message_type;
-			template.message_type_name = messageTemplate.name;
+			const template = list[key];
+			const message_template = this._getMessageTemplate(template.eventsource, template.recovery);
+
+			template.message_type = message_template.message_type;
+			template.message_type_name = message_template.name;
 
 			this._addMessageTemplateRow(template);
 			this.message_template_list[template.message_type] = template;
@@ -362,12 +365,10 @@ window.mediatype_edit_popup = new class {
 		const event_menu_url = this.form.querySelector('#event_menu_url');
 
 		if (event_menu.checked) {
-			event_menu.value = <?= ZBX_EVENT_MENU_SHOW ?>;
 			event_menu_name.disabled = false;
 			event_menu_url.disabled = false;
 		}
 		else {
-			event_menu.value = <?= ZBX_EVENT_MENU_HIDE ?>;
 			event_menu_name.disabled = true;
 			event_menu_url.disabled = true;
 		}
@@ -455,14 +456,11 @@ window.mediatype_edit_popup = new class {
 
 				provider.onchange = (e) => {
 					const change = typeof e.detail === 'undefined' ? true : e.detail.change;
-					if (change) {
 
-					}
 					this._loadProviderFields(change, parseInt(provider.value));
-
 				};
 
-				provider.dispatchEvent(new CustomEvent('change', {detail: {change:false}}));
+				provider.dispatchEvent(new CustomEvent('change', {detail: {change: false}}));
 				break;
 
 			case <?= MEDIA_TYPE_SMS ?>:
@@ -510,12 +508,12 @@ window.mediatype_edit_popup = new class {
 		this.form.querySelector('#smtp_port').value = providers[provider]['smtp_port'];
 		this.form.querySelector('#smtp_email').value = providers[provider]['smtp_email'];
 		this.form.querySelector('#smtp_server').value = providers[provider]['smtp_server'];
-		this.form.querySelector(`input[name=smtp_security][value= '${providers[provider]['smtp_security']}']`)
+		this.form.querySelector(`input[name=smtp_security][value='${providers[provider]['smtp_security']}']`)
 			.checked = true;
-		this.form.querySelector(`input[name=content_type][value= '${providers[provider]['content_type']}']`)
+		this.form.querySelector(`input[name=content_type][value='${providers[provider]['content_type']}']`)
 			.checked = true;
 		this.form.querySelector(
-			`input[name=smtp_authentication][value= '${providers[provider]['smtp_authentication']}']`
+			`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 		).checked = true;
 	}
 
@@ -620,68 +618,69 @@ window.mediatype_edit_popup = new class {
 		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		passwd.setAttribute('aria-required', 'true');
 
-		if (parseInt(this.type) === <?= MEDIA_TYPE_EMAIL ?>) {
-			if (parseInt(provider) === <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>) {
-				smtp_auth_1.innerHTML = <?= json_encode(_('Username and password')) ?>;
-				passwd_label.removeAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-				passwd.removeAttribute('aria-required', 'true');
+		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
+			switch (parseInt(provider)) {
+				case <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>:
+					smtp_auth_1.innerHTML = <?= json_encode(_('Username and password')) ?>;
+					passwd_label.removeAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+					passwd.removeAttribute('aria-required', 'true');
 
-				switch (parseInt(authentication)) {
-					case <?= SMTP_AUTHENTICATION_NONE ?>:
-						this.form.querySelector('#passwd').value = '';
-						this.form.querySelector('#smtp_username').value = '';
+					switch (parseInt(authentication)) {
+						case <?= SMTP_AUTHENTICATION_NONE ?>:
+							this.form.querySelector('#passwd').value = '';
+							this.form.querySelector('#smtp_username').value = '';
 
-						const hide_fields = [
-							'#smtp-username-label', '#smtp-username-field',
-							'#passwd_label', '#passwd_field'
-						];
+							const hide_fields = [
+								'#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							];
 
-						hide_fields.forEach((field) => {
-							this.form.querySelector(field).style.display = 'none';
-						});
-						break;
+							hide_fields.forEach((field) => {
+								this.form.querySelector(field).style.display = 'none';
+							});
+							break;
 
-					case <?= SMTP_AUTHENTICATION_NORMAL ?>:
-						const show_fields = [
-							'#smtp-username-label', '#smtp-username-field',
-							'#passwd_label', '#passwd_field'
-						];
+						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+							const show_fields = [
+								'#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							];
 
-						show_fields.forEach((field) => {
-							this.form.querySelector(field).style.display = '';
-						});
-						break;
-				}
-			}
+							show_fields.forEach((field) => {
+								this.form.querySelector(field).style.display = '';
+							});
+							break;
+					}
+					break;
 
-			if (provider === <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>
-				|| provider === <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>) {
-				smtp_auth_1.innerHTML = <?= json_encode(_('Email and password')) ?>;
+				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
+				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
+					smtp_auth_1.innerHTML = <?= json_encode(_('Email and password')) ?>;
 
-				switch (parseInt(authentication)) {
-					case <?= SMTP_AUTHENTICATION_NONE ?>:
-						this.form.querySelector('#passwd').value = '';
+					switch (parseInt(authentication)) {
+						case <?= SMTP_AUTHENTICATION_NONE ?>:
+							this.form.querySelector('#passwd').value = '';
 
-						const hide_fields = [
-							'#smtp-username-label', '#smtp-username-field',
-							'#passwd_label', '#passwd_field'
-						];
+							const hide_fields = [
+								'#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							];
 
-						hide_fields.forEach((field) => {
-							this.form.querySelector(field).style.display = 'none';
-						});
-						break;
+							hide_fields.forEach((field) => {
+								this.form.querySelector(field).style.display = 'none';
+							});
+							break;
 
-					case <?= SMTP_AUTHENTICATION_NORMAL ?>:
-						const show_fields = [
-							'#passwd_label', '#passwd_field'
-						];
+						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
+							const show_fields = [
+								'#passwd_label', '#passwd_field'
+							];
 
-						show_fields.forEach((field) => {
-							this.form.querySelector(field).style.display = '';
-						});
-						break;
-				}
+							show_fields.forEach((field) => {
+								this.form.querySelector(field).style.display = '';
+							});
+							break;
+					}
 			}
 		}
 	}
@@ -699,7 +698,7 @@ window.mediatype_edit_popup = new class {
 			];
 		}
 
-		if (type === 'all') {
+		else if (type === 'all') {
 			fields = [
 				'#email-provider-label', '#email-provider-field', '#smtp-server-label', '#smtp-server-field',
 				'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field', '#smtp-helo-label',

@@ -58,7 +58,7 @@ class CControllerMediatypeEnable extends CController {
 			'filter' => [
 				'type' => MEDIA_TYPE_EMAIL,
 				'provider' => [CMediatypeHelper::EMAIL_PROVIDER_GMAIL, CMediatypeHelper::EMAIL_PROVIDER_OFFICE365],
-				'status' => MEDIA_STATUS_DISABLED
+				'status' => MEDIA_TYPE_STATUS_DISABLED
 			],
 			'preservekeys' => true
 		]);
@@ -67,7 +67,7 @@ class CControllerMediatypeEnable extends CController {
 		$incomplete_configurations = [];
 
 		foreach ($mediatypeids as $mediatypeid) {
-			if (array_key_exists($mediatypeid, $email_providers) && $email_providers[$mediatypeid]['passwd'] == '') {
+			if (array_key_exists($mediatypeid, $email_providers) && $email_providers[$mediatypeid]['passwd'] === '') {
 				$incomplete_configurations[] = $email_providers[$mediatypeid]['name'];
 				continue;
 			}
@@ -93,7 +93,6 @@ class CControllerMediatypeEnable extends CController {
 			else {
 				$output['success']['title'] = _n('Media type enabled', 'Media types enabled', $updated);
 			}
-
 		}
 		else {
 			$output['error'] = [
@@ -102,7 +101,7 @@ class CControllerMediatypeEnable extends CController {
 			];
 
 			if ($incomplete_configurations) {
-				$output['error']['messages'] = _s(
+				$output['error']['messages'][] = _s(
 					'%1$s: %2$s', _('Incomplete configuration'), implode(',', $incomplete_configurations)
 				);
 			}
@@ -111,4 +110,3 @@ class CControllerMediatypeEnable extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }
-

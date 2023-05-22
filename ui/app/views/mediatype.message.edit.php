@@ -42,7 +42,7 @@ if ($data['params']['old_message_type'] != -1) {
 
 $message_type_select = (new CSelect('message_type'))
 	->setId('message_type')
-	->setFocusableElementId( 'label-message-type')
+	->setFocusableElementId( 'message-type')
 	->setValue($data['params']['old_message_type'])
 	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem')))
 		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types']))
@@ -77,13 +77,13 @@ $message_type_select = (new CSelect('message_type'))
 
 $form_grid = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Message type')))->setId('label-message-type'),
+		(new CLabel(_('Message type'), $message_type_select->getFocusableElementId()))->setId('label-message-type'),
 		new CFormField($message_type_select)
 	]);
 
 if ($data['params']['type'] != MEDIA_TYPE_SMS) {
 	$form_grid->addItem([
-		new CLabel(_('Subject')),
+		new CLabel(_('Subject'), 'subject'),
 		new CFormField(
 			(new CTextBox('subject', $data['params']['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -93,7 +93,7 @@ if ($data['params']['type'] != MEDIA_TYPE_SMS) {
 }
 
 $form_grid->addItem([
-	new CLabel(_('Message')),
+	new CLabel(_('Message'), 'message'),
 	new CFormField((new CTextArea('message', $data['params']['message']))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'message'))
