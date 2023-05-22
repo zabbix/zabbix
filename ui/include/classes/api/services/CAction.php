@@ -84,7 +84,6 @@ class CAction extends CApiService {
 	 * @param array $options['groupids']
 	 * @param array $options['actionids']
 	 * @param array $options['status']
-	 * @param bool  $options['editable']
 	 * @param array $options['extendoutput']
 	 * @param array $options['count']
 	 * @param array $options['pattern']
@@ -113,8 +112,6 @@ class CAction extends CApiService {
 			'usrgrpids'						=> null,
 			'userids'						=> null,
 			'scriptids'						=> null,
-			'nopermissions'					=> null,
-			'editable'						=> false,
 			// filter
 			'filter'					=> null,
 			'search'					=> null,
@@ -136,10 +133,9 @@ class CAction extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		// editable + PERMISSION CHECK
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		// PERMISSION CHECK
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// conditions are checked here by sql, operations after, by api queries
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
 
 			// condition hostgroup
@@ -154,7 +150,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.zbx_dbstr($permission).
+						' OR MAX(r.permission)<'.PERM_READ.
 					')';
 
 			// condition host or template
@@ -170,7 +166,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.zbx_dbstr($permission).
+						' OR MAX(r.permission)<'.PERM_READ.
 					')';
 
 			// condition trigger
@@ -188,7 +184,7 @@ class CAction extends CApiService {
 					' GROUP BY cc.value'.
 					' HAVING MIN(r.permission) IS NULL'.
 						' OR MIN(r.permission)='.PERM_DENY.
-						' OR MAX(r.permission)<'.zbx_dbstr($permission).
+						' OR MAX(r.permission)<'.PERM_READ.
 					')';
 		}
 
@@ -310,7 +306,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// check hosts, templates
 			$hosts = [];
 			$hostIds = [];
@@ -345,7 +341,6 @@ class CAction extends CApiService {
 			$allowedHosts = API::Host()->get([
 				'hostids' => $hostIds,
 				'output' => ['hostid'],
-				'editable' => $options['editable'],
 				'templated_hosts' => true,
 				'preservekeys' => true
 			]);
@@ -393,7 +388,6 @@ class CAction extends CApiService {
 			$allowedGroups = API::HostGroup()->get([
 				'groupids' => $groupIds,
 				'output' => ['groupid'],
-				'editable' => $options['editable'],
 				'preservekeys' => true
 			]);
 			foreach ($groupIds as $groupId) {
@@ -1508,8 +1502,7 @@ class CAction extends CApiService {
 
 		$db_actions = $this->get([
 			'output' => ['actionid', 'name'],
-			'actionids' => $actionids,
-			'editable' => true
+			'actionids' => $actionids
 		]);
 
 		if (count($db_actions) != count($actionids)) {
@@ -2573,7 +2566,6 @@ class CAction extends CApiService {
 				'notify_if_canceled', 'pause_symptoms'
 			],
 			'actionids' => array_column($actions, 'actionid'),
-			'editable' => true,
 			'preservekeys' => true
 		]);
 
@@ -2998,8 +2990,7 @@ class CAction extends CApiService {
 
 		$count = API::HostGroup()->get([
 			'countOutput' => true,
-			'groupids' => $groupids,
-			'editable' => true
+			'groupids' => $groupids
 		]);
 
 		if ($count != count($groupids)) {
@@ -3058,8 +3049,7 @@ class CAction extends CApiService {
 
 		$count = API::Host()->get([
 			'countOutput' => true,
-			'hostids' => $hostids,
-			'editable' => true
+			'hostids' => $hostids
 		]);
 
 		if ($count != count($hostids)) {
@@ -3196,8 +3186,7 @@ class CAction extends CApiService {
 
 		$count = API::Template()->get([
 			'countOutput' => true,
-			'templateids' => $templateids,
-			'editable' => true
+			'templateids' => $templateids
 		]);
 
 		if ($count != count($templateids)) {
@@ -3237,8 +3226,7 @@ class CAction extends CApiService {
 
 		$count = API::Trigger()->get([
 			'countOutput' => true,
-			'triggerids' => $triggerids,
-			'editable' => true
+			'triggerids' => $triggerids
 		]);
 
 		if ($count != count($triggerids)) {
@@ -3278,8 +3266,7 @@ class CAction extends CApiService {
 
 		$count = API::DRule()->get([
 			'countOutput' => true,
-			'druleids' => $druleids,
-			'editable' => true
+			'druleids' => $druleids
 		]);
 
 		if ($count != count($druleids)) {
@@ -3319,8 +3306,7 @@ class CAction extends CApiService {
 
 		$count = API::DCheck()->get([
 			'countOutput' => true,
-			'dcheckids' => $dcheckids,
-			'editable' => true
+			'dcheckids' => $dcheckids
 		]);
 
 		if ($count != count($dcheckids)) {
@@ -3360,8 +3346,7 @@ class CAction extends CApiService {
 
 		$count = API::Proxy()->get([
 			'countOutput' => true,
-			'proxyids' => $proxyids,
-			'editable' => true
+			'proxyids' => $proxyids
 		]);
 
 		if ($count != count($proxyids)) {

@@ -57,7 +57,8 @@ $html_page = (new CHtmlPage())
 								'srctbl' => 'drules',
 								'srcfld1' => 'druleid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_druleids_'
+								'dstfld1' => 'filter_druleids_',
+								'enabled_only' => 1
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

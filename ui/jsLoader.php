@@ -116,9 +116,6 @@ $translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
 	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
-	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
 		'Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.' => _('Cannot add dashboard page: maximum number of %1$d dashboard pages has been added.'),

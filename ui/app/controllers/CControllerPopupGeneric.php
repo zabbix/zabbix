@@ -1577,9 +1577,15 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if ($this->getInput('enabled_only', 0)) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$records = API::DRule()->get([
 					'output' => ['druleid', 'name'],
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'preservekeys' => true
 				]);
 

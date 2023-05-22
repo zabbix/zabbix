@@ -271,8 +271,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srctbl' => 'hosts',
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'action.edit',
-									'dstfld1' => 'operation_opcommand_hst__hostid',
-									'editable' => '1'
+									'dstfld1' => 'operation_opcommand_hst__hostid'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -291,8 +290,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srctbl' => 'host_groups',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'action.edit',
-									'dstfld1' => 'operation_opcommand_grp__groupid',
-									'editable' => '1'
+									'dstfld1' => 'operation_opcommand_grp__groupid'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -321,8 +319,7 @@ $form_grid->addItem([
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_opgroup__groupid',
-					'editable' => '1'
+					'dstfld1' => 'operation_opgroup__groupid'
 				]
 			]
 		]))
@@ -348,8 +345,7 @@ $form_grid->addItem([
 					'srctbl' => 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_optemplate__templateid',
-					'editable' => '1'
+					'dstfld1' => 'operation_optemplate__templateid'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
