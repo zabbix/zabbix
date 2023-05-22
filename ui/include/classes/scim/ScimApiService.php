@@ -41,7 +41,7 @@ abstract class ScimApiService extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options): array {
-		self::exception(ZBX_API_ERROR_NO_METHOD, 'The endpoint does not support the provided method.');  // TODO this is differend error code, why this is used?
+		self::exception(ZBX_API_ERROR_NO_METHOD, 'The endpoint does not support the provided method.');
 	}
 
 	public function put(array $options): array {

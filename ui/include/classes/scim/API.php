@@ -71,7 +71,7 @@ class API {
 
 		if ($filter !== '') {
 			if (strtolower($request->method()) === 'get') {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported'); // TODO this again is not correct error code
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported');
 			}
 
 			$value = null;
@@ -89,7 +89,7 @@ class API {
 			}
 
 			if ($value === null) {
-				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported'); // TODO this again is not correct error code
+				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported');
 			}
 
 			$data[$key] = $value;

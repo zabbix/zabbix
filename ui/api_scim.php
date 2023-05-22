@@ -48,7 +48,7 @@ try {
 }
 catch (Throwable $e) {
 	$response = new HttpResponse();
-	$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage()); // TODO wasn't here meant http response error?
+	$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage());
 
 	$response->setException($exception);
 }
