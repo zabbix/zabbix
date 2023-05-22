@@ -20,8 +20,8 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageSearch extends CLegacyWebTest {
-	public function testPageSearch_FindZabbixServer() {
+class testPageSearch extends CWebTest {
+	public function testPageSearch_FindZabbixServer_Old() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestInputTypeWait('search', 'ЗАББИКС Сервер');
 		$this->zbxTestClickXpath('//button[@class="search-icon"]');
@@ -34,6 +34,23 @@ class testPageSearch extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Zabbix server');
 		$this->zbxTestTextPresent('127.0.0.1');
 		$this->zbxTestTextPresent(['Latest data', 'Triggers', 'Applications', 'Items', 'Triggers', 'Graphs', 'Problems']);
+	}
+
+	/**
+	 * Search for an existing Host and check the results page.
+	 */
+	public function testPageSearch_FindHost() {
+		$this->openSearchResults('ЗАББИКС Сервер');
+	}
+
+	/**
+	 * Opens Zabbix Dashboard, searches by search string and opens the page.
+	 */
+	private function openSearchResults($searchString) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->asForm()->one()->waitUntilVisible();
+		$form->query('id:search')->one()->fill($searchString);
+		$form->submit();
 	}
 
 	public function testPageSearch_FindNotExistingHost() {
