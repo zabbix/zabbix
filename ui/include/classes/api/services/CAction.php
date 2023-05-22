@@ -133,7 +133,7 @@ class CAction extends CApiService {
 		];
 		$options = zbx_array_merge($defOptions, $options);
 
-		// editable + PERMISSION CHECK
+		// PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			// conditions are checked here by sql, operations after, by api queries
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
