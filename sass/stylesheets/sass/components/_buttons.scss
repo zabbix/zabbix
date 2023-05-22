@@ -1,20 +1,66 @@
-button {
+%button {
 	position: relative;
-	min-height: 24px;
+	min-width: 24px;
+	height: 24px;
 	padding: 0 11px;
-	margin: 0;
 	font-family: $font-stack;
 	font-size: $font-form-size;
-	color: $btn-color;
+	line-height: 22px;
+	text-align: center;
+	vertical-align: top;
 	cursor: pointer;
-	background-color: $btn-bg-color;
-	border: 1px solid $btn-border-color;
+	border: 1px solid;
 	border-radius: 2px;
-	outline: 0;
 
 	@if $ui-transitions {
-		transition: border-color .2s ease-out, background-color .2s ease-out;
+		transition: color $ui-controls-transition-duration ease-out,
+					border-color $ui-controls-transition-duration ease-out,
+					background-color $ui-controls-transition-duration ease-out;
 	}
+
+	&:empty {
+		padding-right: 0;
+		padding-left: 0;
+	}
+
+	&:active,
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		outline: none;
+	}
+
+	&.btn-small {
+		@extend %button-size-small;
+
+		line-height: 14px;
+	}
+
+	&[class^="zi-"], &[class*=" zi-"] {
+		@extend %icon-position;
+
+		&:not(:empty) {
+			&::before {
+				margin-right: 4px;
+				margin-left: -6px;
+			}
+		}
+	}
+}
+
+%button-size-medium {
+	min-width: 18px;
+	height: 18px;
+}
+
+%button-size-small {
+	min-width: 16px;
+	height: 16px;
+}
+
+%button-colors {
+	color: $btn-color;
+	background-color: $btn-bg-color;
+	border-color: $btn-border-color;
 
 	&:hover {
 		color: $btn-color;
@@ -27,53 +73,10 @@ button {
 		color: $btn-color;
 		background-color: $btn-focus-bg-color;
 		border-color: $btn-focus-border-color;
-		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-	}
-
-	&::-moz-focus-inner {
-		padding: 0;
-		border: 0;
-		vertical-align: middle;
-	}
-
-	&:empty {
-		width: 24px;
-		padding: 0;
-	}
-
-	&[class^="zi-"], &[class*=" zi-"] {
-		@extend %icon-position;
-
-		&:not(:empty) {
-			&::before {
-				margin-right: 4px;
-				margin-left: -6px;
-			}
-		}
-
-		@if $ui-transitions {
-			&::before {
-				transition: color .2s ease-out;
-			}
-		}
-	}
-
-	&[disabled] {
-		cursor: default;
-
-		&,
-		&:hover,
-		&:focus,
-		&:active {
-			color: $btn-disabled-color;
-			background-color: $btn-disabled-bg-color;
-			border-color: $btn-disabled-border-color;
-			box-shadow: none;
-		}
 	}
 }
 
-.btn-alt {
+%button-alt-colors {
 	color: $btn-alt-color;
 	background-color: $btn-alt-bg-color;
 	border-color: $btn-alt-border-color;
@@ -87,172 +90,197 @@ button {
 	&:focus {
 		background-color: $btn-alt-focus-bg-color;
 		border-color: $btn-alt-focus-border-color;
-		box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	}
 }
 
-.btn-grey {
-	color: $btn-form-font-color;
+%button-form-colors {
+	color: $btn-form-color;
 	background-color: $btn-form-bg-color;
 	border-color: $btn-form-border-color;
 
-	&:hover,
-	&:focus,
-	&:active {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-	}
-
 	&:hover {
+		color: $btn-form-color;
+		background-color: $btn-form-hover-bg-color;
 		border-color: $btn-form-border-color;
 	}
 
-	&:focus,
-	&:active {
-		border-color: $form-border-focus-color;
+	&:active,
+	&:focus {
+		color: $btn-form-color;
+		background-color: $btn-form-hover-bg-color;
+		border-color: $btn-form-focus-border-color;
 	}
 }
 
-a.btn,
-a.btn-icon {
-	@extend button;
-}
-
-a.btn-icon,
-.btn-icon,
-.btn-overlay-close {
-	color: $icon-btn-color;
+%button-icon-colors {
+	color: $btn-icon-color;
 	background: transparent;
 	border: none;
 
 	&:hover {
-		color: $icon-btn-hover-color;
+		color: $btn-icon-hover-color;
 		background: transparent;
+		border: none;
 	}
 
 	&:active,
 	&:focus {
-		color: $icon-btn-focus-color;
+		color: $btn-icon-focus-color;
 		background: transparent;
+		border: none;
 	}
 
 	&[disabled] {
-		color: $icon-btn-disabled-color !important;
-		background-color: transparent !important;
-	}
-}
-
-.btn-icon {
-	&.btn-small {
-		width: 16px;
-		min-height: 16px;
-	}
-}
-
-.btn-link {
-	padding: 0;
-	min-height: inherit;
-	font-size: inherit;
-	border-width: 0 0 1px;
-	border-style: dotted;
-	border-radius: 0;
-
-	&,
-	&:active,
-	&:hover,
-	&:focus {
+		color: $btn-icon-disabled-color;
 		background-color: transparent;
+	}
+}
+
+%button-link-colors {
+	color: $link-color;
+	background: transparent;
+	border-color: $link-color;
+
+	&:hover {
 		color: $link-color;
+		background: transparent;
 		border-color: $link-color;
-
-		&.red {
-			color: $negative-color;
-			border-color: $negative-color;
-		}
-
-		&.green {
-			color: $positive-color;
-			border-color: $positive-color;
-		}
 	}
 
-	&:hover,
+	&:active,
 	&:focus {
-		border-style: solid;
-	}
-
-	&:focus {
-		margin-bottom: -2px;
-		border-bottom-width: 2px;
+		color: $link-color;
+		background: transparent;
 		border-color: rgba($btn-focus-border-color, .5);
-		box-shadow: none;
 	}
+}
 
+%button-disabled {
 	&[disabled] {
-		background-color: transparent !important;
-		border-style: dotted !important;
+		pointer-events: none;
+		color: $btn-disabled-color;
+		background-color: $btn-disabled-bg-color;
+		border-color: $btn-disabled-border-color;
+		box-shadow: none;
 	}
 }
 
 button {
-	&.btn-overlay-close,
-	&.zi-remove { // TODO: check
-		width: 18px;
-		height: 18px;
-		min-height: 18px;
+	@extend %button;
+	@extend %button-colors;
+	@extend %button-disabled;
+}
 
-		&::before {
-			font-size: $icon-small-size *.85;
+.btn {
+	@extend %button;
+	@extend %button-colors;
+	@extend %button-disabled;
+
+	display: inline-block;
+
+	&:link,
+	&:visited {
+		color: $btn-color;
+	}
+}
+
+.btn-alt {
+	@extend %button;
+	@extend %button-alt-colors;
+	@extend %button-disabled;
+}
+
+.btn-grey {
+	@extend %button;
+	@extend %button-form-colors;
+	@extend %button-disabled;
+}
+
+.btn-icon {
+	@extend %button;
+	@extend %button-icon-colors;
+
+	display: inline-block;
+	line-height: 24px;
+
+	&:not(:hover):not(:focus) {
+		&:link,
+		&:visited {
+			color: $btn-icon-color;
 		}
+	}
+
+	&[disabled] {
+		pointer-events: none;
+	}
+
+	&.btn-small {
+		line-height: 16px;
+	}
+}
+
+.btn-link {
+	@extend %button;
+	@extend %button-link-colors;
+
+	box-sizing: content-box;
+	padding: 0;
+	height: 14px;
+	line-height: 14px;
+	vertical-align: baseline;
+	border-width: 0 0 1px;
+	border-style: dotted;
+	border-radius: 0;
+
+	&:active,
+	&:focus,
+	&:hover {
+		border-style: solid;
+		box-shadow: none;
+	}
+
+	&:active,
+	&:focus {
+		margin-bottom: -1px;
+		border-bottom-width: 2px;
+	}
+
+	&[disabled] {
+		background-color: transparent;
+		border-style: dotted;
 	}
 }
 
 .btn-overlay-close {
+	@extend %button;
+	@extend %button-size-medium;
+	@extend %button-icon-colors;
 	@extend %icon-position;
-	@extend %icons-font;
+	@extend %icon-smaller;
 
 	position: absolute;
 	top: 1px;
 	right: 1px;
 	z-index: 1000;
 
-	&::before {
-		content: $zi-remove;
+	&:before {
+		@extend %icons-font;
 
-		@if $ui-transitions {
-			transition: color .2s ease-out;
-		}
+		content: $zi-remove;
 	}
 }
 
 .btn-debug {
+	@extend %button;
+	@extend %button-form-colors;
+
 	position: fixed;
 	bottom: 4px;
 	right: 31px;
 	z-index: 15000;
-	color: $btn-form-font-color;
-	background-color: $btn-form-bg-color;
-	border-color: $btn-form-border-color;
 	opacity: 0;
-
-	@if $ui-transitions {
-		transition: opacity $ui-transition-duration ease-out;
-	}
 
 	&.visible {
 		opacity: 0.75;
-	}
-
-	&:hover {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $btn-form-border-color;
-	}
-
-	&:active,
-	&:focus {
-		color: $btn-form-font-color;
-		background-color: $btn-form-hover-color;
-		border-color: $form-border-focus-color;
 	}
 }

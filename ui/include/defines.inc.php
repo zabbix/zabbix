@@ -2296,6 +2296,7 @@ define('ZBX_ICON_PLUS', 'zi-plus');
 define('ZBX_ICON_PLUS_SMALL', 'zi-plus-small');
 define('ZBX_ICON_REMOVE', 'zi-remove');
 define('ZBX_ICON_REMOVE_SMALL', 'zi-remove-small');
+define('ZBX_ICON_REMOVE_SMALLER', 'zi-remove-smaller');
 define('ZBX_ICON_REPORT', 'zi-report');
 define('ZBX_ICON_SEARCH', 'zi-search');
 define('ZBX_ICON_SIGNOUT', 'zi-signout');

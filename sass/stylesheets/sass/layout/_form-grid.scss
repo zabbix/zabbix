@@ -84,8 +84,7 @@
 
 			.btn-icon,
 			.icon {
-				width: 18px;
-				min-height: 18px;
+				@extend %button-size-medium;
 			}
 		}
 

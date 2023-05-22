@@ -785,8 +785,6 @@ function makeLogo(int $type): CTag {
 
 /**
  * Renders a page footer.
- *
- * @param bool $with_version
  */
 function makePageFooter(bool $with_version = true): CTag {
 	return (new CTag('footer', true, CBrandHelper::getFooterContent($with_version)))
@@ -899,9 +897,9 @@ function makeInformationList($info_icons) {
 /**
  * Renders an icon for host in maintenance.
  *
- * @param int    $type         Type of the maintenance.
- * @param string $name         Name of the maintenance.
- * @param string $description  Description of the maintenance.
+ * @param int|string $type         Type of the maintenance.
+ * @param string     $name         Name of the maintenance.
+ * @param string     $description  Description of the maintenance.
  */
 function makeMaintenanceIcon($type, string $name, string $description): CButtonIcon {
 	$hint = $name.' ['.($type
@@ -924,7 +922,7 @@ function makeMaintenanceIcon($type, string $name, string $description): CButtonI
  *        string $icon_data[]['suppress_until']    Time until the problem is suppressed.
  *        string $icon_data[]['maintenance_name']  Name of the maintenance.
  *        string $icon_data[]['username']          User who created manual suppression.
- * @param bool   $blink  Add 'blink' CSS class for jqBlink.
+ * @param bool   $blink                            Add 'blink' CSS class for jqBlink.
  *
  * @throws Exception
  */
@@ -994,7 +992,7 @@ function makeInformationIcon($message): CButtonIcon {
 }
 
 /**
- * Renders a warning icon like yellow [i] with error message
+ * Renders a warning icon like yellow [i] with error message.
  */
 function makeWarningIcon($warning): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_I_WARNING))
@@ -1003,9 +1001,8 @@ function makeWarningIcon($warning): CButtonIcon {
 }
 
 /**
- * Renders an error icon like red [i] with error message
+ * Renders an error icon like red [i] with error message.
  */
-
 function makeErrorIcon($error): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_I_NEGATIVE))
 		->setSmall()

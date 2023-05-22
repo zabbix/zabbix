@@ -47,9 +47,9 @@
 
 		&:not(:first-of-type) {
 			button {
+				min-width: 20px;
+				height: 20px;
 				padding: 0;
-				width: 20px;
-				min-height: 20px;
 				border: 1px solid $ui-bg-color;
 				border-radius: 0;
 				vertical-align: middle;
@@ -57,7 +57,7 @@
 
 				&:hover,
 				&:focus {
-					border-color: $form-border-focus-color;
+					border-color: $form-focus-border-color;
 					box-shadow: inset 0 0 0 1px $ui-bg-color;
 				}
 

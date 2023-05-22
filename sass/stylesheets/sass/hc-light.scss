@@ -88,7 +88,7 @@ $sidebar-server-name-color: #9f9f9f;
 // UI
 $ui-bg-color: #ffffff;
 $ui-bg-selected-color: #333333;
-$ui-hover-color: #f4f4f4;
+$ui-hover-bg-color: #f4f4f4;
 $ui-border-color: #9f9f9f;
 $ui-placeholder-background-color: darken($body-bg-color, 10%);
 $ui-highlighted-parent-background-color: darken($body-bg-color, 4%);
@@ -102,10 +102,8 @@ $table-border-color: #888888;
 $ui-tab-bg-selected-color: #888888;
 
 // Forms
-$form-font-color: #000000;
-$form-bg-color: #ffffff;
 $form-border-color: #888888;
-$form-border-focus-color: #000000;
+$form-focus-border-color: #000000;
 $form-fields-group-border-color: #888888;
 
 $form-disabled-font-color: #9f9f9f;
@@ -137,9 +135,7 @@ $btn-focus-outline-color: #111111;
 
 $btn-alt-color: $font-color;
 
-$btn-form-font-color: #333333;
-$btn-form-hover-color: #f4f4f4;
-$btn-form-border-color: $form-border-color;
+$btn-form-color: #333333;
 
 $btn-disabled-color: #999999;
 $btn-disabled-bg-color: transparent;
@@ -160,9 +156,9 @@ $link-alt-underline-color: #808080;
 // Icons.
 $icon-color: #555555;
 
-$icon-btn-color: #555555;
-$icon-btn-hover-color: #000000 !default;
-$icon-btn-disabled-color: #cccccc; // TODO: to check color
+$btn-icon-color: #555555;
+$btn-icon-hover-color: #000000 !default;
+$btn-icon-disabled-color: #cccccc; // TODO: to check color
 
 // Analog clock
 $clock-face-color: #ffffff;
@@ -878,8 +874,8 @@ td.inactive-bg {
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
-				background-color: $ui-hover-color;
-				border-color: $ui-hover-color;
+				background-color: $ui-hover-bg-color;
+				border-color: $ui-hover-bg-color;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}

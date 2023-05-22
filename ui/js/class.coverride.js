@@ -32,7 +32,7 @@ jQuery(function ($) {
 					e.stopPropagation();
 					e.preventDefault();
 				})
-				.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALL]),
+				.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALLER]),
 			opt = $override.data('options'),
 			field_name = opt.makeName(option, opt.getId($override));
 

@@ -5,8 +5,11 @@
 	li {
 		position: relative;
 		display: inline-block;
-		margin-right: -1px;
 		padding: 0;
+
+		&:not(:last-child) {
+			margin-right: -1px;
+		}
 
 		&:first-child {
 			border-top-left-radius: 3px;
@@ -51,12 +54,12 @@
 			background-color: $form-bg-color;
 
 			&:hover {
-				background-color: $btn-form-hover-color;
+				background-color: $btn-form-hover-bg-color;
 			}
 
 			&:active {
 				border-color: $form-border-color;
-				background-color: $btn-form-hover-color;
+				background-color: $btn-form-hover-bg-color;
 			}
 		}
 

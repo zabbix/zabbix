@@ -10,13 +10,11 @@
 }
 
 %icons-font {
-	font: {{fontSize}} / 1 '{{fontname}}';
+	font-family: '{{fontname}}';
+	font-size: {{fontSize}};
+	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-
-	@if $ui-transitions {
-		transition: color $ui-transition-duration ease-out;
-	}
 }
 
 %icon-position {

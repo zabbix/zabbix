@@ -48,7 +48,7 @@ if ($data['form'] === 'massupdate') {
 		->addClass('js-element-table-addfrom')
 		->setAttribute('data-context', 'template');
 	$buttons[] = (new CButtonLink(_('Add from host')))
-		->addClass('js-`element-table-addfrom')
+		->addClass('js-element-table-addfrom')
 		->setAttribute('data-context', 'host');
 }
 

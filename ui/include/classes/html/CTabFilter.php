@@ -331,6 +331,7 @@ class CTabFilter extends CDiv {
 				(new CLink(relativeDateToText($data['from'], $data['to'])))
 					->setAttribute('tabindex', $enabled ? 0 : -1)
 					->addClass('tabfilter-item-link')
+					->addClass(ZBX_STYLE_BTN)
 					->addClass(ZBX_ICON_CLOCK)
 					->addClass(ZBX_STYLE_BTN_TIME)
 					->addClass($data['disabled'] ? ZBX_STYLE_DISABLED : null)

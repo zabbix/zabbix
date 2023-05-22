@@ -25,7 +25,7 @@
 		&:hover,
 		&:focus,
 		&:active {
-			background-color: $ui-hover-color;
+			background-color: $ui-hover-bg-color;
 		}
 	}
 
@@ -39,6 +39,7 @@
 		}
 
 		.btn {
+			height: auto;
 			padding-bottom: 7px;
 			margin-bottom: 0;
 			color: $font-color;
@@ -51,7 +52,7 @@
 			&:hover,
 			&:focus,
 			&:active {
-				background-color: $ui-hover-color;
+				background-color: $ui-hover-bg-color;
 			}
 		}
 	}

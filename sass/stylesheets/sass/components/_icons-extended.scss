@@ -4,6 +4,12 @@
 	}
 }
 
+%icon-smaller {
+	&::before {
+		font-size: $icon-smaller-size;
+	}
+}
+
 %icon-with-content {
 	&::after {
 		content: attr(data-content);
@@ -132,6 +138,11 @@
 .zi-remove-small {
 	@extend .zi-remove;
 	@extend %icon-small;
+}
+
+.zi-remove-smaller {
+	@extend .zi-remove;
+	@extend %icon-smaller;
 }
 
 .zi-wrench-alt-small {

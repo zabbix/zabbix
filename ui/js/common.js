@@ -46,6 +46,7 @@ const ZBX_ICON_PLUS = 'zi-plus';
 const ZBX_ICON_PLUS_SMALL = 'zi-plus-small';
 const ZBX_ICON_REMOVE = 'zi-remove';
 const ZBX_ICON_REMOVE_SMALL = 'zi-remove-small';
+const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';

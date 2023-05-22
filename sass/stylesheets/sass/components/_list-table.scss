@@ -55,7 +55,7 @@
 				&:focus,
 				&:active {
 					text-decoration: none;
-					background-color: $ui-hover-color;
+					background-color: $ui-hover-bg-color;
 				}
 			}
 		}
@@ -75,7 +75,7 @@
 			}
 
 			&:not(.hover-nobg):not(.row-selected):hover {
-				background-color: $ui-hover-color;
+				background-color: $ui-hover-bg-color;
 			}
 
 			&.row-selected {
@@ -106,6 +106,7 @@
 		border-bottom: 1px solid $table-border-color;
 
 		&.second-col {
+			width: 20px;
 			padding-left: 0;
 			padding-right: 0;
 			text-align: center;
@@ -235,10 +236,13 @@
 		}
 	}
 
+	.icon {
+		border-radius: 2px;
+	}
+
 	.btn-icon:not(.btn-small),
 	.icon {
-		width: 18px;
-		min-height: 18px;
+		@extend %button-size-medium;
 	}
 
 	.btn-small,
@@ -470,31 +474,6 @@
 					margin-bottom: 0;
 					border: 1px solid $ui-bg-color;
 				}
-			}
-		}
-
-		.link-action {
-			color: $font-color;
-
-			&:hover,
-			&:focus {
-				color: $link-hover-color;
-			}
-
-			&.red {
-				color: $negative-color;
-			}
-
-			&.orange {
-				color: $orange;
-			}
-
-			&.yellow {
-				color: $warning-color;
-			}
-
-			&.green {
-				color: $positive-color;
 			}
 		}
 	}

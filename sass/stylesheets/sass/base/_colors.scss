@@ -26,6 +26,7 @@ $teal: #0f998b;
 $white: #ffffff !default;
 $teal: #0f998b;
 
+$accent-color: $orange !default;
 $negative-color: $red !default;
 $positive-color: $green !default;
 $warning-color: $dark-yellow !default;
@@ -60,6 +61,10 @@ $font-alt-color: #768d99 !default;
 $body-bg-color: #ebeef0 !default;
 $overlay-bg-color: #ffffff !default;
 $overlay-border-color: #ccd5d9 !default;
+
+// Icons.
+$icon-color: #768d99 !default;
+$icon-content-color: #ffffff !default;
 
 // Main menu.
 $menu-main-icon-color: $sidebar-color !default;
@@ -128,7 +133,7 @@ $sidebar-server-name-color: rgba($menu-user-color, 0.5) !default;
 // UI.
 $ui-bg-color: #ffffff !default;
 $ui-border-color: #dfe4e7 !default;
-$ui-hover-color: #e8f5ff !default;
+$ui-hover-bg-color: #e8f5ff !default;
 $ui-selected-color: #fff !default;
 $ui-selected-hover-color: #dfe4e7 !default;
 $ui-bg-selected-color: #768d99 !default;
@@ -149,12 +154,14 @@ $ui-tabfilter-item-border-color: #768d99 !default;
 $colorpicker-empty-color: #d40000 !default;
 
 // Forms.
-$form-font-color: #1f2c33 !default;
-$form-bg-color: #ffffff !default;
+$form-font-color: $font-color !default;
+$form-bg-color: $ui-bg-color !default;
 $form-border-color: #acbbc2 !default;
-$form-border-focus-color: #02659f !default;
+$form-focus-border-color: #02659f !default;
 $form-label-asterisk-color: $red;
 $form-fields-group-border-color: #ebeef0 !default;
+
+$form-hover-bg-color: $ui-hover-bg-color !default;
 
 $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
@@ -190,10 +197,16 @@ $btn-alt-hover-border-color: $btn-alt-hover-bg-color !default;
 $btn-alt-focus-bg-color: $btn-alt-hover-bg-color !default;
 $btn-alt-focus-border-color: $btn-alt-focus-bg-color !default;
 
-$btn-form-font-color: #1f2c33 !default;
+$btn-form-color: $font-color !default;
 $btn-form-bg-color: $form-bg-color !default;
-$btn-form-hover-color: #e8f5ff !default;
 $btn-form-border-color: $form-border-color !default;
+$btn-form-hover-bg-color: $form-hover-bg-color !default;
+$btn-form-focus-border-color: $form-focus-border-color !default;
+
+$btn-icon-color: lighten($icon-color, 20%) !default;
+$btn-icon-hover-color: $icon-color !default;
+$btn-icon-focus-color: $icon-color !default;
+$btn-icon-disabled-color: lighten($icon-color, 30%) !default;
 
 $btn-disabled-color: #acbbc2 !default;
 $btn-disabled-bg-color: #ebebeb !default;
@@ -211,15 +224,6 @@ $link-visited-color: $link-color !default;
 
 $link-alt-underline-color: #768d99 !default;
 
-// Icons.
-$icon-color: #768d99 !default;
-$icon-content-color: #ffffff !default;
-
-$icon-btn-color: lighten($icon-color, 20%) !default;
-$icon-btn-hover-color: $icon-color !default;
-$icon-btn-focus-color: $icon-color !default;
-$icon-btn-disabled-color: lighten($icon-color, 30%) !default;
-
 // FIXME need to check color variables
 // FIXME DF has variables that are not used, need to check after problems page
 $icon-hint-color: #768d99 !default;
@@ -227,8 +231,8 @@ $icon-calendar-color: #acbbc2 !default;
 $icon-action-arrow-up: #e33734 !default;
 $icon-action-check: #009900 !default;
 $icon-action-severity-down: #009900 !default; // TODO - delete
-$icon-action-severety-up: #e33734 !default;
-$icon-action-severety-changed: #768d99 !default;
+$icon-action-severity-up: #e33734 !default;
+$icon-action-severity-changed: #768d99 !default;
 $icon-action-list-table-color: #768d99 !default;
 $icon-remove-fav-color: #f3a914 !default;
 $icon-event-action-red: #e33734 !default;
@@ -245,7 +249,7 @@ $msg-warning-color: #ffc107 !default;
 // Tabfilter.
 $tab-label-color: $btn-color;
 $tab-label-bg-color: $btn-bg-color;
-$tab-label-focus-bg-color: $btn-form-hover-color;
+$tab-label-focus-bg-color: $btn-form-hover-bg-color;
 $tab-label-selected-color: $btn-color;
 $tab-label-selected-bg-color: $btn-bg-color;
 $tab-label-selected-border-color: $btn-bg-color;

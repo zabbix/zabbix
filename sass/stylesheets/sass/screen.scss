@@ -1,20 +1,21 @@
 $theme-name: 'blue' !default;
 
 $ui-transitions: true !default;
-// Sync with JavaScript variable: UI_TRANSITION_DURATION.
-$ui-transition-duration: .3s !default;
+$ui-transition-duration: .3s !default;  // Sync with JavaScript variable: UI_TRANSITION_DURATION.
+$ui-controls-transition-duration: .2s !default;
 
-$icon-default-size: 18px;
-$icon-medium-size: 16px;
-$icon-small-size: 12px;
+$icon-default-size: 18px !default;
+$icon-medium-size: 16px !default;
+$icon-small-size: 12px !default;
+$icon-smaller-size: 10px !default;
 
-$main-menu-icon-size: 24px;
-$main-menu-submenu-icon-size: $icon-medium-size;
-$menu-user-icon-size: $icon-medium-size;
+$main-menu-icon-size: 24px !default;
+$main-menu-submenu-icon-size: $icon-medium-size !default;
+$menu-user-icon-size: $icon-medium-size !default;
 
 // Sprite path
 $sprite-path: '../img/icon-sprite.svg?20220722'; // TODO - AS: should be removed
-$icons-path: '../fonts/';
+$icons-path: '../fonts/' !default;
 $browser-sprite: '../img/browser-sprite.png?20220722';
 
 @import "utils/mixins";
@@ -39,7 +40,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "layout/form-grid";
 
 @import "components/buttons";
-@import "components/icons_extended";
+@import "components/icons-extended";
 @import "components/checkbox-list";
 @import "components/color-picker";
 @import "components/columns-wrapper";
@@ -81,7 +82,6 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 
 	&:hover {
-		@extend %link-action-style;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, .35);
 	}
@@ -332,7 +332,7 @@ form {
 
 	&:hover {
 		color: $font-color;
-		background-color: $btn-form-hover-color;
+		background-color: $btn-form-hover-bg-color;
 	}
 
 	&:focus {
@@ -343,7 +343,7 @@ form {
 
 	&:active {
 		color: $font-color;
-		background-color: $btn-form-hover-color;
+		background-color: $btn-form-hover-bg-color;
 		z-index: 10;
 		position: relative;
 	}
@@ -402,17 +402,17 @@ form {
 	}
 
 	&:hover {
-		background-color: $ui-hover-color;
+		background-color: $ui-hover-bg-color;
 		border-bottom-color: $form-border-color;
 	}
 
 	&:focus {
-		background-color: $ui-hover-color;
-		border-color: $form-border-focus-color;
+		background-color: $ui-hover-bg-color;
+		border-color: $form-focus-border-color;
 	}
 
 	&:active {
-		background-color: $ui-hover-color;
+		background-color: $ui-hover-bg-color;
 		border-color: $form-border-color;
 	}
 }
@@ -631,7 +631,7 @@ form {
 	white-space: normal;
 
 	&.active {
-		border-color: $form-border-focus-color;
+		border-color: $form-focus-border-color;
 	}
 
 	&[aria-disabled] {
@@ -690,26 +690,22 @@ form {
 				overflow: hidden;
 				text-overflow: ellipsis;
 			}
-		}
 
-		.btn-icon.zi-remove {
-			@extend %icon-position;
+			.btn-icon {
+				@extend %button-size-medium;
 
-			flex-shrink: 0;
-			width: 18px;
-			height: 18px;
-			min-height: 18px;
-			cursor: pointer;
-
-			&::before {
-				font-size: $icon-small-size *.85;
+				flex-shrink: 0;
+				margin-left: 0;
 				color: $ui-selected-color;
-			}
 
-			&:hover,
-			&:focus {
-				&::before {
+				&:hover,
+				&:focus {
 					color: $ui-selected-hover-color;
+				}
+
+				&:active,
+				&:focus {
+					box-shadow: none;
 				}
 			}
 		}
@@ -722,16 +718,10 @@ form {
 		.subfilter-enabled {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
-		}
 
-		.btn-icon.zi-remove {
-			cursor: default;
-
-			&,
-			&:hover {
-				&::before {
-					color: $multiselect-item-disabled-color;
-				}
+			.btn-icon {
+				pointer-events: none;
+				color: $multiselect-item-disabled-color;
 			}
 		}
 	}
@@ -950,8 +940,7 @@ form {
 		table {
 			.btn-icon,
 			.icon {
-				width: 18px;
-				min-height: 18px;
+				@extend %button-size-medium;
 			}
 		}
 
@@ -1174,7 +1163,7 @@ textarea {
 		@extend %form-disabled;
 
 		&:focus {
-			border-color: $form-border-focus-color;
+			border-color: $form-focus-border-color;
 		}
 	}
 }
@@ -1336,7 +1325,7 @@ select {
 	}
 
 	&:focus + label span {
-		border-color: $form-border-focus-color;
+		border-color: $form-focus-border-color;
 	}
 
 	&:checked[disabled] + label span {
@@ -1381,7 +1370,7 @@ select {
 	transition: border-color .2s ease-out, box-shadow .2s ease-out;
 
 	&:focus {
-		border-color: $form-border-focus-color;
+		border-color: $form-focus-border-color;
 	}
 }
 
@@ -1559,20 +1548,20 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%btn-widget {
+%btn-widget { // TODO: check
 	width: 24px;
 	height: 24px;
 	margin: 2px 2px 0 0;
 	@extend %btn-widget-defaults;
 }
 
-%btn-dashboard {
+%btn-dashboard { // TODO: check
 	width: 24px;
 	height: 24px;
 	@extend %btn-widget-defaults;
 }
 
-%btn-widget-defaults {
+%btn-widget-defaults { // TODO: check
 	border: 0;
 	min-height: 0;
 	padding: 0;
@@ -1600,7 +1589,7 @@ select {
 	padding: 0;
 }
 
-%form-disabled {
+%form-disabled { // TODO: check
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
@@ -1612,7 +1601,7 @@ select {
 	}
 }
 
-%btn-widget-hover-active {
+%btn-widget-hover-active { // TODO: check
 	background-color: transparent;
 	opacity: 1;
 }
@@ -1945,13 +1934,17 @@ select {
 		margin: -8px -10px 6px -10px;
 		padding: 8px 10px;
 
-		a.btn-icon,
+		.btn-icon {
+			@extend %button-size-medium;
+		}
+
+		.btn-overlay-close {
+			@extend %icon-small;
+		}
+
 		.btn-icon,
 		.btn-overlay-close {
 			position: initial;
-			width: 18px;
-			height: 18px;
-			min-height: 18px;
 			margin-top: -9px;
 			margin-left: 4px;
 
@@ -2177,7 +2170,7 @@ select {
 			border-color: $form-border-color;
 
 			&:hover {
-				background-color: $btn-form-hover-color;
+				background-color: $btn-form-hover-bg-color;
 			}
 		}
 	}
@@ -2730,131 +2723,6 @@ select {
 	background-color: $ui-bg-color;
 	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
 	background-attachment: local, local, scroll, scroll;
-}
-
-// Alerts.
-.green {
-	color: $green;
-}
-
-a.green {
-	@extend .green;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.red {
-	color: $red;
-}
-
-a.red {
-	@extend .red;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.orange {
-	color: $orange;
-}
-
-a.orange {
-	@extend .orange;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.yellow {
-	color: $dark-yellow;
-}
-
-a.yellow {
-	@extend .yellow;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.grey {
-	color: $font-alt-color;
-}
-
-a.grey {
-	@extend .grey;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.blue {
-	color: $blue;
-}
-
-a.blue {
-	@extend .blue;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-.teal {
-	color: $teal;
-}
-
-a.teal {
-	@extend .teal;
-
-	&:hover,
-	&:focus {
-		color: $link-hover-color;
-	}
-}
-
-a.link-action {
-	color: $font-color;
-
-	&.red {
-		color: $red;
-	}
-
-	&.orange {
-		color: $orange;
-	}
-
-	&.yellow {
-		color: $dark-yellow;
-	}
-
-	&.green {
-		color: $green;
-	}
-
-	&.grey {
-		color: $font-alt-color;
-	}
-
-	&:hover {
-		color: $link-hover-color;
-		border-bottom: 1px solid rgba($link-hover-color, .5);
-	}
-
-	&:focus {
-		color: $link-hover-color;
-	}
 }
 
 .tag {
@@ -3703,7 +3571,7 @@ svg {
 				padding: 8px 0;
 
 				&:hover {
-					background-color: $ui-hover-color;
+					background-color: $ui-hover-bg-color;
 				}
 
 				> .problem-icon-list {
@@ -3748,8 +3616,7 @@ svg {
 
 			.tools {
 				.btn-icon {
-					width: 18px;
-					min-height: 18px;
+					@extend %button-size-medium;
 
 					&:not(:first-of-type) {
 						margin-left: 5px;
@@ -4047,7 +3914,7 @@ a.icon-count {
 
 		&:focus {
 			+ .btn-undo {
-				border-color: $form-border-focus-color;
+				border-color: $form-focus-border-color;
 			}
 		}
 	}
@@ -4072,7 +3939,7 @@ a.icon-count {
 		&:focus,
 		&:hover {
 			color: $btn-color;
-			border-color: $form-border-focus-color;
+			border-color: $form-focus-border-color;
 		}
 	}
 }
@@ -4608,12 +4475,15 @@ z-select,
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 }
+
 .geomap-filter.collapsed {
 	display: block;
 }
+
 .geomap-filter li {
 	width: calc(100% + 20px);
 }
+
 .geomap-filter label {
 	white-space: nowrap;
 }
@@ -4621,6 +4491,7 @@ z-select,
 .marker-cluster {
 	background: none;
 }
+
 .marker-cluster div {
 	text-align: center;
 	border-radius: 50%;
@@ -4629,14 +4500,17 @@ z-select,
 	height: 30px;
 	width: 30px;
 }
+
 .leaflet-marker-icon:focus {
 	box-shadow: 0 0 0 2px $btn-focus-outline-color;
 	border-radius: 2px;
 	outline: none;
 }
+
 .marker-cluster span {
 	line-height: 30px;
 }
+
 .leaflet-control {
 	.navigate-home-button,
 	.geomap-filter-button {
@@ -4677,29 +4551,52 @@ z-select,
 }
 
 // Dynamically generated classes:
-// .color-negative
+// .color-accent
+// .orange
+// .color-icon
 // .color-positive
 // .color-warning
-// .color-icon
+// .color-negative
+// .blue
+// .green
+// .grey
+// .orange
+// .red
+// .teal
+// .yellow
 @each $class, $color in (
+	color-accent: $accent-color,
 	color-icon: $icon-color,
 	color-negative: $negative-color,
+	color-warning: $warning-color,
 	color-positive: $positive-color,
-	color-warning: $warning-color
+	'blue': $blue,
+	'green': $green,
+	'grey': $font-alt-color,
+	'orange': $orange,
+	'red': $red,
+	'teal': $teal,
+	'yellow': $dark-yellow
 ) {
 	.#{$class} {
 		color: $color;
 
-		&.btn-icon {
-			color: $color;
+		&.btn-icon:not([disabled]) {
+			@extend .#{$class};
+		}
 
-			&:active,
-			&:focus,
-			&:hover {
-				color: $color;
-			}
+		&.btn-link:not([disabled]) {
+			@extend .#{$class};
+
+			border-color: $color;
+		}
+
+		&.link-action:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
+
+		&.link-alt:not(:hover):not(:focus) {
+			@extend .#{$class};
 		}
 	}
-
-
 }

@@ -204,7 +204,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		}
 
 		$dataset_head[] = (new CDiv(
-			new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete'))
+			new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete'))
 		))->addClass('dataset-actions');
 
 		return (new CListItem([

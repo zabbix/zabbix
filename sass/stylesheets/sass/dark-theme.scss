@@ -53,10 +53,10 @@ $menu-main-submenu-next-level-shadow: rgba(#2b2b2b, .35) !default;
 // UI
 $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
-$ui-hover-color: #383838;
+$ui-hover-bg-color: #383838;
 $ui-border-color: #303030;
-$ui-placeholder-background-color: darken($ui-hover-color, 15%);
-$ui-highlighted-parent-background-color: darken($ui-hover-color, 10%);
+$ui-placeholder-background-color: darken($ui-hover-bg-color, 15%);
+$ui-highlighted-parent-background-color: darken($ui-hover-bg-color, 10%);
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
@@ -70,7 +70,7 @@ $ui-tab-bg-selected-color: #69808d;
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #4f4f4f;
-$form-border-focus-color: #768d99;
+$form-focus-border-color: #768d99;
 $form-fields-group-border-color: #383838;
 
 $form-disabled-font-color: #525252;
@@ -84,7 +84,7 @@ $scrollbar-thumb-color: #383838;
 
 // Search form
 $form-search-bg-color: #191919;
-$form-search-focused-border-color: $form-border-focus-color; // TODO: to be cleaned not used
+$form-search-focused-border-color: $form-focus-border-color; // TODO: to be cleaned not used
 
 // Buttons
 $btn-color: #f2f2f2;
@@ -94,9 +94,7 @@ $btn-hover-bg-color: #5e737e;
 $btn-alt-color: #768d99;
 $btn-alt-bg-color: transparent;
 
-$btn-form-font-color: #f2f2f2;
-$btn-form-hover-color: #414141;
-$btn-form-border-color: $form-border-color;
+$btn-form-hover-bg-color: #414141;
 
 $btn-disabled-color: #525252;
 $btn-disabled-bg-color: transparent;
@@ -115,9 +113,9 @@ $link-visited-color: #4796c4;
 // Icons
 $icon-color: #69808d;
 
-$icon-btn-color: $icon-color;
-$icon-btn-hover-color: lighten($icon-color, 20%);
-$icon-btn-disabled-color: darken($icon-color, 20%);
+$btn-icon-color: $icon-color;
+$btn-icon-hover-color: lighten($icon-color, 20%);
+$btn-icon-disabled-color: darken($icon-color, 20%);
 
 // Error messages
 $msg-bad-btn-color: $font-color;

@@ -98,10 +98,10 @@ $sidebar-server-name-color: #787878;
 // UI
 $ui-bg-color: #000000;
 $ui-bg-selected-color: #dddddd;
-$ui-hover-color: #222222;
+$ui-hover-bg-color: #222222;
 $ui-border-color: #444444;
-$ui-placeholder-background-color: lighten($ui-hover-color, 10%);
-$ui-highlighted-parent-background-color: lighten($ui-hover-color, 20%);
+$ui-placeholder-background-color: lighten($ui-hover-bg-color, 10%);
+$ui-highlighted-parent-background-color: lighten($ui-hover-bg-color, 20%);
 
 $action-hover-color: #454545;
 $action-border-color: #666666;
@@ -115,7 +115,7 @@ $ui-tab-bg-selected-color: #ffffff;
 $form-font-color: #e1e3ed;
 $form-bg-color: #383838;
 $form-border-color: #666666;
-$form-border-focus-color: #bbbbbb;
+$form-focus-border-color: #bbbbbb;
 $form-fields-group-border-color: #333333;
 
 $form-disabled-font-color: #7d7d7d;
@@ -147,9 +147,8 @@ $btn-focus-outline-color: #ffffff;
 
 $btn-alt-color: $font-color;
 
-$btn-form-font-color: #f2f2f2;
-$btn-form-hover-color: #414141;
-$btn-form-border-color: $form-border-color;
+$btn-form-color: #f2f2f2;
+$btn-form-hover-bg-color: #414141;
 
 $btn-disabled-color: #7d7d7d;
 $btn-disabled-bg-color: transparent;
@@ -170,8 +169,8 @@ $link-alt-underline-color: #818181;
 // Icons
 $icon-color: #dddddd;
 
-$icon-btn-color: #7d7d7d;
-$icon-btn-hover-color: #ffffff;
+$btn-icon-color: #7d7d7d;
+$btn-icon-hover-color: #ffffff;
 
 $icon-content-color: #000000;
 
@@ -970,7 +969,7 @@ td.inactive-bg {
 		&.ui-tabs-active {
 			.btn-time,
 			.filter-trigger {
-				background-color: $ui-hover-color;
+				background-color: $ui-hover-bg-color;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}

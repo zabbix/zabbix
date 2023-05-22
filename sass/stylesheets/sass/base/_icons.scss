@@ -118,13 +118,11 @@ $zi-z: "\ea6c";
 }
 
 %icons-font {
-	font: 18px / 1 'zabbix-icons';
+	font-family: 'zabbix-icons';
+	font-size: 18px;
+	line-height: 1;
 	-webkit-font-smoothing: antialiased;
 	-moz-osx-font-smoothing: grayscale;
-
-	@if $ui-transitions {
-		transition: color $ui-transition-duration ease-out;
-	}
 }
 
 %icon-position {
