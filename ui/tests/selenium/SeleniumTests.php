@@ -60,7 +60,6 @@ require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/testPageMonitoringHosts.php';
-require_once dirname(__FILE__).'/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/lld/testPageLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testPasswordComplexity.php';
 /*
@@ -118,7 +117,8 @@ require_once dirname(__FILE__).'/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/testFormMacrosTemplate.php';
 require_once dirname(__FILE__).'/testFormMaintenance.php';
 require_once dirname(__FILE__).'/testFormMap.php';
-require_once dirname(__FILE__).'/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testFormNetworkDiscovery.php';
+require_once dirname(__FILE__).'/networkDiscovery/testPageNetworkDiscovery.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneHost.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingCloneTemplate.php';
 require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingItem.php';
@@ -270,7 +270,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
-		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -342,6 +341,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormNetworkDiscovery');
+		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testFormPreprocessingCloneHost');
 		$suite->addTestSuite('testFormPreprocessingCloneTemplate');
 		$suite->addTestSuite('testFormPreprocessingItem');
