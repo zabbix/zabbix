@@ -1392,8 +1392,9 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			job->workers_used++;
-			queue->pending_checks_count -= (zbx_uint64_t) (NULL != task->ips ? task->ips->values_num *
-					task->dchecks.values_num : task->dchecks.values_num);
+			queue->pending_checks_count -=  NULL != task->ips ?
+					(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
+					(zbx_uint64_t)task->dchecks.values_num;
 
 			if (0 == job->workers_max || job->workers_used != job->workers_max)
 			{
@@ -1695,7 +1696,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	char				*error;
+	char				*error = NULL;
 	zbx_vector_uint64_pair_t	revisions;
 	zbx_vector_uint64_t		del_druleids;
 	zbx_hashset_t			incomplete_druleids;
@@ -1723,7 +1724,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in->workers_num, &error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager");
+		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
+		zbx_free(error);
 		goto out;
 	}
 
