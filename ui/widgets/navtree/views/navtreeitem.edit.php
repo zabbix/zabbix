@@ -80,11 +80,16 @@ else {
 	]);
 }
 
-$form->addItem($form_grid);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('navtreeitem_edit_popup.init();'))->setOnDocumentReady()
+	);
 
 $output = [
 	'body' => $form->toString(),
-	'script_inline' => $multiselect->getPostJs()
+	'script_inline' => $multiselect->getPostJs().
+		$this->readJsFile('navtreeitem.edit.js.php', null, '')
 ];
 
 if ($messages = get_and_clear_messages()) {
