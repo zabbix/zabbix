@@ -4,12 +4,12 @@ New features:
 ...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
 
 Bug fixes:
-...G...... [ZBX-22797] fixed Zabbix agent 2 postgresql memory leak (esneiders)
+...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 ..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
-...G...PS. [ZBX-21795] fixed unhandled timeout in telnet (askolmeisters)
+...G...PS. [ZBX-21795] fixed unhandled timeout in Telnet (askolmeisters)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.34
