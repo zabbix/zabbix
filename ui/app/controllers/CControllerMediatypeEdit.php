@@ -29,7 +29,7 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeid' =>	'db media_type.mediatypeid',
+			'mediatypeid' =>	'db media_type.mediatypeid'
 		];
 
 		$ret = $this->validateInput($fields);

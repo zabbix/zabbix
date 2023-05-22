@@ -488,7 +488,6 @@ window.mediatype_edit_popup = new class {
 		show_fields.forEach((field) => {
 			this.form.querySelector(field).style.display = '';
 		});
-
 		this._setMaxSessionsType(this.type);
 		this.form.querySelector('#maxsessions_type').dispatchEvent(new Event('change'));
 	}
