@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'5.0.34rc1');
-define('ZABBIX_API_VERSION',	'5.0.34');
+define('ZABBIX_VERSION',		'5.0.35rc1');
+define('ZABBIX_API_VERSION',	'5.0.35');
 define('ZABBIX_EXPORT_VERSION',	'5.0');
 define('ZABBIX_DB_VERSION',		5000000);
 
@@ -1153,11 +1153,6 @@ define('EXPRESSION_HOST_ITEM_UNKNOWN',		'#ERROR_ITEM#');
 define('EXPRESSION_NOT_A_MACRO_ERROR',		'#ERROR_MACRO#');
 define('EXPRESSION_FUNCTION_UNKNOWN',		'#ERROR_FUNCTION#');
 define('EXPRESSION_UNSUPPORTED_VALUE_TYPE',	'#ERROR_VALUE_TYPE#');
-
-/**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
 
 /**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".

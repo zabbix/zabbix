@@ -1,6 +1,26 @@
+Changes for 5.0.35rc1
+
+New features:
+...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
+
+Bug fixes:
+...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+...G...PS. [ZBX-21795] fixed unhandled timeout in Telnet (askolmeisters)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34
+
+5.0.34rc1 was released as 5.0.34 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 5.0.34rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
 ...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
 ........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
 ...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
@@ -2776,9 +2796,9 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 --------------------------------------------------------------------------------
 Changes for 4.0.46rc1
 
-New features:
-
 Bug fixes:
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45
