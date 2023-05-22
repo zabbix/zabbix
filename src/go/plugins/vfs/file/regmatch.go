@@ -104,35 +104,36 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	var buf []byte
 	for 0 < nbytes || initial {
 		initial = false
-
+		fmt.Printf("curline: %d, startline: %d", curline, startline)
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(p.options.Timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
 		curline++
+		buf, nbytes, err = p.readFile(f, encoder)
+		if err != nil {
+			fmt.Printf("TOYOTA PRE-FINAL RES: ->%v+<-", err)
+			return nil, err
+		}
+
+		for f := 0; f < nbytes; f++ {
+			fmt.Printf("TOYOTA ress buf: ->%d<-", buf[f])
+		}
+
+		fmt.Printf("CALLING DECODE, nbytes: %d", nbytes)
+		x := decode(encoder, buf, nbytes)
+
+		for _, m := range bytes.Split(x, []byte("\n")) {
+			fmt.Printf("TOYOTA LINE X: %s", m)
+		}
+
 		if curline >= startline {
-			buf, nbytes, err = p.readFile(f, encoder)
-			if err != nil {
-				fmt.Printf("TOYOTA PRE-FINAL RES: ->%v+<-", err)
-				return nil, err
-			}
-
-			for f := 0; f < nbytes; f++ {
-				fmt.Printf("TOYOTA ress buf: ->%d<-", buf[f])
-			}
-
-			fmt.Printf("CALLING DECODE, nbytes: %d", nbytes)
-			x := decode(encoder, buf, nbytes)
-
-			for _, m := range bytes.Split(x, []byte("\n")) {
-				fmt.Printf("TOYOTA LINE X: %s", m)
-			}
-
 			if match := r.Match(x); match {
 				ret = 1
 			}
 		}
+
 		if curline >= endline {
 			break
 		}

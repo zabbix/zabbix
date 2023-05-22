@@ -70,6 +70,8 @@ func TestFileRegexpOutput(t *testing.T) {
 
 	impl.options.Timeout = 3
 
+	filename := "/tmp/zbx_regexp_test.dat"
+
 	type testCase struct {
 		fileContents      []byte
 		targetSearch      string
@@ -80,27 +82,25 @@ func TestFileRegexpOutput(t *testing.T) {
 		targetContents    string
 	}
 
-	filename := "/tmp/zbx_regexp_test.dat"
+	// феофан\r\n
+	fileContents_1_ISO_8859_5 := []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a}
+
+	//августа\r\n
+	fileContents_2_ISO_8859_5 := []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}
 
 	// выхухоль
 	//
 	// badger
 	//
 	// выхухоль2
-
-	// iso-8859-5 encoded
-	fileContents_ISO_8859_5 := []byte{
+	fileContents_3_ISO_8859_5 := []byte{
 		0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x0a, 0x0a, 0x62, 0x61, 0x64, 0x67, 0x65, 0x72,
 		0x0a, 0x0a, 0xd2, 0xeb, 0xe5, 0xe3, 0xe5, 0xde, 0xdb, 0xec, 0x32, 0x0a}
-
-	// UTF-16LE encoded
 	fileContents_UTF_16LE := []byte{
 		0x32, 0x04, 0x4b, 0x04, 0x45, 0x04, 0x43, 0x04, 0x45, 0x04, 0x3e, 0x04, 0x3b, 0x04, 0x4c, 0x04,
 		0x0a, 0x00, 0x0a, 0x00, 0x62, 0x00, 0x61, 0x00, 0x64, 0x00, 0x67, 0x00, 0x65, 0x00, 0x72, 0x00,
 		0x0a, 0x00, 0x0a, 0x00, 0x32, 0x04, 0x4b, 0x04, 0x45, 0x04, 0x43, 0x04, 0x45, 0x04, 0x3e, 0x04,
 		0x3b, 0x04, 0x4c, 0x04, 0x32, 0x00, 0x0a, 0x00}
-
-	// UTF-32BE encoded
 	fileContents_UTF_32BE := []byte{
 		0x00, 0x00, 0x04, 0x32, 0x00, 0x00, 0x04, 0x4b, 0x00, 0x00, 0x04, 0x45, 0x00, 0x00, 0x04, 0x43,
 		0x00, 0x00, 0x04, 0x45, 0x00, 0x00, 0x04, 0x3e, 0x00, 0x00, 0x04, 0x3b, 0x00, 0x00, 0x04, 0x4c,
@@ -111,23 +111,22 @@ func TestFileRegexpOutput(t *testing.T) {
 		0x00, 0x00, 0x04, 0x3b, 0x00, 0x00, 0x04, 0x4c, 0x00, 0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x0a}
 
 	tests := []*testCase{
-		&testCase{fileContents: []byte{0xe4, 0xd5, 0xde, 0xe4, 0xd0, 0xdd, 0x0d, 0x0a}, targetSearch: "(ф)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "group 0: \\0 group 1: \\1 group 4: \\4", targetContents: "group 0: ф group 1: ф group 4: "},
+		&testCase{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(ф)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "group 0: \\0 group 1: \\1 group 4: \\4", targetContents: "group 0: ф group 1: ф group 4: "},
 
-		// августа\r\n
-		&testCase{fileContents: []byte{0xd0, 0xd2, 0xd3, 0xe3, 0xe1, 0xe2, 0xd0, 0x0d, 0x0a}, targetSearch: "(а)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: "августа\r\n"},
+		&testCase{fileContents: fileContents_2_ISO_8859_5, targetSearch: "(а)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: "августа\r\n"},
 
 		// выхухоль
 		//
 		// badger
 		//
 		// выхухоль2
-		&testCase{fileContents: fileContents_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
+		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
 			targetStringGroup: "", targetContents: "выхухоль2\n"},
 
-		&testCase{fileContents: fileContents_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "1", lineEnd: "",
+		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "1", lineEnd: "",
 			targetStringGroup: "", targetContents: "выхухоль\n"},
 
-		&testCase{fileContents: fileContents_ISO_8859_5, targetSearch: "выхухоль2\n", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "2",
+		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "выхухоль2\n", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "2",
 			targetStringGroup: "", targetContents: ""},
 
 		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2", lineEnd: "",
@@ -147,12 +146,9 @@ func TestFileRegexpOutput(t *testing.T) {
 
 		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-32BE", lineStart: "", lineEnd: "2",
 			targetStringGroup: "", targetContents: ""},
-
-		//&testCase{fileContents: []byte{}, targetSearch: "", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: ""},
-
 	}
 
-	for _, c := range tests {
+	for i, c := range tests {
 
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
@@ -165,10 +161,10 @@ func TestFileRegexpOutput(t *testing.T) {
 			t.Errorf("vfs.file.regexp returned error %s", err.Error())
 		} else {
 			if contents, ok := result.(string); !ok {
-				t.Errorf("vfs.file.regexp returned unexpected value type %s", reflect.TypeOf(result).Kind())
+				t.Errorf("vfs.file.regexp (testCase[%d]) returned unexpected value type %s", i, reflect.TypeOf(result).Kind())
 			} else {
 				if contents != c.targetContents {
-					t.Errorf("vfs.file.regexp returned invalid result: ->%s<-", contents)
+					t.Errorf("vfs.file.regexp (testCase[%d]) returned invalid result: ->%s<-", i, contents)
 				}
 			}
 		}
