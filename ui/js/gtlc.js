@@ -32,7 +32,7 @@ jQuery(function($) {
 			increment: $container.find('.btn-time-right'),
 			decrement: $container.find('.js-btn-time-left'),
 			zoomout: $container.find('.btn-time-zoomout'),
-			quickranges: $container.find('.js-time-quick a'),
+			quickranges: $container.find('.time-quick a'),
 			label: $container.find('.btn-time')
 		},
 		request_data = {
