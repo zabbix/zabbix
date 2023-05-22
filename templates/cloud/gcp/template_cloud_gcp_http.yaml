@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-19T06:16:23Z'
+  date: '2023-05-22T13:11:34Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -7929,7 +7929,7 @@ zabbix_export:
           units: '%'
           description: |
             Memory usage Percentage. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7961,7 +7961,7 @@ zabbix_export:
           units: B
           description: |
             Total VM memory size. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7983,7 +7983,7 @@ zabbix_export:
           units: B
           description: |
             Memory currently used in the VM. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8005,7 +8005,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory read into the guest from its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8027,7 +8027,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory written from the guest to its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
