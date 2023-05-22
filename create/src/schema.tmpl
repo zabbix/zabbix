@@ -133,6 +133,7 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|iprange	|t_varchar(2048)|''	|NOT NULL	|ZBX_PROXY
 FIELD		|delay		|t_varchar(255)	|'1h'	|NOT NULL	|ZBX_PROXY
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|concurrency_max	|t_integer	|'0'	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|proxy_hostid
 UNIQUE		|2		|name
 CHANGELOG	|9
@@ -2118,4 +2119,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050020	|6050020
+ROW		|1		|6050022	|6050022

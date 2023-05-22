@@ -231,6 +231,21 @@ static int	DBpatch_6050020(void)
 	return DBmodify_field_type("connector", &field, NULL);
 }
 
+static int	DBpatch_6050021(void)
+{
+	const zbx_db_field_t	field = {"concurrency_max", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6050022(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("update drules set concurrency_max=1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -258,5 +273,7 @@ DBPATCH_ADD(6050017, 0, 1)
 DBPATCH_ADD(6050018, 0, 1)
 DBPATCH_ADD(6050019, 0, 1)
 DBPATCH_ADD(6050020, 0, 1)
+DBPATCH_ADD(6050021, 0, 1)
+DBPATCH_ADD(6050022, 0, 1)
 
 DBPATCH_END()

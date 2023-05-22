@@ -169,7 +169,7 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-static int	zbx_config_timeout = 3;
+static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)
 {
 	return zbx_config_timeout;
