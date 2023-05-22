@@ -504,37 +504,23 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		const tree_row = document.createElement('div');
-
 		tree_row.classList.add('tree-row');
 		li_item.appendChild(tree_row);
 
-		let tools;
-		let problems;
-
-		if (this._is_edit_mode) {
-			tools = document.createElement('div');
-			tools.classList.add('tools');
-			tree_row.appendChild(tools);
-		}
-		else {
-			problems = document.createElement('div');
-			problems.classList.add('problem-icon-list');
-			tree_row.appendChild(problems);
-		}
-
 		const content = document.createElement('div');
-
 		content.classList.add('content');
 		tree_row.appendChild(content);
 
 		const margin_lvl = document.createElement('div');
-
 		margin_lvl.classList.add('margin-lvl');
 		content.appendChild(margin_lvl);
 
 		if (this._is_edit_mode) {
-			const button_add_child = document.createElement('button');
+			const tools = document.createElement('div');
+			tools.classList.add('tools');
+			tree_row.appendChild(tools);
 
+			const button_add_child = document.createElement('button');
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
 			button_add_child.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_PLUS, 'js-add-child');
@@ -542,7 +528,6 @@ class CWidgetNavTree extends CWidget {
 			tools.appendChild(button_add_child);
 
 			const button_add_maps = document.createElement('button');
-
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
 			button_add_maps.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'js-add-maps');
@@ -551,7 +536,6 @@ class CWidgetNavTree extends CWidget {
 
 			if (editable) {
 				const button_edit = document.createElement('button');
-
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
 				button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_PENCIL, 'js-edit');
@@ -559,24 +543,24 @@ class CWidgetNavTree extends CWidget {
 				tools.appendChild(button_edit);
 
 				const button_remove = document.createElement('button');
-
 				button_remove.type = 'button';
 				button_remove.title = t('Remove');
 				button_remove.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALL, 'js-remove');
 				button_remove.setAttribute('data-id', item.id);
 				tools.appendChild(button_remove);
+
+				const drag = document.createElement('div');
+				drag.classList.add('drag-icon', ZBX_ICON_DRAG_HANDLE);
+				content.appendChild(drag);
 			}
 		}
-
-		if (this._is_edit_mode && editable) {
-			const drag = document.createElement('div');
-
-			drag.classList.add('drag-icon', ZBX_ICON_DRAG_HANDLE);
-			content.appendChild(drag);
+		else {
+			const problems = document.createElement('div');
+			problems.classList.add('problem-icon-list');
+			tree_row.appendChild(problems);
 		}
 
 		const arrow = document.createElement('div');
-
 		arrow.classList.add('arrow');
 		content.appendChild(arrow);
 

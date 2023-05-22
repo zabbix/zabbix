@@ -35,6 +35,12 @@
 		line-height: 14px;
 	}
 
+	&.btn-medium {
+		@extend %button-size-medium;
+
+		line-height: 16px;
+	}
+
 	&[class^="zi-"], &[class*=" zi-"] {
 		@extend %icon-position;
 
