@@ -1,7 +1,6 @@
 // Widget view.
 
 div.dashboard-widget-navtree {
-
 	.navtree {
 		$max_depth: 10;
 
@@ -21,7 +20,7 @@ div.dashboard-widget-navtree {
 				}
 
 				&.root > .tree-item > .tree-row > .content > .margin-lvl {
-					flex: 0 0 15px;
+					width: 15px;
 				}
 
 				> .tree-item.ui-sortable-helper .content {
@@ -45,7 +44,7 @@ div.dashboard-widget-navtree {
 
 				&[data-depth] .ui-sortable-helper {
 					> .tree-row > .content > .margin-lvl {
-						flex: 0 0 15px;
+						width: 15px;
 					}
 
 					@for $i from 1 through $max_depth - 1 {
@@ -56,7 +55,7 @@ div.dashboard-widget-navtree {
 							}
 						}
 						#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
-							flex: 0 0 ($i * 15px + 15px);
+							width: $i * 15px + 15px;
 						}
 					}
 				}
@@ -103,7 +102,7 @@ div.dashboard-widget-navtree {
 
 					.problem-icon-list {
 						padding-left: 10px;
-						margin-right: 10px;
+						margin-right: 5px;
 					}
 
 					.tools {
@@ -176,306 +175,6 @@ div.dashboard-widget-navtree {
 			}
 
 			.placeholder {
-				background-color: $ui-placeholder-background-color;
-				animation: fadein .5s;
-			}
-		}
-	}
-
-	._navtree {
-		$max_depth: 10;
-
-		@keyframes fadein {
-			from {
-				opacity: 0;
-			}
-			to {
-				opacity: 1;
-			}
-		}
-
-		.tree {
-			.tree-list {
-				@for $i from 1 through $max_depth {
-					&[data-depth="#{$i}"] > .tree-item > .tree-row {
-						padding-left: $i * 15px + 5px;
-					}
-				}
-			}
-
-			.tree-item {
-				&:not(.selected) > .tree-row {
-					&:hover {
-						background-color: $ui-hover-bg-color;
-					}
-				}
-
-				&.selected {
-					> .tree-row {
-						background-color: $lighter-yellow;
-					}
-				}
-
-				&:not(.is-parent) > .tree-row {
-					.treeview {
-						display: none;
-					}
-				}
-
-				&.opened > .tree-list {
-					display: block;
-				}
-
-				&.closed > .tree-list {
-					display: none;
-				}
-			}
-
-			.tree-row {
-				display: flex;
-				align-items: center;
-				justify-content: space-between;
-				height: 20px;
-				padding: 8px 5px;
-				border-bottom: 1px solid $table-border-color;
-			}
-
-			.content {
-				white-space: nowrap;
-			}
-
-			.arrow {
-				display: inline-block;
-				width: 16px;
-			}
-
-			.item-name {
-				line-height: 14px;
-			}
-
-			.tools {
-				display: inline-block;
-				width: 87px;
-				padding-left: 10px;
-
-				.btn-icon {
-					@extend %button-size-medium;
-
-					&:not(:first-of-type) {
-						margin-left: 5px;
-					}
-				}
-			}
-		}
-
-
-
-
-
-
-
-
-
-
-
-		._tree {
-			width: 100%;
-			height: 100%;
-
-			._tree-list {
-				list-style: none;
-
-				&.root > .tree-item > .tree-row > .content > .margin-lvl {
-					flex: 0 0 15px;
-				}
-
-				> .tree-item.ui-sortable-helper .content {
-					padding-left: 5px;
-				}
-
-				&[data-depth="0"] > .tree-item {
-					> .tree-row > .content > .margin-lvl {
-						flex: 0 0 10px;
-					}
-					&.ui-sortable-helper {
-						margin-left: 10px;
-
-						> .tree-row > .content > .margin-lvl {
-							display: none;
-						}
-					}
-				}
-
-				@for $i from 1 through $max_depth {
-					&[data-depth="#{$i}"] > .tree-item {
-						> .tree-row > .content > .margin-lvl {
-							flex: 0 0 ($i * 15px + 2px);
-						}
-						&.ui-sortable-helper {
-							margin-left: ($i * 15px + 10px);
-
-							> .tree-row > .content > .margin-lvl {
-								display: none;
-							}
-						}
-					}
-				}
-
-				//&[data-depth] .ui-sortable-helper {
-				//	> .tree-row > .content > .margin-lvl {
-				//		flex: 0 0 15px;
-				//	}
-
-				//	@for $i from 1 through $max_depth - 1 {
-				//		$class_tree_list: '.tree-list';
-				//		@for $j from 1 through $i {
-				//			@if $j != 1 {
-				//				$class_tree_list: $class_tree_list + ' .tree-list';
-				//			}
-				//		}
-				//		#{$class_tree_list} > li > .tree-row > .content > .margin-lvl {
-				//			flex: 0 0 ($i * 15px + 15px);
-				//		}
-				//	}
-				//}
-			}
-
-			._tree-item {
-				> .tree-row {
-					//width: 100%;
-					//min-width: 320px;
-					//border-bottom: 1px solid $table-border-color;
-					//padding: 8px 5px;
-
-					//&:hover {
-					//	background-color: $ui-hover-bg-color;
-					//}
-
-					> .problem-icon-list {
-						float: right;
-						padding-left: 10px;
-						margin-right: 10px;
-					}
-
-					//> .tools {
-					//	float: right;
-					//	position: relative;
-					//	padding-left: 10px;
-					//	display: flex;
-					//	width: 85px;
-					//}
-
-					> .content {
-						//display: flex;
-						//height: 18px;
-						//align-items: center;
-
-						> .arrow {
-							//flex: 0 0 15px;
-							//text-align: center;
-
-							> .treeview {
-								display: none;
-							}
-						}
-
-						> .item-name {
-							flex: 0 1 auto;
-							height: 14px;
-							margin-right: 5px;
-							margin-bottom: -1px;
-							line-height: 14px;
-							overflow: hidden;
-							white-space: nowrap;
-							text-overflow: ellipsis;
-
-							&:focus {
-								margin-bottom: -2px;
-							}
-						}
-					}
-				}
-
-				//.tools {
-				//	.btn-icon {
-				//		@extend %button-size-medium;
-
-				//		&:not(:first-of-type) {
-				//			margin-left: 5px;
-				//		}
-				//	}
-				//}
-
-				.zi-drag-handle {
-					position: relative;
-					top: 0;
-					left: 0;
-					opacity: .35;
-				}
-
-				&.is-parent {
-					> .tree-row {
-						> .content {
-							> .arrow {
-								> .treeview {
-									display: block;
-								}
-							}
-						}
-					}
-				}
-
-				//&.selected {
-				//	> .tree-row {
-				//		@extend %found-bg;
-
-				//		&:hover {
-				//			@extend %found-bg;
-				//		}
-				//	}
-				//}
-
-				&.no-map,
-				&.inaccessible {
-					> .tree-row {
-						> .content {
-							> .item-name {
-								color: $form-border-color;
-							}
-						}
-					}
-				}
-
-				&.ui-sortable-helper {
-					background: $ui-sortable-helper-background-color;
-					border-color: $ui-sortable-helper-border-color;
-					border-width: 1px;
-					border-style: solid;
-
-					.tools {
-						display: none;
-					}
-				}
-
-				//&.opened > ul {
-				//	display: block;
-				//}
-
-				//&.closed > ul {
-				//	display: none;
-				//}
-
-				.sortable-error {
-					border-color: transparent;
-					background: rgba($red, .2);
-				}
-			}
-
-			._highlighted-parent > .tree-row {
-				background: $ui-highlighted-parent-background-color;
-			}
-
-			._placeholder {
 				background-color: $ui-placeholder-background-color;
 				animation: fadein .5s;
 			}
