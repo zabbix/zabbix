@@ -221,6 +221,36 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery rule with "One" concurrent check',
+					'concurrency' => true,
+					'concurrency_type' => '0',
+					'checks' => [
+						['check_action' => 'Add', 'type' => 'FTP', 'ports' => '22']
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Discovery rule with "Unlimited" concurrent checks',
+					'concurrency' => true,
+					'concurrency_type' => '1',
+					'checks' => [
+						['check_action' => 'Add', 'type' => 'FTP', 'ports' => '22']
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Discovery rule with custom concurrent checks',
+					'concurrency' => true,
+					'concurrency_max' => '999',
+					'checks' => [
+						['check_action' => 'Add', 'type' => 'FTP', 'ports' => '22']
+					]
+				]
+			],
+			[
+				[
 					'name' => 'Discovery rule with many checks',
 					'proxy' => 'Active proxy 1',
 					'iprange' => '192.168.0.1-25',
@@ -241,6 +271,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 						[
 							'check_action' => 'Add',
 							'type' => 'ICMP ping'
+						],
+						[
+							'check_action' => 'Add',
+							'type' => 'ICMP ping',
+							'allow_redirect' => true
 						],
 						[
 							'check_action' => 'Add',
@@ -488,6 +523,27 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			],
 			[
 				[
+					'old_name' => 'Local network',
+					'concurrency' => true,
+					'concurrency_max' => '77'
+				]
+			],
+			[
+				[
+					'old_name' => 'Local network',
+					'concurrency' => true,
+					'concurrency_type' => '0'
+				]
+			],
+			[
+				[
+					'old_name' => 'Local network',
+					'concurrency' => true,
+					'concurrency_type' => '1'
+				]
+			],
+			[
+				[
 					'old_name' => 'Discovery rule for update',
 					'name' => 'Update name',
 					'proxy' => 'Active proxy 3',
@@ -589,13 +645,24 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 			$this->zbxTestInputTypeOverwrite('delay', $data['delay']);
 		}
 
+		if (array_key_exists('concurrency', $data)) {
+			if (array_key_exists('concurrency_max', $data)) {
+				$this->zbxTestCheckboxSelect('concurrency_max_type_2');
+				$this->zbxTestInputTypeOverwrite('concurrency_max', $data['concurrency_max']);
+			}
+			else {
+				$this->zbxTestCheckboxSelect('concurrency_max_type_'.$data['concurrency_type']);
+			}
+		}
+
 		if (array_key_exists('checks', $data)) {
 			foreach ($data['checks'] as $check) {
 				foreach ($check as $key => $value) {
 					switch ($key) {
 						case 'check_action':
 							$action = $value;
-							$this->zbxTestClickButtonText($action);
+							COverlayDialogElement::find()->waitUntilReady()->one()->query('button', $action)
+									->waitUntilClickable()->one()->click();
 
 							if ($action !== 'Remove') {
 								$check_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -638,6 +705,9 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 							break;
 						case 'priv_passphrase':
 							$this->zbxTestInputTypeOverwrite('snmpv3_privpassphrase', $value);
+							break;
+						case 'allow_redirect':
+							$this->zbxTestCheckboxSelect('allow_redirect', $value);
 							break;
 					}
 				}

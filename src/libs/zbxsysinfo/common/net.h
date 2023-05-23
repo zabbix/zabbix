@@ -22,8 +22,6 @@
 
 #include "module.h"
 
-extern char	*CONFIG_SOURCE_IP;
-
 #define ZBX_TCP_EXPECT_FAIL	-1
 #define ZBX_TCP_EXPECT_OK	0
 #define ZBX_TCP_EXPECT_IGNORE	1

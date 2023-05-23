@@ -251,17 +251,11 @@ int	zbx_db_connect(int flag)
 	return err;
 }
 
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error)
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program)
-	{
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(),
-				log_slow_queries, error);
-	}
-
-	return SUCCEED;
+	return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), log_slow_queries, error);
 }
 
 void	zbx_db_deinit(void)

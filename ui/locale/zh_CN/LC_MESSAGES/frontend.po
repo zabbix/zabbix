@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-04-06 03:55+0000\n"
+"PO-Revision-Date: 2023-05-22 09:29+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -1220,7 +1220,7 @@ msgstr "允许手动关闭"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "允许跳转"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1566,7 +1566,7 @@ msgstr "HTML属性"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "属性文字"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1830,7 +1830,7 @@ msgstr "低值"
 #: include/views/configuration.item.edit.php:126
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "二进制"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1397
 #, c-format
@@ -5086,6 +5086,10 @@ msgstr "日志文件监视中匹配行的计数与日志轮换支持。 返回�
 #: include/classes/data/CItemData.php:886
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "监控日志文件行数统计。返回 整数"
+
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
@@ -9401,7 +9405,7 @@ msgstr "主机标签类型"
 #: widgets/dataover/includes/WidgetForm.php:64
 #: widgets/trigover/includes/WidgetForm.php:71
 msgid "Host location"
-msgstr ""
+msgstr "主机位置"
 
 #: app/partials/configuration.host.edit.html.php:341
 msgid "Host macros"
@@ -12981,6 +12985,10 @@ msgstr "最大重复计数仅适用于自动发现和遍历。"
 msgid "Max zoom level"
 msgstr "最大缩放级别"
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "操作系统最大的文件打开数量。返回整数"
@@ -13854,7 +13862,7 @@ msgstr "新仪表盘"
 #: app/views/configuration.discovery.edit.php:234
 #: app/views/configuration.discovery.edit.php:275
 msgid "New discovery rule"
-msgstr ""
+msgstr "新建发现规则"
 
 #: jsLoader.php:280
 msgid "New element"
@@ -13907,6 +13915,11 @@ msgstr "添加proxy"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "新的正则表达式"
+
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
@@ -20787,11 +20800,11 @@ msgstr "解锁"
 
 #: app/views/administration.user.list.php:310
 msgid "Unblock selected user?"
-msgstr ""
+msgstr "解锁所选的用户?"
 
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
-msgstr "解除锁定所选的用户?"
+msgstr "解锁所选的用户?"
 
 #: include/forms.inc.php:1452 include/forms.inc.php:1484
 #: include/views/js/item.preprocessing.js.php:139
@@ -23180,7 +23193,7 @@ msgstr "Zabbix客户端(主动式)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
-msgstr ""
+msgstr "zabbix前端版本"
 
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
@@ -23243,7 +23256,7 @@ msgstr "Zabbix主机名称"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
-msgstr ""
+msgstr "zabbix服务端版本"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23442,7 +23455,7 @@ msgstr "所有介质"
 #: include/classes/screens/CScreenDiscovery.php:207
 #: include/discovery.inc.php:84
 msgid "allow redirect"
-msgstr ""
+msgstr "允许跳转"
 
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"

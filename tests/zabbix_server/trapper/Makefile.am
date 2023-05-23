@@ -41,7 +41,8 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
@@ -50,8 +51,8 @@ zbx_trapper_preproc_test_run_SOURCES = \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)
-zbx_trapper_preproc_test_run_LDADD += @SERVER_LIBS@ 
-zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
+zbx_trapper_preproc_test_run_LDADD += @SERVER_LIBS@
+zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) \
 	-Wl,--wrap=zbx_preprocessor_test \
 	-Wl,--wrap=zbx_db_get_user_by_active_session \
 	-Wl,--wrap=zbx_db_get_user_by_auth_token \
@@ -62,6 +63,6 @@ zbx_trapper_preproc_test_run_LDFLAGS = @SERVER_LDFLAGS@ \
 	-Wl,--wrap=zbx_dc_expand_user_macros_from_cache
 
 zbx_trapper_preproc_test_run_CFLAGS = \
-	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@
+	-I@top_srcdir@/tests -I@top_srcdir@/src  @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif
 

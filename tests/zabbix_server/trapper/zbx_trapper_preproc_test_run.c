@@ -76,7 +76,8 @@ int	__wrap_zbx_preprocessor_test(unsigned char value_type, const char *value, co
 
 	zbx_variant_set_none(&value_out);
 
-	pp_execute(&ctx, preproc, NULL, NULL, &value_in, *ts, &value_out, &results_out, &results_num);
+	pp_execute(&ctx, preproc, NULL, NULL, &value_in, *ts, get_zbx_config_source_ip(), &value_out, &results_out,
+			&results_num);
 
 	/* copy results */
 	for (i = 0; i < results_num; i++)

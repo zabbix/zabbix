@@ -89,7 +89,8 @@ zbx_key_access_rule_type_t;
 
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
-		zbx_get_config_int_f get_config_unsafe_user_parameters_cb);
+		zbx_get_config_int_f get_config_unsafe_user_parameters_cb, zbx_get_config_str_f
+		get_config_source_ip_f);
 
 void	zbx_init_metrics(void);
 int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
