@@ -225,7 +225,7 @@
 	.btn-icon,
 	.icon,
 	.link-action {
-		&:not(:first-child) {
+		&:not(.no-indent):not(:first-child) {
 			margin-left: 5px;
 		}
 	}

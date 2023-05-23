@@ -2283,9 +2283,9 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     .list-table.compact-view td.nowrap {
       text-overflow: clip; }
 
-.list-table .btn-icon:not(:first-child),
-.list-table .icon:not(:first-child),
-.list-table .link-action:not(:first-child) {
+.list-table .btn-icon:not(.no-indent):not(:first-child),
+.list-table .icon:not(.no-indent):not(:first-child),
+.list-table .link-action:not(.no-indent):not(:first-child) {
   margin-left: 5px; }
 .list-table .icon {
   border-radius: 2px; }
@@ -3728,7 +3728,7 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 div.dashboard-widget-navtree .navtree .tree .tree-list .margin-lvl {
   display: inline-block; }
 div.dashboard-widget-navtree .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
-  flex: 0 0 15px; }
+  width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
   padding-left: 5px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth="0"] > .tree-item > .tree-row > .content > .margin-lvl {
@@ -3798,25 +3798,25 @@ div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth="10"] > .tree-
   div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth="10"] > .tree-item.ui-sortable-helper > .tree-row > .content > .margin-lvl {
     display: none; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper > .tree-row > .content > .margin-lvl {
-  flex: 0 0 15px; }
+  width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 30px; }
+  width: 30px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 45px; }
+  width: 45px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 60px; }
+  width: 60px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 75px; }
+  width: 75px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 90px; }
+  width: 90px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 105px; }
+  width: 105px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 120px; }
+  width: 120px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 135px; }
+  width: 135px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list[data-depth] .ui-sortable-helper .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list .tree-list > li > .tree-row > .content > .margin-lvl {
-  flex: 0 0 150px; }
+  width: 150px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   display: flex;
   align-items: center;

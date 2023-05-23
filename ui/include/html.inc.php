@@ -912,6 +912,7 @@ function makeMaintenanceIcon($type, string $name, string $description): CButtonI
 
 	return (new CButtonIcon(ZBX_ICON_WRENCH_ALT_SMALL))
 		->addClass(ZBX_STYLE_COLOR_WARNING)
+		->addClass(ZBX_STYLE_NO_INDENT)
 		->setHint($hint);
 }
 

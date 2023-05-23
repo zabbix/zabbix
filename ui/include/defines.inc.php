@@ -2034,6 +2034,7 @@ define('ZBX_STYLE_MSG_DETAILS', 'msg-details');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOTHING_TO_SHOW', 'nothing-to-show');
+define('ZBX_STYLE_NO_INDENT', 'no-indent');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_WORDWRAP', 'wordwrap');
 define('ZBX_STYLE_WORDBREAK', 'wordbreak');
