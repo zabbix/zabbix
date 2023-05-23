@@ -661,7 +661,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 3940412bea334e139a72b223197582eb
-          name: 'Kubernetes: Statefulset count'
+          name: 'Kubernetes: StatefulSet count'
           type: DEPENDENT
           key: kube.statefulset.count
           delay: '0'
@@ -1226,7 +1226,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1250,7 +1250,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1276,7 +1276,49 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
+                  value: '{#NAME}'
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+            - uuid: b6d4d557e6104f6b9e1084863cf4024d
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of available replicas that mismatch the desired number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_deployment_(spec_replicas|status_replicas_available)$", namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas_desired,
+                          replicas_available;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === "kube_deployment_spec_replicas") {
+                              replicas_desired = item.value;
+                          }
+                          if (item.name === "kube_deployment_status_replicas_available") {
+                              replicas_available = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas_desired - replicas_available);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: deployment
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1300,7 +1342,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1326,7 +1368,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1352,7 +1394,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1376,38 +1418,34 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
           trigger_prototypes:
             - uuid: aa9f828467d84252aecc00dd342b5661
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0'
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}])>=0
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch'
+              opdata: 'Desired: {ITEM.LASTVALUE2}, available: {ITEM.LASTVALUE3}'
               priority: WARNING
+              description: 'Deployment has not matched the expected number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.deployment
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_deployment_spec_paused
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.deployment,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3122,7 +3160,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 6244f250f6cd411080221843ad1c59f2
-          name: 'Replicaset discovery'
+          name: 'ReplicaSet discovery'
           type: DEPENDENT
           key: kube.replicaset.discovery
           delay: '0'
@@ -3139,7 +3177,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 928536dae27c4e3497627b9f5642a7a8
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Fully labeled replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Fully labeled replicas'
               type: DEPENDENT
               key: 'kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3165,7 +3203,7 @@ zabbix_export:
                 - tag: status
                   value: fully-labeled
             - uuid: 4e911e4b71c342dba2227ed7ef360190
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Ready'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Ready'
               type: DEPENDENT
               key: 'kube.replicaset.ready[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3191,7 +3229,7 @@ zabbix_export:
                 - tag: status
                   value: ready
             - uuid: 545c8486dcc9409c93c6efee0f4b2ad6
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas'
               type: DEPENDENT
               key: 'kube.replicaset.replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3215,7 +3253,7 @@ zabbix_export:
                 - tag: replicaset
                   value: '{#NAME}'
             - uuid: 30aea656c8a5470ea4566333077628b3
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Desired replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Desired replicas'
               type: DEPENDENT
               key: 'kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3240,34 +3278,72 @@ zabbix_export:
                   value: '{#NAME}'
                 - tag: status
                   value: desired
+            - uuid: a249a4762874499eb83eb8864df5c357
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas that mismatch the desired number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_replicaset_(spec_replicas|status_ready_replicas)$", namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas_desired,
+                          replicas_ready;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === "kube_replicaset_spec_replicas") {
+                              replicas_desired = item.value;
+                          }
+                          if (item.name === "kube_replicaset_status_ready_replicas") {
+                              replicas_ready = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas_desired - replicas_ready);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: replicaset
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+                - tag: replicaset
+                  value: '{#NAME}'
           trigger_prototypes:
             - uuid: 8046757dbd3b459c9cd9f7bd369dd416
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch'
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"replicaset:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}])>=0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicaSet mismatch'
+              opdata: 'Desired: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
               priority: WARNING
+              description: 'ReplicaSet has not matched the expected number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.replicaset
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_replicaset_status_replicas
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.replicaset,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3299,7 +3375,7 @@ zabbix_export:
           master_item:
             key: kube.control_plane.lld
         - uuid: 37812660877243e9bdbc0ffc7815578c
-          name: 'Statefulset discovery'
+          name: 'StatefulSet discovery'
           type: DEPENDENT
           key: kube.statefulset.discovery
           delay: '0'
@@ -3316,7 +3392,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 9cc34425228f44868f3cd46450d557ca
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3340,7 +3416,7 @@ zabbix_export:
                 - tag: statefulset
                   value: '{#NAME}'
             - uuid: 33e5a534b35f40c6ad7fef53212ef970
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Current replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Current replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3364,7 +3440,7 @@ zabbix_export:
                 - tag: statefulset
                   value: '{#NAME}'
             - uuid: 3fee3afc8b924b13ae24ab4b5e793acf
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Desired replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Desired replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_desired[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3389,8 +3465,50 @@ zabbix_export:
                   value: '{#NAME}'
                 - tag: status
                   value: ready
+            - uuid: e2c3e03fe9bd42beab8a5d09c0a766bd
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas that mismatch the number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_statefulset_(status_replicas|status_replicas_ready)$", namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas,
+                          replicas_ready;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === "kube_statefulset_status_replicas") {
+                              replicas = item.value;
+                          }
+                          if (item.name === "kube_statefulset_status_replicas_ready") {
+                              replicas_ready = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas - replicas_ready);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: statefulset
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+                - tag: statefulset
+                  value: '{#NAME}'
             - uuid: b35c1cebd902484998f383585ce29b76
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Ready replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Ready replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3416,7 +3534,7 @@ zabbix_export:
                 - tag: status
                   value: ready
             - uuid: b00b1cfed30e4b90b9754d543e72d7aa
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Updated replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Updated replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3443,9 +3561,14 @@ zabbix_export:
                   value: updated
           trigger_prototypes:
             - uuid: 469d6933f5494ca48a212cdc364058e0
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch'
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}])>=0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet replicas mismatch'
+              opdata: 'Replicas: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
               priority: WARNING
+              description: 'StatefulSet has not matched the number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
@@ -3458,24 +3581,15 @@ zabbix_export:
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.statefulset
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_statefulset_status_replicas
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.statefulset,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3543,6 +3657,9 @@ zabbix_export:
         - macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered worker nodes by nodename.'
+        - macro: '{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}'
+          value: '#5'
+          description: 'The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.'
         - macro: '{$KUBE.SCHEDULER.PORT}'
           value: '10259'
           description: 'Kubernetes Scheduler metrics endpoint port. Used in ControlPlane LLD.'

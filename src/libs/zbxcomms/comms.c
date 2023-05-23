@@ -190,7 +190,6 @@ static int	zbx_socket_peer_ip_save(zbx_socket_t *s)
  * Purpose: retrieve 'hostent' by IP address                                  *
  *                                                                            *
  ******************************************************************************/
-#ifdef HAVE_IPV6
 void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 {
 	struct addrinfo	hints, *ai = NULL;
@@ -198,7 +197,11 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 	assert(ip);
 
 	memset(&hints, 0, sizeof(hints));
+#ifdef HAVE_IPV6
 	hints.ai_family = PF_UNSPEC;
+#else
+	hints.ai_family = AF_INET;
+#endif
 
 	if (0 != getaddrinfo(ip, NULL, &hints, &ai))
 	{
@@ -215,29 +218,6 @@ out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
 }
-#else
-void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
-{
-	struct in_addr	addr;
-	struct hostent  *hst;
-
-	assert(ip);
-
-	if (0 == inet_aton(ip, &addr))
-	{
-		host[0] = '\0';
-		return;
-	}
-
-	if (NULL == (hst = gethostbyaddr((char *)&addr, sizeof(addr), AF_INET)))
-	{
-		host[0] = '\0';
-		return;
-	}
-
-	zbx_strlcpy(host, hst->h_name, hostlen);
-}
-#endif	/* HAVE_IPV6 */
 
 /******************************************************************************
  *                                                                            *

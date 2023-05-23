@@ -72,6 +72,7 @@ static int	selfmon_is_process_monitored(unsigned char proc_type)
 	switch (proc_type)
 	{
 		case ZBX_PROCESS_TYPE_PREPROCESSOR:
+		case ZBX_PROCESS_TYPE_DISCOVERER:
 			return FAIL;
 		default:
 			return SUCCEED;

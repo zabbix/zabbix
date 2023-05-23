@@ -37,8 +37,9 @@ static int	connector_object_compare_func(const void *d1, const void *d2)
 			&((const zbx_connector_data_point_t *)d2)->ts);
 }
 
-static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *message,
-		zbx_vector_connector_data_point_t *connector_data_points, zbx_uint64_t *processed_num)
+static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_source_ip,
+		zbx_ipc_message_t *message, zbx_vector_connector_data_point_t *connector_data_points,
+		zbx_uint64_t *processed_num)
 {
 	zbx_connector_t	connector;
 	int		i;
@@ -66,7 +67,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
 			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, status_codes,
-			HTTP_STORE_RAW, &out, &error))
+			HTTP_STORE_RAW, config_source_ip, &out, &error))
 	{
 		char	*info = NULL;
 
@@ -103,6 +104,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, zbx_ipc_message_t *
 		zbx_free(info);
 	}
 #else
+	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
 #endif
 	zbx_free(str);
@@ -136,11 +138,14 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 	zbx_ipc_message_t			message;
 	double					time_stat, time_idle = 0, time_now, time_read;
 	const zbx_thread_info_t			*info = &((zbx_thread_args_t *)args)->info;
-	int					server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+						process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_vector_connector_data_point_t	connector_data_points;
 	zbx_uint64_t				processed_num = 0, connections_num = 0;
+
+	const zbx_thread_connector_worker_args	*connector_worker_args_in = (const zbx_thread_connector_worker_args *)
+						(((zbx_thread_args_t *)args)->args);
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(info->program_type), process_num);
 
@@ -208,7 +213,8 @@ ZBX_THREAD_ENTRY(connector_worker_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_CONNECTOR_REQUEST:
-				worker_process_request(&socket, &message, &connector_data_points, &processed_num);
+				worker_process_request(&socket, connector_worker_args_in->config_source_ip, &message,
+						&connector_data_points, &processed_num);
 				connections_num++;
 				break;
 		}

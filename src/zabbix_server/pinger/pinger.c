@@ -538,7 +538,7 @@ static void	process_pinger_hosts(icmpitem_t *items, int items_count, int process
 
 			ping_result = zbx_ping(hosts, hosts_count,
 						items[i].count, items[i].interval, items[i].size, items[i].timeout,
-						items[i].allow_redirect, error, sizeof(error));
+						items[i].allow_redirect, 0, error, sizeof(error));
 
 			if (FAIL != ping_result)
 				process_values(items, first_index, i + 1, hosts, hosts_count, &ts, ping_result, error);
@@ -574,6 +574,7 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+	zbx_init_icmpping_env(get_process_type_string(process_type), zbx_get_thread_id());
 
 	if (NULL == items)
 		items = (icmpitem_t *)zbx_malloc(items, sizeof(icmpitem_t) * items_alloc);

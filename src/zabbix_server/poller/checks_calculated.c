@@ -98,6 +98,7 @@ int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 
 	zbx_expression_eval_clear(&eval);
 	zbx_eval_clear(&ctx);
+	zbx_variant_clear(&value);
 out:
 	zbx_dc_close_user_macros(um_handle);
 

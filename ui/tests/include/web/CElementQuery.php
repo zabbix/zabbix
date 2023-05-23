@@ -49,6 +49,7 @@ require_once dirname(__FILE__).'/elements/CPopupButtonElement.php';
 require_once dirname(__FILE__).'/elements/CInputGroupElement.php';
 require_once dirname(__FILE__).'/elements/CHostInterfaceElement.php';
 require_once dirname(__FILE__).'/elements/CFilterTabElement.php';
+require_once dirname(__FILE__).'/elements/CFieldsetElement.php';
 
 require_once dirname(__FILE__).'/IWaitable.php';
 require_once dirname(__FILE__).'/WaitableTrait.php';
@@ -605,7 +606,8 @@ class CElementQuery implements IWaitable {
 			],
 			'CColorPickerElement'		=> '/div[contains(@class, "color-picker")]',
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
-			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]'
+			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
+			'CFieldsetElement'			=> '/fieldset'
 		];
 
 		if ($class !== null) {

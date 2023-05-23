@@ -26,8 +26,6 @@
 
 #ifdef HAVE_LIBCURL
 
-extern char	*CONFIG_SOURCE_IP;
-
 extern char	*CONFIG_SSL_CA_LOCATION;
 extern char	*CONFIG_SSL_CERT_LOCATION;
 extern char	*CONFIG_SSL_KEY_LOCATION;
@@ -95,7 +93,7 @@ int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zb
 
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
-		char **error)
+		const char *config_source_ip, char **error)
 {
 	CURLcode	err;
 
@@ -113,9 +111,9 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 		return FAIL;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != config_source_ip)
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, config_source_ip)))
 		{
 			*error = zbx_dsprintf(*error, "Cannot specify source interface for outgoing traffic: %s",
 					curl_easy_strerror(err));
@@ -314,7 +312,7 @@ char	*zbx_http_parse_header(char **headers)
 }
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
-		const char *ssl_key_file, char **out, long *response_code, char **error)
+		const char *ssl_key_file, const char *config_source_ip, char **out, long *response_code, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -339,7 +337,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, error))
+	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, "", 1, 1, config_source_ip, error))
 		goto clean;
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, "Zabbix " ZABBIX_VERSION)))
@@ -574,7 +572,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
-		unsigned char post_type, char *status_codes, unsigned char output_format, char **out, char **error)
+		unsigned char post_type, char *status_codes, unsigned char output_format, const char *config_source_ip,
+		char **out, char **error)
 {
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -654,7 +653,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	}
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
-			verify_peer, verify_host, error))
+			verify_peer, verify_host, config_source_ip, error))
 	{
 		goto clean;
 	}

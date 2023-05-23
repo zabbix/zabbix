@@ -105,12 +105,13 @@ unlock:
  *                                                                            *
  * Purpose: execute task of job                                               *
  *                                                                            *
- * Parameters: job - [IN] the job object                                      *
+ * Parameters: job              - [IN] job object                             *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  * Return value: count of successfully executed jobs                          *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_job_exec(zbx_vmware_job_t *job)
+static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip)
 {
 	int	ret = FAIL;
 
@@ -122,13 +123,13 @@ static int	vmware_job_exec(zbx_vmware_job_t *job)
 	switch (job->type)
 	{
 		case ZBX_VMWARE_UPDATE_CONF:
-			ret = zbx_vmware_service_update(job->service);
+			ret = zbx_vmware_service_update(job->service, config_source_ip);
 			break;
 		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
-			ret = zbx_vmware_service_update_perf(job->service);
+			ret = zbx_vmware_service_update_perf(job->service, config_source_ip);
 			break;
 		case ZBX_VMWARE_UPDATE_REST_TAGS:
-			ret = zbx_vmware_service_update_tags(job->service);
+			ret = zbx_vmware_service_update_tags(job->service, config_source_ip);
 			break;
 		default:
 			ret = FAIL;
@@ -187,12 +188,14 @@ static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t
 ZBX_THREAD_ENTRY(vmware_thread, args)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
-	int			services_updated = 0, services_removed = 0;
-	double			time_now, time_stat, time_idle = 0;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	int				services_updated = 0, services_removed = 0,
+					server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	double				time_stat, time_idle = 0;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	const zbx_thread_vmware_args	*vmware_args_in = (const zbx_thread_vmware_args *)
+					(((zbx_thread_args_t *)args)->args);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -208,8 +211,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_vmware_job_t	*job;
+		double			time_now = zbx_time();
 
-		time_now = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), time_now);
 
 		if (STAT_INTERVAL < time_now - time_stat)
@@ -233,7 +236,7 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 				continue;
 			}
 
-			services_updated += vmware_job_exec(job);
+			services_updated += vmware_job_exec(job, vmware_args_in->config_source_ip);
 			vmware_job_schedule(vmware, job, (time_t)time_now);
 		}
 
