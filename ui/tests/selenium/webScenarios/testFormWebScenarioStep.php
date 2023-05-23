@@ -19,8 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource WebScenarios
@@ -51,12 +51,14 @@ class testFormWebScenarioStep extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * Get the necessary properties of entities used within this test.
+	 */
 	public static function getContextData() {
 		self::$hostid = CDataHelper::get('WebScenarios.hostid');
 		self::$templateid = CDataHelper::get('WebScenarios.templateid');
 	}
 
-	// Returns layout context data
 	public static function getStepLayoutData() {
 		return [
 			[
@@ -87,6 +89,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$context_id = ($data['context'] === 'host') ? self::$hostid : self::$templateid;
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.$context_id)->waitUntilReady();
 
+		// Open the step configuration form for the corresponding web scenario.
 		$selector = (array_key_exists('scenario_name', $data)) ? $data['scenario_name'] : self::UPDATE_SCENARIO;
 
 		$this->query('link', $selector)->waitUntilClickable()->one()->click();
@@ -95,7 +98,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$scenario_form->selectTab('Steps');
 		$steps_table = $scenario_form->getField('Steps')->asTable();
 
-
+		// Steps cannot be added to templated web scenario from host, so in this case the existing step is opened.
 		if (array_key_exists('step_name', $data)) {
 			$steps_table->findRow('Name', $data['step_name'])->getColumn('Name')->click();
 		}
@@ -128,6 +131,7 @@ class testFormWebScenarioStep extends CWebTest {
 			'Required status codes' => ['maxlength' => 255]
 		];
 
+		// Differences between step creation form and update form of templated scenario step should be taken into account.
 		if (array_key_exists('step_name', $data)) {
 			$step_fields['Name'] = ['value' => $data['step_name'], 'enabled' => false, 'maxlength' => 64];
 			$step_fields['id:url']['value'] = 'http://zabbix.com';
@@ -184,6 +188,7 @@ class testFormWebScenarioStep extends CWebTest {
 			'Raw data' => ['Post fields' => false, 'Raw post' => true]
 		];
 
+		// Check visibility of the post rellated fields based on the initially selected post type.
 		foreach ([$new_type, $initial_type] as $post_type) {
 			$step_form->getField('Post type')->select($post_type);
 
@@ -213,6 +218,7 @@ class testFormWebScenarioStep extends CWebTest {
 			'headers' => ['', 'Name', '', 'Value', '']
 		];
 
+		// Check the layout of the value pair field tables.
 		foreach (['Query fields', 'Post fields', 'Variables', 'Headers'] as $table_name) {
 			$table = $step_form->getField($table_name)->asTable();
 			$row = $table->getRow(0);
@@ -723,6 +729,12 @@ class testFormWebScenarioStep extends CWebTest {
 		$this->checkStepAction($data, 'update');
 	}
 
+	/**
+	 * Perform create or update action for a web scenario step and check the result.
+	 *
+	 * @param array		$data		data provider
+	 * @param string	$action		action to be performed
+	 */
 	private function checkStepAction($data, $action) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
@@ -731,6 +743,7 @@ class testFormWebScenarioStep extends CWebTest {
 			$old_hash = CDBHelper::getHash(self::SQL);
 		}
 
+		// Open the web scenario step configuration form in create or update mode depending on the executed action.
 		$scenario = ($action === 'update') ? self::UPDATE_SCENARIO : self::CREATE_SCENARIO;
 		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
 		$steps_table = $scenario_form->getField('Steps')->asTable();
@@ -755,6 +768,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$step_form->submit();
 
 		if ($expected === TEST_BAD) {
+			// There are step form level errors and scenario form level errors. They are checked checked differently.
 			if (CTestArrayHelper::get($data, 'step_error')) {
 				$this->assertMessage(TEST_BAD, null, $data['step_error']);
 				$dialog->close();
@@ -778,12 +792,12 @@ class testFormWebScenarioStep extends CWebTest {
 				self::$update_step = $data['fields']['Name'];
 			}
 
-			$this->query('link', $scenario)->waitUntilCLickable()->one()->click();
+			$this->query('link', $scenario)->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 
 			$scenario_form->selectTab('Steps');
 
-			// Check values displayed in Steps table
+			// Check values displayed in Steps table.
 			$step_row = $scenario_form->getField('Steps')->asTable()->findRow('Name', $data['fields']['Name']);
 			$this->assertEquals($data['fields']['id:url'], $step_row->getColumn('URL')->getText());
 
@@ -802,6 +816,7 @@ class testFormWebScenarioStep extends CWebTest {
 				$this->assertEquals($value, $step_row->getColumn($column)->getText());
 			}
 
+			// Check the values in the web scenario step configuration form.
 			$step_row->query('link', $data['fields']['Name'])->one()->click();
 			$step_form->invalidate();
 
@@ -833,6 +848,11 @@ class testFormWebScenarioStep extends CWebTest {
 		$this->checkImpactlessAction('cancel_delete');
 	}
 
+	/**
+	 * Check different action cancellation and update without applying any changes.
+	 *
+	 * @param string	$action		action to be checked
+	 */
 	private function checkImpactlessAction($action) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 		$scenario_form = $this->getScenarioFormOnStepsTab(self::UPDATE_SCENARIO);
@@ -1156,6 +1176,12 @@ class testFormWebScenarioStep extends CWebTest {
 		}
 	}
 
+	/**
+	 * Return web scenario step configuration form for the specified web scenario.
+	 *
+	 * @param	string			$scenario	name of web scenario for which to open step configuration form
+	 * @return	CFormElement
+	 */
 	private function getStepForm($scenario) {
 		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
 		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
@@ -1163,6 +1189,12 @@ class testFormWebScenarioStep extends CWebTest {
 		return COverlayDialogElement::find()->waitUntilReady()->one()->asForm();
 	}
 
+	/**
+	 * Return web scenario configuration form with opened Steps tab.
+	 *
+	 * @param	string	$scenario	Name of the scenario to be opened
+	 * @return	CFormElement
+	 */
 	private function getScenarioFormOnStepsTab($scenario) {
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::$hostid)->waitUntilReady();
 		$this->query('link:'.$scenario)->waitUntilClickable()->one()->click();
@@ -1174,6 +1206,11 @@ class testFormWebScenarioStep extends CWebTest {
 		return $scenario_form;
 	}
 
+	/**
+	 * Check the content of the error dialog that appears when parsing URL or converting post data.
+	 *
+	 * @param string	$error	expected error message text
+	 */
 	private function checkErrorDialog($error) {
 		$error_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
@@ -1183,6 +1220,12 @@ class testFormWebScenarioStep extends CWebTest {
 		$error_dialog->waitUntilNotPresent();
 	}
 
+	/**
+	 * Compare values from corresponding value pair table with expected data.
+	 *
+	 * @param	string	$table_field	name of the value pair field
+	 * @param	array	$expected		array with reference values
+	 */
 	private function checkTableField($table_field, $expected) {
 		$obtained_fields = [];
 		$i = 0;
@@ -1200,6 +1243,12 @@ class testFormWebScenarioStep extends CWebTest {
 		$this->assertEquals($expected, $obtained_fields);
 	}
 
+	/**
+	 * Fill the corresponding value pair table.
+	 *
+	 * @param	array	$input_data		values to be filled in
+	 * @param	string	$table_field	name of the value pair field
+	 */
 	private function fillTableField($input_data, $table_field) {
 		$count = count($input_data);
 		$add_button = $table_field->query('button:Add')->one();

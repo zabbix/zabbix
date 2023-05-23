@@ -19,8 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @dataSource WebScenarios
@@ -99,6 +99,9 @@ class testFormWebScenario extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
+	/**
+	 * Get the necessary properties of entities used within this test.
+	 */
 	public static function getContextData() {
 		self::$hostid = CDataHelper::get('WebScenarios.hostid');
 		self::$templateid = CDataHelper::get('WebScenarios.templateid');
@@ -107,7 +110,6 @@ class testFormWebScenario extends CWebTest {
 		self::$delete_scenarioid = CDataHelper::get('WebScenarios.httptestids.'.self::DELETE_SCENARIO);
 	}
 
-	// Returns layout data
 	public static function getLayoutData() {
 		return [
 			[
@@ -248,6 +250,7 @@ class testFormWebScenario extends CWebTest {
 			}
 		}
 
+		// Check Steps tab.
 		$form->selectTab('Steps');
 		$this->assertTrue($form->isRequired('Steps'));
 		$steps_table = $form->getField('Steps')->asTable();
@@ -256,6 +259,7 @@ class testFormWebScenario extends CWebTest {
 				$steps_table->getHeadersText()
 		);
 
+		// Adding steps to a template scenario from host should not be possible (the Add button should be hidden).
 		if (array_key_exists('scenario_name', $data)) {
 			$this->assertFalse($steps_table->query('xpath:.//button')->one(false)->isValid());
 		}
@@ -263,7 +267,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertEquals(['Add'], $steps_table->query('xpath:.//button')->all()->asText());
 		}
 
-
+		// Check Authentication tab.
 		$form->selectTab('Authentication');
 
 		$authentication_fields = [
@@ -288,10 +292,13 @@ class testFormWebScenario extends CWebTest {
 		foreach (['Basic', 'NTLM', 'Kerberos'] as $auth_type) {
 			$auth_field->select($auth_type);
 
-			$this->assertTrue($user_field->isDisplayed());
-			$this->assertTrue($user_field->isEnabled());
+			foreach ([$user_field, $password_field] as $field) {
+				$this->assertTrue($field->isDisplayed());
+				$this->assertTrue($field->isEnabled());
+			}
 		}
 
+		// Check the presence and clickability of control buttons.
 		$expected_buttons = (array_key_exists('scenario_name', $data))
 			? ['Update' => true, 'Clone' => true, 'Clear history and trends' => true, 'Delete' => false, 'Cancel' => true]
 			: ['Add' => true, 'Cancel' => true];
@@ -305,6 +312,12 @@ class testFormWebScenario extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check the values of corresponding field element attributes based on the passed reference array.
+	 *
+	 * @param CFormElement	$form		form element where the passed field attributes should be checked
+	 * @param array			$fields		array of fields and their attributes to be checked
+	 */
 	private function checkFieldAttributes($form, $fields) {
 		foreach ($fields as $field => $attributes) {
 			$value = (array_key_exists('value', $attributes)) ? $attributes['value'] : '';
@@ -850,6 +863,11 @@ class testFormWebScenario extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check different action cancellation and update without applying any changes.
+	 *
+	 * @param string	$action		action to be checked
+	 */
 	private function checkImpactlessAction($action) {
 		$old_hash = CDBHelper::getHash(self::SQL);
 
@@ -861,7 +879,6 @@ class testFormWebScenario extends CWebTest {
 				$this->query('id:httpForm')->asForm()->one()->submit();
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Web scenario updated');
-
 				break;
 
 			case 'cancel_create':
@@ -890,6 +907,12 @@ class testFormWebScenario extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
+	/**
+	 * Perform create or update action and check the result.
+	 *
+	 * @param array		$data		data provider
+	 * @param string	$action		action to be performed
+	 */
 	private function checkAction($data, $action = 'create') {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		if ($expected === TEST_BAD) {
@@ -903,6 +926,7 @@ class testFormWebScenario extends CWebTest {
 		$this->page->waitUntilReady();
 		$form = $this->query('id:httpForm')->asForm()->one();
 
+		// Add postfix to scenario name in case of update scenario exept for empty name and template scenario update cases.
 		if ($action === 'update' && !in_array($data['scenario_fields']['Name'], ['', '   ', self::TEMPLATE_SCENARIO])) {
 			$data['scenario_fields']['Name'] = ($data['scenario_fields']['Name'] === STRING_64)
 				? $data['scenario_fields']['Name'] = substr(STRING_64, 0, 57).' update'
@@ -960,6 +984,7 @@ class testFormWebScenario extends CWebTest {
 
 			$form->invalidate();
 
+			// If new application field was set, then it should be moved to Application field.
 			if (array_key_exists('id:new_application', $data['scenario_fields'])) {
 				$data['scenario_fields']['Application'] = $data['scenario_fields']['id:new_application'];
 
@@ -993,6 +1018,13 @@ class testFormWebScenario extends CWebTest {
 		}
 	}
 
+	/**
+	 * Fill in the Scenario tab of the web scenario configuration form.
+	 *
+	 * @param array			$data	data provider
+	 * @param CFormElement	$form	form that should be filled in
+	 * @param string		$action	Type of action being performed (create or update)
+	 */
 	private function fillScenarioForm($data, $form, $action = 'update') {
 		$form->fill($data['scenario_fields']);
 
@@ -1017,6 +1049,7 @@ class testFormWebScenario extends CWebTest {
 			}
 		}
 
+		// Add a step to the web scenario in create scenarios except case when step absence is checked.
 		if (!CTestArrayHelper::get($data, 'no_steps') && $action === 'create') {
 			$form->selectTab('Steps');
 			$form->getField('Steps')->query('button:Add')->waitUntilClickable()->one()->click();
