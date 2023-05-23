@@ -150,6 +150,7 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
+			<arg line="--with-stacksize=128"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -329,6 +330,7 @@
 			<arg line="--with-mysql"/>
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
+			<arg line="--with-stacksize=128"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
