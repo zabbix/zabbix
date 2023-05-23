@@ -138,7 +138,7 @@ final class CItemData {
 			'logrt.count[file_regexp,<regexp>,<encoding>,<maxproclines>,<mode>,<maxdelay>,<options>,<persistent_dir>]',
 			'logrt[file_regexp,<regexp>,<encoding>,<maxlines>,<mode>,<output>,<maxdelay>,<options>,<persistent_dir>]',
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
-			'mqtt.get[<broker_url>,topic]',
+			'mqtt.get[<broker_url>,topic,<username>,<password>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
@@ -959,7 +959,7 @@ final class CItemData {
 				'description' => _('Reads modbus data. Returns various types'),
 				'value_type' => null
 			],
-			'mqtt.get[<broker_url>,topic]' => [
+			'mqtt.get[<broker_url>,topic,<username>,<password>]' => [
 				'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],

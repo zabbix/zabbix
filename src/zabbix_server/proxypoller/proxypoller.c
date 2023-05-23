@@ -652,6 +652,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_PROXYPOLLER_PROCESS};
 
 	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
@@ -671,7 +672,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, proxy_poller_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxy_poller_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

@@ -1150,10 +1150,10 @@ int	main(int argc, char **argv)
 
 	/* required for simple checks */
 	zbx_init_metrics();
+	zbx_init_library_cfg(program_type, config_file);
 
 	zbx_load_config(&t);
 
-	zbx_init_library_cfg(program_type);
 	zbx_init_library_dbupgrade(get_program_type);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);
@@ -1289,8 +1289,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #ifdef HAVE_OPENIPMI
 	zbx_thread_ipmi_manager_args		ipmimanager_args = {config_timeout, config_unavailable_delay};
 #endif
-	zbx_thread_preprocessing_manager_args	preproc_man_args =
-						{.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR]};
+	zbx_thread_preprocessing_manager_args	preproc_man_args = {
+							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
+							.config_timeout = config_timeout};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
@@ -1620,7 +1621,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (0 < (ret = waitpid((pid_t)-1, &i, WNOHANG)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "PROCESS EXIT: %d", ret);
 			zbx_set_exiting_with_fail();
 			break;
 		}
@@ -1633,6 +1633,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 	}
 out:
+	zbx_log_exit_signal();
+
 	if (SUCCEED == ZBX_EXIT_STATUS())
 		zbx_rtc_shutdown_subs(&rtc);
 

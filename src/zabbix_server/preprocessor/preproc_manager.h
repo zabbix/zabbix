@@ -25,6 +25,7 @@
 typedef struct
 {
 	int	workers_num;
+	int	config_timeout;
 }
 zbx_thread_preprocessing_manager_args;
 

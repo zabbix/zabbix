@@ -466,6 +466,12 @@ int	zbx_telnet_execute(ZBX_SOCKET socket_fd, const char *command, AGENT_RESULT *
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
+		if (EINTR == zbx_socket_last_error() && SUCCEED == zbx_alarm_timed_out())
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find prompt after command execution: "
+					"execution timed out"));
+			goto fail;
+		}
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
 				strerror_from_system(zbx_socket_last_error())));
 		goto fail;

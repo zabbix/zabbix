@@ -23,71 +23,124 @@
 
 #include "zbxcommon.h"
 #include "zbxserialize.h"
-#include "zbxjson.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxthreads.h"
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse runtime control option                                      *
+ * Purpose: parse runtime control option target parameter                     *
+ *                                                                            *
+ * Parameters: opt        - [IN] the runtime control option                   *
+ *             len        - [IN] the runtime control option length without    *
+ *                               parameter                                    *
+ *             size_total - [IN] total number of parsed bytes (optional)      *
+ *             j          - [OUT] the runtime control option result           *
+ *             error      - [OUT] error message                               *
+ *                                                                            *
+ * Return value: SUCCEED - the runtime control option was processed           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_parse_target_parameter(const char *opt, size_t len, size_t *size_total, struct zbx_json *j,
+		char **error)
+{
+	const char	*param = opt + len;
+	char		*err_reason = NULL;
+	int		proc_num, proc_type, ret = FAIL;
+	pid_t		pid;
+	size_t		size;
+
+	if (SUCCEED != rtc_option_get_parameter(param, &size, &err_reason))
+		goto out;
+
+	if (0 == size)
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	param += size;
+
+	if (SUCCEED != rtc_option_get_pid(param, &size, &pid, &err_reason))
+		goto out;
+
+	if (0 != size)
+	{
+		param += size;
+		zbx_json_addint64(j, ZBX_PROTO_TAG_PID, (zbx_uint64_t)pid);
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (SUCCEED != rtc_option_get_process_type(param, &size, &proc_type, &err_reason))
+		goto out;
+
+	zbx_json_addstring(j, ZBX_PROTO_TAG_PROCESS_NAME, get_process_type_string((unsigned char)proc_type),
+			ZBX_JSON_TYPE_STRING);
+
+	param += size;
+
+	if (SUCCEED != rtc_option_get_process_num(param, &size, &proc_num, &err_reason))
+		goto out;
+
+	if (0 != size)
+	{
+		zbx_json_addint64(j, ZBX_PROTO_TAG_PROCESS_NUM, proc_num);
+		param += size;
+	}
+
+	if ('\0' == *param)
+		ret = SUCCEED;
+	else
+		err_reason = zbx_dsprintf(NULL, "unrecognized parameter part \"%s\"", param);
+out:
+	if (NULL != size_total)
+		*size_total = (size_t)(param - opt);
+
+	if (SUCCEED != ret)
+	{
+		*error = zbx_dsprintf(NULL, "invalid parameter: %s", err_reason);
+		zbx_free(err_reason);
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse profiler runtime control option                             *
  *                                                                            *
  * Parameters: opt   - [IN] the runtime control option                        *
  *             len   - [IN] the runtime control option length without         *
  *                          parameter                                         *
- *             data  - [OUT] the runtime control option result                *
+ *             j     - [OUT] the runtime control option result                *
  *             error - [OUT] error message                                    *
  *                                                                            *
  * Return value: SUCCEED - the runtime control option was processed           *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	rtc_parse_runtime_parameter(const char *opt, zbx_uint32_t code, size_t len, char **data, char **error)
+static int	rtc_parse_profiler_parameter(const char *opt, size_t len, struct zbx_json *j, char **error)
 {
-	struct 	zbx_json	j;
-	const char		*proc_name;
-	int			pid = 0, proc_num = 0, proc_type = ZBX_PROCESS_TYPE_UNKNOWN, scope = 0;
+	int	ret = FAIL, scope;
+	size_t	size;
 
-	if (SUCCEED != zbx_rtc_parse_option(opt, len, &pid, &proc_type, &proc_num,
-			ZBX_RTC_PROF_ENABLE == code ? &scope : NULL, error))
+	ret = rtc_parse_target_parameter(opt, len, &size, j, error);
+
+	if ('\0' != opt[size])
 	{
-		return FAIL;
+		if (SUCCEED == (ret = rtc_option_get_prof_scope(opt + size, size - len, &scope)))
+			zbx_json_addint64(j, ZBX_PROTO_TAG_SCOPE, scope);
 	}
 
-	if (0 != pid)
+	if (SUCCEED != ret)
 	{
-		zbx_json_init(&j, 1024);
-		zbx_json_addint64(&j, ZBX_PROTO_TAG_PID, pid);
-		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
-		goto finish;
+		/* hard to give specific error reason because scope can be used in any part */
+		*error = zbx_dsprintf(NULL, "invalid parameter \"%s\"", opt);
 	}
 
-	if (ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
-	{
-		if (0 != scope)
-		{
-			zbx_json_init(&j, 1024);
-			zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
-			goto finish;
-		}
-		return SUCCEED;
-	}
-
-	proc_name = get_process_type_string((unsigned char)proc_type);
-
-	zbx_json_init(&j, 1024);
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_PROCESS_NAME, proc_name, ZBX_JSON_TYPE_STRING);
-
-	if (0 != proc_num)
-		zbx_json_addint64(&j, ZBX_PROTO_TAG_PROCESS_NUM, proc_num);
-
-	if (0 != scope)
-		zbx_json_addint64(&j, ZBX_PROTO_TAG_SCOPE, scope);
-finish:
-	*data = zbx_strdup(NULL, j.buffer);
-	zbx_json_clean(&j);
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -99,34 +152,34 @@ finish:
  *               FAIL    - an error occurred                                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char **error)
+int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *j, char **error)
 {
 	if (0 == strncmp(opt, ZBX_LOG_LEVEL_INCREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE)))
 	{
 		*code = ZBX_RTC_LOG_LEVEL_INCREASE;
 
-		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), data, error);
+		return rtc_parse_target_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_INCREASE), NULL, j, error);
 	}
 
 	if (0 == strncmp(opt, ZBX_LOG_LEVEL_DECREASE, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE)))
 	{
 		*code = ZBX_RTC_LOG_LEVEL_DECREASE;
 
-		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), data, error);
+		return rtc_parse_target_parameter(opt, ZBX_CONST_STRLEN(ZBX_LOG_LEVEL_DECREASE), NULL, j, error);
 	}
 
 	if (0 == strncmp(opt, ZBX_PROF_ENABLE, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE)))
 	{
 		*code = ZBX_RTC_PROF_ENABLE;
 
-		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE), data, error);
+		return rtc_parse_profiler_parameter(opt, ZBX_CONST_STRLEN(ZBX_PROF_ENABLE), j, error);
 	}
 
 	if (0 == strncmp(opt, ZBX_PROF_DISABLE, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE)))
 	{
 		*code = ZBX_RTC_PROF_DISABLE;
 
-		return rtc_parse_runtime_parameter(opt, *code, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE), data, error);
+		return rtc_parse_profiler_parameter(opt, ZBX_CONST_STRLEN(ZBX_PROF_DISABLE), j, error);
 	}
 
 	if (0 == strcmp(opt, ZBX_CONFIG_CACHE_RELOAD))
@@ -165,14 +218,8 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, char **data, char
 
 		if (NULL != param)
 		{
-			struct 	zbx_json	j;
-
 			*code = ZBX_RTC_DIAGINFO;
-
-			zbx_json_init(&j, 1024);
-			zbx_json_addstring(&j, ZBX_PROTO_TAG_SECTION, param, ZBX_JSON_TYPE_STRING);
-			*data = zbx_strdup(NULL, j.buffer);
-			zbx_json_clean(&j);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_SECTION, param, ZBX_JSON_TYPE_STRING);
 
 			return SUCCEED;
 		}
@@ -212,14 +259,18 @@ void	zbx_rtc_notify_config_sync(int config_timeout, zbx_ipc_async_socket_t *rtc)
  * Parameters:                                                                *
  *      proc_type      - [IN]                                                 *
  *      proc_num       - [IN]                                                 *
+ *      msgs            - [IN] the RTC notifications to subscribe for         *
+ *      msgs_num        - [IN] the number of RTC notifications                *
  *      config_timeout - [IN]                                                 *
  *      rtc            - [OUT] the RTC notification subscription socket       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout, zbx_ipc_async_socket_t *rtc)
+void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
+		zbx_ipc_async_socket_t *rtc)
 {
-	unsigned char		data[sizeof(int) + sizeof(unsigned char)];
-	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(int) + sizeof(unsigned char));
+	const zbx_uint32_t	size = (zbx_uint32_t)(sizeof(unsigned char) + sizeof(int) + sizeof(int) +
+				sizeof(zbx_uint32_t) * (zbx_uint32_t)msgs_num);
+	unsigned char		*data, *ptr;
 	char			*error = NULL;
 
 	if (FAIL == zbx_ipc_async_socket_open(rtc, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
@@ -229,8 +280,14 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout
 		exit(EXIT_FAILURE);
 	}
 
-	(void)zbx_serialize_value(data, proc_type);
-	(void)zbx_serialize_value(data + sizeof(proc_type), proc_num);
+	ptr = data = (unsigned char *)zbx_malloc(NULL, size);
+
+	ptr += zbx_serialize_value(ptr, proc_type);
+	ptr += zbx_serialize_value(ptr, proc_num);
+	ptr += zbx_serialize_value(ptr, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		ptr += zbx_serialize_value(ptr, msgs[i]);
 
 	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_SUBSCRIBE, data, size))
 	{
@@ -243,6 +300,66 @@ void	zbx_rtc_subscribe(unsigned char proc_type, int proc_num, int config_timeout
 		zabbix_log(LOG_LEVEL_CRIT, "cannot flush RTC notification subscribe request");
 		exit(EXIT_FAILURE);
 	}
+
+	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subscribe process for RTC notifications                           *
+ *                                                                            *
+ * Parameters:                                                                *
+ *      proc_type      - [IN]                                                 *
+ *      proc_num       - [IN]                                                 *
+ *      msgs           - [IN] the RTC notifications to subscribe for          *
+ *      msgs_num       - [IN] the number of RTC notifications                 *
+ *      config_timeout - [IN]                                                 *
+ *      service        - [IN] the subscriber IPC service                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_subscribe_service(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num,
+		int config_timeout, const char *service)
+{
+	unsigned char		*data, *ptr;
+	zbx_uint32_t		data_len = 0, service_len;
+	char			*error = NULL;
+	zbx_ipc_socket_t	sock;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_RTC, config_timeout, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to RTC service: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_serialize_prepare_value(data_len, proc_type);
+	zbx_serialize_prepare_value(data_len, proc_num);
+	zbx_serialize_prepare_value(data_len, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		zbx_serialize_prepare_value(data_len, msgs[i]);
+
+	zbx_serialize_prepare_str_len(data_len, service, service_len);
+
+	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
+
+	ptr += zbx_serialize_value(ptr, proc_type);
+	ptr += zbx_serialize_value(ptr, proc_num);
+	ptr += zbx_serialize_value(ptr, msgs_num);
+
+	for (int i = 0; i < msgs_num; i++)
+		ptr += zbx_serialize_value(ptr, msgs[i]);
+
+	(void)zbx_serialize_str(ptr, service, service_len);
+
+	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_RTC_SUBSCRIBE_SERVICE, data, data_len))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send RTC notification service subscribe request");
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_free(data);
+	zbx_ipc_socket_close(&sock);
 }
 
 /******************************************************************************

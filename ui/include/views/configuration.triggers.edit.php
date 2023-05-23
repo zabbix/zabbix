@@ -625,9 +625,8 @@ $dependenciesTable = (new CTable())
 foreach ($data['db_dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-	$dep_trigger_description = CHtml::encode(
-		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
-	);
+	$dep_trigger_description =
+		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description'];
 
 	$dependenciesTable->addRow(
 		(new CRow([
