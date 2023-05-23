@@ -2698,9 +2698,8 @@ output {
     output.msg-warning::before {
       content: ""; }
   output.msg-global {
-    max-width: 25%;
-    margin: 5% auto 0;
-    text-align: left; }
+    max-width: 475px;
+    margin: 5% auto 0; }
   output.msg-global-footer {
     position: fixed;
     bottom: 0;
