@@ -146,6 +146,12 @@ func TestFileRegexpOutput(t *testing.T) {
 
 		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-32BE", lineStart: "", lineEnd: "2",
 			targetStringGroup: "", targetContents: ""},
+
+		// wrong encodings, but we cannot detect this and there is no expected target contents
+		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
+			targetStringGroup: "", targetContents: ""},
+		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
+			targetStringGroup: "", targetContents: ""},
 	}
 
 	for i, c := range tests {
@@ -158,7 +164,7 @@ func TestFileRegexpOutput(t *testing.T) {
 		defer os.Remove(filename)
 
 		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
-			t.Errorf("vfs.file.regexp returned error %s", err.Error())
+			t.Errorf("vfs.file.regexp (testCase[%d]) returned error %s", i, err.Error())
 		} else {
 			if contents, ok := result.(string); !ok {
 				t.Errorf("vfs.file.regexp (testCase[%d]) returned unexpected value type %s", i, reflect.TypeOf(result).Kind())
@@ -168,5 +174,40 @@ func TestFileRegexpOutput(t *testing.T) {
 				}
 			}
 		}
+	}
+
+	// wrong encodings, but we can detect this
+	tests_wrong_encodings := []*testCase{
+		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2", lineEnd: "",
+			targetStringGroup: "", targetContents: "выхухоль2\n"},
+
+		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "",
+			targetStringGroup: "", targetContents: "выхухоль\n"},
+
+		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "",
+			targetStringGroup: "", targetContents: "выхухоль\n"},
+
+		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "",
+			targetStringGroup: "", targetContents: "выхухоль\n"},
+	}
+
+	expected_error := "No line feed detected"
+
+	for i, c := range tests_wrong_encodings {
+		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
+			t.Errorf("failed to created file: %s", err1.Error())
+			return
+		}
+
+		defer os.Remove(filename)
+
+		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+			if err.Error() != expected_error {
+				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s", i, err.Error(), expected_error)
+			}
+		} else {
+			t.Errorf("vfs.file.regexp testcase[%d] did NOT return error, result: %s", i, result)
+		}
+
 	}
 }

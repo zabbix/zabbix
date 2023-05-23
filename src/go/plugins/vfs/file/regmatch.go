@@ -20,18 +20,12 @@
 package file
 
 import (
-	//	"io/ioutil"
-	"bytes"
-	//"io"
-	//"bufio"
 	"errors"
 	"fmt"
-	//"git.zabbix.com/ap/plugin-support/log"
 	"math"
 	"os"
 	"regexp"
 	"strconv"
-	"strings"
 	"time"
 )
 
@@ -41,7 +35,6 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	var startline, endline, curline uint64
 
 	start := time.Now()
-	fmt.Printf("BADGER: %s", strings.Join(params, ", "))
 
 	if len(params) > 5 {
 		return nil, errors.New("Too many parameters.")
@@ -86,13 +79,10 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 
 	elapsed := time.Since(start)
 
-	fmt.Printf("TOYOTA HUEVOS ALPHA, elapsed: %f, timeout: %d", elapsed.Seconds(), p.options.Timeout)
-
 	if elapsed.Seconds() > float64(p.options.Timeout) {
 		return nil, errors.New("Timeout while processing item.")
 	}
 
-	fmt.Printf("TOYOTA FILE NAME: ->%s<-", params[0])
 	f, e := os.Open(params[0])
 	if e != nil {
 		return nil, e
@@ -104,7 +94,6 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	var buf []byte
 	for 0 < nbytes || initial {
 		initial = false
-		fmt.Printf("curline: %d, startline: %d", curline, startline)
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(p.options.Timeout) {
 			return nil, errors.New("Timeout while processing item.")
@@ -113,20 +102,10 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		curline++
 		buf, nbytes, err = p.readFile(f, encoder)
 		if err != nil {
-			fmt.Printf("TOYOTA PRE-FINAL RES: ->%v+<-", err)
 			return nil, err
 		}
 
-		for f := 0; f < nbytes; f++ {
-			fmt.Printf("TOYOTA ress buf: ->%d<-", buf[f])
-		}
-
-		fmt.Printf("CALLING DECODE, nbytes: %d", nbytes)
 		x := decode(encoder, buf, nbytes)
-
-		for _, m := range bytes.Split(x, []byte("\n")) {
-			fmt.Printf("TOYOTA LINE X: %s", m)
-		}
 
 		if curline >= startline {
 			if match := r.Match(x); match {
@@ -138,8 +117,6 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 			break
 		}
 	}
-
-	fmt.Printf("TOYOTA FINAL RES: ->%d<-", ret)
 
 	return ret, nil
 }

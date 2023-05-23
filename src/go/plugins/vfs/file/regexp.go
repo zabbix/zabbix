@@ -20,11 +20,9 @@
 package file
 
 import (
-	"bytes"
-	"os"
 	"errors"
-	"fmt"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
 	"time"
@@ -82,10 +80,8 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 	}
 
 	f, e := os.Open(params[0])
-	fmt.Printf("STRATA 2 type: %T\n", f)
 
 	if e != nil {
-		fmt.Printf("FAILED!!! XX: +i%v\n", e)
 		return nil, e
 	}
 	defer f.Close()
@@ -106,21 +102,11 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		curline++
 		buf, nbytes, err = p.readFile(f, encoder)
 		if err != nil {
-			fmt.Printf("FORD PRE-FINAL RES: ->%v+<-\n", err)
 			return nil, err
 		}
 
-		for f := 0; f < nbytes; f++ {
-			fmt.Printf("FORD ress buf: ->%x<-\n", buf[f])
-		}
-
-		fmt.Printf("LAMBDA decode: %d\n", nbytes)
 		x := decode(encoder, buf, nbytes)
 		if curline >= startline {
-			for _, m := range bytes.Split(x, []byte("\n")) {
-				fmt.Printf("FORD LINE X: %s\n", m)
-			}
-			fmt.Printf("NEXT")
 			if out, ok := zbxregexp.ExecuteRegex(x, rx, []byte(output)); ok {
 				return out, nil
 			}
@@ -129,7 +115,6 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		if curline >= endline {
 			break
 		}
-
 	}
 	return "", nil
 }

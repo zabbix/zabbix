@@ -84,49 +84,21 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		return nil, 0, err
 	}
 
-	fmt.Printf("BADGER zbx_read 2: offset: %d\n", offset)
-
 	nbytes, err = targetFile.Read(buf)
 	if err != nil {
 		if err != io.EOF {
-			fmt.Printf("BADGER READ ERROR: %+v\n", err)
 			return nil, 0, err
-		} else {
-			fmt.Printf("BADGER EOF\n")
 		}
-
 	}
 	if 0 >= nbytes {
-		fmt.Printf("BADGER nbytes: %d\n", nbytes)
 		return buf, nbytes, nil
 	}
 
-	fmt.Printf("BADGER zbx_read 3\n")
 	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
 
-	fmt.Printf("BADGER cr: ->%d<-\n", cr)
-	fmt.Printf("BADGER lf ->%d<-\n", lf)
-	fmt.Printf("BADGER szbyte ->%d<-\n", szbyte)
 	lf_found := 0
 
 	for i = 0; i <= nbytes-szbyte; i += szbyte {
-
-		fmt.Printf("BADGER i ->%d<-\n", i)
-
-		fmt.Printf("BADGER buf ->%d<- and ->%d<-\n", buf[i], buf[i+1])
-		fmt.Printf("BADGER lf ->%d<-\n", lf[0])
-		if len(lf) > 1 {
-			fmt.Printf("BADGER lf2: %d\n", lf[1])
-		}
-
-		fmt.Printf("BADGER buf size: %d, lf size: %d\n", len(buf), len(lf))
-		for x := i; x < szbyte; x++ {
-			fmt.Printf("BADGER buf val: %d\n", buf[x])
-		}
-		for x := 0; x < szbyte; x++ {
-			fmt.Printf("BADGER lf val: %d\n", lf[x])
-		}
-
 		if p.bytesCompare(buf, lf, szbyte, i, 0) == true { /* LF (Unix) */
 			i += szbyte
 			lf_found = 1
@@ -144,12 +116,6 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		}
 	}
 
-	fmt.Printf("BADGER AFTER i ->%d<-\n", i)
-
-	fmt.Printf("BADGER AFTER nbytes ->%d<-\n", nbytes)
-	fmt.Printf("BADGER AFTER nbytes-szbyte ->%d<-\n", nbytes-szbyte)
-	fmt.Printf("BADGER AFTER szbyte ->%d<-\n", szbyte)
-
 	if (0 == lf_found) &&
 		(strings.EqualFold(encoding, "UNICODE") || strings.EqualFold(encoding, "UNICODELITTLE") ||
 			strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
@@ -161,18 +127,13 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 			strings.EqualFold(encoding, "UTF-32") || strings.EqualFold(encoding, "UTF-32LE") ||
 			strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") ||
 			strings.EqualFold(encoding, "UTF-32BE") || strings.EqualFold(encoding, "UTF32BE")) {
-		fmt.Printf("BADGER no line feed\n")
 		return nil, 0, fmt.Errorf("No line feed detected")
 	}
-
-	fmt.Printf("BADGER zbx_read 33\n")
 
 	offset, err = targetFile.Seek(offset+int64(i), os.SEEK_SET)
 	if err != nil {
 		return nil, 0, err
 	}
-
-	fmt.Printf("BADGER zbx_read 4; i: %d", i)
 
 	return buf, int(i), nil
 }

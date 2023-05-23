@@ -88,6 +88,10 @@ func TestFileRegmatch(t *testing.T) {
 		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "2", lineEnd: "", match: 1},
 		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "", match: 1},
 		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-32BE", lineStart: "", lineEnd: "2", match: 0},
+
+		// wrong encodings, but we cannot detect this and there is no expected match
+		&testCase{fileContents: fileContents_1_UTF_16LE, targetSearch: "(error)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", match: 0},
+		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "", match: 0},
 	}
 
 	for i, c := range tests {
@@ -107,6 +111,31 @@ func TestFileRegmatch(t *testing.T) {
 					t.Errorf("vfs.file.regmatch testcase[%d] returned invalid result: %d, while expected: %d", i, match, c.match)
 				}
 			}
+		}
+	}
+
+	// wrong encodings, but we can detect this
+	tests_wrong_encodings := []*testCase{
+		&testCase{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", match: 1},
+		&testCase{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-32BE", lineStart: "", lineEnd: "", match: 1},
+		&testCase{fileContents: fileContents_2_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "2", lineEnd: "", match: 1},
+		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "", match: 1},
+	}
+	expected_error := "No line feed detected"
+
+	for i, c := range tests_wrong_encodings {
+
+		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
+			t.Errorf("failed to created file: %s", err1.Error())
+			return
+		}
+
+		if _, err := impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd}, nil); err != nil {
+			if err.Error() != expected_error {
+				t.Errorf("vfs.file.regmatch testcase[%d] failed with unexpected error: %s, expected: %s", i, err.Error(), expected_error)
+			}
+		} else {
+			t.Errorf("vfs.file.regmatch testcase[%d] did NOT return error", i)
 		}
 	}
 }
