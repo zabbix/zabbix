@@ -1591,8 +1591,6 @@ static int	evaluate_count_many(char *operator, char *pattern, zbx_dc_item_t *dci
 
 	zbx_history_record_vector_create(&values);
 
-	sleep(10);
-
 	if (FAIL == zbx_init_count_pattern(operator, pattern, dcitem->value_type, &pdata, error))
 		goto out;
 
