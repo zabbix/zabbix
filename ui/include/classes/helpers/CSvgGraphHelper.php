@@ -786,19 +786,19 @@ class CSvgGraphHelper {
 			}
 		}
 
-		$item_ids = [];
+		$itemids = [];
 
 		foreach ($metrics as $metric) {
 			if ($metric['options']['aggregate_function'] != AGGREGATE_NONE) {
 				foreach ($metric['items'] as $item) {
-					if (!in_array($item['itemid'], $item_ids)) {
-						$item_ids[] = $item['itemid'];
+					if (!in_array($item['itemid'], $itemids)) {
+						$itemids[] = $item['itemid'];
 					}
 				}
 			}
 			else {
-				if (!in_array($metric['itemid'], $item_ids)) {
-					$item_ids[] = $metric['itemid'];
+				if (!in_array($metric['itemid'], $itemids)) {
+					$itemids[] = $metric['itemid'];
 				}
 			}
 		}
@@ -806,9 +806,7 @@ class CSvgGraphHelper {
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
-			'itemids' => $problem_options['graph_item_problems']
-				? $item_ids
-				: null,
+			'itemids' => $problem_options['graph_item_problems'] ? $itemids : null,
 			'monitored' => true,
 			'preservekeys' => true
 		]));
