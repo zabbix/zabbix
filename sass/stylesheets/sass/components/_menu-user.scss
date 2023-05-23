@@ -21,7 +21,7 @@
 	span {
 		position: relative;
 		display: block;
-		padding: 12px 14px 12px 13px;
+		padding: 12px 14px 12px 45px;
 		font-size: 12px;
 		white-space: nowrap;
 		border-left: 3px solid transparent;
@@ -32,6 +32,8 @@
 	}
 
 	[class^="zi-"], [class*=" zi-"] {
+		padding-left: 13px;
+
 		&::before {
 			color: $menu-user-icon-color;
 		}
