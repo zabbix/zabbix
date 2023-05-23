@@ -60,7 +60,6 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 	defer C.free(unsafe.Pointer(fromcode))
 
 	log.Tracef("Calling C function \"iconv_open()\"")
-
 	cd, err := C.iconv_open(tocode, fromcode)
 
 	if err != nil {
@@ -91,7 +90,6 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 
 	log.Tracef("Calling C function \"iconv_close()\"")
 	C.iconv_close(cd)
-
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
 	}

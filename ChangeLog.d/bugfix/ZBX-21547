@@ -1,0 +1,1 @@
+...G...... [ZBX-21547] fixed Zabbix agent 2 failing to properly read non-UTF-8 encoded files (arimdjonoks)

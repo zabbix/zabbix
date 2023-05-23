@@ -22,7 +22,6 @@
 package file
 
 import (
-	//	"fmt"
 	"os"
 	"reflect"
 	"testing"
