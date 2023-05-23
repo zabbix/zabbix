@@ -3981,7 +3981,7 @@ form.dashboard-widget-svggraph .overrides-options-list {
     vertical-align: middle;
     white-space: nowrap; }
     form.dashboard-widget-svggraph .overrides-options-list li > div {
-      padding: 1px;
+      padding: 1px 0 1px 1px;
       background-color: #dddddd;
       border-radius: 2px;
       line-height: 22px; }
@@ -3994,14 +3994,14 @@ form.dashboard-widget-svggraph .overrides-options-list {
         border-style: none; }
     form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
       margin-right: 5px; }
-  form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller {
-    background-color: red;
-    height: 22px; }
-    form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller::before {
-      color: #000000; }
-    form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove:hover::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small:hover::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller:hover::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove:focus::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small:focus::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller:focus::before {
+  form.dashboard-widget-svggraph .overrides-options-list .btn-icon {
+    min-width: 18px;
+    margin: -1px 0;
+    color: #000000; }
+    form.dashboard-widget-svggraph .overrides-options-list .btn-icon:hover, form.dashboard-widget-svggraph .overrides-options-list .btn-icon:focus {
       color: #000000; }
   form.dashboard-widget-svggraph .overrides-options-list .color-picker .color-picker-preview {
+    width: 20px;
     min-width: 20px;
     height: 20px;
     margin: 1px 0 1px 1px; }

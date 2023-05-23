@@ -223,7 +223,7 @@ form.dashboard-widget-svggraph {
 			white-space: nowrap;
 
 			> div {
-				padding: 1px;
+				padding: 1px 0 1px 1px;
 				background-color: $ui-bg-selected-color;
 				border-radius: 2px;
 				line-height: 22px;
@@ -245,23 +245,20 @@ form.dashboard-widget-svggraph {
 			}
 		}
 
-		.btn-icon.zi-remove {  // FIXME
-			height: 22px;
-
-			&::before {
-				color: $ui-selected-color;
-			}
+		.btn-icon {
+			min-width: 18px;
+			margin: -1px 0;
+			color: $ui-selected-color;
 
 			&:hover,
 			&:focus {
-				&::before {
-					color: $ui-selected-hover-color;
-				}
+				color: $ui-selected-hover-color;
 			}
 		}
 
 		.color-picker {
 			.color-picker-preview {
+				width: 20px;
 				min-width: 20px;
 				height: 20px;
 				margin: 1px 0 1px 1px;
@@ -273,31 +270,6 @@ form.dashboard-widget-svggraph {
 		display: none;
 		line-height: 24px;
 		color: $font-alt-color;
-	}
-}
-
-[theme="hc-dark"] form.dashboard-widget-svggraph {
-	.overrides-options-list {
-		> li > div {
-			//border: 1px solid $ui-tab-bg-selected-color; // TODO - AS: theme fix
-			//background-color: transparent !important;
-
-			> .subfilter-disable-btn {
-				//border: none !important;
-				//top: 0;
-			}
-		}
-	}
-}
-
-[theme="hc-light"] form.dashboard-widget-svggraph {
-	.overrides-options-list {
-		> li > div {
-			> .subfilter-disable-btn {
-				//border: none !important; // TODO - AS: theme fix
-				//top: 0;
-			}
-		}
 	}
 }
 
