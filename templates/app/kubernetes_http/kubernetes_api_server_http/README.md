@@ -49,7 +49,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |Kubernetes API: Audit events, total|<p>Accumulated number audit events generated and sent to the audit backend.</p>|Dependent item|kubernetes.api.audit_event_total<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(apiserver_audit_event_total)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Virtual memory, bytes|<p>Virtual memory size in bytes.</p>|Dependent item|kubernetes.api.process_virtual_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_virtual_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Resident memory, bytes|<p>Resident memory size in bytes.</p>|Dependent item|kubernetes.api.process_resident_memory_bytes<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_resident_memory_bytes)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes API: CPU|<p>Total user and system CPU usage ratio.</p>|Dependent item|kubernetes.api.cpu.util<p>**Preprocessing**</p><ul><li>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</li><li>Change per second</li><li>Custom multiplier: `100`</li></ul>|
+|Kubernetes API: CPU|<p>Total user and system CPU usage ratio.</p>|Dependent item|kubernetes.api.cpu.util<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_cpu_seconds_total)`</p></li><li>Change per second</li><li><p>Custom multiplier: `100`</p></li></ul>|
 |Kubernetes API: Goroutines|<p>Number of goroutines that currently exist.</p>|Dependent item|kubernetes.api.go_goroutines<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(go_goroutines)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Go threads|<p>Number of OS threads created.</p>|Dependent item|kubernetes.api.go_threads<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(go_threads)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes API: Fds open|<p>Number of open file descriptors.</p>|Dependent item|kubernetes.api.open_fds<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(process_open_fds)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
@@ -80,7 +80,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Long-running requests|<p>Discovery of long-running requests by verb, resource and scope.</p>|Dependent item|kubernetes.api.longrunning_gauge.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Long-running requests|<p>Discovery of long-running requests by verb, resource and scope.</p>|Dependent item|kubernetes.api.longrunning_gauge.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Long-running requests
 
@@ -92,13 +92,13 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Request duration histogram|<p>Discovery raw data and percentile items of request duration.</p>|Dependent item|kubernetes.api.requests_bucket.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Request duration histogram|<p>Discovery raw data and percentile items of request duration.</p>|Dependent item|kubernetes.api.requests_bucket.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `{__name__=~ "apiserver_request_duration_*", verb =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Request duration histogram
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes API: ["{#VERB}"] Requests bucket: {#LE}|<p>Response latency distribution in seconds for each verb.</p>|Dependent item|kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]<p>**Preprocessing**</p><ul><li>Prometheus pattern: `The text is too long. Please see the template.`</li></ul>|
+|Kubernetes API: ["{#VERB}"] Requests bucket: {#LE}|<p>Response latency distribution in seconds for each verb.</p>|Dependent item|kubernetes.api.request_duration_seconds_bucket[{#LE},"{#VERB}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes API: ["{#VERB}"] Requests, p90|<p>90 percentile of response latency distribution in seconds for each verb.</p>|Calculated|kubernetes.api.request_duration_seconds_p90["{#VERB}"]|
 |Kubernetes API: ["{#VERB}"] Requests, p95|<p>95 percentile of response latency distribution in seconds for each verb.</p>|Calculated|kubernetes.api.request_duration_seconds_p95["{#VERB}"]|
 |Kubernetes API: ["{#VERB}"] Requests, p99|<p>99 percentile of response latency distribution in seconds for each verb.</p>|Calculated|kubernetes.api.request_duration_seconds_p99["{#VERB}"]|
@@ -108,7 +108,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Requests inflight discovery|<p>Discovery requests inflight by kind.</p>|Dependent item|kubernetes.api.inflight_requests.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `apiserver_current_inflight_requests{request_kind =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Requests inflight discovery|<p>Discovery requests inflight by kind.</p>|Dependent item|kubernetes.api.inflight_requests.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `apiserver_current_inflight_requests{request_kind =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Requests inflight discovery
 
@@ -120,7 +120,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|gRPC completed requests discovery|<p>Discovery grpc completed requests by grpc code.</p>|Dependent item|kubernetes.api.grpc_client_handled.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `grpc_client_handled_total{grpc_code =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|gRPC completed requests discovery|<p>Discovery grpc completed requests by grpc code.</p>|Dependent item|kubernetes.api.grpc_client_handled.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `grpc_client_handled_total{grpc_code =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for gRPC completed requests discovery
 
@@ -132,7 +132,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Authentication attempts discovery|<p>Discovery authentication attempts by result.</p>|Dependent item|kubernetes.api.authentication_attempts.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `authentication_attempts{result =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Authentication attempts discovery|<p>Discovery authentication attempts by result.</p>|Dependent item|kubernetes.api.authentication_attempts.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `authentication_attempts{result =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Authentication attempts discovery
 
@@ -144,7 +144,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Authentication requests discovery|<p>Discovery authentication attempts by name.</p>|Dependent item|kubernetes.api.authenticated_user_requests.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `authenticated_user_requests{username =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Authentication requests discovery|<p>Discovery authentication attempts by name.</p>|Dependent item|kubernetes.api.authenticated_user_requests.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `authenticated_user_requests{username =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Authentication requests discovery
 
@@ -156,7 +156,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Watchers metrics discovery|<p>Discovery watchers by kind.</p>|Dependent item|kubernetes.api.apiserver_registered_watchers.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `apiserver_registered_watchers{kind =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Watchers metrics discovery|<p>Discovery watchers by kind.</p>|Dependent item|kubernetes.api.apiserver_registered_watchers.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `apiserver_registered_watchers{kind =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Watchers metrics discovery
 
@@ -168,7 +168,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Etcd objects metrics discovery|<p>Discovery etcd objects by resource.</p>|Dependent item|kubernetes.api.etcd_object_counts.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `etcd_object_counts{resource =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Etcd objects metrics discovery|<p>Discovery etcd objects by resource.</p>|Dependent item|kubernetes.api.etcd_object_counts.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `etcd_object_counts{resource =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Etcd objects metrics discovery
 
@@ -180,7 +180,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Workqueue metrics discovery|<p>Discovery workqueue metrics by name.</p>|Dependent item|kubernetes.api.workqueue.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `workqueue_adds_total{name =~ ".*"}`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Workqueue metrics discovery|<p>Discovery workqueue metrics by name.</p>|Dependent item|kubernetes.api.workqueue.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `workqueue_adds_total{name =~ ".*"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Workqueue metrics discovery
 
@@ -193,7 +193,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Client certificate expiration histogram|<p>Discovery raw data of client certificate expiration</p>|Dependent item|kubernetes.api.certificate_expiration.discovery<p>**Preprocessing**</p><ul><li>Prometheus to JSON: `The text is too long. Please see the template.`</li><li>JavaScript: `The text is too long. Please see the template.`</li><li>Discard unchanged with heartbeat: `3h`</li></ul>|
+|Client certificate expiration histogram|<p>Discovery raw data of client certificate expiration</p>|Dependent item|kubernetes.api.certificate_expiration.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Client certificate expiration histogram
 
@@ -211,6 +211,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 
 ## Feedback
 
-Please report any issues with the template at `https://support.zabbix.com`.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-You can also provide feedback, discuss the template, or ask for help at [ZABBIX forums](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback).
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
+

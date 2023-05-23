@@ -75,7 +75,7 @@ class testFormServicesSla extends CWebTest {
 		$form->checkValue($default_values);
 
 		// Check that all locales are present in the dropdown.
-		$this->assertEquals(426, count($form->getField('Time zone')->getOptions()->asText()));
+		$this->assertEquals(427, count($form->getField('Time zone')->getOptions()->asText()));
 
 		// Check that mandatory fields are marked accordingly.
 		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {

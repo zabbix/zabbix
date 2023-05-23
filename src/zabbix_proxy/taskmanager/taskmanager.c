@@ -442,6 +442,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SNMP_CACHE_RELOAD};
+	int				rtc_msgs_num = 1;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -461,7 +463,12 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
-	zbx_rtc_subscribe(process_type, process_num, taskmanager_args_in->config_comms->config_timeout, &rtc);
+#ifdef HAVE_NETSNMP
+	rtc_msgs_num++;
+#endif
+
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs,rtc_msgs_num,
+			taskmanager_args_in->config_comms->config_timeout, &rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

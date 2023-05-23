@@ -59,6 +59,8 @@ require_once dirname(__FILE__).'/testMaintenance.php';
 require_once dirname(__FILE__).'/testMap.php';
 require_once dirname(__FILE__).'/testProxy.php';
 require_once dirname(__FILE__).'/testRole.php';
+require_once dirname(__FILE__).'/testScimGroup.php';
+require_once dirname(__FILE__).'/testScimUser.php';
 require_once dirname(__FILE__).'/testScripts.php';
 require_once dirname(__FILE__).'/testServices.php';
 require_once dirname(__FILE__).'/testTagFiltering.php';
@@ -122,6 +124,8 @@ class ApiJsonTests {
 		$suite->addTestSuite('testMap');
 		$suite->addTestSuite('testProxy');
 		$suite->addTestSuite('testRole');
+		$suite->addTestSuite('testScimGroup');
+		$suite->addTestSuite('testScimUser');
 		$suite->addTestSuite('testScripts');
 		$suite->addTestSuite('testServices');
 		$suite->addTestSuite('testTagFiltering');
