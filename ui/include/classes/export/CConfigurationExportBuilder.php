@@ -587,6 +587,7 @@ class CConfigurationExportBuilder {
 
 		foreach ($discoveryRules as $discoveryRule) {
 			CArrayHelper::sort($discoveryRule['lld_macro_paths'], ['lld_macro']);
+			CArrayHelper::sort($discoveryRule['overrides'], ['step']);
 
 			foreach ($discoveryRule['triggerPrototypes'] as $i => $trigger_prototype) {
 				if (count($trigger_prototype['items']) == 1) {
@@ -1360,9 +1361,7 @@ class CConfigurationExportBuilder {
 	protected function formatWidgetFields(array $fields) {
 		$result = [];
 
-		CArrayHelper::sort($fields, ['type', 'name', 'value_int', 'value_str', 'value_groupid', 'value_hostid',
-			'value_itemid', 'value_graphid', 'value_sysmapid', 'value_serviceid', 'value_slaid'
-		]);
+		CArrayHelper::sort($fields, ['name', 'type', 'value']);
 
 		foreach ($fields as $field) {
 			$result[] = [
