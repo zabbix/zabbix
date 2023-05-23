@@ -1,0 +1,1 @@
+...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted conncetion in Zabbix agent 2 (kprutkovs)

@@ -1232,7 +1232,8 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		return
 	}
 
-	log.Debugf("connection established using %s", c)
+	// explicit conversion needed to avoid nested calls to logging
+	log.Debugf("connection established using %s", c.String())
 
 	return c, nil
 }
