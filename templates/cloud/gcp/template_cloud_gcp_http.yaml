@@ -4,7 +4,7 @@ zabbix_export:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   host_groups:
-    - uuid: 776d22b7c3b1422ca54c31e69114e8f3
+    - uuid: 748ad4d098d447d492bb935c907f652f
       name: Databases
     - uuid: 137f19e6e2dc4219b33553b812627bc2
       name: 'Virtual machines'
@@ -6425,7 +6425,7 @@ zabbix_export:
           name: 'GCP Cloud SQL PostgreSQL: Databases discovery'
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.db.discovery
-          delay: 3m
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
