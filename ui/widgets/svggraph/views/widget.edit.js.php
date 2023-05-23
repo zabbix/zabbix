@@ -174,7 +174,7 @@ window.widget_svggraph_form = new class {
 		}
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-add-item')) {
+			if (e.target.classList.contains('js-add')) {
 				this._selectItems();
 			}
 
@@ -182,7 +182,7 @@ window.widget_svggraph_form = new class {
 				this._removeSingleItem(e.target);
 			}
 
-			if (e.target.classList.contains('zi-remove')) {
+			if (e.target.classList.contains('js-remove')) {
 				this._removeDataSet(e.target);
 			}
 		});

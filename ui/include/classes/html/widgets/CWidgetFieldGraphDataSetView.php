@@ -192,7 +192,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 								(new CList())
 									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
 									->addItem(
-										(new CButtonLink(_('Add')))->addClass('js-add-item')
+										(new CButtonLink(_('Add')))->addClass('js-add')
 									)
 							))->setColSpan(5)
 						)
@@ -204,7 +204,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		}
 
 		$dataset_head[] = (new CDiv(
-			new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete'))
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
 		))->addClass('dataset-actions');
 
 		return (new CListItem([

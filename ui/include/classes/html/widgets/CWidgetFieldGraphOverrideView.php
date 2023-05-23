@@ -78,7 +78,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				.dynamicRows({
 					template: "#overrides-row",
 					beforeRow: ".overrides-foot",
-					remove: ".'.ZBX_ICON_REMOVE.'",
+					remove: ".js-remove",
 					add: "#override-add",
 					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
 				})
@@ -334,7 +334,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 				->setEnabled(!$this->isDisabled())
 				->setAriaRequired($this->isRequired()),
 			(new CDiv(
-				new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete'))
+				(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
 			))->addClass('dataset-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
