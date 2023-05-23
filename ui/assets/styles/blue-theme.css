@@ -2451,7 +2451,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   margin-right: 10px;
   color: #8cb2ca;
   font-size: 24px;
-  line-height: 0; }
+  line-height: 0;
+  transition: color 0.2s ease-out; }
 .menu-main a {
   position: relative;
   display: block;
@@ -2541,7 +2542,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   .menu-user [class^="zi-"]::before, .menu-user [class*=" zi-"]::before {
     margin-right: 16px;
     font-size: 16px;
-    line-height: 0; }
+    line-height: 0;
+    transition: color 0.2s ease-out; }
   .menu-user a,
   .menu-user span {
     position: relative;
@@ -2559,6 +2561,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
       border-bottom: 0;
       border-color: transparent;
       color: #ffffff; }
+      .menu-user a:hover[class^="zi-"]::before, .menu-user a:hover[class*=" zi-"]::before, .menu-user a:focus[class^="zi-"]::before, .menu-user a:focus[class*=" zi-"]::before {
+        color: inherit; }
   .menu-user span {
     color: #768d99; }
   .menu-user > li.is-selected > a {
@@ -2602,7 +2606,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
       .menu-user .submenu > li:not(:last-child) {
         border-bottom: 1px solid #051620; }
     .menu-user .submenu [class^="zi-"]::before, .menu-user .submenu [class*=" zi-"]::before {
-      margin-right: 8px; }
+      margin-right: 8px;
+      color: inherit; }
     .menu-user .submenu a {
       padding: 8px 20px;
       background: #0e354d;

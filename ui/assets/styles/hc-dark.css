@@ -2527,6 +2527,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
       border-bottom: 0;
       border-color: #000000;
       color: #000000; }
+      .menu-user a:hover[class^="zi-"]::before, .menu-user a:hover[class*=" zi-"]::before, .menu-user a:focus[class^="zi-"]::before, .menu-user a:focus[class*=" zi-"]::before {
+        color: inherit; }
   .menu-user span {
     color: #787878; }
   .menu-user > li.is-selected > a {
@@ -2567,7 +2569,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
       .menu-user .submenu > li:not(:last-child) {
         border-bottom: 1px solid #f3f3f3; }
     .menu-user .submenu [class^="zi-"]::before, .menu-user .submenu [class*=" zi-"]::before {
-      margin-right: 8px; }
+      margin-right: 8px;
+      color: inherit; }
     .menu-user .submenu a {
       padding: 8px 20px;
       background: #cccccc;

@@ -10,6 +10,10 @@
 			margin-right: 16px;
 			font-size: $menu-user-icon-size;
 			line-height: 0;
+
+			@if $ui-transitions {
+				transition: color $ui-controls-transition-duration ease-out;
+			}
 		}
 	}
 
@@ -41,6 +45,12 @@
 			border-bottom: 0;
 			border-color: $menu-user-hover-border-color;
 			color: $menu-user-hover-color;
+
+			&[class^="zi-"], &[class*=" zi-"] {
+				&::before {
+					color: inherit;
+				}
+			}
 		}
 	}
 
@@ -138,6 +148,7 @@
 		[class^="zi-"], [class*=" zi-"] {
 			&::before {
 				margin-right: 8px;
+				color: inherit;
 			}
 		}
 

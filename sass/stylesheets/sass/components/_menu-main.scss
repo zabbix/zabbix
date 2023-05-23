@@ -77,6 +77,10 @@
 			color: $menu-main-icon-color;
 			font-size: $main-menu-icon-size;
 			line-height: 0;
+
+			@if $ui-transitions {
+				transition: color $ui-controls-transition-duration ease-out;
+			}
 		}
 	}
 
