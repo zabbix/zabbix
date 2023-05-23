@@ -441,7 +441,7 @@ class testPageProblems extends CLegacyWebTest {
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
 		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
 		// Check Acknowledgement status.
-		$this->zbxTestCheckboxSelect('acknowledgement_status_1');
+		$this->zbxTestCheckboxSelect('acknowledgement_status_1_0');
 		// Check Show details
 		$this->zbxTestCheckboxSelect('details_0');
 
