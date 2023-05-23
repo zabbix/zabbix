@@ -18,6 +18,7 @@
 **/
 
 #include "zbxalgo.h"
+
 #include "zbxnum.h"
 
 #define ZBX_MATH_EPSILON	(1e-6)

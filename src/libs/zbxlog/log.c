@@ -31,8 +31,6 @@
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
-#define LOG_COMPONENT_NAME_LEN	64
-
 static char			log_filename[MAX_STRING_LEN];
 static int			log_type = LOG_TYPE_UNDEFINED;
 static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
@@ -687,7 +685,6 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 
 	zbx_free(buf);
 }
-
 
 /* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
 /* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
