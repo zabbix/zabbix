@@ -2091,12 +2091,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     right: 2px;
     min-width: 20px;
     height: 20px;
-    /*&,
-    &[disabled] {
-    	&::before, {
-    		color: $form-search-icon-color; // FIXME: DF TO AS
-    	}
-    }*/ }
+    color: #8cb2ca; }
     .form-search .btn-icon:hover {
       color: #ffffff; }
     .form-search .btn-icon:focus {
@@ -4036,6 +4031,7 @@ form.dashboard-widget-svggraph .overrides-options-list {
     form.dashboard-widget-svggraph .overrides-options-list li:not(:last-child) {
       margin-right: 5px; }
   form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller {
+    background-color: red;
     height: 22px; }
     form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-small::before, form.dashboard-widget-svggraph .overrides-options-list .btn-icon.zi-remove-smaller::before {
       color: #fff; }

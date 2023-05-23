@@ -244,6 +244,18 @@ a.btn-icon,
 	}
 }
 
+.form-search {
+	.btn-icon {
+		&:focus {
+			color: $form-search-icon-color;
+
+			&:hover {
+				color: $form-search-icon-color;
+			}
+		}
+	}
+}
+
 .dashboard-navigation-tabs {
 	.sortable-list {
 		& > .sortable-item:focus:not(:active) {

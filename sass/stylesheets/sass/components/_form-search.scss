@@ -31,6 +31,7 @@
 		right: 2px;
 		min-width: 20px;
 		height: 20px;
+		color: $form-search-icon-color;
 
 		&:hover {
 			color: $form-search-icon-hover-color;
@@ -40,13 +41,6 @@
 			color: $form-search-icon-focus-color;
 			box-shadow: 0 0 0 1.5px $form-search-focused-border-color;
 		}
-
-		/*&,
-		&[disabled] {
-			&::before, {
-				color: $form-search-icon-color; // FIXME: DF TO AS
-			}
-		}*/
 	}
 }
 
