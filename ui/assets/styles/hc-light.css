@@ -4863,7 +4863,9 @@ z-select button.focusable,
       background-color: #333333;
       border-bottom: 0; }
 
-.calendar-control .zi-calendar::before {
+.calendar-control .btn-icon:not(:first-child) {
+  margin-left: 2px; }
+.calendar-control .btn-icon::before {
   font-size: 22px; }
 
 .header-kioskmode-controls {
