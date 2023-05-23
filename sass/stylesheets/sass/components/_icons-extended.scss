@@ -145,6 +145,19 @@
 	@extend %icon-smaller;
 }
 
+.zi-user-filled-small {
+	@extend .zi-user-filled;
+	@extend %icon-small;
+}
+
+.zi-users-filled-small {
+	@extend .zi-users-filled;
+
+	&::before {
+		font-size: 16px;
+	}
+}
+
 .zi-wrench-alt-small {
 	@extend .zi-wrench-alt;
 	@extend %icon-small;

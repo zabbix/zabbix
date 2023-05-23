@@ -4083,18 +4083,17 @@ z-select,
 	}
 }
 
-.subscriptions-table {
-	th {
-		color: $font-alt-color;
-	}
+.form-grid {
+	.subscriptions-table {
+		th {
+			color: $font-alt-color;
+		}
 
-	.zi-user-filled {
-		padding: 0 7px 0 2px;
+		.icon {
+			@extend %button-size-small;
 
-		&::before {
-			top: -1px;
-			font-size: 12px;
-			color: $icon-color;
+			margin-right: 3px;
+			vertical-align: text-bottom;
 		}
 	}
 }

@@ -360,13 +360,13 @@ button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"]
 .zi-uncheck:before {
   content: "\ea63"; }
 
-.zi-user-filled:before {
+.zi-user-filled:before, .zi-user-filled-small:before {
   content: "\ea64"; }
 
 .zi-user:before {
   content: "\ea65"; }
 
-.zi-users-filled:before {
+.zi-users-filled:before, .zi-users-filled-small:before {
   content: "\ea66"; }
 
 .zi-users:before {
@@ -1046,22 +1046,22 @@ footer {
     grid-column-start: 3 !important; }
   .form-grid .form-field.offset-3 {
     grid-column-start: 4 !important; }
-  .form-grid .form-field table {
+  .form-grid table {
     width: 100%; }
-    .form-grid .form-field table.table-initial-width {
+    .form-grid table.table-initial-width {
       width: auto; }
-    .form-grid .form-field table .sortable td {
+    .form-grid table .sortable td {
       padding-bottom: 0;
       vertical-align: middle;
       line-height: 24px; }
-  .form-grid .form-field th {
+  .form-grid th {
     padding: 0 5px 0 0;
     color: #737373; }
-    .form-grid .form-field th:last-child {
+    .form-grid th:last-child {
       padding: 0; }
-  .form-grid .form-field td {
+  .form-grid td {
     padding: 0 5px 5px 0; }
-  .form-grid .form-field .list-check-radio {
+  .form-grid .list-check-radio {
     line-height: 1.4em; }
   .form-grid .btn-icon:not(:first-child),
   .form-grid .btn-link:not(:first-child) {
@@ -1114,14 +1114,14 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
     margin-right: 4px;
     margin-left: -6px; }
 
-.form-grid .form-field table .btn-icon,
-.form-grid .form-field table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
+.form-grid table .btn-icon,
+.form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
 .list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
 
-button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, div.dashboard-widget-navtree .treeview {
+button.btn-small, .btn-small.btn, .btn-small.btn-alt, .btn-small.btn-grey, .btn-small.btn-icon, .btn-small.btn-link, .btn-small.btn-overlay-close, .btn-small.btn-debug, div.dashboard-widget-navtree .treeview, .form-grid .subscriptions-table .icon {
   min-width: 16px;
   height: 16px; }
 
@@ -1249,7 +1249,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   .btn-debug.visible {
     opacity: 0.75; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -1300,6 +1300,9 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .zi-i-warning, .zi-i-warning.btn-icon {
   color: #ffffff;
   background-color: #e99003; }
+
+.zi-users-filled-small::before {
+  font-size: 16px; }
 
 .checkbox-list {
   display: grid;
@@ -6604,14 +6607,11 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .overlay-dialogue .valuemap-list-table td {
   vertical-align: top; }
 
-.subscriptions-table th {
+.form-grid .subscriptions-table th {
   color: #737373; }
-.subscriptions-table .zi-user-filled {
-  padding: 0 7px 0 2px; }
-  .subscriptions-table .zi-user-filled::before {
-    top: -1px;
-    font-size: 12px;
-    color: #69808d; }
+.form-grid .subscriptions-table .icon {
+  margin-right: 3px;
+  vertical-align: text-bottom; }
 
 .import-compare {
   display: flex;
