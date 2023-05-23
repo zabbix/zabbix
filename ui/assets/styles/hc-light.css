@@ -3234,6 +3234,8 @@ section {
     line-height: 22px;
     color: #000000;
     border: 1px transparent; }
+  .filter-container.tabfilter-container .tabfilter-edit {
+    margin: -1px -6px -1px 2px; }
   .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label.ui-sortable-helper + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before,
   .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(.selected) + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before {
     content: ' ';

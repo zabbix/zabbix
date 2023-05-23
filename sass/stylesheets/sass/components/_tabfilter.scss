@@ -181,6 +181,10 @@
 		border: 1px transparent;
 	}
 
+	.tabfilter-edit {
+		margin: -1px -6px -1px 2px;
+	}
+
 	.ui-sortable-container {
 		// Tab sortable handle left border is visible when handle is not selected, do not have selected sibling before and is not dragged.
 		.tabfilter-item-label.ui-sortable-helper,
