@@ -930,7 +930,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service)
 	if (NULL != headers)
 		vmware_service_rest_logout(easyhandle, &page);
 
-	zbx_vmware_shared_tags_replace(&entity_tags, &service->data_tags.entity_tags);
+	zbx_vmware_shared_tags_replace(&entity_tags, &service->data_tags);
 
 	ret = SUCCEED;
 clean:
