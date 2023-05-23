@@ -1310,21 +1310,28 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .color-picker .color-picker-preview,
 .color-picker-dialogue .color-picker-preview {
   position: relative;
-  background: linear-gradient(to top left, #fff calc(50% - 2px), #d40000, #fff calc(50% + 2px));
+  background: #ffffff;
   border: 1px solid #acbbc2;
   color: #1f2c33; }
+  .color-picker .color-picker-preview::after,
+  .color-picker-dialogue .color-picker-preview::after {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    bottom: 2px;
+    left: 2px; }
 .color-picker .use-default,
 .color-picker-dialogue .use-default {
-  background: none; }
+  background: transparent; }
   .color-picker .use-default::after,
   .color-picker-dialogue .use-default::after {
     content: attr(data-use-default);
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
     text-align: center;
-    line-height: 22px; }
+    line-height: 18px; }
+.color-picker .use-transparent::after,
+.color-picker-dialogue .use-transparent::after {
+  content: ' ';
+  background: linear-gradient(to top left, #fff calc(50% - 2px), #d40000, #fff calc(50% + 2px)); }
 
 .color-picker {
   display: inline-block;
@@ -1364,7 +1371,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     width: 18px;
     height: 18px; }
     .color-picker-dialogue .color-picker-input .color-picker-preview::after {
-      line-height: 18px; }
+      line-height: 14px; }
   .color-picker-dialogue .color-picker-input input {
     padding-left: 25px; }
 
@@ -3003,7 +3010,7 @@ section {
   padding-right: 3px;
   padding-left: 3px;
   font-size: 0.917em;
-  line-height: 14px;
+  line-height: 15px;
   text-align: center;
   vertical-align: top;
   border-width: 1px;

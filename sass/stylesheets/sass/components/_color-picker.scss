@@ -2,22 +2,33 @@
 .color-picker-dialogue {
 	.color-picker-preview {
 		position: relative;
-		background: linear-gradient(to top left, #fff calc(50% - 2px), $colorpicker-empty-color, #fff calc(50% + 2px));
+		background: #ffffff;
 		border: 1px solid $form-border-color;
 		color: $font-color;
+
+		&::after {
+			position: absolute;
+			top: 2px;
+			right: 2px;
+			bottom: 2px;
+			left: 2px;
+		}
 	}
 
 	.use-default {
-		background: none;
+		background: transparent;
 
 		&::after {
 			content: attr(data-use-default);
-			position: absolute;
-			top: 0;
-			right: 0;
-			left: 0;
 			text-align: center;
-			line-height: 22px;
+			line-height: 18px;
+		}
+	}
+
+	.use-transparent {
+		&::after {
+			content: ' ';
+			background: linear-gradient(to top left, #fff calc(50% - 2px), $colorpicker-empty-color, #fff calc(50% + 2px));
 		}
 	}
 }
@@ -81,7 +92,7 @@
 			height: 18px;
 
 			&::after {
-				line-height: 18px;
+				line-height: 14px;
 			}
 		}
 
