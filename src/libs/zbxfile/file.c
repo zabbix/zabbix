@@ -89,31 +89,18 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	ssize_t		nbytes;
 	const char	*cr, *lf;
 	zbx_offset_t	offset;
+	int		lf_found = 0;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		return -1;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER zbx_read 2");
-
 	if (0 >= (nbytes = read(fd, buf, count)))
 		return (int)nbytes;
 
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER zbx_read 3");
-
 	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER cr: ->%s<-", cr);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER lf ->%s<-", lf);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER szbyte ->%lu<-", szbyte);
-	int	lf_found = 0;
 	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER i ->%d<-", i);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER buf ->%d<- and ->%d<-", buf[i], buf[i+1]);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER lf ->%d<- and ->%d<-", lf[0], lf[1]);
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
 			i += szbyte;
@@ -133,12 +120,6 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AFTER i ->%lu<-", i);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AFTER nbytes ->%lu<-", nbytes);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AFTER nbytes-szbyte ->%lu<-", nbytes-szbyte);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AFTER szbyte ->%lu<-", szbyte);
-
 	if ((0 == lf_found) &&
 			(0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
 			0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
@@ -151,16 +132,11 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 				0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE") ||
 				0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE")))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER no line feed");
 		return -2;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER zbx_read 33");
-
 	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
 		return -1;
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER zbx_read 4; i: %d", i);
 
 	return (int)i;
 }

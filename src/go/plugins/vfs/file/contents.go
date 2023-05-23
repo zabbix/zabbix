@@ -61,5 +61,5 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 
 	outbuf := decode(encoder, buf.Bytes(), len(buf.Bytes()))
 
-	return string(outbuf), nil
+	return string(bytes.TrimRight(outbuf, "\n\r")), nil
 }

@@ -657,20 +657,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents");
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, f: %d", f);
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, sizeof buf: %lu", sizeof(buf));
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, s: %s", encoding);
-
 	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
 	{
-
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, nbytes: %d", nbytes);
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, buf: %s", buf);
-
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while processing item."));
@@ -681,8 +669,6 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
-
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, utf8: ->%s<-", utf8);
 
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))

@@ -71,16 +71,16 @@ func TestFileContentsEncoding(t *testing.T) {
 		0x47, 0x04, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00}
 
 	tests := []*testCase{
-		&testCase{fileContents: fileContents_UTF_8, targetEncoding: "", targetContents: "августа\r\n"},
-		&testCase{fileContents: fileContents_2_UTF_8, targetEncoding: "", targetContents: "августа\r\n"},
+		&testCase{fileContents: fileContents_UTF_8, targetEncoding: "", targetContents: "августа"},
+		&testCase{fileContents: fileContents_2_UTF_8, targetEncoding: "", targetContents: "августа"},
 		&testCase{fileContents: []byte{}, targetEncoding: "iso-8859-5", targetContents: ""},
 		&testCase{fileContents: []byte{}, targetEncoding: "UTF-32LE", targetContents: ""},
-		&testCase{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "", targetContents: "\n\n"},
-		&testCase{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "UTF-8", targetContents: "\n\n"},
-		&testCase{fileContents: []byte{0x0a, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00}, targetEncoding: "UTF-32LE", targetContents: "\n\n"},
-		&testCase{fileContents: fileContents_ISO_8859_5, targetEncoding: "iso-8859-5", targetContents: "кирпич \n\n еще кирпич\nи еще один\n"},
-		&testCase{fileContents: fileContents_UTF_16BE, targetEncoding: "UTF-16BE", targetContents: "ロシアデスマン\n\n🌭\nкирпич\n"},
-		&testCase{fileContents: fileContents_UTF_32LE, targetEncoding: "UTF-32LE", targetContents: "ロシアデスマン\n\n🌭\nкирпич\n"}}
+		&testCase{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "", targetContents: ""},
+		&testCase{fileContents: []byte{0x0a, 0x0a}, targetEncoding: "UTF-8", targetContents: ""},
+		&testCase{fileContents: []byte{0x0a, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00}, targetEncoding: "UTF-32LE", targetContents: ""},
+		&testCase{fileContents: fileContents_ISO_8859_5, targetEncoding: "iso-8859-5", targetContents: "кирпич \n\n еще кирпич\nи еще один"},
+		&testCase{fileContents: fileContents_UTF_16BE, targetEncoding: "UTF-16BE", targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
+		&testCase{fileContents: fileContents_UTF_32LE, targetEncoding: "UTF-32LE", targetContents: "ロシアデスマン\n\n🌭\nкирпич"}}
 
 	for i, c := range tests {
 		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
