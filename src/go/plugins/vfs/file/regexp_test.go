@@ -1,3 +1,5 @@
+//go:build (linux && (amd64 || arm64))
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA

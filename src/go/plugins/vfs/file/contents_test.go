@@ -1,3 +1,5 @@
+//go:build linux && (amd64 || arm64)
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -20,7 +22,7 @@
 package file
 
 import (
-	"os"
+	"git.zabbix.com/ap/plugin-support/std"
 	"reflect"
 	"testing"
 )
@@ -81,12 +83,7 @@ func TestFileContentsEncoding(t *testing.T) {
 		&testCase{fileContents: fileContents_UTF_32LE, targetEncoding: "UTF-32LE", targetContents: "ロシアデスマン\n\n🌭\nкирпич\n"}}
 
 	for i, c := range tests {
-		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
-			t.Errorf("failed to created file: %s", err1.Error())
-			return
-		}
-
-		defer os.Remove(filename)
+		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
 
 		if result, err := impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil); err != nil {
 			t.Errorf("vfs.file.contents (testCase[%d]) returned error %s", i, err.Error())
