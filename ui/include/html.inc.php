@@ -956,7 +956,8 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 	$maintenances = implode(',', $maintenance_names);
 
-	return (new CButtonIcon(ZBX_ICON_EYE)) // TODO ZBX_STYLE_ACTION_ICON_SUPPRESS
+	return (new CButtonIcon(ZBX_ICON_EYE_OFF)) // TODO ZBX_STYLE_ACTION_ICON_SUPPRESS
+		->addClass(ZBX_STYLE_COLOR_ICON)
 		->addClass($blink ? 'js-blink' : null)
 		->setHint(
 			_s('Suppressed till: %1$s', $suppressed_till).
