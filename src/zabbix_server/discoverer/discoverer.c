@@ -543,6 +543,10 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 						task->dchecks.values[0]->dcheckid == dcheck->dcheckid)
 				{
 					zbx_vector_str_append(task->ips, zbx_strdup(NULL, ip));
+
+					if (0 == task->dchecks.values[0]->allow_redirect && 1 == dcheck->allow_redirect)
+						task->dchecks.values[0]->allow_redirect = 1;
+
 					zbx_discovery_dcheck_free(dcheck_ptr);
 				}
 				else if ('\0' != *task_local.ip || FAIL == zbx_vector_dc_dcheck_ptr_search(
