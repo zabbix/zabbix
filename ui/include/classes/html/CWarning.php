@@ -22,9 +22,12 @@
 class CWarning extends Ctag {
 
 	public function __construct($header, $messages = [], $buttons = []) {
-		parent::__construct('output', true, $header);
+		parent::__construct('output', true);
 
 		$this
+			->addItem(
+				new CSpan($header)
+			)
 			->addClass(ZBX_STYLE_MSG_GLOBAL)
 			->addClass(ZBX_STYLE_MSG_BAD);
 
