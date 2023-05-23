@@ -675,8 +675,6 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 			res = 1;
 		zbx_free(utf8);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, current_line: %lu", current_line);
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER, zbx_read vfs_file_contents, end_line: %lu", end_line);
 		if (current_line >= end_line)
 			break;
 	}
@@ -686,7 +684,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file, failed to find line feed"));
 		goto err;
-	} else if (-1 == nbytes)	/* error occurred */
+	}
+	else if (-1 == nbytes)	/* error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;

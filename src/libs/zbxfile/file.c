@@ -17,8 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
-
 #include "zbxfile.h"
 
 void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte)
@@ -120,6 +118,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 		}
 	}
 
+	/* list of encodings taken from zbx_find_cr_lf_szbyte() */
 	if ((0 == lf_found) &&
 			(0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
 			0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
