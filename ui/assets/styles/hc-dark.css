@@ -3322,7 +3322,7 @@ section {
     border-bottom-left-radius: 0; }
     .ui-tabs-nav .ui-tabs-active .btn:hover, .ui-tabs-nav .ui-tabs-active .btn:focus, .ui-tabs-nav .ui-tabs-active .btn:active {
       background-color: #222222; }
-  .ui-tabs-nav .ui-state-focus .ui-tabs-anchor {
+  .ui-tabs-nav .ui-state-focus .ui-tabs-anchor:not(:focus) {
     box-shadow: 0 0 0 2px #ffffff; }
   .ui-tabs-nav .ui-state-disabled .ui-tabs-anchor {
     cursor: default;

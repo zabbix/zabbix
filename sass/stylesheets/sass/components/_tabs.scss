@@ -58,7 +58,7 @@
 	}
 
 	.ui-state-focus {
-		.ui-tabs-anchor {
+		.ui-tabs-anchor:not(:focus){
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
 	}
