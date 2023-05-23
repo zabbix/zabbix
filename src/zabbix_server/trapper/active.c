@@ -648,11 +648,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_json_close(&json);
 
-	if (0 != zbx_get_unsent_commands_num())
-	{
-		zbx_json_addarray(&json, ZBX_PROTO_TAG_COMMANDS);
-		zbx_remote_commans_prepare_to_send(&json, hostid);
-	}
+	zbx_remote_commans_prepare_to_send(&json, hostid);
 
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
