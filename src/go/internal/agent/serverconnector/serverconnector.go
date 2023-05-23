@@ -39,7 +39,6 @@ import (
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
-	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxcomms"
@@ -76,18 +75,11 @@ type activeChecksRequest struct {
 	ListenPort     int    `json:"port,omitempty"`
 }
 
-type CommandRequest struct {
-	Id      uint64 `json:"id"`
-	Command string `json:"command"`
-	Wait    int    `json:"wait"`
-}
-
 type activeChecksResponse struct {
 	Response       string               `json:"response"`
 	Info           string               `json:"info"`
 	ConfigRevision uint64               `json:"config_revision,omitempty"`
 	Data           []*plugin.Request    `json:"data"`
-	Commands       []*CommandRequest    `json:"commands"`
 	Expressions    []*glexpr.Expression `json:"regexp"`
 }
 
@@ -168,18 +160,15 @@ func (c *Connector) refreshActiveChecks() {
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.addresses)
 	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.addresses)
 
-	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
-		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
-		agent.LocalChecksClientID); err != nil {
+	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostInterface",
+		c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host interface: %s", err)
-
 		return
 	}
 
 	if a.HostMetadata, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second, "HostMetadata",
 		c.options.HostMetadata, c.options.HostMetadataItem, agent.HostMetadataLen, agent.LocalChecksClientID); err != nil {
 		log.Errf("cannot get host metadata: %s", err)
-
 		return
 	}
 
@@ -246,16 +235,12 @@ func (c *Connector) refreshActiveChecks() {
 		return
 	}
 
-	if response.Data == nil && response.Commands == nil {
+	if response.Data == nil {
 		if c.configRevision == 0 {
 			log.Errf("[%d] cannot parse list of active checks from [%s]: data array is missing", c.clientID,
 				c.addresses[0])
 		}
 		return
-	}
-
-	if response.Data == nil {
-		goto commands
 	}
 
 	c.configRevision = response.ConfigRevision
@@ -334,34 +319,6 @@ func (c *Connector) refreshActiveChecks() {
 				c.clientID, c.addresses[0])
 			return
 		}
-	}
-commands:
-	for i := 0; i < len(response.Commands); i++ {
-		if len(response.Commands[i].Command) == 0 {
-			log.Errf("[%d] cannot parse list of active commands from [%s]: command is missing for id '%d'",
-				c.clientID, c.addresses[0], response.Commands[i].Id)
-			return
-		}
-
-		var commandItem plugin.Request
-		var dummyMtime int
-		var dummyLastlogsize uint64
-		var keyParams []string
-
-		commandItem.Itemid = response.Commands[i].Id
-		keyParams = append(keyParams, response.Commands[i].Command)
-		if response.Commands[i].Wait == 0 {
-			keyParams = append(keyParams, "nowait")
-		} else {
-			keyParams = append(keyParams, "wait")
-		}
-		commandItem.Key = itemutil.MakeKey("system.run", keyParams)
-		commandItem.Delay = "1"
-		commandItem.RemoteCommand = 1
-		commandItem.LastLogsize = &dummyLastlogsize
-		commandItem.Mtime = &dummyMtime
-
-		response.Data = append(response.Data, &commandItem)
 	}
 
 	c.taskManager.UpdateTasks(c.clientID, c.resultCache.(plugin.ResultWriter), c.firstActiveChecksRefreshed,

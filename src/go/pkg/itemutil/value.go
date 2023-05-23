@@ -29,7 +29,7 @@ import (
 
 const StateNotSupported = 1
 
-func ValueToResult(itemid uint64, ts time.Time, u interface{}, rcmd int) (result *plugin.Result) {
+func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.Result) {
 	var value string
 	switch v := u.(type) {
 	case *plugin.Result:
@@ -68,5 +68,5 @@ func ValueToResult(itemid uint64, ts time.Time, u interface{}, rcmd int) (result
 		// note that this conversion is slow and it's better to return known value type
 		value = fmt.Sprintf("%v", u)
 	}
-	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts, RemoteCommand: rcmd}
+	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
 }

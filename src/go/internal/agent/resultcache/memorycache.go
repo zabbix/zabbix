@@ -36,28 +36,24 @@ import (
 type MemoryCache struct {
 	*cacheData
 	results         []*AgentData
-	cresults        []*AgentCommands
 	maxBufferSize   int32
 	totalValueNum   int32
 	persistValueNum int32
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
-	resultsLen := len(c.results) + len(c.cresults)
-	if resultsLen == 0 {
+	if len(c.results) == 0 {
 		return
 	}
 
-	c.Debugf("upload history data, %d/%d value(s) commands %d/%d value(s)", len(c.results), cap(c.results),
-		len(c.cresults), cap(c.cresults))
+	c.Debugf("upload history data, %d/%d value(s)", len(c.results), cap(c.results))
 
 	request := AgentDataRequest{
-		Request:  "agent data",
-		Data:     c.results,
-		Commands: c.cresults,
-		Session:  u.Session(),
-		Host:     u.Hostname(),
-		Version:  version.Short(),
+		Request: "agent data",
+		Data:    c.results,
+		Session: u.Session(),
+		Host:    u.Hostname(),
+		Version: version.Short(),
 	}
 
 	var data []byte
@@ -67,7 +63,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	timeout := resultsLen * c.timeout
+	timeout := len(c.results) * c.timeout
 	if timeout > 60 {
 		timeout = 60
 	}
@@ -89,21 +85,11 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	}
 
 	// clear results slice to ensure that the data is garbage collected
-	if len(c.results) != 0 {
-		c.results[0] = nil
-		for i := 1; i < len(c.results); i *= 2 {
-			copy(c.results[i:], c.results[:i])
-		}
-		c.results = c.results[:0]
+	c.results[0] = nil
+	for i := 1; i < len(c.results); i *= 2 {
+		copy(c.results[i:], c.results[:i])
 	}
-
-	if len(c.cresults) != 0 {
-		c.cresults[0] = nil
-		for i := 1; i < len(c.cresults); i *= 2 {
-			copy(c.cresults[i:], c.cresults[:i])
-		}
-		c.cresults = c.cresults[:0]
-	}
+	c.results = c.results[:0]
 
 	c.totalValueNum = 0
 	c.persistValueNum = 0
@@ -131,18 +117,6 @@ func (c *MemoryCache) addResult(result *AgentData) {
 	}
 
 	if c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize {
-		if !full && c.uploader != nil {
-			c.flushOutput(c.uploader)
-		}
-	}
-}
-
-func (c *MemoryCache) addCommandResult(result *AgentCommands) {
-	full := c.totalValueNum >= c.maxBufferSize
-	c.cresults = append(c.cresults, result)
-	c.totalValueNum++
-
-	if c.totalValueNum >= c.maxBufferSize {
 		if !full && c.uploader != nil {
 			c.flushOutput(c.uploader)
 		}
@@ -184,44 +158,17 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 	c.results[len(c.results)-1] = result
 }
 
-func (c *MemoryCache) insertCommandResult(result *AgentCommands) {
-	copy(c.cresults[0:], c.cresults[1:])
-	c.cresults[len(c.cresults)-1] = result
-}
-
 func (c *MemoryCache) write(r *plugin.Result) {
 	c.lastDataID++
 	var value *string
-	var cmdErr *string
 	var state *int
 	if r.Error == nil {
 		value = r.Value
 	} else {
 		errmsg := r.Error.Error()
-		if r.RemoteCommand != 0 {
-			cmdErr = &errmsg
-
-		} else {
-			value = &errmsg
-			tmp := itemutil.StateNotSupported
-			state = &tmp
-
-		}
-	}
-
-	if r.RemoteCommand != 0 {
-		cmd := &AgentCommands{
-			Id:    r.Itemid,
-			Value: value,
-			Error: cmdErr}
-
-		if c.totalValueNum >= c.maxBufferSize {
-			c.insertCommandResult(cmd)
-		} else {
-			c.addCommandResult(cmd)
-		}
-
-		return
+		value = &errmsg
+		tmp := itemutil.StateNotSupported
+		state = &tmp
 	}
 
 	var clock, ns int
@@ -251,7 +198,6 @@ func (c *MemoryCache) write(r *plugin.Result) {
 	} else {
 		c.addResult(data)
 	}
-
 }
 
 func (c *MemoryCache) run() {
