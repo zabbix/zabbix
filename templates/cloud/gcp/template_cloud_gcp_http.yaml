@@ -4,7 +4,7 @@ zabbix_export:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   host_groups:
-    - uuid: 776d22b7c3b1422ca54c31e69114e8f3
+    - uuid: 748ad4d098d447d492bb935c907f652f
       name: Databases
     - uuid: 137f19e6e2dc4219b33553b812627bc2
       name: 'Virtual machines'
@@ -1982,7 +1982,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
@@ -2180,7 +2180,7 @@ zabbix_export:
                   value: availability
             - uuid: 3c080bba511e44aab1139b66f00451ee
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -4129,7 +4129,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
@@ -4460,7 +4460,7 @@ zabbix_export:
                   value: availability
             - uuid: 347215d307c8465cad41198f12b5ff68
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-              name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -5691,7 +5691,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
@@ -5889,7 +5889,7 @@ zabbix_export:
                   value: availability
             - uuid: 959072ed00c4461196bef71618799b82
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -6425,7 +6425,7 @@ zabbix_export:
           name: 'GCP Cloud SQL PostgreSQL: Databases discovery'
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.db.discovery
-          delay: 3m
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
