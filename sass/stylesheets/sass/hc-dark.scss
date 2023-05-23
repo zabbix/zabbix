@@ -189,6 +189,10 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+$status-disabled-border-color: rgba(#ffffff, .2);
+
+$status-grey-border-color: $status-disabled-border-color;
+
 // Multiselect
 $multiselect-selected-bg-color: #999999;
 
@@ -550,11 +554,6 @@ a.link-action {
 		border-bottom-color: $link-active-color;
 	}
 }
-
-// .status-dark-grey {
-// border: none !important; // TODO: DF clean not used anywhere
-// background-color: #666666 !important;
-// }
 
 .btn-link { // TODO: DF needs to be checked manually
 	font-weight: bold !important;

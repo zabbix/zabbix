@@ -2962,8 +2962,7 @@ section {
 .status-warning-bg,
 .status-average-bg,
 .status-high-bg,
-.status-disaster-bg, .status-green, .status-disabled,
-.status-grey, .status-yellow, .status-red {
+.status-disaster-bg, .status-green, .status-disabled, .status-grey, .status-yellow, .status-red {
   box-sizing: border-box;
   display: inline-block;
   min-width: 16px;
@@ -2981,8 +2980,7 @@ section {
   .status-warning-bg:not(:last-of-type),
   .status-average-bg:not(:last-of-type),
   .status-high-bg:not(:last-of-type),
-  .status-disaster-bg:not(:last-of-type), .status-green:not(:last-of-type), .status-disabled:not(:last-of-type),
-  .status-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-red:not(:last-of-type) {
+  .status-disaster-bg:not(:last-of-type), .status-green:not(:last-of-type), .status-disabled:not(:last-of-type), .status-grey:not(:last-of-type), .status-yellow:not(:last-of-type), .status-red:not(:last-of-type) {
     padding-right: 4px;
     border-right-style: none; }
   .status-na-bg:first-of-type,
@@ -2990,8 +2988,7 @@ section {
   .status-warning-bg:first-of-type,
   .status-average-bg:first-of-type,
   .status-high-bg:first-of-type,
-  .status-disaster-bg:first-of-type, .status-green:first-of-type, .status-disabled:first-of-type,
-  .status-grey:first-of-type, .status-yellow:first-of-type, .status-red:first-of-type {
+  .status-disaster-bg:first-of-type, .status-green:first-of-type, .status-disabled:first-of-type, .status-grey:first-of-type, .status-yellow:first-of-type, .status-red:first-of-type {
     border-top-left-radius: 2px;
     border-bottom-left-radius: 2px; }
   .status-na-bg:last-of-type,
@@ -2999,8 +2996,7 @@ section {
   .status-warning-bg:last-of-type,
   .status-average-bg:last-of-type,
   .status-high-bg:last-of-type,
-  .status-disaster-bg:last-of-type, .status-green:last-of-type, .status-disabled:last-of-type,
-  .status-grey:last-of-type, .status-yellow:last-of-type, .status-red:last-of-type {
+  .status-disaster-bg:last-of-type, .status-green:last-of-type, .status-disabled:last-of-type, .status-grey:last-of-type, .status-yellow:last-of-type, .status-red:last-of-type {
     border-top-right-radius: 2px;
     border-bottom-right-radius: 2px; }
 
@@ -3017,7 +3013,7 @@ section {
 .status-average-bg,
 .status-high-bg,
 .status-disaster-bg {
-  border-color: rgba(31, 44, 51, 0.05);
+  border-color: rgba(31, 44, 51, 0.2);
   border-radius: 0; }
 
 .status-green {
@@ -3025,11 +3021,15 @@ section {
   background-color: #34af67;
   border-color: #2f9f5e; }
 
-.status-disabled,
+.status-disabled {
+  color: #7d7d7d;
+  background-color: #000000;
+  border-color: rgba(255, 255, 255, 0.2); }
+
 .status-grey {
   color: #7d7d7d;
   background-color: #000000;
-  border-color: #383838; }
+  border-color: rgba(255, 255, 255, 0.2); }
 
 .status-yellow {
   color: #000000 !important;

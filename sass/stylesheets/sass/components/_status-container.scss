@@ -58,7 +58,14 @@
 	border-color: $status-green-border-color;
 }
 
-.status-disabled,
+.status-disabled {
+	@extend %status;
+
+	color: $form-disabled-font-color;
+	background-color: $status-grey-bg-color;
+	border-color: $status-disabled-border-color;
+}
+
 .status-grey {
 	@extend %status;
 

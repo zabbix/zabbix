@@ -132,6 +132,11 @@ $problem-ack-fg-color: #ff3333;
 $ok-unack-fg-color: #00ff00;
 $ok-ack-fg-color: #00ff00;
 
+$status-border-color: rgba(#2b2b2b, .2);
+$status-disabled-border-color: rgba(#f2f2f2, .2);
+
+$status-grey-border-color: #3d3d3d;
+
 // Multiselect
 $multiselect-selected-bg-color: #696969;
 
@@ -139,15 +144,6 @@ $multiselect-selected-bg-color: #696969;
 $compact-view-color: #000000;
 $compact-view-tag-color: #ffffff;
 $compact-view-tag-bg-color: $ui-bg-selected-color;
-
-.status-na-bg,
-.status-info-bg,
-.status-warning-bg,
-.status-average-bg,
-.status-high-bg,
-.status-disaster-bg {
-	border-color: rgba($ui-bg-color, .2) !important;
-}
 
 .timeline-axis {
 	border-right-color: darken(desaturate($btn-bg-color, 4%), 18%) !important;

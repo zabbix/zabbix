@@ -166,6 +166,9 @@ $clock-hand-color: #000000;
 $clock-hand-sec-color: #555555;
 $clock-lines-color: #555555;
 
+// Statuses
+$status-disabled-border-color: rgba(#000000, 0.2);
+
 // Multiselect
 $multiselect-selected-bg-color: #777777;
 
@@ -466,11 +469,6 @@ a.link-action {
 		}
 	}
 }
-
-//.status-dark-grey {
-//	border: none !important; // TODO: DF clean not used anywhere
-//	background-color: #666666 !important;
-//}
 
 .btn-link { // FIXME: DF needs to be checked manually
 	font-weight: bold !important;
