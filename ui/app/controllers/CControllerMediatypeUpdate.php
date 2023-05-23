@@ -94,8 +94,8 @@ class CControllerMediatypeUpdate extends CController {
 
 		$mediatype = [
 			'mediatypeid' => $this->getInput('mediatypeid'),
-			'type' =>  $this->getInput('type', MEDIA_TYPE_EMAIL),
-			'name' => $this->getInput('name', ''),
+			'type' =>  $this->getInput('type'),
+			'name' => $this->getInput('name'),
 			'maxsessions' => $this->getInput('maxsessions',  $db_defaults['maxsessions']),
 			'maxattempts' =>  $this->getInput('maxattempts', $db_defaults['maxattempts']),
 			'attempt_interval' => $this->getInput('attempt_interval', $db_defaults['attempt_interval']),
@@ -106,17 +106,18 @@ class CControllerMediatypeUpdate extends CController {
 
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$mediatype['provider'] = $this->getInput('provider', CMediatypeHelper::EMAIL_PROVIDER_SMTP);
-
-				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'content_type', 'provider'
+				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security', 'smtp_authentication',
+					'content_type'
 				]);
 
 				$smtp_email = $this->getInput('smtp_email', '');
 
+				$mediatype['provider'] = $this->getInput('provider', CMediatypeHelper::EMAIL_PROVIDER_SMTP);
 				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
 				$mediatype['smtp_email'] = $smtp_email;
 				$mediatype['passwd'] = $this->getInput('passwd', '');
+				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
+				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
 
 				if ($mediatype['provider'] != CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 					preg_match('/.*<(?<email>.*[^>])>$/i', $smtp_email, $match);
@@ -137,14 +138,9 @@ class CControllerMediatypeUpdate extends CController {
 						$mediatype['smtp_server'] = $formatted_domain.$static_part;
 					}
 				}
-				else {
-					if ($this->hasInput('smtp_username')) {
-						$mediatype['username'] = $this->getInput('smtp_username');
-					}
+				elseif ($this->hasInput('smtp_username')) {
+					$mediatype['username'] = $this->getInput('smtp_username');
 				}
-
-				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
-				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
 				break;
 
 			case MEDIA_TYPE_EXEC:
@@ -162,13 +158,16 @@ class CControllerMediatypeUpdate extends CController {
 				break;
 
 			case MEDIA_TYPE_WEBHOOK:
-				$mediatype['process_tags'] = ZBX_MEDIA_TYPE_TAGS_DISABLED;
-				$mediatype['show_event_menu'] = ZBX_EVENT_MENU_HIDE;
+				$this->getInputs($mediatype,
+					['script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_name', 'event_menu_url']
+				);
 
-				$this->getInputs($mediatype, ['script', 'timeout', 'process_tags', 'show_event_menu']);
-
-				$mediatype['event_menu_name'] = $this->getInput('event_menu_name', '');
-				$mediatype['event_menu_url'] = $this->getInput('event_menu_url', '');
+				$mediatype += [
+					'process_tags' => ZBX_MEDIA_TYPE_TAGS_DISABLED,
+					'show_event_menu' => ZBX_EVENT_MENU_HIDE,
+					'event_menu_name' => '',
+					'event_menu_url' => ''
+				];
 
 				$parameters = $this->getInput('parameters_webhook', []);
 

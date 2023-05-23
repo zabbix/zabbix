@@ -53,7 +53,7 @@ window.mediatype_edit_popup = new class {
 
 		this.form.querySelector('.element-table-add').addEventListener('click', () => {
 			this._addExecParam();
-			this.row_num ++;
+			this.row_num++;
 		});
 
 		this.form.querySelector('.webhook-param-add').addEventListener('click', () => this._addWebhookParam());
@@ -196,7 +196,7 @@ window.mediatype_edit_popup = new class {
 
 		for (const parameter of this.mediatype.parameters_exec) {
 			this._addExecParam(parameter);
-			this.row_num ++;
+			this.row_num++;
 		}
 	}
 

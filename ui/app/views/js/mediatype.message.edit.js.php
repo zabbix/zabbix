@@ -102,7 +102,8 @@ window.mediatype_message_popup = new class {
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
-				} else {
+				}
+				else {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
 

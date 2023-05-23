@@ -26,7 +26,6 @@ class CControllerMediatypeMessageCheck extends CController {
 	 */
 	protected $message_types = [];
 
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();

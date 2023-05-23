@@ -133,7 +133,7 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('smtp-authentication-field')
 	])
 	->addItem([
-		(new CLabel(_('Username')))->setId('smtp-username-label'),
+		(new CLabel(_('Username'), 'smtp_username'))->setId('smtp-username-label'),
 		(new CFormField(
 			(new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
 		)->setId('smtp-username-field')
