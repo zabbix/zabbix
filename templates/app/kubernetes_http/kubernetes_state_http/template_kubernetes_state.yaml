@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-19T09:47:03Z'
+  date: '2023-05-22T14:28:06Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -3555,6 +3555,13 @@ zabbix_export:
                 - tag: status
                   value: updated
           trigger_prototypes:
+            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down'
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 469d6933f5494ca48a212cdc364058e0
               expression: |
                 min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0
@@ -3564,13 +3571,6 @@ zabbix_export:
               opdata: 'Replicas: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
               priority: WARNING
               description: 'StatefulSet has not matched the number of replicas during the specified trigger evaluation period.'
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down'
-              priority: HIGH
               tags:
                 - tag: scope
                   value: availability

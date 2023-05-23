@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:28:10Z'
+  date: '2023-05-22T14:49:33Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1100,7 +1100,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                reventing Transaction ID Wraparound Failures
+                Preventing Transaction ID Wraparound Failures
                 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
               preprocessing:
                 - type: JSONPATH
