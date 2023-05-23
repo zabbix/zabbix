@@ -4,7 +4,7 @@ zabbix_export:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
   host_groups:
-    - uuid: 504a842d13934bb4a8348120121c093b
+    - uuid: 776d22b7c3b1422ca54c31e69114e8f3
       name: Databases
     - uuid: 137f19e6e2dc4219b33553b812627bc2
       name: 'Virtual machines'
@@ -7607,8 +7607,8 @@ zabbix_export:
           triggers:
             - uuid: fb8e28649b4947e9a11d891e3126a3a1
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}'
-              name: 'GCP Compute Engine: High CPU Utilization'
-              event_name: 'GCP Compute Engine: High CPU Utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
+              name: 'GCP Compute Engine: High CPU utilization'
+              event_name: 'GCP Compute Engine: High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               manual_close: 'YES'
@@ -7828,7 +7828,7 @@ zabbix_export:
                   value: availability
             - uuid: 1223f00a5e4b4bc8aa9e8ec08253c4cc
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7'
-              name: 'GCP Compute Engine: Instance is in Suspended state'
+              name: 'GCP Compute Engine: Instance is in suspended state'
               priority: INFO
               description: 'The VM is in a suspended state. You can resume the VM or delete it.'
               manual_close: 'YES'
@@ -7953,7 +7953,7 @@ zabbix_export:
           units: '%'
           description: |
             Memory usage Percentage. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7966,10 +7966,10 @@ zabbix_export:
             - tag: component
               value: memory
           triggers:
-            - uuid: fa918889bcb84d3886254f00f0df288c
+            - uuid: 9b1dc8d92a614fad9e920bc0bedd0923
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}'
-              name: 'GCP Compute Engine: High Memory Utilization '
-              event_name: 'GCP Compute Engine: (over {$GCE.RAM.UTIL.MAX}% for 15m)'
+              name: 'GCP Compute Engine: High memory utilization'
+              event_name: 'GCP Compute Engine: High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
@@ -7985,7 +7985,7 @@ zabbix_export:
           units: B
           description: |
             Total VM memory size. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8007,7 +8007,7 @@ zabbix_export:
           units: B
           description: |
             Memory currently used in the VM. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8029,7 +8029,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory read into the guest from its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8051,7 +8051,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory written from the guest to its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
