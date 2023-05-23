@@ -50,6 +50,7 @@ extern char 				*CONFIG_HOSTNAME;
  *             ttl                           - [IN] task expiration period in seconds *
  *             now                           - [IN]                                   *
  *             config_timeout                - [IN]                                   *
+ *             config_source_ip              - [IN]                                   *
  *             config_enable_remote_commands - [IN]                                   *
  *             config_log_remote_commands    - [IN]                                   *
  *                                                                                    *
@@ -58,7 +59,7 @@ extern char 				*CONFIG_HOSTNAME;
  *                                                                                    *
  **************************************************************************************/
 static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout,
-		int config_enable_remote_commands, int config_log_remote_commands)
+		const char *config_source_ip, int config_enable_remote_commands, int config_log_remote_commands)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
@@ -135,8 +136,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, in
 		ZBX_DBROW2UINT64(alertid, row[11]);
 	}
 
-	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, 0 == alertid ? &info : NULL,
-			error, sizeof(error), NULL)))
+	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_source_ip, 0 == alertid ?
+			&info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
@@ -357,8 +358,8 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 		{
 			case ZBX_TM_TASK_REMOTE_COMMAND:
 				if (SUCCEED == tm_execute_remote_command(taskid, clock, ttl, now,
-						config_comms->config_timeout, config_enable_remote_commands,
-						config_log_remote_commands))
+						config_comms->config_timeout, config_comms->config_source_ip,
+						config_enable_remote_commands, config_log_remote_commands))
 				{
 					processed_num++;
 				}

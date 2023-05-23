@@ -35,7 +35,6 @@
 /* the size of temporary buffer used to read from data channel */
 #define DATA_BUFFER_SIZE	4096
 
-extern char	*CONFIG_SOURCE_IP;
 extern char	*CONFIG_SSH_KEY_LOCATION;
 
 #ifndef HAVE_NO_SSH_OPTIONS
@@ -193,7 +192,8 @@ static int	ssh_nonblocking_error(ssh_session session, int errcode, int errcode_a
 }
 
 /* example ssh.run["ls /"] */
-int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout)
+int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, const char *options, int timeout,
+		const char *config_source_ip)
 {
 	ssh_session	session;
 	ssh_channel	channel;
@@ -205,6 +205,8 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 	zbx_timespec_t	deadline;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ZBX_UNUSED(config_source_ip);
 
 	/* initializes an SSH session object */
 	if (NULL == (session = ssh_new()))

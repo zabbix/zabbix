@@ -3801,14 +3801,16 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select druleid,proxy_hostid,delay,status from drules");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select druleid,proxy_hostid,delay,name,iprange,status,concurrency_max from drules");
 
-	dbsync_prepare(sync, 4, NULL);
+	dbsync_prepare(sync, 7, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
 		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
 			ret = FAIL;
+
 		goto out;
 	}
 
@@ -3836,9 +3838,13 @@ int	zbx_dbsync_prepare_dchecks(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select dcheckid,druleid from dchecks");
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select dcheckid,druleid,type,key_,snmp_community,ports,snmpv3_securityname,"
+				"snmpv3_securitylevel,snmpv3_authpassphrase,snmpv3_privpassphrase,uniq,"
+				"snmpv3_authprotocol,snmpv3_privprotocol,snmpv3_contextname,allow_redirect"
+			" from dchecks");
 
-	dbsync_prepare(sync, 2, NULL);
+	dbsync_prepare(sync, 15, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

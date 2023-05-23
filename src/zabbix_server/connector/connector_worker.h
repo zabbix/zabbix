@@ -22,6 +22,12 @@
 
 #include "zbxthreads.h"
 
+typedef struct
+{
+	const char	*config_source_ip;
+}
+zbx_thread_connector_worker_args;
+
 ZBX_THREAD_ENTRY(connector_worker_thread, args);
 
 #endif

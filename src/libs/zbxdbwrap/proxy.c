@@ -2381,8 +2381,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2395,8 +2396,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	service = services->values[(*processed_num)++];

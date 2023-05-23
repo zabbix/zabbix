@@ -622,6 +622,46 @@ typedef struct
 }
 zbx_config_cache_info_t;
 
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+	unsigned char	type;
+	char		*key_;
+	char		*snmp_community;
+	char		*ports;
+	char		*snmpv3_securityname;
+	unsigned char	snmpv3_securitylevel;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	unsigned char	uniq;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+	char		*snmpv3_contextname;
+	unsigned char	allow_redirect;
+}
+zbx_dc_dcheck_t;
+
+ZBX_PTR_VECTOR_DECL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
+
+typedef struct
+{
+	zbx_uint64_t			druleid;
+	zbx_uint64_t			proxy_hostid;
+	time_t				nextcheck;
+	int				delay;
+	char				*delay_str;
+	char				*iprange;
+	unsigned char			status;
+	unsigned char			location;
+	zbx_uint64_t			revision;
+	char				*name;
+	zbx_uint64_t			unique_dcheckid;
+	zbx_vector_dc_dcheck_ptr_t	dchecks;
+	int				concurrency_max;
+}
+zbx_dc_drule_t;
+
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	zbx_in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
@@ -664,7 +704,8 @@ typedef struct zbx_um_cache zbx_um_cache_t;
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
-void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
+void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);
@@ -1132,8 +1173,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
-void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
+void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
