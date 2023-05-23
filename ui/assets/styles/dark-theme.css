@@ -2096,7 +2096,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
       color: #ffffff;
       background: #191919;
       border-color: #768d99; }
-      .form-search .search:focus ~ .btn-icon {
+      .form-search .search:focus ~ .btn-icon:not([disabled]) {
         color: #ffffff !important; }
   .form-search .btn-icon {
     position: absolute;

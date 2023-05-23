@@ -19,7 +19,7 @@
 			background: $form-search-focused-bg-color;
 			border-color: $form-search-focused-border-color;
 
-			& ~ .btn-icon {
+			& ~ .btn-icon:not([disabled]) {
 				color: $form-search-icon-focus-color !important;
 			}
 		}
