@@ -106,11 +106,14 @@
 		}
 	}
 
-	.btn-icon {
+	.btn-icon,
+	.btn-link {
 		&:not(:first-child) {
 			margin-left: 5px;
 		}
+	}
 
+	.btn-icon {
 		&.btn-small {
 			top: 1px;
 			vertical-align: text-bottom;

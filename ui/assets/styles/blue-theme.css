@@ -1058,7 +1058,8 @@ footer {
     padding: 0 5px 5px 0; }
   .form-grid .form-field .list-check-radio {
     line-height: 1.4em; }
-  .form-grid .btn-icon:not(:first-child) {
+  .form-grid .btn-icon:not(:first-child),
+  .form-grid .btn-link:not(:first-child) {
     margin-left: 5px; }
   .form-grid .btn-icon.btn-small {
     top: 1px;
