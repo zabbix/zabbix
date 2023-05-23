@@ -416,14 +416,14 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_MAX, now, itemid, history);
 		}
 
+		/* trend rules are shared between all trend types, so we can default to floating type */
+		rule = &rules[HK_UPDATE_CACHE_OFFSET_TREND_FLOAT];
+
+		if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
+			continue;
+
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 		{
-			rule = rules + (value_type == ITEM_VALUE_TYPE_FLOAT ?
-					HK_UPDATE_CACHE_OFFSET_TREND_FLOAT : HK_UPDATE_CACHE_OFFSET_TREND_UINT);
-
-			if (ZBX_HK_MODE_REGULAR != *rule->poption_mode)
-				continue;
-
 			tmp = zbx_strdup(tmp, row[3]);
 			substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL,
 					NULL, &tmp, MACRO_TYPE_COMMON, NULL, 0);
@@ -439,13 +439,19 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 				zabbix_log(LOG_LEVEL_WARNING, "invalid trends storage period for itemid '%s'", row[0]);
 				continue;
 			}
-
-			if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
-				trends = *rule->poption;
-
-			hk_history_item_update(rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT, rule,
-					HK_UPDATE_CACHE_TREND_COUNT, now, itemid, trends);
 		}
+		else
+		{
+			/* if item type was changed from numeric to non-numeric use default trends */
+			/* storage period for old trends data removal                              */
+			trends = SEC_PER_DAY * 90;
+		}
+
+		if (0 != trends && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
+			trends = *rule->poption;
+
+		hk_history_item_update(rules + HK_UPDATE_CACHE_OFFSET_TREND_FLOAT, rule, HK_UPDATE_CACHE_TREND_COUNT,
+				now, itemid, trends);
 	}
 	DBfree_result(result);
 
