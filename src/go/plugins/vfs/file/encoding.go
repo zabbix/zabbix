@@ -34,12 +34,7 @@ import (
 	"unsafe"
 )
 
-func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
-
-	if bytecount == 0 {
-		return inbuf
-	}
-
+func verifyEncoder(encoder string, bytecount int, inbuf []byte) string {
 	if "" == encoder {
 		if bytecount > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
 			encoder = "UTF-8"
@@ -47,9 +42,18 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
 			encoder = "UTF-16LE"
 		} else if bytecount > 2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
 			encoder = "UTF-16BE"
-		} else {
-			return inbuf
 		}
+	}
+
+	return encoder
+}
+
+func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte) {
+	if bytecount == 0 {
+		return inbuf
+	}
+	if encoder = verifyEncoder(encoder, bytecount, inbuf); encoder == "" {
+		return inbuf
 	}
 
 	tocode := C.CString("UTF-8")

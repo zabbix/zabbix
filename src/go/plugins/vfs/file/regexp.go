@@ -89,9 +89,7 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 	initial := true
 	nbytes := 0
 	var buf []byte
-
 	for 0 < nbytes || initial {
-
 		elapsed := time.Since(start)
 
 		if elapsed.Seconds() > float64(p.options.Timeout) {

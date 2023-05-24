@@ -20,6 +20,7 @@
 package file
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -69,49 +70,31 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
 			ee = false
 		}
 	}
+
 	return ee
 }
 
-func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
-	var i, szbyte int
-	var offset int64
-	var cr, lf []byte
-
-	buf = make([]byte, MAX_BUFFER_LEN)
-
-	offset, err = targetFile.Seek(0, os.SEEK_CUR)
-	if err != nil {
-		return nil, 0, err
-	}
-
-	nbytes, err = targetFile.Read(buf)
-	if err != nil {
-		if err != io.EOF {
-			return nil, 0, err
-		}
-	}
-	if 0 >= nbytes {
-		return buf, nbytes, nil
-	}
-
-	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
-
+func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte int, encoding string) ([]byte,
+	int, error) {
 	lf_found := 0
+	var i int
 
 	for i = 0; i <= nbytes-szbyte; i += szbyte {
-		if p.bytesCompare(buf, lf, szbyte, i, 0) == true { /* LF (Unix) */
+		if p.bytesCompare(buf, lf, szbyte, i, 0) { /* LF (Unix) */
 			i += szbyte
 			lf_found = 1
+
 			break
 		}
 
-		if p.bytesCompare(buf, cr, szbyte, i, 0) == true { /* CR (Mac) */
+		if p.bytesCompare(buf, cr, szbyte, i, 0) { /* CR (Mac) */
 			/* CR+LF (Windows) ? */
 			if i < nbytes-szbyte && p.bytesCompare(buf, lf, szbyte, i+szbyte, 0) {
 				i += szbyte
 			}
 			i += szbyte
 			lf_found = 1
+
 			break
 		}
 	}
@@ -130,10 +113,42 @@ func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nby
 		return nil, 0, fmt.Errorf("No line feed detected")
 	}
 
-	offset, err = targetFile.Seek(offset+int64(i), os.SEEK_SET)
+	return buf, i, nil
+}
+
+func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
+	var szbyte int
+	var offset int64
+	var cr, lf []byte
+
+	buf = make([]byte, MAX_BUFFER_LEN)
+
+	offset, err = targetFile.Seek(0, io.SeekCurrent)
 	if err != nil {
 		return nil, 0, err
 	}
 
-	return buf, int(i), nil
+	nbytes, err = targetFile.Read(buf)
+	if err != nil {
+		if !errors.Is(err, io.EOF) {
+			return nil, 0, err
+		}
+	}
+	if 0 >= nbytes {
+		return buf, nbytes, nil
+	}
+
+	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
+
+	var i int
+	if buf, i, err = p.checkLF(buf, lf, cr, nbytes, szbyte, encoding); err != nil {
+		return nil, 0, err
+	}
+
+	_, err = targetFile.Seek(offset+int64(i), io.SeekStart)
+	if err != nil {
+		return nil, 0, err
+	}
+
+	return buf, i, nil
 }

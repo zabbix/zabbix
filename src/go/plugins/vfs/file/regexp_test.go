@@ -1,4 +1,4 @@
-//go:build (linux && (amd64 || arm64))
+//go:build linux && (amd64 || arm64)
 
 /*
 ** Zabbix
@@ -39,16 +39,16 @@ func TestExecuteRegex(t *testing.T) {
 	}
 
 	tests := []*testCase{
-		&testCase{input: `1`, pattern: `1`, output: ``, result: `1`, match: true},
-		&testCase{input: `1`, pattern: `2`, output: ``, result: `1`, match: false},
-		&testCase{input: `123 456 789"`, pattern: `([0-9]+)`, output: `\1`, result: `123`, match: true},
-		&testCase{input: `value ""`, pattern: `value "([^"]*)"`, output: `\1`, result: ``, match: true},
-		&testCase{input: `b:xyz"`, pattern: `b:([^ ]+)`, output: `\\1`, result: `\1`, match: true},
-		&testCase{input: `a:1 b:2`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `1,2`, match: true},
-		&testCase{input: `a:\2 b:xyz`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `\2,xyz`, match: true},
-		&testCase{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\@`, result: `value: 10`, match: true},
-		&testCase{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\0`, result: `value: 10`, match: true},
-		&testCase{input: `a:9 b:2`, pattern: `a:([^\d ]+) | b:([^ ]+)`, output: `\0,\1,\2`, result: ` b:2,,2`, match: true},
+		{input: `1`, pattern: `1`, output: ``, result: `1`, match: true},
+		{input: `1`, pattern: `2`, output: ``, result: `1`, match: false},
+		{input: `123 456 789"`, pattern: `([0-9]+)`, output: `\1`, result: `123`, match: true},
+		{input: `value ""`, pattern: `value "([^"]*)"`, output: `\1`, result: ``, match: true},
+		{input: `b:xyz"`, pattern: `b:([^ ]+)`, output: `\\1`, result: `\1`, match: true},
+		{input: `a:1 b:2`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `1,2`, match: true},
+		{input: `a:\2 b:xyz`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `\2,xyz`, match: true},
+		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\@`, result: `value: 10`, match: true},
+		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\0`, result: `value: 10`, match: true},
+		{input: `a:9 b:2`, pattern: `a:([^\d ]+) | b:([^ ]+)`, output: `\0,\1,\2`, result: ` b:2,,2`, match: true},
 	}
 
 	for _, c := range tests {
@@ -113,84 +113,97 @@ func TestFileRegexpOutput(t *testing.T) {
 		0x00, 0x00, 0x04, 0x3b, 0x00, 0x00, 0x04, 0x4c, 0x00, 0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x0a}
 
 	tests := []*testCase{
-		&testCase{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(ф)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "group 0: \\0 group 1: \\1 group 4: \\4", targetContents: "group 0: ф group 1: ф group 4: "},
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(ф)", targetEncoding: "iso-8859-5",
+			lineStart: "", lineEnd: "", targetStringGroup: "group 0: \\0 group 1: \\1 group 4: \\4",
+			targetContents: "group 0: ф group 1: ф group 4: "},
 
-		&testCase{fileContents: fileContents_2_ISO_8859_5, targetSearch: "(а)", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: "августа\r\n"},
+		{fileContents: fileContents_2_ISO_8859_5, targetSearch: "(а)", targetEncoding: "iso-8859-5",
+			lineStart: "", lineEnd: "", targetStringGroup: "", targetContents: "августа\r\n"},
 
 		// выхухоль
 		//
 		// badger
 		//
 		// выхухоль2
-		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль2\n"},
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
 
-		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "1", lineEnd: "",
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "iso-8859-5",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "выхухоль2\n", targetEncoding: "iso-8859-5",
+			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "",
 			targetStringGroup: "", targetContents: "выхухоль\n"},
 
-		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "выхухоль2\n", targetEncoding: "iso-8859-5", lineStart: "", lineEnd: "2",
-			targetStringGroup: "", targetContents: ""},
+		{fileContents: fileContents_UTF_16LE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-16LE",
+			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
 
-		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль2\n"},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "2",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
 
-		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль\n"},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
 
-		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "2",
-			targetStringGroup: "", targetContents: ""},
-
-		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль2\n"},
-
-		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль\n"},
-
-		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-32BE", lineStart: "", lineEnd: "2",
-			targetStringGroup: "", targetContents: ""},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-32BE",
+			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
 
 		// wrong encodings, but we cannot detect this and there is no expected target contents
-		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: ""},
-		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: ""},
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
+			lineEnd: "", targetStringGroup: "", targetContents: ""},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
+			lineEnd: "", targetStringGroup: "", targetContents: ""},
 	}
-
 	for i, c := range tests {
-
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
+
 			return
 		}
 
 		defer os.Remove(filename)
 
-		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+		var result interface{}
+		var err error
+
+		if result, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
+			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
 			t.Errorf("vfs.file.regexp (testCase[%d]) returned error %s", i, err.Error())
-		} else {
-			if contents, ok := result.(string); !ok {
-				t.Errorf("vfs.file.regexp (testCase[%d]) returned unexpected value type %s", i, reflect.TypeOf(result).Kind())
-			} else {
-				if contents != c.targetContents {
-					t.Errorf("vfs.file.regexp (testCase[%d]) returned invalid result: ->%s<-", i, contents)
-				}
-			}
+
+			return
+		}
+
+		var contents string
+		var ok bool
+		if contents, ok = result.(string); !ok {
+			t.Errorf("vfs.file.regexp (testCase[%d]) returned unexpected value type %s", i, reflect.TypeOf(result).Kind())
+
+			return
+		}
+		if contents != c.targetContents {
+			t.Errorf("vfs.file.regexp (testCase[%d]) returned invalid result: ->%s<-", i, contents)
+
+			return
 		}
 	}
 
 	// wrong encodings, but we can detect this
 	tests_wrong_encodings := []*testCase{
-		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль2\n"},
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-16LE",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
 
-		&testCase{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль\n"},
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
 
-		&testCase{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль\n"},
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
 
-		&testCase{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль\n"},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
 	}
 
 	expected_error := "No line feed detected"
@@ -198,18 +211,20 @@ func TestFileRegexpOutput(t *testing.T) {
 	for i, c := range tests_wrong_encodings {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
+
 			return
 		}
 
 		defer os.Remove(filename)
 
-		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding, c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
+		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
+			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
 			if err.Error() != expected_error {
-				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s", i, err.Error(), expected_error)
+				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s",
+					i, err.Error(), expected_error)
 			}
 		} else {
 			t.Errorf("vfs.file.regexp testcase[%d] did NOT return error, result: %s", i, result)
 		}
-
 	}
 }
