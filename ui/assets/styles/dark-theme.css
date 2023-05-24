@@ -3283,6 +3283,8 @@ section {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
       box-shadow: 0 0 0 2px rgba(30, 135, 227, 0.35); }
+      .filter-container.tabfilter-container .tabfilter-item-label.focused .btn-icon:active, .filter-container.tabfilter-container .tabfilter-item-label.focused .btn-icon:focus {
+        box-shadow: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.disabled {
       box-shadow: none;
       pointer-events: none; }
@@ -6000,7 +6002,6 @@ span.is-loading {
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
   cursor: move;
-  /* fallback if grab cursor is unsupported */
   cursor: grab; }
 
 .dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
@@ -6008,7 +6009,6 @@ span.is-loading {
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .dashboard-widget-head, .cursor-dragging {
   cursor: move;
-  /* fallback if grab cursor is unsupported */
   cursor: grabbing; }
 
 .cursor-move {

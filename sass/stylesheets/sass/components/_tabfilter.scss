@@ -148,6 +148,13 @@
 
 		&.focused {
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+
+			.btn-icon {
+				&:active,
+				&:focus {
+					box-shadow: none;
+				}
+			}
 		}
 
 		&.disabled {
