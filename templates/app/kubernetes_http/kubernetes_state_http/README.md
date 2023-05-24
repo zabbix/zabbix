@@ -53,10 +53,10 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 Also, see the Macros section for a list of macros used to set trigger values.
 
-Set up the macros to filter the metrics of discovered worker nodes:
+Set up the macros to filter the metrics of discovered Kubelets by node names:
 
-- {$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}
-- {$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}
+- {$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}
+- {$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}
 
 Set up macros to filter metrics by namespace:
 
@@ -69,6 +69,23 @@ Set up macros to filter node metrics by nodename:
 - {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
 
 **Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
+
+You can use the `{$KUBE.KUBELET.FILTER.LABELS}` and `{$KUBE.KUBELET.FILTER.ANNOTATIONS}` macros for advanced filtering of Kubelets by node labels and annotations.
+
+Notes about labels and annotations filters:
+
+- Macro values should be specified separated by commas and must have the key/value form with support for regular expressions in the value (`key1: value, key2: regexp`).
+- ECMAScript syntax is used for regular expressions.
+- Filters are applied if such a label key exists for the entity that is being filtered (it means that if you specify a key in a filter, entities which do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
+- You can also use the exclamation point symbol (`!`) to invert the filter (`!key: value`).
+
+For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the Kubelets on nodes 5-25 without the "ingress" role will be discovered.
+
+
+See the Kubernetes documentation for details about labels and annotations:
+
+- <https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/>
+- <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>
 
 You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the macro `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}`, which supports context and regular expressions. For example, you can create the following macros:
 
@@ -108,8 +125,10 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 |{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered metrics by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes by nodename.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes by nodename.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}|<p>Filter of discoverable worker nodes by nodename.</p>|`.*`|
-|{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}|<p>Filter to exclude discovered worker nodes by nodename.</p>|`CHANGE_IF_NEEDED`|
+|{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}|<p>Filter of discoverable Kubelets by nodename.</p>|`.*`|
+|{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}|<p>Filter to exclude discovered Kubelets by nodename.</p>|`CHANGE_IF_NEEDED`|
+|{$KUBE.KUBELET.FILTER.ANNOTATIONS}|<p>Node annotations to filter Kubelets (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.KUBELET.FILTER.LABELS}|<p>Node labels to filter Kubelets (regex in values are supported). See the template's README.md for details.</p>||
 |{$KUBE.LLD.FILTER.PV.MATCHES}|<p>Filter of discoverable persistent volumes by name.</p>|`.*`|
 |{$KUBE.LLD.FILTER.PV.NOT_MATCHES}|<p>Filter to exclude discovered persistent volumes by name.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}|<p>The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.</p>|`#5`|
