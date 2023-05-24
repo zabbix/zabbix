@@ -66,9 +66,9 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 	},
 
 	onAdd: function(map) {
-		const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-		const btn = L.DomUtil.create('a', 'geomap-filter-button', div);
-		this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', div);
+		this.div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+		const btn = L.DomUtil.create('a', 'geomap-filter-button', this.div);
+		this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', this.div);
 
 		btn.ariaLabel = t('Severity filter');
 		btn.title = t('Severity filter');
@@ -92,19 +92,27 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 				label.htmlFor = chBoxId;
 			}
 
-			L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
+			L.DomEvent.on(btn, 'click', () => {
+				if (!this.div.classList.contains('disabled')) {
+					this.bar.classList.toggle('collapsed')
+				}
+			});
 			L.DomEvent.on(this.bar, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
-			L.DomEvent.on(div, 'change', () => {
+			L.DomEvent.on(this.div, 'change', () => {
 				map.updateFilter([...this.bar.querySelectorAll('input[type="checkbox"]:checked')].map(n => n.value));
 			});
 		}
 		else {
-			div.classList.add('disabled');
+			this.div.classList.add('disabled');
 		}
 
 		L.DomEvent.on(btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
 
-		return div;
+		return this.div;
+	},
+
+	disable: function() {
+		this.div.classList.add('disabled');
 	},
 
 	close: function() {
