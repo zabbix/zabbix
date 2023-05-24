@@ -708,8 +708,9 @@ svg a {
     .sortable .sortable-item:not(.sortable-dragging) {
       transition: left .2s, top .2s; }
   .sortable.sortable-dragging .sortable-item {
-    position: absolute;
-    opacity: 0.6; }
+    position: absolute; }
+    .sortable.sortable-dragging .sortable-item.sortable-dragging {
+      opacity: 0.6; }
 
 html,
 body {
@@ -1525,8 +1526,6 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
       color: #ffffff; }
-  .dashboard-navigation-tabs .sortable-dragging .sortable-item {
-    opacity: 1; }
   .dashboard-navigation-tabs .btn-dashboard-page-properties:hover, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus, .dashboard-navigation-tabs .btn-dashboard-page-properties:active {
     color: #ffffff; }
 
@@ -5993,7 +5992,7 @@ span.is-loading {
   cursor: move;
   cursor: grab; }
 
-.dashboard-navigation-tabs .sortable-dragging .sortable-item > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable .drag-icon,

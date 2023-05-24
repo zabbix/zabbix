@@ -25,7 +25,10 @@
 	&.sortable-dragging {
 		.sortable-item {
 			position: absolute;
-			opacity: 0.6;
+
+			&.sortable-dragging {
+				opacity: 0.6;
+			}
 		}
 	}
 }

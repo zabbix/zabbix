@@ -149,13 +149,9 @@
 		}
 	}
 
-	.sortable-dragging {
-		.sortable-item {
-			opacity: 1;
-
-			& > div {
-				@extend %cursor-dragging;
-			}
+	.sortable-item {
+		&.sortable-dragging > div {
+			@extend %cursor-dragging;
 		}
 	}
 
