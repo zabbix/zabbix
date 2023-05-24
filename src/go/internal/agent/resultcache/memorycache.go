@@ -33,27 +33,37 @@ import (
 	"zabbix.com/pkg/version"
 )
 
+const (
+	MaxCmdBufferSize = 10
+)
+
 type MemoryCache struct {
 	*cacheData
-	results         []*AgentData
-	maxBufferSize   int32
-	totalValueNum   int32
-	persistValueNum int32
+	results          []*AgentData
+	cresults         []*AgentCommands
+	maxBufferSize    int32
+	maxCmdBufferSize int32
+	totalValueNum    int32
+	totalCmdValueNum int32
+	persistValueNum  int32
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
-	if len(c.results) == 0 {
+	resultsLen := len(c.results) + len(c.cresults)
+	if resultsLen == 0 {
 		return
 	}
 
-	c.Debugf("upload history data, %d/%d value(s)", len(c.results), cap(c.results))
+	c.Debugf("upload history data, %d/%d value(s) commands %d/%d value(s)", len(c.results), cap(c.results),
+		len(c.cresults), cap(c.cresults))
 
 	request := AgentDataRequest{
-		Request: "agent data",
-		Data:    c.results,
-		Session: u.Session(),
-		Host:    u.Hostname(),
-		Version: version.Short(),
+		Request:  "agent data",
+		Data:     c.results,
+		Commands: c.cresults,
+		Session:  u.Session(),
+		Host:     u.Hostname(),
+		Version:  version.Short(),
 	}
 
 	var data []byte
@@ -63,7 +73,7 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	timeout := len(c.results) * c.timeout
+	timeout := resultsLen * c.timeout
 	if timeout > 60 {
 		timeout = 60
 	}
@@ -85,14 +95,26 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 	}
 
 	// clear results slice to ensure that the data is garbage collected
-	c.results[0] = nil
-	for i := 1; i < len(c.results); i *= 2 {
-		copy(c.results[i:], c.results[:i])
+	if len(c.results) != 0 {
+		c.results[0] = nil
+		for i := 1; i < len(c.results); i *= 2 {
+			copy(c.results[i:], c.results[:i])
+		}
+		c.results = c.results[:0]
 	}
-	c.results = c.results[:0]
+
+	if len(c.cresults) != 0 {
+		c.cresults[0] = nil
+		for i := 1; i < len(c.cresults); i *= 2 {
+			copy(c.cresults[i:], c.cresults[:i])
+		}
+		c.cresults = c.cresults[:0]
+	}
 
 	c.totalValueNum = 0
 	c.persistValueNum = 0
+	c.totalCmdValueNum = 0
+
 	return
 }
 
@@ -117,6 +139,18 @@ func (c *MemoryCache) addResult(result *AgentData) {
 	}
 
 	if c.persistValueNum >= c.maxBufferSize/2 || c.totalValueNum >= c.maxBufferSize {
+		if !full && c.uploader != nil {
+			c.flushOutput(c.uploader)
+		}
+	}
+}
+
+func (c *MemoryCache) addCommandResult(result *AgentCommands) {
+	full := c.totalCmdValueNum >= c.maxCmdBufferSize
+	c.cresults = append(c.cresults, result)
+	c.totalCmdValueNum++
+
+	if c.totalCmdValueNum >= c.maxCmdBufferSize {
 		if !full && c.uploader != nil {
 			c.flushOutput(c.uploader)
 		}
@@ -156,6 +190,11 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 
 	copy(c.results[index:], c.results[index+1:])
 	c.results[len(c.results)-1] = result
+}
+
+func (c *MemoryCache) insertCommandResult(result *AgentCommands) {
+	copy(c.cresults[0:], c.cresults[1:])
+	c.cresults[len(c.cresults)-1] = result
 }
 
 func (c *MemoryCache) write(r *plugin.Result) {
@@ -200,6 +239,35 @@ func (c *MemoryCache) write(r *plugin.Result) {
 	}
 }
 
+func (c *MemoryCache) writeCommand(cr *CommandResult) {
+	var value *string
+	var err *string
+
+	log.Debugf("cache command(%d) result:%s error:%s", cr.ID, cr.Result, cr.Error)
+
+	c.lastCommandID++
+
+	if cr.Result != "" {
+		value = &cr.Result
+	}
+
+	if cr.Error != nil {
+		err_msg := cr.Error.Error()
+		err = &err_msg
+	}
+
+	cmd := &AgentCommands{
+		Id:    cr.ID,
+		Value: value,
+		Error: err}
+
+	if c.totalCmdValueNum >= c.maxCmdBufferSize {
+		c.insertCommandResult(cmd)
+	} else {
+		c.addCommandResult(cmd)
+	}
+}
+
 func (c *MemoryCache) run() {
 	defer log.PanicHook()
 	c.Debugf("starting memory cache")
@@ -214,6 +282,8 @@ func (c *MemoryCache) run() {
 			c.flushOutput(v)
 		case *plugin.Result:
 			c.write(v)
+		case *CommandResult:
+			c.writeCommand(v)
 		case *agent.AgentOptions:
 			c.updateOptions(v)
 		}
@@ -224,6 +294,7 @@ func (c *MemoryCache) run() {
 
 func (c *MemoryCache) updateOptions(options *agent.AgentOptions) {
 	c.maxBufferSize = int32(options.BufferSize)
+	c.maxCmdBufferSize = MaxCmdBufferSize
 	c.timeout = options.Timeout
 }
 
