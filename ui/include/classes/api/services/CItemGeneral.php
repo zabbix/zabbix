@@ -1374,7 +1374,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateParameters(array &$items, array $db_items = null,
+	protected static function updateParameters(array &$items, array &$db_items = null,
 			array &$upd_itemids = null): void {
 		$ins_item_parameters = [];
 		$upd_item_parameters = [];
@@ -1447,7 +1447,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['parameters']);
+					unset($item['parameters'], $db_items[$item['itemid']]['parameters']);
 				}
 			}
 		}
@@ -1485,7 +1485,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updatePreprocessing(array &$items, array $db_items = null,
+	protected static function updatePreprocessing(array &$items, array &$db_items = null,
 			array &$upd_itemids = null): void {
 		$ins_item_preprocs = [];
 		$upd_item_preprocs = [];
@@ -1539,7 +1539,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['preprocessing']);
+					unset($item['preprocessing'], $db_items[$item['itemid']]['preprocessing']);
 				}
 			}
 		}
@@ -1577,7 +1577,7 @@ abstract class CItemGeneral extends CApiService {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	protected static function updateTags(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+	protected static function updateTags(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
 		$ins_tags = [];
 		$del_itemtagids = [];
 
@@ -1616,7 +1616,7 @@ abstract class CItemGeneral extends CApiService {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['tags']);
+					unset($item['tags'], $db_items[$item['itemid']]['tags']);
 				}
 			}
 		}

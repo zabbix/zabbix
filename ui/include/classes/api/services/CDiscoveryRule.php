@@ -487,7 +487,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::updateForce($items, $db_items);
 		self::inherit($items, $db_items);
-// self::exception();
+
 		return ['itemids' => $itemids];
 	}
 
@@ -521,8 +521,9 @@ class CDiscoveryRule extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'
-			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
+			),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
 		]);
@@ -1216,7 +1217,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateLldMacroPaths(array &$items, array $db_items = null,
+	private static function updateLldMacroPaths(array &$items, array &$db_items = null,
 			array &$upd_itemids = null): void {
 		$ins_lld_macro_paths = [];
 		$upd_lld_macro_paths = [];
@@ -1266,7 +1267,7 @@ class CDiscoveryRule extends CItemGeneral {
 					$upd_itemids[$i] = $item['itemid'];
 				}
 				else {
-					unset($item['lld_macro_paths']);
+					unset($item['lld_macro_paths'], $db_items[$item['itemid']]['lld_macro_paths']);
 				}
 			}
 		}
@@ -1304,7 +1305,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateItemFilters(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+	private static function updateItemFilters(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
 		self::updateFilters($items, $db_items, $upd_itemids, 'items', 'item_condition');
 	}
 
@@ -1315,7 +1316,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string     $base_table
 	 * @param string     $condition_table
 	 */
-	private static function updateFilters(array &$objects, ?array $db_objects, ?array &$upd_objectids,
+	private static function updateFilters(array &$objects, ?array &$db_objects, ?array &$upd_objectids,
 			string $base_table, string $condition_table): void {
 		$base_pk = DB::getPk($base_table);
 		$condition_pk = DB::getPk($condition_table);
@@ -1340,14 +1341,18 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 
 			if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$upd_object['formula'] = CConditionHelper::replaceLetterIds($object['filter']['formula'],
-					array_column($object['filter']['conditions'], $condition_pk, 'formulaid')
-				);
+				if ($db_objects === null
+						|| $object['filter']['formula'] != $db_objects[$object[$base_pk]]['filter']['formula']
+						|| array_key_exists($i, $_upd_objectids)) {
+					$upd_object['formula'] = CConditionHelper::replaceLetterIds($object['filter']['formula'],
+						array_column($object['filter']['conditions'], $condition_pk, 'formulaid')
+					);
+				}
 			}
 			elseif ($db_objects !== null
 					&& $db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$upd_object['formula'] = DB::getDefault($base_table, 'formula');
-				$object['formula'] = DB::getDefault($base_table, 'formula');
+				$object['filter']['formula'] = DB::getDefault($base_table, 'formula');
 			}
 
 			if ($upd_object) {
@@ -1363,7 +1368,7 @@ class CDiscoveryRule extends CItemGeneral {
 					$upd_objectids[$i] = $object[$base_pk];
 				}
 				else {
-					unset($object['filter']);
+					unset($object['filter'], $db_objects[$object[$base_pk]]['filter']);
 				}
 			}
 		}
@@ -1381,7 +1386,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param string     $base_table
 	 * @param string     $condition_table
 	 */
-	private static function updateFilterConditions(array &$objects, array $db_objects = null,
+	private static function updateFilterConditions(array &$objects, array &$db_objects = null,
 			array &$upd_objectids = null, string $base_table, string $condition_table): void {
 		$base_pk = DB::getPk($base_table);
 		$condition_pk = DB::getPk($condition_table);
@@ -1414,7 +1419,8 @@ class CDiscoveryRule extends CItemGeneral {
 				if ($object['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$condition['formulaid'] = $formulaids[$j];
 				}
-				elseif ($db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+				elseif ($db_objects !== null
+						&& $db_objects[$object[$base_pk]]['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 					$condition['formulaid'] = '';
 				}
 
@@ -1448,7 +1454,7 @@ class CDiscoveryRule extends CItemGeneral {
 					$upd_objectids[$i] = $object[$base_pk];
 				}
 				elseif ($object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-					unset($object['filter']['conditions']);
+					unset($object['filter']['conditions'], $db_objects[$object[$base_pk]]['filter']['conditions']);
 				}
 			}
 		}
@@ -1503,7 +1509,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_items
 	 * @param array|null $upd_itemids
 	 */
-	private static function updateOverrides(array &$items, array $db_items = null, array &$upd_itemids = null): void {
+	private static function updateOverrides(array &$items, array &$db_items = null, array &$upd_itemids = null): void {
 		$ins_overrides = [];
 		$upd_overrides = [];
 		$del_overrideids = [];
@@ -1535,15 +1541,6 @@ class CDiscoveryRule extends CItemGeneral {
 						];
 						$changed = true;
 					}
-
-					$override += [
-						'filter' => [
-							'evaltype' => DB::getDefault('lld_override', 'evaltype'),
-							'formula' => DB::getDefault('lld_override', 'formula'),
-							'conditions' => []
-						],
-						'operations' => []
-					];
 				}
 				else {
 					$ins_overrides[] = ['itemid' => $item['itemid']] + $override;
@@ -1627,12 +1624,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($item);
 
-		if (!$overrides) {
-			return;
+		if ($overrides) {
+			self::updateOverrideFilters($overrides, $db_overrides, $upd_overrideids);
+			self::updateOverrideOperations($overrides, $db_overrides, $upd_overrideids);
 		}
-
-		self::updateOverrideFilters($overrides, $db_overrides, $upd_overrideids);
-		self::updateOverrideOperations($overrides, $db_overrides, $upd_overrideids);
 
 		if ($db_items !== null) {
 			foreach (array_unique(array_intersect_key($item_indexes, $upd_overrideids)) as $i) {
@@ -1641,7 +1636,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			foreach ($items as $i => &$item) {
 				if (!array_key_exists($i, $_upd_itemids)) {
-					unset($item['overrides']);
+					unset($item['overrides'], $db_items[$item['itemid']]['overrides']);
 				}
 			}
 			unset($item);
@@ -1673,7 +1668,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_overrides
 	 * @param array|null $upd_overrideids
 	 */
-	private static function updateOverrideFilters(array &$overrides, ?array $db_overrides,
+	private static function updateOverrideFilters(array &$overrides, ?array &$db_overrides,
 			?array &$upd_overrideids): void {
 		self::updateFilters($overrides, $db_overrides, $upd_overrideids, 'lld_override', 'lld_override_condition');
 	}
@@ -1683,7 +1678,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array|null $db_overrides
 	 * @param array|null $upd_overrideids
 	 */
-	private static function updateOverrideOperations(array &$overrides, ?array $db_overrides,
+	private static function updateOverrideOperations(array &$overrides, ?array &$db_overrides,
 			?array &$upd_overrideids): void {
 		$ins_operations = [];
 		$del_operationids = [];
@@ -1758,11 +1753,9 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		unset($override);
 
-		if (!$operations) {
-			return;
+		if ($operations) {
+			self::createOverrideOperationFields($operations, $upd_operationids);
 		}
-
-		self::createOverrideOperationFields($operations, $upd_operationids);
 
 		if ($db_overrides !== null) {
 			foreach (array_unique(array_intersect_key($override_indexes, $upd_operationids)) as $i) {
@@ -1771,7 +1764,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 			foreach ($overrides as $i => &$override) {
 				if (!array_key_exists($i, $_upd_overrideids)) {
-					unset($override['operations']);
+					unset($override['operations'], $db_overrides[$override['lld_overrideid']]['operations']);
 				}
 			}
 			unset($override);
@@ -1931,9 +1924,478 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 	}
 
+	/**
+	 * @param array $templateids
+	 * @param array $hostids
+	 */
+	public static function linkTemplateObjects(array $templateids, array $hostids): void {
+		$db_items = DB::select('items', [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
+			),
+			'filter' => [
+				'hostid' => $templateids,
+				'flags' => ZBX_FLAG_DISCOVERY_RULE
+			],
+			'preservekeys' => true
+		]);
+
+		if (!$db_items) {
+			return;
+		}
+
+		self::addInternalFields($db_items);
+
+		$items = [];
+
+		foreach ($db_items as $db_item) {
+			$item = array_intersect_key($db_item, array_flip(['itemid', 'type']));
+
+			if ($db_item['type'] == ITEM_TYPE_SCRIPT) {
+				$item += ['parameters' => []];
+			}
+
+			$items[] = $item + [
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => []
+			];
+		}
+
+		self::addAffectedObjects($items, $db_items);
+
+		$ruleids = array_keys($db_items);
+
+		$items = array_values($db_items);
+
+		foreach ($items as &$item) {
+			if (array_key_exists('parameters', $item)) {
+				$item['parameters'] = array_values($item['parameters']);
+			}
+
+			$item['preprocessing'] = array_values($item['preprocessing']);
+			$item['lld_macro_paths'] = array_values($item['lld_macro_paths']);
+			$item['filter']['conditions'] = array_values($item['filter']['conditions']);
+
+			foreach ($item['filter']['conditions'] as &$condition) {
+				if ($item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+			}
+			unset($condition);
+
+			foreach ($item['overrides'] as &$override) {
+				foreach ($override['filter']['conditions'] as &$condition) {
+					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formulaid']);
+					}
+				}
+				unset($condition);
+
+				$override['filter']['conditions'] = array_values($override['filter']['conditions']);
+
+				foreach ($override['operations'] as &$operation) {
+					$operation['optag'] = array_values($operation['optag']);
+					$operation['optemplate'] = array_values($operation['optemplate']);
+				}
+				unset($operation);
+
+				$override['operations'] = array_values($override['operations']);
+			}
+			unset($override);
+
+			$item['overrides'] = $item['overrides'];
+		}
+		unset($item);
+
+		self::inherit($items, [], $hostids);
+
+		CItemPrototype::linkTemplateObjects($templateids, $hostids);
+		API::TriggerPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
+		API::GraphPrototype()->syncTemplates(['templateids' => $templateids, 'hostids' => $hostids]);
+		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
+	}
+
 	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
+		$tpl_links = self::getTemplateLinks($items, $hostids);
 
+		if ($hostids === null) {
+			self::filterObjectsToInherit($items, $db_items, $tpl_links);
+
+			if (!$items) {
+				return;
+			}
+		}
+
+		self::checkDoubleInheritedNames($items, $db_items, $tpl_links);
+
+		$chunks = self::getInheritChunks($items, $tpl_links);
+
+		foreach ($chunks as $chunk) {
+			$_items = array_intersect_key($items, array_flip($chunk['item_indexes']));
+			$_db_items = array_intersect_key($db_items, array_flip(array_column($_items, 'itemid')));
+			$_hostids = array_keys($chunk['hosts']);
+
+			self::inheritChunk($_items, $_db_items, $tpl_links, $_hostids);
+		}
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $tpl_links
+	 * @param array $hostids
+	 */
+	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+		$items_to_link = [];
+		$items_to_update = [];
+
+		foreach ($items as $i => $item) {
+			if (!array_key_exists($item['itemid'], $db_items)) {
+				$items_to_link[] = $item;
+			}
+			else {
+				$items_to_update[] = $item;
+			}
+
+			unset($items[$i]);
+		}
+
+		$ins_items = [];
+		$upd_items = [];
+		$upd_db_items = [];
+
+		if ($items_to_link) {
+			$upd_db_items = self::getChildObjectsUsingName($items_to_link, $hostids);
+
+			if ($upd_db_items) {
+				$upd_items = self::getUpdChildObjectsUsingName($items_to_link, $upd_db_items);
+			}
+
+			$ins_items = self::getInsChildObjects($items_to_link, $upd_db_items, $tpl_links, $hostids);
+		}
+
+		if ($items_to_update) {
+			$_upd_db_items = self::getChildObjectsUsingTemplateid($items_to_update, $db_items, $hostids);
+			$_upd_items = self::getUpdChildObjectsUsingTemplateid($items_to_update, $_upd_db_items);
+
+			self::checkDuplicates($_upd_items, $_upd_db_items);
+
+			$upd_items = array_merge($upd_items, $_upd_items);
+			$upd_db_items += $_upd_db_items;
+		}
+
+		self::setChildMasterItemIds($upd_items, $ins_items, $hostids);
+
+		self::checkDependentItems(array_merge($upd_items, $ins_items), $upd_db_items, true);
+
+		self::addInterfaceIds($upd_items, $upd_db_items, $ins_items);
+
+		if ($upd_items) {
+			self::updateForce($upd_items, $upd_db_items);
+		}
+
+		if ($ins_items) {
+			self::createForce($ins_items);
+		}
+
+		self::inherit(array_merge($upd_items, $ins_items), $upd_db_items);
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private static function getChildObjectsUsingName(array $items, array $hostids): array {
+		$result = DBselect(
+			'SELECT i.itemid,ht.hostid,i.key_,i.templateid,i.flags,h.status AS host_status,'.
+				'ht.templateid AS parent_hostid'.
+			' FROM hosts_templates ht,items i,hosts h'.
+			' WHERE ht.hostid=i.hostid'.
+				' AND ht.hostid=h.hostid'.
+				' AND '.dbConditionId('ht.templateid', array_unique(array_column($items, 'hostid'))).
+				' AND '.dbConditionString('i.key_', array_unique(array_column($items, 'key_'))).
+				' AND '.dbConditionId('ht.hostid', $hostids)
+		);
+
+		$upd_db_items = [];
+		$parent_indexes = [];
+
+		while ($row = DBfetch($result)) {
+			foreach ($items as $i => $item) {
+				if (bccomp($row['parent_hostid'], $item['hostid']) == 0 && $row['key_'] === $item['key_']) {
+					if ($row['flags'] == $item['flags'] && $row['templateid'] == 0) {
+						$upd_db_items[$row['itemid']] = $row;
+						$parent_indexes[$row['itemid']] = $i;
+					}
+					else {
+						self::showObjectMismatchError($item, $row);
+					}
+				}
+			}
+		}
+
+		if (!$upd_db_items) {
+			return [];
+		}
+
+		$options = [
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
+			),
+			'itemids' => array_keys($upd_db_items)
+		];
+		$result = DBselect(DB::makeSql('items', $options));
+
+		while ($row = DBfetch($result)) {
+			$upd_db_items[$row['itemid']] = $row + $upd_db_items[$row['itemid']];
+		}
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['itemid']]];
+
+			$upd_items[] = [
+				'itemid' => $upd_db_item['itemid'],
+				'type' => $item['type'],
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => [],
+				'parameters' => []
+			];
+		}
+
+		self::addAffectedObjects($upd_items, $upd_db_items);
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $upd_db_items
+	 *
+	 * @return array
+	 */
+	private static function getUpdChildObjectsUsingName(array $items, array $upd_db_items): array {
+		$parent_indexes = [];
+
+		foreach ($items as $i => &$item) {
+			$item['uuid'] = '';
+			$item = self::unsetNestedObjectIds($item);
+
+			$parent_indexes[$item['hostid']][$item['key_']] = $i;
+		}
+		unset($item);
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['parent_hostid']][$upd_db_item['key_']]];
+
+			$upd_item = [
+				'itemid' => $upd_db_item['itemid'],
+				'hostid' => $upd_db_item['hostid'],
+				'templateid' => $item['itemid'],
+				'host_status' => $upd_db_item['host_status']
+			] + $item;
+
+			$upd_item += [
+				'preprocessing' => [],
+				'lld_macro_paths' => [],
+				'filter' => [],
+				'overrides' => [],
+				'parameters' => []
+			];
+
+			$upd_items[] = $upd_item;
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $upd_db_items
+	 * @param array $tpl_links
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private static function getInsChildObjects(array $items, array $upd_db_items, array $tpl_links,
+			array $hostids): array {
+		$ins_items = [];
+
+		$upd_item_keys = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$upd_item_keys[$upd_db_item['hostid']][] = $upd_db_item['key_'];
+		}
+
+		foreach ($items as $item) {
+			$item['uuid'] = '';
+			$item = self::unsetNestedObjectIds($item);
+
+			foreach ($tpl_links[$item['hostid']] as $host) {
+				if (!in_array($host['hostid'], $hostids)
+						|| (array_key_exists($host['hostid'], $upd_item_keys)
+							&& in_array($item['key_'], $upd_item_keys[$host['hostid']]))) {
+					continue;
+				}
+
+				$ins_items[] = [
+					'hostid' => $host['hostid'],
+					'templateid' => $item['itemid'],
+					'host_status' => $host['status']
+				] + array_diff_key($item, array_flip(['itemid']));
+			}
+		}
+
+		return $ins_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $db_items
+	 * @param array $hostids
+	 *
+	 * @return array
+	 */
+	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
+		$upd_db_items = DB::select('items', [
+			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+				array_diff(CItemType::FIELD_NAMES, ['parameters'])
+			),
+			'filter' => [
+				'templateid' => array_keys($db_items),
+				'hostid' => $hostids
+			],
+			'preservekeys' => true
+		]);
+
+		self::addInternalFields($upd_db_items);
+
+		if ($upd_db_items) {
+			$parent_indexes = array_flip(array_column($items, 'itemid'));
+			$upd_items = [];
+
+			foreach ($upd_db_items as $upd_db_item) {
+				$item = $items[$parent_indexes[$upd_db_item['templateid']]];
+				$db_item = $db_items[$upd_db_item['templateid']];
+
+				$upd_item = [
+					'itemid' => $upd_db_item['itemid'],
+					'type' => $item['type']
+				];
+
+				$upd_item += array_intersect_key([
+					'preprocessing' => [],
+					'lld_macro_paths' => [],
+					'filter' => [],
+					'overrides' => [],
+					'parameters' => []
+				], $db_item);
+
+				$upd_items[] = $upd_item;
+			}
+
+			self::addAffectedObjects($upd_items, $upd_db_items);
+		}
+
+		return $upd_db_items;
+	}
+
+	/**
+	 * @param array $items
+	 * @param array $upd_db_items
+	 *
+	 * @return array
+	 */
+	private static function getUpdChildObjectsUsingTemplateid(array $items, array $upd_db_items): array {
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
+
+		foreach ($items as &$item) {
+			unset($item['uuid']);
+			$item = self::unsetNestedObjectIds($item);
+		}
+		unset($item);
+
+		$upd_items = [];
+
+		foreach ($upd_db_items as $upd_db_item) {
+			$item = $items[$parent_indexes[$upd_db_item['templateid']]];
+
+			$upd_items[] = array_intersect_key($upd_db_item,
+				array_flip(['itemid', 'hostid', 'templateid', 'host_status'])
+			) + $item;
+		}
+
+		return $upd_items;
+	}
+
+	/**
+	 * @param array $item
+	 *
+	 * @return array
+	 */
+	protected static function unsetNestedObjectIds(array $item): array {
+		$item = parent::unsetNestedObjectIds($item);
+
+		if (array_key_exists('lld_macro_paths', $item)) {
+			foreach ($item['lld_macro_paths'] as &$lld_macro_path) {
+				unset($lld_macro_path['lld_macro_pathid']);
+			}
+			unset($lld_macro_path);
+		}
+
+		if (array_key_exists('filter', $item)) {
+			foreach ($item['filter']['conditions'] as &$condition) {
+				unset($condition['item_conditionid']);
+			}
+			unset($condition);
+		}
+
+		if (array_key_exists('overrides', $item)) {
+			foreach ($item['overrides'] as &$override) {
+				unset($override['lld_overrideid']);
+
+				if (array_key_exists('filter', $override)) {
+					foreach ($override['filter']['conditions'] as &$condition) {
+						unset($condition['lld_override_conditionid']);
+					}
+					unset($condition);
+				}
+
+				if (array_key_exists('operations', $override)) {
+					foreach ($override['operations'] as &$operation) {
+						unset($operation['lld_override_operationid']);
+
+						if (array_key_exists('optag', $operation)) {
+							foreach ($operation['optag'] as &$optag) {
+								unset($optag['lld_override_optagid']);
+							}
+							unset($optag);
+						}
+
+						if (array_key_exists('optemplate', $operation)) {
+							foreach ($operation['optemplate'] as &$optemplate) {
+								unset($optemplate['lld_override_optemplateid']);
+							}
+							unset($optemplate);
+						}
+					}
+					unset($operation);
+				}
+			}
+			unset($override);
+		}
+
+		return $item;
 	}
 
 	/**
@@ -2062,16 +2524,6 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		return true;
-	}
-
-	/**
-	 * @param array $templateids
-	 * @param array $hostids
-	 *
-	 * @return array Array of discovery rule IDs.
-	 */
-	public function syncTemplates(array $templateids, array $hostids): void {
-
 	}
 
 	/**
