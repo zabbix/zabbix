@@ -3660,6 +3660,10 @@ a.icon-count {
 			color: $btn-color;
 			border-color: $form-focus-border-color;
 		}
+
+		&.is-focused {
+			border-color: $form-focus-border-color;
+		}
 	}
 }
 

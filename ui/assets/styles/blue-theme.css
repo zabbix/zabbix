@@ -6350,6 +6350,8 @@ a.icon-count {
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #ffffff;
       border-color: #02659f; }
+    .macro-input-group .btn-undo.is-focused {
+      border-color: #02659f; }
 
 .input-secret {
   position: relative;

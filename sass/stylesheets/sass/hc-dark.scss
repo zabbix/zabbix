@@ -1101,7 +1101,7 @@ td.inactive-bg {
 
 // InputSecret and ButtonDropdown.
 
-.btn-undo.is-focused { // TODO FIX to input:focus + .btn-undo, textarea:focus + .btn-undo
+.btn-undo.is-focused {
 	box-shadow: 0 1px 0 $btn-focus-outline-color, 0 -1px 0 $btn-focus-outline-color;
 }
 
