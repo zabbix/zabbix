@@ -21,20 +21,20 @@
 
 class CControllerCorrelationList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'sort'          => 'in name,status',
-			'sortorder'     => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'       => 'in 1',
-			'filter_set'    => 'in 1',
-			'filter_rst'    => 'in 1',
-			'filter_name'   => 'string',
-			'filter_status' => 'in -1,'.ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED,
-			'page'          => 'ge 1'
+			'sort' =>			'in name,status',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,11 +46,11 @@ class CControllerCorrelationList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$sort_field = $this->getInput('sort', CProfile::get('web.correlation.php.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.correlation.php.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.correlation.php.sort', $sort_field, PROFILE_TYPE_STR);

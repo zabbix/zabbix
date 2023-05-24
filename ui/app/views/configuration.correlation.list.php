@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('configuration.correlation.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('correlation');
@@ -32,10 +35,9 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
 	->setControls(
 		(new CTag('nav', true,
-			(new CList())
-				->addItem(new CRedirectButton(_('Create correlation'),
-					(new CUrl('zabbix.php'))->setArgument('action', 'correlation.edit')
-				))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create correlation')))->setId('js-create')
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
@@ -43,23 +45,37 @@ $html_page = (new CHtmlPage())
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Status'),
-				(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
-					->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
-					->setModern(true)
-			)
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Name'), 'filter_name'),
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
+				]),
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Status')),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+							->addValue(_('Any'), -1)
+							->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
+							->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
+							->setModern()
+					)
+				])
 		])
 		->addVar('action', 'correlation.list')
 	);
 
 $form = (new CForm())->setName('correlation_form');
+
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'correlation.list')
+	->getUrl();
 
 $table = (new CTableInfo())
 	->setHeader([
@@ -67,75 +83,56 @@ $table = (new CTableInfo())
 			(new CCheckBox('all_items'))
 				->onClick("checkAll('".$form->getName()."', 'all_items', 'correlationids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'correlation.list')
-			->getUrl()
-		),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		_('Conditions'),
 		_('Operations'),
-		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], (new CUrl('zabbix.php'))
-			->setArgument('action', 'correlation.list')
-			->getUrl()
-		)
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url)
 	]);
 
-$csrf_token = CCsrfTokenHelper::get('correlation');
 
-if ($data['correlations']) {
-	foreach ($data['correlations'] as $correlation) {
-		$conditions = [];
-		$operations = [];
+foreach ($data['correlations'] as $correlation) {
+	$conditions = [];
+	$operations = [];
 
-		order_result($correlation['filter']['conditions'], 'type', ZBX_SORT_DOWN);
+	order_result($correlation['filter']['conditions'], 'type', ZBX_SORT_DOWN);
 
-		foreach ($correlation['filter']['conditions'] as $condition) {
-			if (!array_key_exists('operator', $condition)) {
-				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
-			}
-
-			$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
-			$conditions[] = BR();
+	foreach ($correlation['filter']['conditions'] as $condition) {
+		if (!array_key_exists('operator', $condition)) {
+			$condition['operator'] = CONDITION_OPERATOR_EQUAL;
 		}
 
-		CArrayHelper::sort($correlation['operations'], ['type']);
-
-		foreach ($correlation['operations'] as $operation) {
-			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
-			$operations[] = BR();
-		}
-
-		if ($correlation['status'] == ZBX_CORRELATION_DISABLED) {
-			$status = (new CLink(_('Disabled'), (new CUrl('zabbix.php'))
-				->setArgument('correlationids', (array) $correlation['correlationid'])
-				->setArgument('action', 'correlation.enable')
-				->getUrl()
-			))
-				->addCsrfToken($csrf_token)
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED);
-		}
-		else {
-			$status = (new CLink(_('Enabled'), (new CUrl('zabbix.php'))
-				->setArgument('correlationids', (array) $correlation['correlationid'])
-				->setArgument('action', 'correlation.disable')
-				->getUrl()
-			))
-				->addCsrfToken($csrf_token)
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN);
-		}
-
-		$table->addRow([
-			new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-			new CLink($correlation['name'], (new CUrl('zabbix.php'))
-				->setArgument('correlationid', $correlation['correlationid'])
-				->setArgument('action', 'correlation.edit')
-			),
-			$conditions,
-			$operations,
-			$status
-		]);
+		$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
+		$conditions[] = BR();
 	}
+
+	CArrayHelper::sort($correlation['operations'], ['type']);
+
+	foreach ($correlation['operations'] as $operation) {
+		$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
+		$operations[] = BR();
+	}
+
+	$status = ($correlation['status'] == ZBX_CORRELATION_ENABLED)
+		? (new CLink(_('Enabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_GREEN)
+			->addClass('js-disable')
+			->setAttribute('data-correlationid', (int) $correlation['correlationid'])
+		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_RED)
+			->addClass('js-enable')
+			->setAttribute('data-correlationid', (int) $correlation['correlationid']);
+
+	$table->addRow([
+		new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
+		(new CLink($correlation['name']))
+			->addClass('js-edit')
+			->setAttribute('data-correlationid', $correlation['correlationid']),
+		$conditions,
+		$operations,
+		$status
+	]);
 }
 
 $form->addItem([
@@ -143,26 +140,30 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'correlationids', [
 		'correlation.enable' => [
-			'name' => _('Enable'),
-			'confirm_singular' => _('Enable selected correlation?'),
-			'confirm_plural' => _('Enable selected correlations?'),
-			'csrf_token' => $csrf_token
+			'content' => (new CSimpleButton(_('Enable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massenable')
+				->addClass('no-chkbxrange')
 		],
 		'correlation.disable' => [
-			'name' => _('Disable'),
-			'confirm_singular' => _('Disable selected correlation?'),
-			'confirm_plural' => _('Disable selected correlations?'),
-			'csrf_token' => $csrf_token
+			'content' => (new CSimpleButton(_('Disable')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdisable')
+				->addClass('no-chkbxrange')
 		],
 		'correlation.delete' => [
-			'name' => _('Delete'),
-			'confirm_singular' => _('Delete selected correlation?'),
-			'confirm_plural' => _('Delete selected correlations?'),
-			'csrf_token' => $csrf_token
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('no-chkbxrange')
 		]
 	], 'correlation')
 ]);
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();
