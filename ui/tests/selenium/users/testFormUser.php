@@ -586,7 +586,7 @@ class testFormUser extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User added');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username='.zbx_dbstr($data['fields']['Username'])));
 		}
 
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
@@ -602,7 +602,7 @@ class testFormUser extends CWebTest {
 	 * Check the field values after creating or updating user.
 	 */
 	private function assertFormFields($data) {
-		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['fields']['Username']));
 		$this->page->open('zabbix.php?action=user.edit&userid='.$userid);
 		$form_update = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 
@@ -645,7 +645,7 @@ class testFormUser extends CWebTest {
 			$this->assertEquals($data['fields']['Rows per page'], $rows->count());
 
 			// Verification of default theme.
-			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE username ='.zbx_dbstr($data['fields']['Username']));
+			$db_theme = CDBHelper::getValue('SELECT theme FROM users WHERE username='.zbx_dbstr($data['fields']['Username']));
 			$color = $this->query('tag:body')->one()->getCSSValue('background-color');
 			$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
 			$parts = explode('/', $stylesheet->getAttribute('href'));
@@ -1009,7 +1009,7 @@ class testFormUser extends CWebTest {
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User updated');
-			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username='.zbx_dbstr($data['fields']['Username'])));
 		}
 
 		if (CTestArrayHelper::get($data, 'check_form', false)) {
@@ -1106,7 +1106,6 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'guest',
-					'error_title' => 'Cannot delete user',
 					'error_details' => 'Cannot delete Zabbix internal user "guest", try disabling that user.'
 				]
 			],
@@ -1120,7 +1119,6 @@ class testFormUser extends CWebTest {
 						'column' => 'name',
 						'value' => 'Local network'
 					],
-					'error_title' => 'Cannot delete user',
 					'error_details' => 'User "user-zabbix" is map "Local network" owner.'
 				]
 			],
@@ -1129,7 +1127,6 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'test-timezone',
-					'error_title' => 'Cannot delete user',
 					'error_details' => 'User "test-timezone" is dashboard "Testing share dashboard" owner.'
 				]
 			],
@@ -1143,7 +1140,6 @@ class testFormUser extends CWebTest {
 						'column' => 'operationid',
 						'value' => '19'
 					],
-					'error_title' => 'Cannot delete user',
 					'error_details' => 'User "user-for-blocking" is used in "Trigger action 4" action.'
 				]
 			]
@@ -1164,7 +1160,7 @@ class testFormUser extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $username)->one()->click();
-		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username =' . zbx_dbstr($username));
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($username));
 
 		// Link user with map, action to validate user deletion.
 		if (array_key_exists('parameters', $data)) {
@@ -1181,12 +1177,12 @@ class testFormUser extends CWebTest {
 
 		// Validate if the user was deleted.
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
-			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username =' . zbx_dbstr($username)));
+			$this->assertMessage(TEST_BAD, 'Cannot delete user', $data['error_details']);
+			$this->assertEquals(1, CDBHelper::getCount('SELECT userid FROM users WHERE username='.zbx_dbstr($username)));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'User deleted');
-			$this->assertEquals(0, CDBHelper::getCount('SELECT userid FROM users WHERE username ='.zbx_dbstr($data['fields']['Username'])));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT userid FROM users WHERE username='.zbx_dbstr($data['fields']['Username'])));
 		}
 	}
 
