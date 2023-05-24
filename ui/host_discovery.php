@@ -501,7 +501,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('update')) {
 			$db_items = API::DiscoveryRule()->get([
-				'output' => ['templateid', 'type', 'key_', 'authtype', 'allow_traps'],
+				'output' => ['templateid'],
 				'itemids' => $itemid
 			]);
 

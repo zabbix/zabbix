@@ -638,7 +638,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('update')) {
 			$db_items = API::Item()->get([
-				'output' => ['templateid', 'flags', 'type', 'key_', 'value_type', 'authtype', 'allow_traps'],
+				'output' => ['templateid', 'flags'],
 				'itemids' => $itemid
 			]);
 
