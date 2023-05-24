@@ -131,7 +131,7 @@ class CWidgetGeoMap extends CWidget {
 			position: 'topright',
 			checked: config.filter.severity,
 			severity_levels: this._severity_levels,
-			disabled: !this._widgetid
+			disabled: this._is_edit_mode
 		}).addTo(this._map);
 
 		// Navigate home btn.
@@ -270,6 +270,12 @@ class CWidgetGeoMap extends CWidget {
 		// Close opened hintboxes when moving/zooming/resizing widget.
 		this._map.on('zoomstart movestart resize', () => {
 			this.removeHintBoxes();
+		});
+
+		// Disable severity filter in dashboard edit mode.
+		document.getElementById('dashboard-edit').addEventListener('click', () => {
+			this._map.severityFilterControl.close();
+			this._map.severityFilterControl.disable();
 		});
 	}
 
