@@ -251,11 +251,11 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community'],
-			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level'],
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Use bulk requests'],
+			'SNMPv3' => ['SNMP version', 'Context name', 'Security name', 'Security level', 'Use bulk requests'],
 			'authNoPriv' => ['SNMP version', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase'
+				'Authentication protocol', 'Authentication passphrase', 'Use bulk requests'
 			]
 		];
 

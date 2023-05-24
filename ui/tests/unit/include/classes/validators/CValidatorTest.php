@@ -103,7 +103,7 @@ abstract class CValidatorTest extends TestCase {
 		$validator = $this->createValidator($params);
 		$result = $validator->validate($value);
 
-		$this->assertEquals(true, $result);
+		$this->assertSame(true, $result);
 		$this->assertNull($validator->getError());
 	}
 

@@ -48,7 +48,6 @@ class CVaultSecretParser extends CParser {
 	 * @inheritDoc
 	 */
 	public function parse($source, $pos = 0) {
-		$this->start = $pos;
 		$this->errorClear();
 
 		$src_size = strlen($source);

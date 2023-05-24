@@ -35,7 +35,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'Configuration' => 'triggers.php?form=update&triggerid=100035',
 						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
 						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
@@ -49,7 +49,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'Configuration' => 'triggers.php?form=update&triggerid=100032',
 						'Trigger URL' => 'tr_events.php?triggerid=100032&eventid=9000',
 						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101',

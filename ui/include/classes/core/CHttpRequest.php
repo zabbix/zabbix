@@ -27,7 +27,14 @@ class CHttpRequest {
 	/**
 	 * additional HTTP headers not prefixed with HTTP_ in $_SERVER superglobal
 	 */
-	public $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+	private $add_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH'];
+
+	private $body;
+	private $method;
+	private $protocol;
+	private $request_method;
+	private $headers;
+	private $raw;
 
 	/**
 	 * Retrieve HTTP Body

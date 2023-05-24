@@ -879,8 +879,15 @@ class testFormValueMappings extends CWebTest {
 			$this->query('link', $data['name'])->one()->click();
 			$this->checkMappings($data);
 
-			// Check the screenshot of the whole value mappings tab.
+			// Check the value mapping screenshots after form submit.
 			if (CTestArrayHelper::get($data, 'screenshot_id')) {
+				// Take a screenshot to test draggable object position in overlay dialog.
+				if ($action === 'create') {
+					$this->page->removeFocus();
+					$this->assertScreenshot($mapping_table, 'Value mappings popup'.$data['screenshot_id']);
+				}
+
+				// Check the screenshot of the whole value mappings tab.
 				$this->openValueMappingTab($source, false);
 				$this->assertScreenshot($this->query('id:valuemap-tab')->one(), $action.$data['screenshot_id']);
 			}
@@ -1089,5 +1096,28 @@ class testFormValueMappings extends CWebTest {
 
 		// Check that the value mapping data is still populated.
 		$this->assertTableData($reference_valuemaps, 'id:valuemap-formlist');
+	}
+
+	/**
+	 * Function that checks a screenshot of draggable element in hosts/templates value mapping while mass updating.
+	 *
+	 * @param string $source		Entity (hosts or templates) for which the scenario is executed.
+	 */
+	public function checkMassValuemappingScreenshot($source) {
+		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'templates.php')->waitUntilReady();
+		$this->selectTableRows();
+		$this->query('button:Mass update')->one()->click();
+		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$update_form->selectTab('Value mapping');
+		$update_form->query('id:visible_valuemaps')->asCheckbox()->one()->check();
+		$update_form->query('id:valuemap_add')->one()->click();
+		$mapping_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+
+		// Take a screenshot to test draggable object position of value mapping field.
+		$this->page->removeFocus();
+
+		// It is necessary because of unexpected viewport shift.
+		$this->page->updateViewport();
+		$this->assertScreenshot($mapping_form->query('id:mappings_table')->waitUntilVisible()->one(), 'Value mapping mass update');
 	}
 }

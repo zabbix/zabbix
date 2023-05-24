@@ -94,11 +94,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -1332,7 +1331,7 @@ class CHistoryManager {
 	private function deleteHistoryFromSql(array $items) {
 		global $DB;
 
-		$item_tables = array_map('self::getTableName', array_unique($items));
+		$item_tables = array_map([self::class, 'getTableName'], array_unique($items));
 		$table_names = array_flip(self::getTableName());
 
 		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {

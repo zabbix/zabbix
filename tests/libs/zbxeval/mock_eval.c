@@ -234,7 +234,7 @@ static zbx_uint32_t	mock_token_str2type(const char *str)
 
 void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path)
 {
-	int			token_num = 0, len;
+	int			token_num = 0;
 	zbx_mock_handle_t	htokens, htoken;
 	zbx_mock_error_t	err;
 	zbx_uint32_t		expected_type, expected_opt;
@@ -244,6 +244,8 @@ void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path)
 	htokens = zbx_mock_get_parameter_handle(path);
 	while (ZBX_MOCK_END_OF_VECTOR != (err = (zbx_mock_vector_element(htokens, &htoken))))
 	{
+		char	*token_value = NULL;
+
 		if (ZBX_MOCK_SUCCESS != err)
 			fail_msg("cannot read token #%d: %s", token_num, zbx_mock_error_string(err));
 
@@ -275,13 +277,24 @@ void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path)
 			fail_msg("expected token optional data %d while got %d", expected_opt, token->opt);
 		}
 
-		len = token->loc.r - token->loc.l + 1;
-		if (ZBX_EVAL_TOKEN_ARG_NULL != token->type &&
-				0 != strncmp(expected_token, ctx->expression + token->loc.l, len))
+		switch (token->type)
 		{
-			mock_dump_stack(ctx);
-			fail_msg("expected token %s while got %.*s", expected_token, len,
-					ctx->expression + token->loc.l);
+			case ZBX_EVAL_TOKEN_ARG_NULL:
+				break;
+			case ZBX_EVAL_TOKEN_VAR_STR:
+				if (ZBX_VARIANT_STR == token->value.type)
+					token_value = zbx_strdup(NULL, token->value.data.str);
+				else
+					token_value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
+				break;
+			default:
+				token_value = zbx_substr(ctx->expression, token->loc.l, token->loc.r);
+		}
+
+		if (NULL != token_value)
+		{
+			zbx_mock_assert_str_eq("token value", expected_token, token_value);
+			zbx_free(token_value);
 		}
 	}
 

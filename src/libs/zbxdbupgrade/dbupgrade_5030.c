@@ -5423,7 +5423,12 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
 		{
-			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+			char	quoted[FUNCTION_PARAM_LEN * 5 + 1];
+
+			zbx_escape_string(quoted, sizeof(quoted), request->params[3], "\"\\");
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
+			zbx_strcpy_alloc(str, str_alloc, str_offset, quoted);
+			zbx_chrcpy_alloc(str, str_alloc, str_offset, '"');
 		}
 		else
 		{

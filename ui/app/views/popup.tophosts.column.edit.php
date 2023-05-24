@@ -116,7 +116,7 @@ $form_grid->addItem([
 ]);
 
 $numeric_only_warning = new CSpan([
-	'&nbsp;',
+	NBSP(),
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
 ]);
 

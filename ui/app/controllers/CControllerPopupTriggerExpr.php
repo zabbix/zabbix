@@ -364,7 +364,7 @@ class CControllerPopupTriggerExpr extends CController {
 			],
 			'atan2' => [
 				'types' => [ZBX_FUNCTION_TYPE_MATH],
-				'description' => _('atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians'),
+				'description' => _('atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians'),
 				'params' => $this->param1SecCount + [
 					'abscissa' => [
 						'C' => _('Abscissa'),
@@ -1241,8 +1241,6 @@ class CControllerPopupTriggerExpr extends CController {
 
 		// Opening the popup when editing an expression in the trigger constructor.
 		if (($dstfld1 === 'expr_temp' || $dstfld1 === 'recovery_expr_temp') && $expression !== '') {
-			$expression = utf8RawUrlDecode($expression);
-
 			if ($expression_parser->parse($expression) == CParser::PARSE_SUCCESS) {
 				$math_function_token = null;
 				$hist_function_token = null;

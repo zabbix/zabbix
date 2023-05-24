@@ -259,7 +259,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 			return item;
 	}
 
-	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_group_t));
+	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_item_t));
 	item->itemid = itemid;
 	zbx_vector_ptr_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);
@@ -1002,7 +1002,8 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 						args[i].data.dbl);
 				break;
 			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				zbx_strquote_alloc_opt(&params, &params_alloc, &params_offset, args[i].data.str,
+						ZBX_STRQUOTE_SKIP_BACKSLASH);
 				break;
 			case ZBX_VARIANT_UI64:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,

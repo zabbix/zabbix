@@ -166,6 +166,7 @@ $input-placeholder-color: #bbbbbb;
 
 // Error messages
 $msg-bad-color: $light-red;
+$msg-btn-text-color: #ffffff;
 $msg-good-color: $light-green;
 $msg-warning-color: #ffb319;
 $msg-warning-border-color: #ffb319;
@@ -944,18 +945,6 @@ a.link-action {
 			.icon-wizard-action {
 				background: transparent url($sprite-path) no-repeat -318px -624px;
 			}
-		}
-	}
-}
-
-.overlay-dialogue {
-	.list-table {
-		th:first-child {
-			padding-left: 0px;
-		}
-
-		td:first-child {
-			padding-left: 42px;
 		}
 	}
 }

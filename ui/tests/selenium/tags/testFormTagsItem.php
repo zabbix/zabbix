@@ -71,7 +71,7 @@ class testFormTagsItem extends testFormTags {
 		$this->host = 'Host with tags for cloning';
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$hostid.'&context=host';
-		$this->executeFullCloning('item', 'Host');
+		$this->executeCloningByParent('item', 'Host');
 	}
 
 	/**
@@ -81,7 +81,7 @@ class testFormTagsItem extends testFormTags {
 		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 		$this->link = 'items.php?filter_set=1&filter_hostids[0]='.$templateid.'&context=template';
 		$this->clone_name = 'Template item with tags for full cloning';
-		$this->executeFullCloning('item', 'Template');
+		$this->executeCloningByParent('item', 'Template');
 	}
 
 	/**

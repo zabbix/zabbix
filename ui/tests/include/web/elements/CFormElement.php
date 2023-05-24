@@ -249,7 +249,7 @@ class CFormElement extends CElement {
 	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $key => $label) {
+		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 
 			if ($element->isValid()) {
@@ -570,8 +570,10 @@ class CFormElement extends CElement {
 	 * @return array
 	 */
 	public function getRequiredLabels() {
-		return $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
+		$labels = $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
 				->filter(CElementFilter::VISIBLE)->asText();
+
+		return array_values($labels);
 	}
 
 	/**

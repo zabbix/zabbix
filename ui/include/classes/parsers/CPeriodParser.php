@@ -24,6 +24,9 @@
  */
 class CPeriodParser extends CParser {
 
+	private $simple_interval_parser;
+	private $relative_time_parser;
+
 	/**
 	 * An options array.
 	 *

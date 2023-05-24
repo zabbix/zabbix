@@ -140,4 +140,28 @@ class testFormMap extends CLegacyWebTest {
 		}
 	}
 
+	/**
+	 * Check the screenshot of the trigger container in trigger map element.
+	 */
+	public function testFormMap_MapElementScreenshot() {
+		// Open map "Test map 1" in edit mode.
+		$this->page->login()->open('sysmap.php?sysmapid=3')->waitUntilReady();
+
+		// Click on map element "Trigger element (CPU load)".
+		$this->query('xpath://div[@data-id="5"]')->waitUntilVisible()->one()->click();
+
+		$form = $this->query('id:map-window')->asForm()->one()->waitUntilVisible();
+		$form->getField('New triggers')->selectMultiple([
+				'First test trigger with tag priority',
+				'Fourth test trigger with tag priority',
+				'Lack of available memory'
+			], 'ЗАББИКС Сервер'
+		);
+		$form->query('button:Add')->one()->click();
+
+		// Take a screenshot to test draggable object position for triggers of trigger type map element.
+		// TODO: screenshot should be changed after fix ZBX-22528
+		$this->page->removeFocus();
+		$this->assertScreenshot($this->query('id:triggerContainer')->waitUntilVisible()->one(), 'Map element');
+	}
 }

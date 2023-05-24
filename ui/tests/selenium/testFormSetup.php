@@ -250,7 +250,7 @@ class testFormSetup extends CWebTest {
 		$timezones_field = $form->getField('Default time zone');
 
 		$timezones = $timezones_field->getOptions()->asText();
-		$this->assertEquals(426, count($timezones));
+		$this->assertEquals(427, count($timezones));
 		foreach (['System', 'Europe/Riga'] as $timezone_value) {
 			$timezone = CDateTimeHelper::getTimeZoneFormat($timezone_value);
 			$this->assertContains($timezone, $timezones);
@@ -348,7 +348,7 @@ class testFormSetup extends CWebTest {
 	}
 
 	public function getDbConnectionDetails() {
-		return [
+		$provider = [
 			// Incorrect DB host.
 			[
 				[
@@ -545,6 +545,31 @@ class testFormSetup extends CWebTest {
 				]
 			]
 		];
+
+		// MySQL database error depends on php version.
+		$mapping = [
+			'Error connecting to database. Empty cipher.' => [
+				'8.1.0' => '(trying to connect via (null))'
+			],
+			'php_network_getaddresses: getaddrinfo failed: Name or service not known' => [
+				'8.1.0' => 'php_network_getaddresses: getaddrinfo for incorrect_DB_host failed: Name or service not known'
+			]
+		];
+
+		foreach ($provider as &$data) {
+			if (array_key_exists('mysql_error', $data[0]) && array_key_exists($data[0]['mysql_error'], $mapping)) {
+				foreach ($mapping[$data[0]['mysql_error']] as $version => $map) {
+					if (version_compare(phpversion(), $version, '<')) {
+						continue;
+					}
+
+					$data[0]['mysql_error'] = $map;
+				}
+			}
+		}
+		unset($data);
+
+		return $provider;
 	}
 
 	/**

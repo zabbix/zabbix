@@ -281,4 +281,7 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error);
+
+int	zbx_eval_suffixed_number_parse(const char *value, char *suffix);
+
 #endif

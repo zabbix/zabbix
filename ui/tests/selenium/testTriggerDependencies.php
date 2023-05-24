@@ -89,7 +89,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 
 		$this->zbxTestClick('bnt1');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+		$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 		$host->fill([
 			'values' => $data['template'],
 			'context' => 'Templates'

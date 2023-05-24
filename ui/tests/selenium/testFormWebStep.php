@@ -802,6 +802,32 @@ class testFormWebStep extends CLegacyWebTest {
 					'code' => 404,
 					'dbCheck' => true
 				]
+			],
+			// Take a screenshots
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Take a screenshots',
+					'step_name' => 'Fill all step form',
+					'url' => 'http://www.zabbix.com',
+					'post' => [
+						['name' => 'post', 'value' => 'test_post'],
+						['name' => 'post2', 'value' => 'test_post2'],
+						['name' => 'post3', 'value' => 'test_post3']
+					],
+					'query' => [
+						['name' => 'query', 'value' => 'test_query'],
+						['name' => 'query2', 'value' => 'test_query2'],
+						['name' => 'query3', 'value' => 'test_query3']
+					],
+					'headers' => [
+						['name' => 'header', 'value' => 'test_header'],
+						['name' => 'header2', 'value' => 'test_header2'],
+						['name' => 'header3', 'value' => 'test_header3']
+					],
+					'timeout' => 3600,
+					'screenshot' => true
+				]
 			]
 		];
 	}
@@ -813,16 +839,13 @@ class testFormWebStep extends CLegacyWebTest {
 	 * @param array  $items		name-value pairs to be added.
 	 */
 	protected function addPairs($context, $items) {
-		$parent = $this->webDriver->findElement(WebDriverBy::xpath($context));
-		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
-		if (($element = end($rows)) === false) {
-			$this->fail('Pair rows were not found for context "'.$context.'"!');
-		}
+		$parent = $this->query('xpath', $context)->one();
+		$element = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all()->last();
 
 		foreach($items as $item) {
 			foreach ($item as $field => $value) {
-				$this->zbxTestWaitUntilElementPresent(WebDriverBy::xpath($context.'//input[@data-type="'.$field.'"]'));
-				$input = $element->findElement(WebDriverBy::xpath('.//input[@data-type="'.$field.'"]'));
+				$this->query('xpath', $context.'//input[@data-type="'.$field.'"]')->one()->waitUntilPresent();
+				$input = $element->query('xpath:.//input[@data-type="'.$field.'"]')->one();
 				$input->sendKeys($value);
 
 				// Fire onchange event.
@@ -833,9 +856,8 @@ class testFormWebStep extends CLegacyWebTest {
 				);
 			}
 
-			$parent->findElement(WebDriverBy::xpath('.//button[text()="Add"]'))->click();
-			$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
-			$element = end($rows);
+			$parent->query('xpath:.//button[text()="Add"]')->one()->click();
+			$element = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all()->last();
 		}
 	}
 
@@ -846,12 +868,12 @@ class testFormWebStep extends CLegacyWebTest {
 	 */
 	protected function getPairs($context) {
 		$pairs = [];
-		$parent = $this->webDriver->findElement(WebDriverBy::xpath($context));
-		$rows = $parent->findElements(WebDriverBy::xpath('.//tr[contains(@class, "sortable")]'));
+		$parent = $this->query('xpath', $context)->one();
+		$rows = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all();
 
 		foreach ($rows as $row) {
 			$pair = [];
-			$inputs = $row->findElements(WebDriverBy::xpath('.//input[@data-type]'));
+			$inputs = $row->query('xpath:.//input[@data-type]')->all();
 			foreach ($inputs as $input) {
 				$pair[$input->getAttribute('data-type')] = $input->getAttribute('value');
 			}
@@ -967,6 +989,21 @@ class testFormWebStep extends CLegacyWebTest {
 
 		if (array_key_exists('code', $data)) {
 			$this->zbxTestInputType('status_codes',$data['code']);
+		}
+
+		// Take a screenshot to test draggable object position for query, post and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+
+			foreach (['Post fields', 'Headers', 'Query fields'] as $field) {
+				$form = $this->query('id:http_step')->asForm()->one();
+
+				if ($field === 'Query fields') {
+					COverlayDialogElement::find()->one()->scrollToTop();
+				}
+
+				$this->assertScreenshot($form->getField($field), $field);
+			}
 		}
 
 		if ($data['expected'] != TEST_ERROR) {

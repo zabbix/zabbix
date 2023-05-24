@@ -41,7 +41,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
-			$tag = $this->webDriver->findElement(WebDriverBy::xpath($field_xpath))->getTagName();
+			$tag = $this->query('xpath', $field_xpath)->one()->getTagName();
 			$field_id = $this->zbxTestGetAttributeValue($field_xpath, 'id');
 
 			if ($tag === 'input' || $tag === 'textarea') {
@@ -905,7 +905,8 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => 'Content-Type', 'value' => 'application/xml']
 					],
 					'request_type' => 'JSON data',
-					'check_form' => true
+					'check_form' => true,
+					'screenshot' => true
 				]
 			],
 			// Empty Basic authentication user/password
@@ -1000,6 +1001,13 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 
 		if (array_key_exists('headers', $data)) {
 			$this->processPairFields($data['headers'], 'headers');
+		}
+
+		// Take a screenshot to test draggable object position of query and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($this->query('id:query_fields_pairs')->one(), 'Query fields');
+			$this->assertScreenshot($this->query('id:headers_pairs')->one(), 'Headers fields');
 		}
 
 		// Check query fields after url parse.

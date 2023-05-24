@@ -21,6 +21,9 @@
 
 class CVisibilityBox extends CCheckBox {
 
+	private $object_id;
+	private $replace_to;
+
 	public function __construct($name = 'visibilitybox', $object_id = null, $replace_to = null) {
 		$this->object_id = $object_id;
 		$this->replace_to = unpack_object($replace_to);
