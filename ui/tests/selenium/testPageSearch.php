@@ -66,6 +66,21 @@ class testPageSearch extends CWebTest {
 					'port' => '10050'
 				]
 			],
+			[
+				'host' => 'iGnoRe CaSe',
+				'name' => 'ZaBbiX зАБбИкс āēīõšŗ',
+				'groups' => [
+					'groupid' => '6'
+				],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			],
 		]);
 	}
 
@@ -139,6 +154,28 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
+					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
+					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'ignore case',
+					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
 					'search_string' => str_repeat('A', 128),
 					'host_expected_data' => [['Host' => str_repeat('A', 128)]],
 					'host_expected_count' => ['count' => 1, 'total' => 1],
@@ -151,7 +188,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'a',
-					'host_expected_count' => ['count' => 36, 'total' => 36],
+					'host_expected_count' => ['count' => 37, 'total' => 37],
 					'hgroup_expected_count' => ['count' => 28, 'total' => 28],
 					'template_expected_count' => ['count' => 100, 'total' => 234],
 				]
@@ -164,8 +201,7 @@ class testPageSearch extends CWebTest {
 	 *
 	 * @dataProvider getSearchData
 	 */
-	public function testPageSearch_ResultsPage($data) {
-
+	public function testPageSearch_VerifyResults($data) {
 		$this->openSearchResults($data['search_string']);
 		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
 		$this->assertEquals('Search: '.$data['search_string'], $title);
