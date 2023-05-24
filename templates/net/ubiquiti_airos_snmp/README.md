@@ -3,120 +3,134 @@
 
 ## Overview
 
-For Zabbix version: 6.4 and higher.
+This template is designed for the effortless deployment of Ubiquiti AirOS monitoring by Zabbix via SNMP and doesn't require any external scripts.
+
+### Known issues
+
+- Description: 'UBNT unifi reports speed: like IF-MIB::ifSpeed.1 = Gauge32: 4294967295 for all interfaces'
+  - version: 'Firmware: BZ.ar7240.v3.7.51.6230.170322.1513'
+  - device: UBNT UAP-LR
+- Description: 'UBNT AirMax(NanoStation, NanoBridge etc) reports ifSpeed: as 0 for VLAN and wireless(ath0) interfaces'
+  - version: 'Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836'
+  - device: NanoStation M5
+- Description: 'UBNT AirMax(NanoStation, NanoBridge etc) reports always return ifType: as ethernet(6) even for wifi,vlans and other types'
+  - version: 'Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836'
+  - device: NanoStation M5
+- Description: ifXTable is not provided in IF-MIB. So Interfaces Simple Template is used instead
+  - version: all above
+  - device: NanoStation, UAP-LR
+
+## Requirements
+
+Zabbix version: 6.4 and higher.
+
+## Tested versions
+
+This template has been tested on:
+- Ubiquiti AirOS
+
+## Configuration
+
+> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
 Refer to the vendor documentation.
 
-## Zabbix configuration
-
-No specific Zabbix configuration is required.
-
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CPU.UTIL.CRIT} |<p>-</p> |`90` |
-|{$ICMP_LOSS_WARN} |<p>-</p> |`20` |
-|{$ICMP_RESPONSE_TIME_WARN} |<p>-</p> |`0.15` |
-|{$IF.ERRORS.WARN} |<p>-</p> |`2` |
-|{$IF.UTIL.MAX} |<p>-</p> |`95` |
-|{$IFCONTROL} |<p>-</p> |`1` |
-|{$MEMORY.UTIL.MAX} |<p>-</p> |`90` |
-|{$NET.IF.IFADMINSTATUS.MATCHES} |<p>Ignore notPresent(6)</p> |`^.*` |
-|{$NET.IF.IFADMINSTATUS.NOT_MATCHES} |<p>Ignore down(2) administrative status</p> |`^2$` |
-|{$NET.IF.IFDESCR.MATCHES} |<p>-</p> |`.*` |
-|{$NET.IF.IFDESCR.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
-|{$NET.IF.IFNAME.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFNAME.NOT_MATCHES} |<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p> |`(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})` |
-|{$NET.IF.IFOPERSTATUS.MATCHES} |<p>-</p> |`^.*$` |
-|{$NET.IF.IFOPERSTATUS.NOT_MATCHES} |<p>Ignore notPresent(6)</p> |`^6$` |
-|{$NET.IF.IFTYPE.MATCHES} |<p>-</p> |`.*` |
-|{$NET.IF.IFTYPE.NOT_MATCHES} |<p>-</p> |`CHANGE_IF_NEEDED` |
-|{$SNMP.TIMEOUT} |<p>-</p> |`5m` |
+|{$MEMORY.UTIL.MAX}||`90`|
+|{$CPU.UTIL.CRIT}||`90`|
+|{$SNMP.TIMEOUT}||`5m`|
+|{$ICMP_LOSS_WARN}||`20`|
+|{$ICMP_RESPONSE_TIME_WARN}||`0.15`|
+|{$IFCONTROL}||`1`|
+|{$IF.UTIL.MAX}||`95`|
+|{$NET.IF.IFNAME.MATCHES}||`^.*$`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p>|`Macro too long. Please see the template.`|
+|{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
+|{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(6)</p>|`^6$`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>Ignore notPresent(6)</p>|`^.*`|
+|{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore down(2) administrative status</p>|`^2$`|
+|{$NET.IF.IFDESCR.MATCHES}||`.*`|
+|{$NET.IF.IFDESCR.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFTYPE.MATCHES}||`.*`|
+|{$NET.IF.IFTYPE.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
+|{$IF.ERRORS.WARN}||`2`|
 
-## Template links
-
-There are no template links in this template.
-
-## Discovery rules
+### Items
 
 |Name|Description|Type|Key and additional info|
-|----|-----------|----|----|
-|Network interfaces discovery |<p>Discovering interfaces from IF-MIB.</p> |SNMP |net.if.discovery<p>**Filter**:</p>AND <p>- {#IFADMINSTATUS} MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.MATCHES}`</p><p>- {#IFADMINSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFADMINSTATUS.NOT_MATCHES}`</p><p>- {#IFOPERSTATUS} MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.MATCHES}`</p><p>- {#IFOPERSTATUS} NOT_MATCHES_REGEX `{$NET.IF.IFOPERSTATUS.NOT_MATCHES}`</p><p>- {#IFNAME} MATCHES_REGEX `{$NET.IF.IFNAME.MATCHES}`</p><p>- {#IFNAME} NOT_MATCHES_REGEX `{$NET.IF.IFNAME.NOT_MATCHES}`</p><p>- {#IFDESCR} MATCHES_REGEX `{$NET.IF.IFDESCR.MATCHES}`</p><p>- {#IFDESCR} NOT_MATCHES_REGEX `{$NET.IF.IFDESCR.NOT_MATCHES}`</p><p>- {#IFTYPE} MATCHES_REGEX `{$NET.IF.IFTYPE.MATCHES}`</p><p>- {#IFTYPE} NOT_MATCHES_REGEX `{$NET.IF.IFTYPE.NOT_MATCHES}`</p> |
+|----|-----------|----|-----------------------|
+|Ubiquiti AirOS: CPU utilization|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p>|SNMP agent|system.cpu.util[loadValue.2]|
+|Ubiquiti AirOS: Free memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p>|SNMP agent|vm.memory.free[memFree.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Ubiquiti AirOS: Total memory|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>The total memory expressed in bytes.</p>|SNMP agent|vm.memory.total[memTotal.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Ubiquiti AirOS: Memory (buffers)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo).</p>|SNMP agent|vm.memory.buffers[memBuffer.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Ubiquiti AirOS: Memory (cached)|<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).</p>|SNMP agent|vm.memory.cached[memCache.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `1024`</p></li></ul>|
+|Ubiquiti AirOS: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[memoryUsedPercentage]|
+|Ubiquiti AirOS: Hardware model name|<p>MIB: IEEE802dot11-MIB</p><p>A printable string used to identify the manufacturer's product name of the resource. Maximum string length is 128 octets.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Ubiquiti AirOS: Firmware version|<p>MIB: IEEE802dot11-MIB</p><p>Printable string used to identify the manufacturer's product version of the resource. Maximum string length is 128 octets.</p>|SNMP agent|system.hw.firmware<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Ubiquiti AirOS: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Ubiquiti AirOS: Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Ubiquiti AirOS: SNMP traps (fallback)|<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p>|SNMP trap|snmptrap.fallback|
+|Ubiquiti AirOS: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Ubiquiti AirOS: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Ubiquiti AirOS: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Ubiquiti AirOS: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Ubiquiti AirOS: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Ubiquiti AirOS: SNMP agent availability|<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p>|Zabbix internal|zabbix[host,snmp,available]|
+|Ubiquiti AirOS: ICMP ping||Simple check|icmpping|
+|Ubiquiti AirOS: ICMP loss||Simple check|icmppingloss|
+|Ubiquiti AirOS: ICMP response time||Simple check|icmppingsec|
 
-## Items collected
-
-|Group|Name|Description|Type|Key and additional info|
-|-----|----|-----------|----|---------------------|
-|CPU |CPU utilization |<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>5 minute load average of processor load.</p> |SNMP |system.cpu.util[loadValue.2] |
-|General |SNMP traps (fallback) |<p>The item is used to collect all SNMP traps unmatched by other snmptrap items</p> |SNMP_TRAP |snmptrap.fallback |
-|General |System location |<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet, 3rd floor').  If the location is unknown, the value is the zero-length string.</p> |SNMP |system.location[sysLocation.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|General |System contact details |<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person.  If no contact information is known, the value is the zero-length string.</p> |SNMP |system.contact[sysContact.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|General |System object ID |<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity.  This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining`what kind of box' is being managed.  For example, if vendor`Flintstones, Inc.' was assigned the subtree1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its `Fred Router'.</p> |SNMP |system.objectid[sysObjectID.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|General |System name |<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node.By convention, this is the node's fully-qualified domain name.  If the name is unknown, the value is the zero-length string.</p> |SNMP |system.name<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|General |System description |<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should</p><p>include the full name and version identification of the system's hardware type, software operating-system, and</p><p>networking software.</p> |SNMP |system.descr[sysDescr.0]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `12h`</p> |
-|Inventory |Hardware model name |<p>MIB: IEEE802dot11-MIB</p><p>A printable string used to identify the manufacturer's product name of the resource. Maximum string length is 128 octets.</p> |SNMP |system.hw.model<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Inventory |Firmware version |<p>MIB: IEEE802dot11-MIB</p><p>Printable string used to identify the manufacturer's product version of the resource. Maximum string length is 128 octets.</p> |SNMP |system.hw.firmware<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Memory |Free memory |<p>MIB: FROGFOOT-RESOURCES-MIB</p> |SNMP |vm.memory.free[memFree.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Total memory |<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Total memory in Bytes.</p> |SNMP |vm.memory.total[memTotal.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Memory (buffers) |<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by kernel buffers (Buffers in /proc/meminfo).</p> |SNMP |vm.memory.buffers[memBuffer.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Memory (cached) |<p>MIB: FROGFOOT-RESOURCES-MIB</p><p>Memory used by the page cache and slabs (Cached and Slab in /proc/meminfo).</p> |SNMP |vm.memory.cached[memCache.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `1024`</p> |
-|Memory |Memory utilization |<p>Memory utilization in %.</p> |CALCULATED |vm.memory.util[memoryUsedPercentage]<p>**Expression**:</p>`(last(//vm.memory.total[memTotal.0])-(last(//vm.memory.free[memFree.0])+last(//vm.memory.buffers[memBuffer.0])+last(//vm.memory.cached[memCache.0])))/last(//vm.memory.total[memTotal.0])*100` |
-|Network interfaces |Interface {#IFDESCR}: Operational status |<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>- The testing(3) state indicates that no operational packet scan be passed</p><p>- If ifAdminStatus is down(2) then ifOperStatus should be down(2)</p><p>- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic</p><p>- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)</p><p>- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state</p><p>- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</p> |SNMP |net.if.status[ifOperStatus.{#SNMPINDEX}] |
-|Network interfaces |Interface {#IFDESCR}: Bits received |<p>MIB: IF-MIB</p><p>The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.in[ifInOctets.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
-|Network interfaces |Interface {#IFDESCR}: Bits sent |<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.out[ifOutOctets.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p><p>- MULTIPLIER: `8`</p> |
-|Network interfaces |Interface {#IFDESCR}: Inbound packets with errors |<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.in.errors[ifInErrors.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Network interfaces |Interface {#IFDESCR}: Outbound packets with errors |<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.out.errors[ifOutErrors.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Network interfaces |Interface {#IFDESCR}: Outbound packets discarded |<p>MIB: IF-MIB</p><p>The number of outbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Network interfaces |Interface {#IFDESCR}: Inbound packets discarded |<p>MIB: IF-MIB</p><p>The number of inbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p> |SNMP |net.if.in.discards[ifInDiscards.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- CHANGE_PER_SECOND</p> |
-|Network interfaces |Interface {#IFDESCR}: Interface type |<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p> |SNMP |net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**:</p><p>- DISCARD_UNCHANGED_HEARTBEAT: `1d`</p> |
-|Network interfaces |Interface {#IFDESCR}: Speed |<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second.</p><p>For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,</p><p>this object should contain the nominal bandwidth.</p><p>If the bandwidth of the interface is greater than the maximum value reportable by this object then</p><p>this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.</p><p>For a sub-layer which has no concept of bandwidth, this object should be zero.</p> |SNMP |net.if.speed[ifSpeed.{#SNMPINDEX}] |
-|Status |Uptime (network) |<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p> |SNMP |system.net.uptime[sysUpTime.0]<p>**Preprocessing**:</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |Uptime (hardware) |<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p> |SNMP |system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**:</p><p>- CHECK_NOT_SUPPORTED</p><p>⛔️ON_FAIL: `CUSTOM_VALUE -> 0`</p><p>- MULTIPLIER: `0.01`</p> |
-|Status |SNMP agent availability |<p>Availability of SNMP checks on the host. The value of this item corresponds to availability icons in the host list.</p><p>Possible value:</p><p>0 - not available</p><p>1 - available</p><p>2 - unknown</p> |INTERNAL |zabbix[host,snmp,available] |
-|Status |ICMP ping |<p>-</p> |SIMPLE |icmpping |
-|Status |ICMP loss |<p>-</p> |SIMPLE |icmppingloss |
-|Status |ICMP response time |<p>-</p> |SIMPLE |icmppingsec |
-
-## Triggers
+### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----|----|----|
-|High CPU utilization |<p>CPU utilization is too high. The system might be slow to respond.</p> |`min(/Ubiquiti AirOS by SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}` |WARNING | |
-|System name has changed |<p>System name has changed. Ack to close.</p> |`last(/Ubiquiti AirOS by SNMP/system.name,#1)<>last(/Ubiquiti AirOS by SNMP/system.name,#2) and length(last(/Ubiquiti AirOS by SNMP/system.name))>0` |INFO |<p>Manual close: YES</p> |
-|Firmware has changed |<p>Firmware version has changed. Ack to close</p> |`last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS by SNMP/system.hw.firmware))>0` |INFO |<p>Manual close: YES</p> |
-|High memory utilization |<p>The system is running out of free memory.</p> |`min(/Ubiquiti AirOS by SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}` |AVERAGE | |
-|Interface {#IFDESCR}: Link down |<p>This trigger expression works as follows:</p><p>1. Can be triggered if operations status is down.</p><p>2. {$IFCONTROL:"{#IFNAME}"}=1 - user can redefine Context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.</p><p>3. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)</p><p>WARNING: if closed manually - won't fire again on next poll, because of .diff.</p> |`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`<p>Recovery expression:</p>`last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0` |AVERAGE |<p>Manual close: YES</p> |
-|Interface {#IFDESCR}: High bandwidth usage |<p>The network interface utilization is close to its estimated maximum bandwidth.</p> |`(avg(/Ubiquiti AirOS by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or avg(/Ubiquiti AirOS by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0`<p>Recovery expression:</p>`avg(/Ubiquiti AirOS by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and avg(/Ubiquiti AirOS by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFDESCR}: Link down</p> |
-|Interface {#IFDESCR}: High error rate |<p>Recovers when below 80% of {$IF.ERRORS.WARN:"{#IFNAME}"} threshold</p> |`min(/Ubiquiti AirOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Ubiquiti AirOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`<p>Recovery expression:</p>`max(/Ubiquiti AirOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and max(/Ubiquiti AirOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$IF.ERRORS.WARN:"{#IFNAME}"}*0.8` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFDESCR}: Link down</p> |
-|Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before |<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Ack to close.</p> |`change(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and ( last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2) `<p>Recovery expression:</p>`(change(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2) ` |INFO |<p>Manual close: YES</p><p>**Depends on**:</p><p>- Interface {#IFDESCR}: Link down</p> |
-|Host has been restarted |<p>Uptime is less than 10 minutes.</p> |`(last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS by SNMP/system.net.uptime[sysUpTime.0])<10m)` |WARNING |<p>Manual close: YES</p><p>**Depends on**:</p><p>- No SNMP data collection</p> |
-|No SNMP data collection |<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p> |`max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
-|Unavailable by ICMP ping |<p>Last three attempts returned timeout.  Please check device connectivity.</p> |`max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0` |HIGH | |
-|High ICMP ping loss |<p>-</p> |`min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100` |WARNING |<p>**Depends on**:</p><p>- Unavailable by ICMP ping</p> |
-|High ICMP ping response time |<p>-</p> |`avg(/Ubiquiti AirOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}` |WARNING |<p>**Depends on**:</p><p>- High ICMP ping loss</p><p>- Unavailable by ICMP ping</p> |
+|----|-----------|----------|--------|--------------------------------|
+|Ubiquiti AirOS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Ubiquiti AirOS by SNMP/system.cpu.util[loadValue.2],5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Ubiquiti AirOS: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Ubiquiti AirOS by SNMP/vm.memory.util[memoryUsedPercentage],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|Ubiquiti AirOS: Firmware has changed|<p>Firmware version has changed. Acknowledge to close the problem manually.</p>|`last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#1)<>last(/Ubiquiti AirOS by SNMP/system.hw.firmware,#2) and length(last(/Ubiquiti AirOS by SNMP/system.hw.firmware))>0`|Info|**Manual close**: Yes|
+|Ubiquiti AirOS: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`(last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])>0 and last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])<10m) or (last(/Ubiquiti AirOS by SNMP/system.hw.uptime[hrSystemUptime.0])=0 and last(/Ubiquiti AirOS by SNMP/system.net.uptime[sysUpTime.0])<10m)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Ubiquiti AirOS: No SNMP data collection</li></ul>|
+|Ubiquiti AirOS: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Ubiquiti AirOS by SNMP/system.name,#1)<>last(/Ubiquiti AirOS by SNMP/system.name,#2) and length(last(/Ubiquiti AirOS by SNMP/system.name))>0`|Info|**Manual close**: Yes|
+|Ubiquiti AirOS: No SNMP data collection|<p>SNMP is not available for polling. Please check device connectivity and SNMP settings.</p>|`max(/Ubiquiti AirOS by SNMP/zabbix[host,snmp,available],{$SNMP.TIMEOUT})=0`|Warning|**Depends on**:<br><ul><li>Ubiquiti AirOS: Unavailable by ICMP ping</li></ul>|
+|Ubiquiti AirOS: Unavailable by ICMP ping|<p>Last three attempts returned timeout.  Please check device connectivity.</p>|`max(/Ubiquiti AirOS by SNMP/icmpping,#3)=0`|High||
+|Ubiquiti AirOS: High ICMP ping loss||`min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Ubiquiti AirOS by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Ubiquiti AirOS: Unavailable by ICMP ping</li></ul>|
+|Ubiquiti AirOS: High ICMP ping response time||`avg(/Ubiquiti AirOS by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Ubiquiti AirOS: High ICMP ping loss</li><li>Ubiquiti AirOS: Unavailable by ICMP ping</li></ul>|
+
+### LLD rule Network interfaces discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Network interfaces discovery|<p>Discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.discovery|
+
+### Item prototypes for Network interfaces discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Interface {#IFDESCR}: Operational status|<p>MIB: IF-MIB</p><p>The current operational state of the interface.</p><p>- The testing(3) state indicates that no operational packet scan be passed</p><p>- If ifAdminStatus is down(2) then ifOperStatus should be down(2)</p><p>- If ifAdminStatus is changed to up(1) then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic</p><p>- It should change todormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection)</p><p>- It should remain in the down(2) state if and only if there is a fault that prevents it from going to the up(1) state</p><p>- It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.</p>|SNMP agent|net.if.status[ifOperStatus.{#SNMPINDEX}]|
+|Interface {#IFDESCR}: Bits received|<p>MIB: IF-MIB</p><p>The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in[ifInOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFDESCR}: Bits sent|<p>MIB: IF-MIB</p><p>The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out[ifOutOctets.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>Custom multiplier: `8`</p></li></ul>|
+|Interface {#IFDESCR}: Inbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in.errors[ifInErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Interface {#IFDESCR}: Outbound packets with errors|<p>MIB: IF-MIB</p><p>For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out.errors[ifOutErrors.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Interface {#IFDESCR}: Outbound packets discarded|<p>MIB: IF-MIB</p><p>The number of outbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Interface {#IFDESCR}: Inbound packets discarded|<p>MIB: IF-MIB</p><p>The number of inbound packets which were chosen to be discarded</p><p>even though no errors had been detected to prevent their being deliverable to a higher-layer protocol.</p><p>One possible reason for discarding such a packet could be to free up buffer space.</p><p>Discontinuities in the value of this counter can occur at re-initialization of the management system,</p><p>and at other times as indicated by the value of ifCounterDiscontinuityTime.</p>|SNMP agent|net.if.in.discards[ifInDiscards.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Interface {#IFDESCR}: Interface type|<p>MIB: IF-MIB</p><p>The type of interface.</p><p>Additional values for ifType are assigned by the Internet Assigned Numbers Authority (IANA),</p><p>through updating the syntax of the IANAifType textual convention.</p>|SNMP agent|net.if.type[ifType.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Interface {#IFDESCR}: Speed|<p>MIB: IF-MIB</p><p>An estimate of the interface's current bandwidth in bits per second.</p><p>For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made,</p><p>this object should contain the nominal bandwidth.</p><p>If the bandwidth of the interface is greater than the maximum value reportable by this object then</p><p>this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.</p><p>For a sub-layer which has no concept of bandwidth, this object should be zero.</p>|SNMP agent|net.if.speed[ifSpeed.{#SNMPINDEX}]|
+
+### Trigger prototypes for Network interfaces discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|Interface {#IFDESCR}: Link down|<p>This trigger expression works as follows:1. It can be triggered if the operations status is down.2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)WARNING: if closed manually - it will not fire again on the next poll, because of .diff.</p>|`{$IFCONTROL:"{#IFNAME}"}=1 and last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))`|Average|**Manual close**: Yes|
+|Interface {#IFDESCR}: High bandwidth usage|<p>The utilization of the network interface is close to its estimated maximum bandwidth.</p>|`(avg(/Ubiquiti AirOS by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or avg(/Ubiquiti AirOS by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFDESCR}: Link down</li></ul>|
+|Interface {#IFDESCR}: High error rate|<p>It recovers when it is below 80% of the `{$IF.ERRORS.WARN:"{#IFNAME}"}` threshold.</p>|`min(/Ubiquiti AirOS by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"} or min(/Ubiquiti AirOS by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFDESCR}: Link down</li></ul>|
+|Interface {#IFDESCR}: Ethernet has changed to lower speed than it was before|<p>This Ethernet connection has transitioned down from its known maximum speed. This might be a sign of autonegotiation issues. Acknowledge to close the problem manually.</p>|`change(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Ubiquiti AirOS by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and ( last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or last(/Ubiquiti AirOS by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117 ) and (last(/Ubiquiti AirOS by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Interface {#IFDESCR}: Link down</li></ul>|
 
 ## Feedback
 
-Please report any issues with the template at https://support.zabbix.com.
+Please report any issues with the template at [`https://support.zabbix.com`](https://support.zabbix.com)
 
-## Known Issues
-
-- Description: UBNT unifi reports speed: like IF-MIB::ifSpeed.1 = Gauge32: 4294967295 for all interfaces
-  - Version: Firmware: BZ.ar7240.v3.7.51.6230.170322.1513
-  - Device: UBNT UAP-LR
-
-- Description: UBNT AirMax(NanoStation, NanoBridge etc) reports ifSpeed: as 0 for VLAN and wireless(ath0) interfaces
-  - Version: Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836
-  - Device: NanoStation M5
-
-- Description: UBNT AirMax(NanoStation, NanoBridge etc) reports always return ifType: as ethernet(6) even for wifi,vlans and other types
-  - Version: Firmware: XW.ar934x.v5.6-beta4.22359.140521.1836
-  - Device: NanoStation M5
-
-- Description: ifXTable is not provided in IF-MIB. So Interfaces Simple Template is used instead
-  - Version: all above
-  - Device: NanoStation, UAP-LR
+You can also provide feedback, discuss the template, or ask for help at [`ZABBIX forums`](https://www.zabbix.com/forum/zabbix-suggestions-and-feedback)
 

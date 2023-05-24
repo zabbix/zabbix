@@ -31,6 +31,65 @@
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get runtime control option targets                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int *proc_num, int *scope,
+		char **result)
+{
+	struct zbx_json_parse	jp;
+	char			buf[MAX_STRING_LEN];
+
+	if (FAIL == zbx_json_open(data, &jp))
+	{
+		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+		return FAIL;
+	}
+
+	if (NULL != scope)
+	{
+		if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
+			*scope = atoi(buf);
+		else
+			*scope = ZBX_PROF_UNKNOWN;
+	}
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
+	{
+		zbx_uint64_t	pid_ui64;
+
+		if (SUCCEED != zbx_is_uint64(buf, &pid_ui64) || 0 == pid_ui64)
+		{
+			*result = zbx_dsprintf(NULL, "Invalid pid value \"%s\"\n", buf);
+			return FAIL;
+		}
+
+		*pid = (pid_t)pid_ui64;
+	}
+	else
+		*pid = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
+		*proc_num = atoi(buf);
+	else
+		*proc_num = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
+	{
+		if (ZBX_PROCESS_TYPE_UNKNOWN == (*proc_type = get_process_type_by_name(buf)))
+		{
+			*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
+			return FAIL;
+		}
+	}
+	else
+		*proc_type = ZBX_PROCESS_TYPE_UNKNOWN;
+
+	return SUCCEED;
+}
+
 #if defined(HAVE_SIGQUEUE)
 
 /******************************************************************************
@@ -38,110 +97,88 @@ ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
  * Purpose: change log level of service process                               *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_change_service_loglevel(int code)
+static void	rtc_change_service_loglevel(zbx_uint32_t code)
 {
 	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
-	{
-		if (SUCCEED != zabbix_increase_log_level())
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
-					" maximum level has been already set");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
-					zabbix_get_log_level_string());
-		}
-	}
+		zabbix_increase_log_level();
 	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
+		zabbix_decrease_log_level();
+
+	zabbix_report_log_level_change();
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: dispatch log level change runtime control option                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, zbx_uint32_t code, const char *data, char **result)
+{
+	pid_t	pid;
+	int	proc_type, proc_num;
+
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, NULL, result))
+		return;
+
+	/* all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
-		if (SUCCEED != zabbix_decrease_log_level())
+		rtc_change_service_loglevel(code);
+		zbx_rtc_notify(rtc, (unsigned char)proc_type, proc_num, code, data, (zbx_uint32_t)strlen(data) + 1);
+		zbx_signal_process_by_pid(0, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+		return;
+	}
+
+	if (0 != pid)
+	{
+		if (pid == getpid())
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
-					" minimum level has been already set");
+			rtc_change_service_loglevel(code);
+			/* temporary message, the signal forwarding command output will be changed later */
+			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
 		}
 		else
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
-					zabbix_get_log_level_string());
-		}
+			zbx_signal_process_by_pid((int)pid, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+
+		return;
 	}
+
+	if (0 == zbx_rtc_notify(rtc, (unsigned char)proc_type, proc_num, code, data, (zbx_uint32_t)strlen(data) + 1))
+		zbx_signal_process_by_type(proc_type, proc_num, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process runtime control option                                    *
- *                                                                            *
- * Parameters: code   - [IN] the runtime control request code                 *
- *             data   - [IN] the runtime control parameter (optional)         *
- *             result - [OUT] the runtime control result                      *
+ * Purpose: dispatch profiler runtime control option                          *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_option(int code, const char *data, char **result)
+static void	rtc_process_profiler_option(zbx_uint32_t code, const char *data, char **result)
 {
-	struct zbx_json_parse	jp;
-	char			buf[MAX_STRING_LEN];
-	int			process_num = 0, process_type, scope = 0;
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
 
-	if (NULL == data)
+	if (SUCCEED != zbx_rtc_get_command_target(data, &pid, &proc_type, &proc_num, &scope, result))
+		return;
+
+	/* all processes */
+	if (0 == pid && ZBX_PROCESS_TYPE_UNKNOWN == proc_type)
 	{
-		rtc_change_service_loglevel(code);
-		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+		zbx_signal_process_by_pid(0, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
 		return;
 	}
 
-	if (FAIL == zbx_json_open(data, &jp))
+	if (0 != pid)
 	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
-		return;
-	}
-
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_SCOPE, buf, sizeof(buf), NULL))
-		scope = atoi(buf);
-
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PID, buf, sizeof(buf), NULL))
-	{
-		zbx_uint64_t	pid;
-
-		if (SUCCEED != zbx_is_uint64(buf, &pid) || 0 == pid)
-		{
-			*result = zbx_dsprintf(NULL, "Invalid pid value \"%s\"\n", buf);
-			return;
-		}
-
-		if ((pid_t)pid == getpid())
-		{
-			if (ZBX_RTC_LOG_LEVEL_INCREASE == code || ZBX_RTC_LOG_LEVEL_DECREASE == code)
-			{
-				rtc_change_service_loglevel(code);
-				/* temporary message, the signal forwarding command output will be changed later */
-				*result = zbx_strdup(NULL, "Changed log level for the main process\n");
-			}
-			else
-				*result = zbx_dsprintf(NULL, "Cannot use pid value for runtime command \"%s\"\n", buf);
-		}
+		if (pid == getpid())
+			*result = zbx_strdup(NULL, "Cannot use profiler with main process\n");
 		else
-			zbx_signal_process_by_pid((int)pid, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
+			zbx_signal_process_by_pid((int)pid, (int)ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 
 		return;
 	}
 
-	if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NUM, buf, sizeof(buf), NULL))
-		process_num = atoi(buf);
-
-	if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_PROCESS_NAME, buf, sizeof(buf), NULL))
-	{
-		zbx_signal_process_by_pid(0, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
-		return;
-	}
-
-	if (ZBX_PROCESS_TYPE_UNKNOWN == (process_type = get_process_type_by_name(buf)))
-	{
-		*result = zbx_dsprintf(NULL, "Invalid parameters \"%s\"\n", data);
-		return;
-	}
-
-	zbx_signal_process_by_type(process_type, process_num, ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
+	zbx_signal_process_by_type(proc_type, proc_num, (int)ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 }
 #endif
 
@@ -197,37 +234,169 @@ static void	rtc_process_diaginfo(const char *data, char **result)
 	zbx_diag_log_info(scope, result);
 }
 
-void	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
-		const unsigned char *data, zbx_uint32_t size)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify client based subscribers                                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_notify_client(zbx_rtc_sub_t *sub, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size)
 {
-	int	i;
+	if (FAIL == zbx_ipc_client_send(sub->source.client, code, data, size))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to client \"%s\" #%d",
+				get_process_type_string(sub->process_type), sub->process_num);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify service based subscribers                                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_notify_service(zbx_rtc_sub_t *sub, zbx_uint32_t code, const unsigned char *data, zbx_uint32_t size)
+{
+	zbx_ipc_socket_t	sock;
+	char			*error = NULL;
+
+	if (FAIL == zbx_ipc_socket_open(&sock, sub->source.service, SEC_PER_MIN, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to service \"%s\" #%d: %s",
+				get_process_type_string(sub->process_type), sub->process_num, error);
+		zbx_free(error);
+		return;
+	}
+
+	if (FAIL == zbx_ipc_socket_write(&sock, code, data, size))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to service \"%s\" #%d",
+				get_process_type_string(sub->process_type), sub->process_num);
+	}
+
+	zbx_ipc_socket_close(&sock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: match RTC message                                                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_match_message(const zbx_vector_uint32_t *msgs, zbx_uint32_t code)
+{
+	for (int i = 0; i < msgs->values_num; i++)
+	{
+		if (msgs->values[i] == code)
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: notify subscribers                                                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_rtc_notify(zbx_rtc_t *rtc, unsigned char process_type, int process_num, zbx_uint32_t code,
+		const char *data, zbx_uint32_t size)
+{
+	int	i, notified_num = 0;
 
 	for (i = 0; i < rtc->subs.values_num; i++)
 	{
 		if (ZBX_PROCESS_TYPE_UNKNOWN != process_type && process_type != rtc->subs.values[i]->process_type)
 			continue;
 
-		if (0 != process_num && process_num != rtc->subs.values[i]->process_num)
+		if (0 != process_num && 0 != rtc->subs.values[i]->process_num &&
+				process_num != rtc->subs.values[i]->process_num)
+		{
+			continue;
+		}
+
+		if (SUCCEED != rtc_match_message(&rtc->subs.values[i]->msgs, code))
 			continue;
 
-		if (FAIL == zbx_ipc_client_send(rtc->subs.values[i]->client, code, data, size))
+		switch (rtc->subs.values[i]->type)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot send RTC notification to process \"%s\" #%d",
-					get_process_type_string(rtc->subs.values[i]->process_type),
-					rtc->subs.values[i]->process_num);
+			case ZBX_RTC_SUB_CLIENT:
+				rtc_notify_client(rtc->subs.values[i], code, (const unsigned char *)data, size);
+				break;
+			case ZBX_RTC_SUB_SERVICE:
+				rtc_notify_service(rtc->subs.values[i], code, (const unsigned char *)data, size);
 		}
+
+		notified_num++;
 	}
+
+	return notified_num;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: deserialize subscription target notification codes                *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	rtc_deserialize_msgs(const unsigned char *data, zbx_vector_uint32_t *msgs)
+{
+	int			msgs_num;
+	const unsigned char	*ptr = data;
+	zbx_uint32_t		msg;
+
+	ptr += zbx_deserialize_value(ptr, &msgs_num);
+
+	/* reserve additional slot for shutdown notification */
+	zbx_vector_uint32_reserve(msgs, (size_t)msgs_num + 1);
+
+	for (int i = 0; i < msgs_num; i++)
+	{
+		ptr += zbx_deserialize_value(ptr, &msg);
+		zbx_vector_uint32_append(msgs, msg);
+	}
+
+	/* automatically subscribe also for shutdown notifications */
+	zbx_vector_uint32_append(msgs, ZBX_RTC_SHUTDOWN);
+
+	return (size_t)(ptr - data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subscribe for client based RTC notifications                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	rtc_subscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client, const unsigned char *data)
 {
 	zbx_rtc_sub_t	*sub;
 
 	sub = (zbx_rtc_sub_t *)zbx_malloc(NULL, sizeof(zbx_rtc_sub_t));
+	zbx_vector_uint32_create(&sub->msgs);
 
-	sub->client = client;
+	sub->type = ZBX_RTC_SUB_CLIENT;
+	sub->source.client = client;
 	data += zbx_deserialize_value(data, &sub->process_type);
-	(void)zbx_deserialize_value(data, &sub->process_num);
+	data += zbx_deserialize_value(data, &sub->process_num);
+	(void)rtc_deserialize_msgs(data, &sub->msgs);
+
+	zbx_vector_rtc_sub_append(&rtc->subs, sub);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: subscribe for service based RTC notifications                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
+{
+	zbx_rtc_sub_t	*sub;
+	zbx_uint32_t	service_len;
+
+	sub = (zbx_rtc_sub_t *)zbx_malloc(NULL, sizeof(zbx_rtc_sub_t));
+	zbx_vector_uint32_create(&sub->msgs);
+
+	sub->type = ZBX_RTC_SUB_SERVICE;
+	data += zbx_deserialize_value(data, &sub->process_type);
+	data += zbx_deserialize_value(data, &sub->process_num);
+	data += rtc_deserialize_msgs(data, &sub->msgs);
+	(void)zbx_deserialize_str(data, &sub->source.service, service_len);
 
 	zbx_vector_rtc_sub_append(&rtc->subs, sub);
 }
@@ -242,7 +411,7 @@ static void	rtc_subscribe(zbx_rtc_t *rtc, zbx_ipc_client_t *client, const unsign
  *             result - [OUT] the runtime control result                      *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *data,
+static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,
 		char **result)
 {
 	switch (code)
@@ -250,9 +419,11 @@ static void	rtc_process_request(zbx_rtc_t *rtc, int code, const unsigned char *d
 #if defined(HAVE_SIGQUEUE)
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
+			rtc_process_loglevel_option(rtc, code, (const char *)data, result);
+			return;
 		case ZBX_RTC_PROF_ENABLE:
 		case ZBX_RTC_PROF_DISABLE:
-			rtc_process_option(code, (const char *)data, result);
+			rtc_process_profiler_option(code, (const char *)data, result);
 			return;
 #endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:
@@ -322,7 +493,7 @@ static void	rtc_notify_hooks(zbx_rtc_t *rtc, zbx_uint32_t code, unsigned char *d
  * Purpose: process runtime control option                                    *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, int code, const unsigned char *data,
+static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t code, const unsigned char *data,
 		zbx_rtc_process_request_ex_func_t cb_proc_req)
 {
 	char		*result = NULL, *result_ex = NULL;
@@ -341,7 +512,7 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, int code, cons
 	}
 
 	size = (zbx_uint32_t)strlen(result) + 1;
-	zbx_ipc_client_send(client, (zbx_uint32_t)code, (unsigned char *)result, size);
+	zbx_ipc_client_send(client, code, (unsigned char *)result, size);
 	zbx_free(result);
 
 	zbx_free(result_ex);
@@ -375,6 +546,9 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 		case ZBX_RTC_SUBSCRIBE:
 			rtc_subscribe(rtc, client, message->data);
 			break;
+		case ZBX_RTC_SUBSCRIBE_SERVICE:
+			rtc_subscribe_service(rtc, message->data);
+			break;
 		case ZBX_RTC_CONFIG_CACHE_RELOAD_WAIT:
 			rtc_add_control_hook(rtc, client, ZBX_RTC_CONFIG_SYNC_NOTIFY);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_CONFIG_CACHE_RELOAD, NULL, 0);
@@ -383,7 +557,7 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 			rtc_notify_hooks(rtc, message->code, message->data, message->size);
 			break;
 		default:
-			rtc_process(rtc, client, (int)message->code, message->data, cb_proc_req);
+			rtc_process(rtc, client, message->code, message->data, cb_proc_req);
 			break;
 	}
 
@@ -450,3 +624,23 @@ void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc)
 	zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free rtc subscription                                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_rtc_sub_free(zbx_rtc_sub_t *sub)
+{
+	switch (sub->type)
+	{
+		case ZBX_RTC_SUB_CLIENT:
+			zbx_ipc_client_close(sub->source.client);
+			break;
+		case ZBX_RTC_SUB_SERVICE:
+			zbx_free(sub->source.service);
+			break;
+	}
+
+	zbx_vector_uint32_destroy(&sub->msgs);
+	zbx_free(sub);
+}

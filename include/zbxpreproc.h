@@ -198,5 +198,6 @@ ZBX_PTR_VECTOR_DECL(pp_sequence_stats_ptr, zbx_pp_sequence_stats_t *)
 void	zbx_pp_manager_get_sequence_stats(zbx_pp_manager_t *manager, zbx_vector_pp_sequence_stats_ptr_t *sequences);
 
 void	zbx_pp_manager_get_worker_usage(zbx_pp_manager_t *manager, zbx_vector_dbl_t *worker_usage);
+void	zbx_pp_manager_change_worker_loglevel(zbx_pp_manager_t *manager, int worker_num, int direction);
 
 #endif

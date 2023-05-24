@@ -128,14 +128,10 @@ static int	snmp_hex_to_utf8_dyn(char *value, char **out)
 
 static int	snmp_hex_to_mac(char *out)
 {
-	int	hex_num = 0;
-
 	while ('\0' != *out)
 	{
 		if (0 == isxdigit((unsigned char)out[0]) || 0 == isxdigit((unsigned char)out[1]))
 			return FAIL;
-
-		hex_num++;
 
 		if ('\0' == out[2])
 			break;
@@ -165,7 +161,7 @@ static int	snmp_hex_to_mac_dyn(const char *value, char **out)
 
 static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_walk_to_json_param_t *parsed_params)
 {
-	char	*token = NULL, *saveptr, *field_name, *params2, *oid_prefix;
+	char	*token = NULL, *saveptr, *field_name, *params2, *oid_prefix = NULL;
 	int	format_flag , idx = 0;
 
 	if (NULL == params || '\0' == *params)
@@ -213,7 +209,11 @@ static int	preproc_snmp_walk_to_json_params(const char *params, zbx_vector_snmp_
 	zbx_free(params2);
 
 	if (0 != idx % 3)
+	{
+		zbx_free(oid_prefix);
+
 		return FAIL;
+	}
 
 	return SUCCEED;
 }
@@ -749,7 +749,10 @@ int	zbx_snmp_value_cache_init(zbx_snmp_value_cache_t *cache, const char *data, c
 			snmp_value_pair_compare_func);
 
 	if (FAIL == preproc_snmp_walk_to_pairs(&cache->pairs, data, error))
+	{
+		zbx_snmp_value_cache_clear(cache);
 		return FAIL;
+	}
 
 	return SUCCEED;
 }

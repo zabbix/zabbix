@@ -28,8 +28,6 @@
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
 
-static int	hk_period;
-
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS	4
 
@@ -46,8 +44,9 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 {
 	DB_RESULT	result;
 	DB_ROW		row;
-	int		minclock, records = 0;
+	int		records = 0;
 	zbx_uint64_t	lastid, maxid;
+	char		*condition = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' now:%d", __func__, table, now);
 
@@ -66,15 +65,6 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	ZBX_STR2UINT64(lastid, row[0]);
 	zbx_db_free_result(result);
 
-	result = zbx_db_select("select min(clock) from %s",
-			table);
-
-	if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
-		goto rollback;
-
-	minclock = atoi(row[0]);
-	zbx_db_free_result(result);
-
 	result = zbx_db_select("select max(id) from %s",
 			table);
 
@@ -84,16 +74,19 @@ static int	delete_history(const char *table, const char *fieldname, int now)
 	ZBX_STR2UINT64(maxid, row[0]);
 	zbx_db_free_result(result);
 
+	if (0 != CONFIG_PROXY_LOCAL_BUFFER)
+		condition = zbx_dsprintf(NULL, " and clock<%d", now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR);
+
 	records = zbx_db_execute(
 			"delete from %s"
 			" where id<" ZBX_FS_UI64
 				" and (clock<%d"
-					" or (id<=" ZBX_FS_UI64 " and clock<%d))",
+					" or (id<=" ZBX_FS_UI64 "%s))",
 			table, maxid,
 			now - CONFIG_PROXY_OFFLINE_BUFFER * SEC_PER_HOUR,
 			lastid,
-			MIN(now - CONFIG_PROXY_LOCAL_BUFFER * SEC_PER_HOUR,
-					minclock + HK_MAX_DELETE_PERIODS * hk_period));
+			ZBX_NULL2EMPTY_STR(condition));
+	zbx_free(condition);
 
 	zbx_db_commit();
 
@@ -129,26 +122,17 @@ static int	housekeeping_history(int now)
         return records;
 }
 
-static int	get_housekeeper_period(double time_slept)
-{
-	if (SEC_PER_HOUR > time_slept)
-		return SEC_PER_HOUR;
-	else if (24 * SEC_PER_HOUR < time_slept)
-		return 24 * SEC_PER_HOUR;
-	else
-		return (int)time_slept;
-}
-
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	int			records, start, sleeptime;
-	double			sec, time_slept, time_now;
+	double			sec, time_now;
 	char			sleeptext[25];
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char		process_type = info->process_type;
 	int			server_num = info->server_num;
 	int			process_num = info->process_num;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE};
 
 	zbx_thread_proxy_housekeeper_args	*housekeeper_args_in = (zbx_thread_proxy_housekeeper_args *)
 			((((zbx_thread_args_t *)args))->args);
@@ -172,15 +156,14 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_snprintf(sleeptext, sizeof(sleeptext), "idle for %d hour(s)", CONFIG_HOUSEKEEPING_FREQUENCY);
 	}
 
-	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), housekeeper_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 		int		hk_execute = 0;
-
-		sec = zbx_time();
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
@@ -214,10 +197,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 			sleeptime = CONFIG_HOUSEKEEPING_FREQUENCY * SEC_PER_HOUR;
 
 		time_now = zbx_time();
-		time_slept = time_now - sec;
 		zbx_update_env(get_process_type_string(process_type), time_now);
-
-		hk_period = get_housekeeper_period(time_slept);
 
 		start = time(NULL);
 

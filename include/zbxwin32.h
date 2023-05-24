@@ -105,7 +105,10 @@ DWORD 		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
 DWORD 		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
 wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
-int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
+LONG		zbx_win_seh_handler(struct _EXCEPTION_POINTERS *ep);
+#ifdef _M_X64
+LONG		zbx_win_veh_handler(struct _EXCEPTION_POINTERS *ep);
+#endif /* _M_X64 */
 
 void		zbx_init_library_win32(zbx_get_progname_f get_progname);
 

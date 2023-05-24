@@ -25,22 +25,25 @@
 #include "zbxtimekeeper.h"
 #include "zbxpreproc.h"
 
+
 typedef struct
 {
-	int			id;
+	int				id;
 
-	zbx_uint32_t		init_flags;
-	int			stop;
+	zbx_uint32_t			init_flags;
+	int				stop;
 
-	zbx_pp_queue_t		*queue;
-	pthread_t		thread;
+	zbx_pp_queue_t			*queue;
+	pthread_t			thread;
 
-	zbx_pp_context_t	execute_ctx;
+	zbx_pp_context_t		execute_ctx;
 
-	zbx_timekeeper_t	*timekeeper;
+	zbx_timekeeper_t		*timekeeper;
 
-	zbx_pp_notify_cb_t	finished_cb;
-	void			*finished_data;
+	zbx_pp_notify_cb_t		finished_cb;
+	void				*finished_data;
+
+	zbx_log_component_t		logger;
 }
 zbx_pp_worker_t;
 

@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 require_once dirname(__FILE__).'/helpers/CDBHelper.php';
 require_once dirname(__FILE__).'/helpers/CConfigHelper.php';
 require_once dirname(__FILE__).'/helpers/CAPIHelper.php';
+require_once dirname(__FILE__).'/helpers/CAPIScimHelper.php';
 require_once dirname(__FILE__).'/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/helpers/CExceptionHelper.php';
 require_once dirname(__FILE__).'/helpers/CTestArrayHelper.php';
