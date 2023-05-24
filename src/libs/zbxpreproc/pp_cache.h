@@ -36,6 +36,7 @@ typedef struct
 	zbx_variant_t	value;
 	int		type;
 	void		*data;
+	char		*error;
 }
 zbx_pp_cache_t;
 

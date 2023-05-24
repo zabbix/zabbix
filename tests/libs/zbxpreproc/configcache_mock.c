@@ -17,14 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_HISTORY_H
-#define ZABBIX_PP_HISTORY_H
+#include "zbxcommon.h"
+#include "zbxcacheconfig.h"
 
-#include "zbxpreproc.h"
-#include "zbxtime.h"
-#include "zbxvariant.h"
+int	__wrap_zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error)
+{
+	ZBX_UNUSED(um_cache);
+	ZBX_UNUSED(text);
+	ZBX_UNUSED(hostids);
+	ZBX_UNUSED(hostids_num);
+	ZBX_UNUSED(error);
 
-void	pp_history_free(zbx_pp_history_t *history);
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
-
-#endif
+	return SUCCEED;
+}

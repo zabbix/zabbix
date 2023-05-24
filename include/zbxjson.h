@@ -373,7 +373,7 @@ int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char *
 int	zbx_jsonobj_query_ext(zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output);
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
 
-zbx_jsonpath_index_t	*zbx_jsonpath_index_create(void);
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error);
 void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index);
 
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);

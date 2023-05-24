@@ -206,8 +206,8 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 static int	zbx_module_compare_func(const void *d1, const void *d2)
 {
-	const zbx_module_t	*m1 = *(const zbx_module_t **)d1;
-	const zbx_module_t	*m2 = *(const zbx_module_t **)d2;
+	const zbx_module_t	*m1 = *(const zbx_module_t * const *)d1;
+	const zbx_module_t	*m2 = *(const zbx_module_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(m1->lib, m2->lib);
 

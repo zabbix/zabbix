@@ -143,6 +143,7 @@ typedef struct
 	const char		*server;
 	const int		proxymode;
 	const int		config_timeout;
+	const char		*config_source_ip;
 }
 zbx_config_comms_args_t;
 

@@ -69,7 +69,7 @@ This template has been tested on:
 7. Verify it with this command line.
   ```curl -L 127.0.0.1/status```
 
-Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/7.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS_NAME} macro if needed.
+Note that depending on your OS distribution, the PHP-FPM process name may vary. Please, check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/7.0/manual/appendix/items/proc_mem_num_notes) and change {$PHP_FPM.PROCESS.NAME.PARAMETER} macro if needed.
 
 If you use another location of the status/ping page, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
 
@@ -80,18 +80,19 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |Name|Description|Default|
 |----|-----------|-------|
 |{$PHP_FPM.PORT}|<p>The port of the PHP-FPM status host or container.</p>|`80`|
-|{$PHP_FPM.HOST}|<p>The hostname or an IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
+|{$PHP_FPM.HOST}|<p>The hostname or IP address of the PHP-FPM status for a host or container.</p>|`localhost`|
 |{$PHP_FPM.STATUS.PAGE}|<p>The path of the PHP-FPM status page.</p>|`status`|
 |{$PHP_FPM.PING.PAGE}|<p>The path of the PHP-FPM ping page.</p>|`ping`|
 |{$PHP_FPM.PING.REPLY}|<p>The expected reply to the ping.</p>|`pong`|
 |{$PHP_FPM.QUEUE.WARN.MAX}|<p>The maximum percent of the PHP-FPM queue usage for a trigger expression.</p>|`80`|
-|{$PHP_FPM.PROCESS_NAME}|<p>The name of the PHP-FPM process. May vary depending on your OS distribution.</p>|`php-fpm`|
+|{$PHP_FPM.PROCESS_NAME}|<p>The process name filter for the PHP-FPM process discovery. May vary depending on your OS distribution.</p>|`php-fpm`|
+|{$PHP_FPM.PROCESS.NAME.PARAMETER}|<p>The process name of the PHP-FPM used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PHP-FPM: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[,,,summary]|
+|PHP-FPM: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[{$PHP_FPM.PROCESS.NAME.PARAMETER},,,summary]|
 |PHP-FPM: php-fpm_ping||Zabbix agent|web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.PING.PAGE}","{$PHP_FPM.PORT}"]|
 |PHP-FPM: Get status page||Zabbix agent|web.page.get["{$PHP_FPM.HOST}","{$PHP_FPM.STATUS.PAGE}?json","{$PHP_FPM.PORT}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `^[.\s\S]*({.+}) \1`</p></li></ul>|
 |PHP-FPM: Ping||Dependent item|php-fpm.ping<p>**Preprocessing**</p><ul><li><p>Regular expression: `{$PHP_FPM.PING.REPLY}($|\r?\n) 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
@@ -119,7 +120,7 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 |PHP-FPM: Version has changed|<p>The PHP-FPM version has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.version,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.version,#2) and length(last(/PHP-FPM by Zabbix agent/php-fpm.version))>0`|Info|**Manual close**: Yes|
 |PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
 |PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
-|PHP-FPM: Manager  changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
+|PHP-FPM: Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#1)<>last(/PHP-FPM by Zabbix agent/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
 |PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by Zabbix agent/php-fpm.slow_requests,#3)>0`|Warning||
 
 ### LLD rule PHP-FPM process discovery
@@ -132,20 +133,20 @@ If you use an atypical location for the PHP-FPM status-page, don't forget to cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PHP-FPM: Get process data|<p>The summary metrics aggregated by a process `{#NAME}`.</p>|Dependent item|php-fpm.proc.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#NAME} data`</p></li></ul>|
-|PHP-FPM: Memory usage (rss)|<p>The summary of resident set size memory used by a process `{#NAME}` expressed in bytes.</p>|Dependent item|php-fpm.proc.rss[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PHP-FPM: Memory usage (vsize)|<p>The summary of virtual memory used by a process `{#NAME}` expressed in bytes.</p>|Dependent item|php-fpm.proc.vmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PHP-FPM: Memory usage, %|<p>The percentage of real memory used by a process `{#NAME}`.</p>|Dependent item|php-fpm.proc.pmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PHP-FPM: Number of running processes|<p>The number of running processes `{#NAME}`.</p>|Dependent item|php-fpm.proc.num[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|PHP-FPM: CPU utilization|<p>The percentage of the CPU utilization by a process `{#NAME}`.</p>|Zabbix agent|proc.cpu.util[{#NAME}]|
+|PHP-FPM: Get process data|<p>The summary metrics aggregated by a process `{#PHP_FPM.NAME}`.</p>|Dependent item|php-fpm.proc.get[{#PHP_FPM.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#PHP_FPM.NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#PHP_FPM.NAME} data`</p></li></ul>|
+|PHP-FPM: Memory usage (rss)|<p>The summary of resident set size memory used by a process `{#PHP_FPM.NAME}` expressed in bytes.</p>|Dependent item|php-fpm.proc.rss[{#PHP_FPM.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PHP-FPM: Memory usage (vsize)|<p>The summary of virtual memory used by a process `{#PHP_FPM.NAME}` expressed in bytes.</p>|Dependent item|php-fpm.proc.vmem[{#PHP_FPM.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PHP-FPM: Memory usage, %|<p>The percentage of real memory used by a process `{#PHP_FPM.NAME}`.</p>|Dependent item|php-fpm.proc.pmem[{#PHP_FPM.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PHP-FPM: Number of running processes|<p>The number of running processes `{#PHP_FPM.NAME}`.</p>|Dependent item|php-fpm.proc.num[{#PHP_FPM.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|PHP-FPM: CPU utilization|<p>The percentage of the CPU utilization by a process `{#PHP_FPM.NAME}`.</p>|Zabbix agent|proc.cpu.util[{#PHP_FPM.NAME}]|
 
 ### Trigger prototypes for PHP-FPM process discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PHP-FPM: Process is not running||`last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])=0`|High||
-|PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1 and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])>0`|Info|**Manual close**: Yes|
-|PHP-FPM: Service is down||`(last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1) and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#NAME}])>0`|High|**Manual close**: Yes|
+|PHP-FPM: Process is not running||`last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#PHP_FPM.NAME}])=0`|High||
+|PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by Zabbix agent/php-fpm.uptime,30m)=1 and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|Info|**Manual close**: Yes|
+|PHP-FPM: Service is down||`(last(/PHP-FPM by Zabbix agent/php-fpm.ping)=0 or nodata(/PHP-FPM by Zabbix agent/php-fpm.ping,3m)=1) and last(/PHP-FPM by Zabbix agent/php-fpm.proc.num[{#PHP_FPM.NAME}])>0`|High|**Manual close**: Yes|
 
 ## Feedback
 
