@@ -30,65 +30,69 @@ class testPageSearch extends CWebTest {
 
 	use TableTrait;
 
+	public static function getSearchData() {
+		return [
+			[
+				[
+					'search_string' => 'Non existant host',
+					'host_expected_data' => 'No data found.',
+					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'ЗАББИКС Сервер',
+					'host_expected_data' => [['Host' => 'ЗАББИКС Сервер'], ['IP' => '127.0.0.1'], ['DNS' => '']],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'Zabbix servers',
+					'host_expected_data' => 'No data found.',
+					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_data' => [['Host group' => 'Zabbix servers']],
+					'hgroup_expected_count' => ['count' => 1, 'total' => 1],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'Form test template',
+					'host_expected_data' => 'No data found.',
+					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => [['Template' => 'Form test template']],
+					'template_expected_count' => ['count' => 1, 'total' => 1],
+				]
+			],
+		];
+	}
+
 	/**
 	 * Search for an existing Host and check the results page.
-	 */
-	public function testPageSearch_SearchHost() {
-		$this->openSearchResults('ЗАББИКС Сервер');
-		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
-		$this->assertEquals('Search: ЗАББИКС Сервер', $title);
-
-		$expectedTableData = [['Host' => 'ЗАББИКС Сервер'], ['IP' => '127.0.0.1'], ['DNS' => '']];
-
-		$this->verifySearchResultWidget(HOST_WIDGET, $expectedTableData, 1, 1);
-		$this->verifySearchResultWidget(HOST_GROUP_WIDGET, "No data found.", 0, 0);
-		$this->verifySearchResultWidget(TEMPLATE_WIDGET, "No data found.", 0, 0);
-	}
-
-	/**
-	 * Opens Zabbix Dashboard, searches by search string and opens the page.
-	 */
-	private function openSearchResults($searchString) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$form = $this->query('class:form-search')->asForm()->one()->waitUntilVisible();
-		$form->query('id:search')->one()->fill($searchString);
-		$form->submit();
-	}
-
-	/**
-	 * Asserts that a Search result widget contains the expected values.
 	 *
-	 * @param $widgetParams			array of witget parameters
-	 * @param $expectedTableData	expected table data as an array or a string
-	 * @param $countShown			expected shown count in widget footer
-	 * @param $countTotal			expected total count in widget footer
+	 * @dataProvider getSearchData
 	 */
-	private function verifySearchResultWidget($widgetParams, $expectedTableData = null, $countShown = null, $countTotal = null){
-		$this->assertEquals($widgetParams['title'],
-			$this->query('xpath://*[@id="'.$widgetParams['id'].'"]//h4')->one()->getText());
-		if ($expectedTableData) {
-			if(is_array($expectedTableData)){
-				$this->assertTableHasData($expectedTableData,'xpath://div[@id="'.$widgetParams['id'].'"]//table');
-			}else{
-				$tableText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//td')->one()->getText();
-				$this->assertEquals($expectedTableData, $tableText);
-			}
-		}
-		if ($countShown !== null && $countTotal !== null) {
-			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
-			$this->assertEquals('Displaying '.$countShown.' of '.$countTotal.' found', $footerText);
-		}
-	}
+	public function testPageSearch_ResultsPage($data) {
 
-	public function testPageSearch_FindNotExistingHost() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-		$this->zbxTestInputTypeWait('search', 'Not existing host');
-		$this->zbxTestClickXpath('//button[@class="search-icon"]');
-		$this->zbxTestCheckTitle('Search');
-		$this->zbxTestCheckHeader('Search: Not existing host');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestTextPresent('No data found.');
-		$this->zbxTestTextNotPresent('Zabbix server');
+		$this->openSearchResults($data['search_string']);
+		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
+		$this->assertEquals('Search: '.$data['search_string'], $title);
+
+		$this->verifySearchResultWidget(HOST_WIDGET, $data['host_expected_data'] ?? null, $data['host_expected_count'] ?? null);
+		$this->verifySearchResultWidget(HOST_GROUP_WIDGET, $data['hgroup_expected_data'] ?? null, $data['hgroup_expected_count'] ?? null);
+		$this->verifySearchResultWidget(TEMPLATE_WIDGET, $data['template_expected_data'] ?? null, $data['template_expected_count'] ?? null);
 	}
 
 	/**
@@ -108,5 +112,39 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestClickXpath('//button[@class="search-icon"]');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
+	}
+
+	/**
+	 * Opens Zabbix Dashboard, searches by search string and opens the page.
+	 */
+	private function openSearchResults($searchString) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->asForm()->one()->waitUntilVisible();
+		$form->query('id:search')->one()->fill($searchString);
+		$form->submit();
+	}
+
+	/**
+	 * Asserts that a Search result widget contains the expected values.
+	 *
+	 * @param $widgetParams			array of witget parameters
+	 * @param $expectedTableData	expected table data as an array or a string
+	 * @param $expectedCount		expected count and total at the footer
+	 */
+	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount){
+		$this->assertEquals($widgetParams['title'],
+			$this->query('xpath://*[@id="'.$widgetParams['id'].'"]//h4')->one()->getText());
+		if ($expectedTableData) {
+			if(is_array($expectedTableData)){
+				$this->assertTableHasData($expectedTableData,'xpath://div[@id="'.$widgetParams['id'].'"]//table');
+			}else{
+				$tableText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//td')->one()->getText();
+				$this->assertEquals($expectedTableData, $tableText);
+			}
+		}
+		if ($expectedCount !== null) {
+			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$this->assertEquals('Displaying '.$expectedCount['count'].' of '.$expectedCount['total'].' found', $footerText);
+		}
 	}
 }
