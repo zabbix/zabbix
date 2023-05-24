@@ -1006,6 +1006,8 @@ td.inactive-bg {
 .problem-icon-link, // TODO: check
 .problem-icon-list { // TODO: check
 	.problem-icon-list-item { // TODO: check
+		@extend %icon-medium;
+
 		padding-left: 0;
 		color: $font-color;
 		border: none;
@@ -1016,7 +1018,6 @@ td.inactive-bg {
 
 			margin-right: 4px;
 			color: #000000;
-			font-size: $icon-medium-size;
 			border-radius: 3px;
 		}
 	}

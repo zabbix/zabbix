@@ -1,3 +1,9 @@
+%icon-medium {
+	&::before {
+		font-size: $icon-medium-size;
+	}
+}
+
 %icon-small {
 	&::before {
 		font-size: $icon-small-size;
@@ -68,6 +74,13 @@
 	&.btn-icon {
 		color: $icon-color;
 	}
+}
+
+.zi-chevron-down,
+.zi-chevron-left,
+.zi-chevron-right,
+.zi-chevron-up {
+	@extend %icon-medium;
 }
 
 .zi-chevron-down-small {

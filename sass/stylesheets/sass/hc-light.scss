@@ -913,6 +913,8 @@ td.inactive-bg {
 .problem-icon-link,
 .problem-icon-list {
 	.problem-icon-list-item {
+		@extend %icon-medium;
+
 		padding-left: 0;
 		color: $font-color;
 		border: none;
@@ -922,7 +924,6 @@ td.inactive-bg {
 			@extend %icons-font;
 
 			margin-right: 4px;
-			font-size: $icon-medium-size;
 			border-radius: 3px;
 		}
 	}

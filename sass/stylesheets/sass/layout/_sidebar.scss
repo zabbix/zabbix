@@ -28,8 +28,9 @@ $sidebar-padding: 12px;
 		justify-content: flex-end;
 
 		.btn-icon {
+			@extend %icon-medium;
+
 			&::before {
-				font-size: $icon-medium-size;
 				color: $sidebar-mode-icon-color;
 			}
 

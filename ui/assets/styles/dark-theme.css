@@ -895,7 +895,6 @@ footer {
     width: 48px;
     justify-content: flex-end; }
     .sidebar .sidebar-header-buttons .btn-icon::before {
-      font-size: 16px;
       color: #9c9c9c; }
     .sidebar .sidebar-header-buttons .btn-icon:hover::before, .sidebar .sidebar-header-buttons .btn-icon:focus::before {
       color: #ffffff; }
@@ -1248,6 +1247,12 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   opacity: 0; }
   .btn-debug.visible {
     opacity: 0.75; }
+
+.sidebar .sidebar-header-buttons .btn-icon::before, .zi-chevron-down::before, .zi-chevron-down-small::before,
+.zi-chevron-left::before,
+.zi-chevron-right::before,
+.zi-chevron-up::before {
+  font-size: 16px; }
 
 .zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
   font-size: 12px; }
