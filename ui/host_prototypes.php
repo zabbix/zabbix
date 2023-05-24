@@ -493,7 +493,7 @@ if (hasRequest('form')) {
 	}
 	unset($macro);
 
-	// This data is used in common.template.edit.js.php.
+	// This data is used in template.edit.js.php.
 	$data['macros_tab'] = [
 		'linked_templates' => array_map('strval', $templateids),
 		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
