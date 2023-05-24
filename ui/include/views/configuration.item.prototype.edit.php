@@ -660,8 +660,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
-		(new CFormField((new CTextBox('username', $data['username'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('username', $data['username'], false, DB::getFieldLength('items', 'username')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-username-field')
 	])
@@ -685,8 +685,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
-		(new CFormField((new CTextBox('password', $data['password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('password', $data['password'], false, DB::getFieldLength('items', 'password')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-password-field')
 	])

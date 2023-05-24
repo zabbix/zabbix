@@ -109,6 +109,18 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: 0cf11e0dfd3b47f1a0a5d8f011e6517b
+          name: 'TP-LINK: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.10,1.3.6.1.2.1.2.2.1.16,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.2.2.1.5]'
+          key: net.if.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 707bcd801726449d9a7d3de0fa650c0a
           name: 'TP-LINK: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -142,6 +154,18 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: ae66a99ae15d4fe98e513745978c2ce4
+          name: 'TP-LINK: SNMP walk system CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.11863.6.4.1.1.1.1.1,1.3.6.1.4.1.11863.6.4.1.1.1.1.3]'
+          key: system.cpu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 4727c07daa0c413aa4bbc293198f9cde
           name: 'TP-LINK: System description'
           type: SNMP_AGENT
@@ -378,6 +402,18 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 4ac2fe58877e4a8ab1dedb38fe41ef3e
+          name: 'TP-LINK: SNMP walk memory'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.11863.6.4.1.2.1.1.1,1.3.6.1.4.1.11863.6.4.1.2.1.1.2]'
+          key: vm.memory.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: b6cd5b22d8014aa18fdb7735d77cc84c
           name: 'TP-LINK: SNMP agent availability'
           type: INTERNAL
@@ -412,17 +448,16 @@ zabbix_export:
       discovery_rules:
         - uuid: 5325de505855448a8c785066374ba201
           name: 'CPU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.1.1.1.1]'
+          type: DEPENDENT
           key: cpu.discovery
-          delay: 1h
+          delay: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorCpuTable, displays the CPU utilization of all UNITs.'
           item_prototypes:
             - uuid: 84929a905e144746b047a20bbfb7ae40
               name: '#{#SNMPVALUE}: CPU utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.11863.6.4.1.1.1.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -430,6 +465,13 @@ zabbix_export:
                 MIB: TPLINK-SYSMONITOR-MIB
                 Displays the CPU utilization in 1 minute.
                 Reference: http://www.tp-link.com/faq-1330.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.11863.6.4.1.1.1.1.3.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
@@ -455,19 +497,30 @@ zabbix_export:
                   item:
                     host: 'TP-LINK by SNMP'
                     key: 'system.cpu.util[tpSysMonitorCpu1Minute.{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.11863.6.4.1.1.1.1.1
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 7a3144453fc644b3bd42dec4ba843bef
           name: 'Memory Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.11863.6.4.1.2.1.1.1]'
+          type: DEPENDENT
           key: memory.discovery
-          delay: 1h
+          delay: '0'
           description: 'Discovering TPLINK-SYSMONITOR-MIB::tpSysMonitorMemoryTable, displays the memory utilization of all UNITs.'
           item_prototypes:
             - uuid: 5800682fc8f8439eb404707f995ec9a6
               name: '#{#SNMPVALUE}: Memory utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.11863.6.4.1.2.1.1.2.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -475,6 +528,13 @@ zabbix_export:
                 MIB: TPLINK-SYSMONITOR-MIB
                 Displays the memory utilization.
                 Reference: http://www.tp-link.com/faq-1330.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.11863.6.4.1.2.1.1.2.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
@@ -501,12 +561,23 @@ zabbix_export:
                   item:
                     host: 'TP-LINK by SNMP'
                     key: 'vm.memory.util[tpSysMonitorMemoryUtilization.{#SNMPINDEX}]'
+          master_item:
+            key: vm.memory.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.11863.6.4.1.2.1.1.1
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: eec7aaed43e14fbca8c07cdc68d8b683
           name: 'Network interfaces discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFNAME},1.3.6.1.2.1.2.2.1.2,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: net.if.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -549,10 +620,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 27f1c9ccfc744b5eb215d032fbbe2ff8
               name: 'Interface {#IFDESCR}: Inbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -562,9 +632,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -574,18 +653,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 738de59c4df9435d8076751a33098685
               name: 'Interface {#IFDESCR}: Inbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -595,22 +682,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: a9393bc9e68c4c27b01320f776c037cb
               name: 'Interface {#IFDESCR}: Bits received'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.10.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -620,10 +712,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 86798974d9f143bf81e5fa40ac792835
               name: 'Interface {#IFDESCR}: Outbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -633,9 +724,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -645,18 +745,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: aa20e57e43bd4252b232e9f18ab73391
               name: 'Interface {#IFDESCR}: Outbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -666,22 +774,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 694efd29271f4109a3008cd3404c2d54
               name: 'Interface {#IFDESCR}: Bits sent'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.16.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -691,10 +804,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: b06b4597959c44d6b998b506257e0f7f
               name: 'Interface {#IFDESCR}: Speed'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
-              delay: 5m
+              delay: '0'
               history: 7d
               trends: '0'
               units: bps
@@ -706,6 +818,16 @@ zabbix_export:
                 If the bandwidth of the interface is greater than the maximum value reportable by this object then
                 this object should report its maximum value (4,294,967,295) and ifHighSpeed must be used to report the interface's speed.
                 For a sub-layer which has no concept of bandwidth, this object should be zero.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.5.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 5m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -715,9 +837,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 25c78dd4d9ff466980d06912c8ca79db
               name: 'Interface {#IFDESCR}: Operational status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -731,6 +853,13 @@ zabbix_export:
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -759,10 +888,9 @@ zabbix_export:
                       value: availability
             - uuid: 7d5f2f31ef3f49809e1011fed5347942
               name: 'Interface {#IFDESCR}: Interface type'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: 1h
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -773,9 +901,15 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -895,6 +1029,30 @@ zabbix_export:
                   item:
                     host: 'TP-LINK by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: network

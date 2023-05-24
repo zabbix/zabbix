@@ -20,4 +20,6 @@ libzbxserver_a_SOURCES = \
 	calc_checks_eval.c \
 	evaluate_simple.c
 
-libzbxserver_a_CFLAGS = $(LIBXML2_CFLAGS)
+libzbxserver_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)

@@ -53,7 +53,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 |----|-----------|-------|
 |{$RABBITMQ.API.USER}||`zbx_monitor`|
 |{$RABBITMQ.API.PASSWORD}||`zabbix`|
-|{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or an IP of the API endpoint for the RabbitMQ cluster.</p>|`127.0.0.1`|
+|{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ cluster.</p>|`127.0.0.1`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
 |{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}|<p>This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.</p>|`.*`|
@@ -106,7 +106,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}|<p>It responds with a status code`200 OK` if there are no alarms in effect in the cluster.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}|<p>It responds with a status code `200 OK` if there are no alarms in effect in the cluster.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Health Check 3.8.10+ discovery
 
@@ -198,8 +198,9 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
-|{$RABBITMQ.API.HOST}|<p>The hostname or an IP of the API endpoint for the RabbitMQ.</p>|`127.0.0.1`|
-|{$RABBITMQ.PROCESS_NAME}|<p>The name of the RabbitMQ server process.</p>|`beam.smp`|
+|{$RABBITMQ.API.HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ.</p>|`127.0.0.1`|
+|{$RABBITMQ.PROCESS_NAME}|<p>The process name filter for the RabbitMQ process discovery.</p>|`beam.smp`|
+|{$RABBITMQ.PROCESS.NAME.PARAMETER}|<p>The process name of the RabbitMQ server used in the item key `proc.get`. It could be specified if the correct process name is known.</p>||
 |{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`.*`|
 |{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$RABBITMQ.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time by the RabbitMQ expressed in seconds for a trigger expression.</p>|`10`|
@@ -228,7 +229,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 |RabbitMQ: Memory alarm|<p>It checks whether the host has a memory alarm or not.</p>|Dependent item|rabbitmq.node.mem_alarm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.mem_alarm`</p></li><li>Boolean to decimal</li></ul>|
 |RabbitMQ: Disk free alarm|<p>It checks whether the node has a disk alarm or not.</p>|Dependent item|rabbitmq.node.disk_free_alarm<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disk_free_alarm`</p></li><li>Boolean to decimal</li></ul>|
 |RabbitMQ: Uptime|<p>Uptime expressed in milliseconds.</p>|Dependent item|rabbitmq.node.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
-|RabbitMQ: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[,,,summary]|
+|RabbitMQ: Get processes summary|<p>The aggregated data of summary metrics for all processes.</p>|Zabbix agent|proc.get[{$RABBITMQ.PROCESS.NAME.PARAMETER},,,summary]|
 |RabbitMQ: Service response time||Zabbix agent|net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"]|
 
 ### Triggers
@@ -251,22 +252,22 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|RabbitMQ: Get process data|<p>The summary metrics aggregated by a process {#NAME}.</p>|Dependent item|rabbitmq.proc.get[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#NAME} data`</p></li></ul>|
-|RabbitMQ: Number of running processes|<p>The number of running processes {#NAME}.</p>|Dependent item|rabbitmq.proc.num[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|RabbitMQ: Memory usage (rss)|<p>The summary of resident set size memory used by a process {#NAME} expressed in bytes.</p>|Dependent item|rabbitmq.proc.rss[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|RabbitMQ: Memory usage (vsize)|<p>The summary of virtual memory used by a process {#NAME} expressed in bytes.</p>|Dependent item|rabbitmq.proc.vmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|RabbitMQ: Memory usage, %|<p>The percentage of real memory used by a process {#NAME}.</p>|Dependent item|rabbitmq.proc.pmem[{#NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|RabbitMQ: CPU utilization|<p>The percentage of the CPU utilization by a process {#NAME}.</p>|Zabbix agent|proc.cpu.util[{#NAME}]|
+|RabbitMQ: Get process data|<p>The summary metrics aggregated by a process {#RABBITMQ.NAME}.</p>|Dependent item|rabbitmq.proc.get[{#RABBITMQ.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.[?(@["name"]=="{#RABBITMQ.NAME}")].first()`</p><p>⛔️Custom on fail: Set value to: `Failed to retrieve process {#RABBITMQ.NAME} data`</p></li></ul>|
+|RabbitMQ: Number of running processes|<p>The number of running processes {#RABBITMQ.NAME}.</p>|Dependent item|rabbitmq.proc.num[{#RABBITMQ.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.processes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|RabbitMQ: Memory usage (rss)|<p>The summary of resident set size memory used by a process {#RABBITMQ.NAME} expressed in bytes.</p>|Dependent item|rabbitmq.proc.rss[{#RABBITMQ.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rss`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|RabbitMQ: Memory usage (vsize)|<p>The summary of virtual memory used by a process {#RABBITMQ.NAME} expressed in bytes.</p>|Dependent item|rabbitmq.proc.vmem[{#RABBITMQ.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.vsize`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|RabbitMQ: Memory usage, %|<p>The percentage of real memory used by a process {#RABBITMQ.NAME}.</p>|Dependent item|rabbitmq.proc.pmem[{#RABBITMQ.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pmem`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|RabbitMQ: CPU utilization|<p>The percentage of the CPU utilization by a process {#RABBITMQ.NAME}.</p>|Zabbix agent|proc.cpu.util[{#RABBITMQ.NAME}]|
 
 ### Trigger prototypes for RabbitMQ process discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: Process is not running||`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])=0`|High||
-|RabbitMQ: Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Process is not running</li></ul>|
-|RabbitMQ: Service is down||`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0`|Average|**Manual close**: Yes|
-|RabbitMQ: Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0`|Average|**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
-|RabbitMQ: Service response time is too high||`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
+|RabbitMQ: Process is not running||`last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])=0`|High||
+|RabbitMQ: Failed to fetch nodes data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/nodes/{$RABBITMQ.CLUSTER.NAME}@{HOST.NAME}?memory=true"],30m)=1 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Process is not running</li></ul>|
+|RabbitMQ: Service is down||`last(/RabbitMQ node by Zabbix agent/net.tcp.service["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"])=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Manual close**: Yes|
+|RabbitMQ: Node is not running|<p>RabbitMQ node is not running.</p>|`max(/RabbitMQ node by Zabbix agent/rabbitmq.node.running,5m)=0 and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Average|**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
+|RabbitMQ: Service response time is too high||`min(/RabbitMQ node by Zabbix agent/net.tcp.service.perf["{$RABBITMQ.API.SCHEME}","{$RABBITMQ.API.HOST}","{$RABBITMQ.API.PORT}"],5m)>{$RABBITMQ.RESPONSE_TIME.MAX.WARN} and last(/RabbitMQ node by Zabbix agent/rabbitmq.proc.num[{#RABBITMQ.NAME}])>0`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>RabbitMQ: Service is down</li></ul>|
 
 ### LLD rule Health Check 3.8.10+ discovery
 
@@ -288,7 +289,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/7.0/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: There are active alarms in the node|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
+|RabbitMQ: There are active alarms in the node|<p>It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are valid TLS certificates expiring in the next month|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are not running virtual hosts|<p>It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are queues that could potentially lose data if this node goes offline.|<p>It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0`|Average||

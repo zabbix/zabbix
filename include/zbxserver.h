@@ -194,6 +194,9 @@ zbx_eval_count_pattern_data_t;
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
 
+void	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int *count);
+
 int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type,
 		zbx_eval_count_pattern_data_t *pdata, char **error);
 
