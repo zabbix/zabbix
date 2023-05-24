@@ -1983,6 +1983,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 
 	public function getLLDMacrosTabData() {
 		return [
+			// #0
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1994,6 +1995,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/path": cannot be empty.'
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2005,6 +2007,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2016,6 +2019,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2027,6 +2031,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2038,6 +2043,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": cannot be empty.'
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2049,6 +2055,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					'error_details' => 'Invalid parameter "/1/lld_macro_paths/1/lld_macro": a low-level discovery macro is expected.'
 				]
 			],
+			// #6
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2058,9 +2065,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 						['macro' => '{#MACRO}', 'path'=>'$.path.a'],
 						['macro' => '{#MACRO}', 'path'=>'$.path.b']
 					],
-					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2/lld_macro": value "{#MACRO}" already exists.'
+					'error_details' => 'Invalid parameter "/1/lld_macro_paths/2": value (lld_macro)=({#MACRO}) already exists.'
 				]
 			],
+			// #7
 			[
 				[
 					'expected' => TEST_GOOD,
