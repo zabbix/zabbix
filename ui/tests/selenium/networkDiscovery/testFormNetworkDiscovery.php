@@ -204,36 +204,227 @@ class testFormNetworkDiscovery extends CWebTest {
 			// #0.
 			[
 				[
-					'fields' => [
-						'Name' => 'Mimimal fields create'
-					],
-					'Checks' => []
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'Name + 1 check'
-					],
-					'Checks' => [
-						'Check type' => 'HTTP',
-						'Port range' => '65535'
-					]
-				]
-			],
-			[
-				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Empty port'
 					],
 					'Checks' => [
-						'Port range' => ''
+						['Port range' => '']
 					],
 					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.',
-					'error_details' => 'Field "dchecks" is mandatory.'
 				]
 			],
+			// #1.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty fields for SNMPv1'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'Port range' => ''
+						]
+					],
+					'dialog_error' => [
+						'Incorrect value for field "ports": cannot be empty.',
+						'Incorrect value for field "snmp_community": cannot be empty.',
+						'Incorrect value for field "snmp_oid": cannot be empty.'
+					]
+				]
+			],
+			// #2.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation priority for SNMPv1'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'Port range' => 'test',
+							'SNMP community' => 'test',
+							'SNMP OID' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect port range.'
+				]
+			],
+			// #3.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Too big port for SNMPv2'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv2 agent',
+							'Port range' => 65536,
+							'SNMP community' => 'test',
+							'SNMP OID' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect port range.'
+				]
+			],
+			// #4.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Text in port for SNMPv2'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv2 agent',
+							'Port range' => 'text',
+							'SNMP community' => 'test',
+							'SNMP OID' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect port range.'
+				]
+			],
+			// #5.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation priority for SNMPv3'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv3 agent',
+							'Port range' => 'text'
+						]
+					],
+					'dialog_error' => 'Incorrect value for field "snmp_oid": cannot be empty.'
+				]
+			],
+			// #6.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation fields for SNMPv3'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv3 agent',
+							'Port range' => 'text',
+							'SNMP OID' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect port range.'
+				]
+			],
+			// #7.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation authPriv for SNMPv3'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv3 agent',
+							'Security level' => 'authNoPriv'
+						]
+					],
+					'dialog_error' => 'Incorrect value for field "snmp_oid": cannot be empty.'
+				]
+			],
+			// #8.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation authPriv for SNMPv3'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv3 agent',
+							'Security level' => 'authPriv'
+						]
+					],
+					'dialog_error' => [
+						'Incorrect value for field "snmp_oid": cannot be empty.',
+						'Incorrect value for field "snmpv3_privpassphrase": cannot be empty.'
+					]
+				]
+			],
+			// #9.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation key for Zabbix agent'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'Zabbix agent',
+							'Key' => '😀'
+						]
+					],
+					'dialog_error' => 'Invalid key "😀": incorrect syntax near "😀".'
+				]
+			],
+			// #10.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty fields for Zabbix agent'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'Zabbix agent',
+							'Port range' => ''
+						]
+					],
+					'dialog_error' => [
+						'Incorrect value for field "ports": cannot be empty.',
+						'Incorrect value for field "key_": cannot be empty.'
+					]
+				]
+			],
+			// #11.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation priority for Zabbix agent'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'Zabbix agent',
+							'Port range' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect value for field "key_": cannot be empty.'
+				]
+			],
+			// #12.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Validation for Zabbix agent'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'Zabbix agent',
+							'Port range' => 'test'  ,
+							'Key' => 'test'
+						]
+					],
+					'dialog_error' => 'Incorrect port range.'
+				]
+			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -243,6 +434,154 @@ class testFormNetworkDiscovery extends CWebTest {
 					'error_details' => [
 						'Incorrect value for field "name": cannot be empty.' ,
 						'Field "dchecks" is mandatory.'
+					]
+				]
+			],
+			// #14.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Empty interval validation',
+						'Update interval' => ''
+					],
+					'Checks' => [['default' => true]],
+					'error_details' => 'Incorrect value for field "delay": cannot be empty.'
+				]
+			],
+			// #15.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Text interval validation',
+						'Update interval' => 'text'
+					],
+					'Checks' => [['default' => true]],
+					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
+				]
+			],
+			// #16.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Special symbols in interval validation',
+						'Update interval' => '😀'
+					],
+					'Checks' => [['default' => true]],
+					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
+				]
+			],
+			// #17.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Negative interval validation',
+						'Update interval' => -1
+					],
+					'Checks' => [['default' => true]],
+					'error_details' => 'Incorrect value for field "delay": a time unit is expected.'
+				]
+			],
+			// #18.
+			[
+				[
+					'fields' => [
+						'Name' => 'Mimimal fields create'
+					],
+					'Checks' => [['default' => true]]
+				]
+			],
+			// #19.
+			[
+				[
+					'fields' => [
+						'Name' => 'Name + 1 check'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'HTTP',
+							'Port range' => '65535'
+						]
+					]
+				]
+			],
+			// #20.
+			[
+				[
+					'fields' => [
+						'Name' => 'All fields',
+						'Discovery by proxy' => 'Active proxy 1',
+						'IP range' => '192.168.251.253-254',
+						'Update interval' => 604800,
+						'Enabled' => false
+					],
+					'radios' => [
+						'Device uniqueness criteria' => 'Zabbix agent (100) "test"',
+						'Host name' => 'IP address',
+						'Visible name' => 'DNS name'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'HTTPS',
+							'Port range' => 0
+						],
+						[
+							'Check type' => 'ICMP ping'
+						],
+						[
+							'Check type' => 'IMAP',
+							'Port range' => 1
+						],
+						[
+							'Check type' => 'Zabbix agent',
+							'Port range' => 100,
+							'Key' => 'test'
+						],
+					]
+				]
+			],
+			// #21.
+			[
+				[
+					'fields' => [
+						'Name' => 'SNMP agents checks',
+						'Update interval' => '7d',
+						'Enabled' => true
+					],
+					'radios' => [
+						'Device uniqueness criteria' => 'Zabbix agent "key[param1, param2]"',
+						'Host name' => 'SNMPv1 agent (9999) "😀"',
+						'Visible name' => 'SNMPv3 agent "😀"'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'Port range' => 9999,
+							'SNMP community' => 'test_community',
+							'SNMP OID' => '😀'
+						],
+						[
+							'Check type' => 'SNMPv2 agent',
+							'SNMP community' => 'test_community',
+							'SNMP OID' => 123456789
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => '😀',
+							'Context name' => '😀',
+							'Security name' => '😀',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA224',
+							'Privacy protocol' => 'AES192C',
+							'Privacy passphrase' => '😀'
+						],
+						[
+							'Check type' => 'Zabbix agent',
+							'Key' => 'key[param1, param2]'
+						]
 					]
 				]
 			],
@@ -259,38 +598,118 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=discovery.edit');
 		$form = $this->query('id:discoveryForm')->asForm()->one();
-		$form->fill($data['fields']);
 
 		if (CTestArrayHelper::get($data, 'Checks')) {
-			$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$checks_form = $dialog->asForm();
+			$add_button = $form->getField('Checks')->query('button:Add')->waitUntilClickable()->one();
 
-			if ($data['Checks'] !== [])  {
-				$checks_form->fill($data['Checks']);
+			foreach ($data['Checks'] as $i => $check) {
+				$add_button->click();
+				$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+				$checks_form = $dialog->asForm();
+
+				if (!CTestArrayHelper::get($check, 'default')) {
+					$checks_form->fill($check);
+				}
+
+				// Submit Discovery check dialog.
+				$checks_form->submit();
+
+				// After checking error in overlay no need to test further form.
+				if (CTestArrayHelper::get($data, 'dialog_error')) {
+					$this->assertMessage(TEST_BAD, null, $data['dialog_error']);
+					$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+
+					return;
+				}
+
+				$dialog->ensureNotPresent();
+
+				// Ensure that Discovery check is added to table.
+				if (CTestArrayHelper::get($check, 'default')) {
+					$type_text = 'FTP';
+				}
+				elseif (CTestArrayHelper::get($check, 'Port range') !== null) {
+					switch ($check['Check type']) {
+						case 'Zabbix agent':
+							$type_text = $check['Check type'].' ('.$check['Port range'].') "'.$check['Key'].'"';
+							break;
+
+						case 'SNMPv1 agent':
+						case 'SNMPv2 agent':
+						case 'SNMPv3 agent':
+							$type_text = $check['Check type'].' ('.$check['Port range'].') "'.$check['SNMP OID'].'"';
+							break;
+
+						default:
+							$type_text = $check['Check type'].' ('.$check['Port range'].')';
+							break;
+					}
+				}
+				else {
+					switch ($check['Check type']) {
+						case 'Zabbix agent':
+							$type_text = $check['Check type'].' "'.$check['Key'].'"';
+							break;
+
+						case 'SNMPv1 agent':
+						case 'SNMPv2 agent':
+						case 'SNMPv3 agent':
+							$type_text = $check['Check type'].' "'.$check['SNMP OID'].'"';
+							break;
+
+						default:
+							$type_text = $check['Check type'];
+							break;
+					}
+				}
+
+				$this->assertEquals($type_text,
+						$form->getFieldContainer('Checks')->asTable()->getRow($i)->getColumn('Type')->getText()
+				);
+			}
+		}
+
+		$form->fill($data['fields']);
+
+		// Fill radio-fields.
+		if (array_key_exists('radios', $data)) {
+			foreach ($data['radios'] as $field => $value) {
+				$form->getFieldContainer($field)->query("xpath:.//label[text()=".
+						CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
+			}
+		}
+
+		// Submit Discovery rule form.
+		$form->submit();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot create discovery rule', $data['error_details']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+
+			// Check saved fields in form.
+			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name', $data['fields']['Name'])
+					->query('tag:a')->waitUntilClickable()->one()->click();
+			$form->invalidate();
+			$form->checkValue($data['fields']);
+
+			// Check radio-fields.
+			if (array_key_exists('radios', $data)) {
+				foreach ($data['radios'] as $field => $value) {
+					$this->assertTrue($form->getFieldContainer($field)->query("xpath:.//label[text()=".
+						CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists());
+				}
 			}
 
-			// Submit checks dialog.
-			$checks_form->submit();
+			// Check that Discovery rule saved in  DB.
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.
+					zbx_dbstr($data['fields']['Name'])
+			));
 
-			if (CTestArrayHelper::get($data, 'dialog_error')) {
-				$this->assertMessage(TEST_BAD, null, $data['dialog_error']);
-				$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
-			}
 
-			$dialog->ensureNotPresent();
-
-			// Submit Discovery rule form.
-			$form->submit();
-
-			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-				$this->assertMessage(TEST_BAD, 'Cannot create discovery rule', $data['error_details']);
-				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
-			}
-			else {
-				$this->assertMessage(TEST_GOOD, 'Discovery rule created');
-
-				// Trim trailing and leading spaces in expected values before comparison.
+			// Trim trailing and leading spaces in expected values before comparison.
 //				if (CTestArrayHelper::get($data, 'trim', false)) {
 //					$data['fields']['Group name'] = trim($data['fields']['Group name']);
 //				}
@@ -300,7 +719,6 @@ class testFormNetworkDiscovery extends CWebTest {
 //				if ($action === 'update') {
 //					static::$update_group = $data['fields']['Group name'];
 //				}
-			}
 		}
 	}
 }
