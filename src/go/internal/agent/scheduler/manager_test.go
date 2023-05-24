@@ -32,6 +32,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/pkg/itemutil"
 )
 
@@ -214,6 +215,8 @@ func (pc *resultCacheMock) SlotsAvailable() int {
 func (pc *resultCacheMock) PersistSlotsAvailable() int {
 	return 1
 }
+func (pc *resultCacheMock) WriteCommand(cr *resultcache.CommandResult) {
+}
 
 type mockManager struct {
 	Manager
@@ -251,7 +254,7 @@ func (m *mockManager) mockInit(t *testing.T) {
 }
 
 func (m *mockManager) update(update *updateRequest) {
-	m.processUpdateRequest(update, m.now)
+	m.processUpdateRequest(update)
 }
 
 func (m *mockManager) mockTasks() {
@@ -298,23 +301,23 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 				m.clients[index[t]].exporters[t.item.itemid] = mockTask
-			case *directExporterTask:
-				mockTask := &mockExporterTask{
-					exporterTask: exporterTask{
-						taskBase: taskBase{
-							plugin:    task.getPlugin(),
-							scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
-							index:     -1,
-							active:    task.isActive(),
-							recurring: true,
-						},
-						item:   t.item,
-						client: t.client,
-						meta:   t.meta,
+			/*case *dirresultcacheectExporterTask:
+			mockTask := &mockExporterTask{
+				exporterTask: exporterTask{
+					taskBase: taskBase{
+						plugin:    task.getPlugin(),
+						scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
+						index:     -1,
+						active:    task.isActive(),
+						recurring: true,
 					},
-					sink: m.sink,
-				}
-				p.enqueueTask(mockTask)
+					item:   t.item,
+					client: t.client,
+					meta:   t.meta,
+				},
+				sink: m.sink,
+			}
+			p.enqueueTask(mockTask)*/
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -683,7 +686,7 @@ func TestTaskCreate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	if len(manager.pluginQueue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
@@ -735,7 +738,7 @@ func TestTaskUpdate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	for _, item := range items {
 		item.delay = "10" + item.delay
@@ -751,7 +754,7 @@ func TestTaskUpdate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	if len(manager.pluginQueue) != 3 {
 		t.Errorf("Expected %d plugins queued while got %d", 3, len(manager.pluginQueue))
@@ -796,7 +799,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	items[0].delay = "xyz"
 	update.requests = update.requests[:0]
@@ -809,7 +812,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	if len(manager.plugins["debug1"].tasks) != 0 {
 		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug1"].tasks))
@@ -859,7 +862,7 @@ func TestTaskDelete(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	items[2] = items[6]
 	items = items[:cap(items)-4]
@@ -873,7 +876,7 @@ func TestTaskDelete(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
-	manager.processUpdateRequest(&update, time.Now())
+	manager.processUpdateRequest(&update)
 
 	if len(manager.plugins["debug3"].tasks) != 0 {
 		t.Errorf("Expected %d tasks queued while got %d", 0, len(manager.plugins["debug3"].tasks))
