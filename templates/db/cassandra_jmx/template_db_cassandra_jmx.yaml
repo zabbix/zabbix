@@ -1252,7 +1252,7 @@ zabbix_export:
                 - tag: table
                   value: '{#JMXSCOPE}'
             - uuid: c447d219390a48f2bbbe0d19211472c8
-              name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Max sartition size'
+              name: '{#JMXKEYSPACE}.{#JMXSCOPE}: Max partition size'
               type: JMX
               key: 'jmx["org.apache.cassandra.metrics:type=Table,keyspace={#JMXKEYSPACE},scope={#JMXSCOPE},name=MaxPartitionSize","Value"]'
               history: 7d

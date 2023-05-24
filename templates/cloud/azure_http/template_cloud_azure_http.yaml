@@ -3975,7 +3975,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percantage of workers. Not applicable to the data warehouses.'
+          description: 'The percentage of workers. Not applicable to the data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
