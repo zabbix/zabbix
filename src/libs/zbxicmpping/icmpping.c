@@ -489,7 +489,7 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
 
 	for (i = 0; i < hosts_count; i++)
 	{
-		if (0 == strcmp(tmp, hosts[i].addr))
+		if (SUCCEED == zbx_ip_in_list(tmp, hosts[i].addr))
 		{
 			*host = &hosts[i];
 			ret = SUCCEED;
