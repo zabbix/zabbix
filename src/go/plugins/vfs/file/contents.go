@@ -23,6 +23,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 func (p *Plugin) exportContents(params []string) (result interface{}, err error) {
@@ -59,7 +60,8 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
 
-	outbuf := decode(encoder, buf.Bytes(), len(buf.Bytes()))
+	outbuf, outbytes := decode(encoder, buf.Bytes(), len(buf.Bytes()))
+	xs := string(outbuf[:outbytes])
 
-	return string(bytes.TrimRight(outbuf, "\n\r")), nil
+	return string(strings.TrimRight(xs, "\n\r")), nil
 }

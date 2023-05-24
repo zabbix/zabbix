@@ -20,13 +20,15 @@
 package file
 
 import (
+	//	"bytes"
 	"errors"
+	"fmt"
 	"math"
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
-
 	"zabbix.com/pkg/zbxregexp"
 )
 
@@ -102,10 +104,33 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		if err != nil {
 			return nil, err
 		}
+		for ii := 0; ii < nbytes; ii++ {
+			fmt.Printf("BUF NEXT2: %x, %c\n", buf[ii], buf[ii])
+		}
+		x, outbytes := decode(encoder, buf, nbytes)
+		fmt.Printf("OUTBYTES: %d", outbytes)
+		fmt.Printf("GRANDO 22: ->%s<-\n", x)
 
-		x := decode(encoder, buf, nbytes)
+		xs := string(x[:outbytes])
+		fmt.Printf("GRANDO P: ->%s<-\n", xs)
+
+		//xs = string(bytes.TrimRight(xs, "\n\r"))
+		for ii := 0; ii < len(xs); ii++ {
+			fmt.Printf("AGS: %x\n", xs[ii])
+		}
+
+		xs = strings.TrimRight(xs, "\r\n")
+		for ii := 0; ii < len(xs); ii++ {
+			fmt.Printf("AGS2: %x\n", xs[ii])
+		}
+
+		fmt.Printf("GRANDO 1: ->%s<-\n", xs)
+		// for ii:=0; ii< len(); ii++ {
+		// 	fmt.Printf("XXX: %x, %c\n", xs[ii], x[ii])
+		// }
+		fmt.Printf("EEEEEEEEEE")
 		if curline >= startline {
-			if out, ok := zbxregexp.ExecuteRegex(x, rx, []byte(output)); ok {
+			if out, ok := zbxregexp.ExecuteRegex([]byte(xs), rx, []byte(output)); ok {
 				return out, nil
 			}
 		}

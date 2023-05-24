@@ -105,10 +105,15 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 			return nil, err
 		}
 
-		x := decode(encoder, buf, nbytes)
+		x, outbytes := decode(encoder, buf, nbytes)
+		fmt.Printf("OUTBYTES: %d", outbytes)
+		fmt.Printf("GRANDO 22: ->%s<-\n", x)
+
+		xs := string(x[:outbytes])
+		fmt.Printf("GRANDO P: ->%s<-\n", xs)
 
 		if curline >= startline {
-			if match := r.Match(x); match {
+			if match := r.Match([]byte(xs)); match {
 				ret = 1
 			}
 		}
