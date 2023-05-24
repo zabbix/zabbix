@@ -208,14 +208,13 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 		))->addClass('dataset-actions');
 
 		return (new CListItem([
+			(new CDiv())
+				->addClass(ZBX_STYLE_DRAG_ICON)
+				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
+				->addClass('js-main-drag-icon'),
 			(new CLabel(''))
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-dataset-label'),
-			(new CDiv())
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_ICON_DRAG_HANDLE)
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-main-drag-icon'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -418,9 +417,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 			$name = '#{name}', $color = '#{color}'): CRow {
 		return (new CRow([
 			(new CCol(
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass(ZBX_ICON_DRAG_HANDLE)
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),

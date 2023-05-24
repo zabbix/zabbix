@@ -68,11 +68,9 @@ $mappings->addItem(
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->addItem((new CRow([
-			(new CCol((new CDiv)
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_ICON_DRAG_HANDLE)
-			))
-				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol(
+				(new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSelect('mappings[#{index}][type]'))
 				->setValue('#{type}')
 				->addOptions(CSelect::createOptionsFromArray([

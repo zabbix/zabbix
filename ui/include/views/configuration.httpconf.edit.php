@@ -195,7 +195,7 @@ $http_step_form_list = new CFormList();
 $steps_table = (new CTable())
 	->addClass('httpconf-steps-dynamic-row')
 	->setHeader([
-		(new CColHeader())->setWidth('15'),
+		new CColHeader(),
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('150'),
 		(new CColHeader(_('Timeout')))->setWidth('50'),

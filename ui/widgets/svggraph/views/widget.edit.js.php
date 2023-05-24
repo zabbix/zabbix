@@ -464,6 +464,8 @@ window.widget_svggraph_form = new class {
 				this._updatePreview();
 			});
 		}
+
+		this._sortable_data_set.enableSorting(datasets_count > 1);
 	}
 
 	_selectItems() {
@@ -536,11 +538,11 @@ window.widget_svggraph_form = new class {
 
 		jQuery(`.single-item-table`, dataset).sortable({
 			disabled: item_rows.length < 2,
-			items: 'tbody .single-item-table-row',
+			items: '.single-item-table-row',
 			axis: 'y',
 			containment: 'parent',
 			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: () => {

@@ -250,11 +250,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')))
-								->addClass(ZBX_STYLE_DRAG_ICON)
-								->addClass(ZBX_ICON_DRAG_HANDLE)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -404,13 +403,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-							))
-								->addClass(ZBX_STYLE_DRAG_ICON)
-								->addClass(ZBX_ICON_DRAG_HANDLE)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),

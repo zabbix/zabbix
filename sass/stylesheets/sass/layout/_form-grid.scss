@@ -81,6 +81,10 @@
 			padding-bottom: 0;
 			vertical-align: middle;
 			line-height: 24px;
+
+			&.td-drag-icon {
+				line-height: inherit;
+			}
 		}
 
 		.btn-icon,

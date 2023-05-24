@@ -62,23 +62,25 @@ form.dashboard-widget-svggraph {
 			padding-top: 0;
 
 			&:first-child {
-				grid-column-start: 4;
+				grid-column-start: 5;
 			}
 		}
 	}
 
 	.dataset-actions {
 		text-align: right;
+
+		.btn-icon {
+			@extend %button-size-medium;
+		}
 	}
 
 	.items-list {
-		grid-column: 3 / span 3;
+		grid-column: 4 / span 3;
 	}
 
 	.list-vertical-accordion {
 		position: relative;
-		margin-left: 15px;
-		padding-left: 0;
 
 		&.sortable {
 			overflow: visible;
@@ -90,13 +92,23 @@ form.dashboard-widget-svggraph {
 	.list-accordion-item {
 		position: relative;
 		display: grid;
-		grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
+		grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
 		grid-gap: 10px;
 		align-items: start;
 		padding: 5px 0;
 
+		> .drag-icon {
+			height: 24px;
+			margin-left: -2px;
+
+			&:not(.disabled) {
+				& + label {
+					@extend %cursor-drag;
+				}
+			}
+		}
+
 		> label {
-			@extend %cursor-drag;
 			overflow: hidden;
 			line-height: 24px;
 			text-overflow: ellipsis;
@@ -108,7 +120,7 @@ form.dashboard-widget-svggraph {
 				position: absolute;
 				top: 24px;
 				bottom: 0;
-				left: 121px;
+				left: 136px;
 				width: 2px;
 				background: $ui-border-color;
 			}
@@ -143,24 +155,10 @@ form.dashboard-widget-svggraph {
 				padding-left: 0;
 			}
 		}
-
-		.zi-drag-handle {
-			// opacity: .7; // TODO: DF clean
-
-			&::before {
-				vertical-align: text-bottom;
-				font-size: 24px;
-				color: $icon-color;
-			}
-
-			&.disabled {
-				opacity: .35;
-			}
-		}
 	}
 
 	.single-item-table {
-		.table-col-handle { width: 26px; }
+		.table-col-handle { width: 12px; }
 		.table-col-no { width: 20px; }
 		.table-col-color { width: 24px; }
 		.table-col-action { width: 55px; }
@@ -171,6 +169,13 @@ form.dashboard-widget-svggraph {
 
 		.single-item-table-row td {
 			padding: 0 5px 5px 0;
+		}
+
+		th,
+		td {
+			&:first-child {
+				padding-left: 5px;
+			}
 		}
 
 		.single-item-table-row:last-child td {
@@ -199,6 +204,14 @@ form.dashboard-widget-svggraph {
 			overflow: visible;
 			margin-top: -5px;
 			margin-bottom: -5px;
+		}
+
+		.drag-icon {
+			position: absolute;
+			top: 5px;
+			left: -16px;
+			height: 24px;
+			margin-left: -2px;
 		}
 
 		.multiselect {

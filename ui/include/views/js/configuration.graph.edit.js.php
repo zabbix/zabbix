@@ -31,8 +31,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?> <?= ZBX_ICON_DRAG_HANDLE ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -111,8 +110,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?> <?= ZBX_ICON_DRAG_HANDLE ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -182,8 +180,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?> <?= ZBX_ICON_DRAG_HANDLE ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -254,8 +251,7 @@
 			<td>
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
-				<div class="<?= ZBX_STYLE_DRAG_ICON ?> <?= ZBX_ICON_DRAG_HANDLE ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
+				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -658,12 +654,12 @@
 
 		initSortable() {
 			$('#itemsTable').sortable({
-				disabled: ($('#itemsTable tr.sortable').length < 2),
-				items: 'tbody tr.sortable',
+				disabled: ($('#itemsTable .sortable').length < 2),
+				items: '.sortable',
 				axis: 'y',
 				containment: 'parent',
 				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
 				update: this.recalculateSortOrder,

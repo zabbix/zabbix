@@ -42,10 +42,8 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addClass(ZBX_ICON_DRAG_HANDLE)
-				->addStyle('top: 0px;')
+			(new CCol(
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
 			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
@@ -65,11 +63,9 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-pair-row">
 	<?= (new CRow([
-			(new CCol([
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addClass(ZBX_ICON_DRAG_HANDLE)
-			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol(
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
 				->setAttribute('data-type', 'name')
@@ -240,8 +236,25 @@
 			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
+			helper: (e, ui) => {
+				for (const td of ui.find('>td')) {
+					const $td = $(td);
+					$td.attr('width', $td.width())
+				}
+
+				// When dragging element on safari, it jumps out of the table.
+				if (SF) {
+					// Move back draggable element to proper position.
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				return ui;
+			},
 			start: function(e, ui) {
 				ui.placeholder.height(ui.item.height());
+			},
+			stop: (e, ui) => {
+				ui.item.find('>td').removeAttr('width');
 			}
 		};
 	}

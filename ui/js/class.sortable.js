@@ -708,7 +708,6 @@ class CSortable extends CBaseComponent {
 					return;
 				}
 
-
 				// Scroll item into view if it is partially visible.
 				this.scrollItemIntoView(mouse_down_item);
 

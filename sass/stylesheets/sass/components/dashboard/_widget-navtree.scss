@@ -87,10 +87,6 @@ div.dashboard-widget-navtree {
 							}
 						}
 
-						> .drag-icon {
-							min-width: 24px;
-						}
-
 						> .item-name {
 							white-space: nowrap;
 							overflow: hidden;
@@ -108,7 +104,15 @@ div.dashboard-widget-navtree {
 					.tools {
 						padding-left: 10px;
 						margin-right: 5px;
-						width: 97px;
+						width: 87px;
+
+						.btn-icon {
+							@extend %button-size-medium;
+
+							&:not(:first-child) {
+								margin-left: 5px;
+							}
+						}
 					}
 				}
 

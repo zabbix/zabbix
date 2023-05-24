@@ -782,20 +782,6 @@ form {
 
 	td {
 		position: relative;
-
-		&.td-drag-icon {
-			padding: 0 11px 0 0;
-			vertical-align: middle;
-
-			.zi-drag-handle {
-				position: relative;
-				top: 0;
-				left: 0;
-				&::before {
-					left: -8px;
-				}
-			}
-		}
 	}
 
 	.table-forms-td-left {
@@ -828,10 +814,6 @@ form {
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
-
-			&.td-drag-icon {
-				padding-right: 11px;
-			}
 
 			&.center {
 				text-align: center;
@@ -1570,15 +1552,15 @@ select {
 	}
 }
 
-.drag-icon,
-.ui-draggable .dashboard-widget-head {
-	@extend %cursor-drag;
-}
-
 .ui-draggable {
-	.drag-icon,
 	.dashboard-widget-head {
-		@extend %cursor-dragging;
+		@extend %cursor-drag;
+	}
+
+	&.ui-draggable-dragging {
+		.dashboard-widget-head {
+			@extend %cursor-dragging;
+		}
 	}
 }
 
@@ -3247,9 +3229,6 @@ svg {
 }
 
 .list-vertical-accordion {
-	padding-left: 15px;
-	width: calc(100% - 15px);
-
 	.list-accordion-item-head,
 	.list-accordion-item-body {
 		padding-bottom: 2px;
@@ -3329,12 +3308,6 @@ svg {
 		box-sizing: border-box;
 	}
 
-	.preprocessing-step {
-		.zi-drag-handle {
-			left: -8px;
-		}
-	}
-
 	.step-name,
 	.step-parameters,
 	.step-on-fail,
@@ -3347,6 +3320,17 @@ svg {
 	.step-name {
 		flex: 0 0 $name-width;
 		max-width: $name-width;
+	}
+
+	.preprocessing-step {
+		align-items: start;
+
+		.drag-icon {
+			top: 5px;
+			left: -8px;
+			width: 10px;
+			height: 24px;
+		}
 	}
 
 	.step-parameters {
@@ -3396,12 +3380,6 @@ svg {
 
 		.step-name {
 			padding-left: 30px;
-		}
-	}
-
-	.preprocessing-list-item {
-		.step-name {
-			padding-left: 10px;
 		}
 	}
 
@@ -3512,6 +3490,18 @@ a.icon-count {
 .icon-description,
 .icon-user,
 .icon-user-group {
+}
+
+.ui-sortable {
+	tbody {
+		position: relative;
+	}
+
+	&.ui-sortable-disabled {
+		.drag-icon {
+			color: $btn-icon-disabled-color;
+		}
+	}
 }
 
 #expressions_list .ui-sortable-helper {
@@ -3927,7 +3917,7 @@ a.icon-count {
 
 // Table column styles
 #itemsTable {
-	.table-col-handle { width: 10px; }
+	.table-col-handle { width: 12px; }
 	.table-col-no { width: 20px; }
 	.table-col-name-normal { width: 285px; }
 	.table-col-name { width: 365px; }
@@ -4259,17 +4249,6 @@ z-select,
 .leaflet-container {
 	height: 100%;
 	z-index: 1;
-}
-
-.zi-drag-handle {
-	position: absolute;
-	left: -22px;
-	top: 5px;
-	//opacity: .5; // TODO: DF CLEAN
-
-	&::before {
-		font-size: 24px;
-	}
 }
 
 // Dynamically generated classes:

@@ -550,7 +550,7 @@ class CWidgetNavTree extends CWidget {
 				tools.appendChild(button_remove);
 
 				const drag = document.createElement('div');
-				drag.classList.add('drag-icon', ZBX_ICON_DRAG_HANDLE);
+				drag.classList.add('drag-icon');
 				content.appendChild(drag);
 			}
 		}

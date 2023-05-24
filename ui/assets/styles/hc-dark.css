@@ -42,7 +42,7 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1681727779299") format("woff2"), url("../fonts/zabbix-icons.woff?t=1681727779299") format("woff"), url("../fonts/zabbix-icons.ttf?t=1681727779299") format("truetype"), url("../fonts/zabbix-icons.svg?t=1681727779299#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close:before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
+[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon:before, .btn-overlay-close:before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
 .z-select button.focusable::after, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
 .problem-icon-list .problem-icon-list-item::before {
   font-family: 'zabbix-icons';
@@ -51,12 +51,12 @@ svg *:focus {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon {
+.drag-icon, button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon {
   position: relative;
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty {
+  .drag-icon:empty, button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty {
     justify-content: center; }
 
 .zi-alert-check:before {
@@ -218,7 +218,7 @@ button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"]
 .zi-download:before {
   content: "\ea35"; }
 
-.zi-drag-handle:before {
+.zi-drag-handle:before, .drag-icon:before {
   content: "\ea36"; }
 
 .zi-envelope-filled:before {
@@ -700,6 +700,16 @@ svg a {
     .sortable.sortable-dragging .sortable-item.sortable-dragging {
       opacity: 0.6; }
 
+.drag-icon {
+  width: 12px;
+  height: 1.4em;
+  color: #7d7d7d; }
+  .drag-icon:before {
+    font-size: 22px; }
+  .drag-icon.disabled {
+    color: white;
+    opacity: 1; }
+
 html,
 body {
   height: 100vh; }
@@ -1027,6 +1037,8 @@ footer {
       padding-bottom: 0;
       vertical-align: middle;
       line-height: 24px; }
+      .form-grid table .sortable td.td-drag-icon {
+        line-height: inherit; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #cacaca; }
@@ -1088,7 +1100,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
-.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
+.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .dataset-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
@@ -3419,6 +3431,7 @@ z-select,
     overflow: hidden;
     font-size: 1em;
     line-height: initial;
+    vertical-align: baseline;
     text-align: left;
     text-overflow: ellipsis;
     word-break: break-all;
@@ -3801,8 +3814,6 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
       margin-right: 2px; }
       div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow > .treeview {
         display: none; }
-    div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .drag-icon {
-      min-width: 24px; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .item-name {
       white-space: nowrap;
       overflow: hidden;
@@ -3815,7 +3826,9 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {
     padding-left: 10px;
     margin-right: 5px;
-    width: 97px; }
+    width: 87px; }
+    div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon:not(:first-child) {
+      margin-left: 5px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
   display: block; }
 div.dashboard-widget-navtree .navtree .tree .tree-item.no-map > .tree-row > .content > .item-name, div.dashboard-widget-navtree .navtree .tree .tree-item.inaccessible > .tree-row > .content > .item-name {
@@ -3900,15 +3913,13 @@ form.dashboard-widget-svggraph .dataset-head .multiselect {
 form.dashboard-widget-svggraph .dataset-body .form-grid {
   padding-top: 0; }
   form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
-    grid-column-start: 4; }
+    grid-column-start: 5; }
 form.dashboard-widget-svggraph .dataset-actions {
   text-align: right; }
 form.dashboard-widget-svggraph .items-list {
-  grid-column: 3 / span 3; }
+  grid-column: 4 / span 3; }
 form.dashboard-widget-svggraph .list-vertical-accordion {
-  position: relative;
-  margin-left: 15px;
-  padding-left: 0; }
+  position: relative; }
   form.dashboard-widget-svggraph .list-vertical-accordion.sortable {
     overflow: visible;
     margin-top: -5px;
@@ -3916,10 +3927,13 @@ form.dashboard-widget-svggraph .list-vertical-accordion {
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;
-  grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
+  grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
   grid-gap: 10px;
   align-items: start;
   padding: 5px 0; }
+  form.dashboard-widget-svggraph .list-accordion-item > .drag-icon {
+    height: 24px;
+    margin-left: -2px; }
   form.dashboard-widget-svggraph .list-accordion-item > label {
     overflow: hidden;
     line-height: 24px;
@@ -3929,7 +3943,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
     position: absolute;
     top: 24px;
     bottom: 0;
-    left: 121px;
+    left: 136px;
     width: 2px;
     background: #444444; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .multiselect {
@@ -3946,14 +3960,8 @@ form.dashboard-widget-svggraph .list-accordion-item {
     display: none; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-closed .items-list {
     padding-left: 0; }
-  form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle::before {
-    vertical-align: text-bottom;
-    font-size: 24px;
-    color: #dddddd; }
-  form.dashboard-widget-svggraph .list-accordion-item .zi-drag-handle.disabled {
-    opacity: .35; }
 form.dashboard-widget-svggraph .single-item-table .table-col-handle {
-  width: 26px; }
+  width: 12px; }
 form.dashboard-widget-svggraph .single-item-table .table-col-no {
   width: 20px; }
 form.dashboard-widget-svggraph .single-item-table .table-col-color {
@@ -3964,6 +3972,9 @@ form.dashboard-widget-svggraph .single-item-table th {
   padding: 5px 5px 5px 0; }
 form.dashboard-widget-svggraph .single-item-table .single-item-table-row td {
   padding: 0 5px 5px 0; }
+form.dashboard-widget-svggraph .single-item-table th:first-child,
+form.dashboard-widget-svggraph .single-item-table td:first-child {
+  padding-left: 5px; }
 form.dashboard-widget-svggraph .single-item-table .single-item-table-row:last-child td {
   padding-bottom: 0; }
 form.dashboard-widget-svggraph .single-item-table tfoot td {
@@ -3982,6 +3993,12 @@ form.dashboard-widget-svggraph .overrides-list-item {
     overflow: visible;
     margin-top: -5px;
     margin-bottom: -5px; }
+  form.dashboard-widget-svggraph .overrides-list-item .drag-icon {
+    position: absolute;
+    top: 5px;
+    left: -16px;
+    height: 24px;
+    margin-left: -2px; }
   form.dashboard-widget-svggraph .overrides-list-item .multiselect {
     width: 100%; }
 form.dashboard-widget-svggraph .overrides-foot {
@@ -4510,15 +4527,6 @@ form.is-loading {
     margin: 0 10px 0 0; }
   .table-forms td {
     position: relative; }
-    .table-forms td.td-drag-icon {
-      padding: 0 11px 0 0;
-      vertical-align: middle; }
-      .table-forms td.td-drag-icon .zi-drag-handle {
-        position: relative;
-        top: 0;
-        left: 0; }
-        .table-forms td.td-drag-icon .zi-drag-handle::before {
-          left: -8px; }
   .table-forms .table-forms-td-left {
     display: table-cell;
     padding: 5px 0;
@@ -4542,8 +4550,6 @@ form.is-loading {
     .table-forms .table-forms-td-right td {
       padding: 5px 5px 5px 0;
       position: relative; }
-      .table-forms .table-forms-td-right td.td-drag-icon {
-        padding-right: 11px; }
       .table-forms .table-forms-td-right td.center {
         text-align: center;
         vertical-align: middle; }
@@ -5940,20 +5946,20 @@ span.is-loading {
 .overflow-table::-webkit-scrollbar {
   height: 9px; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
+.drag-icon, .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > label, .drag-icon,
-.ui-draggable .dashboard-widget-head {
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
   cursor: move;
+  /* fallback if grab cursor is unsupported */
   cursor: grab; }
 
 .dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable .drag-icon,
-.ui-draggable .dashboard-widget-head, .cursor-dragging {
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .dashboard-widget-head, .cursor-dragging {
   cursor: move;
+  /* fallback if grab cursor is unsupported */
   cursor: grabbing; }
 
 .cursor-move {
@@ -6076,19 +6082,16 @@ svg {
   border: 0;
   border-radius: 0; }
 
-.list-vertical-accordion {
-  padding-left: 15px;
-  width: calc(100% - 15px); }
-  .list-vertical-accordion .list-accordion-item-head,
-  .list-vertical-accordion .list-accordion-item-body {
-    padding-bottom: 2px; }
-  .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-body {
-    display: block; }
-  .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
-    display: none; }
-  .list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
-    margin: 0;
-    transform: rotate(180deg); }
+.list-vertical-accordion .list-accordion-item-head,
+.list-vertical-accordion .list-accordion-item-body {
+  padding-bottom: 2px; }
+.list-vertical-accordion .list-accordion-item-opened .list-accordion-item-body {
+  display: block; }
+.list-vertical-accordion .list-accordion-item-closed .list-accordion-item-body {
+  display: none; }
+.list-vertical-accordion .list-accordion-item-closed .list-accordion-item-toggle {
+  margin: 0;
+  transform: rotate(180deg); }
 
 .display-none, .table-forms > li.display-none {
   display: none; }
@@ -6127,8 +6130,6 @@ svg {
     display: flex;
     align-items: center;
     box-sizing: border-box; }
-  .preprocessing-list .preprocessing-step .zi-drag-handle {
-    left: -8px; }
   .preprocessing-list .step-name,
   .preprocessing-list .step-parameters,
   .preprocessing-list .step-on-fail,
@@ -6139,6 +6140,13 @@ svg {
   .preprocessing-list .step-name {
     flex: 0 0 295px;
     max-width: 295px; }
+  .preprocessing-list .preprocessing-step {
+    align-items: start; }
+    .preprocessing-list .preprocessing-step .drag-icon {
+      top: 5px;
+      left: -8px;
+      width: 10px;
+      height: 24px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
     .preprocessing-list .step-parameters z-select {
@@ -6167,8 +6175,6 @@ svg {
     line-height: 14px; }
     .preprocessing-list .preprocessing-list-head .step-name {
       padding-left: 30px; }
-  .preprocessing-list .preprocessing-list-item .step-name {
-    padding-left: 10px; }
   .preprocessing-list .preprocessing-list-foot {
     justify-content: space-between; }
     .preprocessing-list .preprocessing-list-foot .step-action {
@@ -6219,6 +6225,11 @@ a.icon-count {
 
 ::placeholder {
   color: #bbbbbb; }
+
+.ui-sortable tbody {
+  position: relative; }
+.ui-sortable.ui-sortable-disabled .drag-icon {
+  color: white; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
@@ -6448,7 +6459,7 @@ a.icon-count {
   line-height: 24px; }
 
 #itemsTable .table-col-handle {
-  width: 10px; }
+  width: 12px; }
 #itemsTable .table-col-no {
   width: 20px; }
 #itemsTable .table-col-name-normal {
@@ -6674,13 +6685,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .leaflet-container {
   height: 100%;
   z-index: 1; }
-
-.zi-drag-handle {
-  position: absolute;
-  left: -22px;
-  top: 5px; }
-  .zi-drag-handle::before {
-    font-size: 24px; }
 
 .color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
   color: #ff7800; }
