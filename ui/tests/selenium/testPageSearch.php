@@ -26,9 +26,48 @@ define('HOST_WIDGET', ['id' => 'search_hosts_widget', 'title' => 'Hosts']);
 define('HOST_GROUP_WIDGET', ['id' => 'search_hostgroup_widget', 'title' => 'Host groups']);
 define('TEMPLATE_WIDGET', ['id' => 'search_templates_widget', 'title' => 'Templates']);
 
+/**
+ * @backup hosts
+ *
+ * @onBefore prepareData
+ */
 class testPageSearch extends CWebTest {
 
 	use TableTrait;
+
+	public static function prepareData() {
+		CDataHelper::createHosts([
+			[
+				'host' => 'emoji visible name',
+				'name' => '🙂⭐️',
+				'groups' => [
+					'groupid' => '6'
+				],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			],
+			[
+				'host' => str_repeat('A', 128),
+				'groups' => [
+					'groupid' => '6'
+				],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			],
+		]);
+	}
 
 	public static function getSearchData() {
 		return [
@@ -74,6 +113,47 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => [['Template' => 'Form test template']],
 					'template_expected_count' => ['count' => 1, 'total' => 1],
+				]
+			],
+			[
+				[
+					'search_string' => '⭐️',
+					'host_expected_data' => [['Host' => '🙂⭐️']],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'emoji visible name',
+					'host_expected_data' => [['Host' => "🙂⭐️\n(emoji visible name)"]],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => str_repeat('A', 128),
+					'host_expected_data' => [['Host' => str_repeat('A', 128)]],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'a',
+					'host_expected_count' => ['count' => 36, 'total' => 36],
+					'hgroup_expected_count' => ['count' => 28, 'total' => 28],
+					'template_expected_count' => ['count' => 100, 'total' => 234],
 				]
 			],
 		];
