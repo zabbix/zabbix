@@ -74,7 +74,9 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 					'name' => 'testInheritanceDiscoveryRule5',
 					'key' => 'discovery-rule-inheritance5',
 					'errors' => [
-						'Discovery rule "discovery-rule-inheritance5" already exists on "Template inheritance test host", inherited from another template'
+						'Cannot inherit item prototype with key "discovery-rule-inheritance5" of template "Inheritance '.
+								'test template" to host "Template inheritance test host", because an LLD rule with the '.
+								'same key already exists.'
 					]
 				]
 			],
