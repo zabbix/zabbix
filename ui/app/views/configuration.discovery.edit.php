@@ -102,13 +102,14 @@ $form_grid->addItem([
 		(new CTable())
 			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Type'), _('Actions')])
-			->setFooter(
-				(new CRow(
-					(new CCol(
-						(new CButtonLink(_('Add')))->setAttribute('data-action', 'add')
-					))->setColSpan(2)
-				))->setId('dcheckListFooter')
-			)
+			->addItem(
+				(new CTag('tfoot', true))
+					->addItem(
+						(new CCol(
+							(new CButtonLink(_('Add')))->addClass('js-check-add')
+						))->setColSpan(2)
+					)
+			)->setId('dcheckListFooter')
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')

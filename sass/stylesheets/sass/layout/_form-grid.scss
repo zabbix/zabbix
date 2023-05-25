@@ -256,5 +256,11 @@
 		td {
 			padding: 5px 5px 5px 0;
 		}
+
+		tfoot {
+			td {
+				padding-bottom: 0;
+			}
+		}
 	}
 }

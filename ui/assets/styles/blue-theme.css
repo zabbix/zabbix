@@ -1151,6 +1151,8 @@ footer {
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
+    .form-grid .table-forms-separator tfoot td {
+      padding-bottom: 0; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
@@ -1282,6 +1284,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .btn-link {
   box-sizing: content-box;
   padding: 0;
+  min-width: 1ch;
   height: 14px;
   line-height: 14px;
   vertical-align: baseline;
