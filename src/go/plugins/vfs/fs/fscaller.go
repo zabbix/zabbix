@@ -84,6 +84,8 @@ func (f *fsCaller) checkNotStuckAndExecute(path string) {
 			return
 		case <-f.errChan:
 			return
+		case <-time.After(timeout * 12 * 3600 * time.Second):
+			return
 		}
 	}
 }
