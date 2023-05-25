@@ -1029,7 +1029,7 @@ HEREDOC;
 		$this->reloadConfigurationCache();
 
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 8);
-	
+
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, "Executing command '".self::COMMAND_PROBLEM."'",
 				true, 10, 3);
