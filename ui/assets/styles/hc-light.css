@@ -2500,6 +2500,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   transform: rotate(0deg); }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]::before {
   color: #000000; }
+.menu-main .has-submenu.is-expanded > a[class^="zi-"]:hover:before, .menu-main .has-submenu.is-expanded > a[class^="zi-"]:focus:before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:hover:before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:focus:before {
+  color: #000000; }
 .menu-main .has-submenu.is-expanded > a::after {
   transform: rotate(-180deg); }
 .menu-main [class^="zi-"]::before, .menu-main [class*=" zi-"]::before {

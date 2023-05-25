@@ -62,6 +62,13 @@
 					&::before {
 						color: $menu-main-expanded-icon-color;
 					}
+
+					&:hover,
+					&:focus {
+						&:before {
+							color: $menu-main-hover-color;
+						}
+					}
 				}
 
 				&::after {
