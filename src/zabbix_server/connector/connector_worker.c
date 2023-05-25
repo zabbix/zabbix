@@ -41,7 +41,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zbx_ipc_message_t *message, zbx_vector_connector_data_point_t *connector_data_points,
 		zbx_uint64_t *processed_num)
 {
-	zbx_connector_t	connector;
+	/*zbx_connector_t	connector;
 	int		i;
 	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
@@ -125,7 +125,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
 		exit(EXIT_FAILURE);
-	}
+	}*/
 }
 
 ZBX_THREAD_ENTRY(connector_worker_thread, args)

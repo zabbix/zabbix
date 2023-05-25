@@ -567,22 +567,174 @@ static void	http_output_json(unsigned char retrieve_mode, char **buffer, zbx_htt
 	zbx_json_free(&json);
 }
 
-int	zbx_http_request(unsigned char request_method, const char *url, const char *query_fields, char *headers,
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context)
+{
+	CURLcode	err;
+
+	/* try to retrieve page several times depending on number of retries */
+	do
+	{
+		*context->errbuf = '\0';
+
+		if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
+		{
+			return err;
+		}
+		else
+		{
+			if (1 != context->max_attempts)
+			{
+				zabbix_log(LOG_LEVEL_INFORMATION, "cannot perform request: %s",
+						'\0' == *context->errbuf ? curl_easy_strerror(err) : context->errbuf);
+			}
+		}
+
+		context->header.offset = 0;
+		context->body.offset = 0;
+	}
+	while (0 < --context->max_attempts);
+
+	return err;
+}
+
+int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
+		char **out, char **error)
+{
+	if (CURLE_OK != err)
+	{
+		if (CURLE_WRITE_ERROR == err)
+		{
+			*error = zbx_strdup(NULL, "The requested value is too large");
+		}
+		else
+		{
+			*error = zbx_dsprintf(NULL, "Cannot perform request: %s",
+					'\0' == *context->errbuf ? curl_easy_strerror(err) : context->errbuf);
+		}
+
+		return FAIL;
+	}
+
+	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, response_code)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
+		return FAIL;
+	}
+
+	if (NULL == context->header.data)
+	{
+		*error = zbx_dsprintf(NULL, "Server returned empty header");
+		return FAIL;
+	}
+
+	switch (context->retrieve_mode)
+	{
+		case ZBX_RETRIEVE_MODE_CONTENT:
+			if (NULL != context->body.data && FAIL == zbx_is_utf8(context->body.data))
+			{
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				return FAIL;
+			}
+
+			if (HTTP_STORE_JSON == context->output_format)
+			{
+				http_output_json(context->retrieve_mode, out, &context->header, &context->body);
+			}
+			else
+			{
+				if (NULL != context->body.data)
+				{
+					*out = context->body.data;
+					context->body.data = NULL;
+				}
+				else
+					*out = zbx_strdup(NULL, "");
+			}
+			break;
+		case ZBX_RETRIEVE_MODE_HEADERS:
+			if (FAIL == zbx_is_utf8(context->header.data))
+			{
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				return FAIL;
+			}
+
+			if (HTTP_STORE_JSON == context->output_format)
+			{
+				char		*line;
+				struct zbx_json	json;
+				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+				zbx_json_addobject(&json, "header");
+				char	*headers_ptr = context->header.data;
+				while (NULL != (line = zbx_http_parse_header(&headers_ptr)))
+				{
+					http_add_json_header(&json, line);
+					zbx_free(line);
+				}
+				*out = zbx_strdup(NULL, json.buffer);
+				zbx_json_free(&json);
+			}
+			else
+			{
+				*out = context->header.data;
+				context->header.data = NULL;
+			}
+			break;
+		case ZBX_RETRIEVE_MODE_BOTH:
+			if (FAIL == zbx_is_utf8(context->header.data) || (NULL != context->body.data && FAIL == zbx_is_utf8(context->body.data)))
+			{
+				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
+				return FAIL;
+			}
+
+			if (HTTP_STORE_JSON == context->output_format)
+			{
+				http_output_json(context->retrieve_mode, out, &context->header, &context->body);
+			}
+			else
+			{
+				if (NULL != context->body.data)
+				{
+					zbx_strncpy_alloc(&context->header.data, &context->header.allocated, &context->header.offset, context->body.data,
+							context->body.offset);
+				}
+
+				*out = context->header.data;
+				context->header.data = NULL;
+			}
+			break;
+		default:
+			*error = zbx_dsprintf(NULL, "invalid retrieve mode");
+				return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+void	zbx_http_context_create(zbx_http_context_t *context)
+{
+	memset(context, 0, sizeof(zbx_http_context_t));
+}
+
+void	zbx_http_context_destory(zbx_http_context_t *context)
+{
+	curl_slist_free_all(context->headers_slist);	/* must be called after curl_easy_perform() */
+	zbx_free(context->body.data);
+	zbx_free(context->header.data);
+}
+
+int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
-		unsigned char post_type, char *status_codes, unsigned char output_format, const char *config_source_ip,
-		char **out, char **error)
+		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
+		char **error)
 {
-	CURL			*easyhandle;
 	CURLcode		err;
-	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], errbuf[CURL_ERROR_SIZE], *headers_ptr, *line, *buffer;
+	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
-	long			response_code;
-	struct curl_slist	*headers_slist = NULL;
-	struct zbx_json		json;
-	zbx_http_response_t	body = {0}, header = {0};
+
+
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
@@ -593,11 +745,9 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 
 	zabbix_log(LOG_LEVEL_TRACE, "message body '%s'", posts);
 
-	if (NULL == (easyhandle = curl_easy_init()))
-	{
-		*error = zbx_strdup(NULL, "Cannot initialize cURL library");;
-		goto clean;
-	}
+	context->max_attempts = max_attempts;
+	context->output_format = output_format;
+	context->retrieve_mode = retrieve_mode;
 
 	switch (retrieve_mode)
 	{
@@ -614,8 +764,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 			goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb, curl_body_cb, errbuf,
-			error))
+	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &context->header, &context->body, zbx_curl_write_cb,
+			curl_body_cb, context->errbuf, error))
 	{
 		goto clean;
 	}
@@ -669,7 +819,7 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	headers_ptr = headers;
 	while (NULL != (line = zbx_http_parse_header(&headers_ptr)))
 	{
-		headers_slist = curl_slist_append(headers_slist, line);
+		context->headers_slist = curl_slist_append(context->headers_slist, line);
 
 		if (FAIL == found && 0 == strncmp(line, "Content-Type:", ZBX_CONST_STRLEN("Content-Type:")))
 			found = SUCCEED;
@@ -680,14 +830,14 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 	if (FAIL == found)
 	{
 		if (ZBX_POSTTYPE_JSON == post_type)
-			headers_slist = curl_slist_append(headers_slist, application_json);
+			context->headers_slist = curl_slist_append(context->headers_slist, application_json);
 		else if (ZBX_POSTTYPE_XML == post_type)
-			headers_slist = curl_slist_append(headers_slist, application_xml);
+			context->headers_slist = curl_slist_append(context->headers_slist, application_xml);
 		else if (ZBX_POSTTYPE_NDJSON == post_type)
-			headers_slist = curl_slist_append(headers_slist, application_ndjson);
+			context->headers_slist = curl_slist_append(context->headers_slist, application_ndjson);
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, headers_slist)))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, context->headers_slist)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
@@ -726,145 +876,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		goto clean;
 	}
 
-	/* try to retrieve page several times depending on number of retries */
-	do
-	{
-		*errbuf = '\0';
-
-		if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
-		{
-			break;
-		}
-		else
-		{
-			if (1 != max_attempts)
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot perform request: %s",
-						'\0' == *errbuf ? curl_easy_strerror(err) : errbuf);
-			}
-		}
-
-		header.offset = 0;
-		body.offset = 0;
-	}
-	while (0 < --max_attempts);
-
-	if (CURLE_OK != err)
-	{
-		if (CURLE_WRITE_ERROR == err)
-		{
-			*error = zbx_strdup(NULL, "The requested value is too large");
-		}
-		else
-		{
-			*error = zbx_dsprintf(NULL, "Cannot perform request: %s",
-					'\0' == *errbuf ? curl_easy_strerror(err) : errbuf);
-		}
-		goto clean;
-	}
-
-	if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &response_code)))
-	{
-		*error = zbx_dsprintf(NULL, "Cannot get the response code: %s", curl_easy_strerror(err));
-		goto clean;
-	}
-
-	if (NULL == header.data)
-	{
-		*error = zbx_dsprintf(NULL, "Server returned empty header");
-		goto clean;
-	}
-
-	switch (retrieve_mode)
-	{
-		case ZBX_RETRIEVE_MODE_CONTENT:
-			if (NULL != body.data && FAIL == zbx_is_utf8(body.data))
-			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
-				goto clean;
-			}
-
-			if (HTTP_STORE_JSON == output_format)
-			{
-				http_output_json(retrieve_mode, &buffer, &header, &body);
-				*out = buffer;
-			}
-			else
-			{
-				if (NULL != body.data)
-				{
-					*out = body.data;
-					body.data = NULL;
-				}
-				else
-					*out = zbx_strdup(NULL, "");
-			}
-			break;
-		case ZBX_RETRIEVE_MODE_HEADERS:
-			if (FAIL == zbx_is_utf8(header.data))
-			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
-				goto clean;
-			}
-
-			if (HTTP_STORE_JSON == output_format)
-			{
-				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-				zbx_json_addobject(&json, "header");
-				headers_ptr = header.data;
-				while (NULL != (line = zbx_http_parse_header(&headers_ptr)))
-				{
-					http_add_json_header(&json, line);
-					zbx_free(line);
-				}
-				*out = zbx_strdup(NULL, json.buffer);
-				zbx_json_free(&json);
-			}
-			else
-			{
-				*out = header.data;
-				header.data = NULL;
-			}
-			break;
-		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
-			{
-				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
-				goto clean;
-			}
-
-			if (HTTP_STORE_JSON == output_format)
-			{
-				http_output_json(retrieve_mode, &buffer, &header, &body);
-				*out = buffer;
-			}
-			else
-			{
-				if (NULL != body.data)
-				{
-					zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data,
-							body.offset);
-				}
-
-				*out = header.data;
-				header.data = NULL;
-			}
-			break;
-	}
-
-	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, (int)response_code))
-	{
-		*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-				" required status codes \"%s\"", response_code, status_codes);
-		goto clean;
-	}
-
 	ret = SUCCEED;
 clean:
-	curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
-	curl_easy_cleanup(easyhandle);
-	zbx_free(body.data);
-	zbx_free(header.data);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

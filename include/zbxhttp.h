@@ -51,6 +51,18 @@ typedef struct
 }
 zbx_http_response_t;
 
+typedef struct
+{
+	zbx_http_response_t	body;
+	zbx_http_response_t	header;
+	char			errbuf[CURL_ERROR_SIZE];
+	struct curl_slist	*headers_slist;
+	int			max_attempts;
+	unsigned char		retrieve_mode;
+	unsigned char		output_format;
+}
+zbx_http_context_t;
+
 size_t	zbx_curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata);
 size_t	zbx_curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata);
 
@@ -76,12 +88,18 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 #define HTTP_STORE_RAW		0
 #define HTTP_STORE_JSON		1
 
-int	zbx_http_request(unsigned char request_method, const char *url, const char *query_fields, char *headers,
+void	zbx_http_context_create(zbx_http_context_t *context);
+void	zbx_http_context_destory(zbx_http_context_t *context);
+int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
-		unsigned char post_type, char *status_codes, unsigned char output_format, const char *config_source_ip,
+		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
+		char **error);
+
+CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context);
+int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURLcode err, long *response_code,
 		char **out, char **error);
 #endif
 
