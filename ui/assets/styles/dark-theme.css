@@ -3436,7 +3436,6 @@ section {
       margin-left: 5px; }
   .ui-tabs-nav .ui-tabs-anchor:not(.btn) {
     border: none;
-    border-radius: 2px;
     padding: 8px 10px;
     transition: background-color .2s ease-out; }
     .ui-tabs-nav .ui-tabs-anchor:not(.btn):hover, .ui-tabs-nav .ui-tabs-anchor:not(.btn):focus, .ui-tabs-nav .ui-tabs-anchor:not(.btn):active {

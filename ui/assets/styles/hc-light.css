@@ -3394,7 +3394,6 @@ section {
       margin-left: 5px; }
   .ui-tabs-nav .ui-tabs-anchor:not(.btn) {
     border: none;
-    border-radius: 2px;
     padding: 8px 10px; }
     .ui-tabs-nav .ui-tabs-anchor:not(.btn):hover, .ui-tabs-nav .ui-tabs-anchor:not(.btn):focus, .ui-tabs-nav .ui-tabs-anchor:not(.btn):active {
       background-color: #f4f4f4; }
