@@ -59,7 +59,6 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 				{
 					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
 							" required status codes \"%s\"", response_code, item->status_codes));
-				
 				}
 			}
 			else
