@@ -379,7 +379,7 @@ a.btn-icon,
 	}
 
 	.dashboard-grid-widget-placeholder > div {
-		background-color: lighten($ui-bg-color, 12%) !important; // FIXME DF: important not needed not used
+		background-color: lighten($ui-bg-color, 12%);
 	}
 }
 
@@ -419,7 +419,6 @@ a.btn-icon,
 
 .menu-popup {
 	background-color: $form-bg-color;
-	border-color: $form-border-color; // FIXME: DF only color changes
 
 	.menu-popup-item {
 		&:hover,
@@ -441,8 +440,6 @@ a.btn-icon,
 
 	&.page-title-submenu::before {
 		background-color: $form-bg-color;
-		border-top-color: $form-border-color; // FIXME: DF only color changes
-		border-left-color: $form-border-color;
 	}
 }
 
@@ -460,22 +457,6 @@ a.btn-icon,
 		}
 	}
 }
-
-// Colors and general.
-// TODO - CHECK
-// button {
-//	&:focus {
-//		background-color: darken($btn-bg-color, 10%);
-//		box-shadow: 0 0 0 2px $blue;
-//	}
-//}
-
-// TODO - CHECK
-//.btn-alt {
-//	&:focus {
-//		box-shadow: 0 0 0 2px $blue;
-//	}
-//}
 
 .radio-list-control {
 	.normal-bg,

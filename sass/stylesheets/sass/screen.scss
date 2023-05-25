@@ -14,7 +14,6 @@ $main-menu-submenu-icon-size: $icon-medium-size !default;
 $menu-user-icon-size: $icon-medium-size !default;
 
 // Sprite path
-$sprite-path: '../img/icon-sprite.svg?20220722'; // TODO - AS: should be removed
 $icons-path: '../fonts/' !default;
 $browser-sprite: '../img/browser-sprite.png?20220722';
 
@@ -101,6 +100,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 %link-action-style {
 	border-bottom: 1px dotted;
 	text-decoration: none;
+	background: green;
 }
 
 .link-alt {

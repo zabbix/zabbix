@@ -315,7 +315,7 @@ $toc-title-bg-color: #4f4f4f;
 	}
 
 	.dashboard-grid-widget-placeholder > div {
-		background-color: darken($ui-bg-color, 3%) !important;
+		background-color: darken($ui-bg-color, 3%);
 	}
 }
 

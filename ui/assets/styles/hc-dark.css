@@ -1049,6 +1049,7 @@ footer {
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
   .form-grid label {
+    align-self: start;
     text-align: right;
     word-wrap: break-word; }
     .form-grid label.fields-group-label {
@@ -2010,7 +2011,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     left: .25rem;
     right: .25rem;
     bottom: .25rem;
-    background-color: #020202 !important; }
+    background-color: #020202; }
 
 @keyframes zoom-in-out {
   0% {
@@ -4132,7 +4133,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
 
 .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
-  text-decoration: none; }
+  text-decoration: none;
+  background: green; }
 
 .link-alt {
   text-decoration: none;
@@ -6859,7 +6861,7 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder > div {
-  background-color: #1f1f1f !important; }
+  background-color: #1f1f1f; }
 
 .dashboard-widget-graph-link:focus::after {
   background: #ffffff;
@@ -6881,8 +6883,7 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
     background-color: #b2b2b2 !important; }
 
 .menu-popup {
-  background-color: #383838;
-  border-color: #666666; }
+  background-color: #383838; }
   .menu-popup .menu-popup-item:hover, .menu-popup .menu-popup-item:focus, .menu-popup .menu-popup-item:active, .menu-popup .menu-popup-item.highlighted {
     background-color: #000000;
     color: #ffffff; }
@@ -6891,9 +6892,7 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
   .menu-popup .menu-popup-item.disabled {
     color: #7d7d7d; }
   .menu-popup.page-title-submenu::before {
-    background-color: #383838;
-    border-top-color: #666666;
-    border-left-color: #666666; }
+    background-color: #383838; }
 
 .header-navigation li > span a:focus,
 .header-navigation > li:first-child > span a:focus {

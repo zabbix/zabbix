@@ -1076,6 +1076,7 @@ footer {
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
   .form-grid label {
+    align-self: start;
     text-align: right;
     word-wrap: break-word; }
     .form-grid label.fields-group-label {
@@ -2039,7 +2040,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     left: .25rem;
     right: .25rem;
     bottom: .25rem;
-    background-color: #010101 !important; }
+    background-color: #010101; }
 
 @keyframes zoom-in-out {
   0% {
@@ -4172,7 +4173,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
 
 .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
-  text-decoration: none; }
+  text-decoration: none;
+  background: green; }
 
 .link-alt {
   text-decoration: none;
@@ -6900,7 +6902,7 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-resizable-resizing .dashboard-grid-iterator-mask, .dashboard.dashboard-is-edit-mode .dashboard-grid-iterator.ui-draggable-dragging .dashboard-grid-iterator-mask {
   border: 0; }
 .dashboard.dashboard-is-edit-mode .dashboard-grid-widget-placeholder > div {
-  background-color: #232323 !important; }
+  background-color: #232323; }
 
 .time-quick li a:focus {
   color: #ffffff; }

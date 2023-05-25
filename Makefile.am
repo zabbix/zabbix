@@ -124,7 +124,6 @@ css_hc_dark:
 	cp ui/assets/styles/hc-dark.css sass/stylesheets/hc-dark.css
 
 css_images:
-	cp sass/img/icon-sprite.svg ui/assets/img/
 	cp sass/img/browser-sprite.png ui/assets/img/
 	cp sass/apple-touch-icon-120x120-precomposed.png ui/assets/img/
 	cp sass/apple-touch-icon-152x152-precomposed.png ui/assets/img/

@@ -1049,6 +1049,7 @@ footer {
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
   .form-grid label {
+    align-self: start;
     text-align: right;
     word-wrap: break-word; }
     .form-grid label.fields-group-label {
@@ -2010,7 +2011,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     left: .25rem;
     right: .25rem;
     bottom: .25rem;
-    background-color: #f0f0f0 !important; }
+    background-color: #f0f0f0; }
 
 @keyframes zoom-in-out {
   0% {
@@ -4132,7 +4133,8 @@ div.dashboard-widget-tophosts z-bar-gauge {
 
 .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
-  text-decoration: none; }
+  text-decoration: none;
+  background: green; }
 
 .link-alt {
   text-decoration: none;
