@@ -50,9 +50,17 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 		{
 			if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(item->status_codes, (int)response_code))
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-						" required status codes \"%s\"\n%s", response_code, item->status_codes, out));
-				zbx_free(out);
+				if (NULL != out)
+				{
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
+							" required status codes \"%s\"\n%s", response_code, item->status_codes, out));
+				}
+				else
+				{
+					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
+							" required status codes \"%s\"", response_code, item->status_codes));
+				
+				}
 			}
 			else
 			{

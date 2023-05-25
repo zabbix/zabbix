@@ -41,7 +41,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zbx_ipc_message_t *message, zbx_vector_connector_data_point_t *connector_data_points,
 		zbx_uint64_t *processed_num)
 {
-	/*zbx_connector_t	connector;
+	zbx_connector_t	connector;
 	int		i;
 	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
@@ -60,16 +60,36 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
-	char	headers[] = "", posts[] = "", status_codes[] = "200";
+	char			headers[] = "", posts[] = "", status_codes[] = "200";
+	zbx_http_context_t	context;
+	CURL			*easyhandle;
 
-	if (SUCCEED != zbx_http_request(HTTP_REQUEST_POST, connector.url, headers, posts,
+	zbx_http_context_create(&context);
+
+	if (NULL == (easyhandle = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");;
+	}
+
+	if (SUCCEED == zbx_http_request_prepare(easyhandle, &context, HTTP_REQUEST_POST, connector.url, headers, posts,
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
 			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
-			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON, status_codes,
-			HTTP_STORE_RAW, config_source_ip, &out, &error))
+			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON,
+			HTTP_STORE_RAW, config_source_ip, &error))
 	{
-		char	*info = NULL;
+		char		*info = NULL;
+		long		response_code;
+		CURLcode	err = zbx_http_request_sync_perform(easyhandle, &context);
+
+		if (SUCCEED == (zbx_http_handle_response(easyhandle, &context, err, &response_code, &out, &error)))
+		{
+			if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
+			{
+				error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
+						" required status codes \"%s\"", response_code, status_codes);
+			}
+		}
 
 		if (NULL != out)
 		{
@@ -103,6 +123,13 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 		zbx_free(info);
 	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
+	}
+
+	curl_easy_cleanup(easyhandle);
+	zbx_http_context_destory(&context);
 #else
 	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
@@ -125,7 +152,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send preprocessing result");
 		exit(EXIT_FAILURE);
-	}*/
+	}
 }
 
 ZBX_THREAD_ENTRY(connector_worker_thread, args)
