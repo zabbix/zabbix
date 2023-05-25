@@ -117,6 +117,14 @@
 		.icon {
 			margin-left: 5px;
 		}
+
+		&:not([for]) {
+			pointer-events: none;
+
+			.btn-icon {
+				pointer-events: initial;
+			}
+		}
 	}
 
 	.fields-group {

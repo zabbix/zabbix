@@ -1084,6 +1084,10 @@ footer {
     .form-grid label .btn-icon,
     .form-grid label .icon {
       margin-left: 5px; }
+    .form-grid label:not([for]) {
+      pointer-events: none; }
+      .form-grid label:not([for]) .btn-icon {
+        pointer-events: initial; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
     padding: 5px;
