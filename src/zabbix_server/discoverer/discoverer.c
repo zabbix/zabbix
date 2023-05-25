@@ -547,11 +547,10 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, const zbx_dc_dche
 				else
 					zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck_ptr);
 
-				if ('\0' == *task_local.ip && FAIL == zbx_vector_str_bsearch(task->ips, ip,
-						ZBX_DEFAULT_STR_COMPARE_FUNC))
+				if ('\0' == *task_local.ip && 0 < task->dchecks.values_num &&
+						task->dchecks.values[0]->dcheckid == dcheck->dcheckid)
 				{
 					zbx_vector_str_append(task->ips, zbx_strdup(NULL, ip));
-					zbx_vector_str_sort(task->ips, ZBX_DEFAULT_STR_COMPARE_FUNC);
 				}
 
 				zbx_free(task_local.ip);
@@ -1150,12 +1149,13 @@ ZBX_PTR_VECTOR_DECL(fping_host, ZBX_FPING_HOST)
 ZBX_PTR_VECTOR_IMPL(fping_host, ZBX_FPING_HOST)
 
 static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
-		const zbx_dc_dcheck_t *dcheck, zbx_vector_discoverer_results_ptr_t *results, int worker_max)
+		int dcheck_idx, zbx_vector_discoverer_results_ptr_t *results, int worker_max)
 {
 	char				error[ZBX_ITEM_ERROR_LEN_MAX];
 	int				i, index;
 	zbx_vector_fping_host_t		hosts;
 	zbx_discoverer_results_t	result_cmp, *result;
+	const zbx_dc_dcheck_t		*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[dcheck_idx];
 
 	zbx_vector_fping_host_create(&hosts);
 
@@ -1171,12 +1171,15 @@ static void	discover_icmp(zbx_uint64_t druleid, const zbx_discoverer_task_t *tas
 		result_cmp.ip = host.addr;
 		result_cmp.druleid = druleid;
 
-		if (FAIL == (index = zbx_vector_discoverer_results_ptr_search(results, &result_cmp,
+		if (0 == dcheck_idx || FAIL == (index = zbx_vector_discoverer_results_ptr_bsearch(results, &result_cmp,
 				discoverer_results_compare)))
 		{
 			result = rdiscovery_result_create(druleid, task);
 			result->ip = zbx_strdup(result->ip, task->ips->values[i]);
 			zbx_vector_discoverer_results_ptr_append(results, result);
+
+			if (0 != dcheck_idx)
+				zbx_vector_discoverer_results_ptr_sort(results, discoverer_results_compare);
 		}
 		else
 			result = results->values[index];
@@ -1284,7 +1287,7 @@ static void	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_
 
 	for (i = 0; i < task->dchecks.values_num; i++)
 	{
-		discover_icmp(druleid, task, task->dchecks.values[i], &results, worker_max);
+		discover_icmp(druleid, task, i, &results, worker_max);
 	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
