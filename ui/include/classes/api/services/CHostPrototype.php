@@ -825,9 +825,6 @@ class CHostPrototype extends CHostBase {
 	 * @param array $db_hosts
 	 */
 	private function updateForce(array &$hosts, array $db_hosts): void {
-		// Helps to avoid deadlocks.
-		CArrayHelper::sort($hosts, ['hostid', 'order' => ZBX_SORT_DOWN]);
-
 		$upd_hosts = [];
 		$upd_hostids = [];
 

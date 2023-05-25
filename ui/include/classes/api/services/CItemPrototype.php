@@ -665,7 +665,7 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
-		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+		CArrayHelper::sort($items, ['itemid']);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
