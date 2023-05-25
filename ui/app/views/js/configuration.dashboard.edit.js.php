@@ -143,7 +143,6 @@
 						postMessageOk(response['system-message-ok']);
 					}
 
-					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
 				.catch((error) => {
