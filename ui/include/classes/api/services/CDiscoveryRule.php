@@ -948,7 +948,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'h' => 'ophistory',
 			't' => 'optrends',
 			'ss' => 'opseverity',
-			'i' => 'opinventory',
+			'i' => 'opinventory'
 		];
 
 		while ($db_op_field = DBfetch($db_op_fields, false)) {
@@ -2399,52 +2399,137 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Delete DiscoveryRules.
-	 *
-	 * @param array $ruleids
+	 * @param array $itemids
 	 *
 	 * @return array
 	 */
-	public function delete(array $ruleids) {
-		$this->validateDelete($ruleids);
+	public function delete(array $itemids): array {
+		$this->validateDelete($itemids, $db_items);
 
-		CDiscoveryRuleManager::delete($ruleids);
+		self::deleteForce($db_items);
 
-		return ['ruleids' => $ruleids];
+		return ['itemids' => $itemids];
 	}
 
 	/**
-	 * Validates the input parameters for the delete() method.
+	 * @param array      $itemids
+	 * @param array|null $db_items
 	 *
-	 * @param array $ruleids   [IN/OUT]
-	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
-	private function validateDelete(array &$ruleids) {
+	private function validateDelete(array $itemids, array &$db_items = null): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
-		if (!CApiInputValidator::validate($api_input_rules, $ruleids, '/', $error)) {
+
+		if (!CApiInputValidator::validate($api_input_rules, $itemids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_rules = $this->get([
-			'output' => ['templateid'],
-			'itemids' => $ruleids,
+		$db_items = $this->get([
+			'output' => ['itemid', 'name', 'templateid'],
+			'itemids' => $itemids,
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
-		foreach ($ruleids as $ruleid) {
-			if (!array_key_exists($ruleid, $db_rules)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
+		if (count($db_items) != count($itemids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-			$db_rule = $db_rules[$ruleid];
-
-			if ($db_rule['templateid'] != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete templated items.'));
+		foreach ($itemids as $i => $itemid) {
+			if ($db_items[$itemid]['templateid'] != 0) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('cannot delete inherited item')
+				));
 			}
+		}
+	}
+
+	/**
+	 * @param array $db_items
+	 */
+	public static function deleteForce(array $db_items): void {
+		self::addInheritedItems($db_items);
+
+		$del_itemids = array_keys($db_items);
+
+		self::deleteAffectedItemPrototypes($del_itemids);
+		self::deleteAffectedHostPrototypes($del_itemids);
+		self::deleteAffectedOverrides($del_itemids);
+
+		DB::delete('item_parameter', ['itemid' => $del_itemids]);
+		DB::delete('item_preproc', ['itemid' => $del_itemids]);
+		DB::delete('lld_macro_path', ['itemid' => $del_itemids]);
+		DB::delete('item_condition', ['itemid' => $del_itemids]);
+		DB::update('items', [
+			'values' => ['templateid' => 0],
+			'where' => ['itemid' => $del_itemids]
+		]);
+		DB::delete('items', ['itemid' => $del_itemids]);
+
+		$ins_housekeeper = [];
+
+		foreach ($del_itemids as $itemid) {
+			$ins_housekeeper[] = [
+				'tablename' => 'events',
+				'field' => 'lldruleid',
+				'value' => $itemid
+			];
+		}
+
+		DB::insertBatch('housekeeper', $ins_housekeeper);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_items);
+	}
+
+	/**
+	 * Delete item prototypes, which belongs to the given LLD rules.
+	 *
+	 * @param array $del_itemids
+	 */
+	private static function deleteAffectedItemPrototypes(array $del_itemids): void {
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT id.itemid,i.name'.
+			' FROM item_discovery id,items i'.
+			' WHERE id.itemid=i.itemid'.
+				' AND '.dbConditionId('parent_itemid', $del_itemids)
+		), 'itemid');
+
+		if ($db_items) {
+			CItemPrototype::deleteForce($db_items);
+		}
+	}
+
+	/**
+	 * Delete host prototypes, which belongs to the given LLD rules.
+	 *
+	 * @param array $del_itemids
+	 */
+	private static function deleteAffectedHostPrototypes(array $del_itemids): void {
+		$db_host_prototypes = DBfetchArrayAssoc(DBselect(
+			'SELECT hd.hostid,h.host'.
+			' FROM host_discovery hd,hosts h'.
+			' WHERE hd.hostid=h.hostid'.
+				' AND '.dbConditionId('hd.parent_itemid', $del_itemids)
+		), 'hostid');
+
+		if ($db_host_prototypes) {
+			CHostPrototype::deleteForce($db_host_prototypes);
+		}
+	}
+
+	/**
+	 * Delete overrides, which belongs to the given LLD rules.
+	 *
+	 * @param array $del_itemids
+	 */
+	private static function deleteAffectedOverrides(array $del_itemids): void {
+		$del_overrideids = array_keys(DB::select('lld_override', [
+			'filter' => ['itemid' => $del_itemids],
+			'preservekeys' => true
+		]));
+
+		if ($del_overrideids) {
+			self::deleteOverrides($del_overrideids);
 		}
 	}
 
@@ -2534,7 +2619,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
 		$result = DBselect(
-			'SELECT ii.itemid,h.status AS host_status'.
+			'SELECT ii.itemid,ii.name,ii.templateid,ii.uuid,h.status AS host_status'.
 			' FROM items i,items ii,hosts h'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND ii.hostid=h.hostid'.
@@ -2543,36 +2628,30 @@ class CDiscoveryRule extends CItemGeneral {
 				$hostids_condition
 		);
 
-		$upd_items = [];
-		$ruleids = [];
+		$items = [];
+		$db_items = [];
 
 		while ($row = DBfetch($result)) {
-			$upd_item = [
-				'templateid' => 0,
-				'valuemapid' => 0
+			$item = [
+				'itemid' => $row['itemid'],
+				'templateid' => 0
 			];
 
 			if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
-				$upd_item += ['uuid' => generateUuidV4()];
+				$item += ['uuid' => generateUuidV4()];
 			}
 
-			$upd_items[] = [
-				'values' => $upd_item,
-				'where' => ['itemid' => $row['itemid']]
-			];
-
-			$ruleids[] = $row['itemid'];
+			$items[] = $item;
+			$db_items[$row['itemid']] = $row;
 		}
 
-		if ($upd_items) {
-			DB::update('items', $upd_items);
+		if ($items) {
+			self::updateForce($items, $db_items);
 
-			/*
-			 * TODO: The trigger prototypes and graphs also should be updated here when new audit log will be added for
-			 * them.
-			 */
-			CItemPrototype::unlinkTemplateObjects($ruleids);
-			API::HostPrototype()->unlinkTemplateObjects($ruleids);
+			$itemids = array_keys($db_items);
+
+			CItemPrototype::unlinkTemplateObjects($itemids);
+			API::HostPrototype()->unlinkTemplateObjects($itemids);
 		}
 	}
 
@@ -2583,8 +2662,8 @@ class CDiscoveryRule extends CItemGeneral {
 	public static function clearTemplateObjects(array $templateids, array $hostids = null): void {
 		$hostids_condition = $hostids ? ' AND '.dbConditionId('ii.hostid', $hostids) : '';
 
-		$ruleids = DBfetchColumn(DBselect(
-			'SELECT ii.itemid'.
+		$db_items = DBfetchArrayAssoc(DBselect(
+			'SELECT ii.itemid,ii.name'.
 			' FROM items i,items ii'.
 			' WHERE i.itemid=ii.templateid'.
 				' AND '.dbConditionId('i.hostid', $templateids).
@@ -2592,8 +2671,8 @@ class CDiscoveryRule extends CItemGeneral {
 				$hostids_condition
 		), 'itemid');
 
-		if ($ruleids) {
-			CDiscoveryRuleManager::delete($ruleids);
+		if ($db_items) {
+			self::deleteForce($db_items);
 		}
 	}
 

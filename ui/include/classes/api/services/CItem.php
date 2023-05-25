@@ -1823,10 +1823,10 @@ class CItem extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items, $del_ruleids, $db_item_prototypes);
+		self::addDependentItems($db_items, $db_lld_rules, $db_item_prototypes);
 
-		if ($del_ruleids) {
-			CDiscoveryRuleManager::delete($del_ruleids);
+		if ($db_lld_rules) {
+			CDiscoveryRule::deleteForce($db_lld_rules);
 		}
 
 		if ($db_item_prototypes) {
@@ -1864,12 +1864,12 @@ class CItem extends CItemGeneral {
 	 * prototypes to the given appropriate variables.
 	 *
 	 * @param array      $db_items
-	 * @param array|null $del_ruleids
+	 * @param array|null $db_lld_rules
 	 * @param array|null $db_item_prototypes
 	 */
-	protected static function addDependentItems(array &$db_items, array &$del_ruleids = null,
+	protected static function addDependentItems(array &$db_items, array &$db_lld_rules = null,
 			array &$db_item_prototypes = null): void {
-		$del_ruleids = [];
+		$db_lld_rules = [];
 		$db_item_prototypes = [];
 
 		$master_itemids = array_keys($db_items);
@@ -1885,7 +1885,7 @@ class CItem extends CItemGeneral {
 
 			while ($row = DBfetch($result)) {
 				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
-					$del_ruleids[] = $row['itemid'];
+					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
 				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$master_itemids[] = $row['itemid'];
