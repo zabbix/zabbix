@@ -435,6 +435,7 @@ run:
 						if len(client.pluginsInfo) == 0 {
 							delete(m.clients, client.ID())
 						}
+						client.commandCleanup()
 					}
 					cleaned = now
 				}
