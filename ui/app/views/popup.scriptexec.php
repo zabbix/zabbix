@@ -32,6 +32,7 @@ if ($data['success']) {
 			->addClass('monospace-font')
 			->addClass('active-readonly')
 			->setReadonly(true)
+			->disableSpellcheck()
 	];
 
 	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
