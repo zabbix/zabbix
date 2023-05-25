@@ -310,7 +310,7 @@ class CProblem extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter('problem p', $options, $sqlParts);
+			$this->applyFilters($options, $sqlParts);
 		}
 
 		// limit
@@ -635,5 +635,48 @@ class CProblem extends CApiService {
 			: $tag_conditions[0];
 
 		return $sqlParts;
+	}
+
+	/**
+	 * Apply filter conditions to SQL built query.
+	 *
+	 * @param array $options
+	 * @param array $sql_parts
+	 *
+	 * $options = [
+	 *     'filter' => [
+	 *         'action' =>          (int)       Acknowledge action(s) that must be performed on filtered problems.
+	 *         'action_userid' =>   (int)       User which has performed acknowledge action.
+	 *     ]
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected function applyFilters($options, &$sql_parts): void {
+		// Acknowledge action filter properties.
+		$acknowledge_actions = [
+			'ack.eventid=p.eventid'
+		];
+
+		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
+				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
+			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
+		}
+
+		if (array_key_exists('action_userid', $options['filter'])
+				&& zbx_ctype_digit($options['filter']['action_userid'])) {
+			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
+		}
+
+		if (count($acknowledge_actions) > 1) {
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges ack'.
+				' WHERE '.implode(' AND ', $acknowledge_actions).
+			')';
+		}
+
+		// Apply standard filter properties.
+		$this->dbFilter('problem p', $options, $sql_parts);
 	}
 }
