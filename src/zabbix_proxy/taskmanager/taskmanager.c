@@ -365,7 +365,9 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
 			case ZBX_TM_TASK_DATA:
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, config_comms,
 						config_startup_time, program_type))
+				{
 					processed_num++;
+				}
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;

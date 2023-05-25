@@ -291,7 +291,7 @@ ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 static char	*config_server		= NULL;
 int	CONFIG_SERVER_PORT;
-static char	*config_hostname		= NULL;
+static char	*config_hostname	= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
