@@ -115,7 +115,7 @@ class CMultiselectElement extends CElement {
 			return $this->clear();
 		}
 
-		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
+		$this->edit($context)->query('link:'.$label)->waitUntilVisible(3)->one()->click()->waitUntilNotPresent();
 
 		return $this;
 	}

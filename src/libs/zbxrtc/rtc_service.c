@@ -31,23 +31,6 @@
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
-#if defined(HAVE_SIGQUEUE)
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change log level of service process                               *
- *                                                                            *
- ******************************************************************************/
-static void	rtc_change_service_loglevel(zbx_uint32_t code)
-{
-	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
-		zabbix_increase_log_level();
-	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
-		zabbix_decrease_log_level();
-
-	zabbix_report_log_level_change();
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: get runtime control option targets                                *
@@ -106,6 +89,24 @@ int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_SIGQUEUE)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level of service process                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_change_service_loglevel(zbx_uint32_t code)
+{
+	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
+		zabbix_increase_log_level();
+	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
+		zabbix_decrease_log_level();
+
+	zabbix_report_log_level_change();
+}
+
 
 /******************************************************************************
  *                                                                            *
