@@ -254,6 +254,7 @@ func (m *mockManager) mockInit(t *testing.T) {
 }
 
 func (m *mockManager) update(update *updateRequest) {
+	update.now = m.now
 	m.processUpdateRequest(update)
 }
 
@@ -301,23 +302,23 @@ func (m *mockManager) mockTasks() {
 				}
 				p.enqueueTask(mockTask)
 				m.clients[index[t]].exporters[t.item.itemid] = mockTask
-			/*case *dirresultcacheectExporterTask:
-			mockTask := &mockExporterTask{
-				exporterTask: exporterTask{
-					taskBase: taskBase{
-						plugin:    task.getPlugin(),
-						scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
-						index:     -1,
-						active:    task.isActive(),
-						recurring: true,
+			case *directExporterTask:
+				mockTask := &mockExporterTask{
+					exporterTask: exporterTask{
+						taskBase: taskBase{
+							plugin:    task.getPlugin(),
+							scheduled: getNextcheck(t.item.delay, m.now).Add(priorityExporterTaskNs),
+							index:     -1,
+							active:    task.isActive(),
+							recurring: true,
+						},
+						item:   t.item,
+						client: t.client,
+						meta:   t.meta,
 					},
-					item:   t.item,
-					client: t.client,
-					meta:   t.meta,
-				},
-				sink: m.sink,
-			}
-			p.enqueueTask(mockTask)*/
+					sink: m.sink,
+				}
+				p.enqueueTask(mockTask)
 			case *starterTask:
 				mockTask := &mockStarterTask{
 					taskBase: taskBase{
@@ -673,6 +674,7 @@ func TestTaskCreate(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -686,6 +688,7 @@ func TestTaskCreate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	if len(manager.pluginQueue) != 3 {
@@ -725,6 +728,7 @@ func TestTaskUpdate(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -738,6 +742,7 @@ func TestTaskUpdate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	for _, item := range items {
@@ -754,6 +759,7 @@ func TestTaskUpdate(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	if len(manager.pluginQueue) != 3 {
@@ -786,6 +792,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -799,6 +806,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	items[0].delay = "xyz"
@@ -812,6 +820,7 @@ func TestTaskUpdateInvalidInterval(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	if len(manager.plugins["debug1"].tasks) != 0 {
@@ -849,6 +858,7 @@ func TestTaskDelete(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -862,6 +872,7 @@ func TestTaskDelete(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	items[2] = items[6]
@@ -876,6 +887,7 @@ func TestTaskDelete(t *testing.T) {
 			Mtime:       &mtime,
 		})
 	}
+	update.now = time.Now()
 	manager.processUpdateRequest(&update)
 
 	if len(manager.plugins["debug3"].tasks) != 0 {
@@ -915,6 +927,7 @@ func TestSchedule(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -968,6 +981,7 @@ func TestScheduleCapacity(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1018,6 +1032,7 @@ func TestScheduleUpdate(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1081,6 +1096,7 @@ func TestCollectorSchedule(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1130,6 +1146,7 @@ func TestCollectorScheduleUpdate(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1203,6 +1220,7 @@ func TestRunner(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1312,6 +1330,7 @@ func TestWatcher(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1400,6 +1419,7 @@ func TestCollectorExporterSchedule(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1453,6 +1473,7 @@ func TestRunnerWatcher(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1540,6 +1561,7 @@ func TestMultiCollectorExporterSchedule(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1600,6 +1622,7 @@ func TestMultiRunnerWatcher(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1679,6 +1702,7 @@ func TestPassiveRunner(t *testing.T) {
 		clientID: agent.PassiveChecksClientID,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
@@ -1770,6 +1794,7 @@ func TestConfigurator(t *testing.T) {
 		clientID: agent.MaxBuiltinClientID + 1,
 		sink:     &cache,
 		requests: make([]*plugin.Request, 0),
+		now:      time.Now(),
 	}
 
 	var lastLogsize uint64
