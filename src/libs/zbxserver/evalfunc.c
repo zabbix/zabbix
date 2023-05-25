@@ -1377,7 +1377,7 @@ int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char
 	{
 		if ((*count = values->values_num) > limit)
 			*count = values->values_num;
-s
+
 		return SUCCEED;
 	}
 
