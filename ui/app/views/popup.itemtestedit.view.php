@@ -72,6 +72,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeAttribute('name')
+				->disableSpellcheck()
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
@@ -80,6 +81,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))
+				->disableSpellcheck()
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 	]);
