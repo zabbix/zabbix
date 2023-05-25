@@ -6276,14 +6276,16 @@ a.icon-count {
   white-space: nowrap; }
   .problem-icon-link .problem-icon-list-item,
   .problem-icon-list .problem-icon-list-item {
+    font-size: 12px;
     color: #ffffff;
-    font-size: 12px; }
+    border-color: transparent; }
 
 .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
   margin-right: 5px; }
 
 .problem-icon-link {
-  overflow: hidden; }
+  overflow: hidden;
+  border-radius: 2px; }
   .problem-icon-link:link, .problem-icon-link:hover, .problem-icon-link:focus {
     border-bottom: none; }
   .problem-icon-link:focus {

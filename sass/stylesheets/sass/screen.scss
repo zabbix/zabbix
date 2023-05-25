@@ -3426,8 +3426,9 @@ a.icon-count {
 	white-space: nowrap;
 
 	.problem-icon-list-item {
-		color: $btn-color;
 		font-size: 12px;
+		color: $btn-color;
+		border-color: transparent;
 	}
 }
 
@@ -3441,6 +3442,7 @@ a.icon-count {
 
 .problem-icon-link {
 	overflow: hidden;
+	border-radius: 2px;
 
 	&:link,
 	&:hover,
