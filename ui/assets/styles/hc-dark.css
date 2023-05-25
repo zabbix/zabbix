@@ -42,7 +42,7 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1681727779299") format("woff2"), url("../fonts/zabbix-icons.woff?t=1681727779299") format("woff"), url("../fonts/zabbix-icons.ttf?t=1681727779299") format("truetype"), url("../fonts/zabbix-icons.svg?t=1681727779299#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon:before, .btn-overlay-close:before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
+[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
 .z-select button.focusable::after, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
 .problem-icon-list .problem-icon-list-item::before {
   font-family: 'zabbix-icons';
@@ -704,7 +704,7 @@ svg a {
   width: 12px;
   height: 1.4em;
   color: #7d7d7d; }
-  .drag-icon:before {
+  .drag-icon::before {
     font-size: 22px; }
   .drag-icon.disabled {
     color: white;
@@ -1014,17 +1014,15 @@ footer {
       grid-column: 1 / -1; }
       .form-grid fieldset.collapsible legend .toggle {
         position: relative;
-        padding: 0 5px 0 24px;
+        padding: 0 5px 0 10px;
         border: none;
         background-color: transparent; }
         .form-grid fieldset.collapsible legend .toggle::before {
-          content: ' ';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 24px;
-          height: 24px;
-          background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
+          color: #7d7d7d; }
+        .form-grid fieldset.collapsible legend .toggle:hover::before {
+          color: #ffffff; }
+        .form-grid fieldset.collapsible legend .toggle:active::before, .form-grid fieldset.collapsible legend .toggle:focus::before {
+          color: #dddddd; }
         .form-grid fieldset.collapsible legend .toggle::after {
           content: ' ';
           position: absolute;
@@ -1035,6 +1033,7 @@ footer {
           background: #444444;
           pointer-events: none; }
         .form-grid fieldset.collapsible legend .toggle span {
+          line-height: normal;
           border-bottom: 1px dotted #ffffff; }
         .form-grid fieldset.collapsible legend .toggle:hover span {
           border-bottom-style: solid; }
@@ -1043,8 +1042,6 @@ footer {
           .form-grid fieldset.collapsible legend .toggle:focus span {
             border-bottom-width: 2px;
             border-bottom-style: solid; }
-    .form-grid fieldset.collapsible.collapsed .toggle::before {
-      background-position: -6px -689px; }
     .form-grid fieldset.collapsible.collapsed .toggle::after {
       display: none; }
     .form-grid fieldset.collapsible.collapsed label,
@@ -1283,7 +1280,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   top: 1px;
   right: 1px;
   z-index: 1000; }
-  .btn-overlay-close:before {
+  .btn-overlay-close::before {
     content: ""; }
 
 .btn-debug {
@@ -2503,7 +2500,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   transform: rotate(0deg); }
 .menu-main .has-submenu.is-expanded > a[class^="zi-"]::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]::before {
   color: #ffffff; }
-.menu-main .has-submenu.is-expanded > a[class^="zi-"]:hover:before, .menu-main .has-submenu.is-expanded > a[class^="zi-"]:focus:before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:hover:before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:focus:before {
+.menu-main .has-submenu.is-expanded > a[class^="zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class^="zi-"]:focus::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:hover::before, .menu-main .has-submenu.is-expanded > a[class*=" zi-"]:focus::before {
   color: #ffffff; }
 .menu-main .has-submenu.is-expanded > a::after {
   transform: rotate(-180deg); }
@@ -2966,8 +2963,6 @@ section {
   section.collapsed .section-body,
   section.collapsed .section-foot {
     display: none; }
-  section.collapsed .section-toggle {
-    transform: rotate(180deg); }
   section:not(:last-child) {
     margin-bottom: 10px; }
   section .list-table {
@@ -4964,16 +4959,6 @@ z-select button.focusable,
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
-.form-grid fieldset.collapsible legend .toggle::before {
-  border: 0;
-  min-height: 0;
-  padding: 0;
-  opacity: .5;
-  transition: opacity .2s ease-out; }
-  .form-grid fieldset.collapsible legend [disabled].toggle::before, .form-grid fieldset.collapsible legend [disabled].toggle:hover::before, .form-grid fieldset.collapsible legend [disabled].toggle:focus::before, .form-grid fieldset.collapsible legend [disabled].toggle:active::before {
-    background-color: transparent;
-    opacity: .25; }
-
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
@@ -4983,10 +4968,6 @@ z-select button.focusable,
 
 .inaccessible .subfilter-enabled {
   color: black; }
-
-.form-grid fieldset.collapsible legend .toggle:hover::before, .form-grid fieldset.collapsible legend .toggle:focus::before, .form-grid fieldset.collapsible legend .toggle:active::before {
-  background-color: transparent;
-  opacity: 1; }
 
 .action-buttons {
   margin-top: 10px;

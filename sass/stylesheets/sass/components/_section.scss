@@ -34,10 +34,6 @@ section {
 		.section-foot {
 			display: none;
 		}
-
-		.section-toggle {
-			transform: rotate(180deg);
-		}
 	}
 
 	&:not(:last-child) {

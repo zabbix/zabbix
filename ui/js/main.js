@@ -692,6 +692,9 @@ function toggleSection(id, profile_idx) {
 	let is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
 
 	section.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
+
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
 	if (profile_idx !== '') {

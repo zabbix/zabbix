@@ -65,7 +65,7 @@
 
 					&:hover,
 					&:focus {
-						&:before {
+						&::before {
 							color: $menu-main-hover-color;
 						}
 					}

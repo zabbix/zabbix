@@ -34,20 +34,25 @@
 
 				.toggle {
 					position: relative;
-					padding: 0 5px 0 24px;
+					padding: 0 5px 0 10px;
 					border: none;
 					background-color: transparent;
 
 					&::before {
-						@extend %btn-widget-defaults;
+						color: $btn-icon-color;
+					}
 
-						content: ' ';
-						position: absolute;
-						top: 0;
-						left: 0;
-						width: 24px;
-						height: 24px;
-						background: url($sprite-path) no-repeat -6px -654px;
+					&:hover {
+						&::before {
+							color: $btn-icon-hover-color;
+						}
+					}
+
+					&:active,
+					&:focus {
+						&::before {
+							color: $btn-icon-focus-color;
+						}
 					}
 
 					&::after {
@@ -62,6 +67,7 @@
 					}
 
 					span {
+						line-height: normal;
 						border-bottom: 1px dotted $font-color;
 					}
 
@@ -84,10 +90,6 @@
 
 			&.collapsed {
 				.toggle {
-					&::before {
-						background-position: -6px -689px;
-					}
-
 					&::after {
 						display: none;
 					}

@@ -270,7 +270,7 @@ button {
 	right: 1px;
 	z-index: 1000;
 
-	&:before {
+	&::before {
 		@extend %icons-font;
 
 		content: $zi-remove;

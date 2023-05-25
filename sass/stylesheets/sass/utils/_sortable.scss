@@ -42,7 +42,7 @@
 	height: $body-line-height;
 	color: $btn-icon-color;
 
-	&:before {
+	&::before {
 		@extend %icons-font;
 
 		font-size: 22px;
