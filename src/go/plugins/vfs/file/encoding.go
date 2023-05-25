@@ -29,7 +29,6 @@ package file
 import "C"
 
 import (
-	"fmt"
 	"git.zabbix.com/ap/plugin-support/log"
 	"syscall"
 	"unsafe"
@@ -50,18 +49,12 @@ func verifyEncoder(encoder string, bytecount int, inbuf []byte) string {
 }
 
 func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
-
-	// for ii:=0; ii<len(inbuf) && ii < 200; ii++ {
-	// 	fmt.Printf("INMEGA: %x, %c\n", inbuf[ii], inbuf[ii])
-	// }
-
 	if bytecount == 0 {
 		return inbuf, 0
 	}
 	if encoder = verifyEncoder(encoder, bytecount, inbuf); encoder == "" {
 		return inbuf, bytecount
 	}
-	fmt.Printf("ENCODER: ->%s<-", encoder)
 	tocode := C.CString("UTF-8")
 	log.Tracef("Calling C function \"free()\"")
 	defer C.free(unsafe.Pointer(tocode))
@@ -102,13 +95,6 @@ func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte, outbyte
 	C.iconv_close(cd)
 	if len(outbuf) > 3 && 0xef == outbuf[0] && 0xbb == outbuf[1] && 0xbf == outbuf[2] {
 		outbuf = outbuf[3:]
-	}
-	fmt.Printf("INBYTES: %d\n", bytecount)
-	fmt.Printf("OUTBYTES: %d\n", outbytes)
-	fmt.Printf("OUTBUF LEN: %d\n", len(outbuf))
-
-	for ii := 0; ii < len(outbuf); ii++ {
-		fmt.Printf("OMEGA: %x, %c\n", outbuf[ii], outbuf[ii])
 	}
 
 	return outbuf, len(outbuf)
