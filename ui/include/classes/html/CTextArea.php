@@ -77,6 +77,11 @@ class CTextArea extends CTag {
 		return $this;
 	}
 
+	public function disableSpellcheck() {
+		$this->setAttribute('spellcheck', 'false');
+		return $this;
+	}
+
 	public function setWidth($value) {
 		$this->addStyle('width: '.$value.'px;');
 		return $this;
