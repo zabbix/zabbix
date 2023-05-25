@@ -93,7 +93,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
+		$this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible()->one()->findRow('Name', $name)
 				->getColumn('Name')->query('link', $name)->one()->click();
 
 		$this->zbxTestCheckHeader('Templates');
@@ -116,8 +116,8 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->getField('Host groups')->select('Templates/SAN');
 		$filter->getField('Name')->fill($this->templateName);
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='$this->templateName']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableDataColumn([$this->templateName]);
+		$this->assertTableStats(1);
 	}
 
 	public function testPageTemplates_FilterByLinkedTemplate() {
@@ -130,8 +130,9 @@ class testPageTemplates extends CLegacyWebTest {
 		]);
 		$filter->submit();
 		$this->zbxTestWaitForPageToLoad();
-		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Template ZBX6663 Second']");
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
+		$this->assertTableDataColumn(['Template ZBX6663 First']);
+		$this->assertTableDataColumn(['Template ZBX6663 Second'], 'Linked templates');
+		$this->assertTableStats(1);
 	}
 
 	public function testPageTemplates_FilterNone() {
@@ -142,10 +143,10 @@ class testPageTemplates extends CLegacyWebTest {
 			'Name' => '123template!@#$%^&*()_"='
 		]);
 		$filter->submit();
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->assertTableStats(0);
 		$this->zbxTestInputTypeOverwrite('filter_name', '%');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 0 of 0 found']");
+		$this->assertTableStats(0);
 	}
 
 	public function testPageTemplates_FilterReset() {

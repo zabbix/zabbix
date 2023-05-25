@@ -21009,6 +21009,10 @@ msgstr "atan() - 角度の値のアークタンジェント、ラジアンで示
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr "atan2() - ラジアンで表された角度として指定された縦座標(exprue)と横座標のアークタンジェント"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr "自動登録されたホスト"
