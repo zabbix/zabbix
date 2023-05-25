@@ -175,6 +175,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_hostgroup', $data['sysmap']['label_string_hostgroup']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append host to form list.
@@ -189,6 +190,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_host', $data['sysmap']['label_string_host']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append trigger to form list.
@@ -203,6 +205,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_trigger', $data['sysmap']['label_string_trigger']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map to form list.
@@ -217,6 +220,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_map', $data['sysmap']['label_string_map']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append image to form list.
@@ -231,6 +235,7 @@ $map_tab
 	->addRow(null,
 		(new CTextArea('label_string_image', $data['sysmap']['label_string_image']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	);
 
 // Append map element label to form list.

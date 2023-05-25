@@ -86,6 +86,7 @@ $triggersFormList
 			->setReadonly($data['limited'])
 			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),
@@ -136,7 +137,8 @@ $expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_expression_button
 ];
@@ -349,7 +351,8 @@ $recovery_expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	$add_recovery_expression_button
 ];
