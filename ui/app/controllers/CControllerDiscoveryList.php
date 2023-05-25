@@ -21,20 +21,20 @@
 
 class CControllerDiscoveryList extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
-			'sort'          => 'in name',
-			'sortorder'     => 'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck'       => 'in 1',
-			'filter_set'    => 'in 1',
-			'filter_rst'    => 'in 1',
-			'filter_name'   => 'string',
-			'filter_status' => 'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
-			'page'          => 'ge 1'
+			'sort' =>			'in name',
+			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>		'in 1',
+			'filter_set' =>		'in 1',
+			'filter_rst' =>		'in 1',
+			'filter_name' =>	'string',
+			'filter_status' =>	'in -1,'.DRULE_STATUS_ACTIVE.','.DRULE_STATUS_DISABLED,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -46,11 +46,11 @@ class CControllerDiscoveryList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$sort_field = $this->getInput('sort', CProfile::get('web.discoveryconf.php.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.discoveryconf.php.sortorder', ZBX_SORT_UP));
 		CProfile::update('web.discoveryconf.php.sort', $sort_field, PROFILE_TYPE_STR);

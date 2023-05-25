@@ -1160,7 +1160,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = node_process_command(sock, s, &jp, config_comms->config_timeout);
+			{
+				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
+						config_comms->config_source_ip);
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 		{
@@ -1196,7 +1199,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			ret = process_active_check_heartbeat(&jp);
 		}
 		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
-				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->server))
+				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->config_source_ip,
+				config_comms->server))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);

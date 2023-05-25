@@ -485,7 +485,12 @@ elseif (hasRequest('action') && getRequest('action') === 'itemprototype.massdele
 	if ($result) {
 		uncheckTableRows(getRequest('parent_discoveryid'));
 	}
-	show_messages($result, _('Item prototypes deleted'), _('Cannot delete item prototypes'));
+
+	$item_prototypes_count = count(getRequest('group_itemid'));
+	$messageSuccess = _n('Item prototype deleted', 'Item prototypes deleted', $item_prototypes_count);
+	$messageFailed = _n('Cannot delete item prototype', 'Cannot delete item prototypes', $item_prototypes_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && hasRequest('group_itemid')
 		&& in_array(getRequest('action'), ['itemprototype.massdiscover.enable', 'itemprototype.massdiscover.disable'])) {

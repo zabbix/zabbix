@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,9 +21,11 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('administration.script.list.js.php');
+$this->addJsFile('multilineinput.js');
 
 if ($data['uncheck']) {
 	uncheckTableRows('script');
@@ -32,30 +34,42 @@ if ($data['uncheck']) {
 $html_page = (new CHtmlPage())
 	->setTitle(_('Scripts'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_LIST))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'))
+	->setControls(
+		(new CTag('nav', true,
+			(new CList())->addItem(
+				(new CSimpleButton(_('Create script')))->setId('js-create')
+			)
 		))
-			->setAttribute('aria-label', _('Content controls'))
+		->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'script.list'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
-			(new CFormList())->addRow(_('Name'),
-				(new CTextBox('filter_name', $data['filter']['name']))
-					->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-					->setAttribute('autofocus', 'autofocus')
-			),
-			(new CFormList())->addRow(_('Scope'),
-				(new CRadioButtonList('filter_scope', (int) $data['filter']['scope']))
-					->addValue(_('Any'), -1)
-					->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
-					->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
-					->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
-					->setModern(true)
-			)
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Name'), 'filter_name'),
+					new CFormField(
+						(new CTextBox('filter_name', $data['filter']['name']))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setAttribute('autofocus', 'autofocus')
+					)
+				]),
+			(new CFormGrid())
+				->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
+				->addItem([
+					new CLabel(_('Scope')),
+					new CFormField(
+						(new CRadioButtonList('filter_scope', (int) $data['filter']['scope']))
+							->addValue(_('Any'), -1)
+							->addValue(_('Action operation'), ZBX_SCRIPT_SCOPE_ACTION)
+							->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
+							->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
+							->setModern()
+				)
+			])
 		])
 		->addVar('action', 'script.list')
 	);
@@ -195,10 +209,9 @@ foreach ($data['scripts'] as $script) {
 		$execute_on = '';
 	}
 
-	$link = new CLink($script['name'], (new CUrl('zabbix.php'))
-		->setArgument('action', 'script.edit')
-		->setArgument('scriptid', $script['scriptid'])
-	);
+	$link = (new CLink($script['name']))
+		->addClass('js-edit')
+		->setAttribute('data-scriptid', $script['scriptid']);
 
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
@@ -219,8 +232,12 @@ $scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
 	new CActionButtonList('action', 'scriptids', [
-		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?'),
-			'csrf_token' => CCsrfTokenHelper::get('script')]
+		'script.delete' => [
+			'content' => (new CSimpleButton(_('Delete')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->setId('js-massdelete')
+				->addClass('no-chkbxrange')
+		]
 	], 'script')
 ]);
 

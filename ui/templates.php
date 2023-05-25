@@ -552,7 +552,11 @@ elseif (hasRequest('templates') && hasRequest('action') && str_in_array(getReque
 		uncheckTableRows(null, array_keys($templates));
 	}
 
-	show_messages($result, _('Template deleted'), _('Cannot delete template'));
+	$templates_count = count($templateids);
+	$messageSuccess = _n('Template deleted', 'Templates deleted', $templates_count);
+	$messageFailed = _n('Cannot delete template', 'Cannot delete templates', $templates_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*

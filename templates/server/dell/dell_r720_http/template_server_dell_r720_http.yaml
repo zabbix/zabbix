@@ -1,12 +1,10 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    -
-      uuid: e960332b3f6c46a1956486d4f3f99fce
+    - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
   templates:
-    -
-      uuid: 9643f22821104f809e2486be83e1816e
+    - uuid: 9643f22821104f809e2486be83e1816e
       template: 'DELL PowerEdge R720 by HTTP'
       name: 'DELL PowerEdge R720 by HTTP'
       description: |
@@ -19,11 +17,9 @@ zabbix_export:
         name: Zabbix
         version: 7.0-0
       groups:
-        -
-          name: 'Templates/Server hardware'
+        - name: 'Templates/Server hardware'
       items:
-        -
-          uuid: 55124354a9944934acb01c8d2f8d43a6
+        - uuid: 55124354a9944934acb01c8d2f8d43a6
           name: 'Dell R720: Firmware version'
           type: DEPENDENT
           key: dell.server.hw.firmware
@@ -33,23 +29,19 @@ zabbix_export:
           value_type: CHAR
           description: 'This attribute defines the firmware version of a remote access card.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.firmware
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           master_item:
             key: dell.server.system.get
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: c7c3d5301c8843528929123e1473af5f
+            - uuid: c7c3d5301c8843528929123e1473af5f
               expression: 'last(/DELL PowerEdge R720 by HTTP/dell.server.hw.firmware,#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.hw.firmware,#2) and length(last(/DELL PowerEdge R720 by HTTP/dell.server.hw.firmware))>0'
               name: 'Dell R720: Firmware has changed'
               opdata: 'Current value: {ITEM.LASTVALUE1}'
@@ -57,11 +49,9 @@ zabbix_export:
               description: 'Firmware version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 6ef767b8b0a94ebc822c81abd9ee5a8b
+        - uuid: 6ef767b8b0a94ebc822c81abd9ee5a8b
           name: 'Dell R720: Hardware model name'
           type: DEPENDENT
           key: dell.server.hw.model
@@ -72,22 +62,18 @@ zabbix_export:
           description: 'This attribute defines the model name of the system.'
           inventory_link: MODEL
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.model
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           master_item:
             key: dell.server.system.get
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: 114dd17f872c491eb739f708ae86b340
+        - uuid: 114dd17f872c491eb739f708ae86b340
           name: 'Dell R720: Hardware serial number'
           type: DEPENDENT
           key: dell.server.hw.serialnumber
@@ -98,23 +84,19 @@ zabbix_export:
           description: 'This attribute defines the service tag of the system.'
           inventory_link: SERIALNO_A
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.serialnumber
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           master_item:
             key: dell.server.system.get
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: 53caaec2a0664e879f85c263a43715c3
+            - uuid: 53caaec2a0664e879f85c263a43715c3
               expression: 'last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber,#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber,#2) and length(last(/DELL PowerEdge R720 by HTTP/dell.server.hw.serialnumber))>0'
               name: 'Dell R720: Device has been replaced'
               event_name: 'Dell R720: Device has been replaced (new serial number received)'
@@ -122,11 +104,9 @@ zabbix_export:
               description: 'Device serial number has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: notice
-        -
-          uuid: 3cce4b6aff674b29a80aa5369268d99d
+        - uuid: 3cce4b6aff674b29a80aa5369268d99d
           name: 'Dell R720: Overall system health status'
           type: DEPENDENT
           key: dell.server.status
@@ -136,49 +116,40 @@ zabbix_export:
           value_type: CHAR
           description: 'This attribute defines the overall rollup status of all components in the system being monitored by the remote access card. Includes system, storage, IO devices, iDRAC, CPU, memory, etc.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.status
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
           master_item:
             key: dell.server.system.get
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: da2b7ee5a60948d582327e8a5a9169b9
+            - uuid: da2b7ee5a60948d582327e8a5a9169b9
               expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.status,,"like","Critical")=1'
               name: 'Dell R720: Server is in a critical state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
               description: 'Please check the device for faults.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-            -
-              uuid: b8294b60044c4549baa7c930ce8acc48
+            - uuid: b8294b60044c4549baa7c930ce8acc48
               expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.status,,"like","Warning")=1'
               name: 'Dell R720: Server is in warning state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
               description: 'Please check the device for warnings.'
               dependencies:
-                -
-                  name: 'Dell R720: Server is in a critical state'
+                - name: 'Dell R720: Server is in a critical state'
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.status,,"like","Critical")=1'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: 05403c3757624072be7919dbd8864871
+        - uuid: 05403c3757624072be7919dbd8864871
           name: 'Dell R720: Get system'
           type: HTTP_AGENT
           key: dell.server.system.get
@@ -190,8 +161,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Returns the metrics of a system.'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -288,11 +258,9 @@ zabbix_export:
                   return JSON.stringify(result);
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1'
           tags:
-            -
-              tag: component
+            - tag: component
               value: system
-        -
-          uuid: f71cb6b0b93945ccbb20dc660c73e15c
+        - uuid: f71cb6b0b93945ccbb20dc660c73e15c
           name: 'Dell R720: Redfish API'
           type: SIMPLE
           key: 'net.tcp.service[https]'
@@ -305,26 +273,21 @@ zabbix_export:
           valuemap:
             name: zabbix.host.available
           tags:
-            -
-              tag: component
+            - tag: component
               value: health
-            -
-              tag: component
+            - tag: component
               value: system
           triggers:
-            -
-              uuid: 24004d9971ea4686b2941ecf8135b421
+            - uuid: 24004d9971ea4686b2941ecf8135b421
               expression: 'last(/DELL PowerEdge R720 by HTTP/net.tcp.service[https])=0'
               name: 'Dell R720: Redfish API service is unavailable'
               priority: HIGH
               description: 'The service is unavailable or does not accept TCP connections.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
       discovery_rules:
-        -
-          uuid: acf63330ee40478aa81fa73c156ee6c8
+        - uuid: acf63330ee40478aa81fa73c156ee6c8
           name: 'Array controller cache discovery'
           type: HTTP_AGENT
           key: array.cache.discovery
@@ -334,8 +297,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of a cache of disk array controllers.'
           item_prototypes:
-            -
-              uuid: a13e5b801b034e0eab55bee72afe2c06
+            - uuid: a13e5b801b034e0eab55bee72afe2c06
               name: 'Dell R720: {#BATTERY_NAME} Status'
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}]'
@@ -347,53 +309,43 @@ zabbix_export:
               password: '{$API.PASSWORD}'
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Oem.Dell.DellControllerBattery.PrimaryStatus
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: battery
-                -
-                  tag: component
+                - tag: component
                   value: diskarray
               trigger_prototypes:
-                -
-                  uuid: e4549547cb7747318895e6f237fc52b8
+                - uuid: e4549547cb7747318895e6f237fc52b8
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#BATTERY_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: 3788759c5f91471da7cac5560593be2b
+                - uuid: 3788759c5f91471da7cac5560593be2b
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#BATTERY_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#BATTERY_NAME} is in a critical state'
+                    - name: 'Dell R720: {#BATTERY_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.cache.battery.status[{#BATTERY_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -491,12 +443,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 3ef57728fdca4c2791f57a993474cd98
+        - uuid: 3ef57728fdca4c2791f57a993474cd98
           name: 'Array controller discovery'
           type: HTTP_AGENT
           key: array.discovery
@@ -506,8 +456,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of disk array controllers.'
           item_prototypes:
-            -
-              uuid: 3d61cc1d4b044428b17ad9af11f90652
+            - uuid: 3d61cc1d4b044428b17ad9af11f90652
               name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} Status'
               type: HTTP_AGENT
               key: 'dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}]'
@@ -519,53 +468,43 @@ zabbix_export:
               password: '{$API.PASSWORD}'
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: diskarray
-                -
-                  tag: component
+                - tag: component
                   value: storage
               trigger_prototypes:
-                -
-                  uuid: d8139731126649a8825550863b9ea832
+                - uuid: d8139731126649a8825550863b9ea832
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
                   name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: 6764e247bd64411692e09fe6618c5411
+                - uuid: 6764e247bd64411692e09fe6618c5411
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Warning")=1'
                   name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
+                    - name: 'Dell R720: {#CNTLR_NAME} in slot {#SLOT} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.diskarray.status[{#CNTLR_NAME}{#SLOT}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -664,12 +603,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 38908736806c44bdbd519f770e6dc91e
+        - uuid: 38908736806c44bdbd519f770e6dc91e
           name: 'FAN discovery'
           type: HTTP_AGENT
           key: fan.discovery
@@ -679,8 +616,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of FAN sensors.'
           item_prototypes:
-            -
-              uuid: 2112e99b197044258693bd7c23376a08
+            - uuid: 2112e99b197044258693bd7c23376a08
               name: 'Dell R720: {#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
@@ -693,14 +629,11 @@ zabbix_export:
               description: 'Returns the metrics of a sensor.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fan
-                -
-                  tag: component
+                - tag: component
                   value: raw
-            -
-              uuid: 32c00337c3a24ce1bd76622b8203141f
+            - uuid: 32c00337c3a24ce1bd76622b8203141f
               name: 'Dell R720: {#SENSOR_NAME} Speed'
               type: DEPENDENT
               key: 'dell.server.sensor.fan.speed[{#SENSOR_NAME}]'
@@ -709,18 +642,15 @@ zabbix_export:
               units: rpm
               description: 'The sensor value.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Reading
               master_item:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fan
-            -
-              uuid: b9167957cb1a42749afcecbfd1062f7c
+            - uuid: b9167957cb1a42749afcecbfd1062f7c
               name: 'Dell R720: {#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.fan.status[{#SENSOR_NAME}]'
@@ -730,51 +660,42 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.sensor.fan.get[{#SENSOR_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: fan
               trigger_prototypes:
-                -
-                  uuid: c856499a11124210811fec617dbdd8a8
+                - uuid: c856499a11124210811fec617dbdd8a8
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: d97e44aad2e743759dcf486e73b6e141
+                - uuid: d97e44aad2e743759dcf486e73b6e141
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
+                    - name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.fan.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -854,12 +775,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 677239d906704f1ca4be041b209e7aa3
+        - uuid: 677239d906704f1ca4be041b209e7aa3
           name: 'Network interface discovery'
           type: HTTP_AGENT
           key: net.if.discovery
@@ -869,8 +788,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'The NetworkInterface schema describes links to the NetworkAdapter and represents the functionality available to the containing system.'
           item_prototypes:
-            -
-              uuid: 13f09a8a9ffd4724b783f6f6ffca4237
+            - uuid: 13f09a8a9ffd4724b783f6f6ffca4237
               name: 'Dell R720: {#IFNAME} Get interface'
               type: HTTP_AGENT
               key: 'dell.server.net.if.get[{#IFNAME}]'
@@ -883,14 +801,11 @@ zabbix_export:
               description: 'Returns the metrics of a network interface.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-                -
-                  tag: component
+                - tag: component
                   value: raw
-            -
-              uuid: 5a29abc9a33c498498ede924953e506e
+            - uuid: 5a29abc9a33c498498ede924953e506e
               name: 'Dell R720: {#IFNAME} Status'
               type: DEPENDENT
               key: 'dell.server.net.if.health[{#IFNAME}]'
@@ -900,49 +815,40 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
               trigger_prototypes:
-                -
-                  uuid: c83b9b49f9bd4ddd9fb19033b5ad581c
+                - uuid: c83b9b49f9bd4ddd9fb19033b5ad581c
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#IFNAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: db482b43f586470c9cf46e711954f148
+                - uuid: db482b43f586470c9cf46e711954f148
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#IFNAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#IFNAME} is in a critical state'
+                    - name: 'Dell R720: {#IFNAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.health[{#IFNAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-            -
-              uuid: 03a1c99b946b470393bf59a1025dfad4
+            - uuid: 03a1c99b946b470393bf59a1025dfad4
               name: 'Dell R720: {#IFNAME} Speed'
               type: DEPENDENT
               key: 'dell.server.net.if.speed[{#IFNAME}]'
@@ -951,22 +857,18 @@ zabbix_export:
               units: '!Mbps'
               description: 'Network port current link speed.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.CurrentLinkSpeedMbps
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-            -
-              uuid: bbfc1c324a92402381adf94fee5c4ca0
+            - uuid: bbfc1c324a92402381adf94fee5c4ca0
               name: 'Dell R720: {#IFNAME} State'
               type: DEPENDENT
               key: 'dell.server.net.if.state[{#IFNAME}]'
@@ -976,22 +878,18 @@ zabbix_export:
               value_type: CHAR
               description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.State
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
-            -
-              uuid: a68c98640efc4c5eb146409339261f51
+            - uuid: a68c98640efc4c5eb146409339261f51
               name: 'Dell R720: {#IFNAME} Link status'
               type: DEPENDENT
               key: 'dell.server.net.if.status[{#IFNAME}]'
@@ -1001,23 +899,19 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the link between this port and its link partner. Possible values: Down, Up, null.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.LinkStatus
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.net.if.get[{#IFNAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: network
               trigger_prototypes:
-                -
-                  uuid: bf30aa7ff82e4d08b3b48ded248c4d46
+                - uuid: bf30aa7ff82e4d08b3b48ded248c4d46
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and (find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")="Down" and last(/DELL PowerEdge R720 by HTTP/dell.server.net.if.status[{#IFNAME}],#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.net.if.status[{#IFNAME}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.net.if.status[{#IFNAME}],,"like")<>"Down" or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1033,13 +927,11 @@ zabbix_export:
                     WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/NetworkAdapters'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -1139,12 +1031,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: f40fb375a0ba441ea9942822471be1cf
+        - uuid: f40fb375a0ba441ea9942822471be1cf
           name: 'Physical disk discovery'
           type: HTTP_AGENT
           key: physicaldisk.discovery
@@ -1154,8 +1044,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of physical disks.'
           item_prototypes:
-            -
-              uuid: f4b115b9975e44e388b077eb884d92f4
+            - uuid: f4b115b9975e44e388b077eb884d92f4
               name: 'Dell R720: {#DISK_NAME} Get disk'
               type: HTTP_AGENT
               key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
@@ -1168,17 +1057,13 @@ zabbix_export:
               description: 'Returns the metrics of a physical disk.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: raw
-                -
-                  tag: component
+                - tag: component
                   value: storage
-            -
-              uuid: e3ae47c99fb44bcba8037c71852d7bf6
+            - uuid: e3ae47c99fb44bcba8037c71852d7bf6
               name: 'Dell R720: {#DISK_NAME} Media type'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.media_type[{#DISK_NAME}]'
@@ -1188,25 +1073,20 @@ zabbix_export:
               value_type: CHAR
               description: 'The type of media contained in this drive. Possible values: HDD, SSD, SMR, null.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.MediaType
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: storage
-            -
-              uuid: 3aab8fb330dc49d885afb31d972299fc
+            - uuid: 3aab8fb330dc49d885afb31d972299fc
               name: 'Dell R720: {#DISK_NAME} Model name'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.model[{#DISK_NAME}]'
@@ -1216,25 +1096,20 @@ zabbix_export:
               value_type: CHAR
               description: 'The model number of the drive.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Model
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: storage
-            -
-              uuid: cc0f3d4b18a24cd5a98ce6d85e69a374
+            - uuid: cc0f3d4b18a24cd5a98ce6d85e69a374
               name: 'Dell R720: {#DISK_NAME} Serial number'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]'
@@ -1244,26 +1119,21 @@ zabbix_export:
               value_type: CHAR
               description: 'The serial number of this drive.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.SerialNumber
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: storage
               trigger_prototypes:
-                -
-                  uuid: efaef650ead54921b101e0fe4bb4381a
+                - uuid: efaef650ead54921b101e0fe4bb4381a
                   expression: 'last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#1)<>last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}],#2) and length(last(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.serialnumber[{#DISK_NAME}]))>0'
                   name: 'Dell R720: {#DISK_NAME} has been replaced'
                   event_name: 'Dell R720: {#DISK_NAME} has been replaced (new serial number received)'
@@ -1271,11 +1141,9 @@ zabbix_export:
                   description: '{#DISK_NAME} serial number has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: notice
-            -
-              uuid: 9a72ed848c574f5aaaca432f0548272f
+            - uuid: 9a72ed848c574f5aaaca432f0548272f
               name: 'Dell R720: {#DISK_NAME} Size'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.size[{#DISK_NAME}]'
@@ -1285,25 +1153,20 @@ zabbix_export:
               units: B
               description: 'The size, in bytes, of this drive.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.CapacityBytes
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: storage
-            -
-              uuid: 0db3af82611c4f49899e54c09d600aef
+            - uuid: 0db3af82611c4f49899e54c09d600aef
               name: 'Dell R720: {#DISK_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.hw.physicaldisk.status[{#DISK_NAME}]'
@@ -1313,54 +1176,44 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.physicaldisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: physicaldisk
-                -
-                  tag: component
+                - tag: component
                   value: storage
               trigger_prototypes:
-                -
-                  uuid: 56757be1596c4b0189e5cd6fe0a8fa45
+                - uuid: 56757be1596c4b0189e5cd6fe0a8fa45
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#DISK_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: 0e68f903e424472dac82f3cbd72ef248
+                - uuid: 0e68f903e424472dac82f3cbd72ef248
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#DISK_NAME} is in a critical state'
+                    - name: 'Dell R720: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.physicaldisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -1460,12 +1313,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 1ae5712a1b75459e9f6fe7b3c9334ee9
+        - uuid: 1ae5712a1b75459e9f6fe7b3c9334ee9
           name: 'PSU discovery'
           type: HTTP_AGENT
           key: psu.discovery
@@ -1475,8 +1326,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of PSU sensors.'
           item_prototypes:
-            -
-              uuid: ff702455da7748de995238ebe6bd7fbd
+            - uuid: ff702455da7748de995238ebe6bd7fbd
               name: 'Dell R720: {#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
@@ -1489,14 +1339,11 @@ zabbix_export:
               description: 'Returns the metrics of a sensor.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: psu
-                -
-                  tag: component
+                - tag: component
                   value: raw
-            -
-              uuid: 6c7f9247ea1f46c2938fcf1cd441dd6f
+            - uuid: 6c7f9247ea1f46c2938fcf1cd441dd6f
               name: 'Dell R720: {#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.psu.status[{#SENSOR_NAME}]'
@@ -1506,51 +1353,42 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.sensor.psu.get[{#SENSOR_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: psu
               trigger_prototypes:
-                -
-                  uuid: 1a9a063e006343c0bce9bf21ead9d93f
+                - uuid: 1a9a063e006343c0bce9bf21ead9d93f
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: c9b528eac8844abea4de8a53c0ff8893
+                - uuid: c9b528eac8844abea4de8a53c0ff8893
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
+                    - name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.psu.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -1644,12 +1482,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 0c8eea294f9041ca9cb8b27fd32bea80
+        - uuid: 0c8eea294f9041ca9cb8b27fd32bea80
           name: 'Temperature discovery'
           type: HTTP_AGENT
           key: temp.discovery
@@ -1659,8 +1495,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of temperature sensors.'
           item_prototypes:
-            -
-              uuid: 13eb046f17ae44e3b56a911fa29462b3
+            - uuid: 13eb046f17ae44e3b56a911fa29462b3
               name: 'Dell R720: {#SENSOR_NAME} Get sensor'
               type: HTTP_AGENT
               key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
@@ -1673,14 +1508,11 @@ zabbix_export:
               description: 'Returns the metrics of a sensor.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: raw
-                -
-                  tag: component
+                - tag: component
                   value: temperature
-            -
-              uuid: 7426672931d045349f7a1048a29fd404
+            - uuid: 7426672931d045349f7a1048a29fd404
               name: 'Dell R720: {#SENSOR_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.sensor.temp.status[{#SENSOR_NAME}]'
@@ -1690,49 +1522,40 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: temperature
               trigger_prototypes:
-                -
-                  uuid: c909cc04251c4b53bf512128476dc9ba
+                - uuid: c909cc04251c4b53bf512128476dc9ba
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: 9d4bede243904a6aa92f96948d6f9ed7
+                - uuid: 9d4bede243904a6aa92f96948d6f9ed7
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#SENSOR_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
+                    - name: 'Dell R720: {#SENSOR_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.sensor.temp.status[{#SENSOR_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-            -
-              uuid: 0fb34178623b47609fd59674c01cbc70
+            - uuid: 0fb34178623b47609fd59674c01cbc70
               name: 'Dell R720: {#SENSOR_NAME} Value'
               type: DEPENDENT
               key: 'dell.server.sensor.temp.value[{#SENSOR_NAME}]'
@@ -1742,20 +1565,17 @@ zabbix_export:
               units: °C
               description: 'The sensor value.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Reading
               master_item:
                 key: 'dell.server.sensor.temp.get[{#SENSOR_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: temperature
           url: '{$API.URL}/redfish/v1/Chassis/System.Embedded.1/Sensors'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -1849,12 +1669,10 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
-        -
-          uuid: 0b5735d173a04cf69422118ac8990ff4
+        - uuid: 0b5735d173a04cf69422118ac8990ff4
           name: 'Virtual disk discovery'
           type: HTTP_AGENT
           key: virtualdisk.discovery
@@ -1864,8 +1682,7 @@ zabbix_export:
           password: '{$API.PASSWORD}'
           description: 'Discovery of virtual disks.'
           item_prototypes:
-            -
-              uuid: a5a3da9fd1824fa89d41514deac80619
+            - uuid: a5a3da9fd1824fa89d41514deac80619
               name: 'Dell R720: {#DISK_NAME} Get disk'
               type: HTTP_AGENT
               key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
@@ -1878,14 +1695,11 @@ zabbix_export:
               description: 'Returns the metrics of a virtual disk.'
               url: '{$API.URL}{#ODATA}'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: raw
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
-            -
-              uuid: a6e3cb66270744598ef9d5ad5b99b4a7
+            - uuid: a6e3cb66270744598ef9d5ad5b99b4a7
               name: 'Dell R720: {#DISK_NAME} RAID status'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.raidstatus[{#DISK_NAME}]'
@@ -1895,25 +1709,20 @@ zabbix_export:
               value_type: CHAR
               description: 'This property represents the RAID specific status. Possible values: Blocked, Degraded, Failed, Foreign, Offline, Online, Ready, Unknown, null.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Oem.Dell.DellVirtualDisk.RaidStatus
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
-            -
-              uuid: 1f11df437d8544e6b8824f9ab4b36fd1
+            - uuid: 1f11df437d8544e6b8824f9ab4b36fd1
               name: 'Dell R720: {#DISK_NAME} Read policy'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.readpolicy[{#DISK_NAME}]'
@@ -1923,25 +1732,20 @@ zabbix_export:
               value_type: CHAR
               description: 'Indicates the read cache policy setting for the Volume. Possible values: ReadAhead, AdaptiveReadAhead, Off.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Oem.Dell.DellVirtualDisk.ReadCachePolicy
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
-            -
-              uuid: b1529c9635904ecbb8ea1168fd006253
+            - uuid: b1529c9635904ecbb8ea1168fd006253
               name: 'Dell R720: {#DISK_NAME} Size'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.size[{#DISK_NAME}]'
@@ -1951,25 +1755,20 @@ zabbix_export:
               units: B
               description: 'The size in bytes of this Volume.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.CapacityBytes
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
-            -
-              uuid: aed92b93740a4dc3a0a3db66ebded2d1
+            - uuid: aed92b93740a4dc3a0a3db66ebded2d1
               name: 'Dell R720: {#DISK_NAME} Current state'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.state[{#DISK_NAME}]'
@@ -1979,25 +1778,20 @@ zabbix_export:
               value_type: CHAR
               description: 'The known state of the Resource, for example, enabled. Possible values: Enabled, Disabled, StandbyOffline, StandbySpare, InTest, Starting, Absent, UnavailableOffline, Deferring, Quiesced, Updating, Qualified.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.State
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
-            -
-              uuid: d80c7530a7e84a31a0e5013229c7d3fe
+            - uuid: d80c7530a7e84a31a0e5013229c7d3fe
               name: 'Dell R720: {#DISK_NAME} Status'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.status[{#DISK_NAME}]'
@@ -2007,52 +1801,42 @@ zabbix_export:
               value_type: CHAR
               description: 'The status of the job. Possible values: OK, Warning, Critical.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Status.Health
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
               trigger_prototypes:
-                -
-                  uuid: 2284cde0da39410396fa7dd3d9151d85
+                - uuid: 2284cde0da39410396fa7dd3d9151d85
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   name: 'Dell R720: {#DISK_NAME} is in a critical state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'Please check the device for faults.'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-                -
-                  uuid: ebd49db8ab2f491e9238dd60befe0b20
+                - uuid: ebd49db8ab2f491e9238dd60befe0b20
                   expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Warning")=1'
                   name: 'Dell R720: {#DISK_NAME} is in warning state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'Please check the device for warnings.'
                   dependencies:
-                    -
-                      name: 'Dell R720: {#DISK_NAME} is in a critical state'
+                    - name: 'Dell R720: {#DISK_NAME} is in a critical state'
                       expression: 'find(/DELL PowerEdge R720 by HTTP/dell.server.hw.virtualdisk.status[{#DISK_NAME}],,"like","Critical")=1'
                   tags:
-                    -
-                      tag: scope
+                    - tag: scope
                       value: availability
-            -
-              uuid: b7a38f742f6d46e596e373de673db7aa
+            - uuid: b7a38f742f6d46e596e373de673db7aa
               name: 'Dell R720: {#DISK_NAME} Write policy'
               type: DEPENDENT
               key: 'dell.server.hw.virtualdisk.writepolicy[{#DISK_NAME}]'
@@ -2062,27 +1846,22 @@ zabbix_export:
               value_type: CHAR
               description: 'Indicates the write cache policy setting for the Volume. Possible values: WriteThrough, ProtectedWriteBack, UnprotectedWriteBack.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - $.Oem.Dell.DellVirtualDisk.WriteCachePolicy
-                -
-                  type: DISCARD_UNCHANGED_HEARTBEAT
+                - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 6h
               master_item:
                 key: 'dell.server.hw.virtualdisk.get[{#DISK_NAME}]'
               tags:
-                -
-                  tag: component
+                - tag: component
                   value: storage
-                -
-                  tag: component
+                - tag: component
                   value: virtualdisk
           url: '{$API.URL}/redfish/v1/Systems/System.Embedded.1/Storage'
           preprocessing:
-            -
-              type: JAVASCRIPT
+            - type: JAVASCRIPT
               parameters:
                 - |
                   function request(url) {
@@ -2182,48 +1961,36 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(result);
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
       tags:
-        -
-          tag: class
+        - tag: class
           value: hardware
-        -
-          tag: target
+        - tag: target
           value: dell
-        -
-          tag: target
+        - tag: target
           value: 'dell poweredge'
       macros:
-        -
-          macro: '{$API.PASSWORD}'
+        - macro: '{$API.PASSWORD}'
           value: '<Put your password here>'
           description: 'The Dell iDRAC user password.'
-        -
-          macro: '{$API.URL}'
+        - macro: '{$API.URL}'
           value: '<Put your URL here>'
           description: 'The Dell iDRAC Redfish API URL in the format `<scheme>://<host>:<port>`.'
-        -
-          macro: '{$API.USER}'
+        - macro: '{$API.USER}'
           value: '<Put your username here>'
           description: 'The Dell iDRAC username.'
-        -
-          macro: '{$IFCONTROL}'
+        - macro: '{$IFCONTROL}'
           value: '1'
           description: 'Link status trigger will be fired only for interfaces that have the context macro equaled 1.'
       valuemaps:
-        -
-          uuid: 13a9860da38f4727a6f958b5cd3d3468
+        - uuid: 13a9860da38f4727a6f958b5cd3d3468
           name: zabbix.host.available
           mappings:
-            -
-              value: '0'
+            - value: '0'
               newvalue: 'not available'
-            -
-              value: '1'
+            - value: '1'
               newvalue: available
-            -
-              value: '2'
+            - value: '2'
               newvalue: unknown

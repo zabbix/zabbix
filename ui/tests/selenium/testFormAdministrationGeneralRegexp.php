@@ -18,7 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -30,6 +32,15 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 	private $regexp = 'test_regexp1';
 	private $regexp2 = 'test_regexp2';
 	private $cloned_regexp = 'test_regexp1_clone';
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	public function testFormAdministrationGeneralRegexp_Layout() {
 		$this->zbxTestLogin('zabbix.php?action=gui.edit');
@@ -98,7 +109,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test_string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputTypeWait('test_string', $test_string);
 		$this->zbxTestClick('add');
-		$this->zbxTestTextPresent('Regular expression added');
+		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($name).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regular expression with such name has not been added');
@@ -114,7 +125,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Regular expression "'.$this->regexp.'" already exists.']);
+		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Regular expression "'.$this->regexp.'" already exists.');
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
@@ -126,7 +137,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestInputType('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
 
-		$this->zbxTestTextPresent(['Cannot add regular expression', 'Invalid parameter "/1/expressions/1/expression": cannot be empty.']);
+		$this->assertMessage(TEST_BAD, 'Cannot add regular expression', 'Invalid parameter "/1/expressions/1/expression": cannot be empty.');
 	}
 
 	public function testFormAdministrationGeneralRegexp_TestTrue() {
@@ -159,7 +170,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickWait('clone');
 		$this->zbxTestInputType('name', $this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent('Regular expression added');
+		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->cloned_regexp).' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Cloned regular expression does not exist in the DB');
@@ -171,7 +182,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent('Regular expression updated');
+		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 
 		$sql = 'SELECT * FROM regexps r,expressions e WHERE r.name='.zbx_dbstr($this->regexp.'2').' AND r.regexpid=e.regexpid';
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Regexp name has not been changed in the DB');

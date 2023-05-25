@@ -58,7 +58,8 @@ void	zbx_mock_test_entry(void **state)
 		fail_msg("Cannot convert flags to unsigned 32 bit integer.");
 
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
-			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters);
+			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
+			get_zbx_config_source_ip);
 
 	zbx_init_metrics();
 

@@ -181,7 +181,7 @@ int	rtc_option_get_process_type(const char *param, size_t *size, int *proc_type,
  ******************************************************************************/
 int	rtc_option_get_process_num(const char *param, size_t *size, int *proc_num, char **error)
 {
-	zbx_uint64_t	value;
+	zbx_uint64_t	value = 0;
 
 	switch (*param)
 	{

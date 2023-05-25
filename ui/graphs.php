@@ -295,6 +295,7 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');
+	$graphs_count = count($graphIds);
 
 	if (hasRequest('parent_discoveryid')) {
 		$result = API::GraphPrototype()->delete($graphIds);
@@ -311,7 +312,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows(getRequest('parent_discoveryid'), zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graph prototypes deleted'), _('Cannot delete graph prototypes'));
+
+		$messageSuccess = _n('Graph prototype deleted', 'Graph prototypes deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph prototype', 'Cannot delete graph prototypes', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 	else {
 		$result = API::Graph()->delete($graphIds);
@@ -328,7 +333,11 @@ elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && h
 
 			uncheckTableRows($hostid, zbx_objectValues($graphs, 'graphid'));
 		}
-		show_messages($result, _('Graphs deleted'), _('Cannot delete graphs'));
+
+		$messageSuccess = _n('Graph deleted', 'Graphs deleted', $graphs_count);
+		$messageFailed = _n('Cannot delete graph', 'Cannot delete graphs', $graphs_count);
+
+		show_messages($result, $messageSuccess, $messageFailed);
 	}
 }
 

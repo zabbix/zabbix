@@ -25,7 +25,6 @@
 #include "zbxdbhigh.h"
 #include "zbxvault.h"
 
-extern char	*CONFIG_SOURCE_IP;
 extern int	CONFIG_TRAPPER_TIMEOUT;
 
 typedef struct
@@ -34,6 +33,7 @@ typedef struct
 	zbx_config_vault_t		*config_vault;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 	int				config_timeout;
+	const char			*config_source_ip;
 	const zbx_events_funcs_t	*events_cbs;
 	int				proxyconfig_frequency;
 	int				proxydata_frequency;

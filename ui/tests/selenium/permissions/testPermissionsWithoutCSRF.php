@@ -272,16 +272,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'zabbix.php?action=discovery.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=discovery.list',
+					'overlay' => 'create'
 				]
 			],
 			// #27 Discovery update.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'zabbix.php?action=discovery.edit&druleid=5',
-					'return_button' => true
+					'link' => 'zabbix.php?action=discovery.list',
+					'overlay' => 'update'
 				]
 			],
 			// #28 GUI update.
@@ -472,16 +472,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'link' => 'zabbix.php?action=script.edit&scriptid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=script.list',
+					'overlay' => 'update'
 				]
 			],
 			// #52 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'link' => 'zabbix.php?action=script.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=script.list',
+					'overlay' => 'create'
 				]
 			],
 			// #53 User profile update.

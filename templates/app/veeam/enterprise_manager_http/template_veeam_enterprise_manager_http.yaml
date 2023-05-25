@@ -1,12 +1,10 @@
 zabbix_export:
   version: '7.0'
   template_groups:
-    -
-      uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
+    - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
   templates:
-    -
-      uuid: 2ce384bafd524db5b910d7f55bca1fbb
+    - uuid: 2ce384bafd524db5b910d7f55bca1fbb
       template: 'Veeam Backup Enterprise Manager by HTTP'
       name: 'Veeam Backup Enterprise Manager by HTTP'
       description: |
@@ -31,11 +29,9 @@ zabbix_export:
         name: Zabbix
         version: 7.0-0
       groups:
-        -
-          name: Templates/Applications
+        - name: Templates/Applications
       items:
-        -
-          uuid: a1b612cd8e274a27a834dbdb69fe7d08
+        - uuid: a1b612cd8e274a27a834dbdb69fe7d08
           name: 'Veeam Manager: Failed Job Runs'
           type: DEPENDENT
           key: veeam.manager.failed.jobs
@@ -43,35 +39,29 @@ zabbix_export:
           history: 7d
           description: 'Informs about the failed job runs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.FailedJobRuns
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
           triggers:
-            -
-              uuid: 4885d43f36b541219be87b5e5ea19088
+            - uuid: 4885d43f36b541219be87b5e5ea19088
               expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.failed.jobs)>{$VEEAM.MANAGER.JOB.MAX.FAIL}'
               name: 'Veeam Manager: Failed job runs is too high'
               event_name: 'Veeam Manager: Failed job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.FAIL})'
               priority: AVERAGE
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: e698c05dae9f4d2f8323ce718e9ed83b
+        - uuid: e698c05dae9f4d2f8323ce718e9ed83b
           name: 'Veeam Manager: Get errors'
           type: DEPENDENT
           key: veeam.manager.get.errors
@@ -81,35 +71,29 @@ zabbix_export:
           value_type: TEXT
           description: 'The errors from API requests.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.error
               error_handler: CUSTOM_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: status
           triggers:
-            -
-              uuid: 83316e2168414042aeb9d98857534baa
+            - uuid: 83316e2168414042aeb9d98857534baa
               expression: 'length(last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.get.errors))>0'
               name: 'Veeam Manager: There are errors in requests to API'
               opdata: '{ITEM.LASTVALUE1}'
               priority: AVERAGE
               description: 'Zabbix has received errors in response to API requests.'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
-        -
-          uuid: 525a61ff4fb747efab6ac58d1ac8b7c4
+        - uuid: 525a61ff4fb747efab6ac58d1ac8b7c4
           name: 'Veeam Manager: Get metrics'
           type: SCRIPT
           key: veeam.manager.get.metrics
@@ -190,24 +174,18 @@ zabbix_export:
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           parameters:
-            -
-              name: api_endpoint
+            - name: api_endpoint
               value: '{$VEEAM.MANAGER.API.URL}'
-            -
-              name: password
+            - name: password
               value: '{$VEEAM.MANAGER.PASSWORD}'
-            -
-              name: user
+            - name: user
               value: '{$VEEAM.MANAGER.USER}'
-            -
-              name: http_proxy
+            - name: http_proxy
               value: '{$VEEAM.MANAGER.HTTP.PROXY}'
           tags:
-            -
-              tag: component
+            - tag: component
               value: raw
-        -
-          uuid: a0a1e67c99c64bd1a801c87eeda3977b
+        - uuid: a0a1e67c99c64bd1a801c87eeda3977b
           name: 'Veeam Manager: Running Jobs'
           type: DEPENDENT
           key: veeam.manager.running.jobs
@@ -215,23 +193,19 @@ zabbix_export:
           history: 7d
           description: 'Informs about the running jobs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.RunningJobs
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
-        -
-          uuid: d7510e46c6094e09979ea7dad2828cef
+        - uuid: d7510e46c6094e09979ea7dad2828cef
           name: 'Veeam Manager: Scheduled Backup Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.backup.jobs
@@ -239,23 +213,19 @@ zabbix_export:
           history: 7d
           description: 'Informs about the scheduled backup jobs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledBackupJobs
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
-        -
-          uuid: de9f62198b5b42cdb25460315f4af949
+        - uuid: de9f62198b5b42cdb25460315f4af949
           name: 'Veeam Manager: Scheduled Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.jobs
@@ -263,23 +233,19 @@ zabbix_export:
           history: 7d
           description: 'Informs about the scheduled jobs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledJobs
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
-        -
-          uuid: 599a25d753ce4f5d8542d08569f2a136
+        - uuid: 599a25d753ce4f5d8542d08569f2a136
           name: 'Veeam Manager: Scheduled Replica Jobs'
           type: DEPENDENT
           key: veeam.manager.scheduled.replica.jobs
@@ -287,23 +253,19 @@ zabbix_export:
           history: 7d
           description: 'Informs about the scheduled replica jobs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.ScheduledReplicaJobs
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
-        -
-          uuid: 7d96ebb849c94d5b89656bdfa6398a1d
+        - uuid: 7d96ebb849c94d5b89656bdfa6398a1d
           name: 'Veeam Manager: Total Job Runs'
           type: DEPENDENT
           key: veeam.manager.scheduled.total.jobs
@@ -311,23 +273,19 @@ zabbix_export:
           history: 7d
           description: 'Informs about the total job runs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.TotalJobRuns
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
-        -
-          uuid: b39d33c9d5c544a2996736dbdccfcaff
+        - uuid: b39d33c9d5c544a2996736dbdccfcaff
           name: 'Veeam Manager: Warnings Job Runs'
           type: DEPENDENT
           key: veeam.manager.warning.jobs
@@ -335,36 +293,30 @@ zabbix_export:
           history: 7d
           description: 'Informs about the warning job runs.'
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.JobStatistics.WarningsJobRuns
               error_handler: DISCARD_VALUE
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
           master_item:
             key: veeam.manager.get.metrics
           tags:
-            -
-              tag: component
+            - tag: component
               value: reports
           triggers:
-            -
-              uuid: f65998e99bb24e02a2810b632a4a3f4e
+            - uuid: f65998e99bb24e02a2810b632a4a3f4e
               expression: 'last(/Veeam Backup Enterprise Manager by HTTP/veeam.manager.warning.jobs)>{$VEEAM.MANAGER.JOB.MAX.WARN}'
               name: 'Veeam Manager: Warning job runs is too high'
               event_name: 'Veeam Manager: Warning job runs is too high (over {$VEEAM.MANAGER.JOB.MAX.WARN})'
               priority: WARNING
               manual_close: 'YES'
               tags:
-                -
-                  tag: scope
+                - tag: scope
                   value: availability
       discovery_rules:
-        -
-          uuid: d07b06fbd84d493bb38d61ac0824e794
+        - uuid: d07b06fbd84d493bb38d61ac0824e794
           name: 'Backup Files discovery'
           type: DEPENDENT
           key: veeam.backup.files.discovery
@@ -372,28 +324,23 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              -
-                macro: '{#TYPE}'
+              - macro: '{#TYPE}'
                 value: '{$BACKUP.TYPE.MATCHES}'
                 formulaid: C
-              -
-                macro: '{#TYPE}'
+              - macro: '{#TYPE}'
                 value: '{$BACKUP.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
-              -
-                macro: '{#NAME}'
+              - macro: '{#NAME}'
                 value: '{$BACKUP.NAME.MATCHES}'
                 formulaid: A
-              -
-                macro: '{#NAME}'
+              - macro: '{#NAME}'
                 value: '{$BACKUP.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovery of all backup files created on, or imported to the backup servers that are connected to Veeam Backup Enterprise Manager.'
           item_prototypes:
-            -
-              uuid: d3f87401602c48d3a837504ed08902db
+            - uuid: d3f87401602c48d3a837504ed08902db
               name: 'Veeam Manager: Compression ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.compress.ratio[{#NAME}]'
@@ -401,22 +348,18 @@ zabbix_export:
               history: 7d
               description: 'Gets the data compression ratio with the name `[{#NAME}]`.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[''{#NAME}''].BackupFile.CompressRatio'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: veeam.manager.get.metrics
               tags:
-                -
-                  tag: backup
+                - tag: backup
                   value: '{#NAME}'
-                -
-                  tag: component
+                - tag: component
                   value: backups
-            -
-              uuid: 0c5be137b40949c4946a09c57ccc7796
+            - uuid: 0c5be137b40949c4946a09c57ccc7796
               name: 'Veeam Manager: Data Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.data.size[{#NAME}]'
@@ -426,22 +369,18 @@ zabbix_export:
               units: B
               description: 'Gets the data size with the name `[{#NAME}]`.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[''{#NAME}''].BackupFile.DataSize'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: veeam.manager.get.metrics
               tags:
-                -
-                  tag: backup
+                - tag: backup
                   value: '{#NAME}'
-                -
-                  tag: component
+                - tag: component
                   value: backups
-            -
-              uuid: 62d0b0341bac40f9a63f0fbf3639e0d0
+            - uuid: 62d0b0341bac40f9a63f0fbf3639e0d0
               name: 'Veeam Manager: Deduplication Ratio [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.deduplication.ratio[{#NAME}]'
@@ -449,22 +388,18 @@ zabbix_export:
               history: 7d
               description: 'Gets the data deduplication ratio with the name `[{#NAME}]`.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[''{#NAME}''].BackupFile.DeduplicationRatio'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: veeam.manager.get.metrics
               tags:
-                -
-                  tag: backup
+                - tag: backup
                   value: '{#NAME}'
-                -
-                  tag: component
+                - tag: component
                   value: backups
-            -
-              uuid: 098cc39afb88483f93a98c96fc1450d1
+            - uuid: 098cc39afb88483f93a98c96fc1450d1
               name: 'Veeam Manager: Backup Size [{#NAME}]'
               type: DEPENDENT
               key: 'veeam.backup.file.size[{#NAME}]'
@@ -474,92 +409,70 @@ zabbix_export:
               units: B
               description: 'Gets the backup size with the name `[{#NAME}]`.'
               preprocessing:
-                -
-                  type: JSONPATH
+                - type: JSONPATH
                   parameters:
                     - '$.[''{#NAME}''].BackupFile.BackupSize'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: veeam.manager.get.metrics
               tags:
-                -
-                  tag: backup
+                - tag: backup
                   value: '{#NAME}'
-                -
-                  tag: component
+                - tag: component
                   value: backups
           master_item:
             key: veeam.manager.get.metrics
           lld_macro_paths:
-            -
-              lld_macro: '{#NAME}'
+            - lld_macro: '{#NAME}'
               path: $.Name
-            -
-              lld_macro: '{#TYPE}'
+            - lld_macro: '{#TYPE}'
               path: $.Type
-            -
-              lld_macro: '{#UID}'
+            - lld_macro: '{#UID}'
               path: $.UID
-            -
-              lld_macro: '{#URL}'
+            - lld_macro: '{#URL}'
               path: $.Href
           preprocessing:
-            -
-              type: JSONPATH
+            - type: JSONPATH
               parameters:
                 - $.backupFiles.Refs
-            -
-              type: DISCARD_UNCHANGED_HEARTBEAT
+            - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
       tags:
-        -
-          tag: class
+        - tag: class
           value: software
-        -
-          tag: target
+        - tag: target
           value: veeam
       macros:
-        -
-          macro: '{$BACKUP.NAME.MATCHES}'
+        - macro: '{$BACKUP.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in backup discovery rule.'
-        -
-          macro: '{$BACKUP.NAME.NOT_MATCHES}'
+        - macro: '{$BACKUP.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in backup discovery rule.'
-        -
-          macro: '{$BACKUP.TYPE.MATCHES}'
+        - macro: '{$BACKUP.TYPE.MATCHES}'
           value: '.*'
           description: 'This macro is used in backup discovery rule.'
-        -
-          macro: '{$BACKUP.TYPE.NOT_MATCHES}'
+        - macro: '{$BACKUP.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in backup discovery rule.'
-        -
-          macro: '{$VEEAM.MANAGER.API.URL}'
+        - macro: '{$VEEAM.MANAGER.API.URL}'
           value: 'https://localhost:9398'
           description: 'Veeam Backup Enterprise Manager API endpoint is a URL in the format: `<scheme>://<host>:<port>`.'
-        -
-          macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
+        - macro: '{$VEEAM.MANAGER.DATA.TIMEOUT}'
           value: '10'
           description: 'A response timeout for API.'
-        -
-          macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
+        - macro: '{$VEEAM.MANAGER.HTTP.PROXY}'
           description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
-        -
-          macro: '{$VEEAM.MANAGER.JOB.MAX.FAIL}'
+        - macro: '{$VEEAM.MANAGER.JOB.MAX.FAIL}'
           value: '5'
           description: 'The maximum score of failed jobs (for a trigger expression).'
-        -
-          macro: '{$VEEAM.MANAGER.JOB.MAX.WARN}'
+        - macro: '{$VEEAM.MANAGER.JOB.MAX.WARN}'
           value: '10'
           description: 'The maximum score of warning jobs (for a trigger expression).'
-        -
-          macro: '{$VEEAM.MANAGER.PASSWORD}'
+        - macro: '{$VEEAM.MANAGER.PASSWORD}'
           type: SECRET_TEXT
           description: 'The `password` of the Veeam Backup Enterprise Manager account.'
-        -
-          macro: '{$VEEAM.MANAGER.USER}'
+        - macro: '{$VEEAM.MANAGER.USER}'
           type: SECRET_TEXT
           description: 'The `user name` of the Veeam Backup Enterprise Manager account .'

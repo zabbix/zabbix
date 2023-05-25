@@ -3364,7 +3364,7 @@ $form-icon-btn: (
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(100px, max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
 
 		&.form-grid-1-1 {
 			grid-template-columns: repeat(2, minmax(100px, max-content) auto);

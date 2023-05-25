@@ -121,7 +121,10 @@ $sysmapForm->addItem([
 					->getUrl()
 			)
 		],
-		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?'),
+		'map.massdelete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected map?'),
+			'confirm_plural' => _('Delete selected maps?'),
 			'disabled' => $data['allowed_edit'] ? null : 'disabled',
 			'csrf_token' => CCsrfTokenHelper::get('sysmaps.php')
 		]
