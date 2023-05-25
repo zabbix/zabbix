@@ -130,7 +130,8 @@ class CMacroValue extends CInput {
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
-				->setReadonly($readonly);
+				->setReadonly($readonly)
+				->disableSpellcheck();
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
@@ -139,7 +140,8 @@ class CMacroValue extends CInput {
 			$elements[] = (new CTextAreaFlexible($name.'[value]', $value, ['add_post_js' => $this->add_post_js]))
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
-				->setReadonly($readonly);
+				->setReadonly($readonly)
+				->disableSpellcheck();
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;

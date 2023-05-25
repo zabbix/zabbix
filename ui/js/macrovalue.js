@@ -158,7 +158,8 @@
 					id: $input.attr('id'),
 					name: $input.attr('name'),
 					placeholder: t('value'),
-					maxlength: $input.attr('maxlength')
+					maxlength: $input.attr('maxlength'),
+					spellcheck: false
 				})
 				.text($input.is(':disabled') ? '' : $input.val())
 				.on('focus blur', btnUndoFocusEventHandle)
