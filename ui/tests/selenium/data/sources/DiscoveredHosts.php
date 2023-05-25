@@ -214,7 +214,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template1 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery2',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]
@@ -239,7 +239,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template2 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery3',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]
