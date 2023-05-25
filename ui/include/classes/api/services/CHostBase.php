@@ -925,10 +925,8 @@ abstract class CHostBase extends CApiService {
 
 		foreach ($children as $templateid => $targetids) {
 			foreach ($targetids as $targetid) {
-				$children_parents[$templateid][$targetid] = array_diff_key(
-					self::getTemplateOrTargetRelatedIds($parents, [$targetid => true], false),
-					array_flip([$templateid])
-				);
+				$children_parents[$templateid][$targetid] =
+					self::getTemplateOrTargetRelatedIds($parents, [$targetid => true], $templateid);
 			}
 		}
 
@@ -1027,14 +1025,14 @@ abstract class CHostBase extends CApiService {
 	/**
 	 * Get IDs of targets linked to given templates or IDs of templates linked to given targets.
 	 *
-	 * @param array  $links
-	 * @param array  $sourceids
-	 * @param bool   $recursive
+	 * @param array       $links
+	 * @param array       $sourceids
+	 * @param string|null $ignore_relatedid
 	 *
 	 * @return array
 	 */
 	private static function getTemplateOrTargetRelatedIds(array $links, array $sourceids,
-			bool $recursive = true): array {
+			string $ignore_relatedid = null): array {
 		$processed_sourceids = $sourceids;
 		$relatedids = [];
 
@@ -1045,7 +1043,11 @@ abstract class CHostBase extends CApiService {
 
 			foreach ($scoped_links as $_relatedids) {
 				foreach ($_relatedids as $relatedid) {
-					if ($recursive && !array_key_exists($relatedid, $processed_sourceids)) {
+					if ($ignore_relatedid !== null && bccomp($relatedid, $ignore_relatedid) == 0) {
+						continue;
+					}
+
+					if (!array_key_exists($relatedid, $processed_sourceids)) {
 						$sourceids[$relatedid] = true;
 						$processed_sourceids[$relatedid] = true;
 					}
@@ -1053,6 +1055,8 @@ abstract class CHostBase extends CApiService {
 					$relatedids[$relatedid] = true;
 				}
 			}
+
+			$ignore_relatedid = null;
 		} while ($sourceids);
 
 		return $relatedids;
