@@ -195,6 +195,7 @@ $form_grid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('scripts', 'command'))
 				->setAriaRequired()
+				->disableSpellcheck()
 		))->setId('commands')
 	])
 	->addItem([
