@@ -57,7 +57,7 @@ class CControllerDiscoveryEdit extends CController {
 
 		if ($this->hasInput('druleid')) {
 			$drules = API::DRule()->get([
-				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status'],
+				'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status', 'concurrency_max'],
 				'druleids' => $this->getInput('druleid'),
 				'selectDChecks' => [
 					'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
@@ -110,6 +110,7 @@ class CControllerDiscoveryEdit extends CController {
 			'iprange' => '192.168.0.1-254',
 			'delay' => DB::getDefault('drules', 'delay'),
 			'status' => DB::getDefault('drules', 'status'),
+			'concurrency_max' => DB::getDefault('drules', 'concurrency_max'),
 			'proxy_hostid' => 0,
 			'uniqueness_criteria' => -1,
 			'host_source' => DB::getDefault('dchecks', 'host_source'),
@@ -119,8 +120,18 @@ class CControllerDiscoveryEdit extends CController {
 		CArrayHelper::sort($this->drule['dchecks'], ['name']);
 		$this->drule['dchecks'] = array_values($this->drule['dchecks']);
 
+		$concurrency_max_type = ($this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_UNLIMITED
+			|| $this->drule['concurrency_max'] == ZBX_DISCOVERY_CHECKS_ONE)
+			? $this->drule['concurrency_max']
+			: ZBX_DISCOVERY_CHECKS_CUSTOM;
+
+		if ($concurrency_max_type != ZBX_DISCOVERY_CHECKS_CUSTOM) {
+			$this->drule['concurrency_max'] = ZBX_DISCOVERY_CHECKS_UNLIMITED;
+		}
+
 		$data = [
 			'drule' => $this->drule,
+			'concurrency_max_type' => $concurrency_max_type,
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
@@ -160,7 +171,7 @@ class CControllerDiscoveryEdit extends CController {
 			case SVC_SNMPv1:
 			case SVC_SNMPv2c:
 				$dcheck['snmp_community'] = $db_dcheck['snmp_community'];
-				// break; is not missing here
+			// break; is not missing here
 			case SVC_AGENT:
 				$dcheck['key_'] = $db_dcheck['key_'];
 				break;
@@ -173,7 +184,7 @@ class CControllerDiscoveryEdit extends CController {
 				];
 
 				if ($db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV
-						|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
+					|| $db_dcheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					$dcheck += [
 						'snmpv3_authprotocol' => $db_dcheck['snmpv3_authprotocol'],
 						'snmpv3_authpassphrase' => $db_dcheck['snmpv3_authpassphrase']

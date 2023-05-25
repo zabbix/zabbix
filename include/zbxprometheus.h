@@ -55,6 +55,7 @@ typedef struct
 {
 	zbx_vector_prometheus_row_t		rows;
 	zbx_vector_prometheus_label_index_t	indexes;
+	zbx_hashset_t				hints;
 	pthread_mutex_t				index_lock;
 }
 zbx_prometheus_t;
@@ -67,6 +68,7 @@ int	zbx_prometheus_pattern_ex(zbx_prometheus_t *prom, const char *filter_data, c
 int	zbx_prometheus_pattern(const char *data, const char *filter_data, const char *request, const char *output,
 		char **value, char **error);
 int	zbx_prometheus_to_json(const char *data, const char *filter_data, char **value, char **error);
+int	zbx_prometheus_to_json_ex(zbx_prometheus_t *prom, const char *filter_data, char **value, char **error);
 
 int	zbx_prometheus_validate_filter(const char *pattern, char **error);
 int	zbx_prometheus_validate_label(const char *label);

@@ -45,7 +45,6 @@
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxsysinfo.h"
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 
@@ -302,7 +301,8 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = get_value_agent(item, config_comms->config_timeout, result);
+			res = get_value_agent(item, config_comms->config_timeout, config_comms->config_source_ip,
+					result);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -326,28 +326,29 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_SSH:
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
-			res = get_value_ssh(item, config_comms->config_timeout, result);
+			res = get_value_ssh(item, config_comms->config_timeout, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for SSH checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_TELNET:
-			res = get_value_telnet(item, config_comms->config_timeout, result);
+			res = get_value_telnet(item, config_comms->config_timeout, config_comms->config_source_ip,
+					result);
 			break;
 		case ITEM_TYPE_CALCULATED:
 			res = get_value_calculated(item, result);
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
-			res = get_value_http(item, result);
+			res = get_value_http(item, config_comms->config_source_ip, result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
 			res = CONFIG_ERROR;
 #endif
 			break;
 		case ITEM_TYPE_SCRIPT:
-			res = get_value_script(item, result);
+			res = get_value_script(item, config_comms->config_source_ip, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));
@@ -720,13 +721,14 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_timeout,
+				config_comms->config_source_ip);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
 	{
 		get_values_java(ZBX_JAVA_GATEWAY_REQUEST_JMX, items, results, errcodes, num,
-				config_comms->config_timeout);
+				config_comms->config_timeout, config_comms->config_source_ip);
 	}
 	else if (1 == num)
 	{

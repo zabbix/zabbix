@@ -663,7 +663,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum count of item prototypes in the tree on the template level, combination, fail.' => [
-				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.%d.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.%d" on the template "dependent.items.template.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1001: dependent.items.template.1
 				// 1017: dependent.items.template.1:discovery.rule.1
@@ -687,7 +687,7 @@ class testDependentItems extends CAPITest {
 				]
 			],
 			'Check for maximum count of item prototypes in the tree on the host level, combination.' => [
-				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.2.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.2" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
+				'error' => 'Cannot set dependency for item prototype with key "dependent.item.proto.1.%d.3[{#LLD}]" on the master item prototype with key "dependent.item.proto.1.%d" on the host "dependent.items.host.1": allowed count of dependent items would be exceeded.',
 				'method' => 'itemprototype.create',
 				// 1004: dependent.items.host.1
 				// 1317: dependent.items.template.1:discovery.rule.1

@@ -108,6 +108,66 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: a8734672a10d41c2ba7c1f00171bb93e
+          name: 'Cisco IOS: SNMP walk EtherLike-MIB interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.10.7.2.1.19,1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2]'
+          key: net.if.duplex.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 58168a9cd5464229a9cbb3fb0c978e85
+          name: 'Cisco IOS: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
+          key: net.if.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 7eb9bdaf14274e1a99c0ff2ac17f0723
+          name: 'Cisco IOS: SNMP walk fans'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.4.1.2,1.3.6.1.4.1.9.9.13.1.4.1.3]'
+          key: sensor.fans.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering system fans.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 0a44183c252e4160837cfd960f755097
+          name: 'Cisco IOS: SNMP walk PSUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.5.1.2,1.3.6.1.4.1.9.9.13.1.5.1.3]'
+          key: sensor.psu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The table of power supply status maintained by the environmental monitor card.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: e64d32fe956f481eb6a3899f8c1e09d9
+          name: 'Cisco IOS: SNMP walk temperature sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          key: sensor.temp.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status maintained by the environmental monitor.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 8684622dc8d446f0b17ba7687d47b09d
           name: 'Cisco IOS: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -141,6 +201,23 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 3208aa4fb7c14623bc5129018172e3b9
+          name: 'Cisco IOS: SNMP walk system CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.109.1.1.1.1.5,1.3.6.1.4.1.9.9.109.1.1.1.1.8]'
+          key: system.cpu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
+            This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+            like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+            In case of a single CPU, cpmCPUTotalTable has only one entry.
+          tags:
+            - tag: component
+              value: raw
         - uuid: ae8e0ecf937c4a9492fe67cc5cd07d6f
           name: 'Cisco IOS: System description'
           type: SNMP_AGENT
@@ -209,6 +286,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 1c8c82e3502c46d9b7603812d02ce27b
+          name: 'Cisco IOS: SNMP walk entity serial numbers'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.47.1.1.1.1.5,1.3.6.1.2.1.47.1.1.1.1.7,1.3.6.1.2.1.47.1.1.1.1.11]'
+          key: system.hw.serialnumber.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: ENTITY-MIB
+            Entity Serial Numbers Discovery.
+          tags:
+            - tag: component
+              value: raw
         - uuid: f2173cd0262d4a60b5e134e00fed78e6
           name: 'Cisco IOS: Uptime (hardware)'
           type: SNMP_AGENT
@@ -359,6 +450,21 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: ed5f0ebd013644adbad71e8b93d481de
+          name: 'Cisco IOS: SNMP walk memory'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.48.1.1.1.2,1.3.6.1.4.1.9.9.48.1.1.1.5,1.3.6.1.4.1.9.9.48.1.1.1.6]'
+          key: vm.memory.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: CISCO-MEMORY-POOL-MIB
+            Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+            http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html.
+          tags:
+            - tag: component
+              value: raw
         - uuid: cf9bd75166704b2f93446ece0c2d0fab
           name: 'Cisco IOS: SNMP agent availability'
           type: INTERNAL
@@ -393,10 +499,9 @@ zabbix_export:
       discovery_rules:
         - uuid: f7404c15a9dc497b8e67ab014ca43890
           name: 'CPU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]'
+          type: DEPENDENT
           key: cpu.discovery
-          delay: 1h
+          delay: '0'
           description: |
             If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
             indexed with cpmCPUTotalIndex.
@@ -406,10 +511,9 @@ zabbix_export:
           item_prototypes:
             - uuid: b124144899bd4149a6257440574d4341
               name: '#{#SNMPINDEX}: CPU utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]'
-              delay: 5m
+              delay: 0s
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -417,6 +521,16 @@ zabbix_export:
                 MIB: CISCO-PROCESS-MIB
                 The cpmCPUTotal5minRev MIB object provides a more accurate view of the performance of the router over time than the MIB objects cpmCPUTotal1minRev and cpmCPUTotal5secRev . These MIB objects are not accurate because they look at CPU at one minute and five second intervals, respectively. These MIBs enable you to monitor the trends and plan the capacity of your network. The recommended baseline rising threshold for cpmCPUTotal5minRev is 90 percent. Depending on the platform, some routers that run at 90 percent, for example, 2500s, can exhibit performance degradation versus a high-end router, for example, the 7500 series, which can operate fine.
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.109.1.1.1.1.8.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 5m
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
@@ -442,12 +556,22 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS by SNMP'
                     key: 'system.cpu.util[cpmCPUTotal5minRev.{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.109.1.1.1.1.5
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: e8c57e436eed4958a0a83c7afd6a07e3
           name: 'Entity Serial Numbers Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]'
+          type: DEPENDENT
           key: entity_sn.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -460,18 +584,23 @@ zabbix_export:
           item_prototypes:
             - uuid: e86b198ba7b7451482dfb8ab07553abf
               name: '{#ENT_NAME}: Hardware serial number'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
-              delay: 1h
+              delay: 0s
               history: 2w
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: system.hw.serialnumber.walk
               tags:
                 - tag: component
                   value: system
@@ -486,25 +615,50 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+          master_item:
+            key: system.hw.serialnumber.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#ENT_CLASS}'
+                - 1.3.6.1.2.1.47.1.1.1.1.5
+                - '0'
+                - '{#ENT_NAME}'
+                - 1.3.6.1.2.1.47.1.1.1.1.7
+                - '0'
+                - '{#ENT_SN}'
+                - 1.3.6.1.2.1.47.1.1.1.1.11
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 98eebfb8ed28460c8e5982af61f18931
           name: 'FAN Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.4.1.2]'
+          type: DEPENDENT
           key: fan.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of fan status maintained by the environmental monitor.'
           item_prototypes:
             - uuid: d7188ce8f18442d882c585ef044de2cf
               name: '{#SENSOR_INFO}: Fan status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.fans.walk
               tags:
                 - tag: component
                   value: fan
@@ -534,41 +688,66 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.fans.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.4.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: d7144482448b4bb5b4f59f18365ecb04
           name: 'Memory Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]'
+          type: DEPENDENT
           key: memory.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
             http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
           item_prototypes:
             - uuid: b05c256436e14f72a3dea21d48b98a9c
               name: '{#SNMPVALUE}: Free memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
             - uuid: 58e8eeb2ddf74c6e86e02845f0d38784
               name: '{#SNMPVALUE}: Used memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
@@ -607,12 +786,22 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS by SNMP'
                     key: 'vm.memory.util[vm.memory.util.{#SNMPINDEX}]'
+          master_item:
+            key: vm.memory.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.48.1.1.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: b416fb001e46464f847578a50451164b
           name: 'Network interfaces discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: net.if.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -662,10 +851,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 6d4b70db5618436f8d5096098d94ad39
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -675,9 +863,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -687,18 +884,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 1cdd9e77a6f9420da700b903e2fc0966
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -708,22 +913,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 22cb1c9d188c4274a4f9ac815832fc21
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -733,10 +943,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 75182ac83419420194cf34c4e5f92a62
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -746,9 +955,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -758,18 +976,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: c31a98b3b9784cd699b5d0dadbc3dc4a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -779,22 +1005,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 973dbf88a72d4f5897bb199b5d41941a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -804,10 +1035,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: e24cccb1e89446268b30830ac01d59f8
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
-              delay: 5m
+              delay: '0'
               history: 7d
               trends: '0'
               units: bps
@@ -815,12 +1045,18 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -830,9 +1066,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 6ecd6a8ec5fa487c836adb69e72915e7
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -846,6 +1082,13 @@ zabbix_export:
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -874,10 +1117,9 @@ zabbix_export:
                       value: availability
             - uuid: 51e3b46e009944d594fd4bdadeac83aa
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: 1h
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -888,9 +1130,15 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1012,12 +1260,37 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: d79d3a6026bd4d1f877fc164a3eb7f84
           name: 'EtherLike-MIB Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.10.7.2.1.19,{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2]'
+          type: DEPENDENT
           key: net.if.duplex.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1025,15 +1298,18 @@ zabbix_export:
                 value: '1'
                 formulaid: A
               - macro: '{#SNMPVALUE}'
-                value: (2|3)
+                operator: EXISTS
                 formulaid: B
+              - macro: '{#SNMPVALUE}'
+                value: (2|3)
+                formulaid: C
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: 338e81aa226b41dd956bc1f9d10c0a87
               name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: EtherLike-MIB
@@ -1063,6 +1339,13 @@ zabbix_export:
                 Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.
               valuemap:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.duplex.walk
               tags:
                 - tag: component
                   value: network
@@ -1080,42 +1363,56 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+          master_item:
+            key: net.if.duplex.walk
           preprocessing:
-            - type: JAVASCRIPT
+            - type: SNMP_WALK_TO_JSON
               parameters:
-                - |
-                  try {
-                      var data = JSON.parse(value);
-                  }
-                  catch (error) {
-                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
-                  }
-                  var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
-                  data.forEach(function (element) {
-                      fields.forEach(function (field) {
-                          element[field] = element[field] || '';
-                      });
-                  });
-                  return JSON.stringify(data);
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.2.1.10.7.2.1.19
+                - '0'
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 4ffaea3ee50c424baa1080586d92ba2f
           name: 'PSU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.5.1.2]'
+          type: DEPENDENT
           key: psu.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of power supply status maintained by the environmental monitor card.'
           item_prototypes:
             - uuid: 22ac9f6f30eb4f4b9d009db4adba7f29
               name: '{#SENSOR_INFO}: Power supply status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.psu.walk
               tags:
                 - tag: component
                   value: power
@@ -1145,22 +1442,32 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.psu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.5.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 2751c1ff3f334145971aa400440631fe
           name: 'Temperature Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]'
+          type: DEPENDENT
           key: temperature.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
             maintained by the environmental monitor.
           item_prototypes:
             - uuid: 7985d9ceeaeb4a4f8e39e02730e91d29
               name: '{#SNMPVALUE}: Temperature status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: |
@@ -1168,20 +1475,39 @@ zabbix_export:
                 The current state of the test point being instrumented.
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
             - uuid: c1fb8e8099ed496a9af8d3e36d6d3c8b
               name: '{#SNMPVALUE}: Temperature'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               value_type: FLOAT
               units: °C
               description: |
                 MIB: CISCO-ENVMON-MIB
                 The current measurement of the test point being instrumented.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
@@ -1245,6 +1571,18 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+          master_item:
+            key: sensor.temp.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: network
@@ -2076,6 +2414,42 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: c5cabdb91f004235b481de453db637c6
+          name: 'Cisco IOS: SNMP walk fans'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.4.1.2,1.3.6.1.4.1.9.9.13.1.4.1.3]'
+          key: sensor.fans.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering system fans.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: cdb1b03725624ea18071a197b7e7f21e
+          name: 'Cisco IOS: SNMP walk PSUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.5.1.2,1.3.6.1.4.1.9.9.13.1.5.1.3]'
+          key: sensor.psu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The table of power supply status maintained by the environmental monitor card.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 9620c1de761246e1806fda680ede7bba
+          name: 'Cisco IOS: SNMP walk temperature sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          key: sensor.temp.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status maintained by the environmental monitor.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 53eb0288c9e54490942cedd4ce5f376e
           name: 'Cisco IOS: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -2204,6 +2578,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 3b92777596e2442991618e5feb47567c
+          name: 'Cisco IOS: SNMP walk entity serial numbers'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.47.1.1.1.1.5,1.3.6.1.2.1.47.1.1.1.1.7,1.3.6.1.2.1.47.1.1.1.1.11]'
+          key: system.hw.serialnumber.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: ENTITY-MIB
+            Entity Serial Numbers Discovery.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 732ccfd809b44d7fa923c54e6577851d
           name: 'Cisco IOS: Uptime (hardware)'
           type: SNMP_AGENT
@@ -2354,6 +2742,21 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 011212452fb0421aa913ceee4f59d17b
+          name: 'Cisco IOS: SNMP walk memory'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.48.1.1.1.2,1.3.6.1.4.1.9.9.48.1.1.1.5,1.3.6.1.4.1.9.9.48.1.1.1.6]'
+          key: vm.memory.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: CISCO-MEMORY-POOL-MIB
+            Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+            http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 5a156e9ca10c49bbb87cf3de1b686cff
           name: 'Cisco IOS: SNMP agent availability'
           type: INTERNAL
@@ -2388,10 +2791,9 @@ zabbix_export:
       discovery_rules:
         - uuid: fbeef9c16d9d45b7a5c50f530a697f76
           name: 'Entity Serial Numbers Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]'
+          type: DEPENDENT
           key: entity_sn.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -2404,18 +2806,23 @@ zabbix_export:
           item_prototypes:
             - uuid: 1993495d289d407e85c24f4986819ab8
               name: '{#ENT_NAME}: Hardware serial number'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
-              delay: 1h
+              delay: 0s
               history: 2w
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: system.hw.serialnumber.walk
               tags:
                 - tag: component
                   value: system
@@ -2430,25 +2837,50 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+          master_item:
+            key: system.hw.serialnumber.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#ENT_CLASS}'
+                - 1.3.6.1.2.1.47.1.1.1.1.5
+                - '0'
+                - '{#ENT_NAME}'
+                - 1.3.6.1.2.1.47.1.1.1.1.7
+                - '0'
+                - '{#ENT_SN}'
+                - 1.3.6.1.2.1.47.1.1.1.1.11
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 109cd000cd044e4096bf98dbf57b72d1
           name: 'FAN Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.4.1.2]'
+          type: DEPENDENT
           key: fan.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of fan status maintained by the environmental monitor.'
           item_prototypes:
             - uuid: 7008cccccf2647918bce95bb0a6193df
               name: '{#SENSOR_INFO}: Fan status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.fans.walk
               tags:
                 - tag: component
                   value: fan
@@ -2478,41 +2910,66 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.fans.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.4.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 727adcf658d141ff9e45744107a58c38
           name: 'Memory Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]'
+          type: DEPENDENT
           key: memory.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
             http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
           item_prototypes:
             - uuid: e0df9d6e31384da4af18ab191e467814
               name: '{#SNMPVALUE}: Free memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
             - uuid: 25471f4acc4348bf978792fcfaff6acc
               name: '{#SNMPVALUE}: Used memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
@@ -2551,25 +3008,44 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS prior to 12.0_3_T by SNMP'
                     key: 'vm.memory.util[vm.memory.util.{#SNMPINDEX}]'
+          master_item:
+            key: vm.memory.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.48.1.1.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 5e67e9c84ac54dea866893207a42d3e3
           name: 'PSU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.5.1.2]'
+          type: DEPENDENT
           key: psu.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of power supply status maintained by the environmental monitor card.'
           item_prototypes:
             - uuid: d05d99a68e3540d09d64b8bab5d63004
               name: '{#SENSOR_INFO}: Power supply status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.psu.walk
               tags:
                 - tag: component
                   value: power
@@ -2599,22 +3075,32 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.psu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.5.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 73d10f48886443248f7d2d9167fcfee5
           name: 'Temperature Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]'
+          type: DEPENDENT
           key: temperature.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
             maintained by the environmental monitor.
           item_prototypes:
             - uuid: a12075ae5b834eeeb742fed6f7afc39d
               name: '{#SNMPVALUE}: Temperature status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: |
@@ -2622,20 +3108,39 @@ zabbix_export:
                 The current state of the test point being instrumented.
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
             - uuid: ea0d56dd49104257ba6c14ce3bdb753a
               name: '{#SNMPVALUE}: Temperature'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               value_type: FLOAT
               units: °C
               description: |
                 MIB: CISCO-ENVMON-MIB
                 The current measurement of the test point being instrumented.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
@@ -2699,6 +3204,18 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+          master_item:
+            key: sensor.temp.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: network
@@ -2880,6 +3397,54 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: cb44245cd4224bbdaa8c5546ad483848
+          name: 'Cisco IOS: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
+          key: net.if.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: fa5166db7ce14744817cf098c4be46f7
+          name: 'Cisco IOS: SNMP walk fans'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.4.1.2,1.3.6.1.4.1.9.9.13.1.4.1.3]'
+          key: sensor.fans.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering system fans.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 2c7987c8fb2748978fd9f3f84b5c96d5
+          name: 'Cisco IOS: SNMP walk PSUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.5.1.2,1.3.6.1.4.1.9.9.13.1.5.1.3]'
+          key: sensor.psu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'The table of power supply status maintained by the environmental monitor card.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 7568839f76854edca01234fb707e1558
+          name: 'Cisco IOS: SNMP walk temperature sensors'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.13.1.3.1.2,1.3.6.1.4.1.9.9.13.1.3.1.3,1.3.6.1.4.1.9.9.13.1.3.1.6]'
+          key: sensor.temp.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status maintained by the environmental monitor.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 0f50837172ad475d9d5a27c95be19ab2
           name: 'Cisco IOS: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -2913,6 +3478,23 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: d188b4d086734f438c3752bb3d9b1971
+          name: 'Cisco IOS: SNMP walk system CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.109.1.1.1.1.5]'
+          key: system.cpu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
+            indexed with cpmCPUTotalIndex.
+            This table allows CISCO-PROCESS-MIB to keep CPU statistics for different physical entities in the router,
+            like different CPU chips, group of CPUs, or CPUs in different modules/cards.
+            In case of a single CPU, cpmCPUTotalTable has only one entry.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 5a37d2e4f308475c932a6bb856d0ffb4
           name: 'Cisco IOS: System description'
           type: SNMP_AGENT
@@ -2981,6 +3563,20 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 79968a2e878c45c290f79902e9e1cf37
+          name: 'Cisco IOS: SNMP walk entity serial numbers'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.47.1.1.1.1.5,1.3.6.1.2.1.47.1.1.1.1.7,1.3.6.1.2.1.47.1.1.1.1.11]'
+          key: system.hw.serialnumber.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: ENTITY-MIB
+            Entity Serial Numbers Discovery.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 927d85dbb82f4b9a9edf4fb6194e7427
           name: 'Cisco IOS: Uptime (hardware)'
           type: SNMP_AGENT
@@ -3131,6 +3727,21 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: fe26641865204720a592be13d4793c99
+          name: 'Cisco IOS: SNMP walk memory'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.9.9.48.1.1.1.2,1.3.6.1.4.1.9.9.48.1.1.1.5,1.3.6.1.4.1.9.9.48.1.1.1.6]'
+          key: vm.memory.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: CISCO-MEMORY-POOL-MIB
+            Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
+            http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html.
+          tags:
+            - tag: component
+              value: raw
         - uuid: 92fa54c5c28b4244b0d22c9041064d15
           name: 'Cisco IOS: SNMP agent availability'
           type: INTERNAL
@@ -3165,10 +3776,9 @@ zabbix_export:
       discovery_rules:
         - uuid: 1d8d76707b1049cabfda668257c257b6
           name: 'CPU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.109.1.1.1.1.5]'
+          type: DEPENDENT
           key: cpu.discovery
-          delay: 1h
+          delay: '0'
           description: |
             If your IOS device has several CPUs, you must use CISCO-PROCESS-MIB and its object cpmCPUTotal5minRev from the table called cpmCPUTotalTable,
             indexed with cpmCPUTotalIndex.
@@ -3178,10 +3788,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 2f6285386ed54cd99d7aaf41e6f3e891
               name: '{#SNMPVALUE}: CPU utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]'
-              delay: 5m
+              delay: 0s
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -3193,6 +3802,16 @@ zabbix_export:
                 by cpmCPUTotal5minRev which has the changed range
                 of value (0..100).
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15215-collect-cpu-util-snmp.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.109.1.1.1.1.5.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 5m
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
@@ -3218,12 +3837,22 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP'
                     key: 'system.cpu.util[cpmCPUTotal5min.{#SNMPINDEX}]'
+          master_item:
+            key: system.cpu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.109.1.1.1.1.5
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: afafbf551dc242e8a85dbb12ba1aa067
           name: 'Entity Serial Numbers Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#ENT_CLASS},1.3.6.1.2.1.47.1.1.1.1.5,{#ENT_NAME},1.3.6.1.2.1.47.1.1.1.1.7,{#ENT_SN},1.3.6.1.2.1.47.1.1.1.1.11]'
+          type: DEPENDENT
           key: entity_sn.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -3236,18 +3865,23 @@ zabbix_export:
           item_prototypes:
             - uuid: 88f4929957f5485f974bdc1bafde68d7
               name: '{#ENT_NAME}: Hardware serial number'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'system.hw.serialnumber[entPhysicalSerialNum.{#SNMPINDEX}]'
-              delay: 1h
+              delay: 0s
               history: 2w
               trends: '0'
               value_type: CHAR
               description: 'MIB: ENTITY-MIB'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.47.1.1.1.1.11.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: system.hw.serialnumber.walk
               tags:
                 - tag: component
                   value: system
@@ -3262,25 +3896,50 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: notice
+          master_item:
+            key: system.hw.serialnumber.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#ENT_CLASS}'
+                - 1.3.6.1.2.1.47.1.1.1.1.5
+                - '0'
+                - '{#ENT_NAME}'
+                - 1.3.6.1.2.1.47.1.1.1.1.7
+                - '0'
+                - '{#ENT_SN}'
+                - 1.3.6.1.2.1.47.1.1.1.1.11
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 0906581023f54a0b95102288e8ed4714
           name: 'FAN Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.4.1.2]'
+          type: DEPENDENT
           key: fan.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of fan status maintained by the environmental monitor.'
           item_prototypes:
             - uuid: b1e82af988c14dce81fcbd549fe4ece6
               name: '{#SENSOR_INFO}: Fan status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.fan.status[ciscoEnvMonFanState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.4.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.fans.walk
               tags:
                 - tag: component
                   value: fan
@@ -3310,41 +3969,66 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.fans.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.4.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 4831ae0d8acc47e7bb9c3a4a94678472
           name: 'Memory Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.48.1.1.1.2]'
+          type: DEPENDENT
           key: memory.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoMemoryPoolTable, a table of memory pool monitoring entries.
             http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
           item_prototypes:
             - uuid: e9876af72ead4cc7814f8c54801de7ee
               name: '{#SNMPVALUE}: Free memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.free[ciscoMemoryPoolFree.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently unused on the managed device. Note that the sum of ciscoMemoryPoolUsed and ciscoMemoryPoolFree is the total amount of memory in the pool
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
             - uuid: 260d3d59256040fd808d5d4c6a549d07
               name: '{#SNMPVALUE}: Used memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vm.memory.used[ciscoMemoryPoolUsed.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: CISCO-MEMORY-POOL-MIB
                 Indicates the number of bytes from the memory pool that are currently in use by applications on the managed device.
                 Reference: http://www.cisco.com/c/en/us/support/docs/ip/simple-network-management-protocol-snmp/15216-contiguous-memory.html
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.48.1.1.1.5.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vm.memory.walk
               tags:
                 - tag: component
                   value: memory
@@ -3383,12 +4067,22 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP'
                     key: 'vm.memory.util[vm.memory.util.{#SNMPINDEX}]'
+          master_item:
+            key: vm.memory.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.48.1.1.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 328da4bee6ea49aa8809cdbb74744263
           name: 'Network interfaces discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: net.if.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -3438,10 +4132,9 @@ zabbix_export:
           item_prototypes:
             - uuid: db98684d85c644f28190544d534c1b09
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -3451,9 +4144,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3463,18 +4165,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: a2c7793712e549cbad6e37da30754b58
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3484,22 +4194,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: a77450c8292a483b86e72156af6e7ec7
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3509,10 +4224,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 33e86cf0c2374d0d932a8e3c9b6ebf1a
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -3522,9 +4236,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3534,18 +4257,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 6960110871dd40f89f344ab90cdb03f9
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3555,22 +4286,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: fe427d3bbef7420880906cc52c07c706
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3580,10 +4316,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: c03404b9c68749b3bef5de34a8815cce
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
-              delay: 5m
+              delay: '0'
               history: 7d
               trends: '0'
               units: bps
@@ -3591,12 +4326,18 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3606,9 +4347,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: ec072a91a34244d5ba434f592e9cb72d
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -3622,6 +4363,13 @@ zabbix_export:
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3650,10 +4398,9 @@ zabbix_export:
                       value: availability
             - uuid: 6dec04a0c0fc453ebc103e28daea731d
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: 1h
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -3664,9 +4411,15 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -3788,25 +4541,59 @@ zabbix_export:
                   item:
                     host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 09264b1af69a4a4595ba2e4539106d6f
           name: 'PSU Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SENSOR_INFO},1.3.6.1.4.1.9.9.13.1.5.1.2]'
+          type: DEPENDENT
           key: psu.discovery
-          delay: 1h
+          delay: '0'
           description: 'The table of power supply status maintained by the environmental monitor card.'
           item_prototypes:
             - uuid: 86973dc8030e463fb51b075e161ae8a3
               name: '{#SENSOR_INFO}: Power supply status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.psu.status[ciscoEnvMonSupplyState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: 'MIB: CISCO-ENVMON-MIB'
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.5.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.psu.walk
               tags:
                 - tag: component
                   value: power
@@ -3836,22 +4623,32 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+          master_item:
+            key: sensor.psu.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SENSOR_INFO}'
+                - 1.3.6.1.4.1.9.9.13.1.5.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: eb482b3a03b74dc494632be0728f953b
           name: 'Temperature Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.9.9.13.1.3.1.2]'
+          type: DEPENDENT
           key: temperature.discovery
-          delay: 1h
+          delay: '0'
           description: |
             Discovery of ciscoEnvMonTemperatureTable (ciscoEnvMonTemperatureDescr), a table of ambient temperature status
             maintained by the environmental monitor.
           item_prototypes:
             - uuid: 14f46d8210164b6596dc6bf0c343db3b
               name: '{#SNMPVALUE}: Temperature status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.status[ciscoEnvMonTemperatureState.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               history: 2w
               trends: '0'
               description: |
@@ -3859,20 +4656,39 @@ zabbix_export:
                 The current state of the test point being instrumented.
               valuemap:
                 name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.6.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
             - uuid: 7c68ab13b881467e863b28776c0da571
               name: '{#SNMPVALUE}: Temperature'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'sensor.temp.value[ciscoEnvMonTemperatureValue.{#SNMPINDEX}]'
-              delay: 3m
+              delay: 0s
               value_type: FLOAT
               units: °C
               description: |
                 MIB: CISCO-ENVMON-MIB
                 The current measurement of the test point being instrumented.
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.9.9.13.1.3.1.3.{#SNMPINDEX}'
+                    - '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: sensor.temp.walk
               tags:
                 - tag: component
                   value: temperature
@@ -3936,6 +4752,18 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+          master_item:
+            key: sensor.temp.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.4.1.9.9.13.1.3.1.2
+                - '0'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: network
