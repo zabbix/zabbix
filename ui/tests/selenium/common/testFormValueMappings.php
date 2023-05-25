@@ -126,21 +126,21 @@ class testFormValueMappings extends CWebTest {
 	}
 
 	/**
-	 * Function that create clone and full clone of a host/template and verifies that value mappings were copied.
+	 * Creates a clone of a host/template and verifies that value mappings were copied.
 	 *
 	 * @param string $source	Entity (host or template) for which the scenario is executed.
 	 */
-	public function checkClone($source, $action = 'Clone') {
-		// Create a clone and or a full clone of an existing host/template with value mappings.
+	public function checkClone($source) {
+		// Create a clone of an existing host/template with value mappings.
 		$form = $this->openValueMappingTab($source, true, false);
-		$this->query('button', $action)->one()->click();
-		$form->getField(ucfirst($source).' name')->fill($action.' Valuemap Test');
+		$this->query('button', 'Clone')->one()->click();
+		$form->getField(ucfirst($source).' name')->fill('Clone Valuemap Test');
 		$form->submit();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD);
 
 		// Get the id of the created host/template clone.
-		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr($action.' Valuemap Test'));
+		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE name='.zbx_dbstr('Clone Valuemap Test'));
 
 		// Check value mappings were copied correctly.
 		if ($source === 'host') {

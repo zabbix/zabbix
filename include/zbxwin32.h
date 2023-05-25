@@ -107,7 +107,10 @@ DWORD		zbx_get_builtin_object_index(zbx_builtin_counter_ref_t counter_ref);
 DWORD		zbx_get_builtin_counter_index(zbx_builtin_counter_ref_t counter_ref);
 wchar_t		*zbx_get_all_counter_names(HKEY reg_key, wchar_t *reg_value_name);
 
-int		zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep);
+LONG		zbx_win_seh_handler(struct _EXCEPTION_POINTERS *ep);
+#ifdef _M_X64
+LONG		zbx_win_veh_handler(struct _EXCEPTION_POINTERS *ep);
+#endif /* _M_X64 */
 
 /* symbols */
 
@@ -118,11 +121,18 @@ typedef enum {
 	zbx_FileIdInfo		= 18
 } zbx_file_info_by_handle_class_t;
 
-extern DWORD	(__stdcall *zbx_GetGuiResources)(HANDLE, DWORD);
-extern BOOL	(__stdcall *zbx_GetProcessIoCounters)(HANDLE, PIO_COUNTERS);
-extern BOOL	(__stdcall *zbx_GetPerformanceInfo)(PPERFORMANCE_INFORMATION, DWORD);
-extern BOOL	(__stdcall *zbx_GlobalMemoryStatusEx)(LPMEMORYSTATUSEX);
-extern BOOL	(__stdcall *zbx_GetFileInformationByHandleEx)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+
+typedef DWORD	(__stdcall *GetGuiResources_t)(HANDLE, DWORD);
+typedef BOOL	(__stdcall *GetProcessIoCounters_t)(HANDLE, PIO_COUNTERS);
+typedef BOOL	(__stdcall *GetPerformanceInfo_t)(PPERFORMANCE_INFORMATION, DWORD);
+typedef BOOL	(__stdcall *GlobalMemoryStatusEx_t)(LPMEMORYSTATUSEX);
+typedef BOOL	(__stdcall *GetFileInformationByHandleEx_t)(HANDLE, zbx_file_info_by_handle_class_t, LPVOID, DWORD);
+
+GetGuiResources_t		zbx_get_GetGuiResources(void);
+GetProcessIoCounters_t		zbx_get_GetProcessIoCounters(void);
+GetPerformanceInfo_t		zbx_get_GetPerformanceInfo(void);
+GlobalMemoryStatusEx_t		zbx_get_GlobalMemoryStatusEx(void);
+GetFileInformationByHandleEx_t	zbx_get_GetFileInformationByHandleEx(void);
 
 void	zbx_import_symbols(void);
 

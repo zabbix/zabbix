@@ -94,6 +94,7 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 	const char	**location;
 	char		path[MAX_STRING_LEN], buf[ATTR_MAX], *p;
 	FILE		*f;
+	size_t		l;
 
 	for (location = locations; NULL != *location; location++)
 	{
@@ -108,7 +109,8 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 				break;
 
 			/* Last byte is a '\n'; chop that off */
-			buf[strlen(buf) - 1] = '\0';
+			l = strlen(buf);
+			buf[l - 1] = '\0';
 
 			if (NULL != attribute)
 				*attribute = zbx_strdup(*attribute, buf);

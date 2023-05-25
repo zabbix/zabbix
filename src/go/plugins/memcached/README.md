@@ -33,7 +33,6 @@ The Zabbix Agent's configuration file is used to configure plugins.
 A connection can be configured using either keys' parameters or named sessions.     
 
 *Notes*:  
-* It is not possible to mix configuration using named sessions and keys' parameters simultaneously.
 * You can leave any connection parameter empty, a default hard-coded value will be used in the such case.
 * Embedded URI credentials (userinfo) are forbidden and will be ignored. So, you can't pass the credentials by this:   
   

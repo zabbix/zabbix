@@ -26,7 +26,6 @@ use Zabbix\Widgets\CWidgetField;
 class CWidgetFieldUrl extends CWidgetField {
 
 	public const DEFAULT_VALUE = '';
-	public const MAX_LENGTH = 2048;
 
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
@@ -34,7 +33,11 @@ class CWidgetFieldUrl extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_URL, 'flags' => API_ALLOW_USER_MACRO]);
+			->setValidationRules([
+				'type' => API_URL,
+				'flags' => API_ALLOW_USER_MACRO,
+				'length' => $this->max_length
+			]);
 	}
 
 	public function setFlags(int $flags): self {

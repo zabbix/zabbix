@@ -590,12 +590,11 @@ class testFormTags extends CWebTest {
 	 * Test cloning of host, template, item, trigger or prototype with tags
 	 *
 	 * @param string   $object   host, template, item, trigger or prototype
-	 * @param string   $action   clone or full clone
 	 */
-	public function executeCloning($object, $action) {
+	public function executeCloning($object) {
 		$new_name = (strpos($object, 'prototype') !== false)
-			? 'Tags - '.$action.' '.$object.' {#KEY}'
-			: '1Tags - '.$action.' '.$object;
+			? 'Tags - Clone '.$object.' {#KEY}'
+			: '1Tags - Clone '.$object;
 
 		$this->page->login()->open($this->link);
 
@@ -669,8 +668,8 @@ class testFormTags extends CWebTest {
 		$element = $this->query($tags_table)->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
-		// Click Clone or Full Clone button.
-		$this->query('button', $action)->one()->click();
+		// Click Clone button.
+		$this->query('button', 'Clone')->one()->click();
 		$this->page->waitUntilReady();
 
 		if ($object === 'discovered host') {
@@ -821,13 +820,13 @@ class testFormTags extends CWebTest {
 	}
 
 	/**
-	 * Test full cloning of host or template with trigger, item, web scenario or prototype that have tags.
+	 * Test cloning of host or template with trigger, item, web scenario or prototype that have tags.
 	 *
 	 * @param string   $object   item, trigger, web scenario or prototype
 	 * @param string   $parent   host or template
 	 */
-	public function executeFullCloning($object, $parent) {
-		$new_name = '1Tags - full cloning of '.$parent.' with '.$object;
+	public function executeCloningByParent($object, $parent) {
+		$new_name = '1Tags - cloning of '.$parent.' with '.$object;
 		$this->page->login()->open($this->link);
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
 
@@ -863,14 +862,14 @@ class testFormTags extends CWebTest {
 		$element = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags = $element->getValue();
 
-		// Navigate to host or template for full cloning.
+		// Navigate to host or template for cloning.
 		$this->query('link', ($parent === 'Host') ? $this->host : $this->template)->waitUntilClickable()->one()->click();
-		$host_form = ($object !== 'host prototype' && $parent !== 'Template')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilReady()
+		$host_modal = ($object !== 'host prototype' && $parent !== 'Template')
+			? COverlayDialogElement::find()->one()->waitUntilReady()
 			: $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()->waitUntilPresent()->one();
 
-		$host_form->fill([$parent.' name' => $new_name]);
-		$this->query('button:Full clone')->one()->click();
+		$host_modal->asForm()->fill([$parent.' name' => $new_name]);
+		$host_modal->query('button:Clone')->one()->click();
 		$this->query('xpath://div[@class="overlay-dialogue-footer" or contains(@class, "tfoot-buttons")]//button[text()="Add"]')
 				->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();

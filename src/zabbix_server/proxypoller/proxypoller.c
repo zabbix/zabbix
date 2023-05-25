@@ -40,7 +40,8 @@
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
-static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int timeout)
+static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int timeout,
+		const char *config_source_ip)
 {
 	int		ret = FAIL;
 	const char	*tls_arg1, *tls_arg2;
@@ -77,7 +78,7 @@ static int	connect_to_proxy(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, int
 			goto out;
 	}
 
-	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout,
+	if (FAIL == (ret = zbx_tcp_connect(sock, config_source_ip, proxy->addr, proxy->port, timeout,
 			proxy->tls_connect, tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
@@ -136,26 +137,27 @@ static void	disconnect_proxy(zbx_socket_t *sock)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: get historical data from proxy                                    *
- *                                                                            *
- * Parameters: proxy          - [IN/OUT] proxy data                           *
- *             request        - [IN] requested data type                      *
- *             config_timeout - [IN]                                          *
- *             data           - [OUT] data received from proxy                *
- *             ts             - [OUT] timestamp when the proxy connection was *
- *                                    established                             *
- *                                                                            *
- * Return value: SUCCESS - processed successfully                             *
- *               other code - an error occurred                               *
- *                                                                            *
- * Comments: The proxy->compress property is updated depending on the         *
- *           protocol flags sent by proxy.                                    *
- *                                                                            *
- ******************************************************************************/
-static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int config_timeout, char **data,
-		zbx_timespec_t *ts)
+/********************************************************************************
+ *                                                                              *
+ * Purpose: get historical data from proxy                                      *
+ *                                                                              *
+ * Parameters: proxy            - [IN/OUT] proxy data                           *
+ *             request          - [IN] requested data type                      *
+ *             config_timeout   - [IN]                                          *
+ *             config_source_ip - [IN]                                          *
+ *             data             - [OUT] data received from proxy                *
+ *             ts               - [OUT] timestamp when the proxy connection was *
+ *                                    established                               *
+ *                                                                              *
+ * Return value: SUCCESS - processed successfully                               *
+ *               other code - an error occurred                                 *
+ *                                                                              *
+ * Comments: The proxy->compress property is updated depending on the           *
+ *           protocol flags sent by proxy.                                      *
+ *                                                                              *
+ ********************************************************************************/
+static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int config_timeout,
+		const char *config_source_ip, char **data, zbx_timespec_t *ts)
 {
 	zbx_socket_t	s;
 	struct zbx_json	j;
@@ -183,7 +185,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 	}
 
-	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+	if (SUCCEED == (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT, config_source_ip)))
 	{
 		/* get connection timestamp if required */
 		if (NULL != ts)
@@ -224,7 +226,7 @@ static int	get_data_from_proxy(zbx_dc_proxy_t *proxy, const char *request, int c
 				else
 				{
 					ret = zbx_send_proxy_data_response(proxy, &s, NULL, SUCCEED,
-							ZBX_PROXY_UPLOAD_UNDEFINED);
+							ZBX_PROXY_UPLOAD_UNDEFINED, 0);
 
 					if (SUCCEED == ret)
 						*data = zbx_strdup(*data, s.buffer);
@@ -247,8 +249,9 @@ out:
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy        - [IN/OUT] proxy data                             *
- *             config_vault - [IN]                                            *
+ * Parameters: proxy            - [IN/OUT] proxy data                         *
+ *             config_vault     - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *
@@ -257,7 +260,8 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault)
+static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL, loglevel;
@@ -271,7 +275,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
 
-	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT)))
+	if (SUCCEED != (ret = connect_to_proxy(proxy, &s, CONFIG_TRAPPER_TIMEOUT, config_source_ip)))
 		goto out;
 
 	if (SUCCEED != (ret = send_data_to_proxy(proxy, &s, j.buffer, j.buffer_size, reserved, ZBX_TCP_PROTOCOL)))
@@ -293,7 +297,8 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 
 	zbx_json_clean(&j);
 
-	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, &error)))
+	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
+			&error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->host, error);
@@ -451,6 +456,7 @@ out:
  *             config_timeout      - [IN]                                     *
  *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
+ *             config_source_ip    - [IN]                                     *
  *             more                - [OUT] available data flag                *
  *                                                                            *
  * Return value: SUCCEED - data were received and processed successfully      *
@@ -461,7 +467,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs,
-		int proxydata_frequency, int *more)
+		int proxydata_frequency, const char *config_source_ip, int *more)
 {
 	char		*answer = NULL;
 	int		ret;
@@ -469,8 +475,11 @@ static int	proxy_get_data(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_e
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, config_timeout, &answer, &ts)))
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_DATA, config_timeout, config_source_ip,
+			&answer, &ts)))
+	{
 		goto out;
+	}
 
 	/* handle pre 3.4 proxies that did not support proxy data request and active/passive configuration mismatch */
 	if ('\0' == *answer)
@@ -500,6 +509,7 @@ out:
  *                                                                            *
  * Parameters: proxy               - [IN/OUT] proxy data                      *
  *             config_timeout      - [IN]                                     *
+ *             config_source_ip    - [IN]                                     *
  *             events_cbs          - [IN]                                     *
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *
@@ -510,8 +520,8 @@ out:
  *           properties.                                                      *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_events_funcs_t *events_cbs,
-		int proxydata_frequency)
+static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const char *config_source_ip,
+		const zbx_events_funcs_t *events_cbs, int proxydata_frequency)
 {
 	char		*answer = NULL;
 	int		ret = FAIL, more;
@@ -519,8 +529,11 @@ static int	proxy_get_tasks(zbx_dc_proxy_t *proxy, int config_timeout, const zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, config_timeout, &answer, &ts)))
+	if (SUCCEED != (ret = get_data_from_proxy(proxy, ZBX_PROTO_VALUE_PROXY_TASKS, config_timeout, config_source_ip,
+			&answer, &ts)))
+	{
 		goto out;
+	}
 
 	/* handle pre 3.4 proxies that did not support proxy data request and active/passive configuration mismatch */
 	if ('\0' == *answer)
@@ -548,7 +561,7 @@ out:
  * Purpose: retrieve values of metrics from monitored hosts                   *
  *                                                                            *
  ******************************************************************************/
-static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout,
+static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout, const char *config_source_ip,
 		const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency, int proxydata_frequency)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
@@ -603,7 +616,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			if (proxy.proxy_config_nextcheck <= now && proxy.compatibility == ZBX_PROXY_VERSION_CURRENT)
 			{
-				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault)))
+				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault, config_source_ip)))
 					goto error;
 			}
 
@@ -621,7 +634,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 						break;
 
 					if (SUCCEED != (ret = proxy_get_data(&proxy, config_timeout, events_cbs,
-							proxydata_frequency, &more)))
+							proxydata_frequency, config_source_ip, &more)))
 					{
 						goto error;
 					}
@@ -633,8 +646,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 
 			if (1 == check_tasks)
 			{
-				if (SUCCEED != (ret = proxy_get_tasks(&proxy, config_timeout, events_cbs,
-						proxydata_frequency)))
+				if (SUCCEED != (ret = proxy_get_tasks(&proxy, config_timeout, config_source_ip,
+						events_cbs, proxydata_frequency)))
 				{
 					goto error;
 				}
@@ -671,6 +684,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_PROXYPOLLER_PROCESS};
 
 	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
@@ -690,7 +704,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	zbx_rtc_subscribe(process_type, process_num, proxy_poller_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxy_poller_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -708,8 +723,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		}
 
 		processed += process_proxy(proxy_poller_args_in->config_vault, proxy_poller_args_in->config_timeout,
-				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
-				proxy_poller_args_in->proxydata_frequency);
+				proxy_poller_args_in->config_source_ip, proxy_poller_args_in->events_cbs,
+				proxy_poller_args_in->proxyconfig_frequency, proxy_poller_args_in->proxydata_frequency);
 		total_sec += zbx_time() - sec;
 
 		nextcheck = zbx_dc_config_get_proxypoller_nextcheck();

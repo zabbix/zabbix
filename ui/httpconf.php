@@ -439,7 +439,12 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
 	}
-	show_messages($result, _('Web scenario deleted'), _('Cannot delete web scenario'));
+
+	$web_scenarios_count = count(getRequest('group_httptestid'));
+	$messageSuccess = _n('Web scenario deleted', 'Web scenarios deleted', $web_scenarios_count);
+	$messageFailed = _n('Cannot delete web scenario', 'Cannot delete web scenarios', $web_scenarios_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('group_httptestid') && !$result) {

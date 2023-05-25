@@ -88,7 +88,7 @@ $override_evaltype = (new CDiv([
 				DB::getFieldLength('lld_override', 'formula')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('overrides_formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+			->setAttribute('placeholder', 'A or (B and C) ...')
 	]))
 		->addClass(ZBX_STYLE_CELL)
 		->addClass(ZBX_STYLE_CELL_EXPRESSION)

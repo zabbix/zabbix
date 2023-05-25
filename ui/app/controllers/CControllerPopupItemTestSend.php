@@ -101,7 +101,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value'					=> 'string',
-			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]),
+			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
 			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',
@@ -218,6 +218,35 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					elseif ($tokens && $tokens[0]['sign'] !== '-') {
 						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
 							_('should be less than current time')
+						));
+					}
+				}
+			}
+
+			if ($this->item_type == ITEM_TYPE_CALCULATED) {
+				$expression_parser = new CExpressionParser([
+					'usermacros' => true,
+					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'calculated' => true,
+					'host_macro' => true,
+					'empty_host' => true
+				]);
+
+				if ($expression_parser->parse($this->getInput('params_f')) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+						$expression_parser->getError()
+					));
+				}
+				else {
+					$expression_validator = new CExpressionValidator([
+						'usermacros' => true,
+						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'calculated' => true
+					]);
+
+					if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+							$expression_validator->getError()
 						));
 					}
 				}

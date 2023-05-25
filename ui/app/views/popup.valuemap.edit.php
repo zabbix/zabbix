@@ -68,9 +68,7 @@ $mappings->addItem(
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->addItem((new CRow([
-			(new CCol(
-				(new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)
-			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSelect('mappings[#{index}][type]'))
 				->setValue('#{type}')
 				->addOptions(CSelect::createOptionsFromArray([
@@ -83,7 +81,7 @@ $mappings->addItem(
 				])),
 			(new CTextBox('mappings[#{index}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'&rArr;',
+			RARR(),
 			(new CTextBox('mappings[#{index}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),

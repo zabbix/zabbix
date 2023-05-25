@@ -221,10 +221,10 @@ foreach ($data['discoveries'] as $discovery) {
 
 	if ($discovery['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($discovery['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($discovery['master_item']['name']);
+			$description[] = $discovery['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($discovery['master_item']['name']),
+			$description[] = (new CLink($discovery['master_item']['name'],
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])
@@ -239,7 +239,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$description[] = new CLink(
-		CHtml::encode($discovery['name']),
+		$discovery['name'],
 		(new CUrl('host_discovery.php'))
 			->setArgument('form', 'update')
 			->setArgument('itemid', $discovery['itemid'])
@@ -328,7 +328,7 @@ foreach ($data['discoveries'] as $discovery) {
 				CViewHelper::showNum($discovery['hostPrototypes'])
 			]
 			: '',
-		(new CDiv(CHtml::encode($discovery['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($discovery['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$discovery['delay'],
 		item_type2str($discovery['type']),
 		$status,
@@ -337,10 +337,16 @@ foreach ($data['discoveries'] as $discovery) {
 }
 
 $button_list = [
-	'discoveryrule.massenable' => ['name' => _('Enable'), 'confirm' =>_('Enable selected discovery rules?'),
+	'discoveryrule.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected discovery rule?'),
+		'confirm_plural' => _('Enable selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	],
-	'discoveryrule.massdisable' => ['name' => _('Disable'), 'confirm' =>_('Disable selected discovery rules?'),
+	'discoveryrule.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected discovery rule?'),
+		'confirm_plural' => _('Disable selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -358,7 +364,10 @@ if ($data['context'] === 'host') {
 }
 
 $button_list += [
-	'discoveryrule.massdelete' => ['name' => _('Delete'), 'confirm' =>_('Delete selected discovery rules?'),
+	'discoveryrule.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected discovery rule?'),
+		'confirm_plural' => _('Delete selected discovery rules?'),
 		'csrf_token' => $csrf_token
 	]
 ];

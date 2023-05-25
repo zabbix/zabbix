@@ -233,7 +233,7 @@ out:
  * Purpose: parse a ServerActive element like "IP<:port>" or "[IPv6]<:port>"  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_parse_serveractive_element(char *str, char **host, unsigned short *port, unsigned short port_default)
+int	zbx_parse_serveractive_element(const char *str, char **host, unsigned short *port, unsigned short port_default)
 {
 #ifdef HAVE_IPV6
 	char	*r1 = NULL;

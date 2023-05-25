@@ -257,7 +257,7 @@ function actionConditionValueToString(array $actions) {
 
 	if ($dCheckIds) {
 		$dChecks = API::DCheck()->get([
-			'output' => ['type', 'key_', 'ports'],
+			'output' => ['type', 'key_', 'ports', 'allow_redirect'],
 			'dcheckids' => $dCheckIds,
 			'selectDRules' => ['name'],
 			'preservekeys' => true
@@ -321,8 +321,9 @@ function actionConditionValueToString(array $actions) {
 							$type = $dChecks[$id]['type'];
 							$key_ = $dChecks[$id]['key_'];
 							$ports = $dChecks[$id]['ports'];
+							$allow_redirect = $dChecks[$id]['allow_redirect'];
 
-							$dCheck = discovery_check2str($type, $key_, $ports);
+							$dCheck = discovery_check2str($type, $key_, $ports, $allow_redirect);
 
 							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
@@ -348,7 +349,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
 		$description = [_('Value of tag')];
 		$description[] = ' ';
-		$description[] = italic(CHtml::encode($value2));
+		$description[] = italic($value2);
 		$description[] = ' ';
 	}
 	elseif ($condition_type == CONDITION_TYPE_SUPPRESSED) {
@@ -366,7 +367,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 
 	$description[] = condition_operator2str($operator);
 	$description[] = ' ';
-	$description[] = italic(CHtml::encode($value));
+	$description[] = italic($value);
 
 	return $description;
 }
@@ -1646,7 +1647,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
 			makeActionTableUser($severity, $users),
-			$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name
+			[$old_severity_name, NBSP(), RARR(), NBSP(), $new_severity_name]
 		]);
 	}
 
@@ -1981,7 +1982,7 @@ function makeActionTableIcon(array $action): ?CTag {
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
 
 				$action_icons[] = $button->setHint(
-					$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL// TODO fix to NBSP()
+					[$old_severity_name, NBSP(), RARR(), NBSP(), $new_severity_name], ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL
 				);
 			}
 

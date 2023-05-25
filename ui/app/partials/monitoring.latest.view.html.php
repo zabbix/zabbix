@@ -145,12 +145,18 @@ foreach ($data['items'] as $itemid => $item) {
 			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_history['clock']), '', true, '', 0);
 
-		$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
-			->addClass(ZBX_STYLE_CURSOR_POINTER)
-			->setHint(
-				(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))->addClass(ZBX_STYLE_HINTBOX_WRAP),
-				'', true, '', 0
-			);
+		if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			$last_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
+				->addClass(ZBX_STYLE_CURSOR_POINTER)
+				->setHint(
+					(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						->addClass(ZBX_STYLE_HINTBOX_WRAP),
+					'', true, '', 0
+				);
+		}
 
 		$change = '';
 

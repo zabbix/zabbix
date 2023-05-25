@@ -39,24 +39,24 @@ int     vm_memory_size(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL != mode && 0 == strcmp(mode, "cached"))
 	{
-		if (NULL == zbx_GetPerformanceInfo)
+		if (NULL == zbx_get_GetPerformanceInfo())
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 			return SYSINFO_RET_FAIL;
 		}
 
-		zbx_GetPerformanceInfo(&pfi, sizeof(PERFORMANCE_INFORMATION));
+		(*zbx_get_GetPerformanceInfo())(&pfi, sizeof(PERFORMANCE_INFORMATION));
 
 		SET_UI64_RESULT(result, (zbx_uint64_t)pfi.SystemCache * pfi.PageSize);
 
 		return SYSINFO_RET_OK;
 	}
 
-	if (NULL != zbx_GlobalMemoryStatusEx)
+	if (NULL != zbx_get_GlobalMemoryStatusEx())
 	{
 		ms_ex.dwLength = sizeof(MEMORYSTATUSEX);
 
-		zbx_GlobalMemoryStatusEx(&ms_ex);
+		(*zbx_get_GlobalMemoryStatusEx())(&ms_ex);
 
 		if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))
 		{

@@ -108,6 +108,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 	protected function doAction(): void {
 		if ($this->hasInput('update')) {
 			$hostids = $this->getInput('hostids');
+			$hosts_count = count($hostids);
 			$visible = $this->getInput('visible', []);
 
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
@@ -505,7 +506,10 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					ob_start();
 					uncheckTableRows('hosts');
 
-					$output = ['title' => _('Hosts updated'), 'script_inline' => ob_get_clean()];
+					$output = [
+						'title' => _n('Host updated', 'Hosts updated', $hosts_count),
+						'script_inline' => ob_get_clean()
+					];
 
 					if ($messages = CMessageHelper::getMessages()) {
 						$output['messages'] = array_column($messages, 'message');
@@ -514,7 +518,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 				else {
 					$output = [
 						'error' => [
-							'title' => _('Cannot update hosts'),
+							'title' => _n('Cannot update host', 'Cannot update hosts', $hosts_count),
 							'messages' => array_column(get_and_clear_messages(), 'message')
 						]
 					];

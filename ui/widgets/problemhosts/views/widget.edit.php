@@ -26,20 +26,22 @@
  * @var array $data
  */
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
-	$data['captions']['ms']['groups']['groupids']
-);
+$groupids = array_key_exists('groupids', $data['fields'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
+	: null;
 
 (new CWidgetFormView($data))
 	->addField($groupids)
-	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
+	->addField(array_key_exists('exclude_groupids', $data['fields'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
 			$data['captions']['ms']['groups']['exclude_groupids']
 		)
+		: null
 	)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+	->addField(array_key_exists('hostids', $data['fields'])
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldTextBoxView($data['fields']['problem'])
@@ -56,8 +58,9 @@ $groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['hide_empty_groups'])
+	->addField(array_key_exists('hide_empty_groups', $data['fields'])
+		? new CWidgetFieldCheckBoxView($data['fields']['hide_empty_groups'])
+		: null
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['ext_ack'])

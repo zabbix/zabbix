@@ -41,9 +41,7 @@
 		)
 	)
 	->addField(
-		(new CWidgetFieldCheckBoxListView($data['fields']['statuses']))
-			->addClass(ZBX_STYLE_COLUMNS)
-			->addClass(ZBX_STYLE_COLUMNS_3)
+		(new CWidgetFieldCheckBoxListView($data['fields']['statuses']))->setColumns(3)
 	)
 	->addField(
 		(new CWidgetFieldTextBoxView($data['fields']['message']))->setPlaceholder(_('subject or body text'))

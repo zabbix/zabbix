@@ -378,7 +378,6 @@ if (array_key_exists('render_html', $data)) {
 				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CCol(
 				(new CButton('tags[#{rowNum}][remove]', _('Remove')))
-					->removeId()
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('element-table-remove')
 					->removeId()

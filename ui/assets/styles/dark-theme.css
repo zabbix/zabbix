@@ -1027,24 +1027,83 @@ footer {
   grid-template-columns: minmax(15%, max-content) auto; }
   .form-grid.label-width-true {
     grid-template-columns: max-content auto; }
+  .form-grid fieldset {
+    display: contents; }
+    .form-grid fieldset legend {
+      grid-column: 2 / -1;
+      margin-top: 10px; }
+      .form-grid fieldset legend span {
+        font-size: 1.167em;
+        color: #f2f2f2; }
+    .form-grid fieldset > label {
+      padding-left: 24px; }
+    .form-grid fieldset.collapsible legend {
+      grid-column: 1 / -1; }
+      .form-grid fieldset.collapsible legend .toggle {
+        position: relative;
+        padding: 0 5px 0 24px;
+        border: none;
+        background-color: transparent; }
+        .form-grid fieldset.collapsible legend .toggle::before {
+          content: ' ';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 24px;
+          height: 24px;
+          background: url("../img/icon-sprite.svg?20220722") no-repeat -6px -654px; }
+        .form-grid fieldset.collapsible legend .toggle::after {
+          content: ' ';
+          position: absolute;
+          top: 20px;
+          left: 11px;
+          width: 2px;
+          height: var(--fieldset-height, 0);
+          background: #303030;
+          pointer-events: none; }
+        .form-grid fieldset.collapsible legend .toggle span {
+          border-bottom: 1px dotted #f2f2f2; }
+        .form-grid fieldset.collapsible legend .toggle:hover span {
+          border-bottom-style: solid; }
+        .form-grid fieldset.collapsible legend .toggle:focus {
+          box-shadow: none; }
+          .form-grid fieldset.collapsible legend .toggle:focus span {
+            border-bottom-width: 2px;
+            border-bottom-style: solid; }
+    .form-grid fieldset.collapsible.collapsed .toggle::before {
+      background-position: -6px -689px; }
+    .form-grid fieldset.collapsible.collapsed .toggle::after {
+      display: none; }
+    .form-grid fieldset.collapsible.collapsed label,
+    .form-grid fieldset.collapsible.collapsed .fields-group,
+    .form-grid fieldset.collapsible.collapsed .form-field {
+      display: none !important; }
+  .form-grid label {
+    text-align: right;
+    word-wrap: break-word; }
+    .form-grid label.fields-group-label {
+      padding-top: 5px; }
+    .form-grid label .btn-icon,
+    .form-grid label .icon {
+      margin-left: 5px; }
   .form-grid .fields-group {
     grid-column: 2 / -1;
     padding: 5px;
     border: 1px solid #383838; }
-  .form-grid > label {
-    line-height: 24px;
-    text-align: right;
-    word-wrap: break-word; }
-    .form-grid > label.fields-group-label {
-      padding-top: 5px; }
-    .form-grid > label .btn-icon,
-    .form-grid > label .icon {
-      margin-left: 5px; }
   .form-grid > .form-field,
   .form-grid > .field-fluid,
+  .form-grid fieldset > .form-field,
+  .form-grid fieldset > .field-fluid,
   .form-grid .form-actions {
     grid-column: 2 / -1;
-    text-align: left;
+    text-align: left; }
+  .form-grid > label,
+  .form-grid > .form-field,
+  .form-grid > .field-fluid,
+  .form-grid fieldset > .form-field,
+  .form-grid fieldset > .field-fluid,
+  .form-grid fieldset > label,
+  .form-grid .form-actions {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
     margin-left: 10px; }
@@ -1128,7 +1187,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
-.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .dataset-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
+.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
@@ -3576,8 +3635,6 @@ form.dashboard-widget-clock .fields-group.fields-group-date, form.dashboard-widg
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-clock .fields-group.fields-group-date label, form.dashboard-widget-clock .fields-group.fields-group-time label, form.dashboard-widget-clock .fields-group.fields-group-tzone label {
-    text-align: right; }
   form.dashboard-widget-clock .fields-group.fields-group-date .field-size input, form.dashboard-widget-clock .fields-group.fields-group-time .field-size input, form.dashboard-widget-clock .fields-group.fields-group-tzone .field-size input {
     margin-right: 5px; }
 form.dashboard-widget-clock .fields-group.fields-group-time .field-format {
@@ -3624,8 +3681,6 @@ form.dashboard-widget-item .fields-group.fields-group-description, form.dashboar
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
-  form.dashboard-widget-item .fields-group.fields-group-description label, form.dashboard-widget-item .fields-group.fields-group-value label, form.dashboard-widget-item .fields-group.fields-group-time label, form.dashboard-widget-item .fields-group.fields-group-change-indicator label {
-    text-align: right; }
   form.dashboard-widget-item .fields-group.fields-group-description hr, form.dashboard-widget-item .fields-group.fields-group-value hr, form.dashboard-widget-item .fields-group.fields-group-time hr, form.dashboard-widget-item .fields-group.fields-group-change-indicator hr {
     grid-column: 1 / -1;
     margin: 0;
@@ -3956,7 +4011,8 @@ form.dashboard-widget-svggraph .dataset-body .form-grid {
   padding-top: 0; }
   form.dashboard-widget-svggraph .dataset-body .form-grid:first-child {
     grid-column-start: 5; }
-form.dashboard-widget-svggraph .dataset-actions {
+form.dashboard-widget-svggraph .list-item-actions {
+  grid-column: span 1 / -1;
   text-align: right; }
 form.dashboard-widget-svggraph .items-list {
   grid-column: 4 / span 3; }
@@ -3979,6 +4035,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
   form.dashboard-widget-svggraph .list-accordion-item > label {
     overflow: hidden;
     line-height: 24px;
+    text-align: left;
     text-overflow: ellipsis; }
   form.dashboard-widget-svggraph .list-accordion-item.list-accordion-item-opened::before {
     content: ' ';
@@ -4038,9 +4095,8 @@ form.dashboard-widget-svggraph .overrides-list-item {
   form.dashboard-widget-svggraph .overrides-list-item .drag-icon {
     position: absolute;
     top: 5px;
-    left: -16px;
-    height: 24px;
-    margin-left: -2px; }
+    left: -17px;
+    height: 24px; }
   form.dashboard-widget-svggraph .overrides-list-item .multiselect {
     width: 100%; }
 form.dashboard-widget-svggraph .overrides-foot {
@@ -4943,6 +4999,16 @@ z-select button.focusable,
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
+.form-grid fieldset.collapsible legend .toggle::before {
+  border: 0;
+  min-height: 0;
+  padding: 0;
+  opacity: .5;
+  transition: opacity .2s ease-out; }
+  .form-grid fieldset.collapsible legend [disabled].toggle::before, .form-grid fieldset.collapsible legend [disabled].toggle:hover::before, .form-grid fieldset.collapsible legend [disabled].toggle:focus::before, .form-grid fieldset.collapsible legend [disabled].toggle:active::before {
+    background-color: transparent;
+    opacity: .25; }
+
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
 .z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
@@ -4952,6 +5018,10 @@ z-select button.focusable,
 
 .inaccessible .subfilter-enabled {
   color: #b2b2b2; }
+
+.form-grid fieldset.collapsible legend .toggle:hover::before, .form-grid fieldset.collapsible legend .toggle:focus::before, .form-grid fieldset.collapsible legend .toggle:active::before {
+  background-color: transparent;
+  opacity: 1; }
 
 .action-buttons {
   margin-top: 10px;
@@ -5251,7 +5321,7 @@ z-select button.focusable,
     z-index: 4;
     margin: 0 0 10px; }
   .overlay-dialogue .form-grid {
-    grid-template-columns: minmax(100px, max-content) auto; }
+    grid-template-columns: minmax(var(--label-width, 100px), max-content) auto; }
     .overlay-dialogue .form-grid.form-grid-1-1 {
       grid-template-columns: repeat(2, minmax(100px, max-content) auto); }
     .overlay-dialogue .form-grid.form-grid-3-1 {

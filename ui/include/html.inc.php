@@ -59,9 +59,9 @@ function make_decoration($haystack, $needle, $class = null) {
 	$pos = mb_strpos($tmpHaystack, $tmpNeedle);
 
 	if ($pos !== false) {
-		$start = CHtml::encode(mb_substr($haystack, 0, $pos));
-		$end = CHtml::encode(mb_substr($haystack, $pos + mb_strlen($needle)));
-		$found = CHtml::encode(mb_substr($haystack, $pos, mb_strlen($needle)));
+		$start = mb_substr($haystack, 0, $pos);
+		$end = mb_substr($haystack, $pos + mb_strlen($needle));
+		$found = mb_substr($haystack, $pos, mb_strlen($needle));
 
 		if (is_null($class)) {
 			$result = [$start, bold($found), $end];
@@ -132,6 +132,38 @@ function url_params(array $params): string {
 
 function BR(): CTag {
 	return new CTag('br');
+}
+
+function BULLET() {
+	return new CHtmlEntity('&bullet;');
+}
+
+function COPYR() {
+	return new CHtmlEntity('&copy;');
+}
+
+function HELLIP() {
+	return new CHtmlEntity('&hellip;');
+}
+
+function LARR() {
+	return new CHtmlEntity('&lArr;');
+}
+
+function NBSP() {
+	return new CHtmlEntity('&nbsp;');
+}
+
+function NDASH() {
+	return new CHtmlEntity('&ndash;');
+}
+
+function RARR() {
+	return new CHtmlEntity('&rArr;');
+}
+
+function ZWSPACE() {
+	return new CHtmlEntity('&#8203;');
 }
 
 function get_icon($type, $params = []): ?CSimpleButton {
@@ -307,7 +339,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		}
 
 		$host = new CSpan(
-			(new CLink(CHtml::encode($db_host['name']),
+			(new CLink($db_host['name'],
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'host.edit')
 					->setArgument('hostid', $db_host['hostid'])
@@ -436,11 +468,11 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 	else {
 		$discovery_rule = (new CSpan())->addItem(
 			new CLink(
-				CHtml::encode($db_discovery_rule['name']),
-					(new CUrl('host_discovery.php'))
-						->setArgument('form', 'update')
-						->setArgument('itemid', $db_discovery_rule['itemid'])
-						->setArgument('context', $context)
+				$db_discovery_rule['name'],
+				(new CUrl('host_discovery.php'))
+					->setArgument('form', 'update')
+					->setArgument('itemid', $db_discovery_rule['itemid'])
+					->setArgument('context', $context)
 			)
 		);
 

@@ -325,7 +325,7 @@ class testFormTagsServicesProblemTags extends testFormTags {
 	 * Test cloning of Service with problem tags.
 	 */
 	public function testFormTagsServicesProblemTags_Clone() {
-		$this->executeCloning('service', 'Clone');
+		$this->executeCloning('service');
 	}
 
 	/**

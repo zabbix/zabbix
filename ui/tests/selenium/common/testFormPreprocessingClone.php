@@ -261,10 +261,10 @@ class testFormPreprocessingClone extends CWebTest {
 		$item_prototype_original_steps = $this->getSteps('disc_prototypes.php?form=update&parent_discoveryid='.
 				$this->lldid.'&context='.$context.'&itemid='.$this->item_prototypeid);
 
-		// Open host or template and make a full clone of it.
+		// Open host or template and make a clone of it.
 		$url = ($template) ? 'templates.php?form=update&templateid=' : 'zabbix.php?action=host.edit&hostid=';
 		$this->page->open($url.$this->hostid);
-		$this->query('button:Full clone')->waitUntilClickable()->one()->click();
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
 
 		// Fill cloned host or template form and save it.
 		$form = ($template)

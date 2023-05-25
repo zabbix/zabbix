@@ -334,6 +334,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('lefty_static_units'))
 					->setFlags(!$this->lefty_on || !$this->lefty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('righty', _('Right Y'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
@@ -359,6 +360,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('righty_static_units', null))
 					->setFlags(!$this->righty_on || !$this->righty_units_static ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('axisx', _('X-Axis'), _('Show')))->setDefault(SVG_GRAPH_AXIS_ON)
@@ -400,8 +402,9 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
-			->addField(
-				(new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
+			->addField($this->isTemplateDashboard()
+				? null
+				: (new CWidgetFieldHostPatternSelect('problemhosts', _('Problem hosts')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -413,7 +416,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))
