@@ -279,7 +279,7 @@ class CLegacyWebTest extends CWebTest {
 		$this->zbxTestClickXpathWait(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
 			"/ul[@class='multiselect-list']/li/span[@class='subfilter-enabled']/span[text()='$string']/..".
-			"/span[contains(@class, 'zi-remove')]"
+			"/span[@class='subfilter-disable-btn']"
 		);
 		$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath(
 			"//div[contains(@class, 'multiselect') and @id='$id']/div[@class='selected']".
@@ -295,7 +295,7 @@ class CLegacyWebTest extends CWebTest {
 	public function zbxTestMultiselectClear($id) {
 		$xpath = '//div[contains(@class, "multiselect") and @id="'.$id.'"]'.
 				'/div[@class="selected"]/ul[@class="multiselect-list"]/li'.
-				'//span[contains(@class, "zi-remove")]';
+				'//span[@class="subfilter-disable-btn"]';
 		$locator = WebDriverBy::xpath($xpath);
 		$elements = $this->webDriver->findElements($locator);
 

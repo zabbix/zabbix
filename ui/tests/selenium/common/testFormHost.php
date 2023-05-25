@@ -2121,7 +2121,7 @@ class testFormHost extends CWebTest {
 					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
 
 					// Check hintbox.
-					$form->query('class:zi-circle-question-filled')->one()->click();
+					$form->query('class:icon-help-hint')->one()->click();
 					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
 							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
@@ -2129,7 +2129,7 @@ class testFormHost extends CWebTest {
 					);
 
 					// Close the hint-box.
-					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [
