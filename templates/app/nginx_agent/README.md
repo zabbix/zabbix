@@ -66,7 +66,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$NGINX.STUB_STATUS.HOST}|<p>The hostname or an IP address of the Nginx host or Nginx container of `astub_status`.</p>|`localhost`|
+|{$NGINX.STUB_STATUS.HOST}|<p>The hostname or IP address of the Nginx host or Nginx container of `astub_status`.</p>|`localhost`|
 |{$NGINX.STUB_STATUS.PATH}|<p>The path of the `Nginx stub_status` page.</p>|`basic_status`|
 |{$NGINX.STUB_STATUS.PORT}|<p>The port of the `Nginx stub_status` host or container.</p>|`80`|
 |{$NGINX.RESPONSE_TIME.MAX.WARN}|<p>The maximum response time of Nginx expressed in seconds for a trigger expression.</p>|`10`|

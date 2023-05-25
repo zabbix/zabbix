@@ -26,6 +26,7 @@ class CControllerPopupImportCompare extends CController {
 	public const CHANGE_REMOVED = 2;
 
 	private $toc = [];
+	private $id_counter = 0;
 
 	protected function checkInput(): bool {
 		$fields = [
@@ -429,7 +430,8 @@ class CControllerPopupImportCompare extends CController {
 					$object = $before ?: $after;
 					unset($entity['before'], $entity['after']);
 
-					$id = $object['uuid'];
+					$id = $this->id_counter++;
+
 					$this->toc[$change_type][$entity_type][] = [
 						'name' => $this->nameForToc($entity_type, $object),
 						'id' => $id

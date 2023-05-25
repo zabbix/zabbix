@@ -641,8 +641,8 @@ class CFrontendSetup {
 
 		return [
 			'name' => _s('PHP option "%1$s"', 'arg_separator.output'),
-			'current' => htmlspecialchars($current),
-			'required' => htmlspecialchars(self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT),
+			'current' => $current,
+			'required' => self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT,
 			'result' => ($current === self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT) ? self::CHECK_OK : self::CHECK_FATAL,
 			'error' => _s('PHP option "%1$s" must be set to "%2$s"', 'arg_separator.output',
 				self::REQUIRED_PHP_ARG_SEPARATOR_OUTPUT

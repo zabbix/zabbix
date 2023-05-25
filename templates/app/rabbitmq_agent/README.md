@@ -53,7 +53,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 |----|-----------|-------|
 |{$RABBITMQ.API.USER}||`zbx_monitor`|
 |{$RABBITMQ.API.PASSWORD}||`zabbix`|
-|{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or an IP of the API endpoint for the RabbitMQ cluster.</p>|`127.0.0.1`|
+|{$RABBITMQ.API.CLUSTER_HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ cluster.</p>|`127.0.0.1`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
 |{$RABBITMQ.LLD.FILTER.EXCHANGE.MATCHES}|<p>This macro is used in the discovery of exchanges. It can be overridden at host level or its linked template level.</p>|`.*`|
@@ -106,7 +106,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}|<p>It responds with a status code`200 OK` if there are no alarms in effect in the cluster.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|RabbitMQ: Healthcheck: alarms in effect in the cluster{#SINGLETON}|<p>It responds with a status code `200 OK` if there are no alarms in effect in the cluster.</p><p>Otherwise, it responds with a status code `503 Service Unavailable`.</p>|Zabbix agent|web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.CLUSTER_HOST}:{$RABBITMQ.API.PORT}/api/health/checks/alarms{#SINGLETON}"]<p>**Preprocessing**</p><ul><li><p>Regular expression: `HTTP\/1\.1\b\s(\d+) \1`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Trigger prototypes for Health Check 3.8.10+ discovery
 
@@ -198,7 +198,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 |{$RABBITMQ.CLUSTER.NAME}|<p>The name of the RabbitMQ cluster.</p>|`rabbit`|
 |{$RABBITMQ.API.PORT}|<p>The port of the RabbitMQ API endpoint.</p>|`15672`|
 |{$RABBITMQ.API.SCHEME}|<p>The request scheme, which may be HTTP or HTTPS.</p>|`http`|
-|{$RABBITMQ.API.HOST}|<p>The hostname or an IP of the API endpoint for the RabbitMQ.</p>|`127.0.0.1`|
+|{$RABBITMQ.API.HOST}|<p>The hostname or IP of the API endpoint for the RabbitMQ.</p>|`127.0.0.1`|
 |{$RABBITMQ.PROCESS_NAME}|<p>The name of the RabbitMQ server process.</p>|`beam.smp`|
 |{$RABBITMQ.LLD.FILTER.QUEUE.MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`.*`|
 |{$RABBITMQ.LLD.FILTER.QUEUE.NOT_MATCHES}|<p>This macro is used in the discovery of queues. It can be overridden at host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
@@ -269,7 +269,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|RabbitMQ: There are active alarms in the node|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
+|RabbitMQ: There are active alarms in the node|<p>It checks the active alarms in the nodes via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/local-alarms{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are valid TLS certificates expiring in the next month|<p>It checks if there are valid TLS certificates expiring in the next month. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/certificate-expiration/1/months{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are not running virtual hosts|<p>It checks if there are not running virtual hosts via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/virtual-hosts{#SINGLETON}"])=0`|Average||
 |RabbitMQ: There are queues that could potentially lose data if this node goes offline.|<p>It checks whether there are queues that could potentially lose data if this node goes offline via API. This is the default API endpoint path: http://{HOST.CONN}:{$RABBITMQ.API.PORT}/api/index.html.</p>|`last(/RabbitMQ node by Zabbix agent/web.page.get["{$RABBITMQ.API.SCHEME}://{$RABBITMQ.API.USER}:{$RABBITMQ.API.PASSWORD}@{$RABBITMQ.API.HOST}:{$RABBITMQ.API.PORT}/api/health/checks/node-is-mirror-sync-critical{#SINGLETON}"])=0`|Average||

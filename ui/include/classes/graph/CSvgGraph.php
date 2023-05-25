@@ -327,8 +327,7 @@ class CSvgGraph extends CSvg {
 			$this->left_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->left_y_units = htmlspecialchars($units);
+			$this->left_y_units = trim(preg_replace('/\s+/', ' ', $options['units']));
 		}
 
 		return $this;
@@ -355,8 +354,7 @@ class CSvgGraph extends CSvg {
 			$this->right_y_max = $options['max'];
 		}
 		if ($options['units'] !== null) {
-			$units = trim(preg_replace('/\s+/', ' ', $options['units']));
-			$this->right_y_units = htmlspecialchars($units);
+			$this->right_y_units = trim(preg_replace('/\s+/', ' ', $options['units']));
 		}
 
 		return $this;

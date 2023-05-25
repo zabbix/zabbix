@@ -84,7 +84,7 @@ Install and setup [Zabbix agent](https://www.zabbix.com/documentation/6.0/manual
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$APACHE.STATUS.HOST}|<p>The hostname or an IP address of the Apache status page.</p>|`127.0.0.1`|
+|{$APACHE.STATUS.HOST}|<p>The hostname or IP address of the Apache status page.</p>|`127.0.0.1`|
 |{$APACHE.STATUS.PORT}|<p>The port of the Apache status page.</p>|`80`|
 |{$APACHE.STATUS.PATH}|<p>The URL path.</p>|`server-status?auto`|
 |{$APACHE.STATUS.SCHEME}|<p>The request scheme, which may be either HTTP or HTTPS.</p>|`http`|
