@@ -141,6 +141,7 @@ function createFontSelect(string $name): CSelect {
 						(new CTextArea('label'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->disableSpellcheck()
 							->setId('elementLabel')
 					)
 					->addRow(new CLabel(_('Label location'), 'label-label-location'),
@@ -666,6 +667,7 @@ function createFontSelect(string $name): CSelect {
 						(new CTextArea('label'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->disableSpellcheck()
 							->setId('massLabel')
 					)
 					->addRow(
@@ -783,6 +785,7 @@ function createFontSelect(string $name): CSelect {
 						(new CTextArea('label'))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setRows(2)
+							->disableSpellcheck()
 							->setId('linklabel')
 					)
 					->addRow(new CLabel(_('Connect to'), 'label-selementid2'), (new CSelect('selementid2'))
