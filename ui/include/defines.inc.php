@@ -1155,11 +1155,6 @@ define('EXPRESSION_FUNCTION_UNKNOWN',		'#ERROR_FUNCTION#');
 define('EXPRESSION_UNSUPPORTED_VALUE_TYPE',	'#ERROR_VALUE_TYPE#');
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.

@@ -713,7 +713,7 @@ function make_status_of_zbx() {
 						(new CCol([
 							_('This setting should be enabled, because history tables contain compressed chunks.'),
 							' ',
-							new CLink(_('Configuration').'&hellip;',
+							new CLink([_('Configuration'), HELLIP()],
 								(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 							)
 						]))->addClass(ZBX_STYLE_RED)
@@ -729,7 +729,7 @@ function make_status_of_zbx() {
 						(new CCol([
 							_('This setting should be enabled, because trend tables contain compressed chunks.'),
 							' ',
-							new CLink(_('Configuration').'&hellip;',
+							new CLink([_('Configuration'), HELLIP()],
 								(new CUrl('zabbix.php'))->setArgument('action', 'housekeeping.edit')
 							)
 						]))->addClass(ZBX_STYLE_RED)

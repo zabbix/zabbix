@@ -1,26 +1,27 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 5.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-04-01 16:26+0300\n"
-"PO-Revision-Date: 2021-03-19 18:02+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"PO-Revision-Date: 2022-05-30 06:48+0000\n"
+"Last-Translator: Rostislav <rostislav.palivoda@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Pootle 2.5.1.3\n"
-"X-Poedit-Basepath: ../../\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1616169770.000000\n"
+"X-Poedit-Basepath: ../../\n"
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:139
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" замість \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:346
 #: include/classes/import/validators/C10XmlValidator.php:363

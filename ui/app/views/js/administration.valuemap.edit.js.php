@@ -27,7 +27,7 @@
 <script type="text/x-jquery-tmpl" id="mapping_row">
 	<?= (new CRow([
 			(new CTextBox('mappings[#{rowNum}][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'&rArr;',
+			RARR(),
 			(new CTextBox('mappings[#{rowNum}][newvalue]', '', false, 64))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),
