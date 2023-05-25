@@ -108,7 +108,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			else if (0 == strcmp(param3, "delay"))
 			{
 				time_t	lastaccess;
-				int	tmp = value;
+				int	tmp;
 
 				param2 = get_rparam(request, 1);
 

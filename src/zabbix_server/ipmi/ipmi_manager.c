@@ -961,7 +961,7 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 	zbx_ipmi_manager_t		ipmi_manager;
 	zbx_ipmi_poller_t		*poller;
 	time_t				now, nextcheck, nextcleanup;
-	int				ret, polled_num = 0, scheduled_num = 0;
+	int				ret, polled_num = 0, scheduled_num = 0, tmp;
 	double				time_stat, time_idle = 0, time_now, sec;
 	zbx_timespec_t			timeout = {0, 0};
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
@@ -1000,8 +1000,6 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		int	tmp = nextcheck;
-
 		time_now = zbx_time();
 		now = (time_t)time_now;
 
@@ -1020,9 +1018,9 @@ ZBX_THREAD_ENTRY(ipmi_manager_thread, args)
 		/* manager -> client */
 		scheduled_num += ipmi_manager_schedule_requests(&ipmi_manager, now,
 				ipmi_manager_args_in->config_timeout, &tmp);
-		nextcheck = tmp;
+		nextcheck = (time_t)tmp;
 
-		if (FAIL != nextcheck)
+		if (FAIL != tmp)
 			timeout.sec = (nextcheck > now ? nextcheck - now : 0);
 		else
 			timeout.sec = ZBX_IPMI_MANAGER_DELAY;

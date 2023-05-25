@@ -1678,11 +1678,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (1 == args_num && ZBX_VARIANT_STR == args[0].type)
 			{
-				if (FAIL == zbx_is_time_suffix(args[0].data.str, &seconds, ZBX_LENGTH_UNLIMITED))
+				int	tmp;
+
+				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
 				{
 					*error = zbx_strdup(NULL, "invalid second parameter");
 					goto out;
 				}
+
+				seconds = tmp;
 			}
 			else
 				seconds = 0;
@@ -1707,7 +1711,7 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 			if (ZBX_VARIANT_STR == args[0].type)
 			{
-				int	tmp = (time_t)seconds;
+				int	tmp;
 
 				if (FAIL == zbx_is_time_suffix(args[0].data.str, &tmp, ZBX_LENGTH_UNLIMITED))
 				{

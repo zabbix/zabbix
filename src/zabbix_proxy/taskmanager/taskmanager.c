@@ -58,7 +58,7 @@ extern char 				*CONFIG_HOSTNAME;
  *               FAIL    - otherwise                                                  *
  *                                                                                    *
  **************************************************************************************/
-static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, int now, int config_timeout,
+static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, time_t now, int config_timeout,
 		const char *config_source_ip, int config_enable_remote_commands, int config_log_remote_commands)
 {
 	zbx_db_row_t	row;
@@ -258,7 +258,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, int now,
+static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, time_t now,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	zbx_db_row_t		row;
@@ -328,7 +328,7 @@ finish:
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_config_comms_args_t *config_comms,
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands)
 {
 	zbx_db_row_t		row;
@@ -392,11 +392,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now, const zbx_conf
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *
  ******************************************************************************/
-static void	tm_remove_old_tasks(int now)
+static void	tm_remove_old_tasks(time_t now)
 {
 	zbx_db_begin();
-	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
-			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=" ZBX_FS_TIME_T,
+			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, (zbx_fs_time_t)(now - ZBX_TM_CLEANUP_TASK_AGE));
 	zbx_db_commit();
 }
 
@@ -436,8 +436,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 							(((zbx_thread_args_t *)args)->args);
-	static time_t			cleanup_time = 0, sleeptime, nextcheck;
-
+	static time_t			sleeptime, nextcheck;
+	static double			cleanup_time = 0.0;
 	double				sec1, sec2;
 	int				tasks_num;
 	zbx_ipc_async_socket_t		rtc;
@@ -464,7 +464,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
-	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
+	zbx_setproctitle("%s [started, idle " ZBX_FS_TIME_T " sec]", get_process_type_string(process_type),
+			(zbx_fs_time_t)sleeptime);
 
 #ifdef HAVE_NETSNMP
 	rtc_msgs_num++;
@@ -507,7 +508,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((time_t)sec1);
-			cleanup_time = (time_t)sec1;
+			cleanup_time = sec1;
 		}
 
 		sec2 = zbx_time();
@@ -517,8 +518,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;
 
-		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
+		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle " ZBX_FS_TIME_T " sec]",
+				get_process_type_string(process_type), tasks_num, sec2 - sec1,
+				(zbx_fs_time_t)sleeptime);
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

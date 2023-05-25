@@ -1275,7 +1275,7 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxy_h
  * Return value: The number of successfully processed tasks                   *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1421,11 +1421,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, int now)
  * Purpose: remove old done/expired tasks                                     *
  *                                                                            *
  ******************************************************************************/
-static void	tm_remove_old_tasks(int now)
+static void	tm_remove_old_tasks(time_t now)
 {
 	zbx_db_begin();
-	zbx_db_execute("delete from task where status in (%d,%d) and clock<=%d",
-			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, now - ZBX_TM_CLEANUP_TASK_AGE);
+	zbx_db_execute("delete from task where status in (%d,%d) and clock<=" ZBX_FS_TIME_T,
+			ZBX_TM_STATUS_DONE, ZBX_TM_STATUS_EXPIRED, (zbx_fs_time_t)(now - ZBX_TM_CLEANUP_TASK_AGE));
 	zbx_db_commit();
 }
 
@@ -1609,9 +1609,10 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
-	static int		cleanup_time = 0;
+	static time_t		cleanup_time = 0;
 	double			sec1, sec2;
-	int			tasks_num, sleeptime, nextcheck;
+	int			tasks_num, sleeptime;
+	time_t			nextcheck;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;

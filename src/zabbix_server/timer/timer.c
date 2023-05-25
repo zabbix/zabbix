@@ -164,10 +164,11 @@ static void	db_update_host_maintenances(const zbx_vector_ptr_t *updates)
  * Purpose: remove expired event_suppress records                             *
  *                                                                            *
  ******************************************************************************/
-static void	db_remove_expired_event_suppress_data(int now)
+static void	db_remove_expired_event_suppress_data(time_t now)
 {
 	zbx_db_begin();
-	zbx_db_execute("delete from event_suppress where suppress_until<%d and suppress_until<>0", now);
+	zbx_db_execute("delete from event_suppress where suppress_until<" ZBX_FS_TIME_T " and suppress_until<>0",
+			(zbx_fs_time_t)now);
 	zbx_db_commit();
 }
 
@@ -645,7 +646,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			update_time -= update_time % 60;
 			maintenance_time = update_time;
 
-			if (0 > (idle = ZBX_TIMER_DELAY - (time_t)zbx_time() - maintenance_time))
+			if (0 > (idle = ZBX_TIMER_DELAY - ((time_t)zbx_time() - maintenance_time)))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

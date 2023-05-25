@@ -2965,11 +2965,11 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, struct zbx_json_parse *j
 	/* first packet can be empty for active proxy */
 	check_proxy_nodata(ts, proxy_status, proxydata_frequency, &proxy_diff);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:%d"
-			" timestamp:%d lastaccess:%d proxy_delay:%d more:%d", __func__, proxy_diff.nodata_win.flags,
-			flags_old, (int)proxy_diff.flags, proxy_status, proxy_diff.nodata_win.period_end,
-			ts->sec - proxy_diff.lastaccess, ts->sec, proxy_diff.lastaccess, proxy_diff.proxy_delay,
-			proxy_diff.more_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() flag_win:%d/%d flag:%d proxy_status:%d period_end:%d delay:" ZBX_FS_TIME_T
+			" timestamp:%d lastaccess:" ZBX_FS_TIME_T " proxy_delay:%d more:%d", __func__,
+			proxy_diff.nodata_win.flags, flags_old, (int)proxy_diff.flags, proxy_status,
+			proxy_diff.nodata_win.period_end, (zbx_fs_time_t)(ts->sec - proxy_diff.lastaccess), ts->sec,
+			(zbx_fs_time_t)proxy_diff.lastaccess, proxy_diff.proxy_delay, proxy_diff.more_data);
 
 	if (ZBX_FLAGS_PROXY_DIFF_UNSET != proxy_diff.flags)
 		zbx_dc_update_proxy(&proxy_diff);
@@ -3330,10 +3330,8 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 	/* warn if another proxy version is used and proceed with compatibility rules*/
 	if (ZBX_PROXY_VERSION_CURRENT != compatibility)
 	{
-		time_t	now;
+		time_t	now = (time_t)zbx_time();
 		int	print_log = 0;
-
-		now = (time_t)zbx_time();
 
 		if (proxy->last_version_error_time <= now)
 		{
@@ -3369,4 +3367,3 @@ int	zbx_check_protocol_version(zbx_dc_proxy_t *proxy, int version)
 
 	return SUCCEED;
 }
-
