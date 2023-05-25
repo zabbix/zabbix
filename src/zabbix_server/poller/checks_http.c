@@ -28,25 +28,18 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 	int			ret;
 	long			response_code;
 	zbx_http_context_t	context;
-	CURL			*easyhandle;
-
-	if (NULL == (easyhandle = curl_easy_init()))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot initialize cURL library"));
-		return FAIL;
-	}
 
 	zbx_http_context_create(&context);
 
-	if (SUCCEED == (ret = zbx_http_request_prepare(easyhandle, &context, item->request_method, item->url,
+	if (SUCCEED == (ret = zbx_http_request_prepare(&context, item->request_method, item->url,
 			item->query_fields, item->headers, item->posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
 			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error)))
 	{
-		CURLcode	err = zbx_http_request_sync_perform(easyhandle, &context);
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
 
-		if (SUCCEED == (ret = zbx_http_handle_response(easyhandle, &context, err, &response_code, &out, &error)))
+		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out, &error)))
 		{
 			if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(item->status_codes, (int)response_code))
 			{
@@ -83,7 +76,6 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 	zbx_free(out);
 
 	zbx_http_context_destory(&context);
-	curl_easy_cleanup(easyhandle);
 
 	return ret;
 }

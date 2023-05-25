@@ -53,10 +53,11 @@ zbx_http_response_t;
 
 typedef struct
 {
+	CURL			*easyhandle;
+	struct curl_slist	*headers_slist;
 	zbx_http_response_t	body;
 	zbx_http_response_t	header;
 	char			errbuf[CURL_ERROR_SIZE];
-	struct curl_slist	*headers_slist;
 	int			max_attempts;
 	unsigned char		retrieve_mode;
 	unsigned char		output_format;
@@ -90,7 +91,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 
 void	zbx_http_context_create(zbx_http_context_t *context);
 void	zbx_http_context_destory(zbx_http_context_t *context);
-int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
+int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,

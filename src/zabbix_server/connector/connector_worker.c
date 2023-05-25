@@ -62,16 +62,10 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 #ifdef HAVE_LIBCURL
 	char			headers[] = "", posts[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
-	CURL			*easyhandle;
 
 	zbx_http_context_create(&context);
 
-	if (NULL == (easyhandle = curl_easy_init()))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot initialize cURL library");;
-	}
-
-	if (SUCCEED == zbx_http_request_prepare(easyhandle, &context, HTTP_REQUEST_POST, connector.url, headers, posts,
+	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers, posts,
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0,
 			connector.timeout, connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
@@ -80,9 +74,9 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	{
 		char		*info = NULL;
 		long		response_code;
-		CURLcode	err = zbx_http_request_sync_perform(easyhandle, &context);
+		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
 
-		if (SUCCEED == (zbx_http_handle_response(easyhandle, &context, err, &response_code, &out, &error)))
+		if (SUCCEED == (zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out, &error)))
 		{
 			if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
 			{
@@ -128,7 +122,6 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
 	}
 
-	curl_easy_cleanup(easyhandle);
 	zbx_http_context_destory(&context);
 #else
 	ZBX_UNUSED(config_source_ip);

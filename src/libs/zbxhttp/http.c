@@ -720,9 +720,10 @@ void	zbx_http_context_destory(zbx_http_context_t *context)
 	curl_slist_free_all(context->headers_slist);	/* must be called after curl_easy_perform() */
 	zbx_free(context->body.data);
 	zbx_free(context->header.data);
+	curl_easy_cleanup(context->easyhandle);
 }
 
-int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
+int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
@@ -749,6 +750,12 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 	context->output_format = output_format;
 	context->retrieve_mode = retrieve_mode;
 
+	if (NULL == (context->easyhandle = curl_easy_init()))
+	{
+		*error = zbx_strdup(NULL, "Cannot initialize cURL library");
+		goto clean;
+	}
+
 	switch (retrieve_mode)
 	{
 		case ZBX_RETRIEVE_MODE_CONTENT:
@@ -764,19 +771,19 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 			goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &context->header, &context->body, zbx_curl_write_cb,
+	if (SUCCEED != zbx_http_prepare_callbacks(context->easyhandle, &context->header, &context->body, zbx_curl_write_cb,
 			curl_body_cb, context->errbuf, error))
 	{
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, http_proxy)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROXY, http_proxy)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set proxy: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION,
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_FOLLOWLOCATION,
 			0 == follow_redirects ? 0L : 1L)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set follow redirects: %s", curl_easy_strerror(err));
@@ -784,7 +791,7 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 	}
 
 	if (0 != follow_redirects &&
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
+			CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s", curl_easy_strerror(err));
 		goto clean;
@@ -796,22 +803,22 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)timeout_seconds)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_TIMEOUT, (long)timeout_seconds)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify timeout: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
+	if (SUCCEED != zbx_http_prepare_ssl(context->easyhandle, ssl_cert_file, ssl_key_file, ssl_key_password,
 			verify_peer, verify_host, config_source_ip, error))
 	{
 		goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_auth(easyhandle, authtype, username, password, token, error))
+	if (SUCCEED != zbx_http_prepare_auth(context->easyhandle, authtype, username, password, token, error))
 		goto clean;
 
-	if (SUCCEED != http_prepare_request(easyhandle, posts, request_method, error))
+	if (SUCCEED != http_prepare_request(context->easyhandle, posts, request_method, error))
 	{
 		goto clean;
 	}
@@ -837,7 +844,7 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 			context->headers_slist = curl_slist_append(context->headers_slist, application_ndjson);
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HTTPHEADER, context->headers_slist)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_HTTPHEADER, context->headers_slist)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
@@ -847,9 +854,9 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
 	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
 #	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
 #	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 #	endif
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
@@ -858,19 +865,19 @@ int	zbx_http_request_prepare(CURL *easyhandle, zbx_http_context_t *context, unsi
 #endif
 
 	zbx_snprintf(url_buffer, sizeof(url_buffer),"%s%s", url, query_fields);
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url_buffer)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_URL, url_buffer)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot specify URL: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_COOKIEFILE, "")))
 	{
 		*error =  zbx_dsprintf(NULL, "Cannot enable cURL cookie engine: %s", curl_easy_strerror(err));
 		goto clean;
