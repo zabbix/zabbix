@@ -32,7 +32,6 @@ var stuckMux sync.Mutex
 
 type fsCaller struct {
 	fsFunc                func(path string) (stats *FsStats, err error)
-	paths                 []string
 	errChan               chan error
 	outChanStuckUnchecked chan *FsStats
 	outChanStuckChecked   chan interface{}
@@ -44,6 +43,7 @@ func (f *fsCaller) executeFunc(path string) {
 
 	if err != nil {
 		f.errChan <- err
+
 		return
 	}
 
@@ -66,9 +66,11 @@ func (f *fsCaller) checkNotStuckAndExecute(path string) {
 	select {
 	case stat := <-f.outChanStuckUnchecked:
 		f.outChanStuckChecked <- stat
+
 		return
 	case err := <-f.errChan:
 		f.outChanStuckChecked <- err
+
 		return
 	case <-time.After(timeout * time.Second):
 		f.outChanStuckChecked <- fmt.Errorf("operation on mount '%s' timed out", path)
