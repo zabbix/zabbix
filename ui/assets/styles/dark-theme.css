@@ -6451,6 +6451,7 @@ a.icon-count {
   display: flex; }
   .btn-dropdown-container .btn-dropdown-toggle {
     width: auto;
+    height: auto;
     padding-right: 3px;
     align-items: start;
     line-height: 22px;
