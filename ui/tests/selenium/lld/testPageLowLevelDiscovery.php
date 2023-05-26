@@ -612,7 +612,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'drule-ZBX6663-second'
 					],
 					'message' => 'Cannot delete discovery rule',
-					'details' => 'Cannot delete templated items.',
+					'details' => 'Invalid parameter "/1": cannot delete inherited item.',
 					'db_count' => 1
 				]
 			]
