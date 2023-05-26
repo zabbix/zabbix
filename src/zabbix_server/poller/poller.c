@@ -1158,8 +1158,8 @@ static void on_timeout(evutil_socket_t fd, short events, void *arg)
 	int running_handles;
 
 	printf("on_timeout\n");
-	//curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
-	//check_multi_info();
+	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+	check_multi_info();
 }
 
 static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
