@@ -1099,8 +1099,6 @@ footer {
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
-    .form-grid table .td-drag-icon {
-      width: 12px; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #cacaca; }
@@ -6332,6 +6330,8 @@ a.icon-count {
 
 .ui-sortable tbody {
   position: relative; }
+.ui-sortable.ui-sortable-disabled .td-drag-icon {
+  width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
   color: white; }
 

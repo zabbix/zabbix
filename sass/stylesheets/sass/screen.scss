@@ -3432,6 +3432,10 @@ a.icon-count {
 	}
 
 	&.ui-sortable-disabled {
+		.td-drag-icon {
+			width: 12px;
+		}
+
 		.drag-icon {
 			color: $btn-icon-disabled-color;
 		}
