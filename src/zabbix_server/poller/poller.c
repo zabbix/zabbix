@@ -1132,7 +1132,6 @@ static void check_multi_info(void)
 				}
 				else
 				{
-							
 					zbx_preprocess_item_value(context->item_context.itemid, context->item_context.hostid,context->item_context.value_type,
 							context->item_context.flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
 				}
@@ -1234,7 +1233,7 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 			curl_context = socketp ? (curl_context_t *) socketp : create_curl_context(s);
 
 			curl_multi_assign(curl_handle, s, (void *) curl_context);
-		
+
 			if(action != CURL_POLL_IN)
 				events |= EV_WRITE;
 			if(action != CURL_POLL_OUT)
