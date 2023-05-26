@@ -1072,10 +1072,11 @@ footer {
       display: none !important; }
   .form-grid label {
     align-self: start;
+    line-height: 24px;
     text-align: right;
     word-wrap: break-word; }
     .form-grid label.fields-group-label {
-      padding-top: 5px; }
+      margin-top: 6px; }
     .form-grid label .btn-icon,
     .form-grid label .icon {
       margin-left: 5px; }
@@ -1094,12 +1095,10 @@ footer {
   .form-grid .form-actions {
     grid-column: 2 / -1;
     text-align: left; }
-  .form-grid > label,
   .form-grid > .form-field,
   .form-grid > .field-fluid,
   .form-grid fieldset > .form-field,
   .form-grid fieldset > .field-fluid,
-  .form-grid fieldset > label,
   .form-grid .form-actions {
     line-height: 24px; }
   .form-grid .form-actions button:not(:first-of-type) {
@@ -1129,8 +1128,6 @@ footer {
       padding: 0; }
   .form-grid td {
     padding: 0 5px 5px 0; }
-  .form-grid .list-check-radio {
-    line-height: 1.4em; }
   .form-grid .btn-icon:not(:first-child),
   .form-grid .btn-link:not(:first-child) {
     margin-left: 5px; }
@@ -4707,18 +4704,17 @@ form.is-loading {
   padding: 4px 0; }
 
 .list-check-radio li {
-  display: block;
-  padding: .3em 0; }
+  display: block; }
 .list-check-radio.hor-list li {
-  margin-right: 15px;
-  padding: .3em 0 0; }
+  margin-right: 15px; }
   .list-check-radio.hor-list li:last-child {
     margin-right: 0; }
 .list-check-radio label {
-  padding: 0 0 0 18px;
   display: inline-block;
-  text-indent: -18px;
-  max-width: 600px; }
+  max-width: 600px;
+  padding: 0 0 0 18px;
+  line-height: 24px;
+  text-indent: -18px; }
   .list-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }

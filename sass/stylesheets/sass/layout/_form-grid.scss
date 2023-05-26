@@ -106,11 +106,12 @@
 
 	label {
 		align-self: start;
+		line-height: 24px;
 		text-align: right;
 		word-wrap: break-word;
 
 		&.fields-group-label {
-			padding-top: 5px;
+			margin-top: 6px;
 		}
 
 		.btn-icon,
@@ -142,12 +143,10 @@
 		text-align: left;
 	}
 
-	> label,
 	> .form-field,
 	> .field-fluid,
 	fieldset > .form-field,
 	fieldset > .field-fluid,
-	fieldset > label,
 	.form-actions {
 		line-height: 24px;
 	}
@@ -216,10 +215,6 @@
 
 	td {
 		padding: 0 5px 5px 0;
-	}
-
-	.list-check-radio {
-		line-height: $body-line-height;
 	}
 
 	.btn-icon,

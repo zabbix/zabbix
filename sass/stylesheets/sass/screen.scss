@@ -932,12 +932,10 @@ form {
 .list-check-radio {
 	li {
 		display: block;
-		padding: .3em 0;
 	}
 
 	&.hor-list li {
 		margin-right: 15px;
-		padding: .3em 0 0;
 
 		&:last-child {
 			margin-right: 0;
@@ -945,10 +943,11 @@ form {
 	}
 
 	label {
-		padding: 0 0 0 18px;
 		display: inline-block;
-		text-indent: -18px;
 		max-width: 600px;
+		padding: 0 0 0 18px;
+		line-height: 24px;
+		text-indent: -18px;
 
 		input[type="checkbox"] {
 			left: -3px;
