@@ -7075,7 +7075,9 @@ z-select button.focusable:focus,
   box-shadow: inset 0 -1px 0 0 #333333; }
   .list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before {
     box-shadow: inset 0 -1px 0 0 #333333;
-    font-size: 22px; }
+    font-size: 22px;
+    padding-top: 0;
+    padding-bottom: 0; }
 
 .filter-highlight-row-cb {
   display: none; }
