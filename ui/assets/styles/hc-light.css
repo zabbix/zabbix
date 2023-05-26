@@ -2198,6 +2198,11 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 
 .inline-filter {
   text-align: right; }
+  .inline-filter label {
+    line-height: 24px; }
+  .inline-filter label,
+  .inline-filter input {
+    vertical-align: top; }
   .inline-filter > li {
     display: inline-block; }
     .inline-filter > li:not(:last-child) {

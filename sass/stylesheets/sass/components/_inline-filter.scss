@@ -1,6 +1,15 @@
 .inline-filter {
 	text-align: right;
 
+	label {
+		line-height: 24px;
+	}
+
+	label,
+	input {
+		vertical-align: top;
+	}
+
 	> li {
 		display: inline-block;
 
