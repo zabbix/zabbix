@@ -2624,9 +2624,9 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   .menu-user [class^="zi-"], .menu-user [class*=" zi-"] {
     padding-left: 13px; }
     .menu-user [class^="zi-"]::before, .menu-user [class*=" zi-"]::before {
-      color: #cedae1; }
+      color: #c8c8c8; }
   .menu-user a {
-    color: #cedae1; }
+    color: #c8c8c8; }
     .menu-user a:hover, .menu-user a:focus {
       border-bottom: 0;
       border-color: #ffffff;
