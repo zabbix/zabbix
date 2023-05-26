@@ -1019,7 +1019,6 @@ static int	add_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		goto exit;
 	}
 
-
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 
 	for (i = 0; i < num; i++)
@@ -1348,32 +1347,31 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		if (1)
+		if (ZBX_POLLER_TYPE_NORMAL == poller_type)
 		{
 			struct timeval	tv = {1, 0};
 
 			evtimer_add(loop_timer, &tv);
 
-			if (0 == sleeptime) /* also need to check if there is capacity to add new checks */
-			{
-				processed += add_values(poller_type, &nextcheck, poller_args_in->config_comms,
-						curl_handle);
-			}
+			processed += add_values(poller_type, &nextcheck, poller_args_in->config_comms, curl_handle);
 
 			event_base_loop(base, EVLOOP_ONCE);
 
 			evtimer_del(loop_timer);
+
+			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
+			sleeptime = 0;
 		}
 		else
 		{
 			processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
 				poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
 				poller_args_in->config_unreachable_period, poller_args_in->config_unreachable_delay);
+
+			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
 
 		total_sec += zbx_time() - sec;
-
-		sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
@@ -1395,7 +1393,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
@@ -1408,6 +1406,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 				break;
 		}
 	}
+
 
 	curl_multi_cleanup(curl_handle);
 	event_free(curl_timeout);
