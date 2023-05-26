@@ -1072,7 +1072,7 @@ typedef struct curl_context_s {
 }
 curl_context_t;
 
-static void check_multi_info(void)
+static void	check_multi_info(void)
 {
 	CURLMsg			*message;
 	int			pending;
@@ -1136,6 +1136,10 @@ static void check_multi_info(void)
 							context->item_context.flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
 				}
 
+				int	errcode = SUCCEED;
+				int	nextcheck;
+				zbx_dc_poller_requeue_items(&context->item_context.itemid, &timespec.sec, &errcode, 1,
+						ZBX_POLLER_TYPE_NORMAL, &nextcheck);
 				zbx_free_agent_result(&result);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
@@ -1154,8 +1158,8 @@ static void on_timeout(evutil_socket_t fd, short events, void *arg)
 	int running_handles;
 
 	printf("on_timeout\n");
-	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
-	check_multi_info();
+	//curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+	//check_multi_info();
 }
 
 static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
@@ -1263,11 +1267,16 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
+static void zbx_on_timeout(evutil_socket_t fd, short events, void *arg)
+{
+
+}
+
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	int			nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
+	int			nextcheck = 0, sleeptime = -1, processed = 0, old_processed = 0;
 	double			sec, total_sec = 0.0, old_total_sec = 0.0;
 	time_t			last_stat_time;
 	unsigned char		poller_type;
@@ -1277,6 +1286,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
+	struct event		*loop_timer;
 
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -1318,6 +1328,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	base = event_base_new();
 	curl_timeout = evtimer_new(base, on_timeout, NULL);
+	loop_timer = evtimer_new(base, zbx_on_timeout, NULL);
+
 	curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
 	curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
 
@@ -1338,8 +1350,19 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 		if (1)
 		{
-			processed += add_values(poller_type, &nextcheck, poller_args_in->config_comms, curl_handle);
-			event_base_dispatch(base);
+			struct timeval	tv = {1, 0};
+
+			evtimer_add(loop_timer, &tv);
+
+			if (0 == sleeptime) /* also need to check if there is capacity to add new checks */
+			{
+				processed += add_values(poller_type, &nextcheck, poller_args_in->config_comms,
+						curl_handle);
+			}
+
+			event_base_loop(base, EVLOOP_ONCE);
+
+			evtimer_del(loop_timer);
 		}
 		else
 		{
@@ -1372,7 +1395,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 		{
 #ifdef HAVE_NETSNMP
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
