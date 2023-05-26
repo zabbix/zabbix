@@ -10704,7 +10704,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			max_items = ZBX_MAX_PINGER_ITEMS;
 			break;
 		default:
-			max_items = 1;
+			max_items = 3;
 	}
 
 	WRLOCK_CACHE;

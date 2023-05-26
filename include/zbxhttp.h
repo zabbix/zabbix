@@ -53,14 +53,26 @@ zbx_http_response_t;
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	unsigned char	value_type;
+	unsigned char	flags;
+	unsigned char	state;
+}
+zbx_dc_item_context_t;
+
+typedef struct
+{
 	CURL			*easyhandle;
 	struct curl_slist	*headers_slist;
+	char			*posts;
 	zbx_http_response_t	body;
 	zbx_http_response_t	header;
 	char			errbuf[CURL_ERROR_SIZE];
 	int			max_attempts;
 	unsigned char		retrieve_mode;
 	unsigned char		output_format;
+	zbx_dc_item_context_t	item_context;
 }
 zbx_http_context_t;
 

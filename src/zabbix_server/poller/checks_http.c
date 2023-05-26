@@ -64,6 +64,7 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 		{
 			SET_MSG_RESULT(result, error);
 			error = NULL;
+			ret = NOTSUPPORTED;
 		}
 	}
 	else
@@ -79,4 +80,6 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 
 	return ret;
 }
+
+
 #endif
