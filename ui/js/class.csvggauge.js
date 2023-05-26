@@ -120,7 +120,7 @@ class CSVGGauge {
 		if (this.options.value.arc.show) {
 			window.requestAnimationFrame(() => {
 				this.#animate(this.angleOld, (currentAngle) => {
-					const pathDefinition = this.#defineArc(this.angleStart, currentAngle, this.radiusValueArc, this.options.value.arc.size);
+					const pathDefinition = this.#defineArc(this.angleStart, currentAngle, this.radiusValueArc, this.thicknessValueArc);
 					this.elements.value_arc.node.setAttribute('d', pathDefinition);
 					this.elements.value_arc.node.style.fill = '#' + this.#getCurrentThresholdColor(currentAngle);
 				});
@@ -322,7 +322,7 @@ class CSVGGauge {
 			path.style.fill = '#' + this.thresholdsArcParts[i].color;
 			this.elements.threshold_arc_container.node.appendChild(path);
 
-			const pathDefinition = this.#defineArc(this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.radiusThresholdArc, this.options.thresholds.arc.size);
+			const pathDefinition = this.#defineArc(this.thresholdsArcParts[i].angleStart, this.thresholdsArcParts[i].angleEnd, this.radiusThresholdArc, this.thicknessThresholdArc);
 
 			path.setAttribute('d', pathDefinition);
 		}
@@ -454,7 +454,7 @@ class CSVGGauge {
 				node: path
 			};
 
-			const pathDefinition = this.#defineArc(this.angleStart, this.angleStart, this.radiusValueArc, this.options.value.arc.size);
+			const pathDefinition = this.#defineArc(this.angleStart, this.angleStart, this.radiusValueArc, this.thicknessValueArc);
 
 			path.setAttribute('d', pathDefinition);
 		}
@@ -475,12 +475,12 @@ class CSVGGauge {
 		if (container.classList.contains('svg-gauge-value-arc-container')) {
 			arc = 'value_arc_empty';
 			radius = this.radiusValueArc;
-			thickness = this.options.value.arc.size;
+			thickness = this.thicknessValueArc;
 		}
 		else if (container.classList.contains('svg-gauge-threshold-arc-container')) {
 			arc = 'threshold_arc_empty';
 			radius = this.radiusThresholdArc;
-			thickness = this.options.thresholds.arc.size;
+			thickness = this.thicknessThresholdArc;
 		}
 
 		this.elements[arc] = {
@@ -677,14 +677,12 @@ class CSVGGauge {
 		].join(' ');
 	}
 
-	#defineArc(startAngle, endAngle, radius, thicknessPercents) {
+	#defineArc(startAngle, endAngle, radius, thickness) {
 		const x = 0;
 		const y = 0;
 
-		const thicknessPixels = this.maxSpace * thicknessPercents / 100;
-
-		const innerStart = this.#polarToCartesian(x, y, radius - thicknessPixels, endAngle);
-		const innerEnd = this.#polarToCartesian(x, y, radius - thicknessPixels, startAngle);
+		const innerStart = this.#polarToCartesian(x, y, radius - thickness, endAngle);
+		const innerEnd = this.#polarToCartesian(x, y, radius - thickness, startAngle);
 		const outerStart = this.#polarToCartesian(x, y, radius, endAngle);
 		const outerEnd = this.#polarToCartesian(x, y, radius, startAngle);
 
@@ -694,7 +692,7 @@ class CSVGGauge {
 			'M', outerStart.x, outerStart.y,
 			'A', radius, radius, 0, largeArcFlag, 0, outerEnd.x, outerEnd.y,
 			'L', innerEnd.x, innerEnd.y,
-			'A', radius - thicknessPixels, radius - thicknessPixels, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
+			'A', radius - thickness, radius - thickness, 0, largeArcFlag, 1, innerStart.x, innerStart.y,
 			'L', outerStart.x, outerStart.y,
 			'Z'
 		].join(' ');
