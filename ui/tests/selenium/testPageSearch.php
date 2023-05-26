@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
@@ -88,7 +90,7 @@ class testPageSearch extends CWebTest {
 		return [
 			[
 				[
-					'search_string' => 'Non existant host',
+					'search_string' => 'Non-existent host',
 					'host_expected_data' => 'No data found.',
 					'host_expected_count' => ['count' => 0, 'total' => 0],
 					'hgroup_expected_data' => 'No data found.',
@@ -230,12 +232,98 @@ class testPageSearch extends CWebTest {
 		$this->zbxTestCheckHeader('Global view');
 	}
 
+	public static function getSuggestionsData()
+	{
+		return [
+			[
+				[
+					'search_string' => 'Non-existent host',
+					'expected_suggestions' => [],
+					'expected_count' => 0,
+				]
+			],
+			[
+				[
+					'search_string' => 'Test host',
+					'expected_suggestions' => [
+						'Simple form test host',
+						'Template inheritance test host',
+						'Visible host for template linkage',
+						'ЗАББИКС Сервер',
+					],
+					'expected_count' => 4,
+				]
+			],
+			[
+				[
+					'search_string' => 'a',
+					'expected_count' => 15,
+				]
+			],
+			[
+				[
+					'search_string' => '⭐️',
+					'expected_suggestions' => ['🙂⭐️'],
+					'expected_count' => 1,
+				]
+			],
+		];
+	}
+
+
+	/**
+	 * Fill the Search input and verify that autocomplete shows the correct suggestions.
+	 *
+	 * @dataProvider getSuggestionsData
+	 */
+	public function testPageSearch_VerifySearchSuggestions($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+		$form->query('id:search')->one()->fill($data['search_string']);
+
+		$itemSelector = 'xpath://*[@class="search-suggest"]//li';
+
+		// Verify suggestions.
+		if (isset($data['expected_suggestions'])) {
+			if(count($data['expected_suggestions']) > 0) {
+				$items = $this->query($itemSelector)->waitUntilVisible()->all()->asText();
+				foreach ($items as $item){
+					if(in_array($item, $data['expected_suggestions'])) {
+						// Remove item from the expected result array.
+						unset($data['expected_suggestions'][array_search($item, $data['expected_suggestions'])]);
+					}
+					else{
+						throw new Exception("Unexpected search suggestion: ".$item);
+					}
+				}
+				if(count($data['expected_suggestions']) > 0) {
+					throw new Exception("Not all expected search suggestions shown. Missing: ".
+						implode(', ', $data['expected_suggestions']));
+				}
+			}
+			else {
+				$this->verifyThatSuggestionsNotShow();
+			}
+		}
+
+		// Verify suggestion count.
+		if (isset($data['expected_count'])) {
+			if ($data['expected_count'] > 0) {
+				$this->assertEquals($data['expected_count'], $this->query($itemSelector)->waitUntilVisible()->all()->count());
+			}
+			else {
+				$this->verifyThatSuggestionsNotShow();
+			}
+		}
+
+	}
+
 	/**
 	 * Opens Zabbix Dashboard, searches by search string and opens the page.
 	 */
 	private function openSearchResults($searchString) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$form = $this->query('class:form-search')->asForm()->one()->waitUntilVisible();
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($searchString);
 		$form->submit();
 	}
@@ -261,6 +349,17 @@ class testPageSearch extends CWebTest {
 		if ($expectedCount !== null) {
 			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.$expectedCount['count'].' of '.$expectedCount['total'].' found', $footerText);
+		}
+	}
+
+	/**
+	 * Verify that the suggestion list is NOT visible.
+	 */
+	private function verifyThatSuggestionsNotShow(){
+		try {
+			$this->query('class:search-suggest')->waitUntilVisible(1);
+		} catch (TimeoutException $e) {
+			// All good, the suggestion list is not visible, continue the test.
 		}
 	}
 }
