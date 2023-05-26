@@ -46,8 +46,9 @@ svg *:focus {
 
 @font-face {
   font-family: "zabbix-icons";
-  src: url("../fonts/zabbix-icons.woff2?t=1685098014996") format("woff2"), url("../fonts/zabbix-icons.woff?t=1685098014996") format("woff"), url("../fonts/zabbix-icons.ttf?t=1685098014996") format("truetype"), url("../fonts/zabbix-icons.svg?t=1685098014996#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon::before, .btn-overlay-close::before, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
+  src: url("../fonts/zabbix-icons.woff2?t=1685100044866") format("woff2"), url("../fonts/zabbix-icons.woff?t=1685100044866") format("woff"), url("../fonts/zabbix-icons.ttf?t=1685100044866") format("truetype"), url("../fonts/zabbix-icons.svg?t=1685100044866#zabbix-icons") format("svg"); }
+[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
+.color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, z-select button.focusable::after,
 .z-select button.focusable::after, .btn-dropdown-container .btn-dropdown-toggle::after {
   font-family: 'zabbix-icons';
   font-size: 18px;
@@ -55,12 +56,14 @@ svg *:focus {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-.drag-icon, button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon {
+.drag-icon, button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker .use-transparent::after,
+.color-picker-dialogue .use-transparent::after {
   position: relative;
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  .drag-icon:empty, button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty {
+  .drag-icon:empty, button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker .use-transparent:empty::after,
+  .color-picker-dialogue .use-transparent:empty::after {
     justify-content: center; }
 
 .zi-alert-check:before {
@@ -1421,8 +1424,9 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     line-height: 18px; }
 .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after {
-  content: ' ';
-  background: linear-gradient(to top left, #fff calc(50% - 2px), #d40000, #fff calc(50% + 2px)); }
+  content: "";
+  font-size: 20px;
+  color: #d40000; }
 
 .color-picker {
   display: inline-block;
@@ -1463,6 +1467,8 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     height: 18px; }
     .color-picker-dialogue .color-picker-input .color-picker-preview::after {
       line-height: 14px; }
+    .color-picker-dialogue .color-picker-input .color-picker-preview.use-transparent::after {
+      font-size: 18px; }
   .color-picker-dialogue .color-picker-input input {
     padding-left: 25px; }
 
@@ -4127,6 +4133,7 @@ form.dashboard-widget-svggraph .list-accordion-item {
     height: 24px;
     margin-left: -2px; }
   form.dashboard-widget-svggraph .list-accordion-item > label {
+    pointer-events: initial;
     overflow: hidden;
     line-height: 24px;
     text-align: left;

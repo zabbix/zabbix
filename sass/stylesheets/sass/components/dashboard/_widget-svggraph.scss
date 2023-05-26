@@ -110,6 +110,7 @@ form.dashboard-widget-svggraph {
 		}
 
 		> label {
+			pointer-events: initial;
 			overflow: hidden;
 			line-height: 24px;
 			text-align: left;

@@ -27,8 +27,11 @@
 
 	.use-transparent {
 		&::after {
-			content: ' ';
-			background: linear-gradient(to top left, #fff calc(50% - 2px), $colorpicker-empty-color, #fff calc(50% + 2px));
+			@extend %icon-position;
+			@extend %icons-font;
+			content: $zi-slash;
+			font-size: 20px;
+			color: $colorpicker-empty-color;
 		}
 	}
 }
@@ -93,6 +96,12 @@
 
 			&::after {
 				line-height: 14px;
+			}
+
+			&.use-transparent {
+				&::after {
+					font-size: $icon-default-size;
+				}
 			}
 		}
 
