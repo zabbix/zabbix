@@ -3431,11 +3431,11 @@ a.icon-count {
 		position: relative;
 	}
 
-	&.ui-sortable-disabled {
-		.td-drag-icon {
-			width: 12px;
-		}
+	.td-drag-icon {
+		width: 12px;
+	}
 
+	&.ui-sortable-disabled {
 		.drag-icon {
 			color: $btn-icon-disabled-color;
 		}
