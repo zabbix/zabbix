@@ -6864,6 +6864,8 @@ a.btn-icon:link, a.btn-icon:hover, a.btn-icon:focus, a.btn-icon:visited,
 .menu-user a:link, .menu-user a:visited {
   border-bottom: 0; }
 
+.form-search .search:focus ~ .btn-icon {
+  color: #000000 !important; }
 .form-search .btn-icon:focus {
   color: #ffffff; }
   .form-search .btn-icon:focus:hover {

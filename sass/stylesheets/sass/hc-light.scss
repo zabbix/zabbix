@@ -245,6 +245,12 @@ a.btn-icon,
 }
 
 .form-search {
+	.search {
+		&:focus ~ .btn-icon {
+			color: $form-search-icon-focus-color !important;
+		}
+	}
+
 	.btn-icon {
 		&:focus {
 			color: $form-search-icon-color;

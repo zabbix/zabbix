@@ -130,6 +130,8 @@ $scrollbar-thumb-color-darken: 30%;
 $input-placeholder-color: #bbbbbb;
 
 $form-search-icon-color: #000000;
+$form-search-icon-hover-color: #000000;
+$form-search-icon-focus-color: #ffffff;
 $form-search-color: #000000;
 $form-search-bg-color: #ffffff;
 $form-search-border-color: #000000;
@@ -272,6 +274,12 @@ a.btn-icon,
 }
 
 .form-search {
+	.search {
+		&:focus ~ .btn-icon {
+			color: $form-search-icon-focus-color !important;
+		}
+	}
+
 	.btn-icon {
 		&:focus {
 			color: $form-search-icon-color;
