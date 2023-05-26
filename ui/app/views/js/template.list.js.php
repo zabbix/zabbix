@@ -25,7 +25,7 @@
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
-	<?= CTagFilterFieldHelper::getTemplate(); ?>
+	<?= CTagFilterFieldHelper::getTemplate() ?>
 </script>
 
 <script>
@@ -33,13 +33,6 @@
 		init() {
 			this._initActions();
 			this._initFilter();
-
-			const filter_fields = ['#filter_groups_', '#filter_templates_']
-
-			filter_fields.forEach(filter => {
-				$(filter).on('change', () => this._updateMultiselect($(filter)));
-				this._updateMultiselect($(filter));
-			})
 		}
 
 		_initActions() {
@@ -65,8 +58,10 @@
 				}
 			});
 
-			document.getElementById('js-create').addEventListener('click', (e) =>
-				this._edit({groupids: e.target.dataset.groupids})
+			document.getElementById('js-create').addEventListener('click', (e) => {
+					this._edit({groupids: JSON.parse(e.target.dataset.groupids)})
+			}
+
 			);
 		}
 
@@ -82,6 +77,13 @@
 			document.querySelectorAll('#filter-tags .form_row').forEach(row => {
 				new CTagFilterItem(row);
 			});
+
+			const filter_fields = ['#filter_groups_', '#filter_templates_']
+
+			filter_fields.forEach(filter => {
+				$(filter).on('change', () => this._updateMultiselect($(filter)));
+				this._updateMultiselect($(filter));
+			})
 		}
 
 		_edit(parameters) {
@@ -89,6 +91,28 @@
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
 			});
 		}
 
@@ -106,7 +130,6 @@
 					) ?>;
 
 				curl.setArgument('action', 'template.delete');
-				// todo - fix arg 1;
 				curl.setArgument('clear', 1);
 			}
 			else {

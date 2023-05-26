@@ -27,27 +27,24 @@
 $tabs = new CTabView();
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('templates.php')))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
 	->setName('templatesForm');
-	//->addVar('form', $data['form']);
 
-if ($data['templateid'] != null) {
+if ($data['templateid'] !== null) {
 	$form->addVar('templateid', $data['templateid']);
 }
 
 //$form->addVar('clear_templates', $data['clear_templates']);
 
 // Template tab.
-// todo - add database numbers not hardcoded,
 $template_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Template name'), 'template_name'))
-			// todo - think about better approach:
 			->addStyle('min-width: 150px;')
 			->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('template_name', $data['template_name'], false, 128))
+			(new CTextBox('template_name', $data['template_name'], false, DB::getFieldLength('hosts', 'host')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
@@ -56,7 +53,8 @@ $template_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Visible name')),
 		new CFormField(
-			(new CTextBox('visiblename', $data['visible_name'], false, 128))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextBox('visiblename', $data['visible_name'], false, DB::getFieldLength('hosts', 'name')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
 	]);
 
@@ -349,8 +347,7 @@ if ($data['templateid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			// todo - add parameter - clear?
-			'action' => 'template_edit_popup.delete();'
+			'action' => 'template_edit_popup.delete('.json_encode(['clear' => true]).');'
 		]
 	];
 }

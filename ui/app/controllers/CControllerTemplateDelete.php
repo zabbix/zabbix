@@ -26,9 +26,8 @@ class CControllerTemplateDelete extends CController {
 	}
 
 	protected function checkInput(): bool {
-		// todo - add strict validation rules
 		$fields = [
-			'templateids' =>	'required|array',
+			'templateids' =>	'not_empty|array_db hosts.hostid',
 			'clear' =>			'in 1'
 		];
 

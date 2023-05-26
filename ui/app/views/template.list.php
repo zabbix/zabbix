@@ -38,7 +38,7 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem(
 				(new CSimpleButton(_('Create template')))
-					->setAttribute('data-groupids', array_keys($data['filter']['groups']))
+					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
 					->setId('js-create'))
 			->addItem(
 				(new CButton('form', _('Import')))
@@ -343,8 +343,6 @@ $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init('.json_encode([
-		'tags' => array_values($data['filter']['tags'])
-	]). ');'))
+(new CScriptTag('view.init();'))
 	->setOnDocumentReady()
 	->show();

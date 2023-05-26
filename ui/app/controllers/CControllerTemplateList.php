@@ -26,21 +26,20 @@ class CControllerTemplateList extends CController {
 	}
 
 	protected function checkInput(): bool {
-		// todo - update validation fields, set stricter validation rules
 		$fields = [
-			'sort' =>					'in name',
-			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
-			'uncheck' =>				'in 1',
 			'filter_set' =>				'in 1',
 			'filter_rst' =>				'in 1',
 			'filter_name' =>			'string',
 			'filter_vendor_name' =>		'string',
 			'filter_vendor_version' =>	'string',
-			'filter_templates' =>		'',
-			'filter_groups' =>			'',
+			'filter_templates' =>		'array_db hosts.hostid',
+			'filter_groups' =>			'array_db hosts_groups.groupid',
 			'filter_evaltype' =>		'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
-			'page' =>					'ge 1',
-			'filter_tags' =>			''
+			'filter_tags' =>			'array',
+			'sort' =>					'in name',
+			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
+			'uncheck' =>				'in 1',
+			'page' =>					'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,19 +57,6 @@ class CControllerTemplateList extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.templates.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.templates.filter_vendor_name', $this->getInput('filter_vendor_name', ''),
-				PROFILE_TYPE_STR
-			);
-			CProfile::update('web.templates.filter_vendor_version', $this->getInput('filter_vendor_version', ''),
-				PROFILE_TYPE_STR);
-			CProfile::updateArray('web.templates.filter_templates', $this->getInput('filter_templates', []),
-				PROFILE_TYPE_ID);
-			CProfile::updateArray('web.templates.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
-			CProfile::update('web.templates.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
-				PROFILE_TYPE_INT
-			);
-
 			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
 			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
 				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
@@ -81,20 +67,11 @@ class CControllerTemplateList extends CController {
 				$filter_tags['values'][] = $filter_tag['value'];
 				$filter_tags['operators'][] = $filter_tag['operator'];
 			}
-			CProfile::updateArray('web.templates.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.templates.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.templates.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+
+			$this->updateProfiles($filter_tags);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.templates.filter_name');
-			CProfile::delete('web.templates.filter_vendor_name');
-			CProfile::delete('web.templates.filter_vendor_version');
-			CProfile::deleteIdx('web.templates.filter_templates');
-			CProfile::deleteIdx('web.templates.filter_groups');
-			CProfile::delete('web.templates.filter.evaltype');
-			CProfile::deleteIdx('web.templates.filter.tags.tag');
-			CProfile::deleteIdx('web.templates.filter.tags.value');
-			CProfile::deleteIdx('web.templates.filter.tags.operator');
+			$this->deleteProfiles();
 		}
 
 		$filter = [
@@ -117,12 +94,11 @@ class CControllerTemplateList extends CController {
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		// todo - check CProfile for template.list/templates.php
-		$sort_field = $this->getInput('sort', CProfile::get('web.templates.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.php.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.templates.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.sortorder', ZBX_SORT_UP));
 
-		CProfile::update('web.templates.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.templates.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
@@ -250,5 +226,35 @@ class CControllerTemplateList extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of templates'));
 		$this->setResponse($response);
+	}
+
+	private function updateProfiles($filter_tags): void {
+		CProfile::update('web.templates.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_name', $this->getInput('filter_vendor_name', ''),
+			PROFILE_TYPE_STR
+		);
+		CProfile::update('web.templates.filter_vendor_version', $this->getInput('filter_vendor_version', ''),
+			PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter_templates', $this->getInput('filter_templates', []),
+			PROFILE_TYPE_ID);
+		CProfile::updateArray('web.templates.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
+		CProfile::update('web.templates.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			PROFILE_TYPE_INT
+		);
+		CProfile::updateArray('web.templates.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+	}
+
+	private function deleteProfiles(): void {
+		CProfile::delete('web.templates.filter_name');
+		CProfile::delete('web.templates.filter_vendor_name');
+		CProfile::delete('web.templates.filter_vendor_version');
+		CProfile::deleteIdx('web.templates.filter_templates');
+		CProfile::deleteIdx('web.templates.filter_groups');
+		CProfile::delete('web.templates.filter.evaltype');
+		CProfile::deleteIdx('web.templates.filter.tags.tag');
+		CProfile::deleteIdx('web.templates.filter.tags.value');
+		CProfile::deleteIdx('web.templates.filter.tags.operator');
 	}
 }

@@ -34,8 +34,8 @@ class CControllerTemplateEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'templateid' =>	'',
-			'groupids' =>	''
+			'templateid' =>	'db hosts.hostid',
+			'groupids' =>	'array_db hosts_groups.groupid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,7 +59,6 @@ class CControllerTemplateEdit extends CController {
 		}
 
 		if ($this->hasInput('templateid')) {
-			// todo - check if all output elements are needed here.
 			$templates = API::Template()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'templateids' => $this->getInput('templateid'),
@@ -79,22 +78,9 @@ class CControllerTemplateEdit extends CController {
 	protected function doAction(): void {
 		$templateid = $this->getInput('templateid');
 
-//		if ($this->getInput('templateid') === null) {
-//			$dbTemplates = API::Template()->get([
-//				'output' => API_OUTPUT_EXTEND,
-//				'selectTemplateGroups' => ['groupid'],
-//				'selectParentTemplates' => ['templateid', 'name'],
-//				'selectMacros' => API_OUTPUT_EXTEND,
-//				'selectTags' => ['tag', 'value'],
-//				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-//				'templateids' => $templateid
-//			]);
-//			$data['dbTemplate'] = reset($dbTemplates);
-//		}
-
-		// temporary data array:
+		// Default template data.
 		$data = [
-			'templateid' => getRequest('templateid', 0),
+			'templateid' => $templateid,
 			'template_name' => '',
 			'visible_name' => '',
 			'description' => '',
@@ -109,12 +95,64 @@ class CControllerTemplateEdit extends CController {
 			'valuemaps' => []
 		];
 
-	//	$data = array_merge($this->template, $data);
+		if ($templateid !== null) {
+			$dbTemplates = API::Template()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'selectTemplateGroups' => ['groupid'],
+				'selectParentTemplates' => ['templateid'],
+				'selectMacros' => API_OUTPUT_EXTEND,
+				'selectTags' => ['tag', 'value'],
+				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+				'templateids' => $templateid
+			]);
+			$data['dbTemplate'] = reset($dbTemplates);
 
-//		// description
-//		$data['description'] = ($data['templateid'] !== null)
-//			? $data['dbTemplate']['description']
-//			: getRequest('description', '');
+			$data['vendor'] = array_filter([
+				'name' => $data['dbTemplate']['vendor_name'],
+				'version' => $data['dbTemplate']['vendor_version']
+			], 'strlen');
+
+			foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
+				$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
+			}
+
+			$data['tags'] = $data['dbTemplate']['tags'];
+			$data['macros'] = $data['dbTemplate']['macros'];
+
+			foreach ($data['macros'] as &$macro) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+					$macro['allow_revert'] = true;
+				}
+			}
+			unset($macro);
+
+			order_result($data['dbTemplate']['valuemaps'], 'name');
+			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
+
+
+			$data['template_name'] = $data['dbTemplate']['host'];
+			$data['visible_name'] = $data['dbTemplate']['name'];
+
+			// Display empty visible name if equal to host name.
+			if ($data['visible_name'] === $data['template_name']) {
+				$data['visible_name'] = '';
+			}
+
+//			$templateids = $data['original_templates'];
+		}
+
+		// todo - add clear_templates
+//		$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
+//		$clear_templates = array_diff($clear_templates, array_keys($templateids));
+
+//		$data['clear_templates'] = $clear_templates;
+
+		$data = array_merge($this->template, $data);
+
+		// description
+		$data['description'] = ($data['templateid'] !== null)
+			? $data['dbTemplate']['description']
+			: getRequest('description', '');
 
 		// tags
 		if (!array_key_exists('tags', $data)) {
@@ -124,35 +162,40 @@ class CControllerTemplateEdit extends CController {
 			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
-//		// Add already linked and new templates.
-//		$templates = [];
-//		$request_linked_templates = getRequest('templates', hasRequest('form_refresh') ? [] : $data['original_templates']);
-//		$request_add_templates = getRequest('add_templates', []);
+		// Add already linked and new templates.
+		$templates = [];
+		$linked_templates = $data['dbTemplate']['parentTemplates'];
 
-//		if ($request_linked_templates || $request_add_templates) {
-//			$templates = API::Template()->get([
-//				'output' => ['templateid', 'name'],
-//				'templateids' => array_merge($request_linked_templates, $request_add_templates),
-//				'preservekeys' => true
-//			]);
+		foreach ($linked_templates as $template) {
+			$linked_template_ids[$template['templateid']] = $template['templateid'];
+		}
+		// todo - add add_templates
+		$add_templates = getRequest('add_templates', []);
 
-//			$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
-//			CArrayHelper::sort($data['linked_templates'], ['name']);
+		if ($linked_templates || $add_templates) {
+			$templates = API::Template()->get([
+				'output' => ['templateid', 'name'],
+				'templateids' => array_merge($linked_template_ids, $add_templates),
+				'preservekeys' => true
+			]);
 
-//			$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+			$data['linked_templates'] = array_intersect_key($templates, array_flip($linked_template_ids));
+			CArrayHelper::sort($data['linked_templates'], ['name']);
 
-//			foreach ($data['add_templates'] as &$template) {
-//				$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
-//			}
-//			unset($template);
-//		}
+			$data['add_templates'] = array_intersect_key($templates, array_flip($add_templates));
 
-//		$data['writable_templates'] = API::Template()->get([
-//			'output' => ['templateid'],
-//			'templateids' => array_keys($data['linked_templates']),
-//			'editable' => true,
-//			'preservekeys' => true
-//		]);
+			foreach ($data['add_templates'] as &$template) {
+				$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+			}
+			unset($template);
+		}
+
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys($data['linked_templates']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
 		// Add inherited macros to template macros.
 		if ($data['show_inherited_macros']) {
@@ -245,14 +288,6 @@ class CControllerTemplateEdit extends CController {
 			'add_templates' => array_map('strval', array_keys($data['add_templates']))
 		];
 
-
-		$templateids = getRequest('templates', []);
-		$clear_templates = getRequest('clear_templates', []);
-
-		$clear_templates = array_intersect($clear_templates, array_keys($data['original_templates']));
-		$clear_templates = array_diff($clear_templates, array_keys($templateids));
-
-		$data['clear_templates'] = $clear_templates;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

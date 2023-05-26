@@ -32,6 +32,7 @@ window.template_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.data = data;
+		this.templateid = data.templateid;
 
 		this._initMacrosTab();
 
@@ -104,14 +105,13 @@ window.template_edit_popup = new class {
 			})
 			.trigger('input');
 
-		//const show_inherited = document.querySelector('input[name=show_inherited_macros]:checked');
 		this.macros_manager = new HostMacrosManager(<?= json_encode([
 			'readonly' => $data['readonly'],
 			'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 		]) ?>);
 
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
-			var panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
 			if (panel.attr('id') === 'macroTab') {
 				const macros_initialized = panel.data('macros_initialized') || false;
@@ -150,7 +150,6 @@ window.template_edit_popup = new class {
 			}
 		});
 
-
 		document.querySelector('#show_inherited_macros').onchange = (e) => {
 			this.macros_manager.load(
 				document.querySelector('input[name=show_inherited_macros]:checked').value == 1, linked_templateids.concat(this.getAddTemplates())
@@ -176,5 +175,95 @@ window.template_edit_popup = new class {
 		}
 
 		return templateids;
+	}
+
+	clone({title, buttons}) {
+		this.templateid = null;
+
+		this.overlay.setProperties({title, buttons});
+		this.overlay.unsetLoading();
+		this.overlay.recoverFocus();
+	}
+
+	delete(clear = false) {
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'template.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('template'), JSON_THROW_ON_ERROR) ?>
+		);
+
+		let data = {templateids: [this.templateid]}
+		if (clear) {
+			data.clear = 1;
+		}
+
+		this._post(curl.getUrl(), data, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
+	}
+
+	submit() {
+		const fields = getFormFields(this.form);
+
+		if (this.templateid !== null) {
+			fields.templateid = this.templateid;
+		}
+
+		// todo - trim fields
+
+		this.overlay.setLoading();
+
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', this.templateid === null ? 'template.create' : 'template.update');
+
+		this._post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
+	}
+
+	_post(url, data, success_callback) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
 }
