@@ -158,7 +158,7 @@ $icon-color: #555555;
 
 $btn-icon-color: #555555;
 $btn-icon-hover-color: #000000 !default;
-$btn-icon-disabled-color: #cccccc; // TODO: to check color
+$btn-icon-disabled-color: #cccccc;
 
 // Analog clock
 $clock-face-color: #ffffff;
@@ -366,22 +366,6 @@ a.btn-icon,
 		}
 	}
 }
-
-// Colors and general.
-// TODO - check
-// button {
-//	&:focus {
-//		background-color: lighten($btn-bg-color, 10%);
-//		box-shadow: 0 0 0 2px $blue;
-//	}
-//}
-
-// TODO-check
-// .btn-alt {
-// 	&:focus {
-// 		box-shadow: 0 0 0 2px $blue;
-// 	}
-// }
 
 .radio-list-control {
 	.normal-bg,

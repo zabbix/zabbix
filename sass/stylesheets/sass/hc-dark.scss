@@ -173,6 +173,7 @@ $icon-color: #dddddd;
 
 $btn-icon-color: #7d7d7d;
 $btn-icon-hover-color: #ffffff;
+$btn-icon-disabled-color: #555555;
 
 $icon-content-color: #000000;
 
@@ -564,6 +565,22 @@ a.link-action {
 	&:focus {
 		margin-bottom: -3px !important;
 		border-bottom: 3px solid $link-hover-color;
+	}
+}
+
+.drag-icon {
+	color: $btn-icon-hover-color;
+
+	&.disabled {
+		color: $btn-icon-color;
+	}
+}
+
+.ui-sortable {
+	&.ui-sortable-disabled {
+		.drag-icon {
+			color: $btn-icon-color;
+		}
 	}
 }
 

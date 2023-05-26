@@ -713,7 +713,7 @@ svg a {
   .drag-icon::before {
     font-size: 22px; }
   .drag-icon.disabled {
-    color: white;
+    color: #555555;
     opacity: 1; }
 
 html,
@@ -1225,7 +1225,7 @@ button, .btn {
     background: transparent;
     border: none; }
   [disabled].btn-icon, [disabled].btn-overlay-close {
-    color: white;
+    color: #555555;
     background-color: transparent; }
 
 .btn-link {
@@ -6343,7 +6343,7 @@ a.icon-count {
 .ui-sortable .td-drag-icon {
   width: 12px; }
 .ui-sortable.ui-sortable-disabled .drag-icon {
-  color: white; }
+  color: #555555; }
 
 #expressions_list .ui-sortable-helper {
   display: table; }
@@ -7001,6 +7001,14 @@ a.link-action {
   .btn-link:focus {
     margin-bottom: -3px !important;
     border-bottom: 3px solid #ffffff; }
+
+.drag-icon {
+  color: #ffffff; }
+  .drag-icon.disabled {
+    color: #7d7d7d; }
+
+.ui-sortable.ui-sortable-disabled .drag-icon {
+  color: #7d7d7d; }
 
 .table-paging a:focus {
   background-color: #ffffff; }
