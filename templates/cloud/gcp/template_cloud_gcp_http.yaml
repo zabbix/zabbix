@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-23T12:25:45Z'
+  date: '2023-05-26T12:16:59Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1948,7 +1948,8 @@ zabbix_export:
                 - 1h
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within {$GCP.TIME.WINDOW} | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -2132,6 +2133,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -3289,7 +3291,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
-          description: 'Databases discovery.'
+          description: 'Schedulers discovery.'
           item_prototypes:
             - uuid: 67bde61c128e4dfe9e47d8a3a6e3ceec
               name: 'GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers'
@@ -4088,7 +4090,8 @@ zabbix_export:
                 - 1h
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within {$GCP.TIME.WINDOW} | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -4405,6 +4408,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -5643,7 +5647,8 @@ zabbix_export:
                 - 1h
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
-          posts: '{"query":"cloudsql.googleapis.com/database/up | within {$GCP.TIME.WINDOW} | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -5827,6 +5832,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -7580,8 +7586,8 @@ zabbix_export:
           triggers:
             - uuid: fb8e28649b4947e9a11d891e3126a3a1
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}'
-              name: 'GCP Compute Engine: High CPU Utilization'
-              event_name: 'GCP Compute Engine: High CPU Utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
+              name: 'GCP Compute Engine: High CPU utilization'
+              event_name: 'GCP Compute Engine: High CPU utilization (over {$GCE.CPU.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'The CPU utilization is too high. The system might be slow to respond.'
               manual_close: 'YES'
@@ -7777,6 +7783,7 @@ zabbix_export:
                 - 1h
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://compute.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}/zones/{$GCE.INSTANCE.ZONE}/instances/{HOST.NAME}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json

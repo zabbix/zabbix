@@ -246,7 +246,7 @@ This template will be connected to discovered entities automatically with all re
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP Compute Engine: High CPU Utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
+|GCP Compute Engine: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.cpu.utilization,15m) >= {$GCE.CPU.UTIL.MAX}`|Average|**Manual close**: Yes|
 |GCP Compute Engine: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}`|Average||
 |GCP Compute Engine: Instance is in suspended state|<p>The VM is in a suspended state. You can resume the VM or delete it.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7`|Info|**Manual close**: Yes|
 |GCP Compute Engine: The instance is in repairing state|<p>The VM is being repaired. Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance. During this time, the VM is unusable.</p>|`last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4`|Warning|**Manual close**: Yes|
@@ -692,7 +692,7 @@ This template will be connected to discovered entities automatically with all re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Schedulers discovery|<p>Databases discovery.</p>|Dependent item|gcp.cloudsql.schedulers.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Schedulers discovery|<p>Schedulers discovery.</p>|Dependent item|gcp.cloudsql.schedulers.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Schedulers discovery
 
