@@ -1,8 +1,11 @@
 Changes for 7.0.0alpha2
 
 New features:
+A.F.I..... [ZBXNEXT-2299] implemented problem/event filtering by performed update actions and user; reworked problem filter to support filtering by acknowledgement status and current user (miks)
 
 Bug fixes:
+...G...... [ZBX-22762] fixed race condition in Zabbix agent 2 when reading filesystem (arimdjonoks)
+...G...... [ZBX-22593] changed representation of boolean item values in wmi.get, wmi.getall items in Zabbix agent 2 to match the format in classic Zabbix agent (mprihodko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0alpha1
