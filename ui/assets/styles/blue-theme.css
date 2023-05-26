@@ -457,7 +457,7 @@ pre {
 a:link {
   color: #0275b8;
   text-decoration: none;
-  transition: color .2s ease-out; }
+  transition: color 0.2s ease-out; }
 a:visited {
   color: #0275b8;
   text-decoration: none; }
@@ -4259,9 +4259,9 @@ div.dashboard-widget-url .widget-url {
   display: block; }
 
 .link-action {
-  border-bottom: 1px dotted;
-  cursor: pointer;
-  color: #1f2c33; }
+  cursor: pointer; }
+  .link-action:link, .link-action:visited {
+    color: #1f2c33; }
   .link-action:hover {
     color: #0275b8;
     border-bottom: 1px solid rgba(2, 117, 184, 0.35); }
@@ -4269,7 +4269,7 @@ div.dashboard-widget-url .widget-url {
     outline: none;
     border-bottom: 2px solid rgba(2, 117, 184, 0.35); }
 
-.link-action:visited, .link-action:active {
+.link-action, .link-action:link, .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
   text-decoration: none; }
 

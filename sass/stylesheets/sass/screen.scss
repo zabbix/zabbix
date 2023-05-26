@@ -78,12 +78,15 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-url";
 
 .link-action {
-	border-bottom: 1px dotted;
-	cursor: pointer;
-	color: $font-color;
+	@extend %link-action-style;
 
+	cursor: pointer;
+
+	&:link,
 	&:visited {
 		@extend %link-action-style;
+
+		color: $font-color;
 	}
 
 	&:hover {

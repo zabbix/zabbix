@@ -87,7 +87,7 @@ a {
 	&:link {
 		color: $link-color;
 		text-decoration: none;
-		transition: color .2s ease-out;
+		transition: color $ui-controls-transition-duration ease-out;
 	}
 
 	&:visited {

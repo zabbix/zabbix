@@ -458,7 +458,7 @@ pre {
 a:link {
   color: #f8f8f8;
   text-decoration: none;
-  transition: color .2s ease-out; }
+  transition: color 0.2s ease-out; }
 a:visited {
   color: #f8f8f8;
   text-decoration: none; }
@@ -4221,9 +4221,9 @@ div.dashboard-widget-url .widget-url {
   display: block; }
 
 .link-action {
-  border-bottom: 1px dotted;
-  cursor: pointer;
-  color: #ffffff; }
+  cursor: pointer; }
+  .link-action:link, .link-action:visited {
+    color: #ffffff; }
   .link-action:hover {
     color: #ffffff;
     border-bottom: 1px solid rgba(255, 255, 255, 0.35); }
@@ -4231,7 +4231,7 @@ div.dashboard-widget-url .widget-url {
     outline: none;
     border-bottom: 2px solid rgba(255, 255, 255, 0.35); }
 
-.link-action:visited, .link-action:active {
+.link-action, .link-action:link, .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
   text-decoration: none; }
 
