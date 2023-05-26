@@ -282,6 +282,10 @@ a.btn-icon,
 			color: $white;
 		}
 	}
+
+	.btn-dashboard-page-properties {
+		color: lighten($btn-icon-color, 25%);
+	}
 }
 
 // Dashboard, widgets and iterators.
