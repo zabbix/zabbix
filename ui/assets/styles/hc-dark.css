@@ -455,33 +455,33 @@ pre {
   font-family: "Courier New", Courier, monospace;
   font-size: 1em; }
 
-a:link {
+a {
   color: #f8f8f8;
-  text-decoration: none;
-  transition: color 0.2s ease-out; }
-a:visited {
-  color: #f8f8f8;
+  transition: color 0.2s ease-out;
   text-decoration: none; }
-a:hover {
-  outline: 0;
-  color: #ffffff;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
-a:focus {
-  color: #ffffff;
-  outline: none;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.5); }
-a:active {
-  outline: 0;
-  color: #f8f8f8;
-  border-bottom: 1px solid rgba(248, 248, 248, 0.5); }
-a img {
-  border: 0;
-  vertical-align: top; }
-a.disabled:active, a.disabled:focus, a.disabled:hover {
-  cursor: default !important;
-  border-bottom: 0;
-  outline: 0;
-  opacity: .35; }
+  a:visited {
+    color: #f8f8f8;
+    text-decoration: none; }
+  a:hover {
+    outline: 0;
+    color: #ffffff;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.5); }
+  a:focus {
+    color: #ffffff;
+    outline: none;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5); }
+  a:active {
+    outline: 0;
+    color: #f8f8f8;
+    border-bottom: 1px solid rgba(248, 248, 248, 0.5); }
+  a img {
+    border: 0;
+    vertical-align: top; }
+  a.disabled:active, a.disabled:focus, a.disabled:hover {
+    cursor: default !important;
+    border-bottom: 0;
+    outline: 0;
+    opacity: .35; }
 
 svg a {
   fill: #f8f8f8;
@@ -4221,8 +4221,9 @@ div.dashboard-widget-url .widget-url {
   display: block; }
 
 .link-action {
+  color: #ffffff;
   cursor: pointer; }
-  .link-action:link, .link-action:visited {
+  .link-action:visited {
     color: #ffffff; }
   .link-action:hover {
     color: #ffffff;
@@ -4231,7 +4232,7 @@ div.dashboard-widget-url .widget-url {
     outline: none;
     border-bottom: 2px solid rgba(255, 255, 255, 0.35); }
 
-.link-action, .link-action:link, .link-action:visited, .link-action:active {
+.link-action, .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
   text-decoration: none; }
 

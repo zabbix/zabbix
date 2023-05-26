@@ -84,11 +84,9 @@ pre {
 }
 
 a {
-	&:link {
-		color: $link-color;
-		text-decoration: none;
-		transition: color $ui-controls-transition-duration ease-out;
-	}
+	color: $link-color;
+	transition: color $ui-controls-transition-duration ease-out;
+	text-decoration: none;
 
 	&:visited {
 		color: $link-visited-color;

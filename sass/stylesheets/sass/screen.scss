@@ -79,13 +79,11 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 .link-action {
 	@extend %link-action-style;
-
+	color: $font-color;
 	cursor: pointer;
 
-	&:link,
 	&:visited {
 		@extend %link-action-style;
-
 		color: $font-color;
 	}
 
