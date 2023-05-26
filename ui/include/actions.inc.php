@@ -760,17 +760,6 @@ function get_conditions_by_eventsource($eventsource) {
 	return $conditions[EVENT_SOURCE_TRIGGERS];
 }
 
-function get_opconditions_by_eventsource($eventsource) {
-	$conditions = [
-		EVENT_SOURCE_TRIGGERS => [CONDITION_TYPE_EVENT_ACKNOWLEDGED],
-		EVENT_SOURCE_DISCOVERY => []
-	];
-
-	if (array_key_exists($eventsource, $conditions)) {
-		return $conditions[$eventsource];
-	}
-}
-
 /**
  * Return allowed operations types.
  *

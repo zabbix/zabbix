@@ -61,7 +61,7 @@
 
 		#edit(parameters = {}) {
 			const overlay = PopUp('correlation.edit', parameters, {
-				dialogueid: 'correlation-form',
+				dialogueid: 'correlationForm',
 				dialogue_class: 'modal-popup-medium',
 				prevent_navigation: true
 			});

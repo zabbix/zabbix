@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('configuration.correlation.list.js.php');
+$this->includeJsFile('correlation.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('correlation');
@@ -71,7 +71,7 @@ $html_page = (new CHtmlPage())
 		->addVar('action', 'correlation.list')
 	);
 
-$form = (new CForm())->setName('correlation_form');
+$form = (new CForm())->setName('correlationsForm');
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'correlation.list')
