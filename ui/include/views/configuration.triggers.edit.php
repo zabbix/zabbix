@@ -103,10 +103,10 @@ $triggersFormList
 	->addRow(
 		(new CLabel(_('Event name'), 'event_name')),
 		(new CTextAreaFlexible('event_name', $data['event_name']))
-			->setReadonly($readonly)
 			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableSpellcheck()
+			->setReadonly($readonly)
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),

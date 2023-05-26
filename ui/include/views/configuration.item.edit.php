@@ -727,9 +727,9 @@ $item_tab
 		(new CFormField((new CTextArea('params_es', $data['params']))
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setReadonly($discovered_item)
 			->setAriaRequired()
 			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-executed-script-field')
 	])
 	->addItem([
@@ -740,8 +740,8 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setReadonly($discovered_item)
 			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-sql-query-field')
 	])
 	->addItem([
@@ -752,8 +752,8 @@ $item_tab
 			->addClass(ZBX_STYLE_MONOSPACE_FONT)
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
-			->setReadonly($discovered_item)
 			->disableSpellcheck()
+			->setReadonly($discovered_item)
 		))->setId('js-item-formula-field')
 	])
 	->addItem([

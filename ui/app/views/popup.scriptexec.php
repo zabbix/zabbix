@@ -31,8 +31,8 @@ if ($data['success']) {
 			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 			->addClass('monospace-font')
 			->addClass('active-readonly')
-			->setReadonly(true)
 			->disableSpellcheck()
+			->setReadonly(true)
 	];
 
 	if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {

@@ -909,7 +909,8 @@ foreach ($lld_macro_paths as $i => $lld_macro_path) {
 		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
 	]))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		->setAttribute('placeholder', _('$.path.to.node'));
+		->setAttribute('placeholder', _('$.path.to.node'))
+		->disableSpellcheck();
 
 	$remove = [
 		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))
