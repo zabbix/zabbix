@@ -113,17 +113,8 @@ class CWidgetGauge extends CWidget {
 	#getGaugeContainerSize() {
 		const computed_style = getComputedStyle(this.gauge_container);
 
-		const width = Math.floor(
-			parseFloat(computed_style.width)
-				- parseFloat(computed_style.paddingLeft) - parseFloat(computed_style.paddingRight)
-				- parseFloat(computed_style.borderLeftWidth) - parseFloat(computed_style.borderRightWidth)
-		);
-
-		const height = Math.floor(
-			parseFloat(computed_style.height)
-				- parseFloat(computed_style.paddingTop) - parseFloat(computed_style.paddingBottom)
-				- parseFloat(computed_style.borderTopWidth) - parseFloat(computed_style.borderBottomWidth)
-		);
+		const width = Math.floor(parseFloat(computed_style.width));
+		const height = Math.floor(parseFloat(computed_style.height));
 
 		return {width, height};
 	}

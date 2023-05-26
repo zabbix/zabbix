@@ -86,11 +86,10 @@ form.dashboard-widget-gauge {
 
 div.dashboard-widget-gauge {
 	.dashboard-grid-widget-body {
-		$line-height: 1.2em;
-
 		> div {
 			height: 100%;
 			padding: 0 10px;
+			overflow: hidden;
 		}
 	}
 }
@@ -98,36 +97,32 @@ div.dashboard-widget-gauge {
 // Widget view and downloaded image.
 
 .svg-gauge {
-	$line-height: 1.2em;
+	dominant-baseline: text-before-edge
+}
 
-	div {
-		line-height: $line-height;
-		text-align: center;
-		white-space: nowrap;
-		color: $font-color;
-	}
+.svg-gauge-description,
+.svg-gauge-value-container {
+	text-anchor: middle;
+}
 
-	#value,
-	#units {
-		white-space: pre;
-	}
+.svg-gauge-value-container {
+	dominant-baseline: auto;
+}
 
-	.arc {
-		&.empty {
-			fill: $gauge-empty-color;
-		}
+.svg-gauge-arc-empty {
+	fill: $gauge-empty-color;
+}
 
-		&.value {
-			fill: $gauge-fill-color;
-			transition: fill 0.2s;
-		}
-	}
+.svg-gauge-arc-value {
+	fill: $gauge-fill-color;
+	transition: fill 0.2s;
+}
 
-	#needle {
-		fill: $gauge-needle-color;
-		stroke: $gauge-needle-color;
-		transition: fill 0.2s;
-	}
+.svg-gauge-needle {
+	vector-effect: non-scaling-stroke;
+	fill: $gauge-needle-color;
+	stroke: $gauge-needle-color;
+	transition: fill 0.2s;
 }
 
 // Modifications by themes.

@@ -1669,24 +1669,29 @@ form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
     width: 100%; }
 
 div.dashboard-widget-gauge .dashboard-grid-widget-body > div {
-  box-sizing: border-box;
   height: 100%;
-  padding: 0 10px; }
+  padding: 0 10px;
+  overflow: hidden; }
 
-.svg-gauge div {
-  line-height: 1.2em;
-  text-align: center;
-  white-space: nowrap;
-  color: #f2f2f2; }
-.svg-gauge #value,
-.svg-gauge #units {
-  white-space: pre; }
-.svg-gauge .arc.empty {
+.svg-gauge {
+  dominant-baseline: text-before-edge; }
+
+.svg-gauge-description,
+.svg-gauge-value-container {
+  text-anchor: middle; }
+
+.svg-gauge-value-container {
+  dominant-baseline: auto; }
+
+.svg-gauge-arc-empty {
   fill: #383838; }
-.svg-gauge .arc.value {
+
+.svg-gauge-arc-value {
   fill: #69808d;
   transition: fill 0.2s; }
-.svg-gauge #needle {
+
+.svg-gauge-needle {
+  vector-effect: non-scaling-stroke;
   fill: #f2f2f2;
   stroke: #f2f2f2;
   transition: fill 0.2s; }
