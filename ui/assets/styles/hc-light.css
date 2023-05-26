@@ -4233,8 +4233,7 @@ div.dashboard-widget-url .widget-url {
 
 .link-action:visited, .link-action:active {
   border-bottom: 1px dotted;
-  text-decoration: none;
-  background: green; }
+  text-decoration: none; }
 
 .link-alt {
   text-decoration: none;
