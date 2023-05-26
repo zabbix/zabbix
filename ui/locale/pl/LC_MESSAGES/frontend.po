@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-30 13:25+0000\n"
+"PO-Revision-Date: 2023-05-26 19:40+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -590,6 +590,11 @@ msgstr "Potwierdzone zdarzenia w stanie PROBLEM"
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
 msgstr "Oznacz zdarzenia ROZWIĄZANE"
+
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1261,7 +1266,7 @@ msgstr "Zezwól na zamknięcie ręczne"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "Zezwól na przekierowania"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1284,7 +1289,7 @@ msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
 #: include/classes/data/CItemData.php:1623
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Ilość fizycznej pamięci, która jest zamieniona na przestrzeń pliku wymiany, \"url\" - URL usługi VMware, \"uuid\" - unikalny globalny identyfikator wirtualnej maszyny VMware"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1292,7 +1297,7 @@ msgstr "Ilość fizycznej pamięci, która jest zamieniona na przestrzeń pliku 
 
 #: include/classes/data/CItemData.php:1643
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Ilość fizycznej pamięci zyżytej na kopie stron fizycznej pamięci, \"url\" - URL usługi VMware, \"uuid\" - unikalny globalny identyfikator wirtualnej maszyny VMware"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -1611,7 +1616,7 @@ msgstr "Atrybucja HTML"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Atrybucja tekstu"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1791,7 +1796,7 @@ msgstr "Średni"
 
 #: include/classes/data/CItemData.php:1715
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Średnia liczba pozostających zapytań odczytu do dysku wirtualnego podczas interwału zbierania , \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator wirtualnej maszyny VMware, \"instance\" - instancja urządzenia dyskowego"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1799,7 +1804,7 @@ msgstr "Średnia liczba pozostających zapytań odczytu do dysku wirtualnego pod
 
 #: include/classes/data/CItemData.php:1735
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Średnia liczba pozostających zapytań zapisu do dysku wirtualnego podczas interwału zbierania , \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator wirtualnej maszyny VMware, \"instance\" - instancja urządzenia dyskowego"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
@@ -1875,12 +1880,12 @@ msgstr "Poniżej wartości"
 #: include/views/configuration.item.edit.php:126
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "Binarny"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1397
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "Binarna pozycja \"%1$s\" nie może być użyta w wyzwalaczu"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1987,6 +1992,11 @@ msgstr "Bułgarski (bg_BG)"
 msgid "By host"
 msgstr "Wg hosta"
 
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
+
 #: report2.php:196
 msgid "By trigger template"
 msgstr "Wg szablonu wyzwalacza"
@@ -2017,7 +2027,7 @@ msgstr "Obciążenie CPU. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/classes/data/CItemData.php:1603
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "Czas oczekiwania CPU na podmianę, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator wirtualnej maszyny VMware, \"instance\" - instancja CPU"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
@@ -2025,7 +2035,7 @@ msgstr "Czas oczekiwania CPU na podmianę, <url> - URL usługi VMware, <uuid> - 
 
 #: include/classes/data/CItemData.php:1407
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Procentowe zużycie CPU podczas okresu czasu zależnego od zarządzania zasilaniem lub HT, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator hypervisora VMware"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -2033,11 +2043,11 @@ msgstr "Procentowe zużycie CPU podczas okresu czasu zależnego od zarządzania 
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Procentowe zużycie CPU podczas okresu czasu, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator hypervisora VMware"
 
 #: include/classes/data/CItemData.php:1607
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Procentowe zużycie CPU podczas okresu czasu, \"url\" - URL usługi VMware, \"uuid\" - globalny unikalny identyfikator wirtualnej maszyny VMware"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -2049,7 +2059,7 @@ msgstr "Procentowe zużycie CPU podczas okresu czasu, <url> - URL usługi VMware
 
 #: include/classes/data/CItemData.php:1559
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr ""
+msgstr "Wykorzystanie procesora w hercach w okresie na puli zasobów VMware, \"url\" - adres URL usługi VMware, \"rpid\" - identyfikator puli zasobów VMware"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
@@ -2620,9 +2630,9 @@ msgstr "Nie można usunąć grup hostów"
 #: host_prototypes.php:293
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można usunąć prototypu hosta"
+msgstr[1] "Nie można usunąć prototypów hosta"
+msgstr[2] "Nie można usunąć prototypów hosta"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2771,7 +2781,7 @@ msgstr "Nie można usunąć wykresu szablonowego."
 
 #: include/classes/api/services/CItemPrototype.php:663
 msgid "Cannot delete templated item prototype."
-msgstr "Nie można usunąć prototypu elementu szablonowego."
+msgstr "Nie można usunąć prototypu pozycji pochodzącej z szablonu."
 
 #: include/classes/api/services/CItem.php:778
 msgid "Cannot delete templated item."
@@ -2909,9 +2919,9 @@ msgstr[2] "Nie można wyłączyć typów mediów"
 #: app/controllers/CControllerModuleDisable.php:75
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można wyłączyć modułu"
+msgstr[1] "Nie można wyłączyć modułów"
+msgstr[2] "Nie można wyłączyć modułów"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -3019,9 +3029,9 @@ msgstr[2] "Nie można włączyć typów mediów"
 #: app/controllers/CControllerModuleEnable.php:99
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można włączyć modułu"
+msgstr[1] "Nie można włączyć modułów"
+msgstr[2] "Nie można włączyć modułów"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3076,12 +3086,12 @@ msgstr "Nie można rozwinąć makra."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:217
 #, c-format
 msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć SLA \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć akcji \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3149,12 +3159,12 @@ msgstr "Nie można znaleźć interfejsu \"%1$s\" stosowane do zasady wyszukiwani
 #: include/classes/import/CConfigurationImport.php:719
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
-msgstr "Nie można znaleźć interfejsu \"%1$s\" użytego dla elementu \"%2$s\" w \"%3$s\"."
+msgstr "Nie można znaleźć interfejsu \"%1$s\" użytego dla pozycji \"%2$s\" w \"%3$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1105
 #, c-format
 msgid "Cannot find interface \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
-msgstr "Nie można znaleźć interfejsu \"%1$s\" użyty do prototypu elementu \"%2$s\" zasady wyszukiwania \"%3$s\" w \"%4$s\"."
+msgstr "Nie można znaleźć interfejsu \"%1$s\" dla prototypu pozycji \"%2$s\" reguły wykrywania \"%3$s\" w \"%4$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1601
 #, c-format
@@ -3189,12 +3199,12 @@ msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w prototypie w
 #: include/classes/import/importers/CTemplateDashboardImporter.php:155
 #, c-format
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
-msgstr "Nie można znaleźć elementu \"%1$s\" użytego w pulpicie \"%2$s\"."
+msgstr "Nie można znaleźć pozycji \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć mapy \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3204,12 +3214,12 @@ msgstr "Nie można znaleźć mapy \"%1$s\" użytej na mapie \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć typu mediów \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć usługi \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/import/CConfigurationImport.php:1234
 #, c-format
@@ -3230,7 +3240,7 @@ msgstr "Nie można znaleźć wyzwalacza \"%1$s\" użytego na mapie \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Nie można znaleźć użytkownika \"%1$s\" użytego w pulpicie \"%2$s\"."
 
 #: include/classes/api/services/CUser.php:1510
 msgid "Cannot find user directory for LDAP."

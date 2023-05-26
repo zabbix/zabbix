@@ -571,6 +571,11 @@ msgstr "Kuitatut ONGELMA-tapahtumat"
 msgid "Acknowledged RESOLVED events"
 msgstr ""
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -1960,6 +1965,11 @@ msgstr "Bulgaria (bg_BG)"
 
 #: report2.php:195
 msgid "By host"
+msgstr ""
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
 msgstr ""
 
 #: report2.php:196
