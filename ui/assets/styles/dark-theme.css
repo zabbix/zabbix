@@ -4994,7 +4994,7 @@ z-select button.focusable,
     border-color: #768d99; }
 
 .btn-tag {
-  min-height: unset;
+  height: auto;
   outline: none;
   border: none; }
   .btn-tag:hover {

@@ -1289,7 +1289,7 @@ select {
 .btn-tag {
 	@extend .tag;
 
-	min-height: unset;
+	height: auto;
 	outline: none;
 	border: none;
 
@@ -1297,6 +1297,7 @@ select {
 		text-decoration: underline;
 		background-color: $ui-bg-selected-color;
 	}
+
 	&:focus {
 		background-color: $ui-bg-selected-color;
 	}
