@@ -202,6 +202,7 @@ $multiselect-selected-bg-color: #999999;
 // List table.
 $compact-view-color: $link-color;
 $compact-view-tag-color: #000000;
+$compact-view-tag-bg-color: $ui-bg-selected-color;
 
 // Dashboard list table.
 $dashboard-shared-bg-color: #e0e0e0;
@@ -656,6 +657,13 @@ a.icon-count {
 	}
 }
 
+.checkbox-list {
+	li {
+		padding-left: 1px;
+		margin-left: -1px;
+	}
+}
+
 %form-input-style {
 	&:focus {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
@@ -698,6 +706,15 @@ a.icon-count {
 		.timeline-date,
 		.problem-expand-td {
 			border-bottom-color: transparent !important;
+		}
+	}
+
+	.action-container {
+		.link-action {
+			&:active,
+			&:focus {
+				margin-bottom: -3px;
+			}
 		}
 	}
 

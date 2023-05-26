@@ -2480,7 +2480,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   border-bottom-color: #f8f8f8; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .tag, .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-tag {
   color: #000000;
-  background-color: rgba(248, 248, 248, 0.5); }
+  background-color: #dddddd; }
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #000000; }
@@ -7054,6 +7054,10 @@ a.icon-count {
   box-shadow: 0 0 0 1px #ffffff;
   transition: box-shadow .2s ease-out; }
 
+.checkbox-list li {
+  padding-left: 1px;
+  margin-left: -1px; }
+
 z-select button.focusable:focus,
 .z-select button.focusable:focus, z-select .list:focus,
 .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
@@ -7079,6 +7083,8 @@ z-select button.focusable:focus,
   .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .timeline-date,
   .list-table .problem-nested:not([class*='flh-']):not(.row-selected):not(:hover) .problem-expand-td {
     border-bottom-color: transparent !important; }
+.list-table .action-container .link-action:active, .list-table .action-container .link-action:focus {
+  margin-bottom: -3px; }
 .list-table.compact-view .flh-na-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-info-bg:not(.row-selected):not(:hover),
 .list-table.compact-view .flh-warning-bg:not(.row-selected):not(:hover),
