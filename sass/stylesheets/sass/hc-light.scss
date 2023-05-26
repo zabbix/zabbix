@@ -419,7 +419,8 @@ a {
 		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
-	&:visited, &:hover {
+	&:visited,
+	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
 
@@ -434,7 +435,7 @@ a.link-action {
 
 .link-action {
 	&:hover {
-		border-bottom-color: $link-hover-color;
+		border-bottom-color: rgba($link-hover-color, .5);
 	}
 
 	&:active {
@@ -482,13 +483,13 @@ a.link-action {
 	}
 }
 
-.btn-link { // FIXME: DF needs to be checked manually
-	font-weight: bold !important;
-	color: #000000 !important;
+.btn-link {
+	font-weight: bold;
+	color: #000000;
 
 	&:focus {
 		margin-bottom: -3px !important;
-		border-bottom: 3px solid $link-hover-color !important;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -506,12 +507,6 @@ a.link-action {
 	}
 }
 
-.filter-trigger {
-	.arrow-down {
-		border-top-color: #ffffff !important;
-	}
-}
-
 .tag {
 	&.green-bg,
 	&.yellow-bg {
@@ -526,7 +521,7 @@ a.link-action {
 
 .multiselect {
 	&.active {
-		box-shadow: 0 0 0 1px $blue;
+		box-shadow: 0 0 0 1px $btn-focus-outline-color;
 		transition: box-shadow .2s ease-out;
 	}
 
@@ -541,7 +536,7 @@ a.link-action {
 			.subfilter-enabled,
 			.subfilter-disable-btn,
 			.subfilter-disable-btn:active {
-				//box-shadow: 0 0 0 1px $blue; // FIXME DF to be asked AS
+				box-shadow: 0 0 0 1px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -668,7 +663,9 @@ a.link-action {
 		bottom: 0;
 		left: 0;
 		width: 34px;
-		font-size: $icon-medium-size * 1.75;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		font-size: 26px;
 		color: #ffffff;
 		text-align: center;
 		-webkit-text-stroke: 0.1px black;
@@ -804,23 +801,14 @@ td.inactive-bg {
 }
 
 .inactive-bg {
-	background-color: rgba(0, 0, 0, 0) !important;
-	padding-left: 42px;
-}
+	@extend %severity-icon;
 
-.inactive-bg::before {	// FIXME: DF should be checked by AS
-	@extend %icons-font;
-	content: $zi-stop-sign;
-	position: absolute;
-	top: 0;
-	left: 0;
-	bottom: 0;
-	width: 34px;
-	min-height: 28px;
-	color: #ffffff;
-	font-size: $icon-medium-size * 1.75;
-	text-align: center;
-	background-color: $alt-red;
+	&::before {
+		@extend %icons-font;
+
+		content: $zi-stop-sign;
+		background-color: $alt-red;
+	}
 }
 
 // Error messages.
@@ -852,12 +840,6 @@ td.inactive-bg {
 
 .map-element-selected {
 	border-color: $font-color;
-}
-
-.btn-back-map-container {
-	a {
-		border-bottom: 0;
-	}
 }
 
 // Time selection.
@@ -968,44 +950,6 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Host availability".
-
-.host-avail-widget {
-	td:not(:first-child) {
-		border-left: 1px solid $ui-border-color;
-	}
-
-	.host-avail-true,
-	.host-avail-false,
-	.host-avail-unknown,
-	.host-avail-total {
-		background: transparent;
-	}
-}
-
-// Widget "Navigation tree".
-
-.navtree {
-	.tree .tree-item > .tree-row {
-		min-width: 410px;
-	}
-}
-
-// Widget "Problems by severity".
-
-.by-severity-widget {
-	> div {
-		min-width: 65px;
-		padding-left: 42px;
-
-		&::before {
-			display: flex;
-			flex-direction: column; // FIXME: SHOULD BE checked to AS
-			justify-content: center;
-		}
-	}
-}
-
 // InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
@@ -1019,15 +963,5 @@ td.inactive-bg {
 		&.focused {
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
-	}
-}
-
-.breadcrumbs {
-	&>::after {
-		content: " /";
-	}
-
-	&>:last-child::after {
-		content: "";
 	}
 }

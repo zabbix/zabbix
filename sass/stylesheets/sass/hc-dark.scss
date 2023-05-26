@@ -500,7 +500,8 @@ a {
 		border-bottom: 1px solid rgba($link-hover-color, .5);
 	}
 
-	&:visited, &:hover { // FIXME: DF joined
+	&:visited,
+	&:hover {
 		border-bottom: 1px solid $link-hover-color;
 	}
 
@@ -510,12 +511,12 @@ a {
 }
 
 a.link-action {
-	border-bottom: 1px dotted; // FIXME: needs to be checked if because link-action class has this value
+	border-bottom: 1px dotted;
 }
 
 .link-action {
 	&:hover {
-		border-bottom-color: $link-hover-color;
+		border-bottom-color: rgba($link-hover-color, .5);
 	}
 
 	&:active {
@@ -548,13 +549,13 @@ a.link-action {
 	}
 }
 
-.btn-link { // TODO: DF needs to be checked manually
-	font-weight: bold !important;
-	color: #ffffff !important;
+.btn-link {
+	font-weight: bold;
+	color: #ffffff;
 
 	&:focus {
 		margin-bottom: -3px !important;
-		border-bottom: 3px solid $link-hover-color !important;
+		border-bottom: 3px solid $link-hover-color;
 	}
 }
 
@@ -578,12 +579,6 @@ a.link-action {
 	color: #000000 !important;
 	&:focus {
 		background-color: $link-hover-color !important;
-	}
-}
-
-.filter-trigger {
-	.arrow-down {
-		border-top-color: #000000 !important; // FIXME DF not needed
 	}
 }
 
@@ -623,7 +618,7 @@ a.icon-count {
 			.subfilter-enabled,
 			.subfilter-disable-btn,
 			.subfilter-disable-btn:active {
-				//box-shadow: 0 0 0 1px $blue; // FIXME DF to be asked AS
+				box-shadow: 0 0 0 1px $btn-focus-outline-color;
 			}
 		}
 	}
@@ -740,7 +735,9 @@ a.icon-count {
 		bottom: 0;
 		left: 0;
 		width: 34px;
-		font-size: $icon-medium-size * 1.75;
+		padding-top: 2px;
+		padding-bottom: 2px;
+		font-size: 26px;
 		color: #000000;
 		text-align: center;
 	}
@@ -875,21 +872,12 @@ td.inactive-bg {
 }
 
 .inactive-bg {
-	background-color: rgba(0, 0, 0, 0) !important;
-	padding-left: 42px;
+	@extend %severity-icon;
 
 	&::before {
 		@extend %icons-font;
+
 		content: $zi-stop-sign;
-		font-size: $icon-medium-size * 1.75;
-		color: #000000;
-		text-align: center;
-		width: 34px;
-		position: absolute;
-		top: 0;
-		left: 0;
-		bottom: 0;
-		min-height: 28px;
 		background-color: $alt-red;
 	}
 }
@@ -929,14 +917,7 @@ td.inactive-bg {
 	border-color: $font-color;
 }
 
-// Multiline input control.
-.btn-back-map-container {
-	a {
-		border-bottom: 0;
-	}
-}
-
-// Time selection. // FIXME: DF needs to be checked after filtertab fix
+// Time selection.
 
 .ui-tabs-nav {
 	.btn-time,
@@ -1042,44 +1023,6 @@ td.inactive-bg {
 	}
 }
 
-// Widget "Host availability".
-
-.host-avail-widget {
-	td:not(:first-child) {
-		border-left: 1px solid $ui-border-color;
-	}
-
-	.host-avail-true,
-	.host-avail-false,
-	.host-avail-unknown,
-	.host-avail-total {
-		background: transparent;
-	}
-}
-
-// Widget "Navigation tree".
-
-.navtree {
-	.tree .tree-item > .tree-row {
-		min-width: 410px;
-	}
-}
-
-// Widget "Problems by severity".
-
-.by-severity-widget {
-	> div {
-		min-width: 65px;
-		padding-left: 42px;
-
-		&::before {
-			display: flex;
-			flex-direction: column; // FIXME: SHOULD BE checked to AS
-			justify-content: center;
-		}
-	}
-}
-
 // InputSecret and ButtonDropdown.
 
 .btn-undo.is-focused {
@@ -1093,16 +1036,5 @@ td.inactive-bg {
 		&.focused {
 			box-shadow: 0 0 0 2px $btn-focus-outline-color;
 		}
-	}
-}
-
-// FIXME: TO check
-.breadcrumbs {
-	&>::after {
-		content: " /";
-	}
-
-	&>:last-child::after {
-		content: "";
 	}
 }

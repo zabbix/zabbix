@@ -39,9 +39,7 @@
 </script>
 <script type="text/x-jquery-tmpl" id="lldoverride-row">
 	<?= (new CRow([
-			(new CCol(
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol((new CSpan('1:'))->setAttribute('data-row-num', '')))
 				->setWidth('15'),
 			(new CCol((new CLink('#{name}', 'javascript:lldoverrides.overrides.open(#{no});'))))

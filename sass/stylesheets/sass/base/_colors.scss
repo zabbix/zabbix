@@ -3,6 +3,8 @@ $lighter-red: #e3c5c5 !default;
 
 $orange: #f24f1d !default;
 
+$gold: #f3a914 !default;
+
 $yellow: #fad634 !default;
 $dark-yellow: #e99003 !default;
 $lighter-yellow: #fcf7c2 !default;
@@ -224,22 +226,6 @@ $link-active-color: $link-color !default;
 $link-visited-color: $link-color !default;
 
 $link-alt-underline-color: #768d99 !default;
-
-// FIXME need to check color variables
-// FIXME DF has variables that are not used, need to check after problems page
-$icon-hint-color: #768d99 !default;
-$icon-calendar-color: #acbbc2 !default;
-$icon-action-arrow-up: #e33734 !default;
-$icon-action-check: #009900 !default;
-$icon-action-severity-down: #009900 !default; // TODO - delete
-$icon-action-severity-up: #e33734 !default;
-$icon-action-severity-changed: #768d99 !default;
-$icon-action-list-table-color: #768d99 !default;
-$icon-remove-fav-color: #f3a914 !default;
-$icon-event-action-red: #e33734 !default;
-$icon-event-action-yellow: #af6b00 !default;
-$icon-event-action-gray: #768d99 !default;
-$icon-maintenance: #f3a914 !default;
 
 // Error messages.
 $msg-bad-color: #dc3545 !default;

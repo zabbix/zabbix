@@ -230,7 +230,8 @@ div.dashboard-widget-item {
 
 // Modifications by themes.
 
-@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+[theme=hc-dark],
+[theme=hc-light] {
 	div.dashboard-widget-item {
 		a {
 			&:link {

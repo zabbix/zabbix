@@ -66,6 +66,7 @@ div.dashboard-widget-navtree {
 					display: flex;
 					align-items: center;
 					justify-content: space-between;
+					min-width: 320px;
 					height: 20px;
 					padding: 8px 0;
 					border-bottom: 1px solid $table-border-color;
@@ -215,6 +216,21 @@ div.dashboard-widget-navtree {
 
 			.arrow-down {
 				border-top-color: $link-color;
+			}
+		}
+	}
+}
+
+[theme=hc-dark],
+[theme=hc-light] {
+	div.dashboard-widget-navtree {
+		.navtree {
+			.tree {
+				.tree-item {
+					.tree-row {
+						min-width: 410px;
+					}
+				}
 			}
 		}
 	}

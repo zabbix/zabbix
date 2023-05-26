@@ -66,12 +66,16 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-select";
 
 @import "components/dashboard/widget-clock";
+@import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";
+@import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
+@import "components/dashboard/widget-problemsbysv";
 @import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
 @import "components/dashboard/widget-tophosts";
+@import "components/dashboard/widget-url";
 
 .link-action {
 	border-bottom: 1px dotted;
@@ -2204,61 +2208,6 @@ select {
 	white-space: break-spaces;
 }
 
-// Map widget back to parent button.
-.btn-back-map-container {
-	text-align: left;
-	position: absolute;
-	left: -1px;
-	max-width: 100%;
-
-	a {
-		&:focus,
-		&:hover {
-			outline: none;
-
-			.btn-back-map {
-				background-color: $btn-back-background-hover;
-				border: $btn-border-color solid 1px;
-
-				.btn-back-map-content {
-					display: inline-block;
-					line-height: 24px;
-					padding: 0 6px 0 0;
-					flex: auto;
-					@extend %overflow-ellipsis;
-				}
-			}
-		}
-	}
-
-	.btn-back-map {
-		border: $ui-border-color solid 1px;
-		border-radius: 0 2px 2px 0;
-		background-color: $btn-back-map-background-color;
-		color: $btn-back-text-color;
-		margin-top: 10px;
-		padding: 0;
-		display: flex;
-		height: 24px;
-		line-height: 24px;
-		vertical-align: middle;
-		text-decoration: none;
-
-		.btn-back-map-content {
-			display: none;
-		}
-
-		.btn-back-map-icon {
-			margin-left: 5px;
-			display: inline-block;
-			flex: 1 0 auto;
-			width: 28px;
-			height: 24px;
-			vertical-align: middle;
-		}
-	}
-}
-
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
@@ -3114,11 +3063,6 @@ main {
 	display: inline;
 }
 
-// Dashboard widget - URL.
-.widget-url {
-	display: block;
-}
-
 // Analog Clock.
 .clock {
 	display: flex;
@@ -3191,16 +3135,6 @@ svg {
 		margin: 0;
 		padding: 0;
 		border: 0;
-	}
-}
-
-.sysmap-widget-container {
-	overflow: hidden;
-	height: 100%;
-	display: flex;
-
-	svg {
-		flex-grow: 1;
 	}
 }
 
@@ -3473,7 +3407,6 @@ a.icon-count {
 .icon-action-msgs,
 .icon-action-severity-up,
 .icon-action-severity-down, // TODO - delete
-.icon-action-severity-changed,
 .icon-action-message,
 .icon-action-ack,
 .icon-action-unack,
@@ -3578,30 +3511,6 @@ a.icon-count {
 		.count {
 			margin-right: 5px;
 		}
-	}
-}
-
-// Widget "Host availability".
-.host-avail-widget {
-	td:not(:first-child) {
-		border-left: 1px dotted $table-border-color;
-
-	}
-
-	.host-avail-true {
-		background: $host-avail-true-bg-color;
-	}
-
-	.host-avail-false {
-		background: $host-avail-false-bg-color;
-	}
-
-	.host-avail-unknown {
-		background: $host-avail-unknown-bg-color;
-	}
-
-	.host-avail-total {
-		background: $host-avail-total-bg-color;
 	}
 }
 
@@ -3798,15 +3707,6 @@ a.icon-count {
 	td:nth-child(1),
 	td.nowrap {
 		display: table-cell;
-	}
-}
-
-@media screen and (-ms-high-contrast: active), (-ms-high-contrast: none) {
-	/* for IE11 only. Fixed cell height if table has 100% height */
-	.host-avail-widget {
-		td {
-			height: 100%;
-		}
 	}
 }
 

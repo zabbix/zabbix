@@ -198,6 +198,10 @@
 			}
 		}
 
+		.td-drag-icon {
+			width: 12px;
+		}
+
 		.btn-icon,
 		.icon {
 			@extend %button-size-medium;

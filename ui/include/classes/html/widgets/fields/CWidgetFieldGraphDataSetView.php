@@ -443,9 +443,7 @@ class CWidgetFieldGraphDataSetView extends CWidgetFieldView {
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
 			$name = '#{name}', $color = '#{color}'): CRow {
 		return (new CRow([
-			(new CCol(
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			))
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(

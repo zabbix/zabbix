@@ -1,0 +1,20 @@
+// Widget view.
+
+[theme=hc-dark],
+[theme=hc-light] {
+	div.dashboard-widget-problemsbysv {
+		.by-severity-widget {
+			> div {
+				min-width: 65px;
+				padding-left: 42px;
+
+				&::before {
+					display: flex;
+					flex-direction: column;
+					justify-content: center;
+				}
+			}
+		}
+	}
+}
+

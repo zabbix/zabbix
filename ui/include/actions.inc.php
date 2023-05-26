@@ -1669,7 +1669,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 			->setAttribute('aria-label', _x('Severity increased', 'screen reader'));
 	}
 	else {
-		$button = (new CButtonIcon(ZBX_ICON_ARROWS_TOP_BOTTOM)) // TODO: ZBX_STYLE_ACTION_ICON_SEV_CHANGED
+		$button = (new CButtonIcon(ZBX_ICON_ARROWS_TOP_BOTTOM))
 			->addClass(ZBX_STYLE_COLOR_ICON)
 			->setAttribute('aria-label', _x('Severity changed', 'screen reader'));
 	}
