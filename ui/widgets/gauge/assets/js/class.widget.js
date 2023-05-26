@@ -55,11 +55,14 @@ class CWidgetGauge extends CWidget {
 	setContents(response) {
 		if (this.gauge === null) {
 			if (!('config' in response)) {
+				this._has_contents = false;
 				throw new Error('Unexpected server error.');
 			}
 
 			this.gauge = new CSVGGauge(this.gauge_container, response.config);
 			this.gauge.setSize(this.#getGaugeContainerSize());
+
+			this._has_contents = true;
 		}
 
 		this.gauge.setValue({
@@ -99,7 +102,7 @@ class CWidgetGauge extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'gauge.png');
+				downloadSvgImage(this.gauge.svg, 'gauge.png');
 			}
 		});
 

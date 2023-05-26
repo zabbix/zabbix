@@ -43,10 +43,10 @@ class CSVGGauge {
 		// Contains all the elements - description, value, min/max, thresholds ...
 		this.elements = {};
 
-		const widgetContents = this.svg.closest('.dashboard-widget-gauge');
+		this.widgetContents = this.svg.closest('.dashboard-widget-gauge');
 
 		// Set background color of widget
-		widgetContents.style.backgroundColor = this.options.bg_color ? '#' + this.options.bg_color : '';
+		this.widgetContents.style.backgroundColor = this.options.bg_color ? '#' + this.options.bg_color : '';
 
 		this.isValueSet = false;
 
@@ -78,7 +78,8 @@ class CSVGGauge {
 
 		this.svg.setAttribute('width', this.width);
 		this.svg.setAttribute('height', this.height);
-		this.svg.style.fontSize = this.height * this.constructor.FONT_SIZE_RATIO + 'px';
+
+		this.widgetContents.style.fontSize = this.height * this.constructor.FONT_SIZE_RATIO + 'px';
 
 		this.minMaxSize = this.options.minmax.size || this.constructor.MINMAX_DEFAULT_SIZE;
 
