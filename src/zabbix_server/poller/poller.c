@@ -1083,7 +1083,6 @@ static void check_multi_info(void)
 	int			ret;
 	char			*error, *out = NULL;
 	AGENT_RESULT		result;
-	
 
 	zbx_timespec(&timespec);
 
@@ -1093,7 +1092,7 @@ static void check_multi_info(void)
 		{
 			case CURLMSG_DONE:
 				easy_handle = message->easy_handle;
-			
+
 				curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &context);
 				printf("DONE\n");
 
@@ -1125,7 +1124,7 @@ static void check_multi_info(void)
 					error = NULL;
 					ret = NOTSUPPORTED;
 				}
-	
+
 				if (SUCCEED == ret)
 				{
 					zbx_preprocess_item_value(context->item_context.itemid, context->item_context.hostid,context->item_context.value_type,
@@ -1153,11 +1152,11 @@ static void check_multi_info(void)
 
 static void on_timeout(evutil_socket_t fd, short events, void *arg)
 {
-  int running_handles;
-   printf("on_timeout\n");
-  curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0,
-                           &running_handles);
-  check_multi_info();
+	int running_handles;
+
+	printf("on_timeout\n");
+	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+	check_multi_info();
 }
 
 static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
@@ -1214,7 +1213,7 @@ static void	curl_perform(int fd, short event, void *arg)
 		flags |= CURL_CSELECT_IN;
 	if(event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
- 
+
 	context = (curl_context_t *) arg;
 	curl_multi_socket_action(curl_handle, context->sockfd, flags, &running_handles);
 
@@ -1310,10 +1309,11 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs),
 			poller_args_in->config_comms->config_timeout, &rtc);
 
-  if(curl_global_init(CURL_GLOBAL_ALL)) {
-    fprintf(stderr, "Could not init curl\n");
-    return 1;
-  }
+	if(curl_global_init(CURL_GLOBAL_ALL))
+	{
+		fprintf(stderr, "Could not init curl\n");
+		return 1;
+	}
 
 	curl_handle = curl_multi_init();
 
@@ -1390,7 +1390,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	curl_multi_cleanup(curl_handle);
 	event_free(curl_timeout);
 	event_base_free(base);
-	
+
 	libevent_global_shutdown();
 	curl_global_cleanup();
 	scriptitem_es_engine_destroy();
