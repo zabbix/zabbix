@@ -78,15 +78,13 @@ func (f *fsCaller) checkNotStuckAndExecute(path string) {
 
 	incStuck(path)
 
-	for {
-		select {
-		case <-f.outChanStuckUnchecked:
-			return
-		case <-f.errChan:
-			return
-		case <-time.After(timeout * 12 * 3600 * time.Second):
-			return
-		}
+	select {
+	case <-f.outChanStuckUnchecked:
+		return
+	case <-f.errChan:
+		return
+	case <-time.After(timeout * 12 * 3600 * time.Second):
+		return
 	}
 }
 
