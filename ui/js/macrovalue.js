@@ -101,8 +101,6 @@
 			$container = $this.closest('.macro-input-group'),
 			curr_value_type = getCurrentValueType($container);
 
-		$('.btn-dropdown-container button', $container).addClass(ZBX_ICON_CHEVRON_DOWN);
-
 		if (value_type == curr_value_type) {
 			return false;
 		}
