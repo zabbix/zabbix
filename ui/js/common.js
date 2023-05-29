@@ -50,6 +50,12 @@ const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
 const ZBX_ICON_TEXT = 'zi-text';
+const ZBX_ICON_TREE_TOP_BOTTOM = 'zi-tree-top-bottom';
+const ZBX_ICON_TREE_TOP_BOTTOM_SMALL = 'zi-tree-top-bottom-small';
+const ZBX_ICON_TREE_TOP_RIGHT = 'zi-tree-top-right';
+const ZBX_ICON_TREE_TOP_RIGHT_SMALL = 'zi-tree-top-right-small';
+const ZBX_ICON_TREE_TOP_RIGHT_BOTTOM = 'zi-tree-top-right-bottom';
+const ZBX_ICON_TREE_TOP_RIGHT_BOTTOM_SMALL = 'zi-tree-top-right-bottom-small';
 const ZBX_ICON_TRIANGLE_WARNING = 'zi-triangle-warning';
 
 const KEY_ARROW_DOWN = 40;

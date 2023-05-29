@@ -1478,7 +1478,7 @@ function makeEventActionsIcons($eventid, array $actions, array $users, bool $is_
 	$action_icons = [];
 
 	if ($is_acknowledged) {
-		$action_icons[] = (new CIcon(ZBX_ICON_CHECK, _('Acknowledged')))->addClass(ZBX_STYLE_COLOR_POSITIVE); // TODO: ZBX_STYLE_ACTION_ICON_ACK_GREEN
+		$action_icons[] = (new CIcon(ZBX_ICON_CHECK, _('Acknowledged')))->addClass(ZBX_STYLE_COLOR_POSITIVE);
 	}
 
 	if ($suppression_icon !== null) {
@@ -1525,7 +1525,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 		$suppression['action_type'] = ZBX_EVENT_HISTORY_MANUAL_UPDATE;
 
 		if (array_key_exists('suppress_until', $suppression)) {
-			$icon = new CIcon(ZBX_ICON_EYE_OFF, _('Suppressed')); // TODO: ZBX_STYLE_ACTION_ICON_SUPPRESS
+			$icon = new CIcon(ZBX_ICON_EYE_OFF, _('Suppressed'));
 
 			if ($suppression['suppress_until'] == ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE) {
 				$suppress_until = _s('Indefinitely');
@@ -1538,7 +1538,7 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 			}
 		}
 		else {
-			$icon = new CIcon(ZBX_ICON_EYE, _('Unsuppressed')); // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+			$icon = new CIcon(ZBX_ICON_EYE, _('Unsuppressed'));
 			$suppress_until = '';
 		}
 
@@ -1558,8 +1558,8 @@ function makeEventSuppressionsProblemIcon(array $data, array $users): ?CButtonIc
 	}
 
 	return (new CButtonIcon(array_key_exists('suppress_until', $data['suppress_until'][0])
-		? ZBX_ICON_EYE_OFF // TODO: ZBX_STYLE_ACTION_ICON_SUPPRESS
-		: ZBX_ICON_EYE     // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+		? ZBX_ICON_EYE_OFF
+		: ZBX_ICON_EYE
 	))
 		->addClass(ZBX_STYLE_COLOR_ICON)
 		->setHint($table, ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
@@ -1659,12 +1659,12 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
 	}
 
 	if ($data['original_severity'] > $data['current_severity']) {
-		$button = (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL)) // TODO: ZBX_STYLE_ACTION_ICON_SEV_DOWN
+		$button = (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))
 			->addClass(ZBX_STYLE_COLOR_POSITIVE)
 			->setAttribute('aria-label', _x('Severity decreased', 'screen reader'));
 	}
 	elseif ($data['original_severity'] < $data['current_severity']) {
-		$button = (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL)) // TODO: ZBX_STYLE_ACTION_ICON_SEV_UP
+		$button = (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))
 			->addClass(ZBX_STYLE_COLOR_NEGATIVE)
 			->setAttribute('aria-label', _x('Severity increased', 'screen reader'));
 	}
@@ -1746,13 +1746,13 @@ function makeEventActionsIcon(array $data, $eventid): ?CButtonIcon {
 		return null;
 	}
 
-	$button = new CButtonIcon(ZBX_ICON_BULLET_RIGHT_WITH_CONTENT); // TODO: ZBX_STYLE_ACTIONS_NUM_GRAY
+	$button = new CButtonIcon(ZBX_ICON_BULLET_RIGHT_WITH_CONTENT);
 
 	if ($data['has_failed_action']) {
-		$button->addClass(ZBX_STYLE_COLOR_NEGATIVE);  // TODO: ZBX_STYLE_ACTIONS_NUM_RED
+		$button->addClass(ZBX_STYLE_COLOR_NEGATIVE);
 	}
 	elseif ($data['has_uncomplete_action']) {
-		$button->addClass(ZBX_STYLE_COLOR_WARNING); // TODO: ZBX_STYLE_ACTIONS_NUM_YELLOW
+		$button->addClass(ZBX_STYLE_COLOR_WARNING);
 	}
 
 	return $button
@@ -1921,32 +1921,32 @@ function makeEventDetailsTableUser(array $action, array $users) {
 function makeActionTableIcon(array $action): ?CTag {
 	switch ($action['action_type']) {
 		case ZBX_EVENT_HISTORY_PROBLEM_EVENT:
-			return new CIcon(ZBX_ICON_CALENDAR_WARNING, _('Problem created')); // TODO: ZBX_STYLE_PROBLEM_GENERATED
+			return new CIcon(ZBX_ICON_CALENDAR_WARNING, _('Problem created'));
 
 		case ZBX_EVENT_HISTORY_RECOVERY_EVENT:
-			return new CIcon(ZBX_ICON_CALENDAR_CHECK, _('Problem resolved')); // TODO: ZBX_STYLE_PROBLEM_RECOVERY
+			return new CIcon(ZBX_ICON_CALENDAR_CHECK, _('Problem resolved'));
 
 		case ZBX_EVENT_HISTORY_MANUAL_UPDATE:
 			$action_icons = [];
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_CLOSE) == ZBX_PROBLEM_UPDATE_CLOSE) {
-				$action_icons[] = new CIcon(ZBX_ICON_CHECKBOX, _('Manually closed')); // TODO: ZBX_STYLE_ACTION_ICON_CLOSE
+				$action_icons[] = new CIcon(ZBX_ICON_CHECKBOX, _('Manually closed'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) {
-				$action_icons[] = new CIcon(ZBX_ICON_ARROW_RIGHT_TOP, _('Cause')); // TODO: ZBX_STYLE_ACTION_ICON_CAUSE
+				$action_icons[] = new CIcon(ZBX_ICON_ARROW_RIGHT_TOP, _('Cause'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) == ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) {
-				$action_icons[] = new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom')); // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
+				$action_icons[] = new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_ACKNOWLEDGE) {
-				$action_icons[] = new CIcon(ZBX_ICON_CHECK, _('Acknowledged')); // TODO: ZBX_STYLE_ACTION_ICON_ACK
+				$action_icons[] = new CIcon(ZBX_ICON_CHECK, _('Acknowledged'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) == ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE) {
-				$action_icons[] = new CIcon(ZBX_ICON_UNCHECK, _('Unacknowledged'));  // TODO: ZBX_STYLE_ACTION_ICON_UNACK
+				$action_icons[] = new CIcon(ZBX_ICON_UNCHECK, _('Unacknowledged'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SUPPRESS) == ZBX_PROBLEM_UPDATE_SUPPRESS) {
@@ -1960,23 +1960,23 @@ function makeActionTableIcon(array $action): ?CTag {
 						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']);
 				}
 
-				$action_icons[] = (new CButtonIcon(ZBX_ICON_EYE_OFF)) // TODO: ZBX_STYLE_ACTION_ICON_SUPPRESS
+				$action_icons[] = (new CButtonIcon(ZBX_ICON_EYE_OFF))
 					->addClass(ZBX_STYLE_COLOR_ICON)
 					->setHint(_s('Suppressed till: %1$s', $suppress_until), ZBX_STYLE_HINTBOX_WRAP_HORIZONTAL);
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_UNSUPPRESS) == ZBX_PROBLEM_UPDATE_UNSUPPRESS) {
-				$action_icons[] = new CIcon(ZBX_ICON_EYE, _('Unsuppressed')); // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+				$action_icons[] = new CIcon(ZBX_ICON_EYE, _('Unsuppressed'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_MESSAGE) == ZBX_PROBLEM_UPDATE_MESSAGE) {
-				$action_icons[] = new CIcon(ZBX_ICON_ALERT_MORE, _('Message')); // TODO: ZBX_STYLE_ACTION_ICON_MSG
+				$action_icons[] = new CIcon(ZBX_ICON_ALERT_MORE, _('Message'));
 			}
 
 			if (($action['action'] & ZBX_PROBLEM_UPDATE_SEVERITY) == ZBX_PROBLEM_UPDATE_SEVERITY) {
 				$button = $action['new_severity'] > $action['old_severity']
-					? (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))->addClass(ZBX_STYLE_COLOR_NEGATIVE) // TODO: ZBX_STYLE_ACTION_ICON_SEV_UP
-					: (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))->addClass(ZBX_STYLE_COLOR_POSITIVE); // TODO: ZBX_STYLE_ACTION_ICON_SEV_DOW
+					? (new CButtonIcon(ZBX_ICON_ARROW_UP_SMALL))->addClass(ZBX_STYLE_COLOR_NEGATIVE)
+					: (new CButtonIcon(ZBX_ICON_ARROW_DOWN_SMALL))->addClass(ZBX_STYLE_COLOR_POSITIVE);
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
@@ -1990,8 +1990,8 @@ function makeActionTableIcon(array $action): ?CTag {
 
 		case ZBX_EVENT_HISTORY_ALERT:
 			return $action['alerttype'] == ALERT_TYPE_COMMAND
-				? new CIcon(ZBX_ICON_COMMAND, _('Remote command')) // TODO: ZBX_STYLE_ACTION_COMMAND
-				: new CIcon(ZBX_ICON_ENVELOPE_FILLED, _('Alert message')); // TODO: ZBX_STYLE_ACTION_MESSAGE
+				? new CIcon(ZBX_ICON_COMMAND, _('Remote command'))
+				: new CIcon(ZBX_ICON_ENVELOPE_FILLED, _('Alert message'));
 
 		default:
 			return null;

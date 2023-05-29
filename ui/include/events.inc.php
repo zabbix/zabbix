@@ -327,14 +327,14 @@ function getEventStatusUpdateIcon(array $event): ?Ctag {
 		// If currently is symptom and there is an active task to convert to cause, set icon style to cause.
 		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE) == ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 				&& $acknowledge['taskid'] != 0) {
-			$icon_class = ZBX_ICON_ARROW_RIGHT_TOP;  // TODO: ZBX_STYLE_ACTION_ICON_CAUSE
+			$icon_class = ZBX_ICON_ARROW_RIGHT_TOP;
 			break;
 		}
 
 		// If currently is cause and there is an active task to convert to symptom, set icon style to symptom.
 		if (($acknowledge['action'] & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM) ==
 				ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM && $acknowledge['taskid'] != 0) {
-			$icon_class = ZBX_ICON_ARROW_TOP_RIGHT;   // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
+			$icon_class = ZBX_ICON_ARROW_TOP_RIGHT;
 			break;
 		}
 	}
@@ -819,7 +819,7 @@ function makeTags(array $list, bool $html = true, string $key = 'eventid', int $
 					}
 				}
 
-				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE)) // TODO: ZBX_STYLE_ICON_WIZARD_ACTION
+				$tags[$element[$key]][] = (new CButtonIcon(ZBX_ICON_MORE))
 					->setHint($hint_content, ZBX_STYLE_HINTBOX_WRAP);
 			}
 		}

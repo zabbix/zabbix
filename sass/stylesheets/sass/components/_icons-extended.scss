@@ -34,6 +34,11 @@
 	color: $icon-color;
 }
 
+.icon-empty-small {
+	display: inline-block;
+	width: $icon-small-size;
+}
+
 .zi-alert-with-content {
 	@extend .zi-alert;
 	@extend %icon-with-content;
@@ -156,6 +161,21 @@
 .zi-remove-smaller {
 	@extend .zi-remove;
 	@extend %icon-smaller;
+}
+
+.zi-tree-top-bottom-small {
+	@extend .zi-tree-top-bottom;
+	@extend %icon-small;
+}
+
+.zi-tree-top-right-small {
+	@extend .zi-tree-top-right;
+	@extend %icon-small;
+}
+
+.zi-tree-top-right-bottom-small {
+	@extend .zi-tree-top-right-bottom;
+	@extend %icon-small;
 }
 
 .zi-user-filled-small {

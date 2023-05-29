@@ -729,7 +729,7 @@ function getTriggerOverviewCell(array $trigger, array $dependencies): CCol {
 			? makeTriggerDependencies($dependencies[$trigger['triggerid']], false)
 			: [],
 		$trigger['problem']['acknowledged'] == 1
-			? (new CSpan())->addClass(ZBX_ICON_CHECK)  // TODO: ZBX_STYLE_ICON_ACKN
+			? (new CSpan())->addClass(ZBX_ICON_CHECK)
 			: null
 	]))
 		->addClass(CSeverityHelper::getStyle((int) $trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE))
@@ -1213,10 +1213,10 @@ function expressionLevelDraw(array $next, $level) {
 	$expr = [];
 	for ($i = 1; $i <= $level; $i++) {
 		if ($i == $level) {
-			$class_name = $next[$i] ? 'zi-tree-top-right-bottom' : 'zi-tree-top-right';
+			$class_name = $next[$i] ? ZBX_ICON_TREE_TOP_RIGHT_BOTTOM_SMALL : ZBX_ICON_TREE_TOP_RIGHT_SMALL;
 		}
 		else {
-			$class_name = $next[$i] ? 'zi-tree-top-bottom' : 'icon-tree-empty';
+			$class_name = $next[$i] ? ZBX_ICON_TREE_TOP_BOTTOM_SMALL : ZBX_STYLE_ICON_EMPTY_SMALL;
 		}
 
 		$expr[] = (new CSpan(''))->addClass($class_name);
@@ -2399,7 +2399,7 @@ function makeTriggerDependencies(array $dependencies, $freeze_on_click = true) {
 				$table->addRow($description);
 			}
 
-			$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))  // TODO: ZBX_STYLE_ICON_DEPEND_DOWN : ZBX_STYLE_ICON_DEPEND_UP
+			$result[] = (new CButtonIcon($type === 'down' ? ZBX_ICON_BULLET_ALT_DOWN : ZBX_ICON_BULLET_ALT_UP))
 				->addClass(ZBX_STYLE_COLOR_ICON)
 				->setHint($table, '', $freeze_on_click);
 		}

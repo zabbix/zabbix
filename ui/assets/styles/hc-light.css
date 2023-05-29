@@ -344,13 +344,13 @@ svg *:focus {
 .zi-trash:before {
   content: "\ea5e"; }
 
-.zi-tree-top-bottom:before {
+.zi-tree-top-bottom:before, .zi-tree-top-bottom-small:before {
   content: "\ea5f"; }
 
-.zi-tree-top-right-bottom:before {
+.zi-tree-top-right-bottom:before, .zi-tree-top-right-bottom-small:before {
   content: "\ea60"; }
 
-.zi-tree-top-right:before {
+.zi-tree-top-right:before, .zi-tree-top-right-small:before {
   content: "\ea61"; }
 
 .zi-triangle-flipped-warning:before {
@@ -1305,7 +1305,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -1322,6 +1322,10 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 
 .icon {
   color: #555555; }
+
+.icon-empty-small {
+  display: inline-block;
+  width: 12px; }
 
 .zi-alert-with-content::after {
   color: #ffffff; }
@@ -2118,6 +2122,22 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
     .diff pre > div {
       white-space: pre; }
 
+.entity-count {
+  display: inline-block;
+  padding: 0 3px;
+  min-width: 10px;
+  line-height: 16px;
+  text-align: center;
+  background-color: #333333;
+  border-radius: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis; }
+  .entity-count, .entity-count:hover, .entity-count:focus, .entity-count:link, .entity-count:visited {
+    color: #ffffff;
+    border-bottom: none; }
+  .entity-count:focus {
+    box-shadow: 0 0 0 2px #111111; }
+
 .expandable-subfilter {
   position: relative;
   word-break: break-word;
@@ -2347,7 +2367,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .list-table .btn-small,
 .list-table .problem-icon-link,
 .list-table .status-container,
-.list-table .symptoms-count,
+.list-table .entity-count,
 .list-table .tag,
 .list-table .btn-tag {
   margin-top: 1px;
@@ -2453,17 +2473,6 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   font-size: 11px; }
   .list-table .problem-nested-small .tag, .list-table .problem-nested-small .btn-tag {
     font-size: 12px; }
-.list-table .symptoms-count {
-  display: inline-block;
-  padding: 2px 3px;
-  min-width: 10px;
-  color: #ffffff;
-  text-align: center;
-  line-height: 1;
-  background-color: #555555;
-  border-radius: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis; }
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) td,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
 .list-table.compact-view .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
@@ -2480,7 +2489,7 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .btn-icon,
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .icon {
   background-color: #ffffff; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .symptoms-count {
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) .entity-count {
   margin-top: 0;
   margin-bottom: 0;
   border: 1px solid #ffffff; }
@@ -4519,17 +4528,13 @@ form.is-loading {
     vertical-align: middle; }
 
 .btn-time-zoomout {
-  vertical-align: top;
   color: #000000;
   background-color: transparent;
   border-color: transparent; }
   .btn-time-zoomout[disabled] {
-    color: #000000;
-    opacity: .35; }
-    .btn-time-zoomout[disabled], .btn-time-zoomout[disabled]:hover, .btn-time-zoomout[disabled]:focus, .btn-time-zoomout[disabled]:active {
-      color: #000000;
-      background-color: transparent;
-      border-color: transparent; }
+    color: #9f9f9f;
+    background-color: transparent;
+    border-color: transparent; }
 
 .multiselect-control {
   display: flex;
@@ -4746,12 +4751,7 @@ form.is-loading {
   box-sizing: border-box;
   display: inline-block;
   padding: 5px;
-  position: relative;
-  /*[class^="zi-"], [class*="zi-"] { // TODO - check DF clean
-  	&::before {
-  		color: $icon-color;
-  	}
-  }*/ }
+  position: relative; }
 
 .border-left {
   border-left: 1px solid #888888; }
@@ -5079,11 +5079,6 @@ z-select button.focusable,
     margin-right: 4px;
     line-height: 24px;
     vertical-align: top; }
-
-.zi-tree-top-right::before,
-.zi-tree-top-right-bottom::before,
-.zi-tree-top-bottom::before {
-  font-size: 12px; }
 
 .setup-container {
   background-color: #ffffff;
@@ -6146,6 +6141,8 @@ svg {
   width: auto;
   padding: 0 10px;
   text-align: center; }
+  .sysmap .sysmap-caption {
+    font-size: 0; }
 
 .sysmap-scroll-container {
   overflow-x: auto;
@@ -6288,20 +6285,6 @@ svg {
         margin-left: auto;
         justify-self: flex-end; }
 
-.icon-count {
-  font-size: 12px;
-  padding: 3px 5px 2px;
-  color: #ffffff;
-  background-color: #333333;
-  border-radius: 3px; }
-  .icon-count:link, .icon-count:hover, .icon-count:focus {
-    border-bottom: none; }
-  .icon-count:focus {
-    box-shadow: 0 0 0 2px #111111; }
-
-a.icon-count {
-  color: #ffffff; }
-
 .problem-icon-link,
 .problem-icon-list {
   display: inline-block;
@@ -6348,9 +6331,6 @@ a.icon-count {
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden; }
-
-.inline-sr-only {
-  font-size: 0; }
 
 .preprocessing-test-results td {
   vertical-align: top !important; }

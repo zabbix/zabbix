@@ -132,8 +132,7 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 		if (!empty($DB['DB'])) {
 			$page_header
-//				->setTheme(getUserTheme(CWebUser::$data))
-				->setTheme(isset($_GET['theme']) ? $_GET['theme'] : getUserTheme(CWebUser::$data)) // TODO: only for dev
+				->setTheme(getUserTheme(CWebUser::$data))
 				->addStyle(getTriggerSeverityCss())
 				->addStyle(getTriggerStatusCss());
 

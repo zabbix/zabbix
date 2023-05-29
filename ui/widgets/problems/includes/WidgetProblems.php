@@ -47,8 +47,6 @@ class WidgetProblems extends CTableInfo {
 	}
 
 	private function build(): void {
-		$this->addClass(ZBX_STYLE_PROBLEM_LIST);
-
 		$sort_div = (new CSpan())->addClass(
 			($this->data['sortorder'] === ZBX_SORT_DOWN) ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP
 		);
@@ -66,9 +64,7 @@ class WidgetProblems extends CTableInfo {
 
 		if ($this->data['show_three_columns']) {
 			$header[] = new CColHeader();
-			$header[] = (new CColHeader())
-				->addClass(ZBX_STYLE_CELL_WIDTH)
-				->addClass(ZBX_STYLE_THIRD_COL);
+			$header[] = (new CColHeader())->addClass(ZBX_STYLE_CELL_WIDTH);
 		}
 		elseif ($this->data['show_two_columns']) {
 			$header[] = new CColHeader();
@@ -276,7 +272,7 @@ class WidgetProblems extends CTableInfo {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE)) // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 						->addClass(ZBX_STYLE_COLOR_ICON)
 						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
@@ -375,7 +371,7 @@ class WidgetProblems extends CTableInfo {
 			}
 
 			$symptom_col = (new CCol(
-				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom')) // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
+				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom'))
 			))->addClass(ZBX_STYLE_RIGHT);
 
 			$empty_col = new CCol();
@@ -392,17 +388,15 @@ class WidgetProblems extends CTableInfo {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_col = (new CCol(
-						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_SYMPTOMS_COUNT)
+						(new CSpan($problem['symptom_count']))->addClass(ZBX_STYLE_ENTITY_COUNT)
 					))->addClass(ZBX_STYLE_RIGHT);
 
 					$collapse_expand_col = (new CCol(
-						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))  // TODO: ZBX_STYLE_BTN_WIDGET_EXPAND
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))
 							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-					))
-						->addClass(ZBX_STYLE_RIGHT)
-						->addClass(ZBX_STYLE_THIRD_COL);
+					))->addClass(ZBX_STYLE_RIGHT);
 
 					if ($data['show_timeline']) {
 						$symptom_count_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -414,15 +408,10 @@ class WidgetProblems extends CTableInfo {
 				else {
 					if ($data['show_three_columns']) {
 						// Show two empty columns.
-						$row->addItem([
-							$empty_col,
-							$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-						]);
+						$row->addItem([$empty_col, $empty_col]);
 					}
 					elseif ($data['show_two_columns']) {
-						$row->addItem(
-							$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-						);
+						$row->addItem($empty_col);
 					}
 				}
 			}
@@ -434,9 +423,7 @@ class WidgetProblems extends CTableInfo {
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
 						->addClass('hidden')
 						->setAttribute('data-cause-eventid', $problem['cause_eventid'])
-						->addItem(
-							$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
-						);
+						->addItem($symptom_col);
 				}
 				else {
 					// First column empty stand-alone symptom event.
@@ -445,9 +432,7 @@ class WidgetProblems extends CTableInfo {
 
 				// If there are causes as well, show additional empty column.
 				if (!$nested && $data['show_three_columns']) {
-					$row->addItem(
-						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-					);
+					$row->addItem($empty_col);
 				}
 			}
 

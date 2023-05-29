@@ -31,8 +31,8 @@ $sidebar-mode-icon-hover-color: #000000;
 
 // Main
 $font-color: #ffffff;
-$font-selected-color: #000000; //#000000
-$ui-selected-color: #000000; //#000000
+$font-selected-color: #000000;
+$ui-selected-color: #000000;
 $ui-selected-hover-color: #000000;
 
 $font-alt-color: #cacaca;
@@ -60,7 +60,6 @@ $menu-main-submenu-color: #0c0c0c;
 $menu-main-submenu-bg-color: #cccccc;
 $menu-main-submenu-border-color: #f3f3f3;
 
-// $menu-main-submenu-hover-color: #ffffff; TODO: DF delete
 $menu-main-submenu-hover-bg-color: #1a1a1a;
 $menu-main-submenu-hover-border-color: transparent;
 
@@ -393,7 +392,7 @@ a.btn-icon,
 	}
 }
 
-.dashboard-widget-graph-link { // TODO: DF moved because it is a widget
+.dashboard-widget-graph-link {
 	&:focus {
 		&::after {
 			background: $blue;
@@ -603,6 +602,7 @@ a.link-action {
 
 .paging-selected {
 	color: #000000 !important;
+
 	&:focus {
 		background-color: $link-hover-color !important;
 	}
@@ -616,11 +616,6 @@ a.link-action {
 		background-color: $ui-bg-selected-color;
 		color: $white;
 	}
-}
-
-.icon-count,
-a.icon-count {
-	color: $ui-bg-color;
 }
 
 .disabled {
@@ -838,7 +833,7 @@ a.icon-count {
 .warning-bg,
 .high-bg,
 .disaster-bg {
-	&.blink-hidden::after { // TODO: check
+	&.blink-hidden::after {
 		content: none;
 	}
 
@@ -861,7 +856,6 @@ a.icon-count {
 	disaster-bg: $alt-red
 ) {
 	.log-#{$class}::before {
-		//color: darken($color, 45%) !important; // TODO: DF to be cleaned
 		background-color: $color !important;
 	}
 }
@@ -928,10 +922,6 @@ td.inactive-bg {
 .msg-bad,
 .msg-good,
 .msg-warning {
-	.link-action:hover { // TODO DF to be asked AS
-		color: $link-hover-color;
-	}
-
 	button {
 		color: $btn-alt-color;
 	}
@@ -1007,9 +997,9 @@ td.inactive-bg {
 	}
 }
 
-.problem-icon-link, // TODO: check
-.problem-icon-list { // TODO: check
-	.problem-icon-list-item { // TODO: check
+.problem-icon-link,
+.problem-icon-list {
+	.problem-icon-list-item {
 		@extend %icon-medium;
 
 		padding-left: 0;
@@ -1025,6 +1015,7 @@ td.inactive-bg {
 			border-radius: 3px;
 		}
 	}
+
 	// Dynamically generated classes:
 	//  .status-na-bg
 	//  .status-normal-bg

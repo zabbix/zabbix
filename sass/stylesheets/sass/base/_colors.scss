@@ -250,13 +250,13 @@ $tab-label-counter-bg-color: $form-disabled-bg-color;
 
 // Indicators.
 $indicator-count-color: #768d99;
-$indicator-mark-color: #009900; // TODO: fix to green color
+$indicator-mark-color: $green;
 
 // Statuses.
 $problem-unack-fg-color: #cc0000 !default;
 $problem-ack-fg-color: #cc0000 !default;
-$ok-unack-fg-color: #009900 !default; // TODO: fix to green color
-$ok-ack-fg-color: #009900 !default; // TODO: fix to green color
+$ok-unack-fg-color: #009900 !default;
+$ok-ack-fg-color: #009900 !default;
 
 $status-color: $white !default;
 $status-border-color: rgba(#1f2c33, .2) !default;

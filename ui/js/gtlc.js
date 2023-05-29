@@ -29,7 +29,7 @@ jQuery(function($) {
 			from_clndr: $container.find('[name=from_calendar]'),
 			to_clndr: $container.find('[name=to_calendar]'),
 			apply: $container.find('[name=apply]'),
-			increment: $container.find('.btn-time-right'),
+			increment: $container.find('.js-btn-time-right'),
 			decrement: $container.find('.js-btn-time-left'),
 			zoomout: $container.find('.btn-time-zoomout'),
 			quickranges: $container.find('.time-quick a'),

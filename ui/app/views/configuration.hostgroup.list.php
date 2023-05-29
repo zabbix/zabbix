@@ -164,7 +164,7 @@ foreach ($data['groups'] as $group) {
 			$count = new CSpan($host_count);
 		}
 
-		$count->addClass(ZBX_STYLE_ICON_COUNT);
+		$count->addClass(ZBX_STYLE_ENTITY_COUNT);
 	}
 
 	$table->addRow([

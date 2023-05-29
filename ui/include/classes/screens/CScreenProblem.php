@@ -990,7 +990,7 @@ class CScreenProblem extends CScreenBase {
 			// There are cause events displayed on page that have symptoms. Maximum column count.
 			if ($do_causes_have_symptoms) {
 				$col_header_1 = (new CColHeader())->addClass(ZBX_STYLE_SECOND_COL);
-				$col_header_2 = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
+				$col_header_2 = new CColHeader();
 
 				if ($this->data['filter']['compact_view']) {
 					$header[] = $col_header_1->addStyle('width: 18px;');
@@ -1003,7 +1003,7 @@ class CScreenProblem extends CScreenBase {
 			}
 			// There might be cause events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
-				$col_header = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
+				$col_header = new CColHeader();
 
 				if ($this->data['filter']['compact_view']) {
 					$header[] = $col_header->addStyle('width: 16px;');
@@ -1030,7 +1030,7 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
-			$table = (new CTableInfo())->addClass(ZBX_STYLE_PROBLEM_LIST);
+			$table = new CTableInfo();
 
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
@@ -1407,7 +1407,7 @@ class CScreenProblem extends CScreenBase {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE)) // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 						->addClass(ZBX_STYLE_COLOR_ICON)
 						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
@@ -1491,9 +1491,7 @@ class CScreenProblem extends CScreenBase {
 
 			$checkbox_col = new CCol(new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']));
 			$empty_col = new CCol();
-			$symptom_col = (new CCol(
-				new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom')) // TODO: ZBX_STYLE_ACTION_ICON_SYMPTOM
-			));
+			$symptom_col = (new CCol(new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom'))));
 
 			if ($data['show_timeline']) {
 				$checkbox_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -1509,21 +1507,21 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_span = (new CSpan($problem['symptom_count']))
-						->addClass(ZBX_STYLE_SYMPTOMS_COUNT)
+						->addClass(ZBX_STYLE_ENTITY_COUNT)
 						->addStyle('max-width: 3ch;');
 
-					if ($problem['symptom_count'] >= 0) {
+					if ($problem['symptom_count'] >= 1000) {
 						$symptom_count_span->setHint($problem['symptom_count']);
 					}
 
 					$symptom_count_col = (new CCol($symptom_count_span))->addClass(ZBX_STYLE_SECOND_COL);
 
-					$collapse_expand_col = (new CCol(
+					$collapse_expand_col = new CCol(
 						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))
 							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-					))->addClass(ZBX_STYLE_THIRD_COL);
+					);
 
 					if ($data['show_timeline']) {
 						$symptom_count_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -1546,7 +1544,7 @@ class CScreenProblem extends CScreenBase {
 							->addClass('problem-row')
 							->addItem([
 								$empty_col->addClass(ZBX_STYLE_SECOND_COL),
-								$empty_col->addClass(ZBX_STYLE_THIRD_COL)
+								$empty_col
 							]);
 					}
 					elseif ($data['show_two_columns']) {
@@ -1574,7 +1572,7 @@ class CScreenProblem extends CScreenBase {
 					$row = (new CRow([
 						$empty_col,
 						$checkbox_col,
-						$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
+						$symptom_col
 					]))
 						->addClass(ZBX_STYLE_PROBLEM_NESTED)
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
@@ -1595,9 +1593,7 @@ class CScreenProblem extends CScreenBase {
 				 * column.
 				 */
 				if (!$nested && $data['show_three_columns']) {
-					$row->addItem(
-						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-					);
+					$row->addItem($empty_col);
 				}
 			}
 
@@ -1693,9 +1689,7 @@ class CScreenProblem extends CScreenBase {
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					))->addClass(ZBX_STYLE_TABLE_STATS)
 				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-			))
-				->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
-				->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+			))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 			if ($data['show_timeline']) {
 				$colspan = 1;
@@ -1710,9 +1704,7 @@ class CScreenProblem extends CScreenBase {
 					$colspan++;
 				}
 
-				$empty_col = (new CCol())
-					->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD)
-					->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+				$empty_col = (new CCol())->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
 
 				if ($colspan > 1) {
 					$empty_col->setColSpan($colspan);
@@ -1720,12 +1712,8 @@ class CScreenProblem extends CScreenBase {
 
 				$row->addItem([
 					$empty_col,
-					(new CCol())
-						->addClass(ZBX_STYLE_TIMELINE_AXIS)
-						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-					(new CCol())
-						->addClass(ZBX_STYLE_TIMELINE_TD)
-						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
+					(new CCol())->addClass(ZBX_STYLE_TIMELINE_AXIS),
+					(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD),
 					$symptom_limit_col->setColSpan($table->getNumCols() - $colspan - 2)
 				]);
 			}

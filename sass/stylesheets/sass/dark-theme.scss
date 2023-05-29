@@ -84,7 +84,6 @@ $scrollbar-thumb-color: #383838;
 
 // Search form
 $form-search-bg-color: #191919;
-$form-search-focused-border-color: $form-focus-border-color; // TODO: to be cleaned not used
 
 // Buttons
 $btn-color: #f2f2f2;
@@ -105,7 +104,7 @@ $btn-back-text-color: #ffffff;
 $btn-back-background-hover: #768d99;
 
 // Links
-$link-color: #4796c4;	// TODO: to ask AS for permission
+$link-color: #4796c4;
 $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
@@ -327,22 +326,6 @@ $toc-title-bg-color: #4f4f4f;
 			}
 		}
 	}
-}
-
-.icon-action-msgs {
-	&[data-count]::after {
-		color: $font-selected-color;
-	}
-}
-
-.icon-actions-number-gray {
-	&[data-count]::after {
-		color: $font-selected-color;
-	}
-}
-
-.icon-description::after {
-	color: $font-selected-color;
 }
 
 .totals-list {

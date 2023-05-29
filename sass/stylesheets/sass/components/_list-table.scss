@@ -242,7 +242,7 @@
 	.btn-small,
 	.problem-icon-link,
 	.status-container,
-	.symptoms-count,
+	.entity-count,
 	.tag {
 		margin-top: 1px;
 		margin-bottom: 1px;
@@ -417,19 +417,6 @@
 		}
 	}
 
-	.symptoms-count {
-		display: inline-block;
-		padding: 2px 3px;
-		min-width: 10px;
-		color: $icon-content-color;
-		text-align: center;
-		line-height: 1;
-		background-color: $icon-color;
-		border-radius: 2px;
-		overflow: hidden;
-		text-overflow: ellipsis;
-	}
-
 	&.compact-view {
 		.problem-nested:not([class*='flh-']):not(.row-selected) {
 			td,
@@ -463,7 +450,7 @@
 					background-color: $ui-bg-color;
 				}
 
-				.symptoms-count {
+				.entity-count {
 					margin-top: 0;
 					margin-bottom: 0;
 					border: 1px solid $ui-bg-color;

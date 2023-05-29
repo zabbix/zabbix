@@ -32,7 +32,6 @@
 	const ZBX_STYLE_MACRO_VALUE_SECRET = 'macro-value-secret';
 	const ZBX_STYLE_MACRO_VALUE_VAULT = 'macro-value-vault';
 
-	const ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
 	const ZBX_STYLE_ICON_SECRET = 'icon-secret';
 
 	function btnUndoFocusEventHandle() {

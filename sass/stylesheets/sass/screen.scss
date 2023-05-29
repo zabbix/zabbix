@@ -13,7 +13,6 @@ $main-menu-icon-size: 24px !default;
 $main-menu-submenu-icon-size: $icon-medium-size !default;
 $menu-user-icon-size: $icon-medium-size !default;
 
-// Sprite path
 $icons-path: '../fonts/' !default;
 $browser-sprite: '../img/browser-sprite.png?20220722';
 
@@ -45,6 +44,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/columns-wrapper";
 @import "components/dashboard/dashboard";
 @import "components/diff";
+@import "components/entity-count";
 @import "components/expandable-subfilter";
 @import "components/form-search";
 @import "components/inline-filter";
@@ -527,24 +527,15 @@ form {
 	}
 }
 
-.btn-time-zoomout {   // TODO: Fix js-btn-time-zoomout
-	vertical-align: top;
+.btn-time-zoomout {
 	color: $font-color;
 	background-color: transparent;
 	border-color: transparent;
 
 	&[disabled] {
-		color: $font-color;
-		opacity: .35;
-
-		&,
-		&:hover,
-		&:focus,
-		&:active {
-			color: $font-color;
-			background-color: transparent;
-			border-color: transparent;
-		}
+		color: $form-disabled-font-color;
+		background-color: transparent;
+		border-color: transparent;
 	}
 }
 
@@ -911,12 +902,6 @@ form {
 	display: inline-block;
 	padding: 5px;
 	position: relative;
-
-	/*[class^="zi-"], [class*="zi-"] { // TODO - check DF clean
-		&::before {
-			color: $icon-color;
-		}
-	}*/
 }
 
 .border-left {
@@ -1481,51 +1466,7 @@ select {
 	box-shadow: 1px 1px 2px $action-shadow-color;
 }
 
-%btn-widget { // TODO: check
-	width: 24px;
-	height: 24px;
-	margin: 2px 2px 0 0;
-	@extend %btn-widget-defaults;
-}
-
-%btn-dashboard { // TODO: check
-	width: 24px;
-	height: 24px;
-	@extend %btn-widget-defaults;
-}
-
-%btn-widget-defaults { // TODO: check
-	border: 0;
-	min-height: 0;
-	padding: 0;
-	opacity: .5;
-
-	@if $ui-transitions {
-		transition: opacity $ui-controls-transition-duration ease-out;
-	}
-
-	&:hover,
-	&:focus,
-	&:active {
-		@extend %btn-widget-hover-active;
-	}
-
-	&[disabled],
-	&[disabled]:hover,
-	&[disabled]:focus,
-	&[disabled]:active {
-		background-color: transparent;
-		opacity: .25;
-	}
-}
-
-%button-icon-size {
-	width: 24px;
-	height: auto;
-	padding: 0;
-}
-
-%form-disabled { // TODO: check
+%form-disabled {
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
@@ -1535,11 +1476,6 @@ select {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
 	}
-}
-
-%btn-widget-hover-active { // TODO: check
-	background-color: transparent;
-	opacity: 1;
 }
 
 .action-buttons {
@@ -1563,15 +1499,6 @@ select {
 		margin-right: 4px;
 		line-height: 24px;
 		vertical-align: top;
-	}
-}
-
-.zi-tree-top-right,
-.zi-tree-top-right-bottom,
-.zi-tree-top-bottom {
-	&::before {
-		//vertical-align: middle; // TODO - check
-		font-size: $icon-small-size;
 	}
 }
 
@@ -2739,7 +2666,7 @@ select {
 		transition: none;
 	}
 
-	&.blink-hidden { // TODO: check
+	&.blink-hidden {
 		background-color: transparent;
 
 		a {
@@ -3135,6 +3062,11 @@ svg {
 	width: auto;
 	padding: 0 10px;
 	text-align: center;
+
+	// Screen reader.
+	.sysmap-caption {
+		font-size: 0;
+	}
 }
 
 .sysmap-scroll-container {
@@ -3359,28 +3291,6 @@ svg {
 	}
 }
 
-.icon-count { // TODO: duplicate with symptoms-count
-	font-size: 12px;
-	padding: 3px 5px 2px;
-	color: $font-selected-color;
-	background-color: $ui-bg-selected-color;
-	border-radius: 3px;
-
-	&:link,
-	&:hover,
-	&:focus {
-		border-bottom: none;
-	}
-
-	&:focus {
-		box-shadow: 0 0 0 2px $btn-focus-outline-color;
-	}
-}
-
-a.icon-count {
-	color: $font-selected-color;
-}
-
 .problem-icon-link,
 .problem-icon-list {
 	display: inline-block;
@@ -3429,32 +3339,6 @@ a.icon-count {
 	color: $input-placeholder-color;
 }
 
-// TODO check classes
-.icon-action-command,
-.icon-action-close,
-.icon-action-msg,
-.icon-action-msgs,
-.icon-action-severity-up,
-.icon-action-severity-down, // TODO - delete
-.icon-action-message,
-.icon-action-ack,
-.icon-action-unack,
-.icon-action-ack-green,
-.icon-action-suppress,
-.icon-action-unsuppress,
-.icon-action-cause,
-.icon-action-symptom,
-.icon-invisible,
-.icon-problem-generated,
-.icon-problem-recovery,
-.icon-actions-number-gray,
-.icon-actions-number-yellow,
-.icon-actions-number-red,
-.icon-description,
-.icon-user,
-.icon-user-group {
-}
-
 .ui-sortable {
 	tbody {
 		position: relative;
@@ -3480,11 +3364,6 @@ a.icon-count {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	overflow: hidden;
-}
-
-// Screen reader.
-.inline-sr-only { // TODO: WTF
-	font-size: 0;
 }
 
 .preprocessing-test-results {
@@ -3911,11 +3790,11 @@ z-select,
 		}
 	}
 
-	> .status-green:not(:last-of-type) { // TODO: check status
+	> .status-green:not(:last-of-type) {
 		border-right: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	}
 
-	> .status-grey:not(:last-of-type) { // TODO: check status
+	> .status-grey:not(:last-of-type) {
 		border-right: 1px solid $form-disabled-border-color;
 	}
 }

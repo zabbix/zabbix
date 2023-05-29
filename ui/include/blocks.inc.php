@@ -669,7 +669,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 					? getUserFullname($actions['users'][$unsuppression_action['userid']])
 					: _('Inaccessible user');
 
-				$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE)) // TODO: ZBX_STYLE_ACTION_ICON_UNSUPPRESS
+				$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
 					->addClass(ZBX_STYLE_COLOR_ICON)
 					->addClass('js-blink')
 					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));

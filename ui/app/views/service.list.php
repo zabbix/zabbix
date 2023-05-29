@@ -59,8 +59,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 			->addTab(
 				(new CLink(_('Info'), '#tab_info'))
 					->addClass(ZBX_STYLE_BTN)
-					->addClass(ZBX_ICON_CIRCLE_INFO)
-					->addClass(ZBX_STYLE_BTN_INFO),
+					->addClass(ZBX_ICON_CIRCLE_INFO),
 				(new CDiv())
 					->setId('tab_info')
 					->addClass(ZBX_STYLE_FILTER_CONTAINER)

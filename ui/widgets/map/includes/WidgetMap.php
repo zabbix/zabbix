@@ -166,7 +166,7 @@ class WidgetMap extends CDiv
 			}
 
 			$map_div = (new CDiv(
-				(new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_INLINE_SR_ONLY))
+				(new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_SYSMAP_CAPTION))
 			)->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');
