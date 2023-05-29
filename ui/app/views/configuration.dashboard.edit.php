@@ -66,9 +66,11 @@ $html_page = (new CHtmlPage())
 						->addClass(ZBX_ICON_COG_FILLED),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
-						->addItem((new CButton('dashboard-add-widget', _('Add')))
-							->addClass(ZBX_ICON_PLUS_SMALL)
-							->addClass(ZBX_STYLE_BTN_ALT))
+						->addItem(
+							(new CButton('dashboard-add-widget', _('Add')))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_ICON_PLUS_SMALL)
+						)
 						->addItem(
 							(new CButton('dashboard-add'))
 								->addClass(ZBX_STYLE_BTN_ALT)

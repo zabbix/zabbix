@@ -40,9 +40,9 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 		$view->addItem(
 			(new CDiv(
 				(new CButton('override_add', _('Add new override')))
-					->addClass(ZBX_ICON_PLUS_SMALL)
-					->addClass(ZBX_STYLE_BTN_ALT)
 					->setId('override-add')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass(ZBX_ICON_PLUS_SMALL)
 			)),
 			'overrides-foot'
 		);

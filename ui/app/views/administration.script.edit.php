@@ -74,7 +74,7 @@ $form_grid = (new CFormGrid())
 				->setAriaRequired()
 		))
 	])
-	->addItem(([
+	->addItem([
 		new CLabel(_('Scope'), 'scope'),
 		new CFormField(
 			(new CRadioButtonList('scope', (int) $data['scope']))
@@ -82,8 +82,9 @@ $form_grid = (new CFormGrid())
 				->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 				->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 				->setModern()
-				->setEnabled(!$data['actions']))
-	]))
+				->setEnabled(!$data['actions'])
+		)
+	])
 	->addItem([
 		(new CLabel(_('Menu path'), 'menu_path'))->setId('menu-path-label'),
 		(new CFormField(

@@ -102,7 +102,7 @@ function url_param($param, bool $getFromRequest = true, string $name = null): st
 			fatal_error(_('URL parameter cannot be array.'));
 		}
 	}
-	elseif (is_null($name)) {
+	elseif ($name === null) {
 		if (!$getFromRequest) {
 			fatal_error(_('URL parameter name is empty.'));
 		}
@@ -339,10 +339,9 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 				(new CUrl('zabbix.php'))
 					->setArgument('action', 'host.edit')
 					->setArgument('hostid', $db_host['hostid'])
-				)
-			)
-			->setAttribute('data-hostid', $db_host['hostid'])
-			->onClick('view.editHost(event, this.dataset.hostid);')
+			))
+				->setAttribute('data-hostid', $db_host['hostid'])
+				->onClick('view.editHost(event, this.dataset.hostid);')
 		);
 
 		if ($current_element === '') {

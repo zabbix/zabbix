@@ -170,7 +170,7 @@ $token_form->addItem([
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-token')
 				->addClass('js-no-chkbxrange')
-				->removeid()
+				->removeId()
 		]
 	], 'user.token')
 ]);

@@ -561,7 +561,7 @@ $form->addItem([
 				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-no-chkbxrange')
-				->removeAttribute('id')
+				->removeId()
 		]
 	], 'hosts')
 ]);
