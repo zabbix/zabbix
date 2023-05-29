@@ -102,8 +102,32 @@ class CSVGGauge {
 
 	setValue({value, value_text, units_text}) {
 		if (this.options.units.show) {
-			this.elements.value.node.textContent = value_text;
-			this.elements.units.node.textContent = units_text;
+			if (this.options.value.size >= this.options.units.size) {
+				if (this.options.units.position === this.constructor.UNITS_POSITION_BEFORE) {
+					this.elements.value.node.textContent = ' ' + value_text;
+				}
+				else if (this.options.units.position === this.constructor.UNITS_POSITION_AFTER) {
+					this.elements.value.node.textContent = value_text + ' ';
+				}
+				else {
+					this.elements.value.node.textContent = value_text;
+				}
+
+				this.elements.units.node.textContent = units_text;
+			}
+			else {
+				if (this.options.units.position === this.constructor.UNITS_POSITION_BEFORE) {
+					this.elements.units.node.textContent = units_text + ' ';
+				}
+				else if (this.options.units.position === this.constructor.UNITS_POSITION_AFTER) {
+					this.elements.units.node.textContent = ' ' + units_text;
+				}
+				else {
+					this.elements.units.node.textContent = units_text;
+				}
+
+				this.elements.value.node.textContent = value_text;
+			}
 		}
 		else {
 			this.elements.value_container.node.textContent = value_text;
@@ -512,15 +536,15 @@ class CSVGGauge {
 	}
 
 	#drawValue() {
-		if (this.options.units.show) {
-			let container = this.svg.querySelector('.svg-gauge-value-container');
+		let container = this.svg.querySelector('.svg-gauge-value-container');
 
-			if (!container) {
-				container = document.createElementNS(this.constructor.SVGNS, 'text');
-				container.classList.add('svg-gauge-value-container');
-				container.setAttribute('x', '50%');
-				this.svg.appendChild(container);
+		if (!container) {
+			container = document.createElementNS(this.constructor.SVGNS, 'text');
+			container.classList.add('svg-gauge-value-container');
+			container.setAttribute('x', '50%');
+			this.svg.appendChild(container);
 
+			if (this.options.units.show) {
 				const value = document.createElementNS(this.constructor.SVGNS, 'tspan');
 				value.classList.add('svg-gauge-value');
 				value.style.fontSize = this.options.value.size + '%';
@@ -568,18 +592,10 @@ class CSVGGauge {
 					node: units
 				};
 			}
-		}
-		else {
-			let container = this.svg.querySelector('.svg-gauge-value-container');
-
-			if (!container) {
-				container = document.createElementNS(this.constructor.SVGNS, 'text');
-				container.classList.add('svg-gauge-value-container');
+			else {
 				container.style.fontSize = this.options.value.size + '%';
 				container.style.fontWeight = this.options.value.is_bold ? 'bold' : 'normal';
 				container.style.color = this.options.value.color ? '#' + this.options.value.color : '';
-				container.setAttribute('x', '50%');
-				this.svg.appendChild(container);
 
 				this.elements.value_container = {
 					node: container
