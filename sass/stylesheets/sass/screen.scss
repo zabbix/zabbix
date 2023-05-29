@@ -334,7 +334,10 @@ form {
 	text-decoration: none;
 	color: $font-color;
 	outline: 0;
-	transition: background-color .2s ease-out;
+
+	@if $ui-transitions {
+		transition: background-color $ui-controls-transition-duration ease-out;
+	}
 
 	&:hover {
 		color: $font-color;
@@ -688,7 +691,10 @@ form {
 		cursor: pointer;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		transition: background-color .2s ease-out;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
 
 		&.suggest-hover {
 			background-color: $action-hover-color;
@@ -1279,7 +1285,11 @@ select {
 	box-sizing: border-box;
 	color: $font-color;
 	outline: 0;
-	transition: border-color .2s ease-out, box-shadow .2s ease-out;
+
+	@if $ui-transitions {
+		transition: border-color $ui-controls-transition-duration ease-out,
+					box-shadow $ui-controls-transition-duration ease-out;
+	}
 
 	&:focus {
 		border-color: $form-focus-border-color;
@@ -1360,7 +1370,10 @@ select {
 
 			&:hover {
 				background: $action-hover-color;
-				transition: background-color .2s ease-out;
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
+				}
 			}
 
 			&:focus {
@@ -1370,7 +1383,10 @@ select {
 			&.selected {
 				background: $ui-bg-selected-color;
 				color: $white;
-				transition: background-color .2s ease-out;
+
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
+				}
 			}
 		}
 	}
@@ -1483,7 +1499,10 @@ select {
 	min-height: 0;
 	padding: 0;
 	opacity: .5;
-	transition: opacity .2s ease-out;
+
+	@if $ui-transitions {
+		transition: opacity $ui-controls-transition-duration ease-out;
+	}
 
 	&:hover,
 	&:focus,
@@ -1781,7 +1800,10 @@ select {
 		margin: 0 -15px 0 -25px;
 		position: relative;
 		@extend %overflow-ellipsis;
-		transition: background-color .2s ease-out;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
 
 		&:hover,
 		&:focus,
@@ -2264,7 +2286,9 @@ select {
 			text-align: center;
 
 			td {
-				transition: background-color .2s ease-out;
+				@if $ui-transitions {
+					transition: background-color $ui-controls-transition-duration ease-out;
+				}
 
 				&.selected {
 					background-color: $ui-bg-selected-color;
@@ -3561,12 +3585,14 @@ a.icon-count {
 	.btn-undo {
 		display: none;
 		color: $icon-color;
+		background-color: $form-bg-color;
 		border-width: 1px 0;
 		border-color: $form-border-color;
 
 		&:focus,
 		&:hover {
 			color: $btn-color;
+			background-color: $btn-alt-hover-bg-color;
 			border-color: $form-focus-border-color;
 		}
 
@@ -3597,7 +3623,10 @@ a.icon-count {
 			&:focus,
 			&:active {
 				opacity: 1;
-				animation: fadein .2s;
+
+				@if $ui-transitions {
+					animation: fadein $ui-controls-transition-duration;
+				}
 			}
 		}
 	}

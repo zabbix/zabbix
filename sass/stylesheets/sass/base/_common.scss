@@ -85,8 +85,11 @@ pre {
 
 a {
 	color: $link-color;
-	transition: color $ui-controls-transition-duration ease-out;
 	text-decoration: none;
+
+	@if $ui-transitions {
+		transition: color $ui-controls-transition-duration ease-out;
+	}
 
 	&:visited {
 		color: $link-visited-color;

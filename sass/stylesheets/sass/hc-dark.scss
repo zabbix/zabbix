@@ -630,7 +630,6 @@ a.icon-count {
 .multiselect {
 	&.active {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
-		transition: box-shadow .2s ease-out;
 	}
 
 	input[type="text"] {
@@ -653,7 +652,6 @@ a.icon-count {
 .checkbox-radio {
 	&:focus + label span {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
-		transition: box-shadow .2s ease-out;
 	}
 }
 

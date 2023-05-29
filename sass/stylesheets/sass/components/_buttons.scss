@@ -14,8 +14,9 @@
 
 	@if $ui-transitions {
 		transition: color $ui-controls-transition-duration ease-out,
+					background-color $ui-controls-transition-duration ease-out,
 					border-color $ui-controls-transition-duration ease-out,
-					background-color $ui-controls-transition-duration ease-out;
+					box-shadow $ui-controls-transition-duration ease-out;
 	}
 
 	&:empty {

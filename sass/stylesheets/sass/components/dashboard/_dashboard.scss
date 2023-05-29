@@ -348,7 +348,10 @@
 
 .dashboard-grid-widget-actions {
 	opacity: 0;
-	transition: opacity .2s ease-out;
+
+	@if $ui-transitions {
+		transition: opacity $ui-controls-transition-duration ease-out;
+	}
 
 	li {
 		margin-top: 2px;
@@ -954,7 +957,7 @@
 }
 
 .new-widget {
-	animation: zoom-in-out .2s linear;
+	animation: zoom-in-out $ui-controls-transition-duration linear;
 }
 
 .dashboard-widget {

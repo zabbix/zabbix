@@ -127,7 +127,10 @@ header {
 				border-right: 2px solid $font-color;
 				border-bottom: 2px solid $font-color;
 				transform: rotate(45deg);
-				transition: border-color .2s ease-out;
+
+				@if $ui-transitions {
+					transition: border-color $ui-controls-transition-duration ease-out;
+				}
 			}
 		}
 

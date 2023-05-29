@@ -516,7 +516,6 @@ a.link-action {
 .multiselect {
 	&.active {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
-		transition: box-shadow .2s ease-out;
 	}
 
 	input[type="text"] {
@@ -539,7 +538,6 @@ a.link-action {
 .checkbox-radio {
 	&:focus + label span {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
-		transition: box-shadow .2s ease-out;
 	}
 }
 
@@ -553,7 +551,6 @@ a.link-action {
 %form-input-style {
 	&:focus {
 		box-shadow: 0 0 0 1px $btn-focus-outline-color;
-		transition: box-shadow .2s ease-out;
 	}
 }
 

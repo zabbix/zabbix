@@ -37,8 +37,11 @@
 		border: 1px solid $form-border-color;
 		line-height: 14px;
 		padding: 4px 11px;
-		transition: background-color .2s ease-out;
 		cursor: pointer;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
 	}
 
 	input[type="radio"] {
