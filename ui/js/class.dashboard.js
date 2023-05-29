@@ -878,7 +878,7 @@ class CDashboard extends CBaseComponent {
 
 		stored_data = JSON.parse(stored_data);
 
-		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode === this._is_kiosk_mode) {
+		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode !== this._is_kiosk_mode) {
 			return null;
 		}
 
