@@ -35,7 +35,7 @@ $table_user_groups = (new CTable())
 		(new CRow(
 			(new CCol(
 				(new CButtonLink(_('Add')))->onClick(
-					'return PopUp("popup.generic", '. json_encode([
+					'return PopUp("popup.generic", '.json_encode([
 						'srctbl' => 'usrgrp',
 						'srcfld1' => 'usrgrpid',
 						'srcfld2' => 'name',

@@ -300,7 +300,7 @@ $form = (new CForm('post', $form_action))
 	)
 	->addItem(
 		(new CScriptTag('
-			ldap_edit_popup.init('. json_encode([
+			ldap_edit_popup.init('.json_encode([
 				'provision_groups' => $data['provision_groups'],
 				'provision_media' => $data['provision_media']
 			], JSON_FORCE_OBJECT) .');

@@ -420,8 +420,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 						->addClass('label'),
 					new CCol('#{name}'),
 					(new CCol([
-						(new CButtonLink(_('Remove')))
-							->addClass('js-remove'),
+						(new CButtonLink(_('Remove')))->addClass('js-remove'),
 						(new CInput('hidden'))
 							->setAttribute('value', '#{conditiontype}')
 							->setName('operation[opconditions][#{row_index}][conditiontype]'),
