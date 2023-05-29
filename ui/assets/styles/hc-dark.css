@@ -6412,6 +6412,8 @@ a.icon-count {
     background-color: #383838;
     border-width: 1px 0;
     border-color: #666666; }
+    .macro-input-group .btn-undo::before {
+      font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #333333;
       background-color: #d3d3d3;

@@ -3589,6 +3589,10 @@ a.icon-count {
 		border-width: 1px 0;
 		border-color: $form-border-color;
 
+		&::before {
+			font-size: $icon-medium-size;
+		}
+
 		&:focus,
 		&:hover {
 			color: $btn-color;
