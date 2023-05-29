@@ -620,10 +620,6 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 
 /**
  * Create HTML helper element for host interfaces availability.
- *
- * @param array $host_interfaces
- *
- * @return CHostAvailability
  */
 function getHostAvailabilityTable(array $host_interfaces): CHostAvailability {
 	$interfaces = [];
@@ -916,6 +912,8 @@ function getAdministrationGeneralSubmenu(): array {
  * Renders an icon list.
  *
  * @param array $info_icons  The list of information icons.
+ *
+ * @return CDiv|string
  */
 function makeInformationList($info_icons) {
 	return $info_icons ? (new CDiv($info_icons))->addClass(ZBX_STYLE_REL_CONTAINER) : '';
@@ -995,6 +993,8 @@ function makeSuppressedProblemIcon(array $icon_data, bool $blink = false): CSimp
 
 /**
  * Renders an icon with question mark and text in hint.
+ *
+ * @param string|array|CTag $help_text
  */
 function makeHelpIcon($help_text): CSimpleButton {
 	return (new CButtonIcon(ZBX_ICON_HELP_FILLED_SMALL))
@@ -1013,6 +1013,8 @@ function makeDescriptionIcon(string $description): CButtonIcon {
 
 /**
  * Renders an information icon like green [i] with message.
+ *
+ * @param string|array|CTag $message
  */
 function makeInformationIcon($message): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_I_POSITIVE))
@@ -1022,6 +1024,8 @@ function makeInformationIcon($message): CButtonIcon {
 
 /**
  * Renders a warning icon like yellow [i] with error message.
+ *
+ * @param string|array|CTag $warning
  */
 function makeWarningIcon($warning): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_I_WARNING))
@@ -1031,6 +1035,8 @@ function makeWarningIcon($warning): CButtonIcon {
 
 /**
  * Renders an error icon like red [i] with error message.
+ *
+ * @param string|array|CTag $error
  */
 function makeErrorIcon($error): CButtonIcon {
 	return (new CButtonIcon(ZBX_ICON_I_NEGATIVE))

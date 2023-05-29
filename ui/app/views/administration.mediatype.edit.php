@@ -188,7 +188,7 @@ foreach ($data['parameters_webhook'] as $parameter) {
 			->removeId(),
 		(new CButtonLink(_('Remove')))
 			->addClass('element-table-remove')
-			->onClick('jQuery(this).closest("tr").remove()')
+			->onClick('jQuery(this).closest("tr").remove();')
 	], 'form_row');
 }
 
@@ -205,7 +205,7 @@ $row_template = (new CTag('script', true))
 				->removeId(),
 			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
-				->onClick('jQuery(this).closest("tr").remove()')
+				->onClick('jQuery(this).closest("tr").remove();')
 		]))->addClass('form_row')
 	);
 

@@ -164,7 +164,7 @@ if ($parameters_data) {
 			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
 				->setEnabled(!$data['limited'])
-				->onClick('jQuery(this).closest("tr").remove()')
+				->onClick('jQuery(this).closest("tr").remove();')
 		]);
 	}
 }
@@ -233,7 +233,7 @@ $item_tab
 						->removeId(),
 					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
-						->onClick('jQuery(this).closest("tr").remove()')
+						->onClick('jQuery(this).closest("tr").remove();')
 				]))
 			)
 	)

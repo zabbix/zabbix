@@ -344,6 +344,13 @@ function actionConditionValueToString(array $actions) {
 
 /**
  * Returns the HTML representation of an action condition and action operation condition.
+ *
+ * @param string $condition_type
+ * @param string $operator
+ * @param string $value
+ * @param string $value2
+ *
+ * @return array|string
  */
 function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
@@ -696,8 +703,10 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 
 /**
  * Return an array of action conditions supported by the given event source.
+ *
+ * @param int|string $eventsource
  */
-function get_conditions_by_eventsource($eventsource) {
+function get_conditions_by_eventsource($eventsource): array {
 	$conditions[EVENT_SOURCE_TRIGGERS] = [
 		CONDITION_TYPE_TRIGGER_NAME,
 		CONDITION_TYPE_TRIGGER,
@@ -760,6 +769,8 @@ function get_opconditions_by_eventsource($eventsource): array {
 
 /**
  * Return allowed operations types.
+ *
+ * @param int $eventsource
  */
 function getAllowedOperations($eventsource): array {
 	switch ($eventsource) {
@@ -819,6 +830,8 @@ function getAllowedOperations($eventsource): array {
  * will be returned.
  *
  * @param int|null $type  Operation type, one of OPERATION_TYPE_* constant or null.
+ *
+ * @return string|array
  */
 function operation_type2str($type) {
 	$types = [
@@ -876,6 +889,8 @@ function sortOperations($eventsource, &$operations): void {
 
 /**
  * Return an array of operators supported by the given action condition.
+ *
+ * @param int $conditiontype
  */
 function get_operators_by_conditiontype($conditiontype): array {
 	switch ($conditiontype) {
@@ -1018,6 +1033,10 @@ function count_operations_delay($operations, $def_period): array {
  *
  * If the $type parameter is passed, returns the name of the specific value, otherwise - returns an array of all
  * supported values.
+ *
+ * @param string $type
+ *
+ * @return array|string
  */
 function eventType($type = null) {
 	$types = [
@@ -1468,6 +1487,8 @@ function getEventUpdates(array $event): array {
  * @param bool   $is_acknowledged          Is the event currently acknowledged. If true, display icon.
  *
  * @throws Exception
+ *
+ * @return CCol|string
  */
 function makeEventActionsIcons($eventid, array $actions, array $users, bool $is_acknowledged) {
 	$suppression_icon = makeEventSuppressionsProblemIcon($actions['suppressions'][$eventid], $users);
@@ -1891,6 +1912,8 @@ function makeActionTableUser(array $action, array $users): string {
  *        array  $action['userid']       ID of message author, or alert receiver.
  *        array  $action['sendto']       Receiver media address for automatic action.
  * @param array  $users                  Array with user data - username, name, surname.
+ *
+ * @return array|string
  */
 function makeEventDetailsTableUser(array $action, array $users) {
 	if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT && $action['alerttype'] == ALERT_TYPE_MESSAGE) {
@@ -1955,7 +1978,7 @@ function makeActionTableIcon(array $action): ?CTag {
 				}
 				else {
 					$suppress_until = $action['suppress_until'] < strtotime('tomorrow')
-					&& $action['suppress_until'] > strtotime('today')
+							&& $action['suppress_until'] > strtotime('today')
 						? zbx_date2str(TIME_FORMAT, $action['suppress_until'])
 						: zbx_date2str(DATE_TIME_FORMAT, $action['suppress_until']);
 				}
@@ -2005,34 +2028,35 @@ function makeActionTableIcon(array $action): ?CTag {
  *        int    $action['action_type']  Type of event table action (ZBX_EVENT_HISTORY_*).
  *        string $action['status']       Alert status.
  *        string $action['alerttype']    Type of alert.
+ *
+ * @return CSpan|string
  */
 function makeActionTableStatus(array $action) {
-	if ($action['action_type'] == ZBX_EVENT_HISTORY_ALERT) {
-		switch ($action['status']) {
-			case ALERT_STATUS_SENT:
-				$status_label = ($action['alerttype'] == ALERT_TYPE_COMMAND)
-					? _('Executed')
-					: _('Sent');
-				$status_color = ZBX_STYLE_GREEN;
-				break;
-
-			case ALERT_STATUS_NEW:
-			case ALERT_STATUS_NOT_SENT:
-				$status_label = _('In progress');
-				$status_color = ZBX_STYLE_YELLOW;
-				break;
-
-			default:
-				$status_label = _('Failed');
-				$status_color = ZBX_STYLE_RED;
-				break;
-		}
-
-		return (new CSpan($status_label))->addClass($status_color);
-	}
-	else {
+	if ($action['action_type'] != ZBX_EVENT_HISTORY_ALERT) {
 		return '';
 	}
+
+	switch ($action['status']) {
+		case ALERT_STATUS_SENT:
+			$status_label = ($action['alerttype'] == ALERT_TYPE_COMMAND)
+				? _('Executed')
+				: _('Sent');
+			$status_color = ZBX_STYLE_GREEN;
+			break;
+
+		case ALERT_STATUS_NEW:
+		case ALERT_STATUS_NOT_SENT:
+			$status_label = _('In progress');
+			$status_color = ZBX_STYLE_YELLOW;
+			break;
+
+		default:
+			$status_label = _('Failed');
+			$status_color = ZBX_STYLE_RED;
+			break;
+	}
+
+	return (new CSpan($status_label))->addClass($status_color);
 }
 
 /**

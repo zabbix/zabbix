@@ -113,8 +113,7 @@
 				(new CButtonLink(_('Edit')))
 					->addClass('element-table-open')
 					->onClick('lldoverrides.operations.open(#{no});'),
-				(new CButtonLink(_('Remove')))
-					->addClass('element-table-remove')
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))->toString()
 	?>

@@ -199,18 +199,18 @@ var AudioControl = {
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-time-to-blink="60">test 1</span>
- *      <span class="blink" data-time-to-blink="30">test 2</span>
- *      <span class="blink" data-toggle-class="normal">test 3</span>
- *      <span class="blink">test 3</span>
+ *      <span class="js-blink" data-time-to-blink="60">test 1</span>
+ *      <span class="js-blink" data-time-to-blink="30">test 2</span>
+ *      <span class="js-blink" data-toggle-class="normal">test 3</span>
+ *      <span class="js-blink">test 3</span>
  *      <script type="text/javascript">
  *          jQuery(document).ready(function(
  *              jqBlink.blink();
  *          ));
  *      </script>
- * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
+ * Elements with class 'js-blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
- * For elements with class 'blink' and attribute 'data-toggle-class' class will be toggled.
+ * For elements with class 'js-blink' and attribute 'data-toggle-class' class will be toggled.
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?

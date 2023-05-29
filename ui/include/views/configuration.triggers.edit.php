@@ -206,7 +206,7 @@ elseif ($data['expression_constructor'] != IM_FORCED) {
 	$input_method_toggle = (new CButtonLink(_('Expression constructor')))->onClick(
 		'document.getElementById("toggle_expression_constructor").value=1;'.
 		'document.getElementById("expression_constructor").value='.
-			(($data['expression_constructor'] == IM_TREE) ? IM_ESTABLISHED : IM_TREE).';'.
+			($data['expression_constructor'] == IM_TREE ? IM_ESTABLISHED : IM_TREE).';'.
 		'document.forms["'.$triggersForm->getName().'"].submit();'
 	);
 

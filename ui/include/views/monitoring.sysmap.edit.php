@@ -321,25 +321,22 @@ $tabs->addTab('sysmap_tab', _('Map'), $map_tab);
 $user_group_shares_table = (new CTable())
 	->setId('user-group-share-table')
 	->setHeader([_('User groups'), _('Permissions'), _('Action')])
-	->setAttribute('style', 'width: 100%;');
-
-$add_user_group_btn = ([
-	(new CButtonLink(_('Add')))->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'usrgrp',
-			'srcfld1' => 'usrgrpid',
-			'srcfld2' => 'name',
-			'dstfrm' => $form->getName(),
-			'multiselect' => '1'
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-]);
-
-$user_group_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_group_btn))->setColSpan(3)
-	))->setId('user_group_list_footer')
-);
+	->setAttribute('style', 'width: 100%')
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'usrgrp',
+						'srcfld1' => 'usrgrpid',
+						'srcfld2' => 'name',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
+			))->setColSpan(3)
+		))->setId('user_group_list_footer')
+	);
 
 $user_groups = [];
 
@@ -358,25 +355,22 @@ $js_insert = 'window.addPopupValues('.json_encode(['object' => 'usrgrpid', 'valu
 $user_shares_table = (new CTable())
 	->setId('user-share-table')
 	->setHeader([_('Users'), _('Permissions'), _('Action')])
-	->setAttribute('style', 'width: 100%;');
-
-$add_user_btn = ([
-	(new CButtonLink(_('Add')))->onClick(
-		'return PopUp("popup.generic", '.json_encode([
-			'srctbl' => 'users',
-			'srcfld1' => 'userid',
-			'srcfld2' => 'fullname',
-			'dstfrm' => $form->getName(),
-			'multiselect' => '1'
-		]).', {dialogue_class: "modal-popup-generic"});'
-	)
-]);
-
-$user_shares_table->addRow(
-	(new CRow(
-		(new CCol($add_user_btn))->setColSpan(3)
-	))->setId('user_list_footer')
-);
+	->setAttribute('style', 'width: 100%')
+	->addRow(
+		(new CRow(
+			(new CCol(
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.generic", '.json_encode([
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $form->getName(),
+						'multiselect' => '1'
+					]).', {dialogue_class: "modal-popup-generic"});'
+				)
+			))->setColSpan(3)
+		))->setId('user_list_footer')
+	);
 
 $users = [];
 
