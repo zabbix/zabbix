@@ -1115,6 +1115,7 @@ function visibilityStatusChanges(value, objectid, replace_to) {
 		}
 		else if (!value) {
 			const new_obj = document.createElement('span');
+			new_obj.classList.add('visibility-box-caption');
 			new_obj.setAttribute('name', obj.name);
 			new_obj.setAttribute('id', obj.id);
 			new_obj.innerHTML = replace_to;

@@ -6261,6 +6261,9 @@ svg {
 .visibility-hidden {
   visibility: hidden; }
 
+.visibility-box-caption {
+  line-height: 24px; }
+
 .preprocessing-list {
   display: block;
   max-width: 930px;
