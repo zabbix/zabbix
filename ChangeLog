@@ -10,6 +10,8 @@ Bug fixes:
 ..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
 ...G...PS. [ZBX-21795] fixed unhandled timeout in Telnet (askolmeisters)
+..F....... [ZBX-22858] fixed xss vulnerability in graph item properties (miks)
+..F....... [ZBX-22859] fixed validation of input parameters in action configuration form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.34
@@ -2799,6 +2801,8 @@ Changes for 4.0.46rc1
 Bug fixes:
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+..F....... [ZBX-22858] fixed xss vulnerability in graph item properties (miks)
+..F....... [ZBX-22859] fixed validation of input parameters in action configuration form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45
