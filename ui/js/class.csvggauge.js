@@ -211,35 +211,39 @@ class CSVGGauge {
 			this.maxSpace = this.width - this.elements.description.height - (this.elements.min?.width || 0) * 2;
 		}
 
+		// Height ratio of 270 degree arc container - from center to top (full) and from center to bottom (small)
+		// TODO: calculate more precise
+		const arc270HalfHeightRatioFull = 0.58;
+		const arc270HalfHeightRatioSmall = 0.42;
+
 		if (this.options.needle.show && this.options.angle === 180) {
 			const valueSize = this.options.value.size || 0;
 			const unitsSize = this.options.units.size || 0;
 
-			let valueHeightPercents = valueSize;
+			let valueContainerHeightPercents = valueSize;
 
 			if (this.options.units.show) {
 				if (this.options.units.position === this.constructor.UNITS_POSITION_BEFORE
 					|| this.options.units.position === this.constructor.UNITS_POSITION_AFTER) {
-					valueHeightPercents = valueSize >= unitsSize ? valueSize : unitsSize;
+					valueContainerHeightPercents = valueSize >= unitsSize ? valueSize : unitsSize;
 				}
 				else if (this.options.units.position === this.constructor.UNITS_POSITION_ABOVE
 					|| this.options.units.position === this.constructor.UNITS_POSITION_BELOW) {
-					valueHeightPercents = valueSize + unitsSize;
+					valueContainerHeightPercents = valueSize + unitsSize;
 				}
 			}
 
-			const valueHeightPixels = valueHeightPercents * this.height / 100;
-			this.maxSpace -= this.thicknessNeedle + valueHeightPixels;
-			this.y -= this.thicknessNeedle + valueHeightPixels;
+			const valueContainerHeightPixels = valueContainerHeightPercents * this.height / 100;
+			this.maxSpace -= this.thicknessNeedle + valueContainerHeightPixels;
+			this.y -= (this.thicknessNeedle + valueContainerHeightPixels) / 2;
 		}
 		else if (this.options.angle === 270) {
-			// TODO: calculate more precise
-			this.y -= this.maxSpace * 0.43;
-			this.maxSpace *= 0.57;
+			this.y -= this.maxSpace * arc270HalfHeightRatioSmall;
+			this.maxSpace *= arc270HalfHeightRatioFull;
 		}
 
-		if (this.width <= this.maxSpace * 2 + (this.elements.min?.width || 0) * 2) {
-			// Widget's width is too small - need to shrink elements
+		// If widget's width is too small - need to shrink elements
+		if (this.width <= (this.maxSpace + (this.elements.min?.width || 0)) * 2) {
 			const offset = this.maxSpace - this.width / 2 + (this.elements.min?.width || 0);
 			this.maxSpace -= offset;
 		}
@@ -248,6 +252,13 @@ class CSVGGauge {
 		if (this.options.thresholds.arc.show && this.options.thresholds.show_labels) {
 			const labelHeight = (this.minMaxSize * this.height) / 100;
 			this.maxSpace -= labelHeight;
+
+			if (this.options.angle === 180) {
+				this.y += labelHeight / 2;
+			}
+			else {
+				this.y += labelHeight;
+			}
 		}
 
 		if (this.maxSpace <= 0) {
@@ -255,6 +266,14 @@ class CSVGGauge {
 		}
 		else if (this.maxSpaceInitial === 0) {
 			this.maxSpaceInitial = this.maxSpace;
+		}
+
+		// Center vertically
+		if (this.options.angle === 180) {
+			this.y -= (this.height - this.elements.description.height - this.maxSpace) / 2;
+		}
+		else {
+			this.y -= (this.height - this.elements.description.height - this.maxSpace / arc270HalfHeightRatioFull) / 2;
 		}
 
 		// Show both arcs
