@@ -63,9 +63,22 @@ zbx_dc_item_context_t;
 
 typedef struct
 {
+
+	unsigned char		poller_type;
+	CURLM			*curl_handle;
+	struct event_base	*base;
+	int			num;
+	int			config_timeout;
+	const char		*config_source_ip;
+	struct event		*add_items_timer;
+}
+zbx_poller_config_t;
+typedef struct
+{
 	CURL			*easyhandle;
 	struct curl_slist	*headers_slist;
 	char			*posts;
+	zbx_poller_config_t	*poller_config;
 	zbx_http_response_t	body;
 	zbx_http_response_t	header;
 	char			errbuf[CURL_ERROR_SIZE];

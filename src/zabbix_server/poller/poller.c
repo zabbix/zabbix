@@ -963,7 +963,7 @@ exit:
 }
 
 static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result,
-		CURLM *curl_handle)
+		CURLM *curl_handle, zbx_poller_config_t	*poller_config)
 {
 	char			*error = NULL;
 	int			ret = NOTSUPPORTED;
@@ -977,6 +977,7 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 	context->item_context.flags = item->flags;
 	context->item_context.state = item->state;
 	context->posts = item->posts;
+	context->poller_config = poller_config;
 	item->posts = NULL;
 
 	if (SUCCEED != (ret = zbx_http_request_prepare(context, item->request_method, item->url,
@@ -999,18 +1000,6 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 	return ret;
 }
 
-
-typedef struct
-{
-	const			zbx_config_comms_args_t *config_comms;
-	unsigned char		poller_type;
-	CURLM			*curl_handle;
-	struct event_base	*base;
-	int			num;
-	struct event		*add_items_timer;
-}
-zbx_poller_config_t;
-
 static void	add_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
@@ -1024,7 +1013,7 @@ static void	add_items(evutil_socket_t fd, short events, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_comms->config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout, &items);
 
 	if (0 == num)
 	{
@@ -1037,8 +1026,8 @@ static void	add_items(evutil_socket_t fd, short events, void *arg)
 	for (i = 0; i < num; i++)
 	{
 		if (SUCCEED != (errcodes[i] = get_context_http(&items[i],
-				poller_config->config_comms->config_source_ip, &results[i],
-				poller_config->curl_handle)))
+				poller_config->config_source_ip, &results[i],
+				poller_config->curl_handle, poller_config)))
 		{
 			continue;
 		}
@@ -1156,6 +1145,13 @@ static void	check_multi_info(void)
 				zbx_dc_poller_requeue_items(&context->item_context.itemid, &timespec.sec, &errcode, 1,
 						ZBX_POLLER_TYPE_NORMAL, &nextcheck);
 				zbx_free_agent_result(&result);
+
+				if (nextcheck <= time(NULL))
+				{
+					struct timeval tv = {.tv_usec = 1};
+
+					evtimer_add(context->poller_config->add_items_timer, &tv);
+				}
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				zbx_http_context_destory(context);
@@ -1349,7 +1345,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
 	zbx_poller_config_t	poller_config;
 
-	poller_config.config_comms = poller_args_in->config_comms;
+	poller_config.config_source_ip = poller_args_in->config_comms->config_source_ip;
+	poller_config.config_timeout = poller_args_in->config_comms->config_timeout;
 	poller_config.poller_type = poller_type;
 	poller_config.curl_handle = curl_handle;
 	poller_config.base = base;
