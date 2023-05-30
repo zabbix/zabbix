@@ -70,7 +70,7 @@ class API {
 		}
 
 		if ($filter !== '') {
-			if (strtolower($request->method()) === 'get') {
+			if (strtolower($request->method()) !== 'get') {
 				throw new APIException(ZBX_API_ERROR_PARAMETERS, 'This filter is not supported');
 			}
 
