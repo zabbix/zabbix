@@ -656,7 +656,7 @@ out:
 		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_UI64 " max allocated memory: "
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated memory: "
 			ZBX_FS_UI64, __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error), es->env->total_alloc,
 			es->env->max_total_alloc);
 
