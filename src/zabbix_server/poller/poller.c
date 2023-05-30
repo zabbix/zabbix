@@ -1146,12 +1146,8 @@ static void	check_multi_info(void)
 						ZBX_POLLER_TYPE_NORMAL, &nextcheck);
 				zbx_free_agent_result(&result);
 
-				if (nextcheck <= time(NULL))
-				{
-					struct timeval tv = {.tv_usec = 1};
-
-					evtimer_add(context->poller_config->add_items_timer, &tv);
-				}
+				if (FAIL != nextcheck && nextcheck <= time(NULL))
+					event_active(context->poller_config->add_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				zbx_http_context_destory(context);
@@ -1239,7 +1235,7 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 {
 	curl_context_t *curl_context;
 	int		events = 0;
-
+	zabbix_log(LOG_LEVEL_TRACE, "action:%d", action);
 	switch(action)
 	{
 		case CURL_POLL_IN:
@@ -1278,11 +1274,6 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-static void zbx_on_timeout(evutil_socket_t fd, short events, void *arg)
-{
-
-}
-
 ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
@@ -1299,7 +1290,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	struct event		*add_items_timer;
 	struct timeval		tv = {1, 0};
-
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
