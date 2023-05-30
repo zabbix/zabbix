@@ -26,19 +26,19 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 	context->item_context.value_type = item->value_type;
 	context->item_context.flags = item->flags;
 	context->item_context.state = item->state;
-	context->posts = item->posts;
+	context->item_context.posts = item->posts;
 	item->posts = NULL;
 	context->poller_config = poller_config;
 
 	if (SUCCEED != (ret = zbx_http_request_prepare(context, item->request_method, item->url,
-			item->query_fields, item->headers, context->posts, item->retrieve_mode, item->http_proxy,
+			item->query_fields, item->headers, context->item_context.posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
 			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error)))
 	{
 		SET_MSG_RESULT(result, error);
 		error = NULL;
-		zbx_http_context_destory(context);
+		zbx_http_context_destroy(context);
 		zbx_free(context);
 
 		return ret;
@@ -199,7 +199,7 @@ static void	check_multi_info(void)
 					event_active(context->poller_config->add_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
-				zbx_http_context_destory(context);
+				zbx_http_context_destroy(context);
 				zbx_free(context);
 				break;
 			default:

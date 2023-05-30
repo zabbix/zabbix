@@ -58,6 +58,7 @@ typedef struct
 	unsigned char	value_type;
 	unsigned char	flags;
 	unsigned char	state;
+	char		*posts;
 }
 zbx_dc_item_context_t;
 
@@ -78,7 +79,6 @@ typedef struct
 {
 	CURL			*easyhandle;
 	struct curl_slist	*headers_slist;
-	char			*posts;
 	zbx_poller_config_t	*poller_config;
 	zbx_http_response_t	body;
 	zbx_http_response_t	header;
@@ -116,7 +116,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 #define HTTP_STORE_JSON		1
 
 void	zbx_http_context_create(zbx_http_context_t *context);
-void	zbx_http_context_destory(zbx_http_context_t *context);
+void	zbx_http_context_destroy(zbx_http_context_t *context);
 int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_method, const char *url, const char *query_fields, char *headers,
 		const char *posts, unsigned char retrieve_mode, const char *http_proxy, unsigned char follow_redirects,
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,

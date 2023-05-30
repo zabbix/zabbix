@@ -76,7 +76,7 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 	zbx_free(error);
 	zbx_free(out);
 
-	zbx_http_context_destory(&context);
+	zbx_http_context_destroy(&context);
 
 	return ret;
 }

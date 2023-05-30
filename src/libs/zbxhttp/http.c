@@ -715,9 +715,9 @@ void	zbx_http_context_create(zbx_http_context_t *context)
 	memset(context, 0, sizeof(zbx_http_context_t));
 }
 
-void	zbx_http_context_destory(zbx_http_context_t *context)
+void	zbx_http_context_destroy(zbx_http_context_t *context)
 {
-	zbx_free(context->posts);
+	zbx_free(context->item_context.posts);
 	curl_slist_free_all(context->headers_slist);	/* must be called after curl_easy_perform() */
 	zbx_free(context->body.data);
 	zbx_free(context->header.data);

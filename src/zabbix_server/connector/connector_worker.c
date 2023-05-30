@@ -122,7 +122,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
 	}
 
-	zbx_http_context_destory(&context);
+	zbx_http_context_destroy(&context);
 #else
 	ZBX_UNUSED(config_source_ip);
 	zabbix_log(LOG_LEVEL_WARNING, "Support for connectors was not compiled in: missing cURL library");
