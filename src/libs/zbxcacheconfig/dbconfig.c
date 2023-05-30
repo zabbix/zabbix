@@ -264,7 +264,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
-		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_INTERNAL:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
@@ -291,6 +290,11 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
+		case ITEM_TYPE_HTTPAGENT:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_HTTPAGENT;
 	}
 
 	return ZBX_NO_POLLER;
@@ -10702,6 +10706,9 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			break;
 		case ZBX_POLLER_TYPE_PINGER:
 			max_items = ZBX_MAX_PINGER_ITEMS;
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+			max_items = ZBX_MAX_HTTPAGENT_ITEMS;
 			break;
 		default:
 			max_items = 1;

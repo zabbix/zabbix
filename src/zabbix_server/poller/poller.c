@@ -1143,7 +1143,7 @@ static void	check_multi_info(void)
 				int	errcode = SUCCEED;
 				int	nextcheck;
 				zbx_dc_poller_requeue_items(&context->item_context.itemid, &timespec.sec, &errcode, 1,
-						ZBX_POLLER_TYPE_NORMAL, &nextcheck);
+						ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
 				zbx_free_agent_result(&result);
 
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
@@ -1358,7 +1358,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					old_total_sec);
 		}
 
-		if (ZBX_POLLER_TYPE_NORMAL == poller_type)
+		if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 		{
 			if (0 == evtimer_pending(add_items_timer, NULL))
 				evtimer_add(add_items_timer, &tv);

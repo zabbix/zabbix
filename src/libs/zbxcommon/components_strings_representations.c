@@ -117,6 +117,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "connector worker";
 		case ZBX_PROCESS_TYPE_MAIN:
 			return "main";
+		case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+			return "http agent poller";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
