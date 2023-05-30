@@ -38,6 +38,8 @@ zbx_thread_poller_args;
 
 ZBX_THREAD_ENTRY(poller_thread, args);
 
+ZBX_THREAD_ENTRY(httpagent_poller_thread, args);
+
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,
 		size_t *data_offset);
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item, unsigned char **data, size_t *data_alloc,

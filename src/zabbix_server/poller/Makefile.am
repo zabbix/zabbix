@@ -32,6 +32,7 @@ libzbxpoller_a_SOURCES = \
 	telnet_run.h \
 	checks_telnet.c \
 	checks_telnet.h \
+	httpagent_poller.c \
 	poller.c \
 	poller.h
 
