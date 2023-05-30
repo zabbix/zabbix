@@ -398,8 +398,6 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 		event_base_loop(base, EVLOOP_ONCE);
 
 		sleeptime = 0;
-		
-
 		total_sec += zbx_time() - sec;
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
