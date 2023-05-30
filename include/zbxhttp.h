@@ -42,31 +42,6 @@ void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
 
 #ifdef HAVE_LIBCURL
-
-typedef struct
-{
-
-	unsigned char		poller_type;
-	CURLM			*curl_handle;
-	struct event_base	*base;
-	int			num;
-	int			config_timeout;
-	const char		*config_source_ip;
-	struct event		*add_items_timer;
-}
-zbx_poller_config_t;
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	unsigned char		value_type;
-	unsigned char		flags;
-	unsigned char		state;
-	char			*posts;
-	zbx_poller_config_t	*poller_config;
-}
-zbx_dc_item_context_t;
-
 typedef struct
 {
 	char	*data;
@@ -85,7 +60,6 @@ typedef struct
 	int			max_attempts;
 	unsigned char		retrieve_mode;
 	unsigned char		output_format;
-	zbx_dc_item_context_t	item_context;	/* only used by poller */
 }
 zbx_http_context_t;
 

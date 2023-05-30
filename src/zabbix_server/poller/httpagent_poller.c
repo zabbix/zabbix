@@ -12,40 +12,71 @@
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
 
+
+typedef struct
+{
+
+	unsigned char		poller_type;
+	CURLM			*curl_handle;
+	struct event_base	*base;
+	int			num;
+	int			config_timeout;
+	const char		*config_source_ip;
+	struct event		*add_items_timer;
+}
+zbx_poller_config_t;
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
+	char			*posts;
+	zbx_poller_config_t	*poller_config;
+}
+zbx_dc_item_context_t;
+typedef struct
+{
+	zbx_http_context_t	http_context;
+	zbx_dc_item_context_t	item_context;
+}
+zbx_httpagent_context;
+
 static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result,
 		CURLM *curl_handle, zbx_poller_config_t	*poller_config)
 {
 	char			*error = NULL;
 	int			ret = NOTSUPPORTED;
-	zbx_http_context_t	*context = zbx_malloc(NULL, sizeof(zbx_http_context_t));
+	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
 
-	zbx_http_context_create(context);
+	zbx_http_context_create(&httpagent_context->http_context);
 
-	context->item_context.poller_config = poller_config;
-	context->item_context.itemid = item->itemid;
-	context->item_context.hostid = item->host.hostid;
-	context->item_context.value_type = item->value_type;
-	context->item_context.flags = item->flags;
-	context->item_context.state = item->state;
-	context->item_context.posts = item->posts;
+	httpagent_context->item_context.poller_config = poller_config;
+	httpagent_context->item_context.itemid = item->itemid;
+	httpagent_context->item_context.hostid = item->host.hostid;
+	httpagent_context->item_context.value_type = item->value_type;
+	httpagent_context->item_context.flags = item->flags;
+	httpagent_context->item_context.state = item->state;
+	httpagent_context->item_context.posts = item->posts;
 	item->posts = NULL;
 
-	if (SUCCEED != (ret = zbx_http_request_prepare(context, item->request_method, item->url,
-			item->query_fields, item->headers, context->item_context.posts, item->retrieve_mode, item->http_proxy,
+	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method, item->url,
+			item->query_fields, item->headers, httpagent_context->item_context.posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
 			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error)))
 	{
 		SET_MSG_RESULT(result, error);
 		error = NULL;
-		zbx_http_context_destroy(context);
-		zbx_free(context);
+		zbx_http_context_destroy(&httpagent_context->http_context);
+		zbx_free(httpagent_context);
 
 		return ret;
 	}
 
-	curl_easy_setopt(context->easyhandle, CURLOPT_PRIVATE, context);
-	curl_multi_add_handle(curl_handle, context->easyhandle);
+	curl_easy_setopt(httpagent_context->http_context.easyhandle, CURLOPT_PRIVATE, httpagent_context);
+	curl_multi_add_handle(curl_handle, httpagent_context->http_context.easyhandle);
 
 	return ret;
 }
@@ -130,7 +161,7 @@ static void	check_multi_info(void)
 	CURLMsg			*message;
 	int			pending;
 	CURL			*easy_handle;
-	zbx_http_context_t	*context;
+	zbx_httpagent_context	*context;
 	zbx_timespec_t		timespec;
 	long			response_code;
 	int			ret;
@@ -150,7 +181,8 @@ static void	check_multi_info(void)
 				printf("DONE\n");
 
 				zbx_init_agent_result(&result);
-				if (SUCCEED == (ret = zbx_http_handle_response(context->easyhandle, context, message->data.result, &response_code, &out, &error)))
+				if (SUCCEED == (ret = zbx_http_handle_response(context->http_context.easyhandle,
+						&context->http_context, message->data.result, &response_code, &out, &error)))
 				{
 					/*if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(context->status_codes, (int)response_code))
 					{
@@ -199,7 +231,8 @@ static void	check_multi_info(void)
 					event_active(context->item_context.poller_config->add_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
-				zbx_http_context_destroy(context);
+				zbx_http_context_destroy(&context->http_context);
+				zbx_free(context->item_context.posts);
 				zbx_free(context);
 				break;
 			default:
