@@ -45,25 +45,6 @@ int	zbx_http_url_decode(const char *source, char **result);
 
 typedef struct
 {
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-zbx_http_response_t;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	hostid;
-	unsigned char	value_type;
-	unsigned char	flags;
-	unsigned char	state;
-	char		*posts;
-}
-zbx_dc_item_context_t;
-
-typedef struct
-{
 
 	unsigned char		poller_type;
 	CURLM			*curl_handle;
@@ -74,19 +55,37 @@ typedef struct
 	struct event		*add_items_timer;
 }
 zbx_poller_config_t;
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_uint64_t		hostid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	unsigned char		state;
+	char			*posts;
+	zbx_poller_config_t	*poller_config;
+}
+zbx_dc_item_context_t;
+
+typedef struct
+{
+	char	*data;
+	size_t	allocated;
+	size_t	offset;
+}
+zbx_http_response_t;
 
 typedef struct
 {
 	CURL			*easyhandle;
 	struct curl_slist	*headers_slist;
-	zbx_poller_config_t	*poller_config;
 	zbx_http_response_t	body;
 	zbx_http_response_t	header;
 	char			errbuf[CURL_ERROR_SIZE];
 	int			max_attempts;
 	unsigned char		retrieve_mode;
 	unsigned char		output_format;
-	zbx_dc_item_context_t	item_context;
+	zbx_dc_item_context_t	item_context;	/* only used by poller */
 }
 zbx_http_context_t;
 

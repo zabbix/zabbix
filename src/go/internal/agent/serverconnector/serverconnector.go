@@ -189,7 +189,7 @@ func (c *Connector) refreshActiveChecks() {
 		log.Errf("[%d] cannot create active checks request to [%s]: %s", c.clientID, c.addresses[0], err)
 		return
 	}
-
+	log.Debugf("sending [%s]", string(request))
 	data, errs, errRead := zbxcomms.Exchange(&c.addresses, &c.localAddr, time.Second*time.Duration(c.options.Timeout),
 		time.Second*time.Duration(c.options.Timeout), request, c.tlsConfig)
 
@@ -216,7 +216,7 @@ func (c *Connector) refreshActiveChecks() {
 	}
 
 	var response activeChecksResponse
-
+	log.Debugf("received [%s]", string(data))
 	err = json.Unmarshal(data, &response)
 	if err != nil {
 		log.Errf("[%d] cannot parse list of active checks from [%s]: %s", c.clientID, c.addresses[0], err)

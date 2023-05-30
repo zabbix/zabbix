@@ -21,6 +21,7 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 
 	zbx_http_context_create(context);
 
+	context->item_context.poller_config = poller_config;
 	context->item_context.itemid = item->itemid;
 	context->item_context.hostid = item->host.hostid;
 	context->item_context.value_type = item->value_type;
@@ -28,7 +29,6 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 	context->item_context.state = item->state;
 	context->item_context.posts = item->posts;
 	item->posts = NULL;
-	context->poller_config = poller_config;
 
 	if (SUCCEED != (ret = zbx_http_request_prepare(context, item->request_method, item->url,
 			item->query_fields, item->headers, context->item_context.posts, item->retrieve_mode, item->http_proxy,
@@ -196,7 +196,7 @@ static void	check_multi_info(void)
 				zbx_free_agent_result(&result);
 
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
-					event_active(context->poller_config->add_items_timer, 0, 0);
+					event_active(context->item_context.poller_config->add_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				zbx_http_context_destroy(context);
@@ -352,7 +352,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	if (0 == curl_global_init(CURL_GLOBAL_ALL))
+	if (0 != curl_global_init(CURL_GLOBAL_ALL))
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL");
 
 	if (NULL == (curl_handle = curl_multi_init()))
