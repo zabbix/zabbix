@@ -93,7 +93,6 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 	else
 		old_size = 0;
 
-
 	if (env->total_alloc + size + 8 - old_size > env->max_total_alloc)
 		env->max_total_alloc = env->total_alloc + size + 8 - old_size;
 
