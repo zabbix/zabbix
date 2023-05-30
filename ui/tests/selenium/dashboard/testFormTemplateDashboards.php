@@ -262,20 +262,154 @@ class testFormTemplateDashboards extends CWebTest {
 		return [
 			[
 				[
-					'type' => 'Clock',
+					'type' => 'Action log',
+					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'name' => 'Name',
+							'field' => 'Name',
 							'attributes' => [
 								'placeholder' => 'default',
 								'maxlength' => 255
 							]
 						],
 						[
-							'name' => 'Time type',
+							'field' => 'Recipients',
+							'type' => 'multiselect'
+						],
+						[
+							'field' => 'Actions',
+							'type' => 'multiselect'
+						],
+						[
+							'field' => 'Media types',
+							'type' => 'multiselect'
+						],
+						[
+							'field' => 'Status',
+							'type' => 'checkbox_list',
+							'labels' => ['In progress', 'Sent/Executed', 'Failed'],
+							'values' => ['id:statuses_0' => false, 'id:statuses_1' => false, 'id:statuses_2' => false]
+						],
+						[
+							'field' => 'Search string',
+							'attributes' => [
+								'placeholder' => 'subject or body text',
+								'maxlength' => 2048
+							]
+						],
+						[
+							'field' => 'Sort entries by',
+							'type' => 'dropdown',
+							'possible_values' => [
+								'Time (descending)',
+								'Time (ascending)',
+								'Media type (descending)',
+								'Media type (ascending)',
+								'Status (descending)',
+								'Status (ascending)',
+								'Recipient (descending)',
+								'Recipient (ascending)',
+							],
+							'value' => 'Time (descending)'
+						],
+						[
+							'field' => 'Show lines',
+							'value' => 25,
+							'attributes' => [
+								'maxlength' => 3
+							],
+							'mandatory' => true
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Clock'),
+					'refresh_interval' => 'Default (15 minutes)',
+					'fields' => [
+						[
+							'field' => 'Name',
+							'attributes' => [
+								'placeholder' => 'default',
+								'maxlength' => 255
+							]
+						],
+						[
+							'field' => 'Time type',
 							'type' => 'dropdown',
 							'possible_values' => ['Local time', 'Server time', 'Host time'],
 							'value' => 'Local time'
+						]
+					],
+					'hidden_fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Show',
+							'type' => 'checkbox_list',
+							'labels' => ['Date', 'Time', 'Time zone'],
+							'values' => ['id:show_1' => false, 'id:show_2' => true, 'id:show_3' => false],
+							'mandatory' => true
+						],
+						[
+							'field' => 'Background color',
+							'type' => 'color_picker'
+						],
+						[
+							'field' => 'Time',
+							'screenshot' => true
+						]
+					],
+					'change_values' => [
+						'Time type' => 'Host time',
+						'Clock type' => 'Digital',
+						'Advanced configuration' => true
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Discovery status'),
+					'refresh_interval' => 'Default (1 minute)'
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Favorite graphs'),
+					'refresh_interval' => 'Default (15 minutes)'
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Favorite maps'),
+					'refresh_interval' => 'Default (15 minutes)'
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Geomap'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Initial view',
+							'attributes' => [
+								'placeholder' => '40.6892494,-74.0466891',
+								'maxlength' => 255
+							],
+							'hint' => [
+								'locator' => 'class:icon-help-hint',
+								'text' => "Comma separated center coordinates and zoom level to display when the widget ".
+										"is initially loaded.\n".
+										"Supported formats:\n".
+										"<lat>,<lng>,<zoom>\n".
+										"<lat>,<lng>\n\n".
+										"The maximum zoom level is \"0\".\n".
+										"Initial view is ignored if the default view is set."
+							]
 						]
 					]
 				]
@@ -283,29 +417,35 @@ class testFormTemplateDashboards extends CWebTest {
 			[
 				[
 					'type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
+					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'name' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
-							]
-						],
-						[
-							'name' => 'Source',
+							'field' => 'Source',
 							'type' => 'radio_button',
 							'possible_values' => ['Graph', 'Simple graph'],
 							'value' => 'Graph'
 						],
 						[
-							'name' => 'Graph',
-							'type' => 'multiselect'
+							'field' => 'Graph',
+							'type' => 'multiselect',
+							'mandatory' => true
 						],
 						[
-							'name' => 'Show legend',
+							'field' => 'Show legend',
 							'type' => 'checkbox',
 							'value' => true
 						]
+					],
+					'hidden_fields' => [
+						[
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true,
+							'replaces' => 'Graph'
+						]
+					],
+					'change_values' => [
+						'Source' => 'Simple graph'
 					]
 				]
 			],
@@ -313,76 +453,74 @@ class testFormTemplateDashboards extends CWebTest {
 				[
 
 					'type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
+					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'name' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
-							]
-						],
-						[
-							'name' => 'Source',
+							'field' => 'Source',
 							'type' => 'radio_button',
 							'possible_values' => ['Graph prototype', 'Simple graph prototype'],
 							'value' => 'Graph prototype'
 						],
 						[
-							'name' => 'Graph prototype',
+							'field' => 'Graph prototype',
 							'type' => 'multiselect'
 						],
 						[
-							'name' => 'Show legend',
+							'field' => 'Show legend',
 							'type' => 'checkbox',
 							'value' => true
 						],
 						[
-							'name' => 'Columns',
+							'field' => 'Columns',
 							'value' => 2,
 							'attributes' => [
 								'maxlength' => 2
 							]
 						],
 						[
-							'name' => 'Rows',
+							'field' => 'Rows',
 							'value' => 1,
 							'attributes' => [
 								'maxlength' => 2
 							]
 						]
+					],
+					'hidden_fields' => [
+						[
+							'field' => 'Item prototype',
+							'type' => 'multiselect',
+							'mandatory' => true
+						]
+					],
+					'change_values' => [
+						'Source' => 'Simple graph prototype'
 					]
 				]
 			],
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
+					'type' => CFormElement::RELOADABLE_FILL('Host availability'),
+					'refresh_interval' => 'Default (15 minutes)',
 					'fields' => [
 						[
-							'name' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
+							'field' => 'Interface type',
+							'type' => 'checkbox_list',
+							'labels' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
+							'values' => [
+								'id:interface_type_1' => false,
+								'id:interface_type_2' => false,
+								'id:interface_type_3' => false,
+								'id:interface_type_4' => false
 							]
 						],
 						[
-							'name' => 'Items',
-							'type' => 'multiselect'
-						],
-						[
-							'name' => 'Items location',
+							'field' => 'Layout',
 							'type' => 'radio_button',
-							'possible_values' => ['Left', 'Top'],
-							'value' => 'Left'
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
 						],
 						[
-							'name' => 'Show lines',
-							'value' => 25,
-							'attributes' => [
-								'maxlength' => 3
-							]
-						],
-						[
-							'name' => 'Show text as HTML',
+							'field' => 'Show data in maintenance',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -391,26 +529,517 @@ class testFormTemplateDashboards extends CWebTest {
 			],
 			[
 				[
-					'type' => CFormElement::RELOADABLE_FILL('URL'),
+					'type' => CFormElement::RELOADABLE_FILL('Item value'),
+					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'name' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
+							'field' => 'Item',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Show',
+							'type' => 'checkbox_list',
+							'labels' => ['Description', 'Time', 'Value', 'Change indicator'],
+							'values' => ['id:show_1' => true, 'id:show_2' => true, 'id:show_3' => true, 'id:show_4' => true],
+							'mandatory' => true
+						],
+
+					],
+					'hidden_fields' => [
+						[
+							'field' => 'Desctiption',
+							'screenshot' => true,
+							'hint' => [
+								'locator' => 'class:icon-help-hint',
+								'text' => "Supported macros:\n".
+										"{HOST.*}\n".
+										"{ITEM.*}\n".
+										"{INVENTORY.*}\n".
+										"User macros"
 							]
 						],
 						[
-							'name' => 'URL',
+							'field' => 'Value',
+							'screenshot' => true
+						],
+						[
+							'field' => 'Time',
+							'screenshot' => true
+						],
+						[
+							'field' => 'Change indicator',
+							'screenshot' => true
+						],
+						[
+							'field' => 'Background color',
+							'type' => 'color_picker'
+						],
+						[
+							'field' => 'Thresholds',
+							'type' => 'table',
+							'headers' => ['Threshold', 'Action'],
+							'buttons' => ['Add'],
+							'hint' => [
+								'locator' => 'id:item-value-thresholds-warning',
+								'text' => 'This setting applies only to numeric data.'
+							]
+						]
+					],
+					'change_values' => [
+						'Advanced configuration' => true
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Map'),
+					'refresh_interval' => 'Default (15 minutes)',
+					'fields' => [
+						[
+							'field' => 'Source type',
+							'type' => 'radio_button',
+							'possible_values' => ['Map', 'Map navigation tree'],
+							'value' => 'Map'
+						],
+						[
+							'field' => 'Map',
+							'type' => 'multiselect',
+							'mandatory' => true
+						]
+					],
+					'hidden_fields' => [
+						[
+							'field' => 'Filter',
+							'type' => 'dropdown',
+							'mandatory' => true,
+							'possible_values' => ['Select widget'],
+							'value' => 'Select widget',
+							'replaces' => 'Map'
+						]
+					],
+					'change_values' => [
+						'Source type' => 'Map navigation tree'
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Map navigation tree'),
+					'refresh_interval' => 'Default (15 minutes)',
+					'fields' => [
+						[
+							'field' => 'Show unavailable maps',
+							'type' => 'checkbox',
+							'value' => false
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Plain text'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Items',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Items location',
+							'type' => 'radio_button',
+							'possible_values' => ['Left', 'Top'],
+							'value' => 'Left'
+						],
+						[
+							'field' => 'Show lines',
+							'value' => 25,
+							'attributes' => [
+								'maxlength' => 3
+							],
+							'mandatory' => true
+						],
+						[
+							'field' => 'Show text as HTML',
+							'type' => 'checkbox',
+							'value' => false
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Problem hosts'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Problem',
 							'attributes' => [
 								'maxlength' => 2048
 							]
+						],
+						[
+							'field' => 'Severity',
+							'type' => 'checkbox_list',
+							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'values' => [
+								'id:severities_0' => false,
+								'id:severities_1' => false,
+								'id:severities_2' => false,
+								'id:severities_3' => false,
+								'id:severities_4' => false,
+								'id:severities_5' => false
+							]
+						],
+						[
+							'field' => 'Problem tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Problem display',
+							'type' => 'radio_button',
+							'possible_values' => ['All', 'Separated', 'Unacknowledged only'],
+							'value' => 'All'
 						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Problems'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Show',
+							'type' => 'radio_button',
+							'possible_values' => ['Recent problems', 'Problems', 'History'],
+							'value' => 'Recent problems'
+						],
+						[
+							'field' => 'Problem',
+							'attributes' => [
+								'maxlength' => 2048
+							]
+						],
+						[
+							'field' => 'Severity',
+							'type' => 'checkbox_list',
+							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'values' => [
+								'id:severities_0' => false,
+								'id:severities_1' => false,
+								'id:severities_2' => false,
+								'id:severities_3' => false,
+								'id:severities_4' => false,
+								'id:severities_5' => false
+							]
+						],
+						[
+							'field' => 'Problem tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Show tags',
+							'type' => 'radio_button',
+							'possible_values' => ['None', '1', '2', '3'],
+							'value' => 'None'
+						],
+						[
+							'field' => 'Show operational data',
+							'type' => 'radio_button',
+							'possible_values' => ['None', 'Separately', 'With problem name'],
+							'value' => 'None'
+						],
+						[
+							'field' => 'Show symptoms',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Acknowledgement status',
+							'type' => 'screenshot'
+						],
+						[
+							'field' => 'Sort entries by',
+							'type' => 'dropdown',
+							'possible_values' => [
+								'Time (descending)',
+								'Time (ascending)',
+								'Severity (descending)',
+								'Severity (ascending)',
+								'Problem (descending)',
+								'Problem (ascending)',
+							],
+							'value' => 'Time (descending)'
+						],
+						[
+							'field' => 'Show timeline',
+							'type' => 'checkbox',
+							'value' => true
+						],
+						[
+							'field' => 'Show lines',
+							'value' => 25,
+							'attributes' => [
+								'maxlength' => 3
+							],
+							'mandatory' => true
+						]
+					],
+					'disabled_fields' => [
+						[
+							'field' => 'Tag name',
+							'type' => 'radio_button',
+							'possible_values' => ['None', '1', '2', '3'],
+							'value' => 'None'
+						],
+						[
+							'field' => 'Tag display priority',
+							'attributes' => [
+								'maxlength' => 2048,
+								'placeholder' => 'comma-separated list'
+							]
+						],
+						[
+							'field' => 'id:acknowledged_by_me',
+							'type' => 'checkbox',
+							'value' => false
+						]
+					],
+					'change_values' => [
+						'Show tags' => '3',
+						'Acknowledgement status' => 'Acknowledged'
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Problems by severity'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Problem',
+							'attributes' => [
+								'maxlength' => 2048
+							]
+						],
+						[
+							'field' => 'Severity',
+							'type' => 'checkbox_list',
+							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
+							'values' => [
+								'id:severities_0' => false,
+								'id:severities_1' => false,
+								'id:severities_2' => false,
+								'id:severities_3' => false,
+								'id:severities_4' => false,
+								'id:severities_5' => false
+							]
+						],
+						[
+							'field' => 'Problem tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Layout',
+							'type' => 'radio_button',
+							'possible_values' => ['Horizontal', 'Vertical'],
+							'value' => 'Horizontal'
+						],
+						[
+							'field' => 'Show operational data',
+							'type' => 'radio_button',
+							'possible_values' => ['None', 'Separately', 'With problem name'],
+							'value' => 'None'
+						],
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Problem display',
+							'type' => 'radio_button',
+							'possible_values' => ['All', 'Separated', 'Unacknowledged only'],
+							'value' => 'All'
+						],
+						[
+							'field' => 'Show timeline',
+							'type' => 'checkbox',
+							'value' => true
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('SLA report'),
+					'refresh_interval' => 'Default (No refresh)',
+					'fields' => [
+						[
+							'field' => 'SLA',
+							'type' => 'multiselect',
+							'mandatory' => true
+						],
+						[
+							'field' => 'Service',
+							'type' => 'multiselect'
+						],
+						[
+							'field' => 'Show periods',
+							'value' => 20,
+							'attributes' => [
+								'maxlength' => 3
+							]
+						],
+						[
+							'field' => 'From',
+							'type' => 'date_picker',
+							'attributes' => [
+								'maxlength' => 255,
+								'placeholder' =>'YYYY-MM-DD'
+							]
+						],
+						[
+							'field' => 'To',
+							'type' => 'date_picker',
+							'attributes' => [
+								'maxlength' => 255,
+								'placeholder' =>'YYYY-MM-DD'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('System information'),
+					'refresh_interval' => 'Default (15 minutes)',
+					'fields' => [
+						[
+							'field' => 'Show',
+							'type' => 'radio_button',
+							'possible_values' => ['System stats', 'High availability nodes'],
+							'value' => 'System stats'
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Trigger overview'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Show',
+							'type' => 'radio_button',
+							'possible_values' => ['Recent problems', 'Problems', 'Any'],
+							'value' => 'Recent problems'
+						],
+						[
+							'field' => 'Problem tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Host location',
+							'type' => 'radio_button',
+							'possible_values' => ['Left', 'Top'],
+							'value' => 'Left'
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('URL'),
+					'refresh_interval' => 'Default (No refresh)',
+					'fields' => [
+						[
+							'field' => 'URL',
+							'attributes' => [
+								'maxlength' => 2048
+							],
+							'mandatory' => true
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Web monitoring'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Scenario tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Show data in maintenance',
+							'type' => 'checkbox',
+							'value' => false
+						]
+					]
+				]
+			],
+			[
+				[
+					'type' => CFormElement::RELOADABLE_FILL('Data overview'),
+					'refresh_interval' => 'Default (1 minute)',
+					'fields' => [
+						[
+							'field' => 'Item tags',
+							'type' => 'tags_table',
+							'operators' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain'],
+							'default_operator' => 'Contains'
+						],
+						[
+							'field' => 'Show suppressed problems',
+							'type' => 'checkbox',
+							'value' => false
+						],
+						[
+							'field' => 'Host location',
+							'type' => 'radio_button',
+							'possible_values' => ['Left', 'Top'],
+							'value' => 'Left'
+						]
+					],
+					'hint' => [
+						'locator' => 'xpath:.//a[@class="icon-info status-yellow"]',
+						'text' => 'Widget is deprecated.'
 					]
 				]
 			]
 		];
 	}
+
+	// Graph and Top hosts layout should be checked separately.
 
 	/**
 	 * Function that checks the layout and the default settings of widget configuration forms.
