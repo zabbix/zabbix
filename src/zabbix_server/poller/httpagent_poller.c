@@ -377,6 +377,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	add_items_timer = evtimer_new(base, add_items, &poller_config);
 	poller_config.add_items_timer = add_items_timer;
 
+	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
