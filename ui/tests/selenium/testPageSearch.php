@@ -49,7 +49,7 @@ class testPageSearch extends CWebTest {
 					'type' => 1,
 					'main' => 1,
 					'useip' => 1,
-					'ip' => '127.0.0.1',
+					'ip' => '99.99.99.99',
 					'dns' => '',
 					'port' => '10050'
 				]
@@ -62,9 +62,9 @@ class testPageSearch extends CWebTest {
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
-					'useip' => 1,
+					'useip' => 0,
 					'ip' => '127.0.0.1',
-					'dns' => '',
+					'dns' => 'testdns.example.com',
 					'port' => '10050'
 				]
 			],
@@ -193,6 +193,38 @@ class testPageSearch extends CWebTest {
 					'host_expected_count' => ['count' => 37, 'total' => 37],
 					'hgroup_expected_count' => ['count' => 28, 'total' => 28],
 					'template_expected_count' => ['count' => 100, 'total' => 234],
+				]
+			],
+			[
+				[
+					'search_string' => '99.99.99.99',
+					'host_expected_data' => [['Host' => '🙂⭐️'], ['IP' => '99.99.99.99'], ['DNS' => '']],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => '127.0.0.1',
+					'host_expected_count' => ['count' => 44, 'total' => 44],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
+				]
+			],
+			[
+				[
+					'search_string' => 'testdns.example.com',
+					'host_expected_data' => [['Host' => str_repeat('A', 128)], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
+					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_data' => 'No data found.',
+					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_data' => 'No data found.',
+					'template_expected_count' => ['count' => 0, 'total' => 0],
 				]
 			],
 		];
