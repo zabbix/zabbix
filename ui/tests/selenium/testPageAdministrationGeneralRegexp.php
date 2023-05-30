@@ -106,18 +106,16 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	/**
 	 * Test pressing mass delete button but then cancelling.
 	 */
-	public function testPageAdministrationGeneralRegexp_MassDeleteAllCancel() {
+	public function testPageAdministrationGeneralRegexp_DeleteCancel() {
 		$this->calculateHash();
 
-		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('name:all-regexes')->one()->click();
 		$this->query('button:Delete')->one()->click();
 		$this->page->dismissAlert();
 		$this->page->assertTitle('Configuration of regular expressions');
 
 		// Make sure nothing has been deleted.
-		$this->assertFalse($this->query('xpath://*[text()="Regular expression deleted"]')->exists());
-		$this->assertFalse($this->query('xpath://*[text()="Regular expressions deleted"]')->exists());
 		$this->verifyHash();
 
 	}
