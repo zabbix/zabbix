@@ -267,9 +267,29 @@ class testPageSearch extends CWebTest {
 					'expected_count' => 1,
 				]
 			],
+			[
+				[
+					'search_string' => 'ignore case',
+					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
+					'expected_count' => 1,
+				]
+			],
+			[
+				[
+					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
+					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
+					'expected_count' => 1,
+				]
+			],
+			[
+				[
+					'search_string' => str_repeat('A', 128),
+					'expected_suggestions' => [str_repeat('A', 128)],
+					'expected_count' => 1,
+				]
+			],
 		];
 	}
-
 
 	/**
 	 * Fill the Search input and verify that autocomplete shows the correct suggestions.
@@ -306,7 +326,7 @@ class testPageSearch extends CWebTest {
 			}
 		}
 
-		// Verify suggestion count.
+		// Verify suggestion total count.
 		if (isset($data['expected_count'])) {
 			if ($data['expected_count'] > 0) {
 				$this->assertEquals($data['expected_count'], $this->query($itemSelector)->waitUntilVisible()->all()->count());
@@ -335,7 +355,7 @@ class testPageSearch extends CWebTest {
 	 * @param $expectedTableData	expected table data as an array or a string
 	 * @param $expectedCount		expected count and total at the footer
 	 */
-	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount){
+	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
 		$this->assertEquals($widgetParams['title'],
 			$this->query('xpath://*[@id="'.$widgetParams['id'].'"]//h4')->one()->getText());
 		if ($expectedTableData) {
@@ -355,7 +375,7 @@ class testPageSearch extends CWebTest {
 	/**
 	 * Verify that the suggestion list is NOT visible.
 	 */
-	private function verifyThatSuggestionsNotShow(){
+	private function verifyThatSuggestionsNotShow() {
 		try {
 			$this->query('class:search-suggest')->waitUntilVisible(1);
 		} catch (TimeoutException $e) {
