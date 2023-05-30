@@ -1036,7 +1036,7 @@ static void	add_items(evutil_socket_t fd, short events, void *arg)
 
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != (errcodes[i] = get_context_http(&items[i], 
+		if (SUCCEED != (errcodes[i] = get_context_http(&items[i],
 				poller_config->config_comms->config_source_ip, &results[i],
 				poller_config->curl_handle)))
 		{
@@ -1344,8 +1344,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	base = event_base_new();
 	curl_timeout = evtimer_new(base, on_timeout, NULL);
-
-	
 
 	curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
 	curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
