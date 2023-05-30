@@ -43,11 +43,6 @@ $newgroup = getRequest('newgroup', '');
 $templateids = getRequest('templates', []);
 $clear_templates = getRequest('clear_templates', []);
 
-$frm_title = _('Template');
-
-if ($data['templateid'] != 0) {
-	$frm_title .= SPACE.' ['.$data['dbTemplate']['name'].']';
-}
 $frmHost = (new CForm())
 	->addVar('form_refresh', $data['form_refresh'] + 1)
 	->setId('templatesForm')

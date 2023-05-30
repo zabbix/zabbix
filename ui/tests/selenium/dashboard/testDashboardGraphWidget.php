@@ -589,7 +589,10 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021-25-09 00:00:00'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => [
+						'Invalid parameter "To": a time range is expected.',
+						'Maximum time period to display is 731 days.'
+					]
 				]
 			],
 			[
@@ -599,7 +602,10 @@ class testDashboardGraphWidget extends CWebTest {
 						'From' => '2021-05-02 00:00:00',
 						'To' => '2021.07.31 15:53:07'
 					],
-					'error' => 'Invalid parameter "To": a time range is expected.'
+					'error' => [
+						'Invalid parameter "To": a time range is expected.',
+						'Maximum time period to display is 731 days.'
+					]
 				]
 			],
 			[

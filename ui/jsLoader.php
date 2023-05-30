@@ -54,7 +54,6 @@ $availableJScripts = [
 	// classes
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
-	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cclock.js' => '',
 	'class.cdate.js' => '',
@@ -361,7 +360,6 @@ if (empty($_GET['files'])) {
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',
-		'class.bbcode.js',
 		'class.csuggest.js',
 		'class.scrollable.js',
 		'class.sidebar.js',

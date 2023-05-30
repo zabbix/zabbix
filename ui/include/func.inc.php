@@ -1274,7 +1274,7 @@ function zbx_str2links($text) {
 				if ($pos != $start) {
 					$result[] = mb_substr($line, $start, $pos - $start);
 				}
-				$result[] = new CLink(CHtml::encode($match), $match);
+				$result[] = new CLink($match, $match);
 				$start = $pos + mb_strlen($match);
 			}
 		}

@@ -75,8 +75,8 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 				(new CLink(_('Add child'), 'services.php?form=1&parentname='._('root')))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 			]),
-			'algorithm' => SPACE,
-			'description' => SPACE
+			'algorithm' => NBSP(),
+			'description' => NBSP()
 		];
 
 		$service = $serviceNode;
@@ -253,13 +253,13 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 				new CLink([
 					(new CSpan([new CSpan('80%'), new CSpan('100%')]))->addClass(ZBX_STYLE_PROGRESS_BAR_LABEL),
 					$width_green > 0
-						? (new CSpan('&nbsp;'))
+						? (new CSpan(NBSP()))
 							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
 							->addClass(ZBX_STYLE_GREEN_BG)
 							->setAttribute('style', 'width: '.$width_green.'px;')
 						: null,
 					$width_red > 0
-						? (new CSpan('&nbsp;'))
+						? (new CSpan(NBSP()))
 							->addClass(ZBX_STYLE_PROGRESS_BAR_BG)
 							->addClass(ZBX_STYLE_RED_BG)
 							->setAttribute('style', 'width: '.$width_red.'px;')

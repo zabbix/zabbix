@@ -104,9 +104,8 @@ $dependencies_table = (new CTable())
 foreach ($data['dependencies'] as $dependency) {
 	$dependencies_form_list->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
 
-	$dependency_description = CHtml::encode(
-		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description']
-	);
+	$dependency_description =
+		implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description'];
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 		$description = (new CLink($dependency_description,
