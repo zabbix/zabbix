@@ -194,7 +194,7 @@ int	zbx_token_parse_user_macro(const char *expression, const char *macro, zbx_to
 int	zbx_token_parse_macro(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_objectid(const char *expression, const char *macro, zbx_token_t *token);
 int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_token_t *token);
-int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token);
 /* token END */
 

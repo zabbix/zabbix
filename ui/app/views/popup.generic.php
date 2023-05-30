@@ -450,7 +450,9 @@ switch ($data['popup_type']) {
 		foreach ($data['table_records'] as $d_rule) {
 			foreach ($d_rule['dchecks'] as $d_check) {
 				$name = $d_rule['name'].
-					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports']);
+					NAME_DELIMITER.discovery_check2str($d_check['type'], $d_check['key_'], $d_check['ports'],
+						$d_check['allow_redirect']
+					);
 
 				$values = [
 					$options['dstfld1'] => $d_check[$options['srcfld1']]
@@ -746,7 +748,7 @@ switch ($data['popup_type']) {
 				$mappings_table[] = new CDiv($mapping['newvalue']);
 			}
 
-			$hellip = (count($valuemap['mappings']) > 3) ? '&hellip;' : null;
+			$hellip = (count($valuemap['mappings']) > 3) ? HELLIP() : null;
 			$table->addRow([$check_box, $name, [
 				(new CDiv($mappings_table))->addClass(ZBX_STYLE_VALUEMAP_MAPPINGS_TABLE), $hellip
 			]]);

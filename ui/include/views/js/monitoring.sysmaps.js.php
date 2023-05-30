@@ -905,7 +905,8 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<?= (new CRow([
 			(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CTextBox('url_#{selementurlid}_url', '#{url}', false, DB::getFieldLength('sysmap_url', 'url')))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CCol(
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)

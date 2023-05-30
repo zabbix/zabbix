@@ -66,6 +66,7 @@
 					postMessageDetails('success', e.detail.messages);
 				}
 
+				uncheckTableRows('maintenance');
 				location.href = location.href;
 			});
 

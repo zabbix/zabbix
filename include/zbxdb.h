@@ -75,7 +75,7 @@ zbx_config_dbhigh_t;
 #	define ZBX_FOR_UPDATE	" for update"
 #endif
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error);
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error);
 void	zbx_db_deinit_basic(void);
 
 void	zbx_db_init_autoincrement_options_basic(void);
@@ -135,6 +135,13 @@ int		zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, uns
 void		zbx_db_clean_bind_context(zbx_db_bind_context_t *context);
 int		zbx_db_statement_execute(int iters);
 #endif
+
+#if defined (HAVE_MYSQL)
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size);
+#elif defined(HAVE_POSTGRESQL)
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size);
+#endif
+
 int		zbx_db_vexecute(const char *fmt, va_list args);
 zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args);
 zbx_db_result_t	zbx_db_select_n_basic(const char *query, int n);
@@ -241,6 +248,9 @@ struct zbx_db_version_info_t
 
 	int			history_compressed_chunks;
 	int			trends_compressed_chunks;
+#ifdef HAVE_ORACLE
+	struct zbx_json		tables_json;
+#endif
 };
 
 void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info);

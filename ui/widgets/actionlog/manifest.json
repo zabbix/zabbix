@@ -5,7 +5,9 @@
 	"name": "Action log",
 	"namespace": "ActionLog",
 	"version": "1.0",
-	"author": "Zabbix SIA",
+	"author": "Zabbix",
+	"description": "Displays records about executed action operations (notifications, remote commands).",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/action_log",
 	"widget": {
 		"js_class": "CWidgetActionLog",
 		"use_time_selector": true

@@ -1472,11 +1472,48 @@ class testCalculatedFormula extends CWebTest {
 					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(exists_foreach(/host/trap,#7,eg))".'
 				]
 			],
+			// Unsupported operator.
 			[
 				[
 					'expected' => TEST_BAD,
 					'formula' => 'count(max_foreach(/host/trap,1h),1)',
-					'error' => 'Invalid parameter "/1/params": invalid number of parameters in function "count".'
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),"x","2")',
+					'error' => 'Invalid parameter "/1/params": incorrect usage of function "count".'
+				]
+			],
+			// Pattern not provided with operator.
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),"like", )',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),"like", )".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h),,)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h),,)".'
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'formula' => 'count(max_foreach(/host/trap,1h), ,)',
+					'error' => 'Invalid parameter "/1/params": incorrect expression starting from "count(max_foreach(/host/trap,1h), ,)".'
 				]
 			],
 			[

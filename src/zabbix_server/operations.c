@@ -21,7 +21,7 @@
 #include "operations.h"
 
 #include "log.h"
-#include "zbxavailability.h"
+#include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
 #include "zbxnum.h"
@@ -445,7 +445,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
 						"active_available", NULL);
 
-				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid,
+						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
@@ -600,7 +601,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_prepare(&db_insert_host_rtdata, "host_rtdata", "hostid",
 						"active_available", NULL);
 
-				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid, INTERFACE_AVAILABLE_UNKNOWN);
+				zbx_db_insert_add_values(&db_insert_host_rtdata, hostid,
+						ZBX_INTERFACE_AVAILABLE_UNKNOWN);
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 

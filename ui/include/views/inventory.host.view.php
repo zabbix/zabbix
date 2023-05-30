@@ -242,7 +242,9 @@ $inventoryValues = false;
 foreach ($data['host']['inventory'] as $key => $value) {
 	if ($value !== '') {
 		$detailsFormList->addRow($data['tableTitles'][$key]['title'],
-			(new CDiv(zbx_str2links($value)))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			(new CDiv(zbx_str2links($value)))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 		);
 
 		$inventoryValues = true;

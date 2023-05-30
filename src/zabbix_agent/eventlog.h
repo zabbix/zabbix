@@ -28,7 +28,7 @@
 #endif
 
 #include "zbxalgo.h"
-#include "active.h"
+#include "active_checks/active_checks.h"
 #include "metrics.h"
 
 #define EVT_VARIANT_TYPE_ARRAY	128

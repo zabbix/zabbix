@@ -134,7 +134,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param array  $filter['severities']            (optional)
-	 * @param int    $filter['unacknowledged']        (optional)
+	 * @param int    $filter['acknowledgement_status'] (optional)
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
@@ -251,9 +251,6 @@ class CScreenProblem extends CScreenBase {
 					$options['severities'] = $filter['severities'];
 				}
 			}
-			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']) {
-				$options['acknowledged'] = false;
-			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
 			}
@@ -269,8 +266,33 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
+			$filter_options = [];
+
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$options['filter'] = ['cause_eventid' => $filter['cause_eventid']];
+				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+			}
+
+			if (array_key_exists('acknowledgement_status', $filter)) {
+				switch ($filter['acknowledgement_status']) {
+					case ZBX_ACK_STATUS_UNACK:
+						$options['acknowledged'] = false;
+						break;
+
+					case ZBX_ACK_STATUS_ACK:
+						$options['acknowledged'] = true;
+
+						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
+							$filter_options += [
+								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+								'action_userid' => CUser::$userData['userid']
+							];
+						}
+						break;
+				}
+			}
+
+			if ($filter_options) {
+				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -1766,9 +1788,12 @@ class CScreenProblem extends CScreenBase {
 		foreach ($items as $itemid => $item) {
 			if (array_key_exists($itemid, $history_values)) {
 				$last_value = reset($history_values[$itemid]);
-				$last_value['value'] = formatHistoryValue(str_replace(["\r\n", "\n"], [" "], $last_value['value']),
-					$item
-				);
+
+				if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+					$last_value['value'] = formatHistoryValue(str_replace(["\r\n", "\n"], [" "], $last_value['value']),
+						$item
+					);
+				}
 			}
 			else {
 				$last_value = [
@@ -1787,7 +1812,10 @@ class CScreenProblem extends CScreenBase {
 							? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $last_value['clock'])
 							: UNRESOLVED_MACRO_STRING
 					),
-					new CCol($last_value['value']),
+					new CCol($item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? italic(_('binary value'))->addClass(ZBX_STYLE_GREY)
+						: $last_value['value']
+					),
 					new CCol(
 						($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
 							? (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
@@ -1807,13 +1835,19 @@ class CScreenProblem extends CScreenBase {
 					)
 				]);
 
-				$latest_values[] = (new CLinkAction($last_value['value']))
+				$latest_values[] = (new CLinkAction(
+					$item['value_type'] == ITEM_VALUE_TYPE_BINARY
+						? _('binary value')
+						: $last_value['value']
+				))
 					->addClass('hint-item')
 					->setAttribute('data-hintbox', '1');
 				$latest_values[] = ', ';
 			}
 			else {
-				$latest_values[] = $last_value['value'];
+				$latest_values[] = $item['value_type'] == ITEM_VALUE_TYPE_BINARY
+					? UNRESOLVED_MACRO_STRING
+					: $last_value['value'];
 			}
 		}
 

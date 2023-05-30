@@ -52,7 +52,6 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 A connection can be configured using either keys' parameters or named sessions.     
 
 *Notes*:  
-* It is not possible to mix configuration using named sessions and keys' parameters simultaneously.
 * You can leave any connection parameter empty, a default hard-coded value will be used in the such case.
 * TLS information can be passed only with sessions.
 * Embedded URI credentials (userinfo) are forbidden and will be ignored. So, you can't pass the credentials by this:   

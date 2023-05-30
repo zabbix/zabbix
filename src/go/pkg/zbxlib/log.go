@@ -26,6 +26,7 @@ package zbxlib
 #include "log.h"
 
 int zbx_log_level = LOG_LEVEL_WARNING;
+ZBX_THREAD_LOCAL int *zbx_plog_level = &zbx_log_level;
 
 int	zbx_agent_pid;
 

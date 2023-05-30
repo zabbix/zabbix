@@ -48,13 +48,11 @@ function drawChangeType(string $name, array $entity_types): CTag {
 	return (new CTag('li', true))
 		->addItem((new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CTag('button', true))
+			->addItem((new CSimpleButton([
+				(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name
+			]))
 				->addClass(ZBX_STYLE_TOC_ITEM)
 				->addClass(ZBX_STYLE_TOC_ARROW)
-				->addItem((new CSpan())
-					->addClass(ZBX_STYLE_ARROW_DOWN)
-				)
-				->addItem($name)
 			)
 		)
 		->addItem($entity_types_list);
@@ -71,13 +69,11 @@ function drawEntityType(string $name, array $entities): CTag {
 	return (new CTag('li', true))
 		->addItem((new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
-			->addItem((new CTag('button', true))
+			->addItem((new CSimpleButton([
+				(new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN), $name
+			]))
 				->addClass(ZBX_STYLE_TOC_ITEM)
 				->addClass(ZBX_STYLE_TOC_ARROW)
-				->addItem((new CSpan())
-					->addClass(ZBX_STYLE_ARROW_DOWN)
-				)
-				->addItem($name)
 			)
 		)
 		->addItem($entities_list);

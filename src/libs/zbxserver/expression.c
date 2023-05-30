@@ -123,7 +123,7 @@ static int	get_trigger_severity_name(int priority, char **replace_to)
  ******************************************************************************/
 static int	get_problem_update_actions(const zbx_db_acknowledge *ack, int actions, const char *tz, char **out)
 {
-	const char	*prefixes[] = {"", ", ", ", ", ", ", ", ", ", ", ", "};
+	const char	*prefixes[] = {"", ", ", ", ", ", ", ", ", ", ", ", ", ", ", ", "};
 	char		*buf = NULL;
 	size_t		buf_alloc = 0, buf_offset = 0;
 	int		i, index, flags;
@@ -216,7 +216,7 @@ static int	get_problem_update_actions(const zbx_db_acknowledge *ack, int actions
 
 	if (0 != (flags & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
 	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
+		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
 		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
 	}
 
@@ -5614,6 +5614,14 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, NULL, NULL, func->parameter,
 					"item does not exist");
+			continue;
+		}
+
+		if (ITEM_VALUE_TYPE_BIN == item->value_type)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
+					func->parameter, "binary-type items are not supported in functions");
 			continue;
 		}
 

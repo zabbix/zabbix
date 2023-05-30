@@ -38,17 +38,20 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
-				new CWidgetFieldMultiSelectGroup('exclude_groupids', _('Exclude host groups'))
-			)
-			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Scenario tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -57,7 +60,10 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldTags('tags')
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance')))->setDefault(1)
+				(new CWidgetFieldCheckBox(
+					'maintenance',
+					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
+				))->setDefault(1)
 			);
 	}
 }

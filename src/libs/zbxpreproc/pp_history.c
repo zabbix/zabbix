@@ -17,11 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pp_history.h"
-
-#include "zbxvariant.h"
-#include "zbxtime.h"
-#include "zbxalgo.h"
+#include "zbxpreprocbase.h"
 
 ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 
@@ -51,7 +47,7 @@ zbx_pp_history_t	*zbx_pp_history_create(int history_num)
  * Purpose: free preprocessing history                                        *
  *                                                                            *
  ******************************************************************************/
-void	pp_history_free(zbx_pp_history_t *history)
+void	zbx_pp_history_free(zbx_pp_history_t *history)
 {
 	for (int i = 0; i < history->step_history.values_num; i++)
 		zbx_variant_clear(&history->step_history.values[i].value);
@@ -108,7 +104,7 @@ void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *val
  *                             returned                                       *
  *                                                                            *
  ******************************************************************************/
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
+void	zbx_pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
 {
 	if (NULL != history)
 	{

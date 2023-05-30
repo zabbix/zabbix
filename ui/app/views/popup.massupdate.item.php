@@ -129,7 +129,7 @@ $item_form_list
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButton(null, _('Remove')))
@@ -155,7 +155,8 @@ $item_form_list
 				ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 				ITEM_VALUE_TYPE_STR => _('Character'),
 				ITEM_VALUE_TYPE_LOG => _('Log'),
-				ITEM_VALUE_TYPE_TEXT => _('Text')
+				ITEM_VALUE_TYPE_TEXT => _('Text'),
+				ITEM_VALUE_TYPE_BINARY => _('Binary')
 			]))
 	)
 	// Append units to form list.
@@ -179,7 +180,7 @@ $item_form_list
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setLabel(_('User name')),
 		(new CTextBox('username', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)
 	// Append publickey to form list.
@@ -196,7 +197,7 @@ $item_form_list
 	->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))->setLabel(_('Password')),
 		(new CTextBox('password', ''))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	);
 

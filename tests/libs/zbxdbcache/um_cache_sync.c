@@ -141,7 +141,8 @@ void	zbx_mock_test_entry(void **state)
 		zbx_dbsync_init(&htmpls, ZBX_DBSYNC_UPDATE);
 
 		um_mock_cache_diff(mock_cache, &steps.values[i]->mock_cache, &gmacros, &hmacros, &htmpls);
-		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault);
+		umc = steps.values[i]->cache = um_cache_sync(umc, 0, &gmacros, &hmacros, &htmpls, &config_vault,
+				get_program_type());
 		umc->refcount += steps.values[i]->refs;
 
 		mock_dbsync_clear(&gmacros);

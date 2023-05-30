@@ -143,7 +143,8 @@ $info_type_select = (new CSelect('filter_value_type'))
 		ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 		ITEM_VALUE_TYPE_STR => _('Character'),
 		ITEM_VALUE_TYPE_LOG => _('Log'),
-		ITEM_VALUE_TYPE_TEXT => _('Text')
+		ITEM_VALUE_TYPE_TEXT => _('Text'),
+		ITEM_VALUE_TYPE_BINARY => _('Binary')
 	]));
 
 $filter_column_2

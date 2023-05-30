@@ -24,7 +24,7 @@
 #include "log.h"
 #include "zbxsysinfo.h"
 
-#include "../odbc/odbc.h"
+#include "zbxodbc.h"
 
 /******************************************************************************
  *                                                                            *

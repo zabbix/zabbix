@@ -25,8 +25,6 @@
 
 #define ZBX_STATE_NOT_SUPPORTED	1
 
-extern int	CONFIG_DOUBLE_PRECISION;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses preprocessing test request                                 *
@@ -303,7 +301,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_json *j
 		{
 			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
 			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
-					value_type, CONFIG_DOUBLE_PRECISION, &preproc_error))
+					value_type, &preproc_error))
 			{
 				break;
 			}

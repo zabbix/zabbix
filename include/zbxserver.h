@@ -178,4 +178,26 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
+
+typedef struct
+{
+	int			op;
+	int			numeric_search;
+	char			*pattern2;
+	zbx_uint64_t		pattern_ui64;
+	zbx_uint64_t		pattern2_ui64;
+	double			pattern_dbl;
+	zbx_vector_expression_t	regexps;
+}
+zbx_eval_count_pattern_data_t;
+
+void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
+		zbx_vector_dbl_t *values, int *count);
+
+void	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int *count);
+
+int	zbx_validate_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error);
+
 #endif

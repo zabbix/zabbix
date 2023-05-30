@@ -92,7 +92,7 @@ typedef struct
 }
 zbx_vc_item_stats_t;
 
-int	zbx_vc_init(char **error);
+int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error);
 
 void	zbx_vc_destroy(void);
 

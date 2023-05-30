@@ -22,6 +22,8 @@ require_once 'vendor/autoload.php';
 
 require_once dirname(__FILE__).'/../CElement.php';
 
+use Facebook\WebDriver\Exception\TimeoutException;
+
 /**
  * Dashboard element.
  */
@@ -173,8 +175,20 @@ class CDashboardElement extends CElement {
 
 		if ($controls->query('xpath:.//nav[@class="dashboard-edit"]')->one()->isDisplayed()) {
 			$button = $controls->query('id:dashboard-save')->one()->waitUntilClickable();
-			$button->getLocationOnScreenOnceScrolledIntoView();
 			$button->click();
+
+			try {
+				$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible(2);
+			}
+			catch (TimeoutException $ex) {
+				try {
+					$button->click(true);
+				}
+				catch (\Exception $ex) {
+					// Code is not missing here.
+				}
+			}
+
 			$controls->query('xpath:.//nav[@class="dashboard-edit"]')->waitUntilNotVisible();
 		}
 
@@ -293,5 +307,16 @@ class CDashboardElement extends CElement {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
 		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
 		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getReadyCondition() {
+		$target = $this;
+
+		return function () use ($target) {
+			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
+		};
 	}
 }

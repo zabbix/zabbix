@@ -199,6 +199,12 @@ foreach ($tags as $key => $tag) {
 /*
  * Actions
  */
+$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
+$filter_hostids = getRequest('filter_set')
+	? getRequest('filter_hostids', [])
+	: CProfile::getArray($prefix.'triggers.filter_hostids', []);
+$checkbox_hash = crc32(implode('', $filter_hostids));
+
 $expression_action = '';
 if (hasRequest('add_expression')) {
 	$_REQUEST['expression'] = getRequest('expr_temp');
@@ -487,7 +493,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
 	}
 
@@ -497,10 +503,14 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 	$result = API::Trigger()->delete(getRequest('g_triggerid'));
 
 	if ($result) {
-		uncheckTableRows(getRequest('checkbox_hash'));
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
-	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
+	$triggers_count = count(getRequest('g_triggerid'));
+	$messageSuccess = _n('Trigger deleted', 'Triggers deleted', $triggers_count);
+	$messageFailed = _n('Cannot delete trigger', 'Cannot delete triggers', $triggers_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
@@ -895,7 +905,6 @@ else {
 	}
 
 	sort($filter_hostids);
-	$checkbox_hash = crc32(implode('', $filter_hostids));
 
 	$data += [
 		'triggers' => $triggers,

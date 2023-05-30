@@ -861,6 +861,37 @@ in:
 out:
   return: SUCCEED
   value: '1'
+---
+test case: Query identical keys - path.
+in:
+  data: '{"a":1, "b":2, "a":3}'
+  path: $.a 
+out:
+  return: SUCCEED
+  value: 3
+---
+test case: Query identical keys - path (last)
+in:
+  data: '{"a":{"id":1, "value":"A"}, "b":{"id":2, "value":"B"}, "a":{"id":3, "value":"C"}}'
+  path: $[?(@.id==3)].value.first() 
+out:
+  return: SUCCEED
+  value: 'C'
+
+---
+test case: Query identical keys - path (first)
+in:
+  data: '{"a":{"id":1, "value":"A"}, "b":{"id":2, "value":"B"}, "a":{"id":3, "value":"C"}}'
+  path: $[?(@.id==1)].value.first() 
+out:
+  return: SUCCEED
+---
+test case: Query $[ ?(  '  ' *'' )]
+in:
+  data: '{"a":1, "b":2, "a":3}'
+  path: $[ ?(  '  ' *'' )]
+out:
+  return: FAIL
 ...
 
 

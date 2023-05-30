@@ -61,13 +61,6 @@ zbx_session_type_t;
 #define ZBX_AGENT_UNKNOWN	255
 #define ZBX_AGENT_MAX		INTERFACE_TYPE_COUNT
 
-extern zbx_uint64_t	CONFIG_CONF_CACHE_SIZE;
-
-extern int	CONFIG_UNREACHABLE_PERIOD;
-extern int	CONFIG_UNREACHABLE_DELAY;
-extern int	CONFIG_PROXYCONFIG_FREQUENCY;
-extern int	CONFIG_PROXYDATA_FREQUENCY;
-
 typedef struct
 {
 	zbx_uint64_t	interfaceid;
@@ -618,15 +611,6 @@ typedef struct
 }
 zbx_connector_t;
 
-typedef struct
-{
-	zbx_uint64_t		connectorid;
-	int			tags_evaltype;
-	zbx_vector_match_tags_t	connector_tags;
-}
-zbx_connector_filter_t;
-
-ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* the configuration cache statistics */
 typedef struct
@@ -637,6 +621,46 @@ typedef struct
 	double		requiredperformance;
 }
 zbx_config_cache_info_t;
+
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+	unsigned char	type;
+	char		*key_;
+	char		*snmp_community;
+	char		*ports;
+	char		*snmpv3_securityname;
+	unsigned char	snmpv3_securitylevel;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	unsigned char	uniq;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+	char		*snmpv3_contextname;
+	unsigned char	allow_redirect;
+}
+zbx_dc_dcheck_t;
+
+ZBX_PTR_VECTOR_DECL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
+
+typedef struct
+{
+	zbx_uint64_t			druleid;
+	zbx_uint64_t			proxy_hostid;
+	time_t				nextcheck;
+	int				delay;
+	char				*delay_str;
+	char				*iprange;
+	unsigned char			status;
+	unsigned char			location;
+	zbx_uint64_t			revision;
+	char				*name;
+	zbx_uint64_t			unique_dcheckid;
+	zbx_vector_dc_dcheck_ptr_t	dchecks;
+	int				concurrency_max;
+}
+zbx_dc_drule_t;
 
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
@@ -661,7 +685,6 @@ typedef enum
 }
 zbx_synced_new_config_t;
 
-
 #define ZBX_ITEM_GET_INTERFACE		0x0001
 #define ZBX_ITEM_GET_HOST		0x0002
 #define ZBX_ITEM_GET_HOSTNAME		0x0004
@@ -675,10 +698,16 @@ zbx_synced_new_config_t;
 
 #define ZBX_ITEM_GET_PROCESS		0
 
+typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
+typedef struct zbx_um_cache zbx_um_cache_t;
+
 void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault);
-void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault);
-int	zbx_init_configuration_cache(char **error);
+		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
+		int proxyconfig_frequency);
+void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
+		const char *config_source_ip);
+int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
+		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);
 
 void	zbx_dc_config_get_triggers_by_triggerids(zbx_dc_trigger_t *triggers, const zbx_uint64_t *triggerids,
@@ -713,7 +742,8 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter);
 
 int	zbx_dc_config_get_active_items_count_by_hostid(zbx_uint64_t hostid);
 void	zbx_dc_config_get_active_items_by_hostid(zbx_dc_item_t *items, zbx_uint64_t hostid, int *errcodes, size_t num);
-void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_uint64_t *revision);
+void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shared_handle_t **um_handle,
+		zbx_uint64_t *revision);
 void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
 void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num);
@@ -756,7 +786,9 @@ void	zbx_dc_config_delete_autoreg_host(const zbx_vector_ptr_t *autoreg_hosts);
 void	zbx_dc_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks, const int *errcodes, size_t num);
 void	zbx_dc_poller_requeue_items(const zbx_uint64_t *itemids, const int *lastclocks,
 		const int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
+#ifdef HAVE_OPENIPMI
 void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num);
+#endif
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
@@ -781,7 +813,8 @@ int	zbx_dc_config_get_proxypoller_nextcheck(void);
 #define ZBX_PROXY_CONFIG_NEXTCHECK	0x01
 #define ZBX_PROXY_DATA_NEXTCHECK	0x02
 #define ZBX_PROXY_TASKS_NEXTCHECK	0x04
-void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err);
+void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, int proxy_conn_err,
+		int proxyconfig_frequency, int proxydata_frequency);
 int	zbx_dc_check_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error);
 int	zbx_dc_check_host_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid,
 		zbx_uint64_t *revision, char **error);
@@ -808,7 +841,8 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 		zbx_agent_availability_t *out);
 
 int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
-		zbx_agent_availability_t *in, zbx_agent_availability_t *out, const char *error_msg);
+		int unreachable_period, int unreachable_delay, zbx_agent_availability_t *in,
+		zbx_agent_availability_t *out, const char *error_msg);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -1082,8 +1116,23 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 
 int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
 		int hostids_num, char **error);
+int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
+		int hostids_num, char **error);
 
 char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t hostid);
+
+/* shared user macro handle can be used to share user macro handle between threads   */
+/* without locking configuration cache to update user macro handle reference counter */
+struct zbx_dc_um_shared_handle
+{
+	zbx_um_cache_t		*um_cache;
+	zbx_uint64_t		refcount;
+};
+
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_update(zbx_dc_um_shared_handle_t *handle);
+int	zbx_dc_um_shared_handle_reacquire(zbx_dc_um_shared_handle_t *old_handle, zbx_dc_um_shared_handle_t *new_handle);
+zbx_dc_um_shared_handle_t	*zbx_dc_um_shared_handle_copy(zbx_dc_um_shared_handle_t *handle);
+void	zbx_dc_um_shared_handle_release(zbx_dc_um_shared_handle_t *handle);
 
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type);
 int	zbx_dc_update_passive_proxy_nextcheck(zbx_uint64_t proxyid);
@@ -1124,8 +1173,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
-void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
+void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);
@@ -1182,4 +1232,9 @@ zbx_maintenance_type_t;
 #define ZBX_CORR_CONDITION_EVENT_TAG_PAIR		3
 #define ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE		4
 #define ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE		5
+
+#define ZBX_RECALC_TIME_PERIOD_HISTORY	1
+#define ZBX_RECALC_TIME_PERIOD_TRENDS	2
+void	zbx_recalc_time_period(time_t *ts_from, int table_group);
+
 #endif

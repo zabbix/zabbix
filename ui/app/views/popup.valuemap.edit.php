@@ -84,7 +84,7 @@ $mappings->addItem(
 				])),
 			(new CTextBox('mappings[#{index}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-			'&rArr;',
+			RARR(),
 			(new CTextBox('mappings[#{index}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired(),

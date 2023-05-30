@@ -199,7 +199,7 @@ window.maintenance_edit = new class {
 			}
 		}
 
-		const curl = new Curl('zabbix.php', false);
+		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', this._maintenanceid !== null ? 'maintenance.update' : 'maintenance.create');
 
 		this._post(curl.getUrl(), fields, (response) => {

@@ -192,10 +192,16 @@ $mediaTypeForm->addItem([
 	$mediaTypeTable,
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
-		'mediatype.enable' => ['name' => _('Enable'), 'confirm' => _('Enable selected media types?'),
+		'mediatype.enable' => [
+			'name' => _('Enable'),
+			'confirm_singular' => _('Enable selected media type?'),
+			'confirm_plural' => _('Enable selected media types?'),
 			'csrf_token' => $csrf_token
 		],
-		'mediatype.disable' => ['name' => _('Disable'), 'confirm' => _('Disable selected media types?'),
+		'mediatype.disable' => [
+			'name' => _('Disable'),
+			'confirm_singular' => _('Disable selected media type?'),
+			'confirm_plural' => _('Disable selected media types?'),
 			'csrf_token' => $csrf_token
 		],
 		'mediatype.export' => [
@@ -206,7 +212,10 @@ $mediaTypeForm->addItem([
 					->getUrl()
 			)
 		],
-		'mediatype.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected media types?'),
+		'mediatype.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected media type?'),
+			'confirm_plural' => _('Delete selected media types?'),
 			'csrf_token' => $csrf_token
 		]
 	], 'mediatype')

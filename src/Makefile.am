@@ -60,7 +60,6 @@ PROXY_SUBDIRS = \
 else
 
 PROXY_SUBDIRS = \
-	zabbix_server/dbsyncer \
 	zabbix_server/dbconfig \
 	zabbix_server/discoverer \
 	zabbix_server/httppoller \
@@ -70,10 +69,8 @@ PROXY_SUBDIRS = \
 	zabbix_server/snmptrapper \
 	zabbix_server/vmware \
 	zabbix_server/ipmi \
-	zabbix_server/odbc \
 	zabbix_server/scripts \
 	zabbix_server/preproc \
-	zabbix_server/availability \
 	zabbix_server/service \
 	zabbix_proxy \
 	zabbix_js

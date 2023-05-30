@@ -154,7 +154,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_history_record_vector_create(&remainder_values_received);
 	zbx_history_record_vector_create(&remainder_values_expected);
 
-	err = zbx_vc_init(&error);
+	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 	zbx_vc_enable();
 	zbx_vcmock_ds_init();

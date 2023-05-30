@@ -846,7 +846,7 @@ abstract class CMapElement extends CApiService {
 	protected function updateElementsTags(array $selements): void {
 		// Select tags from database.
 		$db_tags = DBselect(
-			'SELECT selementtagid, selementid, tag, value, operator'.
+			'SELECT selementtagid,selementid,tag,value,operator'.
 			' FROM sysmaps_element_tag'.
 			' WHERE '.dbConditionInt('selementid', array_column($selements, 'selementid'))
 		);

@@ -22,7 +22,6 @@
 #include "zbxembed.h"
 #include "zbxmutexs.h"
 #include "zbxstr.h"
-#include "cfg.h"
 
 const char	*progname;
 const char	title_message[] = "zabbix_js";
@@ -83,8 +82,6 @@ static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
 
-char	*CONFIG_SOURCE_IP 		= NULL;
-
 /* not related with tls from libzbxcomms.a */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
@@ -140,9 +137,9 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int			zbx_optind = 0;
 
-	progname = get_program_name(argv[0]);
+	const char		*config_source_ip = NULL;
 
-	zbx_init_library_cfg(program_type);
+	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -242,7 +239,8 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, script_error, sizeof(script_error), NULL))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, config_source_ip, &result, script_error,
+			sizeof(script_error), NULL))
 	{
 		zbx_error("error executing script:\n%s", script_error);
 		goto close;

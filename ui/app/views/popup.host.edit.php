@@ -35,10 +35,7 @@ if ($data['hostid'] == 0) {
 	elseif ($data['clone_hostid'] !== null) {
 		$popup_url->setArgument('hostid', $data['clone_hostid']);
 
-		if ($data['full_clone'] === 1) {
-			$popup_url->setArgument('full_clone', 1);
-		}
-		else {
+		if ($data['clone'] === 1) {
 			$popup_url->setArgument('clone', 1);
 		}
 	}
@@ -72,13 +69,6 @@ else {
 			'action' => 'host_edit_popup.clone();'
 		],
 		[
-			'title' => _('Full clone'),
-			'class' => 'btn-alt',
-			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'host_edit_popup.fullClone();'
-		],
-		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected host?'),
 			'class' => 'btn-alt',
@@ -100,7 +90,7 @@ $output = [
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-			'warning' => $data['warning']
+			'warnings' => $data['warnings']
 		]).');',
 	'buttons' => $buttons
 ];

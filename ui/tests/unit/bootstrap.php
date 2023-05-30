@@ -66,6 +66,7 @@ $autoloader->addNamespace('', [
 	__DIR__.'/../../include/classes/xml',
 	__DIR__.'/../../include/classes/macros',
 	__DIR__.'/../../include/classes/vaults',
+	__DIR__.'/../../include/classes/routing',
 	__DIR__.'/include/classes/db',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',

@@ -344,7 +344,7 @@ class CDashboardPage {
 			});
 		}
 		else {
-			widget = this._createInaccessibleWidget({name, widgetid, pos, unique_id});
+			widget = this._createInaccessibleWidget({widgetid, pos, unique_id});
 		}
 
 		this._doAddWidget(widget);
@@ -447,10 +447,9 @@ class CDashboardPage {
 		});
 	}
 
-	_createInaccessibleWidget({name, widgetid, pos, unique_id}) {
+	_createInaccessibleWidget({widgetid, pos, unique_id}) {
 		return this._createWidget(CWidgetInaccessible, {
 			type: 'inaccessible',
-			name,
 			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
 			fields: {},
 			defaults: {
@@ -752,7 +751,11 @@ class CDashboardPage {
 			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
-		this._dashboard_grid.style.height = `${height}px`;
+		this._dashboard_grid.style.height = '';
+
+		if (num_rows !== 0) {
+			this._dashboard_grid.style.height = `${height}px`;
+		}
 	}
 
 	_getNumOccupiedRows() {

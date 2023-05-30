@@ -44,7 +44,7 @@ for ($weekday = 0; $weekday < 7; $weekday++) {
 			->setChecked($data['form']['schedule_periods'][$weekday] !== ''),
 		(new CTextBox('schedule_periods['.$weekday.']', $data['form']['schedule_periods'][$weekday]))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', '8:00-17:00, &hellip;')
+			->setAttribute('placeholder', '8:00-17:00, ...')
 	]));
 }
 

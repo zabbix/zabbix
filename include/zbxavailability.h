@@ -23,21 +23,7 @@
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
-
-/* interface availability */
-#define INTERFACE_AVAILABLE_UNKNOWN		0
-#define INTERFACE_AVAILABLE_TRUE		1
-#define INTERFACE_AVAILABLE_FALSE		2
-
-#define ZBX_IPC_SERVICE_AVAILABILITY		"availability"
-#define ZBX_IPC_AVAILABILITY_REQUEST		1
-#define ZBX_IPC_AVAILMAN_ACTIVE_HB		2
-#define ZBX_IPC_AVAILMAN_ACTIVE_HOSTDATA	3
-#define ZBX_IPC_AVAILMAN_ACTIVE_STATUS		4
-#define ZBX_IPC_AVAILMAN_CONFSYNC_DIFF		5
-#define ZBX_IPC_AVAILMAN_PROCESS_PROXY_HOSTDATA	6
-#define ZBX_IPC_AVAILMAN_ACTIVE_PROXY_HB_UPDATE	7
-#define ZBX_AVAIL_SERVER_CONN_TIMEOUT		3600
+#include "zbxthreads.h"
 
 /* agent (ZABBIX, SNMP, IPMI, JMX) availability data */
 typedef struct
@@ -75,18 +61,16 @@ zbx_interface_availability_t;
 
 ZBX_PTR_VECTOR_DECL(availability_ptr, zbx_interface_availability_t *)
 
-#define ZBX_IPC_SERVICE_AVAILABILITY	"availability"
-
 void	zbx_availability_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
 void	zbx_availabilities_flush(const zbx_vector_availability_ptr_t *interface_availabilities);
 
 typedef struct
 {
-	zbx_hashset_t		hosts;
-	zbx_hashset_t		queue;
-	zbx_hashset_t		proxy_avail;
-	double			last_status_refresh;
-	double			last_proxy_avail_refresh;
+	zbx_hashset_t	hosts;
+	zbx_hashset_t	queue;
+	zbx_hashset_t	proxy_avail;
+	double		last_status_refresh;
+	double		last_proxy_avail_refresh;
 }
 zbx_avail_active_hb_cache_t;
 
@@ -98,8 +82,6 @@ typedef struct
 	int		active_status;
 }
 zbx_host_active_avail_t;
-
-ZBX_PTR_VECTOR_DECL(host_active_avail_ptr, zbx_host_active_avail_t *)
 
 typedef struct
 {
@@ -145,13 +127,14 @@ void	zbx_availability_deserialize_active_status_response(const unsigned char *da
 
 zbx_uint32_t	zbx_availability_serialize_proxy_hostdata(unsigned char **data, zbx_vector_proxy_hostdata_ptr_t *hosts,
 		zbx_uint64_t proxy_hostid);
-void		zbx_availability_deserialize_proxy_hostdata(const unsigned char *data, zbx_vector_proxy_hostdata_ptr_t *hostdata,
-		zbx_uint64_t *proxy_hostid);
+void	zbx_availability_deserialize_proxy_hostdata(const unsigned char *data,
+		zbx_vector_proxy_hostdata_ptr_t *hostdata, zbx_uint64_t *proxy_hostid);
 
 zbx_uint32_t	zbx_availability_serialize_hostids(unsigned char **data, zbx_vector_uint64_t *hostids);
 void	zbx_availability_deserialize_hostids(const unsigned char *data, zbx_vector_uint64_t *hostids);
 
-zbx_uint32_t	zbx_availability_serialize_active_proxy_hb_update(unsigned char **data, zbx_uint64_t hostid);
 void	zbx_availability_deserialize_active_proxy_hb_update(const unsigned char *data, zbx_uint64_t *hostid);
+
+ZBX_THREAD_ENTRY(zbx_availability_manager_thread, args);
 
 #endif /* ZABBIX_AVAILABILITY_H */
