@@ -759,9 +759,11 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (!this._is_edit_mode) {
+		if (this._data.templateid === null || !this._is_edit_mode) {
 			this._storeSelectedDashboardPage(dashboard_page);
+		}
 
+		if (!this._is_edit_mode) {
 			if (this._isSlideshowRunning()) {
 				this._keepSteadySlideshow();
 			}
@@ -858,19 +860,30 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_storeSelectedDashboardPage(dashboard_page) {
+		const dashboard_pages = [...this._dashboard_pages.keys()];
+		const dashboard_page_index = dashboard_pages.indexOf(dashboard_page);
+
 		const url = new URL(location.href);
-		url.searchParams.set('pageid', dashboard_page.getDashboardPageId());
+
+		if (dashboard_page_index > 0) {
+			url.searchParams.set('page', dashboard_page_index + 1);
+		}
+		else {
+			url.searchParams.delete('page');
+		}
+
 		history.replaceState(null, null, url);
 	}
 
 	_getInitialDashboardPage() {
 		const url = new URL(location.href);
 
-		if (url.searchParams.has('pageid')) {
-			for (const dashboard_page of this._dashboard_pages.keys()) {
-				if (url.searchParams.get('pageid') === dashboard_page.getDashboardPageId()) {
-					return dashboard_page;
-				}
+		if (url.searchParams.has('page')) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+			const dashboard_page_index = parseInt(url.searchParams.get('page')) - 1;
+
+			if (dashboard_page_index in dashboard_pages) {
+				return dashboard_pages[dashboard_page_index];
 			}
 		}
 

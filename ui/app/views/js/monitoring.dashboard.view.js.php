@@ -183,6 +183,12 @@
 
 			const request_data = ZABBIX.Dashboard.save();
 
+			const dashboard_page_index = ZABBIX.Dashboard.getDashboardPages().indexOf(
+				ZABBIX.Dashboard.getSelectedDashboardPage()
+			);
+
+			request_data.page = dashboard_page_index > 0 ? dashboard_page_index + 1 : undefined;
+
 			request_data.sharing = this.dashboard.sharing;
 
 			const curl = new Curl('zabbix.php');
