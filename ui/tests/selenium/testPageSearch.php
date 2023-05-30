@@ -235,7 +235,11 @@ class testPageSearch extends CWebTest {
 	 * @dataProvider getSearchData
 	 */
 	public function testPageSearch_VerifyResults($data) {
-		$this->openSearchResults($data['search_string']);
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+		$form->query('id:search')->one()->fill($data['search_string']);
+		$form->submit();
+
 		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
@@ -374,16 +378,6 @@ class testPageSearch extends CWebTest {
 		$form->submit();
 		$this->page->assertTitle('Dashboard');
 		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-	}
-
-	/**
-	 * Opens Zabbix Dashboard, searches by search string and opens the page.
-	 */
-	private function openSearchResults($searchString) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
-		$form->query('id:search')->one()->fill($searchString);
-		$form->submit();
 	}
 
 	/**
