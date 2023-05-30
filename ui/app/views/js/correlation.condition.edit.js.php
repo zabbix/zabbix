@@ -52,6 +52,12 @@ window.correlation_condition_popup = new class {
 		this.#post(curl.getUrl(), fields);
 	}
 
+	/**
+	 * Sends a POST request to the specified URL with the provided data.
+	 *
+	 * @param {string} url   The URL to send the POST request to.
+	 * @param {object} data  The data to send with the POST request.
+	 */
 	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
