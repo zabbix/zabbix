@@ -75,7 +75,8 @@ window.correlation_condition_popup = new class {
 					}
 				}
 
-				let title, messages;
+				let title,
+				messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -89,8 +90,6 @@ window.correlation_condition_popup = new class {
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 }

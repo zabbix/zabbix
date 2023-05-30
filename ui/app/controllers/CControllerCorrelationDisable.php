@@ -46,17 +46,7 @@ class CControllerCorrelationDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
-			return false;
-		}
-
-		$correlations = API::Correlation()->get([
-			'correlationids' => $this->getInput('correlationids'),
-			'countOutput' => true,
-			'editable' => true
-		]);
-
-		return ($correlations == count($this->getInput('correlationids')));
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
 	}
 
 	protected function doAction(): void {

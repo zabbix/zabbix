@@ -105,7 +105,7 @@ window.correlation_edit_popup = new class {
 	/**
 	 * Adds a correlation condition row when condition popup is closed.
 	 *
-	 * @param {Object} condition  Condition object.
+	 * @param {object} condition  Condition object.
 	 */
 	#addConditionRow(condition) {
 		const row_ids = [];
@@ -204,7 +204,7 @@ window.correlation_edit_popup = new class {
 	/**
 	 * Returns condition name, value and operator depending on condition type.
 	 *
-	 * @param {Object} condition  Condition object.
+	 * @param {object} condition  Condition object.
 	 *
 	 * @return {array}
 	 */
@@ -264,7 +264,7 @@ window.correlation_edit_popup = new class {
 	/**
 	 * Checks of given condition already exists.
 	 *
-	 * @param {Object} condition  Condition object.
+	 * @param {object} condition  Condition object.
 	 *
 	 * @return {array}
 	 */
@@ -335,7 +335,7 @@ window.correlation_edit_popup = new class {
 		);
 
 		this.#post(curl.getUrl(), {correlationids: [this.correlationid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.correlationid);
+			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
 		});
@@ -359,6 +359,13 @@ window.correlation_edit_popup = new class {
 		});
 	}
 
+	/**
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 *
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 */
 	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
@@ -381,7 +388,8 @@ window.correlation_edit_popup = new class {
 					}
 				}
 
-				let title, messages;
+				let title,
+					messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -389,14 +397,12 @@ window.correlation_edit_popup = new class {
 				}
 				else {
 					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-
 				}
+
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 }

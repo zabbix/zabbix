@@ -368,6 +368,7 @@ else {
 			'title' => _('Delete'),
 			'confirmation' => _('Delete correlation?'),
 			'class' => ZBX_STYLE_BTN_ALT,
+			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'correlation_edit_popup.delete();'
 		]
