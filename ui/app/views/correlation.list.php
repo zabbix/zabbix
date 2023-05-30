@@ -94,8 +94,6 @@ foreach ($data['correlations'] as $correlation) {
 	$conditions = [];
 	$operations = [];
 
-	order_result($correlation['filter']['conditions'], 'type', ZBX_SORT_DOWN);
-
 	foreach ($correlation['filter']['conditions'] as $condition) {
 		if (!array_key_exists('operator', $condition)) {
 			$condition['operator'] = CONDITION_OPERATOR_EQUAL;

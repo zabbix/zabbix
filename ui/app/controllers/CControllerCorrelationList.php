@@ -107,9 +107,13 @@ class CControllerCorrelationList extends CController {
 		);
 
 		$groupids = [];
-		foreach ($data['correlations'] as $correlation) {
+
+		foreach ($data['correlations'] as &$correlation) {
+			CArrayHelper::sort($correlation['filter']['conditions'], ['formulaid']);
+
 			$groupids += array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
 		}
+		unset($correlation);
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
