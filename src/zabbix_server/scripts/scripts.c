@@ -344,8 +344,8 @@ static int active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	if (2 > CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
 	{
-		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, increase number"
-				" of trappers up to 2");
+		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, at least two"
+				" trappers are required");
 		goto out;
 	}
 
