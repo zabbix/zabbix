@@ -62,12 +62,12 @@ zbx_remote_commands_t	*remote_commands = NULL;
 
 typedef struct
 {
-	zbx_uint64_t	id;
-	zbx_uint64_t	hostid;
-	char		*command;
-	unsigned char	flag;
-	char		*value;
-	char		*error;
+	zbx_uint64_t		id;
+	zbx_uint64_t		hostid;
+	char			*command;
+	volatile unsigned char	flag;
+	char			*value;
+	char			*error;
 }
 zbx_rc_command_t;
 
@@ -333,12 +333,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static int active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
+static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
 		int config_timeout, char *error, size_t max_error_len)
 {
-	int				ret = FAIL, remote_oom = 0, completed = 0;
-	zbx_rc_command_t		cmd, *pcmd;
-	time_t				time_start;
+	int			ret = FAIL, completed = 0;
+	zbx_rc_command_t	cmd, *pcmd;
+	time_t			time_start;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -383,46 +383,47 @@ static int active_command_send_and_result_fetch(const zbx_dc_host_t *host, const
 
 	for (time_start = time(NULL); config_timeout > time(NULL) - time_start; sleep(1))
 	{
-
-		if  (0 == (REMOTE_COMMAND_COMPLETED & pcmd->flag))
-			continue;
-
-		completed = 1;
-		commands_lock();
-
-		if  (0 != (REMOTE_COMMAND_RESULT_OOM & pcmd->flag))
+		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
 		{
-			remote_oom = 1;
-			commands_unlock();
+			commands_lock();
+
+			if (0 == (REMOTE_COMMAND_COMPLETED & pcmd->flag))
+			{
+				commands_unlock();
+				continue;
+			}
+
+			completed = 1;
 			break;
 		}
-
-		if (NULL != pcmd->value)
-		{
-			if (NULL != result)
-				*result = zbx_strdup(*result, pcmd->value);
-
-			__remote_commands_shmem_free_func(pcmd->value);
-			ret = SUCCEED;
-		}
-		else if (NULL != pcmd->error)
-		{
-			zbx_strlcpy(error, pcmd->error, max_error_len);
-			__remote_commands_shmem_free_func(pcmd->error);
-		}
-
-		commands_unlock();
-		break;
 	}
 
-	if (0 != remote_oom)
-		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command result");
-	else if (0 == completed)
+	if (0 == completed)
+	{
 		zbx_snprintf(error, max_error_len, "timeout while retrieving result for remote command");
+		commands_lock();
+	}
+	else  if (0 != (REMOTE_COMMAND_RESULT_OOM & pcmd->flag))
+	{
+		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command result");
+	}
+	else if (NULL != pcmd->value)
+	{
+		if (NULL != result)
+			*result = zbx_strdup(*result, pcmd->value);
 
-	commands_lock();
+		__remote_commands_shmem_free_func(pcmd->value);
+		ret = SUCCEED;
+	}
+	else if (NULL != pcmd->error)
+	{
+		zbx_strlcpy(error, pcmd->error, max_error_len);
+		__remote_commands_shmem_free_func(pcmd->error);
+	}
+
 	__remote_commands_shmem_free_func(pcmd->command);
 	zbx_hashset_remove_direct(&remote_commands->commands, pcmd);
+
 	commands_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
