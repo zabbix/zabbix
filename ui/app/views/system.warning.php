@@ -24,7 +24,7 @@
  */
 
 $pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team'), CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
+	->addCssFile('assets/styles/'.$data['theme'].'.css')
 	->display();
 
 if (CWebUser::isLoggedIn()) {

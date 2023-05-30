@@ -49,13 +49,11 @@ DB_RESULT	__wrap_DBselect(const char *fmt, ...)
 	return NULL;
 }
 
-#ifdef HAVE_POSTGRESQL
-void	__wrap_zbx_tsdb_recalc_time_period(int *tm_start, int table_group)
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
 {
 	ZBX_UNUSED(tm_start);
 	ZBX_UNUSED(table_group);
 }
-#endif
 
 void	zbx_mock_test_entry(void **state)
 {

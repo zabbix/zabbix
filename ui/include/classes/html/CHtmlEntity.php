@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 1);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,44 +19,18 @@
 **/
 
 
-/**
- * A helper class for working with HTML.
- */
-class CHtml {
+class CHtmlEntity {
 
 	/**
-	 * Encodes the value to be used in HTML code. If the given value is an array, the values will be
-	 * encoded recursively.
-	 *
-	 * @static
-	 *
-	 * @param mixed $data
-	 *
-	 * @return mixed
+	 * @var string
 	 */
-	public static function encode($data) {
-		if (is_array($data)) {
-			$rs = [];
-			foreach ($data as $key => $value) {
-				$rs[$key] = self::encode($value);
-			}
+	private $entity = '';
 
-			return $rs;
-		}
-
-		return htmlspecialchars($data, ENT_QUOTES, 'UTF-8');
+	public function __construct(string $entity) {
+		$this->entity = $entity;
 	}
 
-	/**
-	 * Encodes the data as a JSON string with HTML entities escaped.
-	 *
-	 * @static
-	 *
-	 * @param array $data
-	 *
-	 * @return string
-	 */
-	public static function serialize(array $data) {
-		return self::encode(json_encode($data));
+	public function toString(): string {
+		return $this->entity;
 	}
 }

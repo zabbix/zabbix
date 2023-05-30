@@ -607,9 +607,9 @@ class testPageLatestData extends CWebTest {
 		);
 
 		$this->assertTableData([
-				['Name' => 'Free swap space'],
-				['Name' => 'Free swap space in %'],
-				['Name' => 'Total swap space']
+				['Name' => 'Linux: Free swap space'],
+				['Name' => 'Linux: Free swap space in %'],
+				['Name' => 'Linux: Total swap space']
 			], $this->getTableSelector()
 		);
 	}

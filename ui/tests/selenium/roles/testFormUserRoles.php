@@ -1101,26 +1101,27 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role updated'
 				]
 			],
-			// Remove all API methods.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [],
-					'api_methods' => '',
-					'message_header' => 'User role updated'
-				]
-			],
-			// Allow API list.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'fields' => [
-						'API methods' => 'Allow list'
-					],
-					'api_methods' => ['*.create'],
-					'message_header' => 'User role updated'
-				]
-			],
+			// TODO: remove comments after ZBX-22515 fix.
+//			// Remove all API methods.
+//			[
+//				[
+//					'expected' => TEST_GOOD,
+//					'fields' => [],
+//					'api_methods' => '',
+//					'message_header' => 'User role updated'
+//				]
+//			],
+//			// Allow API list.
+//			[
+//				[
+//					'expected' => TEST_GOOD,
+//					'fields' => [
+//						'API methods' => 'Allow list'
+//					],
+//					'api_methods' => ['*.create'],
+//					'message_header' => 'User role updated'
+//				]
+//			],
 			// Deny API list.
 			[
 				[

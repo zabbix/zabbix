@@ -260,7 +260,7 @@ $item_tab
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -418,7 +418,7 @@ $item_tab
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -1015,7 +1015,7 @@ if (CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA) && $data['item
 				->setArgument('action', 'latest.view')
 				->setArgument('hostids[]', $data['hostid'])
 				->setArgument('name', $data['name'])
-				->setArgument('filter_name', '')
+				->setArgument('filter_set', '1')
 		))->setTarget('_blank')))
 	);
 }
@@ -1111,7 +1111,8 @@ $widget->show();
 		'keys_by_item_type' => CItemData::getKeysByItemType(),
 		'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($data['hostid']),
 		'field_switches' => CItemData::fieldSwitchingConfiguration($data),
-		'interface_types' => itemTypeInterface()
+		'interface_types' => itemTypeInterface(),
+		'discovered_item' => $discovered_item
 	]).');
 '))->show();
 

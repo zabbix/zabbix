@@ -117,6 +117,7 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			$result = DBend(true);
 		}
 		catch (Exception $e) {
+			$result = false;
 			DBend(false);
 		}
 

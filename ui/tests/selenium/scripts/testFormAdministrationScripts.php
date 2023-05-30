@@ -19,8 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup scripts
@@ -901,7 +901,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking script configuration form.
 	 *
-	 * @param arary     $data     data provider
+	 * @param array     $data     data provider
 	 * @param boolean   $update   is it update case, or not
 	 * @param string    $link     link to script form
 	 */
@@ -988,7 +988,7 @@ class testFormAdministrationScripts extends CWebTest {
 	/**
 	 * Function for checking execution confirmation popup.
 	 *
-	 * @param arary     $data    data provider
+	 * @param array     $data    data provider
 	 * @param element   $form    script configuration form
 	 */
 	private function checkConfirmation($data, $form) {
