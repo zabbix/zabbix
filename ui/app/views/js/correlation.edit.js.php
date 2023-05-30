@@ -163,8 +163,8 @@ window.correlation_edit_popup = new class {
 				condition.label = num2letter(condition.row_index);
 
 				switch (parseInt(condition.type)) {
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG?>:
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG?>:
+					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
+					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
 						template = new Template(this.form.querySelector('#condition-tag-row-tmpl').innerHTML);
 						break;
 
@@ -177,7 +177,7 @@ window.correlation_edit_popup = new class {
 						break;
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE?>:
+					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
 						condition.condition_name = this.#getConditionData(condition)[0];
 						condition.condition_operator = this.#getConditionData(condition)[1];
 						condition.tag = this.#getConditionData(condition)[2];
@@ -251,7 +251,7 @@ window.correlation_edit_popup = new class {
 
 				return [condition_name, operator, value, value2];
 
-			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE?>:
+			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 				condition_name = <?= json_encode(_('Value of new event tag')) ?>;
 				value = condition.tag;
 				operator = condition.operator_name;
@@ -280,14 +280,14 @@ window.correlation_edit_popup = new class {
 				let value2;
 
 				switch (parseInt(type)) {
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG?>:
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG?>:
+					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
+					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
 						value = table_row.getElementsByTagName('input')[2].value;
 						result.push(condition.type === type && condition.tag === value);
 						break;
 
 					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE?>:
+					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
 						value = table_row.getElementsByTagName('input')[2].value;
 						value2 = table_row.getElementsByTagName('input')[3].value;
 						result.push(condition.type === type && condition.tag === value && condition.value === value2);
