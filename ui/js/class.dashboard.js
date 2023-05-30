@@ -161,11 +161,7 @@ class CDashboard extends CBaseComponent {
 
 		this._announceWidgets();
 
-		let dashboard_page = this._getRestorableDashboardPage();
-
-		if (dashboard_page === null) {
-			dashboard_page = this._dashboard_pages.keys().next().value;
-		}
+		const dashboard_page = this._getInitialDashboardPage();
 
 		this._selectDashboardPage(dashboard_page);
 
@@ -862,32 +858,23 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_storeSelectedDashboardPage(dashboard_page) {
-		sessionStorage.setItem('dashboard.selected_dashboard_page', JSON.stringify({
-			dashboardid: this._data.dashboardid,
-			dashboard_pageid: dashboard_page.getDashboardPageId(),
-			is_kiosk_mode: this._is_kiosk_mode
-		}));
+		const url = new URL(location.href);
+		url.searchParams.set('pageid', dashboard_page.getDashboardPageId());
+		history.replaceState(null, null, url);
 	}
 
-	_getRestorableDashboardPage() {
-		let stored_data = sessionStorage.getItem('dashboard.selected_dashboard_page');
+	_getInitialDashboardPage() {
+		const url = new URL(location.href);
 
-		if (stored_data === null) {
-			return null;
-		}
-
-		stored_data = JSON.parse(stored_data);
-
-		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode !== this._is_kiosk_mode) {
-			return null;
-		}
-
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			if (stored_data.dashboard_pageid === dashboard_page.getDashboardPageId()) {
-				return dashboard_page;
+		if (url.searchParams.has('pageid')) {
+			for (const dashboard_page of this._dashboard_pages.keys()) {
+				if (url.searchParams.get('pageid') === dashboard_page.getDashboardPageId()) {
+					return dashboard_page;
+				}
 			}
 		}
-		return null;
+
+		return this._dashboard_pages.keys().next().value;
 	}
 
 	getSelectedDashboardPage() {
