@@ -96,6 +96,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$name_list[] = ["Name" => $name];
 		}
 		$this->assertTableHasData($name_list);
+		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 
 		// Check the Delete button.
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
