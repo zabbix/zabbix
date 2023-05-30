@@ -27,8 +27,8 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 	context->item_context.flags = item->flags;
 	context->item_context.state = item->state;
 	context->posts = item->posts;
-	context->poller_config = poller_config;
 	item->posts = NULL;
+	context->poller_config = poller_config;
 
 	if (SUCCEED != (ret = zbx_http_request_prepare(context, item->request_method, item->url,
 			item->query_fields, item->headers, context->posts, item->retrieve_mode, item->http_proxy,
@@ -75,8 +75,7 @@ static void	add_items(evutil_socket_t fd, short events, void *arg)
 
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED != (errcodes[i] = get_context_http(&items[i],
-				poller_config->config_source_ip, &results[i],
+		if (SUCCEED != (errcodes[i] = get_context_http(&items[i], poller_config->config_source_ip, &results[i],
 				poller_config->curl_handle, poller_config)))
 		{
 			continue;
@@ -428,7 +427,6 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 				break;
 		}
 	}
-
 
 	curl_multi_cleanup(curl_handle);
 	event_free(curl_timeout);

@@ -73,6 +73,7 @@ typedef struct
 	struct event		*add_items_timer;
 }
 zbx_poller_config_t;
+
 typedef struct
 {
 	CURL			*easyhandle;
