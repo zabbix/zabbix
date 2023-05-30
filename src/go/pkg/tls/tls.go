@@ -1353,7 +1353,7 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 		return
 	}
 
-	log.Debugf("connection established using %s", s)
+	log.Debugf("connection established using %s", s.String())
 
 	return s, nil
 }
