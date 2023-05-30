@@ -1857,6 +1857,11 @@ select {
 	&:focus {
 		border-color: $form-border-focus-color;
 	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		opacity: 1;
+	}
 }
 
 button::-moz-focus-inner {
@@ -2535,8 +2540,15 @@ $icon-widget-btn: (
 
 %form-disabled {
 	color: $form-disabled-font-color;
+	-webkit-text-fill-color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
+
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
+	}
 }
 
 .inaccessible {
@@ -5317,16 +5329,9 @@ svg {
 	}
 }
 
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
 ::placeholder {
 	color: $input-placeholder-color;
+	opacity: 1;
 }
 
 .icon-action-command,

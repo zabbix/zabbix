@@ -163,6 +163,7 @@ $form-search-icon-focused-bg-position: -600px -616px;
 $form-search-focused-icon-hover-bg-position: $form-search-focused-icon-bg-position;
 
 $input-placeholder-color: #bbbbbb;
+$input-disabled-placeholder-color: darken($input-placeholder-color, 45%);
 
 // Error messages
 $msg-bad-color: $light-red;
