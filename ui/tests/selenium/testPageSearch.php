@@ -20,7 +20,6 @@
 
 use Facebook\WebDriver\Exception\TimeoutException;
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
@@ -245,25 +244,6 @@ class testPageSearch extends CWebTest {
 		$this->verifySearchResultWidget(TEMPLATE_WIDGET, $data['template_expected_data'] ?? null, $data['template_expected_count'] ?? null);
 	}
 
-	/**
-	 * Test if the global search form is not being submitted with empty search string.
-	 */
-	public function testPageSearch_FindEmptyString() {
-		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
-
-		// Do not search if the search field is empty.
-		$this->zbxTestInputTypeWait('search', '');
-		$this->zbxTestClickXpath('//button[@class="search-icon"]');
-		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Global view');
-
-		// Do not search if search string consists only of whitespace characters.
-		$this->zbxTestInputTypeWait('search', '   ');
-		$this->zbxTestClickXpath('//button[@class="search-icon"]');
-		$this->zbxTestCheckTitle('Dashboard');
-		$this->zbxTestCheckHeader('Global view');
-	}
-
 	public static function getSuggestionsData()
 	{
 		return [
@@ -289,6 +269,12 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'a',
+					'expected_count' => 15,
+				]
+			],
+			[
+				[
+					'search_string' => ' ',
 					'expected_count' => 15,
 				]
 			],
@@ -368,6 +354,26 @@ class testPageSearch extends CWebTest {
 			}
 		}
 
+	}
+
+	/**
+	 * Test if the global search form is not being submitted with empty search string.
+	 */
+	public function testPageSearch_FindEmptyString() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+
+		// Do not search if the search field is empty.
+		$form->query('id:search')->one()->fill('');
+		$form->submit();
+		$this->page->assertTitle('Dashboard');
+		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
+
+		// Do not search if search string consists only of whitespace characters.
+		$form->query('id:search')->one()->fill('   ');
+		$form->submit();
+		$this->page->assertTitle('Dashboard');
+		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 	}
 
 	/**
