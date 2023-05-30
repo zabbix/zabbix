@@ -83,7 +83,6 @@ class CControllerCorrelationConditionCheck extends CController {
 	}
 
 	protected function doAction(): void {
-
 		$output = [
 			'type' => $this->getInput('type'),
 			'operator' => $this->getInput('operator'),
