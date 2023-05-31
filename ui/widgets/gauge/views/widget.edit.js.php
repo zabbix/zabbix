@@ -27,7 +27,6 @@ window.widget_gauge_form = new class {
 		const threshold_row_selector = '#' + $thresholds_table.attr('id') + ' .form_row';
 
 		this._form = document.getElementById('widget-dialogue-form');
-		this._advanced_configuration = document.getElementById('adv_conf');
 		this._value_arc = document.getElementById('value_arc');
 		this._units_show = document.getElementById('units_show');
 		this._needle_show = document.getElementById('needle_show');
@@ -45,7 +44,6 @@ window.widget_gauge_form = new class {
 		}
 
 		const checkboxes = [
-			this._advanced_configuration,
 			this._units_show,
 			this._needle_show,
 			this._minmax_show,
@@ -73,19 +71,6 @@ window.widget_gauge_form = new class {
 	}
 
 	updateForm() {
-		// It is best to place most dependent inputs at the end.
-
-		for (const element of this._form.querySelectorAll('.fields-group-description, .fields-group-value,' +
-				' .fields-group-needle, .fields-group-minmax, .js-row-empty-color, .js-row-bg-color,' +
-				' .fields-group-thresholds')) {
-			element.style.display = this._advanced_configuration.checked ? '' : 'none';
-
-			// Disable all advanced configuration elements if, advanced configuration is disabled.
-			for (const input of element.querySelectorAll('input, textarea')) {
-				input.disabled = !this._advanced_configuration.checked;
-			}
-		}
-
 		// Value arc size can only be changed if value arc is enabled and selected.
 		this.toggleGoup(document.querySelectorAll('#value_arc_size'), this._value_arc.checked);
 
@@ -187,7 +172,7 @@ window.widget_gauge_form = new class {
 		}
 
 		for (const element of elements) {
-			element.disabled = !this._advanced_configuration.checked || !dependencies;
+			element.disabled = !dependencies;
 		}
 	}
 };

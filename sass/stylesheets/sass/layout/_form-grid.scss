@@ -236,6 +236,10 @@
 	}
 
 	.table-forms {
+		th {
+			line-height: $body-line-height;
+		}
+
 		td {
 			padding-top: 5px;
 

@@ -32,7 +32,8 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid']))
+			->setPopupParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['angle'])
@@ -43,46 +44,29 @@ $form
 	->addField(
 		new CWidgetFieldNumericBoxView($data['fields']['max'])
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['adv_conf'])
-	)
-	->addFieldsGroup([
-		_('Description'),
-		makeHelpIcon([
-			_('Supported macros:'),
-			(new CList([
-				'{HOST.*}',
-				'{ITEM.*}',
-				'{INVENTORY.*}',
-				_('User macros')
-			]))->addClass(ZBX_STYLE_LIST_DASHED)
-		])
-	], getDescriptionFieldsGroupViews($form, $data['fields']),
-		'fields-group-description'
-	)
-	->addFieldsGroup(_('Value'), getValueFieldsGroupViews($form, $data['fields']),
-		'fields-group-value'
-	)
-	->addFieldsGroup(_('Needle'), getNeedleFieldsGroupViews($form, $data['fields']),
-		'fields-group-needle'
-	)
-	->addFieldsGroup(_('Min/Max'), getMinMaxFieldsGroupViews($form, $data['fields']),
-		'fields-group-minmax'
-	)
-	->addField(
-		new CWidgetFieldColorView($data['fields']['empty_color']),
-		'js-row-empty-color'
-	)
-	->addField(
-		new CWidgetFieldColorView($data['fields']['bg_color']),
-		'js-row-bg-color'
-	)
-	->addFieldsGroup([_('Thresholds'),
-		makeWarningIcon(_('This setting applies only to numeric data.'))
-			->setId('gauge-thresholds-warning')
-		],
-		getThresholdFieldsGroupViews($form, $data['fields']),
-		'fields-group-thresholds'
+	->addFieldset(
+		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
+			->addFieldsGroup(
+				getDescriptionFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-description')
+			)
+			->addFieldsGroup(
+				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
+			)
+			->addFieldsGroup(
+				getNeedleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-needle')
+			)
+			->addFieldsGroup(
+				getMinMaxFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-minmax')
+			)
+			->addField(
+				(new CWidgetFieldColorView($data['fields']['empty_color']))->addRowClass('js-row-empty-color')
+			)
+			->addField(
+				(new CWidgetFieldColorView($data['fields']['bg_color']))->addRowClass('js-row-bg-color')
+			)
+			->addFieldsGroup(
+				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
+			)
 	)
 	->addField(array_key_exists('dynamic', $data['fields'])
 		? new CWidgetFieldCheckBoxView($data['fields']['dynamic'])
@@ -94,153 +78,139 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$description = (new CWidgetFieldTextAreaView($fields['description']))
-		->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 38);
-	$desc_size = new CWidgetFieldIntegerBoxView($fields['desc_size']);
-	$desc_color = new CWidgetFieldColorView($fields['desc_color']);
+function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
-	return [
-		$form->makeCustomField($description, [
-			new CFormField(
-				$description->getView()->setAttribute('maxlength', DB::getFieldLength('widget_field', 'value_str'))
+	return (new CWidgetFieldsGroupView(_('Description')))
+		->setFieldHint(
+			makeHelpIcon([
+				_('Supported macros:'),
+				(new CList([
+					'{HOST.*}',
+					'{ITEM.*}',
+					'{INVENTORY.*}',
+					_('User macros')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		)
+		->addField(
+			(new CWidgetFieldTextAreaView($fields['description']))
+				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 38)
+				->removeLabel()
+		)
+		->addItem([
+			$desc_size_field->getLabel(),
+			(new CFormField([$desc_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addField(
+			new CWidgetFieldRadioButtonListView($fields['desc_v_pos'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['desc_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['desc_color']))->addLabelClass('offset-3')
+		);
+}
+
+function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
+	$value_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_arc_size']));
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
+	$units_field = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+	$units_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['units_size']));
+
+	return (new CWidgetFieldsGroupView(_('Value')))
+		->addField(
+			new CWidgetFieldIntegerBoxView($fields['decimal_places'])
+		)
+		->addItem([
+			$value_size_field->getLabel(),
+			(new CFormField([$value_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['value_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['value_color']))->addLabelClass('offset-3')
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['value_arc'])
+		)
+		->addItem([
+			$value_arc_size_field->getLabel(),
+			(new CFormField([$value_arc_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addItem(
+			new CTag('hr')
+		)
+		->addItem([
+			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))->addClass('units-show'),
+			(new CFormField($units_field->getView()))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		])
+		->addItem([
+			$units_size_field->getLabel(),
+			(new CFormField([$units_size_field->getView(), '%']))->addClass('field-size')
+		])
+		->addField(
+			(new CWidgetFieldCheckBoxView($fields['units_bold']))->addLabelClass('offset-3')
+		)
+		->addField(
+			(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
+				makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
 			)
-		]),
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['units_color']))->addLabelClass('offset-3')
+		);
+}
 
-		$form->makeCustomField($desc_size, [
-			$desc_size->getLabel(),
-			(new CFormField([$desc_size->getView(), '%']))->addClass('field-size')
-		]),
+function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$needle_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['needle_show']));
+	$needle_color_field = $form->registerField(new CWidgetFieldColorView($fields['needle_color']));
 
-		new CWidgetFieldRadioButtonListView($fields['desc_v_pos']),
+	return (new CWidgetFieldsGroupView(_('Needle')))
+		->addItem([
+			(new CDiv([$needle_show_field->getView(), $needle_color_field->getLabel()]))->addClass('needle-show'),
+			new CFormField($needle_color_field->getView())
+		]);
+}
 
-		new CWidgetFieldCheckBoxView($fields['desc_bold']),
+function getMinMaxFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$minmax_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['minmax_show']));
+	$minmax_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['minmax_size']));
 
-		$form->makeCustomField($desc_color, [
-			$desc_color->getLabel()->addClass('offset-3'),
-			new CFormField($desc_color->getView())
+	return (new CWidgetFieldsGroupView(_('Min/Max')))
+		->addItem([
+			(new CDiv([$minmax_show_field->getView(), $minmax_size_field->getLabel()]))->addClass('minmax-show'),
+			(new CFormField([$minmax_size_field->getView(), '%']))->addClass('field-size')
 		])
-	];
+		->addField(new CWidgetFieldCheckBoxView($fields['minmax_show_units']));
 }
 
-function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$value_size = new CWidgetFieldIntegerBoxView($fields['value_size']);
-	$value_color = new CWidgetFieldColorView($fields['value_color']);
-	$value_arc_size = new CWidgetFieldIntegerBoxView($fields['value_arc_size']);
-	$units_show = new CWidgetFieldCheckBoxView($fields['units_show']);
-	$units = (new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH);
-	$units_size = new CWidgetFieldIntegerBoxView($fields['units_size']);
-	$units_bold = new CWidgetFieldCheckBoxView($fields['units_bold']);
-	$units_color = new CWidgetFieldColorView($fields['units_color']);
+function getThresholdFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$th_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['th_arc_size']));
 
-	return [
-		new CWidgetFieldIntegerBoxView($fields['decimal_places']),
-
-		$form->makeCustomField($value_size, [
-			$value_size->getLabel(),
-			(new CFormField([$value_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['value_bold']),
-
-		$form->makeCustomField($value_color, [
-			$value_color->getLabel()->addClass('offset-3'),
-			new CFormField($value_color->getView())
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['value_arc']),
-
-		$form->makeCustomField($value_arc_size, [
-			$value_arc_size->getLabel(),
-			(new CFormField([$value_arc_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CTag('hr'),
-
-		(new CDiv([
-			$units_show->getView(),
-			$units->getLabel()
-		]))->addClass('units-show'),
-
-		(new CFormField(
-			$units->getView()
-		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
-
-		$form->makeCustomField($units_size, [
-			$units_size->getLabel(),
-			(new CFormField([$units_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		$form->makeCustomField($units_bold, [
-			$units_bold->getLabel()->addClass('offset-3'),
-			new CFormField($units_bold->getView())
-		]),
-
-		(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
-			makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
-		),
-
-		$form->makeCustomField($units_color, [
-			$units_color->getLabel()->addClass('offset-3'),
-			new CFormField($units_color->getView())
-		])
-	];
-}
-
-function getNeedleFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$needle_show = new CWidgetFieldCheckBoxView($fields['needle_show']);
-	$needle_color = new CWidgetFieldColorView($fields['needle_color']);
-
-	return [
-		(new CDiv([
-			$needle_show->getView(),
-			$needle_color->getLabel()
-		]))->addClass('needle-show'),
-
-		new CFormField($needle_color->getView())
-	];
-}
-
-function getMinMaxFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$minmax_show = new CWidgetFieldCheckBoxView($fields['minmax_show']);
-	$minmax_size = new CWidgetFieldIntegerBoxView($fields['minmax_size']);
-	$minmax_show_units = new CWidgetFieldCheckBoxView($fields['minmax_show_units']);
-
-	return [
-		(new CDiv([
-			$minmax_show->getView(),
-			$minmax_size->getLabel()
-		]))->addClass('minmax-show'),
-
-		$form->makeCustomField($minmax_size, [
-			(new CFormField([$minmax_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		$form->makeCustomField($minmax_show_units, [
-			$minmax_show_units->getLabel(),
-			(new CFormField($minmax_show_units->getView()))->addStyle('width: 91px')
-		])
-	];
-}
-
-function getThresholdFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$thresholds = (new CWidgetFieldThresholdsView($fields['thresholds']));
-	$th_arc_size = new CWidgetFieldIntegerBoxView($fields['th_arc_size']);
-
-	return [
-		$form->makeCustomField($thresholds, [
-			(new CFormField($thresholds->getView()))->addStyle('grid-column: 1 / -1')
-		]),
-
-		new CTag('hr'),
-
-		new CWidgetFieldCheckBoxView($fields['th_show_labels']),
-
-		new CWidgetFieldCheckBoxView($fields['th_show_arc']),
-
-		$form->makeCustomField($th_arc_size, [
-			$th_arc_size->getLabel()->addClass('offset-3'),
-			(new CFormField([$th_arc_size->getView(), '%']))->addClass('field-size')
-		]),
-	];
+	return (new CWidgetFieldsGroupView(_('Thresholds')))
+		->setFieldHint(
+			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('gauge-thresholds-warning')
+		)
+		->addField(
+			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
+		)
+		->addItem(
+			new CTag('hr')
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['th_show_labels'])
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['th_show_arc'])
+		)
+		->addItem([
+			$th_arc_size_field->getLabel()->addClass('offset-3'),
+			(new CFormField([$th_arc_size_field->getView(), '%']))->addClass('field-size')
+		]);
 }
