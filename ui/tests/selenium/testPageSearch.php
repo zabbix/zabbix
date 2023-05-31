@@ -205,10 +205,12 @@ class testPageSearch extends CWebTest {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
 
-			if(CTestArrayHelper::get($data, 'check_title')) {
+			// Assert widget title.
+			if (CTestArrayHelper::get($data, 'check_title')) {
 				$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
 			}
 
+			// Assert table data.
 			$expected_count = 0;
 			if (isset($data[$wp['key']])) {
 				$this->assertTableHasData($data[$wp['key']],$widget_selector.'//table');
@@ -217,13 +219,13 @@ class testPageSearch extends CWebTest {
 			elseif (isset($data[$wp['key'].'_count'])) {
 				$expected_count = $data[$wp['key'].'_count'];
 			}
+			else {
+				$this->assertTableData(null, $widget_selector.'//table');
+			}
+
+			// Assert table stats.
 			$footer_text =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
-
-			if ($expected_count === 0) {
-				$table_text = $widget->query('xpath:.//table//td')->one()->getText();
-				$this->assertEquals('No data found.', $table_text);
-			}
 		}
 	}
 
