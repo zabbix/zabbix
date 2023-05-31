@@ -860,8 +860,7 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_storeSelectedDashboardPage(dashboard_page) {
-		const dashboard_pages = [...this._dashboard_pages.keys()];
-		const dashboard_page_index = dashboard_pages.indexOf(dashboard_page);
+		const dashboard_page_index = this.getSelectedDashboardPageIndex(dashboard_page);
 
 		const url = new URL(location.href);
 
@@ -892,6 +891,12 @@ class CDashboard extends CBaseComponent {
 
 	getSelectedDashboardPage() {
 		return this._selected_dashboard_page;
+	}
+
+	getSelectedDashboardPageIndex(dashboard_page = this._selected_dashboard_page) {
+		const page_data = this._dashboard_pages.get(dashboard_page);
+
+		return [...this._tabs.getList().children].indexOf(page_data.tab);
 	}
 
 	save() {
@@ -1782,6 +1787,8 @@ class CDashboard extends CBaseComponent {
 				this._selected_dashboard_page.unblockInteraction();
 
 				this._updateNavigationButtons();
+
+				this._storeSelectedDashboardPage();
 			},
 
 			tabsClick: (e) => {
