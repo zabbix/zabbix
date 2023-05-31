@@ -47,22 +47,22 @@ $form
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
 			->addFieldsGroup(
-				getDescriptionFieldsGroupViews($form, $data['fields'])
+				getDescriptionFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-description')
 			)
 			->addFieldsGroup(
-				getValueFieldsGroupViews($form, $data['fields'])
+				getValueFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-value')
 			)
 			->addFieldsGroup(
-				getTimeFieldsGroupViews($form, $data['fields'])
+				getTimeFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-time')
 			)
 			->addFieldsGroup(
-				getChangeIndicatorFieldsGroupViews($data['fields'])
+				getChangeIndicatorFieldsGroupView($data['fields'])->addRowClass('fields-group-change-indicator')
 			)
 			->addField(
 				new CWidgetFieldColorView($data['fields']['bg_color'])
 			)
 			->addFieldsGroup(
-				getThresholdFieldsGroupViews($data['fields'])
+				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
 			)
 	)
 	->addField(array_key_exists('dynamic', $data['fields'])
@@ -75,10 +75,21 @@ $form
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
-function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
+		->setFieldHint(
+			makeHelpIcon([
+				_('Supported macros:'),
+				(new CList([
+					'{HOST.*}',
+					'{ITEM.*}',
+					'{INVENTORY.*}',
+					_('User macros')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		)
 		->addField(
 			(new CWidgetFieldTextAreaView($fields['description']))
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
@@ -99,22 +110,10 @@ function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): C
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['desc_color']))->addLabelClass('offset-3')
-		)
-		->setFieldHint(
-			makeHelpIcon([
-				_('Supported macros:'),
-				(new CList([
-					'{HOST.*}',
-					'{ITEM.*}',
-					'{INVENTORY.*}',
-					_('User macros')
-				]))->addClass(ZBX_STYLE_LIST_DASHED)
-			])
-		)
-		->addRowClass('fields-group-description');
+		);
 }
 
-function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+function getValueFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$decimal_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_size']));
 	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
 	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
@@ -153,17 +152,10 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 		->addItem(
 			new CTag('hr')
 		)
-		->addItem(
-			(new CDiv([
-				$units_show_field->getView(),
-				$units_field->getLabel()
-			]))->addClass('units-show')
-		)
-		->addItem(
-			(new CFormField(
-				$units_field->getView()
-			))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
-		)
+		->addItem([
+			(new CDiv([$units_show_field->getView(), $units_field->getLabel()]))->addClass('units-show'),
+			(new CFormField($units_field->getView()))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
+		])
 		->addField(
 			(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
 				makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
@@ -178,11 +170,10 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['units_color']))->addLabelClass('offset-3')
-		)
-		->addRowClass('fields-group-value');
+		);
 }
 
-function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+function getTimeFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$time_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
@@ -201,11 +192,10 @@ function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetF
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['time_color']))->addLabelClass('offset-3')
-		)
-		->addRowClass('fields-group-time');
+		);
 }
 
-function getChangeIndicatorFieldsGroupViews(array $fields): CWidgetFieldsGroupView {
+function getChangeIndicatorFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Change indicator')))
 		->addItem(
 			(new CSvgArrow(['up' => true, 'fill_color' => $fields['up_color']->getValue()]))
@@ -229,17 +219,15 @@ function getChangeIndicatorFieldsGroupViews(array $fields): CWidgetFieldsGroupVi
 		)
 		->addField(
 			(new CWidgetFieldColorView($fields['updown_color']))->removeLabel()
-		)
-		->addRowClass('fields-group-change-indicator');
+		);
 }
 
-function getThresholdFieldsGroupViews(array $fields): CWidgetFieldsGroupView {
+function getThresholdFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Thresholds')))
-		->addField(
-			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
-		)
 		->setFieldHint(
 			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
 		)
-		->addRowClass('js-row-thresholds');
+		->addField(
+			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
+		);
 }
