@@ -80,8 +80,6 @@ class testPageSearch extends CWebTest {
 				]
 			]
 		]);
-
-
 	}
 
 	public static function getSearchData() {
@@ -175,7 +173,7 @@ class testPageSearch extends CWebTest {
 	 * @dataProvider getSearchData
 	 */
 	public function testPageSearch_VerifyResults($data) {
-		static $all_widget_params = [
+		static $widget_params = [
 			'hosts' => [
 				'key' => 'hosts',
 				'selector_id' => 'search_hosts_widget',
@@ -202,7 +200,7 @@ class testPageSearch extends CWebTest {
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
 		// Verify each widget type.
-		foreach ($all_widget_params as $wp) {
+		foreach ($widget_params as $wp) {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
 			$this->assertEquals($wp['title'],	$widget->query('xpath:.//h4')->one()->getText());
@@ -225,8 +223,7 @@ class testPageSearch extends CWebTest {
 		}
 	}
 
-	public static function getSuggestionsData()
-	{
+	public static function getSuggestionsData()	{
 		return [
 			[
 				[
@@ -363,7 +360,8 @@ class testPageSearch extends CWebTest {
 	private function verifyThatSuggestionsNotShow() {
 		try {
 			$this->query('class:search-suggest')->waitUntilVisible(1);
-		} catch (TimeoutException $e) {
+		}
+		catch (TimeoutException $e) {
 			// All good, the suggestion list is not visible, continue the test.
 		}
 	}
