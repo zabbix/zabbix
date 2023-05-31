@@ -33,7 +33,7 @@ class testFormTagsConnectors extends testFormTags {
 	public $update_name = 'Connector with tags for updating';
 	public $clone_name = 'Connector with tags for cloning';
 	public $remove_name = 'Connector for removing tags';
-
+	protected $tags_table = 'id:tags';
 
 	public function getCreateConnectorTagsData() {
 		return [
