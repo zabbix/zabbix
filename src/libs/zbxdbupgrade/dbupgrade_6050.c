@@ -267,6 +267,27 @@ static int	DBpatch_6050023(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050024(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update widget_field"
+			" set name='show_lines'"
+			" where name='count'"
+				" and widgetid in ("
+					"select widgetid"
+					" from widget"
+					" where type='tophosts'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -297,5 +318,6 @@ DBPATCH_ADD(6050020, 0, 1)
 DBPATCH_ADD(6050021, 0, 1)
 DBPATCH_ADD(6050022, 0, 1)
 DBPATCH_ADD(6050023, 0, 1)
+DBPATCH_ADD(6050024, 0, 1)
 
 DBPATCH_END()
