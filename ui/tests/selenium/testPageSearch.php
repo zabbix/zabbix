@@ -83,6 +83,8 @@ class testPageSearch extends CWebTest {
 				]
 			]
 		]);
+
+
 	}
 
 	public static function getSearchData() {
@@ -91,139 +93,139 @@ class testPageSearch extends CWebTest {
 				[
 					'search_string' => 'Non-existent host',
 					'host_expected_data' => 'No data found.',
-					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'host_expected_count' => 0,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'ЗАББИКС Сервер',
 					'host_expected_data' => [['Host' => 'ЗАББИКС Сервер'], ['IP' => '127.0.0.1'], ['DNS' => '']],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'Zabbix servers',
 					'host_expected_data' => 'No data found.',
-					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'host_expected_count' => 0,
 					'hgroup_expected_data' => [['Host group' => 'Zabbix servers']],
-					'hgroup_expected_count' => ['count' => 1, 'total' => 1],
+					'hgroup_expected_count' => 1,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'Form test template',
 					'host_expected_data' => 'No data found.',
-					'host_expected_count' => ['count' => 0, 'total' => 0],
+					'host_expected_count' => 0,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => [['Template' => 'Form test template']],
-					'template_expected_count' => ['count' => 1, 'total' => 1]
+					'template_expected_count' => 1
 				]
 			],
 			[
 				[
 					'search_string' => '⭐️',
 					'host_expected_data' => [['Host' => '🙂⭐️']],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'emoji visible name',
 					'host_expected_data' => [['Host' => "🙂⭐️\n(emoji visible name)"]],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
 					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'ignore case',
 					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => str_repeat('A', 128),
 					'host_expected_data' => [['Host' => str_repeat('A', 128)]],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'a',
-					'host_expected_count' => ['count' => 37, 'total' => 37],
-					'hgroup_expected_count' => ['count' => 28, 'total' => 28],
-					'template_expected_count' => ['count' => 100, 'total' => 234]
+					'host_expected_count' => 37,
+					'hgroup_expected_count' => 28,
+					'template_expected_count' => 234
 				]
 			],
 			[
 				[
 					'search_string' => '99.99.99.99',
 					'host_expected_data' => [['Host' => '🙂⭐️'], ['IP' => '99.99.99.99'], ['DNS' => '']],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => '127.0.0.1',
-					'host_expected_count' => ['count' => 44, 'total' => 44],
+					'host_expected_count' => 44,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'testdns.example.com',
 					'host_expected_data' => [['Host' => str_repeat('A', 128)], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
-					'host_expected_count' => ['count' => 1, 'total' => 1],
+					'host_expected_count' => 1,
 					'hgroup_expected_data' => 'No data found.',
-					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
+					'hgroup_expected_count' => 0,
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0]
+					'template_expected_count' => 0
 				]
 			]
 		];
@@ -385,7 +387,7 @@ class testPageSearch extends CWebTest {
 	 *
 	 * @param $widgetParams			array of witget parameters
 	 * @param $expectedTableData	expected table data as an array or a string
-	 * @param $expectedCount		expected count and total at the footer
+	 * @param $expectedCount		expected total count at the footer
 	 */
 	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
 		$this->assertEquals($widgetParams['title'],
@@ -400,7 +402,7 @@ class testPageSearch extends CWebTest {
 		}
 		if ($expectedCount !== null) {
 			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
-			$this->assertEquals('Displaying '.$expectedCount['count'].' of '.$expectedCount['total'].' found', $footerText);
+			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
 		}
 	}
 
