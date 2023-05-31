@@ -437,8 +437,7 @@ static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_threa
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-	
+}	
 
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 {
@@ -467,7 +466,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 	http_agent_poller_init(&poller_config, poller_args_in);
-	
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
