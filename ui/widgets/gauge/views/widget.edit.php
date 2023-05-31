@@ -176,8 +176,9 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): array {
 			new CFormField($units_bold->getView())
 		]),
 
-		(new CWidgetFieldSelectView($fields['units_pos']))
-			->setHelpHint(_('Position is ignored for s, uptime and unixtime units.')),
+		(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
+			makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
+		),
 
 		$form->makeCustomField($units_color, [
 			$units_color->getLabel()->addClass('offset-3'),

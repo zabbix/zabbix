@@ -76,18 +76,9 @@ $form
 	->show();
 
 function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$desc_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
+	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Description')))
-		->setHelpHint([
-			_('Supported macros:'),
-			(new CList([
-				'{HOST.*}',
-				'{ITEM.*}',
-				'{INVENTORY.*}',
-				_('User macros')
-			]))->addClass(ZBX_STYLE_LIST_DASHED)
-		])
 		->addField(
 			(new CWidgetFieldTextAreaView($fields['description']))
 				->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH - 30)
@@ -97,8 +88,8 @@ function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): C
 			new CWidgetFieldRadioButtonListView($fields['desc_h_pos'])
 		)
 		->addItem([
-			$desc_size->getLabel(),
-			(new CFormField([$desc_size->getView(), '%']))->addClass('field-size')
+			$desc_size_field->getLabel(),
+			(new CFormField([$desc_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldRadioButtonListView($fields['desc_v_pos'])
@@ -109,25 +100,36 @@ function getDescriptionFieldsGroupViews(CWidgetFormView $form, array $fields): C
 		->addField(
 			(new CWidgetFieldColorView($fields['desc_color']))->addLabelClass('offset-3')
 		)
+		->setFieldHint(
+			makeHelpIcon([
+				_('Supported macros:'),
+				(new CList([
+					'{HOST.*}',
+					'{ITEM.*}',
+					'{INVENTORY.*}',
+					_('User macros')
+				]))->addClass(ZBX_STYLE_LIST_DASHED)
+			])
+		)
 		->addRowClass('fields-group-description');
 }
 
 function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$decimal_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_size']));
-	$value_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
-	$units_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
-	$units = $form->registerField(
+	$decimal_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_size']));
+	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
+	$units_field = $form->registerField(
 		(new CWidgetFieldTextBoxView($fields['units']))->setAdaptiveWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	);
-	$units_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['units_size']));
+	$units_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['units_size']));
 
 	return (new CWidgetFieldsGroupView(_('Value')))
 		->addField(
 			new CWidgetFieldIntegerBoxView($fields['decimal_places'])
 		)
 		->addItem([
-			$decimal_size->getLabel(),
-			(new CFormField([$decimal_size->getView(), '%']))->addClass('field-size')
+			$decimal_size_field->getLabel(),
+			(new CFormField([$decimal_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addItem(
 			new CTag('hr')
@@ -136,8 +138,8 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 			new CWidgetFieldRadioButtonListView($fields['value_h_pos'])
 		)
 		->addItem([
-			$value_size->getLabel(),
-			(new CFormField([$value_size->getView(), '%']))->addClass('field-size')
+			$value_size_field->getLabel(),
+			(new CFormField([$value_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldRadioButtonListView($fields['value_v_pos'])
@@ -153,22 +155,23 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 		)
 		->addItem(
 			(new CDiv([
-				$units_show->getView(),
-				$units->getLabel()
+				$units_show_field->getView(),
+				$units_field->getLabel()
 			]))->addClass('units-show')
 		)
 		->addItem(
 			(new CFormField(
-				$units->getView()
+				$units_field->getView()
 			))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 		)
 		->addField(
-			(new CWidgetFieldSelectView($fields['units_pos']))
-				->setHelpHint(_('Position is ignored for s, uptime and unixtime units.'))
+			(new CWidgetFieldSelectView($fields['units_pos']))->setFieldHint(
+				makeHelpIcon(_('Position is ignored for s, uptime and unixtime units.'))
+			)
 		)
 		->addItem([
-			$units_size->getLabel(),
-			(new CFormField([$units_size->getView(), '%']))->addClass('field-size')
+			$units_size_field->getLabel(),
+			(new CFormField([$units_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			(new CWidgetFieldCheckBoxView($fields['units_bold']))->addLabelClass('offset-3')
@@ -180,15 +183,15 @@ function getValueFieldsGroupViews(CWidgetFormView $form, array $fields): CWidget
 }
 
 function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
+	$time_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
 	return (new CWidgetFieldsGroupView(_('Time')))
 		->addField(
 			new CWidgetFieldRadioButtonListView($fields['time_h_pos'])
 		)
 		->addItem([
-			$time_size->getLabel(),
-			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
+			$time_size_field->getLabel(),
+			(new CFormField([$time_size_field->getView(), '%']))->addClass('field-size')
 		])
 		->addField(
 			new CWidgetFieldRadioButtonListView($fields['time_v_pos'])
@@ -232,11 +235,11 @@ function getChangeIndicatorFieldsGroupViews(array $fields): CWidgetFieldsGroupVi
 
 function getThresholdFieldsGroupViews(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Thresholds')))
-		->setHint(
-			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
-		)
 		->addField(
 			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
+		)
+		->setFieldHint(
+			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
 		)
 		->addRowClass('js-row-thresholds');
 }
