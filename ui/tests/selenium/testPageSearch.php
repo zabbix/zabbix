@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 use Facebook\WebDriver\Exception\TimeoutException;
 
 require_once dirname(__FILE__).'/../include/CWebTest.php';
@@ -123,13 +124,13 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
-					'hosts' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]]
+					'hosts' => [['Host' => 'ZaBbiX зАБбИкс āēīõšŗ']]
 				]
 			],
 			[
 				[
 					'search_string' => 'ignore case',
-					'hosts' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]]
+					'hosts' => [['Host' => 'ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)']]
 				]
 			],
 			[
@@ -174,7 +175,7 @@ class testPageSearch extends CWebTest {
 	 * @dataProvider getSearchData
 	 */
 	public function testPageSearch_VerifyResults($data) {
-		static $allWidgetParams = [
+		static $all_widget_params = [
 			'hosts' => [
 				'key' => 'hosts',
 				'selector_id' => 'search_hosts_widget',
@@ -201,25 +202,25 @@ class testPageSearch extends CWebTest {
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
 		// Verify each widget type.
-		foreach ($allWidgetParams as $wp) {
-			$widgetSelector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
-			$widget = $this->query($widgetSelector)->one();
+		foreach ($all_widget_params as $wp) {
+			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
+			$widget = $this->query($widget_selector)->one();
 			$this->assertEquals($wp['title'],	$widget->query('xpath:.//h4')->one()->getText());
 
-			$expectedCount = 0;
+			$expected_count = 0;
 			if (isset($data[$wp['key']])) {
-				$this->assertTableHasData($data[$wp['key']],$widgetSelector.'//table');
-				$expectedCount = count($data[$wp['key']]);
+				$this->assertTableHasData($data[$wp['key']],$widget_selector.'//table');
+				$expected_count = count($data[$wp['key']]);
 			}
 			elseif (isset($data[$wp['key'].'_count'])) {
-				$expectedCount = $data[$wp['key'].'_count'];
+				$expected_count = $data[$wp['key'].'_count'];
 			}
-			$footerText =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
-			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
+			$footer_text =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
 
-			if ($expectedCount === 0) {
-				$tableText = $widget->query('xpath:.//table//td')->one()->getText();
-				$this->assertEquals('No data found.', $tableText);
+			if ($expected_count === 0) {
+				$table_text = $widget->query('xpath:.//table//td')->one()->getText();
+				$this->assertEquals('No data found.', $table_text);
 			}
 		}
 	}
@@ -299,12 +300,12 @@ class testPageSearch extends CWebTest {
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($data['search_string']);
 
-		$itemSelector = 'xpath://ul[@class="search-suggest"]//li';
+		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
 
 		// Verify suggestions.
 		if (isset($data['expected_suggestions'])) {
 			if(count($data['expected_suggestions']) > 0) {
-				$items = $this->query($itemSelector)->waitUntilVisible()->all()->asText();
+				$items = $this->query($item_selector)->waitUntilVisible()->all()->asText();
 				foreach ($items as $item){
 					if(in_array($item, $data['expected_suggestions'])) {
 						// Remove item from the expected result array.
@@ -327,7 +328,7 @@ class testPageSearch extends CWebTest {
 		// Verify suggestion total count.
 		if (isset($data['expected_count'])) {
 			if ($data['expected_count'] > 0) {
-				$this->assertEquals($data['expected_count'], $this->query($itemSelector)->waitUntilVisible()->all()->count());
+				$this->assertEquals($data['expected_count'], $this->query($item_selector)->waitUntilVisible()->all()->count());
 			}
 			else {
 				$this->verifyThatSuggestionsNotShow();
