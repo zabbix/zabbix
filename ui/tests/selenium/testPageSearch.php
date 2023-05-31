@@ -81,7 +81,7 @@ class testPageSearch extends CWebTest {
 					'dns' => '',
 					'port' => '10050'
 				]
-			],
+			]
 		]);
 	}
 
@@ -95,7 +95,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -106,7 +106,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -117,7 +117,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => [['Host group' => 'Zabbix servers']],
 					'hgroup_expected_count' => ['count' => 1, 'total' => 1],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -128,7 +128,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => [['Template' => 'Form test template']],
-					'template_expected_count' => ['count' => 1, 'total' => 1],
+					'template_expected_count' => ['count' => 1, 'total' => 1]
 				]
 			],
 			[
@@ -139,7 +139,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -150,7 +150,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -161,7 +161,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -172,7 +172,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -183,7 +183,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -191,7 +191,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'a',
 					'host_expected_count' => ['count' => 37, 'total' => 37],
 					'hgroup_expected_count' => ['count' => 28, 'total' => 28],
-					'template_expected_count' => ['count' => 100, 'total' => 234],
+					'template_expected_count' => ['count' => 100, 'total' => 234]
 				]
 			],
 			[
@@ -202,7 +202,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -212,7 +212,7 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
 			],
 			[
@@ -223,9 +223,9 @@ class testPageSearch extends CWebTest {
 					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => ['count' => 0, 'total' => 0],
 					'template_expected_data' => 'No data found.',
-					'template_expected_count' => ['count' => 0, 'total' => 0],
+					'template_expected_count' => ['count' => 0, 'total' => 0]
 				]
-			],
+			]
 		];
 	}
 
@@ -255,7 +255,7 @@ class testPageSearch extends CWebTest {
 				[
 					'search_string' => 'Non-existent host',
 					'expected_suggestions' => [],
-					'expected_count' => 0,
+					'expected_count' => 0
 				]
 			],
 			[
@@ -265,51 +265,51 @@ class testPageSearch extends CWebTest {
 						'Simple form test host',
 						'Template inheritance test host',
 						'Visible host for template linkage',
-						'ЗАББИКС Сервер',
+						'ЗАББИКС Сервер'
 					],
-					'expected_count' => 4,
+					'expected_count' => 4
 				]
 			],
 			[
 				[
 					'search_string' => 'a',
-					'expected_count' => 15,
+					'expected_count' => 15
 				]
 			],
 			[
 				[
 					'search_string' => ' ',
-					'expected_count' => 15,
+					'expected_count' => 15
 				]
 			],
 			[
 				[
 					'search_string' => '⭐️',
 					'expected_suggestions' => ['🙂⭐️'],
-					'expected_count' => 1,
+					'expected_count' => 1
 				]
 			],
 			[
 				[
 					'search_string' => 'ignore case',
 					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
-					'expected_count' => 1,
+					'expected_count' => 1
 				]
 			],
 			[
 				[
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
 					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
-					'expected_count' => 1,
+					'expected_count' => 1
 				]
 			],
 			[
 				[
 					'search_string' => str_repeat('A', 128),
 					'expected_suggestions' => [str_repeat('A', 128)],
-					'expected_count' => 1,
+					'expected_count' => 1
 				]
-			],
+			]
 		];
 	}
 
