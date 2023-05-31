@@ -92,11 +92,8 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'Non-existent host',
-					'host_expected_data' => 'No data found.',
 					'host_expected_count' => 0,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -105,29 +102,23 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'ЗАББИКС Сервер',
 					'host_expected_data' => [['Host' => 'ЗАББИКС Сервер'], ['IP' => '127.0.0.1'], ['DNS' => '']],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'Zabbix servers',
-					'host_expected_data' => 'No data found.',
 					'host_expected_count' => 0,
 					'hgroup_expected_data' => [['Host group' => 'Zabbix servers']],
 					'hgroup_expected_count' => 1,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
 			[
 				[
 					'search_string' => 'Form test template',
-					'host_expected_data' => 'No data found.',
 					'host_expected_count' => 0,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
 					'template_expected_data' => [['Template' => 'Form test template']],
 					'template_expected_count' => 1
@@ -138,9 +129,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => '⭐️',
 					'host_expected_data' => [['Host' => '🙂⭐️']],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -149,9 +138,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'emoji visible name',
 					'host_expected_data' => [['Host' => "🙂⭐️\n(emoji visible name)"]],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -160,9 +147,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
 					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -171,9 +156,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'ignore case',
 					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -182,9 +165,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => str_repeat('A', 128),
 					'host_expected_data' => [['Host' => str_repeat('A', 128)]],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -201,9 +182,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => '99.99.99.99',
 					'host_expected_data' => [['Host' => '🙂⭐️'], ['IP' => '99.99.99.99'], ['DNS' => '']],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -211,9 +190,7 @@ class testPageSearch extends CWebTest {
 				[
 					'search_string' => '127.0.0.1',
 					'host_expected_count' => 44,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			],
@@ -222,9 +199,7 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'testdns.example.com',
 					'host_expected_data' => [['Host' => str_repeat('A', 128)], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
 					'host_expected_count' => 1,
-					'hgroup_expected_data' => 'No data found.',
 					'hgroup_expected_count' => 0,
-					'template_expected_data' => 'No data found.',
 					'template_expected_count' => 0
 				]
 			]
@@ -392,14 +367,17 @@ class testPageSearch extends CWebTest {
 	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
 		$this->assertEquals($widgetParams['title'],
 			$this->query('xpath://*[@id="'.$widgetParams['id'].'"]//h4')->one()->getText());
-		if ($expectedTableData) {
-			if(is_array($expectedTableData)){
-				$this->assertTableHasData($expectedTableData,'xpath://div[@id="'.$widgetParams['id'].'"]//table');
-			}else{
-				$tableText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//td')->one()->getText();
-				$this->assertEquals($expectedTableData, $tableText);
-			}
+
+		// Check table data or that the 'No data found' string is present.
+		if (isset($expectedTableData)) {
+			$this->assertTableHasData($expectedTableData,'xpath://div[@id="'.$widgetParams['id'].'"]//table');
 		}
+		elseif ($expectedCount === 0) {
+			$tableText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//td')->one()->getText();
+			$this->assertEquals('No data found.', $tableText);
+		}
+
+		// Check shown and total count display.
 		if ($expectedCount !== null) {
 			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
