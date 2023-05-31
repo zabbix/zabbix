@@ -833,7 +833,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = zbx_dc_config_get_poller_items(poller_type, config_comms->config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(poller_type, config_comms->config_timeout, 0, &items);
 
 	if (0 == num)
 	{

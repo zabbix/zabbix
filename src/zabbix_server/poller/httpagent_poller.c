@@ -96,7 +96,7 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 		goto fail;
 	}
 
-	if (CURLE_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
+	if (CURLM_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
 			httpagent_context->http_context.easyhandle)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot add a standard curl handle to the multi stack: %s",
@@ -127,7 +127,8 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	items = &item;
-	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout, &items);
+	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
+			poller_config->processing, &items);
 
 	if (0 == num)
 	{
@@ -379,26 +380,82 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
+static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in)
+{
+	CURLMcode	merr;
+	CURLcode	err;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL: %s", curl_easy_strerror(err));
+
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == (curl_handle = curl_multi_init()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL multi session");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == (base = event_base_new()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == (curl_timeout = evtimer_new(base, on_timeout, NULL)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot create timer event");
+		exit(EXIT_FAILURE);
+	}
+
+	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETFUNCTION: %s", curl_multi_strerror(merr));
+		exit(EXIT_FAILURE);
+	}
+
+	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERFUNCTION: %s", curl_multi_strerror(merr));
+		exit(EXIT_FAILURE);
+	}
+
+	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
+	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
+	poller_config->poller_type = poller_args_in->poller_type;
+	poller_config->curl_handle = curl_handle;
+	poller_config->base = base;
+
+	if (NULL == (poller_config->async_items_timer = evtimer_new(base, async_items, poller_config)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot create async items timer event");
+		exit(EXIT_FAILURE);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+	
+
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
 	double			sec, total_sec = 0.0;
 	time_t			last_stat_time;
-	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	struct event		*async_items_timer;
 	struct timeval		tv = {1, 0};
 	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
-	poller_type = (poller_args_in->poller_type);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -408,30 +465,9 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
-	if (0 != curl_global_init(CURL_GLOBAL_ALL))
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL");
-
-	if (NULL == (curl_handle = curl_multi_init()))
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL multi session");
-
-	if (NULL == (base = event_base_new()))
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
-
-	curl_timeout = evtimer_new(base, on_timeout, NULL);
-
-	curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
-	curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
-
-	poller_config.config_source_ip = poller_args_in->config_comms->config_source_ip;
-	poller_config.config_timeout = poller_args_in->config_comms->config_timeout;
-	poller_config.poller_type = poller_type;
-	poller_config.curl_handle = curl_handle;
-	poller_config.base = base;
-	async_items_timer = evtimer_new(base, async_items, &poller_config);
-	poller_config.async_items_timer = async_items_timer;
-
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
-
+	http_agent_poller_init(&poller_config, poller_args_in);
+	
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
@@ -441,8 +477,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (0 == evtimer_pending(async_items_timer, &tv_pending))
-			evtimer_add(async_items_timer, &tv);
+		if (0 == evtimer_pending(poller_config.async_items_timer, &tv_pending))
+			evtimer_add(poller_config.async_items_timer, &tv);
 
 		event_base_loop(base, EVLOOP_ONCE);
 
