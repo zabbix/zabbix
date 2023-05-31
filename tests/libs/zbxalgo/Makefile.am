@@ -2,7 +2,8 @@ if SERVER
 SERVER_tests = \
 	evaluate \
 	evaluate_unknown \
-	queue
+	queue \
+	list
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -75,5 +76,19 @@ queue_LDADD += @SERVER_LIBS@
 queue_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 queue_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+
+list_SOURCES = \
+	list.c \
+	$(COMMON_SRC_FILES)
+
+list_LDADD = \
+	$(COMMON_LIB_FILES)
+
+list_LDADD += @SERVER_LIBS@
+
+list_LDFLAGS = @SERVER_LDFLAGS@
+
+list_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif
