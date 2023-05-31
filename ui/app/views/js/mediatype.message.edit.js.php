@@ -38,7 +38,10 @@ window.mediatype_message_popup = new class {
 		this.form.querySelector('#message_type').onchange = (e) => {
 			const message_template = this._getDefaultMessageTemplate(e.target.value);
 
-			this.form.querySelector('#subject').value = message_template.subject;
+			if (this.form.querySelector('#subject') !== null) {
+				this.form.querySelector('#subject').value = message_template.subject;
+			}
+
 			this.form.querySelector('#message').value = message_template.message;
 		};
 	}
