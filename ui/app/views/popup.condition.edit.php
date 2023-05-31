@@ -556,8 +556,7 @@ switch ($data['type']) {
 								'srcfld2' => 'name',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'dcheck_new_condition_value',
-								'dstfld2' => 'dcheck',
-								'writeonly' => '1'
+								'dstfld2' => 'dcheck'
 							], JSON_THROW_ON_ERROR).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
