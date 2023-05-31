@@ -205,7 +205,7 @@ class testPageSearch extends CWebTest {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
 
-			if(CTestArrayHelper::get($data, 'check_title')){
+			if(CTestArrayHelper::get($data, 'check_title')) {
 				$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
 			}
 
@@ -227,7 +227,7 @@ class testPageSearch extends CWebTest {
 		}
 	}
 
-	public static function getSuggestionsData()	{
+	public static function getSuggestionsData() {
 		return [
 			[
 				[
@@ -305,18 +305,18 @@ class testPageSearch extends CWebTest {
 
 		// Verify suggestions.
 		if (isset($data['expected_suggestions'])) {
-			if(count($data['expected_suggestions']) > 0) {
+			if (count($data['expected_suggestions']) > 0) {
 				$items = $this->query($item_selector)->waitUntilVisible()->all()->asText();
-				foreach ($items as $item){
-					if(in_array($item, $data['expected_suggestions'])) {
+				foreach ($items as $item) {
+					if (in_array($item, $data['expected_suggestions'])) {
 						// Remove item from the expected result array.
 						unset($data['expected_suggestions'][array_search($item, $data['expected_suggestions'])]);
 					}
-					else{
+					else {
 						throw new Exception("Unexpected search suggestion: ".$item);
 					}
 				}
-				if(count($data['expected_suggestions']) > 0) {
+				if (count($data['expected_suggestions']) > 0) {
 					throw new Exception("Not all expected search suggestions shown. Missing: ".
 						implode(', ', $data['expected_suggestions']));
 				}
