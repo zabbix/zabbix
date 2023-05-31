@@ -54,7 +54,7 @@ class testPageSearch extends CWebTest {
 				]
 			],
 			[
-				'host' => str_repeat('A', 128),
+				'host' => STRING_128,
 				'groups' => [
 					'groupid' => '6'
 				],
@@ -162,8 +162,8 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => str_repeat('A', 128),
-					'host_expected_data' => [['Host' => str_repeat('A', 128)]],
+					'search_string' => STRING_128,
+					'host_expected_data' => [['Host' => STRING_128]],
 					'host_expected_count' => 1,
 					'hgroup_expected_count' => 0,
 					'template_expected_count' => 0
@@ -197,7 +197,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'testdns.example.com',
-					'host_expected_data' => [['Host' => str_repeat('A', 128)], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
+					'host_expected_data' => [['Host' => STRING_128], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
 					'host_expected_count' => 1,
 					'hgroup_expected_count' => 0,
 					'template_expected_count' => 0
@@ -282,8 +282,8 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => str_repeat('A', 128),
-					'expected_suggestions' => [str_repeat('A', 128)],
+					'search_string' => STRING_128,
+					'expected_suggestions' => [STRING_128],
 					'expected_count' => 1
 				]
 			]
