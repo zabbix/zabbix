@@ -249,7 +249,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					});
 
 					if ($texts_having_macros) {
-						$supported_macros = array_merge_recursive($supported_macros, $macros);
+						$macros = CMacrosResolver::extractMacros($texts_having_macros, ['macros' => $macros]);
+						$supported_macros = array_merge_recursive($supported_macros, array_unique($macros));
 						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
 						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
 
@@ -273,7 +274,8 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 				// Field support macros like {HOST.*}, {ITEM.*} etc.
 				if ($macros) {
-					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$macros = CMacrosResolver::extractMacros($texts_having_macros, ['macros' => $macros]);
+					$supported_macros = array_merge_recursive($supported_macros, array_unique($macros));
 					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
 				}
 
