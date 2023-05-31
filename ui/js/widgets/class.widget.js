@@ -95,8 +95,6 @@ class CWidget extends CBaseComponent {
 		this._scope_id = scope_id;
 		this._unique_id = unique_id;
 
-		this._is_unsaved = false;
-
 		this._init();
 		this._registerEvents();
 	}
@@ -291,10 +289,6 @@ class CWidget extends CBaseComponent {
 	announceWidgets(widgets) {
 	}
 
-	isUnsaved() {
-		return this._is_unsaved;
-	}
-
 	resize() {
 	}
 
@@ -378,8 +372,6 @@ class CWidget extends CBaseComponent {
 		if (this._state === WIDGET_STATE_ACTIVE) {
 			this._startUpdating();
 		}
-
-		this._is_unsaved = true;
 	}
 
 	getRfRate() {
