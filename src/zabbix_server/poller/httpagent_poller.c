@@ -453,7 +453,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 			zbx_setproctitle("%s #%d [got %d values, queued %d in " ZBX_FS_DBL " sec]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
 				poller_config.queued, total_sec);
-			
+
 			poller_config.processed = 0;
 			poller_config.queued = 0;
 			total_sec = 0.0;
