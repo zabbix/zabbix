@@ -366,20 +366,20 @@ class testPageSearch extends CWebTest {
 	 */
 	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
 		$this->assertEquals($widgetParams['title'],
-			$this->query('xpath://*[@id="'.$widgetParams['id'].'"]//h4')->one()->getText());
+			$this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//h4')->one()->getText());
 
 		// Check table data or that the 'No data found' string is present.
 		if (isset($expectedTableData)) {
-			$this->assertTableHasData($expectedTableData,'xpath://div[@id="'.$widgetParams['id'].'"]//table');
+			$this->assertTableHasData($expectedTableData,'xpath://div[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//table');
 		}
 		elseif ($expectedCount === 0) {
-			$tableText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//td')->one()->getText();
+			$tableText = $this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//td')->one()->getText();
 			$this->assertEquals('No data found.', $tableText);
 		}
 
 		// Check shown and total count display.
 		if ($expectedCount !== null) {
-			$footerText = $this->query('xpath://*[@id="'.$widgetParams['id'].'"]//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$footerText = $this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
 		}
 	}
