@@ -269,23 +269,24 @@ static int	DBpatch_6050023(void)
 
 static int	DBpatch_6050024(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > zbx_db_execute(
+	const char	*sql =
 			"update widget_field"
 			" set name='show_lines'"
 			" where name='count'"
-				" and widgetid in ("
-					"select widgetid"
-					" from widget"
-					" where type='tophosts'"
-				")"))
-	{
-		return FAIL;
-	}
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")";
 
-	return SUCCEED;
+		if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+			return SUCCEED;
+
+		if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+			return SUCCEED;
+
+		return FAIL;
 }
 
 #endif
