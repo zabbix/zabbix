@@ -23,6 +23,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
+use Facebook\WebDriver\WebDriverKeys;
+
 /**
  * @backup items, interface, hosts
  *
@@ -389,111 +391,110 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		self::$dashboardid = CDataHelper::getIds('name');
 	}
 
-	public static function getCheckData() {
+	public static function getCheckDependingData() {
 		return [
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 2',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 2',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 3',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 3',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 4',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 4',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 5',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 5',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 2',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 2',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 3',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 3',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 4',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 4',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 5',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 5',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 2',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 3',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 2',
+						'host' => 'Host for widget 3',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 2',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 4',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 2',
+						'host' => 'Host for widget 4',
+						'item' => '*'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 2',
-						'xpath://input[@placeholder="host pattern"]' => 'Host for widget 5',
-						'xpath://input[@placeholder="item pattern"]' => '*'
+						'host' => 'Host for widget 1',
+						'host' => 'Host for widget 2',
+						'host' => 'Host for widget 5',
+						'item' => '*'
 					]
 				]
 			],
@@ -503,7 +504,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	/**
 	 * Function checks if Graph Widget is correctly selecting and displaying hosts, their items
 	 *
-	 * @dataProvider getCheckData
+	 * @dataProvider getCheckDependingData
 	 */
 
 	public function testDashboardGraphWidgetSelectedHosts_Check($data) {
@@ -513,7 +514,48 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$form->fill(['Type' => 'Graph']);
-		$form->fill($data['Data set']);
+
+		if (CTestArrayHelper::isAssociative($data['Data set'])) {
+			$data['Data set'] = [$data['Data set']];
+		}
+
+		foreach ($data['Data set'] as $data_set) {
+			if (array_key_exists('item', $data_set)) {
+				$mapping = [
+					'item' => 'xpath://input[@placeholder="item pattern"]',
+					'host' => 'xpath://input[@placeholder="host pattern"]'
+				];
+				var_dump('Test');
+			} else {
+				$mapping = [
+					'host' => 'xpath://input[@placeholder="host pattern"]'
+				];
+				var_dump('Test2');
+			}
+
+			foreach ($mapping as $field => $selector) {
+				$data_set = [$selector => $data_set[$field]] + $data_set;
+				unset($data_set[$field]);
+			}
+
+			$form->fill($data_set);
+			do {
+				$this->query('xpath:.//div[@aria-live="assertive"]');
+
+
+
+			} while ($this->query('id:ds_0_hosts_')->one()->asMultiselect()->getOptions()->getText());
+		}
+
+		//sleep(1);
+		//$element = $form->query('xpath://div[@class="selected"]/..')->one()->waitUntilReady();
+		//$this->query('xpath://input[@placeholder="host pattern"]')->one()->fill($data['Data set']['host']);
+		sleep(5);
+		$this->assertScreenshotExcept();
+
+
+		//'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
+		//'xpath://input[@placeholder="item pattern"]' => '*'
 
 	}
 
