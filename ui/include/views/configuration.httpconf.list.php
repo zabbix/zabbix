@@ -217,10 +217,16 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 }
 
 $button_list = [
-	'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?'),
+	'httptest.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected web scenario?'),
+		'confirm_plural' => _('Enable selected web scenarios?'),
 		'csrf_token' => $csrf_token
 	],
-	'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?'),
+	'httptest.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected web scenario?'),
+		'confirm_plural' => _('Disable selected web scenarios?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -229,15 +235,19 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
 			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?'),
+			'confirm_singular' => _('Delete history of selected web scenario?'),
+			'confirm_plural' => _('Delete history of selected web scenarios?'),
 			'csrf_token' => $csrf_token
 		]
 	];
 }
 
 $button_list += [
-	'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'),
-			'csrf_token' => $csrf_token
+	'httptest.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected web scenario?'),
+		'confirm_plural' => _('Delete selected web scenarios?'),
+		'csrf_token' => $csrf_token
 	]
 ];
 

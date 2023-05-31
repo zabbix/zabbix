@@ -40,91 +40,87 @@ $form
 		new CWidgetFieldRadioButtonListView($data['fields']['clock_type'])
 	)
 	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['show']),
-		'js-row-show'
+		(new CWidgetFieldCheckBoxListView($data['fields']['show']))->addRowClass('js-row-show'),
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['adv_conf']),
-		'js-row-adv-conf'
+	->addFieldset(
+		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
+			->addField(
+				new CWidgetFieldColorView($data['fields']['bg_color']),
+			)
+			->addFieldsGroup(
+				getDateFieldsGroupViews($form, $data['fields'])
+			)
+			->addFieldsGroup(
+				getTimeFieldsGroupViews($form, $data['fields'])
+			)
+			->addFieldsGroup(
+				getTimeZoneFieldsGroupViews($form, $data['fields'])
+			)
+			->addClass('js-fieldset-adv-conf')
 	)
-	->addField(
-		new CWidgetFieldColorView($data['fields']['bg_color']),
-		'js-row-bg-color'
-	)
-	->addFieldsGroup(_('Date'), getDateFieldsGroupViews($form, $data['fields']), 'fields-group-date')
-	->addFieldsGroup(_('Time'), getTimeFieldsGroupViews($form, $data['fields']), 'fields-group-time')
-	->addFieldsGroup(_('Time zone'), getTimeZoneFieldsGroupViews($form, $data['fields']), 'fields-group-tzone')
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_clock_form.init();')
 	->show();
 
-function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$date_size = new CWidgetFieldIntegerBoxView($fields['date_size']);
-	$date_color = new CWidgetFieldColorView($fields['date_color']);
+function getDateFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$date_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['date_size']));
 
-	return [
-		$form->makeCustomField($date_size, [
+	return (new CWidgetFieldsGroupView(_('Date')))
+		->addItem([
 			$date_size->getLabel(),
 			(new CFormField([$date_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['date_bold']),
-
-		$form->makeCustomField($date_color, [
-			$date_color->getLabel()->addClass('offset-3'),
-			new CFormField($date_color->getView())
 		])
-	];
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['date_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['date_color']))->addLabelClass('offset-3')
+		)
+		->addRowClass('fields-group-date');
 }
 
-function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$time_size = new CWidgetFieldIntegerBoxView($fields['time_size']);
-	$time_color = new CWidgetFieldColorView($fields['time_color']);
-	$time_format = new CWidgetFieldRadioButtonListView($fields['time_format']);
+function getTimeFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$time_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['time_size']));
 
-	return [
-		$form->makeCustomField($time_size, [
+	return (new CWidgetFieldsGroupView(_('Time')))
+		->addItem([
 			$time_size->getLabel(),
 			(new CFormField([$time_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['time_bold']),
-
-		$form->makeCustomField($time_color, [
-			$time_color->getLabel()->addClass('offset-3'),
-			new CFormField($time_color->getView())
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['time_sec']),
-
-		$form->makeCustomField($time_format, [
-			$time_format->getLabel(),
-			(new CFormField($time_format->getView()))->addClass('field-format')
 		])
-	];
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['time_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['time_color']))->addLabelClass('offset-3')
+		)
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['time_sec'])
+		)
+		->addField(
+			(new CWidgetFieldRadioButtonListView($fields['time_format']))->addClass('field-format')
+		)
+		->addRowClass('fields-group-time');
 }
 
-function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): array {
-	$tzone_size = new CWidgetFieldIntegerBoxView($fields['tzone_size']);
-	$tzone_color = new CWidgetFieldColorView($fields['tzone_color']);
-	$tzone_timezone = new CWidgetFieldTimeZoneView($fields['tzone_timezone']);
-	$tzone_format = new CWidgetFieldRadioButtonListView($fields['tzone_format']);
+function getTimeZoneFieldsGroupViews(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$tzone_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['tzone_size']));
 
-	return [
-		$form->makeCustomField($tzone_size, [
+	return (new CWidgetFieldsGroupView(_('Time zone')))
+		->addItem([
 			$tzone_size->getLabel(),
 			(new CFormField([$tzone_size->getView(), '%']))->addClass('field-size')
-		]),
-
-		new CWidgetFieldCheckBoxView($fields['tzone_bold']),
-
-		$form->makeCustomField($tzone_color, [
-			$tzone_color->getLabel()->addClass('offset-3'),
-			new CFormField($tzone_color->getView())
-		]),
-
-		$form->makeCustomField($tzone_timezone, [], 'field-tzone-timezone'),
-
-		$form->makeCustomField($tzone_format, [], 'field-tzone-format')
-	];
+		])
+		->addField(
+			new CWidgetFieldCheckBoxView($fields['tzone_bold'])
+		)
+		->addField(
+			(new CWidgetFieldColorView($fields['tzone_color']))->addLabelClass('offset-3')
+		)
+		->addField(
+			(new CWidgetFieldTimeZoneView($fields['tzone_timezone']))->addRowClass('field-tzone-timezone')
+		)
+		->addField(
+			(new CWidgetFieldRadioButtonListView($fields['tzone_format']))->addRowClass('field-tzone-format')
+		)
+		->addRowClass('fields-group-tzone');
 }

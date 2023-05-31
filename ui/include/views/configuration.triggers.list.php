@@ -357,10 +357,16 @@ $triggers_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?'),
+			'trigger.massenable' => [
+				'name' => _('Enable'),
+				'confirm_singular' => _('Enable selected trigger?'),
+				'confirm_plural' => _('Enable selected triggers?'),
 				'csrf_token' => $csrf_token
 			],
-			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?'),
+			'trigger.massdisable' => [
+				'name' => _('Disable'),
+				'confirm_singular' => _('Disable selected trigger?'),
+				'confirm_plural' => _('Disable selected triggers?'),
 				'csrf_token' => $csrf_token
 			],
 			'trigger.masscopyto' => [
@@ -382,7 +388,10 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?'),
+			'trigger.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected trigger?'),
+				'confirm_plural' => _('Delete selected triggers?'),
 				'csrf_token' => $csrf_token
 			]
 		],

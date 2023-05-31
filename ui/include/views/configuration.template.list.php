@@ -308,11 +308,18 @@ $form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'template.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected templates?'),
+			'template.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected template?'),
+				'confirm_plural' => _('Delete selected templates?'),
 				'csrf_token' => CCsrfTokenHelper::get('templates.php')
 			],
-			'template.massdeleteclear' => ['name' => _('Delete and clear'),
-				'confirm' => _('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
+			'template.massdeleteclear' => [
+				'name' => _('Delete and clear'),
+				'confirm_singular' =>
+					_('Delete and clear selected template? (Warning: all linked hosts will be cleared!)'),
+				'confirm_plural' =>
+					_('Delete and clear selected templates? (Warning: all linked hosts will be cleared!)'),
 				'csrf_token' => CCsrfTokenHelper::get('templates.php')
 			]
 		]

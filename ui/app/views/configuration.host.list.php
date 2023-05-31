@@ -523,14 +523,16 @@ $form->addItem([
 	new CActionButtonList('action', 'hostids', [
 		'enable-hosts' => [
 			'name' => _('Enable'),
-			'confirm' => _('Enable selected hosts?'),
+			'confirm_singular' => _('Enable selected host?'),
+			'confirm_plural' => _('Enable selected hosts?'),
 			'redirect' => $status_toggle_url
 				->setArgument('status', HOST_STATUS_MONITORED)
 				->getUrl()
 		],
 		'disable-hosts' => [
 			'name' => _('Disable'),
-			'confirm' => _('Disable selected hosts?'),
+			'confirm_singular' => _('Disable selected host?'),
+			'confirm_plural' => _('Disable selected hosts?'),
 			'redirect' => $status_toggle_url
 				->setArgument('status', HOST_STATUS_NOT_MONITORED)
 				->getUrl()
@@ -556,7 +558,6 @@ $form->addItem([
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
-				->setAttribute('confirm', _('Delete selected hosts?'))
 				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('no-chkbxrange')
