@@ -107,7 +107,7 @@ class CControllerMediatypeUpdate extends CController {
 		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
 				$this->getInputs($mediatype, ['smtp_port', 'smtp_helo', 'smtp_security', 'smtp_authentication',
-					'content_type'
+					'content_type', 'passwd'
 				]);
 
 				$smtp_email = $this->getInput('smtp_email', '');
@@ -115,7 +115,6 @@ class CControllerMediatypeUpdate extends CController {
 				$mediatype['provider'] = $this->getInput('provider', CMediatypeHelper::EMAIL_PROVIDER_SMTP);
 				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
 				$mediatype['smtp_email'] = $smtp_email;
-				$mediatype['passwd'] = $this->getInput('passwd', '');
 				$mediatype['smtp_verify_peer'] = $this->getInput('smtp_verify_peer', 0);
 				$mediatype['smtp_verify_host'] = $this->getInput('smtp_verify_host', 0);
 
