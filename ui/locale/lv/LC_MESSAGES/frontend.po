@@ -591,6 +591,11 @@ msgstr "Atzītie PROBLEM notikumi"
 msgid "Acknowledged RESOLVED events"
 msgstr "Atzītie RESOLVED notikumi"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -1988,6 +1993,11 @@ msgstr "Bulgāru (bg_BG)"
 #: report2.php:195
 msgid "By host"
 msgstr "Pēc resursdatora"
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
 
 #: report2.php:196
 msgid "By trigger template"
@@ -5262,6 +5272,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:886
 msgid "Count of matched lines in log file monitoring. Returns integer"
+msgstr ""
+
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
 msgstr ""
 
 #: include/classes/data/CItemData.php:1802
@@ -13207,6 +13221,10 @@ msgstr ""
 msgid "Max zoom level"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr ""
@@ -14154,6 +14172,11 @@ msgstr ""
 
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
+msgstr ""
+
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
 msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400

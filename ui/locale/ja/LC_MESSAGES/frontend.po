@@ -551,6 +551,11 @@ msgstr "確認済障害イベント"
 msgid "Acknowledged RESOLVED events"
 msgstr "確認済の解決済イベント"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -1938,6 +1943,11 @@ msgstr "ブルガリア語 (bg_BG)"
 #: report2.php:195
 msgid "By host"
 msgstr "ホストごと"
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
 
 #: report2.php:196
 msgid "By trigger template"
@@ -5083,6 +5093,10 @@ msgstr "ログローテーションに対応したログの一致行数。整数
 #: include/classes/data/CItemData.php:886
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "ログの一致行数。整数値を返す。"
+
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
@@ -12977,6 +12991,10 @@ msgstr "最大繰り返し回数は、ディスカバリとwalkにのみ適用�
 msgid "Max zoom level"
 msgstr "最大ズームレベル"
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "OSがサポートしている最大ファイルオープン数。整数値を返す。"
@@ -13903,6 +13921,11 @@ msgstr "新規プロキシ"
 #: app/views/administration.regex.list.php:37
 msgid "New regular expression"
 msgstr "正規表現の作成"
+
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"

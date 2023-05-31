@@ -746,7 +746,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				|| $type == 'Database monitor') {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 255);
 
 			if ($authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -755,7 +755,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Password');
 			}
 			$this->zbxTestAssertVisibleId('password');
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 255);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);

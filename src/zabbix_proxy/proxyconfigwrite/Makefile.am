@@ -6,4 +6,6 @@ libzbxproxyconfigwrite_a_SOURCES = \
 	proxyconfig_write.c \
 	proxyconfig_write.h
 
-libzbxproxyconfigwrite_a_CFLAGS = -I$(top_srcdir)/src
+libzbxproxyconfigwrite_a_CFLAGS = \
+	-I$(top_srcdir)/src \
+	$(TLS_CFLAGS)

@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,7 +21,11 @@
 
 class CControllerScriptUpdate extends CController {
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
 			'scriptid' =>				'fatal|required|db scripts.scriptid',
 			'name' =>					'required|db scripts.name|not_empty',
@@ -42,50 +46,41 @@ class CControllerScriptUpdate extends CController {
 			'script' => 				'db scripts.command|flags '.P_CRLF,
 			'timeout' => 				'db scripts.timeout|time_unit '.implode(':', [1, SEC_PER_MIN]),
 			'url' => 					'db scripts.url',
-			'new_window' => 			'db scripts.new_window|in '.implode(',', [ZBX_SCRIPT_URL_NEW_WINDOW_NO, ZBX_SCRIPT_URL_NEW_WINDOW_YES]),
+			'new_window' => 			'db scripts.new_window|in '.ZBX_SCRIPT_URL_NEW_WINDOW_YES,
 			'description' =>			'db scripts.description',
 			'host_access' =>			'db scripts.host_access|in '.implode(',', [PERM_READ, PERM_READ_WRITE]),
 			'groupid' =>				'db scripts.groupid',
 			'usrgrpid' =>				'db scripts.usrgrpid',
 			'hgstype' =>				'in 0,1',
 			'confirmation' =>			'db scripts.confirmation|not_empty',
-			'enable_confirmation' =>	'in 1',
-			'form_refresh' =>			'int32'
+			'enable_confirmation' =>	'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			switch ($this->GetValidationError()) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect('zabbix.php?action=script.edit');
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update script'));
-					$this->setResponse($response);
-					break;
-
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'title' => _('Cannot update script'),
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				], JSON_THROW_ON_ERROR)])
+			);
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)) {
 			return false;
 		}
 
-		return (bool) API::Script()->get([
-			'output' => [],
-			'scriptids' => $this->getInput('scriptid'),
-			'editable' => true
-		]);
+		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$script = [];
 
 		$this->getInputs($script, ['scriptid', 'name', 'description', 'groupid']);
@@ -150,7 +145,9 @@ class CControllerScriptUpdate extends CController {
 
 				case ZBX_SCRIPT_TYPE_URL:
 					$script['url'] = $this->getInput('url', '');
-					$script['new_window'] = $this->getInput('new_window', ZBX_SCRIPT_URL_NEW_WINDOW_YES);
+					$script['new_window'] = $this->hasInput('new_window')
+						? ZBX_SCRIPT_URL_NEW_WINDOW_YES
+						: ZBX_SCRIPT_URL_NEW_WINDOW_NO;
 					break;
 		}
 
@@ -159,24 +156,22 @@ class CControllerScriptUpdate extends CController {
 		}
 
 		$result = (bool) API::Script()->update($script);
+		$output = [];
 
 		if ($result) {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'script.list')
-				->setArgument('page', CPagerHelper::loadPage('script.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('Script updated'));
+			$output['success']['title'] = _('Script updated');
+
+			if ($messages = get_and_clear_messages()) {
+				$output['success']['messages'] = array_column($messages, 'message');
+			}
 		}
 		else {
-			$response = new CControllerResponseRedirect((new CUrl('zabbix.php'))
-				->setArgument('action', 'script.edit')
-				->setArgument('scriptid', $this->getInput('scriptid'))
-			);
-			$response->setFormData($this->getInputAll());
-			CMessageHelper::setErrorTitle(_('Cannot update script'));
+			$output['error'] = [
+				'title' => _('Cannot update script'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

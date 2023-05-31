@@ -306,7 +306,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		36
 #define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
 #define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
-#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
+#define ZBX_PROCESS_TYPE_DISCOVERYMANAGER	39
+#define ZBX_PROCESS_TYPE_COUNT			40	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -378,7 +379,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
-#define DISCOVERER_DELAY	60
+#define DISCOVERER_DELAY	5
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 

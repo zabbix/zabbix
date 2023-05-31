@@ -189,10 +189,10 @@ class testFormConnectors extends CWebTest {
 				'maxlength' => '128'
 			],
 			'Username' => [
-				'maxlength' => '64'
+				'maxlength' => '255'
 			],
 			'Password' => [
-				'maxlength' => '64'
+				'maxlength' => '255'
 			],
 			'id:max_records' => [
 				'maxlength' => '10'
@@ -918,6 +918,14 @@ class testFormConnectors extends CWebTest {
 
 			$this->query('link', $data['fields']['Name'])->waitUntilClickable()->one()->click();
 			$form->invalidate();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$form->checkValue(['Advanced configuration' => false]);
+				$form->fill(['Advanced configuration' => true]);
+			}
+
 			$form->checkValue($data['fields']);
 			$dialog->close();
 		}
