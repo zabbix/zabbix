@@ -494,7 +494,7 @@ var hintBox = {
 			}
 		});
 
-		target.observer.observe(document.documentElement || document.body, {
+		target.observer.observe(document.body, {
 			attributes: true,
 			attributeFilter: ['style', 'class'],
 			subtree: true,
@@ -633,6 +633,16 @@ var hintBox = {
 			target.observer.disconnect();
 
 			delete target.observer;
+		}
+	},
+
+	deleteAll: () => {
+		for (let i = overlays_stack.length - 1; i >= 0; i--) {
+			const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+			if (overlay.type === 'hintbox') {
+				hintBox.deleteHint(overlay.element);
+			}
 		}
 	},
 

@@ -337,14 +337,7 @@ function PopUp(action, parameters, {
 	dialogue_class = '',
 	trigger_element = document.activeElement
 } = {}) {
-	// Close all hintboxes.
-	for (let i = overlays_stack.length - 1; i >= 0; i--) {
-		const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-		if (overlay.type === 'hintbox') {
-			hintBox.deleteHint(overlay.element);
-		}
-	}
+	hintBox.deleteAll();
 
 	let overlay = overlays_stack.getById(dialogueid);
 
@@ -879,9 +872,9 @@ function showHideVisible(obj) {
 }
 
 /**
- * Checks element visibility. Returns true, if element is visible. False otherwise.
+ * Check if element is visible.
  *
- * @param {Element} element  DOM element to check it's visibility.
+ * @param {Element} element
  *
  * @return {boolean}
  */
