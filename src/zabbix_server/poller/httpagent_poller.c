@@ -12,7 +12,6 @@
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
 
-
 typedef struct
 {
 
@@ -22,7 +21,7 @@ typedef struct
 	int			num;
 	int			config_timeout;
 	const char		*config_source_ip;
-	struct event		*add_items_timer;
+	struct event		*async_items_timer;
 }
 zbx_poller_config_t;
 typedef struct
@@ -92,7 +91,7 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 	return ret;
 }
 
-static void	add_items(evutil_socket_t fd, short events, void *arg)
+static void	async_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -233,7 +232,7 @@ static void	check_multi_info(void)
 				zbx_free_agent_result(&result);
 
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
-					event_active(context->item_context.poller_config->add_items_timer, 0, 0);
+					event_active(context->item_context.poller_config->async_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				httpagent_context_clean(context);
@@ -373,7 +372,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	struct event		*add_items_timer;
+	struct event		*async_items_timer;
 	struct timeval		tv = {1, 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -410,8 +409,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	poller_config.poller_type = poller_type;
 	poller_config.curl_handle = curl_handle;
 	poller_config.base = base;
-	add_items_timer = evtimer_new(base, add_items, &poller_config);
-	poller_config.add_items_timer = add_items_timer;
+	async_items_timer = evtimer_new(base, async_items, &poller_config);
+	poller_config.async_items_timer = async_items_timer;
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 
@@ -430,8 +429,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 					old_total_sec);
 		}
 
-		if (0 == evtimer_pending(add_items_timer, NULL))
-			evtimer_add(add_items_timer, &tv);
+		if (0 == evtimer_pending(async_items_timer, NULL))
+			evtimer_add(async_items_timer, &tv);
 
 		event_base_loop(base, EVLOOP_ONCE);
 
