@@ -51,6 +51,7 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.csvggraph.js');
@@ -186,22 +187,22 @@ if (count($data['dashboard']['pages']) > 1
 	$html_page
 		->addItem($dashboard)
 		->show();
-
-	(new CScriptTag('
-		view.init('.json_encode([
-			'host' => $data['host'],
-			'dashboard' => $data['dashboard'],
-			'widget_defaults' => $data['widget_defaults'],
-			'configuration_hash' => $data['configuration_hash'],
-			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode
-		]).');
-	'))
-		->setOnDocumentReady()
-		->show();
 }
 else {
 	$html_page
 		->addItem(new CTableInfo())
 		->show();
 }
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'host' => $data['host'],
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'configuration_hash' => $data['configuration_hash'],
+		'time_period' => $data['time_period'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

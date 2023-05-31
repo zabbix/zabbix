@@ -53,7 +53,7 @@ $condition_table = (new CTable())
 $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength('actions', 'formula')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $condition_hidden_data = (new CCol([
 	(new CButton(null, _('Remove')))

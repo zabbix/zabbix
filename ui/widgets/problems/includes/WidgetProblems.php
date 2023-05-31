@@ -99,7 +99,7 @@ class WidgetProblems extends CTableInfo {
 				($this->data['sortfield'] === 'name')
 					? [_x('Problem', 'compact table header'), $sort_div]
 					: _x('Problem', 'compact table header'),
-				' &bullet; ',
+				' ', BULLET(), ' ',
 				($this->data['sortfield'] === 'severity')
 					? [_x('Severity', 'compact table header'), $sort_div]
 					: _x('Severity', 'compact table header')

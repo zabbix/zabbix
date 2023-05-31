@@ -180,8 +180,8 @@ typedef zbx_uint32_t zbx_token_type_t;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, const zbx_variant_t *args,
-		void *data, const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
+typedef	int (*zbx_eval_function_cb_t)(const char *name, size_t len, int args_num, zbx_variant_t *args, void *data,
+		const zbx_timespec_t *ts, zbx_variant_t *value, char **error);
 
 typedef struct
 {
@@ -285,4 +285,6 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error);
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error);
+
+int	zbx_eval_var_vector_to_dbl(zbx_vector_var_t *input_vector, zbx_vector_dbl_t *output_vector, char **error);
 #endif

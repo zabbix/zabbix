@@ -457,16 +457,7 @@ class CEvent extends CApiService {
 
 		// filter
 		if (is_array($options['filter'])) {
-			$this->dbFilter('events e', $options, $sqlParts);
-
-			// Filter symptom events for given cause.
-			if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
-				zbx_value2array($options['filter']['cause_eventid']);
-
-				$sqlParts['from']['event_symptom'] = 'event_symptom es';
-				$sqlParts['where']['ese'] = 'es.eventid=e.eventid';
-				$sqlParts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
-			}
+			$this->applyFilters($options, $sqlParts);
 		}
 
 		// limit
@@ -529,6 +520,59 @@ class CEvent extends CApiService {
 		if (!$evaltype_validator->validate($options['evaltype'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
 		}
+	}
+
+	/**
+	 * Apply filter conditions to SQL built query.
+	 *
+	 * @param array $options
+	 * @param array $sql_parts
+	 *
+	 * $options = [
+	 *     'filter' => [
+	 *         'action' =>          (int)       Acknowledge action(s) that must be performed on filtered events.
+	 *         'action_userid' =>   (int)       User which has performed acknowledge action.
+	 *         'cause_eventid' =>   (array)     Cause eventids to filter by.
+	 *     ]
+	 * ]
+	 *
+	 * @return array
+	 */
+	protected function applyFilters($options, &$sql_parts): void {
+		// Acknowledge action filter properties.
+		$acknowledge_actions = [
+			'ack.eventid=e.eventid'
+		];
+
+		if (array_key_exists('action', $options['filter']) && ctype_xdigit((string) $options['filter']['action'])
+				&& $options['filter']['action'] != ZBX_PROBLEM_UPDATE_NONE) {
+			$acknowledge_actions[] = 'ack.action & '.$options['filter']['action'].'='.$options['filter']['action'];
+		}
+
+		if (array_key_exists('action_userid', $options['filter'])
+				&& zbx_ctype_digit($options['filter']['action_userid'])) {
+			$acknowledge_actions[] = dbConditionId('ack.userid', [$options['filter']['action_userid']]);
+		}
+
+		if (count($acknowledge_actions) > 1) {
+			$sql_parts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM acknowledges ack'.
+				' WHERE '.implode(' AND ', $acknowledge_actions).
+			')';
+		}
+
+		// Filter symptom events for given cause.
+		if (array_key_exists('cause_eventid', $options['filter']) && $options['filter']['cause_eventid'] !== null) {
+			zbx_value2array($options['filter']['cause_eventid']);
+
+			$sql_parts['from']['event_symptom'] = 'event_symptom es';
+			$sql_parts['where']['ese'] = 'es.eventid=e.eventid';
+			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
+		}
+
+		// Apply standard filter properties.
+		$this->dbFilter('events e', $options, $sql_parts);
 	}
 
 	/**

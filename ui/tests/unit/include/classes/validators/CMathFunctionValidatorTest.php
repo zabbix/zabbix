@@ -133,7 +133,9 @@ class CMathFunctionValidatorTest extends TestCase {
 
 			['count()', ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
 			['count(1)', ['rc' => true, 'error' => null]],
-			['count(1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
+			['count(1, 1)', ['rc' => true, 'error' => null]],
+			['count(1, 1, 1)', ['rc' => true, 'error' => null]],
+			['count(1, 1, 1, 1)', ['rc' => false, 'error' => 'invalid number of parameters in function "count"']],
 
 			['date()', ['rc' => true, 'error' => null]],
 			['date(1)', ['rc' => false, 'error' => 'invalid number of parameters in function "date"']],

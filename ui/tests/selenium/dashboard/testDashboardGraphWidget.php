@@ -2430,20 +2430,20 @@ class testDashboardGraphWidget extends CWebTest {
 			'Data set' => [
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'Available memory*',
+					'item' => 'Linux: Available memory*',
 					'Aggregation function' => 'avg',
 					'Aggregate' => 'Data set',
 					'Data set label' => '祝你今天過得愉快'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU guest*',
+					'item' => 'Linux: CPU guest*',
 					'Aggregation function' => 'max',
 					'Data set label' => 'Data set only'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU utilization',
+					'item' => 'Linux: CPU utilization',
 					'Aggregation function' => 'count',
 					'Aggregation interval' => '24h',
 					'Aggregate' => 'Data set'
@@ -2457,7 +2457,7 @@ class testDashboardGraphWidget extends CWebTest {
 				'Data set #3'
 			],
 			'Legend labels' => [
-				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: Linux: CPU guest nice time)', 'max(ЗАББИКС Сервер: Linux: CPU guest time)',
 				'Data set #3'
 			]
 		];

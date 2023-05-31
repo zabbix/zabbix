@@ -70,4 +70,6 @@ int	zbx_wildcard_match(const char *value, const char *wildcard);
 
 void	zbx_regexp_err_msg_free(const char *err_msg);
 
+void	zbx_init_regexp_env(void);
+
 #endif /* ZABBIX_ZBXREGEXP_H */

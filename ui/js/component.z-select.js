@@ -206,6 +206,13 @@ class ZSelect extends HTMLElement {
 					option.is_disabled = is_disabled;
 					li.toggleAttribute('disabled', is_disabled);
 				}
+			},
+			hidden: {
+				set: (is_hidden) => {
+					option.disabled = is_hidden;
+					is_hidden ? li.setAttribute('disabled', 'disabled') : li.removeAttribute('disabled');
+					li.style.display = is_hidden ? 'none' : '';
+				}
 			}
 		}));
 

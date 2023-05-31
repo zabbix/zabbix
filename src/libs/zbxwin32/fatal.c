@@ -106,16 +106,19 @@ static void	print_backtrace(CONTEXT *pctx)
 	SymGetLineFromAddrW64_func_t	zbx_SymGetLineFromAddrW64 = NULL;
 	SymFromAddr_func_t		zbx_SymFromAddr	= NULL;
 
-	CONTEXT			ctx, ctxcount;
-	STACKFRAME64		s, scount;
-	PSYMBOL_INFO		pSym = NULL;
-	HMODULE			hModule;
-	HANDLE			hProcess, hThread;
-	DWORD64			offset;
-	wchar_t			szProcessName[MAX_PATH];
-	char			*process_name = NULL, *process_path = NULL, *frame = NULL;
-	size_t			frame_alloc = 0, frame_offset;
-	int			nframes = 0;
+	CONTEXT		ctx, ctxcount;
+	STACKFRAME64	s, scount;
+	PSYMBOL_INFO	pSym = NULL;
+	HMODULE		hModule;
+	HANDLE		hProcess, hThread;
+	DWORD64		offset;
+	wchar_t		szProcessName[MAX_PATH];
+	char		*process_name = NULL, *process_path = NULL, *frame = NULL;
+	size_t		frame_alloc = 0, frame_offset;
+	int		nframes = 0;
+	char		*file_name;
+	char		path[MAX_PATH];
+	HMODULE		hm = NULL;
 
 	ctx = *pctx;
 
@@ -190,9 +193,9 @@ static void	print_backtrace(CONTEXT *pctx)
 
 	while (TRUE == StackWalk64(ZBX_IMAGE_FILE_MACHINE, hProcess, hThread, &s, &ctx, NULL, NULL, NULL, NULL))
 	{
+		file_name = process_name;
 		frame_offset = 0;
-		zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%d: %s", nframes--,
-				NULL == process_name ? "(unknown)" : process_name);
+		*path = '\0';
 
 		if (NULL != pSym)
 		{
@@ -203,7 +206,22 @@ static void	print_backtrace(CONTEXT *pctx)
 			if (NULL != zbx_SymFromAddr &&
 					TRUE == zbx_SymFromAddr(hProcess, s.AddrPC.Offset, &offset, pSym))
 			{
-				zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%s+0x%lx", pSym->Name, offset);
+#ifdef _M_X64
+				zbx_uint64_t address = s.AddrPC.Offset;
+#else
+				zbx_uint32_t address = s.AddrPC.Offset;
+#endif
+
+				if (0 != GetModuleHandleExA(
+						GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+						GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+						(LPCSTR) address, &hm))
+				{
+					if (0 != GetModuleFileNameA(hm, path, sizeof(path)))
+						file_name = path;
+				}
+				zbx_snprintf_alloc(&frame, &frame_alloc, &frame_offset, "%s+0x%lx",
+						pSym->Name, offset);
 			}
 
 			if (NULL != zbx_SymGetLineFromAddrW64 && TRUE == zbx_SymGetLineFromAddrW64(hProcess,
@@ -215,7 +233,8 @@ static void	print_backtrace(CONTEXT *pctx)
 			zbx_chrcpy_alloc(&frame, &frame_alloc, &frame_offset, ')');
 		}
 
-		zabbix_log(LOG_LEVEL_CRIT, "%s [0x%lx]", frame, s.AddrPC.Offset);
+		zabbix_log(LOG_LEVEL_CRIT, "%d: %s%s [0x%lx]",
+				nframes--, NULL == file_name ? "(unknown)" : file_name, frame, s.AddrPC.Offset);
 
 		if (0 == s.AddrReturn.Offset)
 			break;
@@ -236,15 +255,29 @@ void	zbx_init_library_win32(zbx_get_progname_f get_progname)
 	get_progname_cb = get_progname;
 }
 
-int	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep)
+static void	zbx_win_exception_filter(struct _EXCEPTION_POINTERS *ep, const char *msg)
 {
-	zabbix_log(LOG_LEVEL_CRIT, "Unhandled exception %x detected at 0x%p. Crashing ...",
-			ep->ExceptionRecord->ExceptionCode, ep->ExceptionRecord->ExceptionAddress);
+	zabbix_log(LOG_LEVEL_CRIT, msg, ep->ExceptionRecord->ExceptionCode, ep->ExceptionRecord->ExceptionAddress);
 
 	print_fatal_info(ep->ContextRecord);
 	print_backtrace(ep->ContextRecord);
 
 	zabbix_log(LOG_LEVEL_CRIT, "================================");
+}
+
+LONG	zbx_win_seh_handler(struct _EXCEPTION_POINTERS *ep)
+{
+	zbx_win_exception_filter(ep, "Unhandled exception %x detected at 0x%p. Crashing ...");
 
 	return EXCEPTION_CONTINUE_SEARCH;
 }
+
+#ifdef _M_X64
+LONG	zbx_win_veh_handler(struct _EXCEPTION_POINTERS *ep)
+{
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+		zbx_win_exception_filter(ep, "VEH Trap detected exception %x at 0x%p. Exception information:");
+
+	return EXCEPTION_CONTINUE_SEARCH;
+}
+#endif /* _M_X64 */

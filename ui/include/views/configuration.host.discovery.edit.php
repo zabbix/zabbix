@@ -206,7 +206,7 @@ $item_tab
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -363,7 +363,7 @@ $item_tab
 						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -595,8 +595,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
-		(new CFormField((new CTextBox('username', $data['username'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('username', $data['username'], false, DB::getFieldLength('items', 'username')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-username-field')
 	])
@@ -620,8 +620,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
-		(new CFormField((new CTextBox('password', $data['password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('password', $data['password'], false, DB::getFieldLength('items', 'password')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-password-field')
 	])
@@ -763,7 +763,7 @@ $condition_tab->addItem([
 			(new CTextBox('formula', $data['formula']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('formula')
-				->setAttribute('placeholder', 'A or (B and C) &hellip;')
+				->setAttribute('placeholder', 'A or (B and C) ...')
 		]))
 			->addClass(ZBX_STYLE_CELL)
 			->addClass(ZBX_STYLE_CELL_EXPRESSION)

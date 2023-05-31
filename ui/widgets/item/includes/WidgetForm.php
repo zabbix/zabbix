@@ -114,9 +114,6 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
-			)
-			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
 					->setDefault('{ITEM.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)

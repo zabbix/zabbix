@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libconnector.a
 
+libconnector_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libconnector_a_SOURCES = \
 	connector_manager.c \
 	connector_manager.h \
