@@ -321,17 +321,11 @@ class testPageSearch extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 
-		// Do not search if the search field is empty.
-		$form->query('id:search')->one()->fill('');
-		$form->submit();
-		$this->page->assertTitle('Dashboard');
-		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-
-		// Do not search if search string consists only of whitespace characters.
-		$form->query('id:search')->one()->fill('   ');
-		$form->submit();
-		$this->page->assertTitle('Dashboard');
-		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
+		foreach (['', '   '] as $search_string) {
+			$form->query('id:search')->one()->fill($search_string);
+			$form->submit();
+			$this->page->assertHeader('Global view');
+		}
 	}
 
 	/**
