@@ -141,9 +141,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'a',
-					'hosts_count' => 37,
-					'host_groups_count' => 28,
-					'templates_count' => 234
+					'count_from_db' => true
 				]
 			],
 			[
@@ -156,7 +154,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '127.0.0.1',
-					'hosts_count' => 44
+					'count_from_db' => true
 				]
 			],
 			[
@@ -192,6 +190,20 @@ class testPageSearch extends CWebTest {
 			]
 		];
 
+		// Get expected result count from DB.
+		if (CTestArrayHelper::get($data, 'count_from_db')) {
+			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
+			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
+			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
+				'WHERE h.status=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
+				'OR i.dns LIKE \'%'.$data['search_string'].'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
+
+			$db_count = [];
+			foreach (['hosts' => $host_sql, 'host_groups' => $hostgroup_sql, 'templates' => $template_sql] as $type => $sql) {
+				$db_count[$type] = CDBHelper::getCount($sql);
+			}
+		}
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($data['search_string']);
@@ -218,6 +230,9 @@ class testPageSearch extends CWebTest {
 			}
 			elseif (isset($data[$wp['key'].'_count'])) {
 				$expected_count = $data[$wp['key'].'_count'];
+			}
+			elseif (CTestArrayHelper::get($data, 'count_from_db', false)) {
+				$expected_count = $db_count[$wp['key']];
 			}
 			else {
 				$this->assertTableData(null, $widget_selector.'//table');
