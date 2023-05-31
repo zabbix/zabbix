@@ -11,6 +11,7 @@
 #include "zbxnix.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
+#include "zbxtypes.h"
 
 typedef struct
 {
@@ -58,6 +59,8 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 	char			*error = NULL;
 	int			ret;
 	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
+	CURLcode		err;
+	CURLMcode		merr;
 
 	httpagent_context_create(httpagent_context);
 
@@ -71,24 +74,41 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 	item->posts = NULL;
 
 	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method, item->url,
-			item->query_fields, item->headers, httpagent_context->item_context.posts, item->retrieve_mode, item->http_proxy,
-			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
-			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
-			item->password, NULL, item->post_type, item->output_format, poller_config->config_source_ip,
-			&error)))
+			item->query_fields, item->headers, httpagent_context->item_context.posts, item->retrieve_mode,
+			item->http_proxy, item->follow_redirects, item->timeout, 1, item->ssl_cert_file,
+			item->ssl_key_file, item->ssl_key_password, item->verify_peer, item->verify_host,
+			item->authtype, item->username, item->password, NULL, item->post_type, item->output_format,
+			poller_config->config_source_ip, &error)))
 	{
 		SET_MSG_RESULT(result, error);
-		error = NULL;
-		httpagent_context_clean(httpagent_context);
-		zbx_free(httpagent_context);
 
-		return ret;
+		goto fail;
 	}
 
-	curl_easy_setopt(httpagent_context->http_context.easyhandle, CURLOPT_PRIVATE, httpagent_context);
-	curl_multi_add_handle(poller_config->curl_handle, httpagent_context->http_context.easyhandle);
+	if (CURLE_OK != (err = curl_easy_setopt(httpagent_context->http_context.easyhandle, CURLOPT_PRIVATE,
+			httpagent_context)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set pointer to private data: %s",
+				curl_easy_strerror(err)));
 
-	return ret;
+		goto fail;
+	}
+
+	if (CURLE_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
+			httpagent_context->http_context.easyhandle)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot add a standard curl handle to the multi stack: %s",
+				curl_multi_strerror(merr)));
+
+		goto fail;
+	}
+
+	return SUCCEED;
+fail:
+	httpagent_context_clean(httpagent_context);
+	zbx_free(httpagent_context);
+
+	return NOTSUPPORTED;
 }
 
 static void	async_items(evutil_socket_t fd, short events, void *arg)
@@ -122,15 +142,10 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		if (SUCCEED == errcodes[i])
+		if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
-			continue;
-		}
-		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
-		{
-			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &timespec, items[i].state, results[i].msg);
+					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
 
 			zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1,
 					poller_config->poller_type, &nextcheck);
