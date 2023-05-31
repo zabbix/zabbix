@@ -437,7 +437,7 @@ static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_threa
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}	
+}
 
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 {
