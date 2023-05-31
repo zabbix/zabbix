@@ -1115,7 +1115,7 @@ class CLineGraphDraw extends CGraphDraw {
 		// Calculate standard label width in time units.
 		$label_size = imageTextSize(7, 90, 'WWW')['width'] * $this->period / $this->sizeX * 2;
 
-		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX);
+		$preferred_sub_interval = (int) ($this->period * $this->cell_width / $this->sizeX) ?: 1;
 
 		foreach (['Y', 'm', 'd', 'H', 'i', 's'] as $magnitude) {
 			if (date($magnitude, $this->stime) !== date($magnitude, $this->stime + $this->period)) {
