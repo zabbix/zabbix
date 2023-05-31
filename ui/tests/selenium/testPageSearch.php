@@ -23,10 +23,6 @@ use Facebook\WebDriver\Exception\TimeoutException;
 require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
-define('HOST_WIDGET', ['id' => 'search_hosts_widget', 'title' => 'Hosts']);
-define('HOST_GROUP_WIDGET', ['id' => 'search_hostgroup_widget', 'title' => 'Host groups']);
-define('TEMPLATE_WIDGET', ['id' => 'search_templates_widget', 'title' => 'Templates']);
-
 /**
  * @backup hosts
  *
@@ -91,116 +87,82 @@ class testPageSearch extends CWebTest {
 		return [
 			[
 				[
-					'search_string' => 'Non-existent host',
-					'host_expected_count' => 0,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'search_string' => 'Non-existent host'
 				]
 			],
 			[
 				[
 					'search_string' => 'ЗАББИКС Сервер',
-					'host_expected_data' => [['Host' => 'ЗАББИКС Сервер'], ['IP' => '127.0.0.1'], ['DNS' => '']],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => 'ЗАББИКС Сервер', 'IP' => '127.0.0.1', 'DNS' => '']]
 				]
 			],
 			[
 				[
 					'search_string' => 'Zabbix servers',
-					'host_expected_count' => 0,
-					'hgroup_expected_data' => [['Host group' => 'Zabbix servers']],
-					'hgroup_expected_count' => 1,
-					'template_expected_count' => 0
+					'host_groups' => [['Host group' => 'Zabbix servers']]
 				]
 			],
 			[
 				[
 					'search_string' => 'Form test template',
-					'host_expected_count' => 0,
-					'hgroup_expected_count' => 0,
-					'template_expected_data' => [['Template' => 'Form test template']],
-					'template_expected_count' => 1
+					'templates' => [['Template' => 'Form test template']]
 				]
 			],
 			[
 				[
 					'search_string' => '⭐️',
-					'host_expected_data' => [['Host' => '🙂⭐️']],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => '🙂⭐️']]
 				]
 			],
 			[
 				[
 					'search_string' => 'emoji visible name',
-					'host_expected_data' => [['Host' => "🙂⭐️\n(emoji visible name)"]],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => "🙂⭐️\n(emoji visible name)"]]
 				]
 			],
 			[
 				[
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
-					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ"]]
 				]
 			],
 			[
 				[
 					'search_string' => 'ignore case',
-					'host_expected_data' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]]
 				]
 			],
 			[
 				[
 					'search_string' => STRING_128,
-					'host_expected_data' => [['Host' => STRING_128]],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => STRING_128]]
 				]
 			],
 			[
 				[
 					'search_string' => 'a',
-					'host_expected_count' => 37,
-					'hgroup_expected_count' => 28,
-					'template_expected_count' => 234
+					'hosts_count' => 37,
+					'host_groups_count' => 28,
+					'templates_count' => 234
 				]
 			],
 			[
 				[
 					'search_string' => '99.99.99.99',
-					'host_expected_data' => [['Host' => '🙂⭐️'], ['IP' => '99.99.99.99'], ['DNS' => '']],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => '🙂⭐️', 'IP' => '99.99.99.99', 'DNS' => '']]
+
 				]
 			],
 			[
 				[
 					'search_string' => '127.0.0.1',
-					'host_expected_count' => 44,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts_count' => 44
 				]
 			],
 			[
 				[
 					'search_string' => 'testdns.example.com',
-					'host_expected_data' => [['Host' => STRING_128], ['IP' => '127.0.0.1'], ['DNS' => 'testdns.example.com']],
-					'host_expected_count' => 1,
-					'hgroup_expected_count' => 0,
-					'template_expected_count' => 0
+					'hosts' => [['Host' => STRING_128, 'IP' => '127.0.0.1', 'DNS' => 'testdns.example.com']]
 				]
 			]
 		];
@@ -212,6 +174,24 @@ class testPageSearch extends CWebTest {
 	 * @dataProvider getSearchData
 	 */
 	public function testPageSearch_VerifyResults($data) {
+		static $allWidgetParams = [
+			'hosts' => [
+				'key' => 'hosts',
+				'selector_id' => 'search_hosts_widget',
+				'title' => 'Hosts'
+			],
+			'hostgroups' => [
+				'key' => 'host_groups',
+				'selector_id' => 'search_hostgroup_widget',
+				'title' => 'Host groups'
+			],
+			'templates' => [
+				'key' => 'templates',
+				'selector_id' => 'search_templates_widget',
+				'title' => 'Templates'
+			]
+		];
+
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($data['search_string']);
@@ -220,9 +200,28 @@ class testPageSearch extends CWebTest {
 		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
-		$this->verifySearchResultWidget(HOST_WIDGET, $data['host_expected_data'] ?? null, $data['host_expected_count'] ?? null);
-		$this->verifySearchResultWidget(HOST_GROUP_WIDGET, $data['hgroup_expected_data'] ?? null, $data['hgroup_expected_count'] ?? null);
-		$this->verifySearchResultWidget(TEMPLATE_WIDGET, $data['template_expected_data'] ?? null, $data['template_expected_count'] ?? null);
+		// Verify each widget type.
+		foreach ($allWidgetParams as $wp) {
+			$widgetSelector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
+			$widget = $this->query($widgetSelector)->one();
+			$this->assertEquals($wp['title'],	$widget->query('xpath:.//h4')->one()->getText());
+
+			$expectedCount = 0;
+			if (isset($data[$wp['key']])) {
+				$this->assertTableHasData($data[$wp['key']],$widgetSelector.'//table');
+				$expectedCount = count($data[$wp['key']]);
+			}
+			elseif (isset($data[$wp['key'].'_count'])) {
+				$expectedCount = $data[$wp['key'].'_count'];
+			}
+			$footerText =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
+
+			if ($expectedCount === 0) {
+				$tableText = $widget->query('xpath:.//table//td')->one()->getText();
+				$this->assertEquals('No data found.', $tableText);
+			}
+		}
 	}
 
 	public static function getSuggestionsData()
@@ -355,34 +354,6 @@ class testPageSearch extends CWebTest {
 		$form->submit();
 		$this->page->assertTitle('Dashboard');
 		$this->assertEquals('Global view', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-	}
-
-	/**
-	 * Asserts that a Search result widget contains the expected values.
-	 *
-	 * @param $widgetParams			array of witget parameters
-	 * @param $expectedTableData	expected table data as an array or a string
-	 * @param $expectedCount		expected total count at the footer
-	 */
-	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
-		$widgetSelector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']';
-		$widget = $this->query($widgetSelector)->one();
-		$this->assertEquals($widgetParams['title'],	$widget->query('xpath:.//h4')->one()->getText());
-
-		// Check table data or that the 'No data found' string is present.
-		if (isset($expectedTableData)) {
-			$this->assertTableHasData($expectedTableData,$widgetSelector.'//table');
-		}
-		elseif ($expectedCount === 0) {
-			$tableText = $widget->query('xpath:.//table//td')->one()->getText();
-			$this->assertEquals('No data found.', $tableText);
-		}
-
-		// Check shown and total count display.
-		if ($expectedCount !== null) {
-			$footerText =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
-			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
-		}
 	}
 
 	/**
