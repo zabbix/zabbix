@@ -351,18 +351,18 @@ function PopUp(action, parameters, {
 		});
 	}
 
+	// Close all hintboxes.
+	for (let i = overlays_stack.length - 1; i >= 0; i--) {
+		const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+		if (overlay.type === 'hintbox') {
+			hintBox.deleteHint(overlay.element);
+		}
+	}
+
 	overlay
 		.load(action, parameters)
 		.then(function(resp) {
-			// Close all hintboxes.
-			for (let i = overlays_stack.length - 1; i >= 0; i--) {
-				const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-				if (overlay.type === 'hintbox') {
-					hintBox.deleteHint(overlay.element);
-				}
-			}
-
 			if (typeof resp.errors !== 'undefined') {
 				overlay.setProperties({
 					content: resp.errors
@@ -881,12 +881,12 @@ function showHideVisible(obj) {
 /**
  * Checks element visibility. Returns true, if element is visible. False otherwise.
  *
- * @param {node} element  DOM element to check it's visibility.
+ * @param {Element} element  DOM element to check it's visibility.
  *
- * @return {bool}
+ * @return {boolean}
  */
 function isVisible(element) {
-	return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
 }
 
 /**
