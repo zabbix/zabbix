@@ -300,7 +300,7 @@ class testPageSearch extends CWebTest {
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 		$form->query('id:search')->one()->fill($data['search_string']);
 
-		$itemSelector = 'xpath://*[@class="search-suggest"]//li';
+		$itemSelector = 'xpath://ul[@class="search-suggest"]//li';
 
 		// Verify suggestions.
 		if (isset($data['expected_suggestions'])) {
@@ -365,21 +365,22 @@ class testPageSearch extends CWebTest {
 	 * @param $expectedCount		expected total count at the footer
 	 */
 	private function verifySearchResultWidget($widgetParams, $expectedTableData, $expectedCount) {
-		$this->assertEquals($widgetParams['title'],
-			$this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//h4')->one()->getText());
+		$widgetSelector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']';
+		$widget = $this->query($widgetSelector)->one();
+		$this->assertEquals($widgetParams['title'],	$widget->query('xpath:.//h4')->one()->getText());
 
 		// Check table data or that the 'No data found' string is present.
 		if (isset($expectedTableData)) {
-			$this->assertTableHasData($expectedTableData,'xpath://div[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//table');
+			$this->assertTableHasData($expectedTableData,$widgetSelector.'//table');
 		}
 		elseif ($expectedCount === 0) {
-			$tableText = $this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//td')->one()->getText();
+			$tableText = $widget->query('xpath:.//table//td')->one()->getText();
 			$this->assertEquals('No data found.', $tableText);
 		}
 
 		// Check shown and total count display.
 		if ($expectedCount !== null) {
-			$footerText = $this->query('xpath://*[@id='.CXPathHelper::escapeQuotes($widgetParams['id']).']//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$footerText =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.(min($expectedCount, 100)).' of '.$expectedCount.' found', $footerText);
 		}
 	}
