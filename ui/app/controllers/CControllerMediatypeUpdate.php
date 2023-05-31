@@ -169,6 +169,7 @@ class CControllerMediatypeUpdate extends CController {
 				];
 
 				$parameters = $this->getInput('parameters_webhook', []);
+				$mediatype['parameters'] = [];
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
 					$mediatype['parameters'] = array_map(function ($name, $value) {
