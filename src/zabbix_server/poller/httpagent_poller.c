@@ -19,7 +19,9 @@ typedef struct
 	unsigned char		poller_type;
 	CURLM			*curl_handle;
 	struct event_base	*base;
-	int			num;
+	int			processed;
+	int			queued;
+	int			processing;
 	int			config_timeout;
 	const char		*config_source_ip;
 	struct event		*async_items_timer;
@@ -103,6 +105,7 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 		goto fail;
 	}
 
+	poller_config->processing++;
 	return SUCCEED;
 fail:
 	httpagent_context_clean(httpagent_context);
@@ -114,8 +117,8 @@ fail:
 static void	async_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
-	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
-	int			errcodes[ZBX_MAX_POLLER_ITEMS];
+	AGENT_RESULT		results[ZBX_MAX_HTTPAGENT_ITEMS];
+	int			errcodes[ZBX_MAX_HTTPAGENT_ITEMS];
 	zbx_timespec_t		timespec;
 	int			i, num;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
@@ -161,7 +164,7 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 exit:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
-	poller_config->num += num;
+	poller_config->queued += num;
 }
 
 struct event_base	*base;
@@ -249,6 +252,8 @@ static void	check_multi_info(void)
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
 					event_active(context->item_context.poller_config->async_items_timer, 0, 0);
 
+				context->item_context.poller_config->processing--;
+				context->item_context.poller_config->processed++;
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				httpagent_context_clean(context);
 				zbx_free(context);
@@ -378,8 +383,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	int			nextcheck = 0, sleeptime = -1, processed = 0, old_processed = 0;
-	double			sec, total_sec = 0.0, old_total_sec = 0.0;
+	double			sec, total_sec = 0.0;
 	time_t			last_stat_time;
 	unsigned char		poller_type;
 	zbx_ipc_async_socket_t	rtc;
@@ -389,6 +393,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	struct event		*async_items_timer;
 	struct timeval		tv = {1, 0};
+	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -417,8 +422,6 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket);
 	curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout);
 
-	zbx_poller_config_t	poller_config;
-
 	poller_config.config_source_ip = poller_args_in->config_comms->config_source_ip;
 	poller_config.config_timeout = poller_args_in->config_comms->config_timeout;
 	poller_config.poller_type = poller_type;
@@ -433,46 +436,31 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+		struct timeval	tv_pending;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (0 != sleeptime)
-		{
-			zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
-					get_process_type_string(process_type), process_num, old_processed,
-					old_total_sec);
-		}
-
-		if (0 == evtimer_pending(async_items_timer, NULL))
+		if (0 == evtimer_pending(async_items_timer, &tv_pending))
 			evtimer_add(async_items_timer, &tv);
 
 		event_base_loop(base, EVLOOP_ONCE);
 
-		sleeptime = 0;
 		total_sec += zbx_time() - sec;
 
-		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
+		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
-			if (0 == sleeptime)
-			{
-				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, getting values]",
-					get_process_type_string(process_type), process_num, processed, total_sec);
-			}
-			else
-			{
-				zbx_setproctitle("%s #%d [got %d values in " ZBX_FS_DBL " sec, idle %d sec]",
-					get_process_type_string(process_type), process_num, processed, total_sec,
-					sleeptime);
-				old_processed = processed;
-				old_total_sec = total_sec;
-			}
-			processed = 0;
+			zbx_setproctitle("%s #%d [got %d values, queued %d in " ZBX_FS_DBL " sec]",
+				get_process_type_string(process_type), process_num, poller_config.processed,
+				poller_config.queued, total_sec);
+			
+			poller_config.processed = 0;
+			poller_config.queued = 0;
 			total_sec = 0.0;
 			last_stat_time = time(NULL);
 		}
 
-		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
+		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
