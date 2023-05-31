@@ -879,6 +879,17 @@ function showHideVisible(obj) {
 }
 
 /**
+ * Checks element visibility. Returns true, if element is visible. False otherwise.
+ *
+ * @param {node} element  DOM element to check it's visibility.
+ *
+ * @return {bool}
+ */
+function isVisible(element) {
+	return !!(element.offsetWidth || element.offsetHeight || element.getClientRects().length);
+}
+
+/**
  * Switch element classes and return final class.
  *
  * @param object|string obj			object or object id

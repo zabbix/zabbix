@@ -490,7 +490,7 @@ var hintBox = {
 			const node = target instanceof Node ? target : target[0];
 			const body = document.documentElement || document.body;
 
-			if (!body.contains(node) || !$(node).is(':visible')) {
+			if (!body.contains(node) || !isVisible(node)) {
 				hintBox.deleteHint(target);
 			}
 		});
