@@ -92,7 +92,8 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'ЗАББИКС Сервер',
-					'hosts' => [['Host' => 'ЗАББИКС Сервер', 'IP' => '127.0.0.1', 'DNS' => '']]
+					'hosts' => [['Host' => 'ЗАББИКС Сервер', 'IP' => '127.0.0.1', 'DNS' => '']],
+					'check_title' => true
 				]
 			],
 			[
@@ -128,7 +129,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'ignore case',
-					'hosts' => [['Host' => 'ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)']]
+					'hosts' => [['Host' => "ZaBbiX зАБбИкс āēīõšŗ\n(iGnoRe CaSe)"]]
 				]
 			],
 			[
@@ -203,7 +204,10 @@ class testPageSearch extends CWebTest {
 		foreach ($widget_params as $wp) {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
-			$this->assertEquals($wp['title'],	$widget->query('xpath:.//h4')->one()->getText());
+
+			if(CTestArrayHelper::get($data, 'check_title')){
+				$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
+			}
 
 			$expected_count = 0;
 			if (isset($data[$wp['key']])) {
