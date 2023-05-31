@@ -1277,7 +1277,7 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 Bug fixes:
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for Jenkins template (egordymov)
-.........T [ZBX-21910] fixed JavaScri[t in Kubernetes nodes template (egordymov)
+.........T [ZBX-21910] fixed JavaScript in Kubernetes nodes template (egordymov)
 ........S. [ZBX-22773] made NodeAddress use ListenIP and ListenPort if not specified (kprutkovs)
 .......PS. [ZBX-21613] fixed broken database upgrade if more than one Zabbix server at the same time on one database is started (vso)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
