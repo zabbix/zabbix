@@ -299,36 +299,18 @@ class testPageSearch extends CWebTest {
 
 		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
 
-		// Verify suggestion total count.
-		$expected_count = $data['expected_count'] ?? count($data['expected_suggestions']);
-		if ($expected_count > 0) {
-			$this->assertEquals($expected_count, $this->query($item_selector)->waitUntilVisible()->all()->count());
-		}
-		else {
-			$this->verifyThatSuggestionsNotShow();
-		}
-
-		// Verify suggestions.
+		// Verify suggestions or the total count of suggestions.
 		if (isset($data['expected_suggestions'])) {
 			if (count($data['expected_suggestions']) > 0) {
 				$items = $this->query($item_selector)->waitUntilVisible()->all()->asText();
-				foreach ($items as $item) {
-					if (in_array($item, $data['expected_suggestions'])) {
-						// Remove item from the expected result array.
-						unset($data['expected_suggestions'][array_search($item, $data['expected_suggestions'])]);
-					}
-					else {
-						throw new Exception("Unexpected search suggestion: ".$item);
-					}
-				}
-				if (count($data['expected_suggestions']) > 0) {
-					throw new Exception("Not all expected search suggestions shown. Missing: ".
-						implode(', ', $data['expected_suggestions']));
-				}
+				$this->assertEquals($data['expected_suggestions'], array_values($items));
 			}
 			else {
 				$this->verifyThatSuggestionsNotShow();
 			}
+		}
+		else {
+			$this->assertEquals($data['expected_count'], $this->query($item_selector)->waitUntilVisible()->all()->count());
 		}
 	}
 
