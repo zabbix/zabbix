@@ -43,14 +43,24 @@ typedef struct
 }
 zbx_httpagent_context;
 
-static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result,
-		CURLM *curl_handle, zbx_poller_config_t	*poller_config)
+static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
+{
+	zbx_http_context_create(&httpagent_context->http_context);
+}
+
+static void	httpagent_context_clean(zbx_httpagent_context *httpagent_context)
+{
+	zbx_free(httpagent_context->item_context.posts);
+	zbx_http_context_destroy(&httpagent_context->http_context);
+}
+
+static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
 {
 	char			*error = NULL;
-	int			ret = NOTSUPPORTED;
+	int			ret;
 	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
 
-	zbx_http_context_create(&httpagent_context->http_context);
+	httpagent_context_create(httpagent_context);
 
 	httpagent_context->item_context.poller_config = poller_config;
 	httpagent_context->item_context.itemid = item->itemid;
@@ -65,18 +75,19 @@ static int	get_context_http(zbx_dc_item_t *item, const char *config_source_ip, A
 			item->query_fields, item->headers, httpagent_context->item_context.posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
-			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error)))
+			item->password, NULL, item->post_type, item->output_format, poller_config->config_source_ip,
+			&error)))
 	{
 		SET_MSG_RESULT(result, error);
 		error = NULL;
-		zbx_http_context_destroy(&httpagent_context->http_context);
+		httpagent_context_clean(httpagent_context);
 		zbx_free(httpagent_context);
 
 		return ret;
 	}
 
 	curl_easy_setopt(httpagent_context->http_context.easyhandle, CURLOPT_PRIVATE, httpagent_context);
-	curl_multi_add_handle(curl_handle, httpagent_context->http_context.easyhandle);
+	curl_multi_add_handle(poller_config->curl_handle, httpagent_context->http_context.easyhandle);
 
 	return ret;
 }
@@ -105,13 +116,7 @@ static void	add_items(evutil_socket_t fd, short events, void *arg)
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 
 	for (i = 0; i < num; i++)
-	{
-		if (SUCCEED != (errcodes[i] = get_context_http(&items[i], poller_config->config_source_ip, &results[i],
-				poller_config->curl_handle, poller_config)))
-		{
-			continue;
-		}
-	}
+		errcodes[i] = async_httpagent_add(&items[i], &results[i], poller_config);
 
 	zbx_timespec(&timespec);
 
@@ -231,8 +236,7 @@ static void	check_multi_info(void)
 					event_active(context->item_context.poller_config->add_items_timer, 0, 0);
 
 				curl_multi_remove_handle(curl_handle, easy_handle);
-				zbx_http_context_destroy(&context->http_context);
-				zbx_free(context->item_context.posts);
+				httpagent_context_clean(context);
 				zbx_free(context);
 				break;
 			default:
