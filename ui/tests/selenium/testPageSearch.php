@@ -234,8 +234,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'Non-existent host',
-					'expected_suggestions' => [],
-					'expected_count' => 0
+					'expected_suggestions' => []
 				]
 			],
 			[
@@ -246,8 +245,7 @@ class testPageSearch extends CWebTest {
 						'Template inheritance test host',
 						'Visible host for template linkage',
 						'ЗАББИКС Сервер'
-					],
-					'expected_count' => 4
+					]
 				]
 			],
 			[
@@ -265,29 +263,25 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '⭐️',
-					'expected_suggestions' => ['🙂⭐️'],
-					'expected_count' => 1
+					'expected_suggestions' => ['🙂⭐️']
 				]
 			],
 			[
 				[
 					'search_string' => 'ignore case',
-					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
-					'expected_count' => 1
+					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ']
 				]
 			],
 			[
 				[
 					'search_string' => 'ZABBIX ЗАББИКС ĀĒĪÕŠŖ',
-					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ'],
-					'expected_count' => 1
+					'expected_suggestions' => ['ZaBbiX зАБбИкс āēīõšŗ']
 				]
 			],
 			[
 				[
 					'search_string' => STRING_128,
-					'expected_suggestions' => [STRING_128],
-					'expected_count' => 1
+					'expected_suggestions' => [STRING_128]
 				]
 			]
 		];
@@ -304,6 +298,15 @@ class testPageSearch extends CWebTest {
 		$form->query('id:search')->one()->fill($data['search_string']);
 
 		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
+
+		// Verify suggestion total count.
+		$expected_count = $data['expected_count'] ?? count($data['expected_suggestions']);
+		if ($expected_count > 0) {
+			$this->assertEquals($expected_count, $this->query($item_selector)->waitUntilVisible()->all()->count());
+		}
+		else {
+			$this->verifyThatSuggestionsNotShow();
+		}
 
 		// Verify suggestions.
 		if (isset($data['expected_suggestions'])) {
@@ -327,17 +330,6 @@ class testPageSearch extends CWebTest {
 				$this->verifyThatSuggestionsNotShow();
 			}
 		}
-
-		// Verify suggestion total count.
-		if (isset($data['expected_count'])) {
-			if ($data['expected_count'] > 0) {
-				$this->assertEquals($data['expected_count'], $this->query($item_selector)->waitUntilVisible()->all()->count());
-			}
-			else {
-				$this->verifyThatSuggestionsNotShow();
-			}
-		}
-
 	}
 
 	/**
