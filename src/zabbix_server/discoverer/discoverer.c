@@ -1407,7 +1407,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGINT);
 
-	if (0 > (err = zbx_sigmask(SIG_BLOCK, &mask, NULL)))
+	if (0 > (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
 		zabbix_log(LOG_LEVEL_WARNING, "cannot block the signals: %s", zbx_strerror(err));
 
 	zbx_init_icmpping_env(get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
