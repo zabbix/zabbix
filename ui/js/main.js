@@ -487,10 +487,9 @@ var hintBox = {
 		jQuery(appendTo).append(box);
 
 		target.observer = new MutationObserver(() => {
-			const node = target instanceof Node ? target : target[0];
-			const body = document.documentElement || document.body;
+			const element = target instanceof jQuery ? target[0] : target;
 
-			if (!body.contains(node) || !isVisible(node)) {
+			if (!isVisible(element)) {
 				hintBox.deleteHint(target);
 			}
 		});

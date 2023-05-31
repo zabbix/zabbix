@@ -337,7 +337,16 @@ function PopUp(action, parameters, {
 	dialogue_class = '',
 	trigger_element = document.activeElement
 } = {}) {
-	var overlay = overlays_stack.getById(dialogueid);
+	// Close all hintboxes.
+	for (let i = overlays_stack.length - 1; i >= 0; i--) {
+		const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+		if (overlay.type === 'hintbox') {
+			hintBox.deleteHint(overlay.element);
+		}
+	}
+
+	let overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
@@ -349,15 +358,6 @@ function PopUp(action, parameters, {
 			element: trigger_element,
 			type: 'popup'
 		});
-	}
-
-	// Close all hintboxes.
-	for (let i = overlays_stack.length - 1; i >= 0; i--) {
-		const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-		if (overlay.type === 'hintbox') {
-			hintBox.deleteHint(overlay.element);
-		}
 	}
 
 	overlay
