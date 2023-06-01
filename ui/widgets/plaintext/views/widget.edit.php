@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['ms']['items']['itemids'])
+		new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['items']['itemids'])
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['style'])

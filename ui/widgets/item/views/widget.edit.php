@@ -32,7 +32,7 @@ $form = new CWidgetFormView($data);
 
 $form
 	->addField(
-		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['ms']['items']['itemid'])
+		new CWidgetFieldMultiSelectItemView($data['fields']['itemid'], $data['captions']['items']['itemid'])
 	)
 	->addField(
 		(new CWidgetFieldCheckBoxListView($data['fields']['show']))

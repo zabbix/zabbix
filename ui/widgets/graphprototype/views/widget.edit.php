@@ -32,13 +32,13 @@
 	)
 	->addField(array_key_exists('graphid', $data['fields'])
 		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'],
-			$data['captions']['ms']['graph_prototypes']['graphid']
+			$data['captions']['graph_prototypes']['graphid']
 		)
 		: null
 	)
 	->addField(array_key_exists('itemid', $data['fields'])
 		? new CWidgetFieldMultiSelectItemPrototypeView($data['fields']['itemid'],
-			$data['captions']['ms']['item_prototypes']['itemid']
+			$data['captions']['item_prototypes']['itemid']
 		)
 		: null
 	)

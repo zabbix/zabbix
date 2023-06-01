@@ -19,28 +19,13 @@
 **/
 
 
-/**
- * Geomap widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+namespace Zabbix\Widgets\Fields;
 
-$groupids = new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids']);
+class CWidgetFieldMultiSelectMap extends CWidgetFieldMultiSelect {
 
-(new CWidgetFormView($data))
-	->addField($groupids)
-	->addField(
-		(new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
-			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
-	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
-	)
-	->addField(
-		new CWidgetFieldTagsView($data['fields']['tags'])
-	)
-	->addField(
-		(new CWidgetFieldLatLngView($data['fields']['default_view']))->setPlaceholder('40.6892494,-74.0466891')
-	)
-	->show();
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+	}
+}
