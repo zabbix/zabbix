@@ -19,7 +19,6 @@
 
 #include "zbxdbhigh.h"
 
-#include "log.h"
 #include "zbxcacheconfig.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"

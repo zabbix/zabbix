@@ -20,7 +20,6 @@
 #include "zbxcacheconfig.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *

@@ -21,7 +21,6 @@
 #include "zbxserver.h"
 
 #include "../db_lengths.h"
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"

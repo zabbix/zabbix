@@ -21,7 +21,6 @@
 #include "module.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "zbxalgo.h"
 

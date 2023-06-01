@@ -19,7 +19,6 @@
 
 #include "checks_script.h"
 #include "zbxembed.h"
-#include "log.h"
 
 static zbx_es_t	es_engine;
 

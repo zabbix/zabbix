@@ -711,27 +711,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-void	__zbx_update_env(double time_now);
 
-#ifdef _WINDOWS
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	ZBX_UNUSED(info);				\
-}							\
-while (0)
-#else
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	zbx_prof_update(info, time_now);		\
-}							\
-while (0)
-#endif
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
@@ -783,5 +763,57 @@ static const type	get_##varname(void) \
 { \
 	return varname; \
 }
+
+#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
+#define LOG_LEVEL_CRIT		1
+#define LOG_LEVEL_ERR		2
+#define LOG_LEVEL_WARNING	3
+#define LOG_LEVEL_DEBUG		4
+#define LOG_LEVEL_TRACE		5
+
+#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
+
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_get_log_level() || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+
+#ifdef HAVE___VA_ARGS__
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, ...)									\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			zbx_log_handle(level, __VA_ARGS__);						\
+	}												\
+	while (0)
+#else
+#	define zabbix_log zbx_log_handle
+#endif
+
+typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
+
+void	zbx_init_library_common(zbx_log_func_t log_func);
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
+void	zbx_set_log_level(int level);
+const char	*zbx_get_log_component_name(void);
+
+#ifndef _WINDOWS
+void		zabbix_increase_log_level(void);
+void		zabbix_decrease_log_level(void);
+void		zabbix_report_log_level_change(void);
+const char	*zabbix_get_log_level_string(void);
+
+typedef struct
+{
+	int		level;
+	const char	*name;
+}
+zbx_log_component_t;
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+#endif
 
 #endif
