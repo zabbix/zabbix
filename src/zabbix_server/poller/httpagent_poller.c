@@ -226,10 +226,10 @@ static void	check_multi_info(void)
 				else
 				{
 					SET_MSG_RESULT(&result, error);
-					zbx_preprocess_item_value(context->item_context.itemid, 
-						context->item_context.hostid,
-						context->item_context.value_type, context->item_context.flags,
-						NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+					zbx_preprocess_item_value(context->item_context.itemid,
+							context->item_context.hostid,
+							context->item_context.value_type, context->item_context.flags,
+							NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
 				}
 
 				zbx_free_agent_result(&result);
