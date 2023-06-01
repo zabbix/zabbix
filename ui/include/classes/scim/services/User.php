@@ -257,8 +257,6 @@ class User extends ScimApiService {
 
 		$this->addScimUserAttributes($user, $options);
 
-		$user[] = ['userid' => $db_user['userid']];
-
 		return $user;
 	}
 
@@ -373,8 +371,6 @@ class User extends ScimApiService {
 		$user = $user ?: $new_user_data;
 
 		$this->addScimUserAttributes($user, $user_idp_data);
-
-		$user[] = ['userid' => $db_user['userid']];
 
 		return $user;
 	}
