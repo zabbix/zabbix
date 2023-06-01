@@ -275,3 +275,22 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 
 	return ret;
 }
+
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case ZBX_CONDITION_OPERATOR_EQUAL:
+			if (value == pattern)
+				ret = SUCCEED;
+			break;
+		case ZBX_CONDITION_OPERATOR_NOT_EQUAL:
+			if (value != pattern)
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}

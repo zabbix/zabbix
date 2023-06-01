@@ -33,10 +33,10 @@ static int	condition_match_service(const zbx_service_action_condition_t *conditi
 {
 	zbx_uint64_t	serviceid;
 
-	if (SUCCEED != zbx_is_uint64(condition->value, &serviceid) || serviceid != update->service->serviceid)
+	if (SUCCEED != zbx_is_uint64(condition->value, &serviceid))
 		return FAIL;
 
-	return SUCCEED;
+	return zbx_uint64match_condition(serviceid, update->service->serviceid, condition->op);
 }
 
 /******************************************************************************

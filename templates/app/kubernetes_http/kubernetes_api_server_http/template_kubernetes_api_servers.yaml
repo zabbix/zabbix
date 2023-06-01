@@ -307,7 +307,7 @@ zabbix_export:
             - tag: component
               value: go-threads
         - uuid: 837c546cb3bc400ab7a62a672792f88b
-          name: 'Kubernetes API: gRPCs messages ressived, rate'
+          name: 'Kubernetes API: gRPCs messages received, rate'
           type: DEPENDENT
           key: kubernetes.api.grpc_client_msg_received.rate
           delay: '0'
