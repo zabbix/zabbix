@@ -71,55 +71,40 @@ window.widget_gauge_form = new class {
 	}
 
 	updateForm() {
-		// Value arc size can only be changed if value arc is enabled and selected.
-		this.toggleGoup(document.querySelectorAll('#value_arc_size'), this._value_arc.checked);
+		document.getElementById('value_arc_size').disabled = !this._value_arc.checked;
 
-		/*
-		 * "Min/Max show", "Min/Max size" and "Min/Max show units" depend on whether the value or threshold arcs are is
-		 * enabled. Either one of them will suffice. However, "Min/Max size" and "Min/Max show units" also depend on the
-		 * "Min/Max show" checkbox. But enable threshold arc checkbox, the list of thresholds cannot be
-		 * empty.
-		 */
-		this.toggleGoup(document.querySelectorAll('#minmax_show, #minmax_size, #minmax_show_units'),
-			this._th_rows_count && this._th_show_arc.checked || this._value_arc.checked
-		);
-		this.toggleGoup(document.querySelectorAll('#minmax_size, #minmax_show_units'), this._minmax_show.checked,
-			this._th_rows_count && this._th_show_arc.checked || this._value_arc.checked
-		);
+		for (const element of document.querySelectorAll('#minmax_show, #minmax_size, #minmax_show_units')) {
+			element.disabled = this._th_rows_count === 0 || (!this._th_show_arc.checked && !this._value_arc.checked);
+		}
 
-		/*
-		 * "Min/Max show units" depends on all three factors: the "Min/Max" block should be enabled, "Units" from value
-		 * block should be enabled and at least one of the arcs value or threhsold should be enabled and selected.
-		 */
-		this.toggleGoup(document.querySelectorAll('#minmax_show_units'), this._units_show.checked,
-			this._minmax_show.checked, this._th_rows_count && this._th_show_arc.checked || this._value_arc.checked
-		);
+		for (const element of document.querySelectorAll('#minmax_size, #minmax_show_units')) {
+			element.disabled = !this._minmax_show.checked || this._th_rows_count === 0 || (!this._th_show_arc.checked
+				&& !this._value_arc.checked);
+		}
 
-		// All units block inputs depend on whether the "Show units" is enabled.
-		this.toggleGoup(document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color'),
-			this._units_show.checked
-		);
+		document.getElementById('minmax_show_units').disabled = !this._units_show.checked || !this._minmax_show.checked
+			|| this._th_rows_count === 0 || (!this._th_show_arc.checked && !this._value_arc.checked);
 
-		/*
-		 * Adding and removing thresholds, enables or disables other threshold controls. There must be at least one
-		 * threshold to enable other controls. Treshold "Arc size" depends on both, number of threshold rows and
-		 * if "Show arc" is selected. However, "Show labels" depends on either value or threshold arc.
-		 */
-		this.toggleGoup(document.querySelectorAll('#th_show_arc, #th_arc_size'), this._th_rows_count);
-		this.toggleGoup(document.querySelectorAll('#th_arc_size'), this._th_rows_count, this._th_show_arc.checked);
-		this.toggleGoup(document.querySelectorAll('#th_show_labels'), this._th_rows_count,
-			this._th_show_arc.checked || this._value_arc.checked
-		);
+		for (const element of
+				document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
+			element.disabled = !this._units_show.checked;
+		}
 
-		// "Show needle" and "Needle color" inputs depend whether there are value or threshold arcs.
-		this.toggleGoup(document.querySelectorAll('#needle_show, #needle_color'),
-			this._th_rows_count && this._th_show_arc.checked || this._value_arc.checked
-		);
+		for (const element of document.querySelectorAll('#th_show_arc, #th_arc_size')) {
+			element.disabled = this._th_rows_count === 0;
+		}
 
-		// "Needle color" depends on "Show needle" and whether there are value or threshold arcs.
-		this.toggleGoup(document.querySelectorAll('#needle_color'), this._needle_show.checked,
-			this._th_rows_count && this._th_show_arc.checked || this._value_arc.checked
-		);
+		document.getElementById('th_arc_size').disabled = this._th_rows_count === 0 || !this._th_show_arc.checked;
+
+		document.getElementById('th_show_labels').disabled = this._th_rows_count === 0 || (!this._th_show_arc.checked
+			&& !this._value_arc.checked);
+
+		for (const element of document.querySelectorAll('#needle_show, #needle_color')) {
+			element.disabled = !this._th_show_arc.checked && !this._value_arc.checked;
+		}
+
+		document.getElementById('needle_color').disabled = !this._needle_show.checked || (!this._th_show_arc.checked
+			&& !this._value_arc.checked);
 	}
 
 	updateWarningIcon() {
@@ -150,29 +135,6 @@ window.widget_gauge_form = new class {
 				.catch((exception) => {
 					console.log('Could not get value data type of the item:', exception);
 				});
-		}
-	}
-
-	/**
-	 * Enables or disables elements, depeding on infinite amount of arguments. First argument is removed, since it is
-	 * the list of elements. Other arguments are booleans. So elements can depend on one or more checkboxes. All of the
-	 * checkboxes should be selected to enable the element.
-	 *
-	 * @param {NodeList} elements  List of elements to enable/disable.
-	 */
-	toggleGoup(elements) {
-		const args = Array.from(arguments);
-
-		let dependencies = true;
-
-		args.shift();
-
-		for (const arg of args) {
-			dependencies = dependencies && !!arg;
-		}
-
-		for (const element of elements) {
-			element.disabled = !dependencies;
 		}
 	}
 };
