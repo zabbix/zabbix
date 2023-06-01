@@ -11,6 +11,7 @@
 #include "zbxnix.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
+#include "zbxtime.h"
 #include "zbxtypes.h"
 
 static ZBX_THREAD_LOCAL struct event_base	*base;
@@ -119,6 +120,59 @@ fail:
 	return NOTSUPPORTED;
 }
 
+static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
+{
+	long			response_code;
+	char			*error, *out = NULL;
+	AGENT_RESULT		result;
+	char			*status_codes;
+	int			errcode = SUCCEED;
+	int			nextcheck;
+	zbx_httpagent_context	*httpagent_context;
+	zbx_dc_item_context_t	*item_context;
+	zbx_timespec_t		timespec;
+
+	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
+
+	zbx_timespec(&timespec);
+
+	zbx_init_agent_result(&result);
+	status_codes = httpagent_context->item_context.status_codes;
+	item_context = &httpagent_context->item_context;
+
+	if (SUCCEED == zbx_http_handle_response(easy_handle, &httpagent_context->http_context, err, &response_code,
+			&out, &error) && SUCCEED == zbx_handle_response_code(status_codes, response_code, out, &error))
+	{
+
+		SET_TEXT_RESULT(&result, out);
+		out = NULL;
+		zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
+				item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+	}
+	else
+	{
+		SET_MSG_RESULT(&result, error);
+		zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
+				item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+	}
+
+	zbx_free_agent_result(&result);
+	zbx_free(out);
+
+	zbx_dc_poller_requeue_items(&httpagent_context->item_context.itemid, &timespec.sec, &errcode, 1,
+			ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
+
+	if (FAIL != nextcheck && nextcheck <= time(NULL))
+		event_active(httpagent_context->poller_config->async_items_timer, 0, 0);
+
+	httpagent_context->poller_config->processing--;
+	httpagent_context->poller_config->processed++;
+
+	curl_multi_remove_handle(curl_handle, easy_handle);
+	httpagent_context_clean(httpagent_context);
+	zbx_free(httpagent_context);
+}
+
 static void	async_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
@@ -182,70 +236,15 @@ curl_context_t;
 
 static void	check_multi_info(void)
 {
-	CURLMsg			*message;
-	int			pending;
-	CURL			*easy_handle;
-	zbx_httpagent_context	*context;
-	zbx_timespec_t		timespec;
-	long			response_code;
-	char			*error, *out = NULL;
-	AGENT_RESULT		result;
-	char			*status_codes;
-	int			errcode = SUCCEED;
-	int			nextcheck;
-
-	zbx_timespec(&timespec);
+	CURLMsg	*message;
+	int	pending;
 
 	while (NULL != (message = curl_multi_info_read(curl_handle, &pending)))
 	{
 		switch(message->msg)
 		{
 			case CURLMSG_DONE:
-				easy_handle = message->easy_handle;
-
-				curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &context);
-				printf("DONE\n");
-
-				zbx_init_agent_result(&result);
-				status_codes = context->item_context.status_codes;
-				out = NULL;
-
-				if (SUCCEED == zbx_http_handle_response(easy_handle, &context->http_context,
-						message->data.result, &response_code, &out, &error) &&
-						SUCCEED == zbx_handle_response_code(status_codes, response_code, out,
-						&error))
-				{
-
-					SET_TEXT_RESULT(&result, out);
-					out = NULL;
-					zbx_preprocess_item_value(context->item_context.itemid,
-							context->item_context.hostid, context->item_context.value_type,
-							context->item_context.flags, &result, &timespec,
-							ITEM_STATE_NORMAL, NULL);
-				}
-				else
-				{
-					SET_MSG_RESULT(&result, error);
-					zbx_preprocess_item_value(context->item_context.itemid,
-							context->item_context.hostid,
-							context->item_context.value_type, context->item_context.flags,
-							NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
-				}
-
-				zbx_free_agent_result(&result);
-				zbx_free(out);
-
-				zbx_dc_poller_requeue_items(&context->item_context.itemid, &timespec.sec, &errcode, 1,
-						ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
-
-				if (FAIL != nextcheck && nextcheck <= time(NULL))
-					event_active(context->poller_config->async_items_timer, 0, 0);
-
-				context->poller_config->processing--;
-				context->poller_config->processed++;
-				curl_multi_remove_handle(curl_handle, easy_handle);
-				httpagent_context_clean(context);
-				zbx_free(context);
+				async_httpagent_done(message->easy_handle, message->data.result);
 				break;
 			default:
 				fprintf(stderr, "CURLMSG default\n");
