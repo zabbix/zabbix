@@ -1,11 +1,47 @@
-Changes for 5.0.34rc1
+Changes for 5.0.36rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 5.0.35
+
+5.0.35rc1 was released as 5.0.35 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.35rc1
+
+New features:
+...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
+
+Bug fixes:
+...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
+..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+...G...PS. [ZBX-21795] fixed unhandled timeout in Telnet (askolmeisters)
+..F....... [ZBX-22858] fixed xss vulnerability in graph item properties (miks)
+..F....... [ZBX-22859] fixed validation of input parameters in action configuration form (Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34
+
+5.0.34rc1 was released as 5.0.34 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 5.0.34rc1
+
+Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+...G...... [ZBX-22521] added debug logging for process selection in proc.mem[] on AIX (Andris)
+........S. [ZBX-22492] removed size limitation for logged messages in JS (dgoloscapov)
+...G...... [ZBX-22373] allowed mixing session and key parameter for Zabbix agent 2 items (esneiders)
+..F....... [ZBX-22241] fixed map link color and drawing style selection when multiple triggers are in problem state (miks)
 ..F....... [ZBX-22538] fixed popup menus disappearing on right-clicking links in them (jfreibergs)
 ..F....... [ZBX-21013] hid option "Groups" for unprivileged users in the Import form (Sasha)
-...G...... [ZBX-22219] added validation to the "Server" ip/dns option in configuration configuration of the Zabbix Agent 2 (kprutkovs)
+...G...... [ZBX-22219] added validation to the "Server" IP/DNS option in configuration of Zabbix agent 2 (kprutkovs)
 ..F....... [ZBX-20084] fixed VMware parameters display (mprihodko)
 ..F....... [ZBX-18527] fixed markup for Type of calculation expression field (dpetra)
 ........S. [ZBX-22622] fixed alert script path validation (vso)
@@ -2772,11 +2808,25 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
 
 --------------------------------------------------------------------------------
-Changes for 4.0.46rc1
+Changes for 4.0.47rc1
 
 New features:
 
 Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 4.0.46
+
+4.0.46rc1 was released as 4.0.46 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 4.0.46rc1
+
+Bug fixes:
+........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
+..F....... [ZBX-22386] fixed encoding of HTML entities in the user interface (Sasha)
+..F....... [ZBX-22858] fixed xss vulnerability in graph item properties (miks)
+..F....... [ZBX-22859] fixed validation of input parameters in action configuration form (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.45

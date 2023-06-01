@@ -106,7 +106,7 @@ if (!CWebUser::$data) {
 
 // page title
 (new CPageHeader(_('Installation'), CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($theme).'.css')
+	->addCssFile('assets/styles/'.$theme.'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('js/vendors/jquery.js'))->getUrl())
 	->addJsFile((new CUrl('js/class.overlaycollection.js'))->getUrl())

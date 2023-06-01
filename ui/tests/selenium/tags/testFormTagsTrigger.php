@@ -136,7 +136,7 @@ class testFormTagsTrigger extends testFormTags {
 		$this->host = 'Host with tags for cloning';
 		$hostid = CDataHelper::get('EntitiesTags.hostids.'.$this->host);
 		$this->link = 'triggers.php?filter_set=1&context=host&filter_hostids%5B0%5D='.$hostid;
-		$this->executeFullCloning('trigger', 'Host');
+		$this->executeCloningByParent('trigger', 'Host');
 	}
 
 	/**
@@ -146,7 +146,7 @@ class testFormTagsTrigger extends testFormTags {
 		$templateid = CDataHelper::get('EntitiesTags.templateids.'.$this->template);
 		$this->link = 'triggers.php?filter_set=1&filter_hostids%5B0%5D='.$templateid.'&context=template';
 		$this->clone_name = 'Template trigger with tags for full cloning';
-		$this->executeFullCloning('trigger', 'Template');
+		$this->executeCloningByParent('trigger', 'Template');
 	}
 
 	/**

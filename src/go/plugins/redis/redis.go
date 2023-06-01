@@ -22,6 +22,7 @@ package redis
 import (
 	"time"
 
+	"zabbix.com/pkg/metric"
 	"zabbix.com/pkg/plugin"
 	"zabbix.com/pkg/uri"
 	"zabbix.com/pkg/zbxerr"
@@ -41,7 +42,12 @@ var impl Plugin
 
 // Export implements the Exporter interface.
 func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	params, _, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	params, _, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
+	if err != nil {
+		return nil, err
+	}
+
+	err = metric.SetDefaults(params, hc, p.options.Default)
 	if err != nil {
 		return nil, err
 	}

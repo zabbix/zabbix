@@ -243,14 +243,14 @@ function makeHttpTestTemplatePrefix($httptestid, array $parent_templates) {
 	$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
 	if ($template['permission'] == PERM_READ_WRITE) {
-		$name = (new CLink(CHtml::encode($template['name']),
+		$name = (new CLink($template['name'],
 			(new CUrl('httpconf.php'))
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
 		))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -271,7 +271,7 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates) {
 		$template = $parent_templates['templates'][$parent_templates['links'][$httptestid]['hostid']];
 
 		if ($template['permission'] == PERM_READ_WRITE) {
-			$name = new CLink(CHtml::encode($template['name']),
+			$name = new CLink($template['name'],
 				(new CUrl('httpconf.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $template['hostid'])
@@ -279,10 +279,10 @@ function makeHttpTestTemplatesHtml($httptestid, array $parent_templates) {
 			);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$httptestid = $parent_templates['links'][$httptestid]['httptestid'];
 	}

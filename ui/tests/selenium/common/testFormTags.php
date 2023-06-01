@@ -558,7 +558,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   trigger or trigger prototype
 	 * @param string   $parent   host or template
 	 */
-	public function executeFullCloning($object, $parent) {
+	public function executeCloningByParent($object, $parent) {
 		$new_name = '1Tags - full cloning of '.$parent.' with '.$object;
 		$this->page->login()->open($this->link);
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();

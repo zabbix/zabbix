@@ -91,7 +91,7 @@ else {
 						->setEnabled($data['dashboard']['editable'])
 						->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
-					->addItem((new CButton('', '&nbsp;'))
+					->addItem((new CButton(null, NBSP()))
 						->addClass(ZBX_STYLE_BTN_ACTION)
 						->setId('dashbrd-actions')
 						->setTitle(_('Actions'))
