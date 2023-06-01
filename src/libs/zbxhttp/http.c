@@ -710,6 +710,27 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 	return SUCCEED;
 }
 
+int	zbx_handle_response_code(char *status_codes, long response_code, const char *out, char **error)
+{
+	if ('\0' != *status_codes && FAIL == zbx_int_in_list(status_codes, (int)response_code))
+	{
+		if (NULL != out)
+		{
+			*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the required status"
+					" codes \"%s\"\n%s", response_code, status_codes, out);
+		}
+		else
+		{
+			*error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the required status"
+					" codes \"%s\"", response_code, status_codes);
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 void	zbx_http_context_create(zbx_http_context_t *context)
 {
 	memset(context, 0, sizeof(zbx_http_context_t));

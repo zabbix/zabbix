@@ -36,6 +36,7 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		state;
 	char			*posts;
+	char			*status_codes;
 }
 zbx_dc_item_context_t;
 typedef struct
@@ -53,6 +54,7 @@ static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
 
 static void	httpagent_context_clean(zbx_httpagent_context *httpagent_context)
 {
+	zbx_free(httpagent_context->item_context.status_codes);
 	zbx_free(httpagent_context->item_context.posts);
 	zbx_http_context_destroy(&httpagent_context->http_context);
 }
@@ -75,13 +77,16 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 	httpagent_context->item_context.state = item->state;
 	httpagent_context->item_context.posts = item->posts;
 	item->posts = NULL;
+	httpagent_context->item_context.status_codes = item->status_codes;
+	item->status_codes = NULL;
 
-	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method, item->url,
-			item->query_fields, item->headers, httpagent_context->item_context.posts, item->retrieve_mode,
-			item->http_proxy, item->follow_redirects, item->timeout, 1, item->ssl_cert_file,
-			item->ssl_key_file, item->ssl_key_password, item->verify_peer, item->verify_host,
-			item->authtype, item->username, item->password, NULL, item->post_type, item->output_format,
-			poller_config->config_source_ip, &error)))
+
+	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
+			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,
+			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
+			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
+			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
+			item->output_format, poller_config->config_source_ip, &error)))
 	{
 		SET_MSG_RESULT(result, error);
 
@@ -183,9 +188,11 @@ static void	check_multi_info(void)
 	zbx_httpagent_context	*context;
 	zbx_timespec_t		timespec;
 	long			response_code;
-	int			ret;
 	char			*error, *out = NULL;
 	AGENT_RESULT		result;
+	char			*status_codes;
+	int			errcode = SUCCEED;
+	int			nextcheck;
 
 	zbx_timespec(&timespec);
 
@@ -200,51 +207,36 @@ static void	check_multi_info(void)
 				printf("DONE\n");
 
 				zbx_init_agent_result(&result);
-				if (SUCCEED == (ret = zbx_http_handle_response(context->http_context.easyhandle,
-						&context->http_context, message->data.result, &response_code, &out, &error)))
+				status_codes = context->item_context.status_codes;
+				out = NULL;
+
+				if (SUCCEED == zbx_http_handle_response(easy_handle, &context->http_context,
+						message->data.result, &response_code, &out, &error) &&
+						SUCCEED == zbx_handle_response_code(status_codes, response_code, out,
+						&error))
 				{
-					/*if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(context->status_codes, (int)response_code))
-					{
-						if (NULL != out)
-						{
-							SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-									" required status codes \"%s\"\n%s", response_code, item->status_codes, out));
-						}
-						else
-						{
-							SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-									" required status codes \"%s\"", response_code, item->status_codes));
-						}
-					}
-					else*/
-					{
-						SET_TEXT_RESULT(&result, out);
-						out = NULL;
-					}
+
+					SET_TEXT_RESULT(&result, out);
+					out = NULL;
+					zbx_preprocess_item_value(context->item_context.itemid,
+							context->item_context.hostid, context->item_context.value_type,
+							context->item_context.flags, &result, &timespec,
+							ITEM_STATE_NORMAL, NULL);
 				}
 				else
 				{
 					SET_MSG_RESULT(&result, error);
-					error = NULL;
-					ret = NOTSUPPORTED;
+					zbx_preprocess_item_value(context->item_context.itemid, 
+						context->item_context.hostid,
+						context->item_context.value_type, context->item_context.flags,
+						NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
 				}
 
-				if (SUCCEED == ret)
-				{
-					zbx_preprocess_item_value(context->item_context.itemid, context->item_context.hostid,context->item_context.value_type,
-							context->item_context.flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
-				}
-				else
-				{
-					zbx_preprocess_item_value(context->item_context.itemid, context->item_context.hostid,context->item_context.value_type,
-							context->item_context.flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
-				}
+				zbx_free_agent_result(&result);
+				zbx_free(out);
 
-				int	errcode = SUCCEED;
-				int	nextcheck;
 				zbx_dc_poller_requeue_items(&context->item_context.itemid, &timespec.sec, &errcode, 1,
 						ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
-				zbx_free_agent_result(&result);
 
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
 					event_active(context->poller_config->async_items_timer, 0, 0);

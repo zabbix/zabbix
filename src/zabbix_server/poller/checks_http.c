@@ -31,34 +31,22 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 
 	zbx_http_context_create(&context);
 
-	if (SUCCEED == (ret = zbx_http_request_prepare(&context, item->request_method, item->url,
+	if (SUCCEED == zbx_http_request_prepare(&context, item->request_method, item->url,
 			item->query_fields, item->headers, item->posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
-			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error)))
+			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error))
 	{
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
 
-		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out, &error)))
+		if (SUCCEED == zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out,
+				&error) && SUCCEED == zbx_handle_response_code(item->status_codes, response_code, out,
+				&error))
 		{
-			if ('\0' != *item->status_codes && FAIL == zbx_int_in_list(item->status_codes, (int)response_code))
-			{
-				if (NULL != out)
-				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-							" required status codes \"%s\"\n%s", response_code, item->status_codes, out));
-				}
-				else
-				{
-					SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
-							" required status codes \"%s\"", response_code, item->status_codes));
-				}
-			}
-			else
-			{
-				SET_TEXT_RESULT(result, out);
-				out = NULL;
-			}
+
+			SET_TEXT_RESULT(result, out);
+			out = NULL;
+			ret = SUCCEED;
 		}
 		else
 		{
@@ -71,6 +59,7 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 	{
 		SET_MSG_RESULT(result, error);
 		error = NULL;
+		ret = NOTSUPPORTED;
 	}
 
 	zbx_free(error);
