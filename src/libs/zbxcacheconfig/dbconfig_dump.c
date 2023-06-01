@@ -20,7 +20,6 @@
 #include "dbconfig.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 static void	DCdump_config(void)

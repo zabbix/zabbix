@@ -19,7 +19,6 @@
 
 #include "zbxcachevalue.h"
 
-#include "log.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"

@@ -1123,7 +1123,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                reventing Transaction ID Wraparound Failures
+                Preventing Transaction ID Wraparound Failures
                 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
               preprocessing:
                 - type: JSONPATH
