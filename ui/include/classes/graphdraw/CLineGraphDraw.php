@@ -306,18 +306,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$result = $results[$item['itemid']];
 
 				foreach ($result['data'] as $data_row) {
-					$idx = $data_row['i'] - 1;
-					if ($idx < 0) {
-						continue;
-					}
+					$idx = $data_row['i'];
 
-					/* --------------------------------------------------
-						We are taking graph on 1px more than we need,
-						and here we are skipping first px, because of MOD (in SELECT),
-						it combines prelast point (it would be last point if not that 1px in beginning)
-						and first point, but we still losing prelast point :(
-						but now we've got the first point.
-					--------------------------------------------------*/
 					$data['count'][$idx] = $data_row['count'];
 					$data['min'][$idx] = (float) $data_row['min'];
 					$data['max'][$idx] = (float) $data_row['max'];
