@@ -33,6 +33,28 @@ class testPageSearch extends CWebTest {
 
 	use TableTrait;
 
+	private static $widget_params = [
+		'hosts' => [
+			'key' => 'hosts',
+			'selector_id' => 'search_hosts_widget',
+			'title' => 'Hosts',
+			'table_columns' => ['Host', 'IP', 'DNS', 'Latest data', 'Problems', 'Graphs', 'Screens', 'Web',
+				'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Web']
+		],
+		'hostgroups' => [
+			'key' => 'host_groups',
+			'selector_id' => 'search_hostgroup_widget',
+			'title' => 'Host groups',
+			'table_columns' => ['Host group', 'Latest data', 'Problems', 'Web', 'Hosts', 'Templates']
+		],
+		'templates' => [
+			'key' => 'templates',
+			'selector_id' => 'search_templates_widget',
+			'title' => 'Templates',
+			'table_columns' => ['Template', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Web']
+		]
+	];
+
 	public static function prepareData() {
 		CDataHelper::createHosts([
 			[
@@ -82,6 +104,47 @@ class testPageSearch extends CWebTest {
 		]);
 	}
 
+	/**
+	 * Check layout of the Search form and result page.
+	 */
+	public function testPageSearch_Layout() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+
+		$search_field = $form->getField('id:search');
+		$search_button = $form->query('tag:button')->one();
+		$this->assertEquals(255, $search_field->getAttribute('maxlength'));
+		$this->assertEquals('off', $search_field->getAttribute('autocomplete'));
+		$this->assertEquals('true', $search_button->getAttribute('disabled'));
+		$this->verifyThatSuggestionsNotShown();
+
+		// Check suggestion highlighting.
+		$search_string = 'host';
+		$search_field->fill($search_string);
+		$this->assertEquals(null, $search_button->getAttribute('disabled'));
+		$highlighted_text = $this->query('xpath://ul[@class="search-suggest"]//span[@class="suggest-found"]')->waitUntilVisible()->one()->getText();
+		$this->assertEquals($search_string, strtolower($highlighted_text));
+
+		// Check that suggestions disappear after deleting input.
+		$search_field->fill('');
+		$this->verifyThatSuggestionsNotShown();
+		$this->assertEquals('true', $search_button->getAttribute('disabled'));
+
+		$search_field->fill($search_string);
+		$search_button->waitUntilReady()->click();
+		$this->assertEquals('Search: '.$search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
+
+		// Assert result widget layout.
+		foreach (self::$widget_params as $wp) {
+			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
+			$widget = $this->query($widget_selector)->one();
+
+			$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
+			$this->assertEquals($wp['table_columns'], $this->query($widget_selector.'//table//th')->all()->asText());
+
+		}
+	}
+
 	public static function getSearchData() {
 		return [
 			[
@@ -92,8 +155,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'ЗАББИКС Сервер',
-					'hosts' => [['Host' => 'ЗАББИКС Сервер', 'IP' => '127.0.0.1', 'DNS' => '']],
-					'check_title' => true
+					'hosts' => [['Host' => 'ЗАББИКС Сервер', 'IP' => '127.0.0.1', 'DNS' => '']]
 				]
 			],
 			[
@@ -172,24 +234,6 @@ class testPageSearch extends CWebTest {
 	 * @dataProvider getSearchData
 	 */
 	public function testPageSearch_VerifyResults($data) {
-		static $widget_params = [
-			'hosts' => [
-				'key' => 'hosts',
-				'selector_id' => 'search_hosts_widget',
-				'title' => 'Hosts'
-			],
-			'hostgroups' => [
-				'key' => 'host_groups',
-				'selector_id' => 'search_hostgroup_widget',
-				'title' => 'Host groups'
-			],
-			'templates' => [
-				'key' => 'templates',
-				'selector_id' => 'search_templates_widget',
-				'title' => 'Templates'
-			]
-		];
-
 		// Get expected result count from DB.
 		if (CTestArrayHelper::get($data, 'count_from_db')) {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
@@ -213,14 +257,9 @@ class testPageSearch extends CWebTest {
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
 		// Verify each widget type.
-		foreach ($widget_params as $wp) {
+		foreach (self::$widget_params as $wp) {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
-
-			// Assert widget title.
-			if (CTestArrayHelper::get($data, 'check_title')) {
-				$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
-			}
 
 			// Assert table data.
 			$expected_count = 0;
@@ -321,7 +360,7 @@ class testPageSearch extends CWebTest {
 				$this->assertEquals($data['expected_suggestions'], array_values($items));
 			}
 			else {
-				$this->verifyThatSuggestionsNotShow();
+				$this->verifyThatSuggestionsNotShown();
 			}
 		}
 		else {
@@ -346,7 +385,7 @@ class testPageSearch extends CWebTest {
 	/**
 	 * Verify that the suggestion list is NOT visible.
 	 */
-	private function verifyThatSuggestionsNotShow() {
+	private function verifyThatSuggestionsNotShown() {
 		try {
 			$this->query('class:search-suggest')->waitUntilVisible(1);
 		}
