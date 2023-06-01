@@ -279,7 +279,7 @@ static int	DBpatch_6050024(void)
 				" from widget w"
 				" where widget_field.widgetid=w.widgetid"
 					" and w.type='tophosts'"
-				")";
+			")";
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
