@@ -1581,8 +1581,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
 
-	discoverer_libs_init();
-
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
@@ -1596,6 +1594,8 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, int worker
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;
 	}
+
+	discoverer_libs_init();
 
 	zbx_hashset_create(&manager->results, 1, discoverer_result_hash, discoverer_result_compare);
 	zbx_hashset_create(&manager->incomplete_checks_count, 1, discoverer_check_count_hash,
@@ -1651,8 +1651,8 @@ out:
 		zbx_hashset_destroy(&manager->incomplete_checks_count);
 		zbx_vector_discoverer_jobs_ptr_destroy(&manager->job_refs);
 
-		manager->timekeeper = zbx_timekeeper_create(workers_num, NULL);
 		zbx_timekeeper_free(manager->timekeeper);
+		discoverer_libs_destroy();
 	}
 
 	return ret;
@@ -1660,8 +1660,8 @@ out:
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
 {
-	int			i;
-	zbx_hashset_iter_t	iter;
+	int				i;
+	zbx_hashset_iter_t		iter;
 	zbx_discoverer_results_t	*result;
 
 	discoverer_queue_lock(&manager->queue);
@@ -1772,7 +1772,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
 		zbx_free(error);
-		goto out;
+		zbx_ipc_service_close(&ipc_service);
+		exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
@@ -1934,7 +1935,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 		zbx_timekeeper_collect(dmanager.timekeeper);
 	}
 out:
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	zbx_setproctitle("%s #%d [terminating]", get_process_type_string(process_type), process_num);
 
 	zbx_vector_uint64_pair_destroy(&revisions);
 	zbx_vector_uint64_destroy(&del_druleids);
