@@ -518,7 +518,8 @@ class testFormTabIndicators extends CWebTest {
 			// Media type configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'create_button' => 'Create media type',
 					'form' => 'id:media-type-form',
 					'tabs' => [
 						[
@@ -929,14 +930,14 @@ class testFormTabIndicators extends CWebTest {
 					}
 				}
 				else {
-					foreach($tab['entries'] as $entry) {
+					foreach ($tab['entries'] as $entry) {
 						if (array_key_exists('table_selector', $tab)) {
 							$form->query($tab['table_selector'])->query('button:Add')->one()->click();
 						}
 						else {
 							$form->getFieldContainer($tab['name'])->query('button:Add')->one()->click();
 						}
-						$overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 						if (array_key_exists('selector', $entry)) {
 							$overlay->query($entry['selector'])->one()->detect()->fill($entry['value']);
 						}
@@ -947,7 +948,10 @@ class testFormTabIndicators extends CWebTest {
 							}
 						}
 						$overlay->submit();
+						$overlay->waitUntilNotVisible();
+					}
 
+					if (CTestArrayHelper::get($tab, 'name') !== 'Message templates') {
 						COverlayDialogElement::ensureNotPresent();
 					}
 				}

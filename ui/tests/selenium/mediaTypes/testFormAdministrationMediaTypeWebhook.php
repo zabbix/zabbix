@@ -485,7 +485,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$button = CTestArrayHelper::get($data, 'update', false) ? 'link:Validation webhook' : 'button:Create media type';
 		$this->query($button)->one()->waitUntilClickable()->click();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->asForm()->waitUntilVisible();
 		$form->fill($data['fields']);
 		// Fill webhook parameters if needed.
 		if (array_key_exists('parameters', $data)) {
@@ -497,7 +498,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 
-		$form->submit();
+		$action = array_key_exists('update', $data) ? 'Update' : 'Add';
+		$overlay->getFooter()->query('button', $action)->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check media type creation or update message.
@@ -508,6 +510,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 		// Check that no DB changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$overlay->close();
 	}
 
 	public function getCreateUpdateWebhookData() {
@@ -697,7 +700,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$button = CTestArrayHelper::get($data, 'update', false) ? 'link:Reference webhook' : 'button:Create media type';
 		$this->query($button)->one()->WaitUntilClickable()->click();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->asForm();
 		$form->fill($data['fields']);
 		// Fill webhook parameters if needed.
 		if (array_key_exists('parameters', $data)) {
@@ -713,6 +717,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 
 		// Check media type creation or update message.
@@ -727,6 +732,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 		// Check the values of created or updated media type fields.
 		$this->checkMediaTypeFields($data);
+		$overlay->close();
 	}
 
 	public function testFormAdministrationMediaTypeWebhook_SimpleUpdate() {
@@ -734,7 +740,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one()->submit();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
 		$this->page->waitUntilReady();
 
 		$message = CMessageElement::find()->one();
@@ -754,10 +761,12 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		// Clone the reference media type.
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->asForm()->waitUntilVisible();
 		$this->query('button:Clone')->one()->click();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
 		$form->fill(['Name' => 'Webhook clone']);
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 
 		$message = CMessageElement::find()->one();
@@ -804,25 +813,29 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		if ($data === 'clone') {
 			$this->query('button:Clone')->one()->click();
 		}
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->asForm();
 		$form->fill($fields);
-		$form->query('button:Cancel')->one()->click();
+		$overlay->query('button:Cancel')->one()->click();
 		$this->page->waitUntilReady();
 		// Make sure no changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
 	}
 
 	public function testFormAdministrationMediaTypeWebhook_Delete() {
-		$mediatypeid = CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name=\'Webhook to delete\'');
-		$this->page->login()->open('zabbix.php?action=mediatype.edit&mediatypeid='.$mediatypeid);
-		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$name = 'Webhook to delete';
+		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->query('link', $name)->one()->waitUntilClickable()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$overlay->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
+		$overlay->ensureNotPresent();
 		$this->page->waitUntilReady();
 		// Verify that media type was deleted
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Media type deleted', $message->getTitle());
-		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name=\'Webhook to delete\''));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($name)));
 	}
 
 	/**
@@ -849,9 +862,11 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 	 * Check the field values after creating or updating a media type.
 	 */
 	private function checkMediaTypeFields($data) {
-		$mediatypeid = CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['fields']['Name']));
-		$this->page->open('zabbix.php?action=mediatype.edit&mediatypeid='.$mediatypeid);
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['fields']['Name']));
+		$this->page->open('zabbix.php?action=mediatype.list');
+		$this->query('link', $data['fields']['Name'])->one()->WaitUntilClickable()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $overlay->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
 
 		// Check that fields in Media type tab are updated.
 		$form->checkValue($data['fields']);

@@ -456,16 +456,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'update'
 				]
 			],
 			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'create'
 				]
 			],
 			// #51 Script update.

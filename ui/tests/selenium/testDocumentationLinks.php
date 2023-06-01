@@ -1804,14 +1804,26 @@ class testDocumentationLinks extends CWebTest {
 			// #193 Administration -> Media type -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create media type'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
 			// #194 Administration -> Media type -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => "xpath://table[@class=\"list-table\"]//tr[1]/td[2]/a"
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
