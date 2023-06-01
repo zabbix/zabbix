@@ -234,7 +234,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			if ($check_double_linkage) {
-				$this->checkDoubleLinkageNew($ins_templates, $del_links);
+				$this->checkDoubleLinkageNew($ins_templates, $del_links, null);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);

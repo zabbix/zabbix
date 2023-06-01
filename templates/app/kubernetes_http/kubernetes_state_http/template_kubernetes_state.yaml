@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-19T09:47:03Z'
+  date: '2023-05-24T05:14:58Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -347,6 +347,11 @@ zabbix_export:
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
+                    ['node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined') {
+                            throw 'Parameter can be empty but not removed: "' + field + '".';
+                        }
+                    });
             
                     Kube.params = params;
                     if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
@@ -398,35 +403,74 @@ zabbix_export:
             
                     return result.response;
                 },
+            
+                parseFilters: function (filter) {
+                    var pairs = {};
+            
+                    filter.split(/\s*,\s*/).forEach(function (kv) {
+                        if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
+                            var pair = kv.split(/\s*:\s*/);
+                            pairs[pair[0]] = pair[1];
+                        }
+                    });
+                    return pairs;
+                },
+            
+                filter: function (name, data, filters) {
+                    var filtered = true;
+                    if (typeof data === 'object') {
+                        Object.keys(filters).some(function (filter) {
+                            var exclude = filter.match(/^!(.+)/);
+                            if (filter in data || (exclude && exclude[1] in data)) {
+                                if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                    || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                    Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+            
+                                    filtered = false;
+                                    return true;
+                                }
+                            };
+                        });
+                    }
+                    return filtered;
+                },
             };
             
             try {
                 Kube.setParams(JSON.parse(value));
             
                 var nodes = Kube.getNodes(),
-                    kubeNodes = [];
+                    kubeNodes = [],
                     api_url = '{$KUBE.API.URL}',
-                    hostname = api_url.match(/\/\/(.+):/);
+                    hostname = api_url.match(/\/\/(.+):/),
+                    filterNodeLabels = Kube.parseFilters(Kube.params.node_filter_labels),
+                    filterNodeAnnotations = Kube.parseFilters(Kube.params.node_filter_annotations);
             
                 if (typeof hostname[1] === 'undefined') {
-                      Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
-                      throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                    };
-                for (idx in nodes.items) {
-                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                        return addr.type === 'InternalIP';
-                    });
+                    Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                    throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                };
             
-                    var internalIP = internalIPs.length && internalIPs[0].address;
+                nodes.items.forEach(function (node) {
+                    if (Kube.filter(node.metadata.name, node.metadata.labels, filterNodeLabels)
+                        && Kube.filter(node.metadata.name, node.metadata.annotations, filterNodeAnnotations)) {
+                        Zabbix.log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
             
-                    kubeNodes.push({
-                        '{#NAME}': nodes.items[idx].metadata.name,
-                        '{#IP}': internalIP,
-                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']')  + ':' + Kube.params.kubelet_port,
-                        '{#COMPONENT}': 'Kubelet',
-                        '{#CLUSTER_HOSTNAME}': hostname[1]
-                    });
-                }
+                        var internalIPs = node.status.addresses.filter(function (addr) {
+                            return addr.type === 'InternalIP';
+                        });
+            
+                        var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                        kubeNodes.push({
+                            '{#NAME}': node.metadata.name,
+                            '{#IP}': internalIP,
+                            '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.kubelet_port,
+                            '{#COMPONENT}': 'Kubelet',
+                            '{#CLUSTER_HOSTNAME}': hostname[1]
+                        });
+                    }
+                });
             
                 return JSON.stringify(kubeNodes);
             }
@@ -450,6 +494,10 @@ zabbix_export:
               value: '{$KUBE.KUBELET.SCHEME}'
             - name: kubelet_port
               value: '{$KUBE.KUBELET.PORT}'
+            - name: node_filter_labels
+              value: '{$KUBE.KUBELET.FILTER.LABELS}'
+            - name: node_filter_annotations
+              value: '{$KUBE.KUBELET.FILTER.ANNOTATIONS}'
           tags:
             - tag: component
               value: raw
@@ -1299,10 +1347,10 @@ zabbix_export:
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === "kube_deployment_spec_replicas") {
+                          if (item.name === 'kube_deployment_spec_replicas') {
                               replicas_desired = item.value;
                           }
-                          if (item.name === "kube_deployment_status_replicas_available") {
+                          if (item.name === 'kube_deployment_status_replicas_available') {
                               replicas_available = item.value;
                           }
                       });
@@ -1705,10 +1753,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+                value: '{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}'
                 formulaid: A
               - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+                value: '{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           host_prototypes:
@@ -3297,10 +3345,10 @@ zabbix_export:
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === "kube_replicaset_spec_replicas") {
+                          if (item.name === 'kube_replicaset_spec_replicas') {
                               replicas_desired = item.value;
                           }
-                          if (item.name === "kube_replicaset_status_ready_replicas") {
+                          if (item.name === 'kube_replicaset_status_ready_replicas') {
                               replicas_ready = item.value;
                           }
                       });
@@ -3484,10 +3532,10 @@ zabbix_export:
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === "kube_statefulset_status_replicas") {
+                          if (item.name === 'kube_statefulset_status_replicas') {
                               replicas = item.value;
                           }
-                          if (item.name === "kube_statefulset_status_replicas_ready") {
+                          if (item.name === 'kube_statefulset_status_replicas_ready') {
                               replicas_ready = item.value;
                           }
                       });
@@ -3555,6 +3603,13 @@ zabbix_export:
                 - tag: status
                   value: updated
           trigger_prototypes:
+            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down'
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: availability
             - uuid: 469d6933f5494ca48a212cdc364058e0
               expression: |
                 min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0
@@ -3564,13 +3619,6 @@ zabbix_export:
               opdata: 'Replicas: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
               priority: WARNING
               description: 'StatefulSet has not matched the number of replicas during the specified trigger evaluation period.'
-              tags:
-                - tag: scope
-                  value: availability
-            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down'
-              priority: HIGH
               tags:
                 - tag: scope
                   value: availability
@@ -3622,12 +3670,22 @@ zabbix_export:
         - macro: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
           value: https
           description: 'Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.'
+        - macro: '{$KUBE.KUBELET.FILTER.ANNOTATIONS}'
+          description: 'Node annotations to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
+        - macro: '{$KUBE.KUBELET.FILTER.LABELS}'
+          description: 'Node labels to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.KUBELET.PORT}'
           value: '10250'
           description: 'Kubernetes Kubelet metrics endpoint port. Used in Kubelet LLD.'
         - macro: '{$KUBE.KUBELET.SCHEME}'
           value: https
           description: 'Kubernetes Kubelet metrics endpoint scheme. Used in Kubelet LLD.'
+        - macro: '{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Kubelets by nodename.'
+        - macro: '{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Kubelets by nodename.'
         - macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable metrics by namespace.'
@@ -3646,12 +3704,6 @@ zabbix_export:
         - macro: '{$KUBE.LLD.FILTER.PV.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered persistent volumes by name.'
-        - macro: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable worker nodes by nodename.'
-        - macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered worker nodes by nodename.'
         - macro: '{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}'
           value: '#5'
           description: 'The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.'
