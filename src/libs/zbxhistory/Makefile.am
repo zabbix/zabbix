@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libzbxhistory.a
 
+libzbxhistory_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libzbxhistory_a_SOURCES = \
 	history.c history.h \
 	history_elastic.c \

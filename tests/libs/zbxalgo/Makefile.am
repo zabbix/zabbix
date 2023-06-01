@@ -78,22 +78,23 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
+COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 evaluate_SOURCES = \
 	evaluate.c \
 	$(COMMON_SRC_FILES)
 
 evaluate_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(COMMON_LIB_FILES) $(TLS_LIBS)
 
 evaluate_LDADD += @SERVER_LIBS@
 
-evaluate_LDFLAGS = @SERVER_LDFLAGS@
+evaluate_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS)
+evaluate_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
 evaluate_unknown_SOURCES = \
@@ -101,13 +102,13 @@ evaluate_unknown_SOURCES = \
 	$(COMMON_SRC_FILES)
 
 evaluate_unknown_LDADD = \
-	$(COMMON_LIB_FILES)
+	$(COMMON_LIB_FILES) $(TLS_LIBS)
 
 evaluate_unknown_LDADD += @SERVER_LIBS@
 
-evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@
+evaluate_unknown_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
-evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS)
+evaluate_unknown_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS)
 
 
 queue_SOURCES = \
@@ -119,7 +120,7 @@ queue_LDADD = \
 
 queue_LDADD += @SERVER_LIBS@
 
-queue_LDFLAGS = @SERVER_LDFLAGS@
+queue_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 queue_CFLAGS = $(COMMON_COMPILER_FLAGS)
 

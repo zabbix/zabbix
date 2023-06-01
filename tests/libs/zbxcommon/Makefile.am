@@ -114,9 +114,14 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
-COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests
+COMMON_COMPILER_FLAGS = \
+	-I@top_srcdir@/tests \
+	$(TLS_CFLAGS) \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 zbx_function_find_SOURCES = \
 	zbx_function_find.c \
@@ -127,7 +132,7 @@ zbx_function_find_LDADD = \
 
 zbx_function_find_LDADD += @SERVER_LIBS@
 
-zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@
+zbx_function_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_function_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -141,7 +146,7 @@ parse_key_LDADD = \
 
 parse_key_LDADD += @SERVER_LIBS@
 
-parse_key_LDFLAGS = @SERVER_LDFLAGS@
+parse_key_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 parse_key_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -155,7 +160,7 @@ replace_key_params_dyn_LDADD = \
 
 replace_key_params_dyn_LDADD += @SERVER_LIBS@
 
-replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@
+replace_key_params_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 replace_key_params_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -169,7 +174,7 @@ calculate_item_nextcheck_LDADD = \
 
 calculate_item_nextcheck_LDADD += @SERVER_LIBS@
 
-calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+calculate_item_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 calculate_item_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -182,7 +187,7 @@ calculate_item_nextcheck_unreachable_LDADD = \
 
 calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
 
-calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@
+calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -195,7 +200,7 @@ zbx_function_get_param_dyn_LDADD = \
 
 zbx_function_get_param_dyn_LDADD += @SERVER_LIBS@
 
-zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@
+zbx_function_get_param_dyn_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_function_get_param_dyn_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -209,7 +214,7 @@ zbx_json_to_xml_LDADD = \
 
 zbx_json_to_xml_LDADD += @SERVER_LIBS@
 
-zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@
+zbx_json_to_xml_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_json_to_xml_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
@@ -223,7 +228,7 @@ zbx_xml_to_json_LDADD = \
 
 zbx_xml_to_json_LDADD += @SERVER_LIBS@
 
-zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@
+zbx_xml_to_json_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_xml_to_json_CFLAGS = $(COMMON_COMPILER_FLAGS) @LIBXML2_CFLAGS@
 
@@ -237,7 +242,7 @@ zbx_token_find_LDADD = \
 
 zbx_token_find_LDADD += @SERVER_LIBS@
 
-zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@
+zbx_token_find_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_token_find_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -250,7 +255,7 @@ zbx_interval_preproc_LDADD = \
 
 zbx_interval_preproc_LDADD += @SERVER_LIBS@
 
-zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@
+zbx_interval_preproc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_interval_preproc_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -264,7 +269,7 @@ zbx_validate_interval_LDADD = \
 
 zbx_validate_interval_LDADD += @SERVER_LIBS@
 
-zbx_validate_interval_LDFLAGS = @SERVER_LDFLAGS@
+zbx_validate_interval_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_validate_interval_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -278,7 +283,7 @@ is_double_suffix_LDADD = \
 
 is_double_suffix_LDADD += @SERVER_LIBS@
 
-is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@
+is_double_suffix_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 is_double_suffix_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -292,7 +297,7 @@ is_double_LDADD = \
 
 is_double_LDADD += @SERVER_LIBS@
 
-is_double_LDFLAGS = @SERVER_LDFLAGS@
+is_double_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 is_double_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -306,7 +311,7 @@ zbx_trim_float_LDADD = \
 
 zbx_trim_float_LDADD += @SERVER_LIBS@
 
-zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@
+zbx_trim_float_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_trim_float_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -320,7 +325,7 @@ zbx_trim_integer_LDADD = \
 
 zbx_trim_integer_LDADD += @SERVER_LIBS@
 
-zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@
+zbx_trim_integer_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_trim_integer_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -334,7 +339,7 @@ zbx_variant_compare_LDADD = \
 
 zbx_variant_compare_LDADD += @SERVER_LIBS@
 
-zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@
+zbx_variant_compare_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_variant_compare_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -348,7 +353,7 @@ zbx_user_macro_parse_LDADD = \
 
 zbx_user_macro_parse_LDADD += @SERVER_LIBS@
 
-zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@
+zbx_user_macro_parse_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_user_macro_parse_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -362,7 +367,7 @@ zbx_str_extract_LDADD = \
 
 zbx_str_extract_LDADD += @SERVER_LIBS@
 
-zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@
+zbx_str_extract_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_str_extract_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -375,7 +380,7 @@ convert_to_utf8_LDADD = \
 
 convert_to_utf8_LDADD += @SERVER_LIBS@
 
-convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@
+convert_to_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 convert_to_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -389,7 +394,7 @@ zbx_truncate_itemkey_LDADD = \
 
 zbx_truncate_itemkey_LDADD += @SERVER_LIBS@
 
-zbx_truncate_itemkey_LDFLAGS = @SERVER_LDFLAGS@
+zbx_truncate_itemkey_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_truncate_itemkey_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -403,7 +408,7 @@ zbx_truncate_value_LDADD = \
 
 zbx_truncate_value_LDADD += @SERVER_LIBS@
 
-zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@
+zbx_truncate_value_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_truncate_value_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -417,7 +422,7 @@ zbx_dyn_escape_string_LDADD = \
 
 zbx_dyn_escape_string_LDADD += @SERVER_LIBS@
 
-zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@
+zbx_dyn_escape_string_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_dyn_escape_string_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -432,7 +437,7 @@ zbx_tm_add_LDADD = \
 
 zbx_tm_add_LDADD += @SERVER_LIBS@
 
-zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@
+zbx_tm_add_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_tm_add_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -447,7 +452,7 @@ zbx_tm_sub_LDADD = \
 
 zbx_tm_sub_LDADD += @SERVER_LIBS@
 
-zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@
+zbx_tm_sub_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_tm_sub_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -462,7 +467,7 @@ zbx_tm_round_up_LDADD = \
 
 zbx_tm_round_up_LDADD += @SERVER_LIBS@
 
-zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@
+zbx_tm_round_up_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_tm_round_up_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -477,7 +482,7 @@ zbx_tm_round_down_LDADD = \
 
 zbx_tm_round_down_LDADD += @SERVER_LIBS@
 
-zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@
+zbx_tm_round_down_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_tm_round_down_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -492,7 +497,7 @@ zbx_get_report_nextcheck_LDADD = \
 
 zbx_get_report_nextcheck_LDADD += @SERVER_LIBS@
 
-zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@
+zbx_get_report_nextcheck_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_get_report_nextcheck_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -508,7 +513,7 @@ zbx_ltrim_utf8_LDADD = \
 
 zbx_ltrim_utf8_LDADD += @SERVER_LIBS@
 
-zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+zbx_ltrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_ltrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -524,7 +529,7 @@ zbx_rtrim_utf8_LDADD = \
 
 zbx_rtrim_utf8_LDADD += @SERVER_LIBS@
 
-zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@
+zbx_rtrim_utf8_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_rtrim_utf8_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
@@ -539,9 +544,8 @@ zbx_get_week_number_LDADD = \
 
 zbx_get_week_number_LDADD += @SERVER_LIBS@
 
-zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@
+zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
 
 endif
