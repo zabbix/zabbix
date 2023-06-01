@@ -1,3 +1,4 @@
+#include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxhttp.h"
 #include "zbxcacheconfig.h"
@@ -18,6 +19,8 @@ static ZBX_THREAD_LOCAL struct event_base	*base;
 static ZBX_THREAD_LOCAL struct event		*curl_timeout;
 static ZBX_THREAD_LOCAL CURLM			*curl_handle;
 
+ZBX_VECTOR_DECL(int32, int)
+ZBX_VECTOR_IMPL(int32, int)
 typedef struct
 {
 	unsigned char		poller_type;
@@ -27,17 +30,20 @@ typedef struct
 	int			config_timeout;
 	const char		*config_source_ip;
 	struct event		*async_items_timer;
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_int32_t	errcodes;
+	zbx_vector_int32_t	lastclocks;		
 }
 zbx_poller_config_t;
 typedef struct
 {
-	zbx_uint64_t		itemid;
-	zbx_uint64_t		hostid;
-	unsigned char		value_type;
-	unsigned char		flags;
-	unsigned char		state;
-	char			*posts;
-	char			*status_codes;
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	unsigned char	value_type;
+	unsigned char	flags;
+	unsigned char	state;
+	char		*posts;
+	char		*status_codes;
 }
 zbx_dc_item_context_t;
 typedef struct
@@ -47,6 +53,13 @@ typedef struct
 	zbx_dc_item_context_t	item_context;
 }
 zbx_httpagent_context;
+
+typedef struct
+{
+	struct event *event;
+	curl_socket_t sockfd;
+}
+zbx_curl_context_t;
 
 static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
 {
@@ -126,8 +139,6 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	char			*error, *out = NULL;
 	AGENT_RESULT		result;
 	char			*status_codes;
-	int			errcode = SUCCEED;
-	int			nextcheck;
 	zbx_httpagent_context	*httpagent_context;
 	zbx_dc_item_context_t	*item_context;
 	zbx_timespec_t		timespec;
@@ -159,11 +170,9 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	zbx_free_agent_result(&result);
 	zbx_free(out);
 
-	zbx_dc_poller_requeue_items(&httpagent_context->item_context.itemid, &timespec.sec, &errcode, 1,
-			ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
-
-	if (FAIL != nextcheck && nextcheck <= time(NULL))
-		event_active(httpagent_context->poller_config->async_items_timer, 0, 0);
+	zbx_vector_uint64_append(&httpagent_context->poller_config->itemids, httpagent_context->item_context.itemid);
+	zbx_vector_int32_append(&httpagent_context->poller_config->errcodes, SUCCEED);
+	zbx_vector_int32_append(&httpagent_context->poller_config->lastclocks, timespec.sec);
 
 	httpagent_context->poller_config->processing--;
 	httpagent_context->poller_config->processed++;
@@ -172,12 +181,25 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	httpagent_context_clean(httpagent_context);
 	zbx_free(httpagent_context);
 }
-typedef struct
+
+static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 {
-	struct event *event;
-	curl_socket_t sockfd;
+	int	nextcheck;
+
+	if (0 == poller_config->itemids.values_num)
+		return;
+
+	zbx_dc_poller_requeue_items(poller_config->itemids.values, poller_config->lastclocks.values,
+			poller_config->errcodes.values, poller_config->itemids.values_num,
+			ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
+
+	zbx_vector_uint64_clear(&poller_config->itemids);
+	zbx_vector_int32_clear(&poller_config->lastclocks);
+	zbx_vector_int32_clear(&poller_config->errcodes);
+
+	if (FAIL != nextcheck && nextcheck <= time(NULL))
+		event_active(poller_config->async_items_timer, 0, 0);
 }
-curl_context_t;
 
 static void	check_multi_info(void)
 {
@@ -229,57 +251,52 @@ static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 	return 0;
 }
 
-static void	curl_perform(int fd, short event, void *arg);
-
-static curl_context_t	*create_curl_context(curl_socket_t sockfd)
-{
-	curl_context_t *context;
-
-	context = (curl_context_t *) malloc(sizeof(*context));
-
-	context->sockfd = sockfd;
-
-	context->event = event_new(base, sockfd, 0, curl_perform, context);
-
-	return context;
-}
-
-static void	destroy_curl_context(curl_context_t *context)
-{
-	event_del(context->event);
-	event_free(context->event);
-	free(context);
-}
-
 static void	curl_perform(int fd, short event, void *arg)
 {
 	int		running_handles;
 	int		flags = 0;
-	curl_context_t	*context;
+	zbx_curl_context_t	*context;
 
 	if(event & EV_READ)
 		flags |= CURL_CSELECT_IN;
 	if(event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
 
-	context = (curl_context_t *) arg;
+	context = (zbx_curl_context_t *) arg;
 	curl_multi_socket_action(curl_handle, context->sockfd, flags, &running_handles);
 
 	check_multi_info();
 }
 
+static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd)
+{
+	zbx_curl_context_t	*context;
+
+	context = (zbx_curl_context_t *) malloc(sizeof(*context));
+	context->sockfd = sockfd;
+	context->event = event_new(base, sockfd, 0, curl_perform, context);
+
+	return context;
+}
+
+static void	destroy_curl_context(zbx_curl_context_t *context)
+{
+	event_del(context->event);
+	event_free(context->event);
+	free(context);
+}
 
 static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
 {
-	curl_context_t *curl_context;
-	int		events = 0;
+	zbx_curl_context_t	*curl_context;
+	int			events = 0;
 	zabbix_log(LOG_LEVEL_TRACE, "action:%d", action);
 	switch(action)
 	{
 		case CURL_POLL_IN:
 		case CURL_POLL_OUT:
 		case CURL_POLL_INOUT:
-			curl_context = socketp ? (curl_context_t *) socketp : create_curl_context(s);
+			curl_context = socketp ? (zbx_curl_context_t *)socketp : create_curl_context(s);
 
 			curl_multi_assign(curl_handle, s, (void *) curl_context);
 
@@ -299,8 +316,8 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	case CURL_POLL_REMOVE:
 		if(socketp)
 		{
-			event_del(((curl_context_t*) socketp)->event);
-			destroy_curl_context((curl_context_t*) socketp);
+			event_del(((zbx_curl_context_t*) socketp)->event);
+			destroy_curl_context((zbx_curl_context_t*) socketp);
 			curl_multi_assign(curl_handle, s, NULL);
 		}
 		break;
@@ -320,7 +337,6 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 	zbx_timespec_t		timespec;
 	int			i, num;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
-	int			nextcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -329,10 +345,7 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 			poller_config->processing, &items);
 
 	if (0 == num)
-	{
-		nextcheck = zbx_dc_config_get_poller_nextcheck(poller_config->poller_type);
 		goto exit;
-	}
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 
@@ -349,8 +362,9 @@ static void	async_items(evutil_socket_t fd, short events, void *arg)
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
 					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
 
-			zbx_dc_poller_requeue_items(&items[i].itemid, &timespec.sec, &errcodes[i], 1,
-					poller_config->poller_type, &nextcheck);
+			zbx_vector_uint64_append(&poller_config->itemids, items[i].itemid);
+			zbx_vector_int32_append(&poller_config->errcodes, errcodes[i]);
+			zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
 		}
 	}
 
@@ -373,6 +387,10 @@ static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_threa
 	CURLcode	err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&poller_config->itemids);
+	zbx_vector_int32_create(&poller_config->lastclocks);
+	zbx_vector_int32_create(&poller_config->errcodes);
 
 	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
 	{
@@ -466,6 +484,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 
 		event_base_loop(base, EVLOOP_ONCE);
 
+		poller_requeue_items(&poller_config);
+
 		total_sec += zbx_time() - sec;
 
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
@@ -490,6 +510,13 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	curl_multi_cleanup(curl_handle);
 	event_free(curl_timeout);
 	event_base_free(base);
+
+	zbx_vector_uint64_clear(&poller_config.itemids);
+	zbx_vector_int32_clear(&poller_config.lastclocks);
+	zbx_vector_int32_clear(&poller_config.errcodes);
+	zbx_vector_uint64_destroy(&poller_config.itemids);
+	zbx_vector_int32_destroy(&poller_config.lastclocks);
+	zbx_vector_int32_destroy(&poller_config.errcodes);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
