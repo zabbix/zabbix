@@ -470,7 +470,7 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
 
 	if (0 != rdns)
 	{
-		*dnsname_len = zbx_strlen_utf8(tmp);
+		*dnsname_len = SUCCEED == zbx_is_ip(tmp) ? 0 : zbx_strlen_utf8(tmp);
 		*c = ' ';
 
 		if (ZBX_MAX_DNSNAME_LEN < *dnsname_len)
