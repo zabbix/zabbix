@@ -13,12 +13,13 @@
 #include "zbxrtc.h"
 #include "zbxtypes.h"
 
+static ZBX_THREAD_LOCAL struct event_base	*base;
+static ZBX_THREAD_LOCAL struct event		*curl_timeout;
+static ZBX_THREAD_LOCAL CURLM			*curl_handle;
+
 typedef struct
 {
-
 	unsigned char		poller_type;
-	CURLM			*curl_handle;
-	struct event_base	*base;
 	int			processed;
 	int			queued;
 	int			processing;
@@ -35,11 +36,11 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		state;
 	char			*posts;
-	zbx_poller_config_t	*poller_config;
 }
 zbx_dc_item_context_t;
 typedef struct
 {
+	zbx_poller_config_t	*poller_config;
 	zbx_http_context_t	http_context;
 	zbx_dc_item_context_t	item_context;
 }
@@ -66,7 +67,7 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 
 	httpagent_context_create(httpagent_context);
 
-	httpagent_context->item_context.poller_config = poller_config;
+	httpagent_context->poller_config = poller_config;
 	httpagent_context->item_context.itemid = item->itemid;
 	httpagent_context->item_context.hostid = item->host.hostid;
 	httpagent_context->item_context.value_type = item->value_type;
@@ -96,8 +97,7 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 		goto fail;
 	}
 
-	if (CURLM_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
-			httpagent_context->http_context.easyhandle)))
+	if (CURLM_OK != (merr = curl_multi_add_handle(curl_handle, httpagent_context->http_context.easyhandle)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot add a standard curl handle to the multi stack: %s",
 				curl_multi_strerror(merr)));
@@ -167,10 +167,6 @@ exit:
 
 	poller_config->queued += num;
 }
-
-struct event_base	*base;
-struct event		*curl_timeout;
-CURLM			*curl_handle;
 
 typedef struct
 {
@@ -251,10 +247,10 @@ static void	check_multi_info(void)
 				zbx_free_agent_result(&result);
 
 				if (FAIL != nextcheck && nextcheck <= time(NULL))
-					event_active(context->item_context.poller_config->async_items_timer, 0, 0);
+					event_active(context->poller_config->async_items_timer, 0, 0);
 
-				context->item_context.poller_config->processing--;
-				context->item_context.poller_config->processed++;
+				context->poller_config->processing--;
+				context->poller_config->processed++;
 				curl_multi_remove_handle(curl_handle, easy_handle);
 				httpagent_context_clean(context);
 				zbx_free(context);
@@ -427,8 +423,6 @@ static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_threa
 	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
 	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
 	poller_config->poller_type = poller_args_in->poller_type;
-	poller_config->curl_handle = curl_handle;
-	poller_config->base = base;
 
 	if (NULL == (poller_config->async_items_timer = evtimer_new(base, async_items, poller_config)))
 	{
