@@ -137,7 +137,8 @@ class WidgetForm extends CWidgetForm {
 			->addField($this->isTemplateDashboard()
 				? null
 				: (new CWidgetFieldIntegerBox('show_lines', _('Host count'), ZBX_MIN_WIDGET_LINES,
-					ZBX_MAX_WIDGET_LINES))
+					ZBX_MAX_WIDGET_LINES
+				))
 					->setDefault(self::DEFAULT_HOSTS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			);
