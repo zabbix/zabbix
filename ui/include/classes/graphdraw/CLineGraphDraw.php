@@ -1632,7 +1632,7 @@ class CLineGraphDraw extends CGraphDraw {
 		return true;
 	}
 
-	protected function drawElement(&$data, $from, $to, $minX, $maxX, $minY, $maxY, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
+	protected function drawElement(&$data, $from, $to, $drawtype, $max_color, $avg_color, $min_color, $minmax_color, $calc_fnc, $yaxisside) {
 		if (!isset($data['max'][$from]) || !isset($data['max'][$to])) {
 			return;
 		}
@@ -2125,9 +2125,6 @@ class CLineGraphDraw extends CGraphDraw {
 
 		// for each metric
 		for ($item = 0; $item < $this->num; $item++) {
-			$minY = $this->m_minY[$this->items[$item]['yaxisside']];
-			$maxY = $this->m_maxY[$this->items[$item]['yaxisside']];
-
 			if (!array_key_exists($this->items[$item]['itemid'], $this->data)) {
 				continue;
 			}
@@ -2189,10 +2186,6 @@ class CLineGraphDraw extends CGraphDraw {
 						$data,
 						$i,
 						$j,
-						0,
-						$this->sizeX,
-						$minY,
-						$maxY,
 						$valueDrawType,
 						$max_color,
 						$avg_color,
