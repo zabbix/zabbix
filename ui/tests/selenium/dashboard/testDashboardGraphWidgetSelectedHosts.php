@@ -414,76 +414,14 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => 'Host for widget 2',
-						'item' => '*'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => 'Host for widget 3',
-						'item' => '*'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => 'Host for widget 4',
-						'item' => '*'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => 'Host for widget 5',
-						'item' => '*'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
 						'host' => [
 							'Host for widget 1',
 							'Host for widget 2'
-						],
-						'item' => '*',
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 3'
-						],
-						'item' => '*',
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 4'
-						],
-						'item' => '*',
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 5'
-						],
-						'item' => '*',
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2'
 					]
 				]
 			],
@@ -494,8 +432,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 							'Host for widget 1',
 							'Host for widget 2',
 							'Host for widget 3'
-						],
-						'item' => '*',
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2',
+						'Host for widget 3',
 					]
 				]
 			],
@@ -505,9 +447,15 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'host' => [
 							'Host for widget 1',
 							'Host for widget 2',
+							'Host for widget 3',
 							'Host for widget 4'
-						],
-						'item' => '*',
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2',
+						'Host for widget 3',
+						'Host for widget 4'
 					]
 				]
 			],
@@ -517,12 +465,56 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'host' => [
 							'Host for widget 1',
 							'Host for widget 2',
+							'Host for widget 3',
+							'Host for widget 4',
 							'Host for widget 5'
-						],
-						'item' => '*',
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2',
+						'Host for widget 3',
+						'Host for widget 4',
+						'Host for widget 5'
 					]
 				]
 			],
+			[
+				[
+					'Data set' => [
+						'host' => [
+							'Host for widget 1',
+							'Host for widget 2',
+							'Host for widget 3',
+							'Host for widget 4',
+							'Host for widget 5'
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2',
+						'Host for widget 3',
+						'Host for widget 4',
+						'Host for widget 5'
+					]
+				]
+			],
+			[
+				[
+					'Data set' => [
+						'host' => [
+							'Host for widget'
+						]
+					],
+					'expected' => [
+						'Host for widget 1',
+						'Host for widget 2',
+						'Host for widget 3',
+						'Host for widget 4',
+						'Host for widget 5'
+					]
+				]
+			]
 		];
 	}
 
