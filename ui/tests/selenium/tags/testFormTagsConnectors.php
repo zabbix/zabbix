@@ -18,26 +18,24 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../common/testFormTags.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource EntitiesTags
  *
- * @backup services
+ * @backup connector
  */
-class testFormTagsServicesProblemTags extends testFormTags {
+class testFormTagsConnectors extends testFormTags {
 
-	public $problem_tags = true;
-	protected $tags_table = 'id:problem_tags';
+	public $link = 'zabbix.php?action=connector.list';
+	public $update_name = 'Connector with tags for updating';
+	public $clone_name = 'Connector with tags for cloning';
+	public $remove_name = 'Connector for removing tags';
+	protected $tags_table = 'id:tags';
 
-	public $update_name = 'Service with tags for updating';
-	public $clone_name = 'Service with tags for cloning';
-	public $remove_name = 'Service for removing tags';
-	public $link = 'zabbix.php?action=service.list.edit';
-	public $saved_link = 'zabbix.php?action=host.edit&hostid=';
-
-	public function getCreateProblemTagsData() {
+	public function getCreateConnectorTagsData() {
 		return [
 			[
 				[
@@ -125,7 +123,7 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/1/tag": cannot be empty.'
+					'error_details' => 'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -146,7 +144,7 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(tag, value) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
 				]
 			],
 			[
@@ -172,10 +170,10 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'tag' => 'Long tag name. Long tag name. Long tag name. Long tag name. Long tag name.'
-									.' Long tag name. Long tag name. Long tag name.',
+								.' Long tag name. Long tag name. Long tag name.',
 							'operator' => 'Equals',
 							'value' => 'Long tag value. Long tag value. Long tag value. Long tag value. Long tag value.'
-									.' Long tag value. Long tag value. Long tag value. Long tag value.'
+								.' Long tag value. Long tag value. Long tag value. Long tag value.'
 						]
 					]
 				]
@@ -184,15 +182,15 @@ class testFormTagsServicesProblemTags extends testFormTags {
 	}
 
 	/**
-	 * Test creating of Service with problem tags.
+	 * Test creating of Connector with tags.
 	 *
-	 * @dataProvider getCreateProblemTagsData
+	 * @dataProvider getCreateConnectorTagsData
 	 */
-	public function testFormTagsServicesProblemTags_Create($data) {
-		$this->checkTagsCreate($data, 'service');
+	public function testFormTagsConnectors_Create($data) {
+		$this->checkTagsCreate($data, 'connector');
 	}
 
-	public static function getUpdateProblemTagsData() {
+	public static function getUpdateConnectorTagsData() {
 		return [
 			[
 				[
@@ -206,7 +204,7 @@ class testFormTagsServicesProblemTags extends testFormTags {
 							'value' => 'value1'
 						]
 					],
-					'error_details'=>'Invalid parameter "/1/problem_tags/1/tag": cannot be empty.'
+					'error_details'=>'Invalid parameter "/1/tags/1/tag": cannot be empty.'
 				]
 			],
 			[
@@ -216,13 +214,13 @@ class testFormTagsServicesProblemTags extends testFormTags {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
-							'tag' => 'problem action',
+							'tag' => 'connector action',
 							'operator' => 'Contains',
-							'value' => 'problem update'
+							'value' => 'connector update'
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/2": value (tag, value)=(problem action,'.
-							' problem update) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/2": value (tag, operator, value)=(connector action,'.
+						' 2, connector update) already exists.'
 				]
 			],
 			[
@@ -232,13 +230,13 @@ class testFormTagsServicesProblemTags extends testFormTags {
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 2,
-							'tag' => 'problem tag without value',
+							'tag' => 'connector tag without value',
 							'operator' => 'Equals',
 							'value' => ''
 						]
 					],
-					'error_details' => 'Invalid parameter "/1/problem_tags/3": value (tag, value)'.
-							'=(problem tag without value, ) already exists.'
+					'error_details' => 'Invalid parameter "/1/tags/3": value (tag, operator, value)'.
+						'=(connector tag without value, 0, ) already exists.'
 				]
 			],
 			[
@@ -314,25 +312,25 @@ class testFormTagsServicesProblemTags extends testFormTags {
 	}
 
 	/**
-	 * Test update of Service with problem tags.
+	 * Test update of Connector with tags.
 	 *
-	 * @dataProvider getUpdateProblemTagsData
+	 * @dataProvider getUpdateConnectorTagsData
 	 */
-	public function testFormTagsServicesProblemTags_Update($data) {
-		$this->checkTagsUpdate($data, 'service');
+	public function testFormTagsConnectors_Update($data) {
+		$this->checkTagsUpdate($data, 'connector');
 	}
 
 	/**
-	 * Test cloning of Service with problem tags.
+	 * Test cloning of Connector with tags.
 	 */
-	public function testFormTagsServicesProblemTags_Clone() {
-		$this->executeCloning('service', 'Clone');
+	public function testFormTagsConnectors_Clone() {
+		$this->executeCloning('connector', 'Clone');
 	}
 
 	/**
-	 * Test removing problem tags from Service.
+	 * Test removing tags from Connector.
 	 */
-	public function testFormTagsServicesProblemTags_RemoveTags() {
-		$this->clearTags('service');
+	public function testFormTagsConnectors_RemoveTags() {
+		$this->clearTags('connector');
 	}
 }
