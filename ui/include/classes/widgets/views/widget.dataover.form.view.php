@@ -35,17 +35,14 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 $scripts = [];
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['groups']['groupids'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts[] = $field_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
-	$form->getName()
-);
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['hosts']['hostids'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-19T06:16:23Z'
+  date: '2023-05-24T09:24:40Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1949,6 +1949,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -1976,7 +1977,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
@@ -2174,7 +2175,7 @@ zabbix_export:
                   value: availability
             - uuid: 3c080bba511e44aab1139b66f00451ee
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -4090,6 +4091,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -4117,7 +4119,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
                 - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
@@ -4448,7 +4450,7 @@ zabbix_export:
                   value: availability
             - uuid: 347215d307c8465cad41198f12b5ff68
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-              name: 'GCP Cloud SQL MySQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -5646,6 +5648,7 @@ zabbix_export:
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
+          status_codes: ''
           headers:
             - name: Content-Type
               value: application/json
@@ -5673,7 +5676,7 @@ zabbix_export:
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
@@ -5871,7 +5874,7 @@ zabbix_export:
                   value: availability
             - uuid: 959072ed00c4461196bef71618799b82
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Suspended state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
@@ -6407,7 +6410,7 @@ zabbix_export:
           name: 'GCP Cloud SQL PostgreSQL: Databases discovery'
           type: HTTP_AGENT
           key: gcp.cloudsql.pgsql.db.discovery
-          delay: 3m
+          delay: 1h
           filter:
             evaltype: AND
             conditions:
@@ -7804,7 +7807,7 @@ zabbix_export:
                   value: availability
             - uuid: 1223f00a5e4b4bc8aa9e8ec08253c4cc
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 7'
-              name: 'GCP Compute Engine: Instance is in Suspended state'
+              name: 'GCP Compute Engine: Instance is in suspended state'
               priority: INFO
               description: 'The VM is in a suspended state. You can resume the VM or delete it.'
               manual_close: 'YES'
@@ -7815,7 +7818,7 @@ zabbix_export:
                   value: notice
             - uuid: d2144e2277ec458c80d2b948364f1924
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 4'
-              name: 'GCP Compute Engine: The instance is in Repairing state'
+              name: 'GCP Compute Engine: The instance is in repairing state'
               priority: WARNING
               description: |
                 The VM is being repaired. 
@@ -7828,7 +7831,7 @@ zabbix_export:
                   value: availability
             - uuid: 4a010c2b1e6f4ec88dbbe97255b9bac4
               expression: 'last(/GCP Compute Engine Instance by HTTP/gcp.gce.instance.state) = 5'
-              name: 'GCP Compute Engine: The instance is in Terminated state'
+              name: 'GCP Compute Engine: The instance is in terminated state'
               priority: AVERAGE
               description: 'The VM is stopped. You stopped the VM, or the VM encountered a failure.'
               manual_close: 'YES'
@@ -7929,7 +7932,7 @@ zabbix_export:
           units: '%'
           description: |
             Memory usage Percentage. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7944,8 +7947,8 @@ zabbix_export:
           triggers:
             - uuid: fa918889bcb84d3886254f00f0df288c
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}'
-              name: 'GCP Compute Engine: High Memory Utilization '
-              event_name: 'GCP Compute Engine: (over {$GCE.RAM.UTIL.MAX}% for 15m)'
+              name: 'GCP Compute Engine: High memory utilization'
+              event_name: 'GCP Compute Engine:High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
@@ -7961,7 +7964,7 @@ zabbix_export:
           units: B
           description: |
             Total VM memory size. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -7983,7 +7986,7 @@ zabbix_export:
           units: B
           description: |
             Memory currently used in the VM. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8005,7 +8008,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory read into the guest from its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
@@ -8027,7 +8030,7 @@ zabbix_export:
           units: B
           description: |
             The amount of memory written from the guest to its own swap space. 
-            This metric is only available for VMs that belong to the e2 family; retuns empty value for different instance types.
+            This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
             - type: JSONPATH
