@@ -15,29 +15,26 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
 
-/**
- * Host availability widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+use Zabbix\Widgets\Fields\CWidgetFieldMultiSelectMap;
 
-(new CWidgetFormView($data))
-	->addField(array_key_exists('groupids', $data['fields'])
-		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
-		: null
-	)
-	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])
-	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
-	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
-	)
-	->show();
+class CWidgetFieldMultiSelectMapView extends CWidgetFieldMultiSelectView {
+
+	public function __construct(CWidgetFieldMultiSelectMap $field, array $data) {
+		parent::__construct($field, $data);
+	}
+
+	protected function getObjectName(): string {
+		return 'sysmaps';
+	}
+
+	protected function getPopupParameters(): array {
+		return [
+			'srctbl' => 'sysmaps',
+			'srcfld1' => 'sysmapid'
+		];
+	}
+}

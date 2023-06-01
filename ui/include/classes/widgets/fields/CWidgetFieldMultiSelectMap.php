@@ -19,25 +19,13 @@
 **/
 
 
-/**
- * Host availability widget form view.
- *
- * @var CView $this
- * @var array $data
- */
+namespace Zabbix\Widgets\Fields;
 
-(new CWidgetFormView($data))
-	->addField(array_key_exists('groupids', $data['fields'])
-		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
-		: null
-	)
-	->addField(
-		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])
-	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['layout'])
-	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
-	)
-	->show();
+class CWidgetFieldMultiSelectMap extends CWidgetFieldMultiSelect {
+
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+	}
+}
