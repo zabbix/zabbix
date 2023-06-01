@@ -32,9 +32,10 @@ typedef struct
 	struct event		*async_items_timer;
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_int32_t	errcodes;
-	zbx_vector_int32_t	lastclocks;		
+	zbx_vector_int32_t	lastclocks;
 }
 zbx_poller_config_t;
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
