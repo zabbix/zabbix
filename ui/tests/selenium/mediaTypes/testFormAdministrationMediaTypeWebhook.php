@@ -498,8 +498,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 			$this->fillOperationsTab($data, $form);
 		}
 
-		$action = array_key_exists('update', $data) ? 'Update' : 'Add';
-		$overlay->getFooter()->query('button', $action)->one()->click();
+		$overlay->getFooter()->query('button', CTestArrayHelper::get($data, 'update', false) ? 'Update' : 'Add')
+				->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check media type creation or update message.
@@ -740,9 +740,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $overlay->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
-		$this->page->waitUntilReady();
+		COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$message = CMessageElement::find()->one();
 		$this->assertTrue($message->isGood());
@@ -761,8 +760,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		// Clone the reference media type.
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link:Reference webhook')->one()->WaitUntilClickable()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$form = $overlay->asForm()->waitUntilVisible();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->waitUntilVisible();
 		$this->query('button:Clone')->one()->click();
 		$form->fill(['Name' => 'Webhook clone']);
 		$form->submit();
@@ -817,6 +815,7 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 		$form = $overlay->asForm();
 		$form->fill($fields);
 		$overlay->query('button:Cancel')->one()->click();
+		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		// Make sure no changes took place.
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));

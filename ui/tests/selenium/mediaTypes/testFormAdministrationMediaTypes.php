@@ -1200,6 +1200,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					: 'Update: '.$data['mediatype_tab']['Name'];
 			}
 		}
+
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:media-type-form')->asForm()->one();
 
@@ -1218,8 +1219,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$form->fill($data['options_tab']);
 		}
 
-		$button = $create ? 'Add' : 'Update';
-		$dialog->getFooter()->query('button', $button)->one()->click();
+		$dialog->getFooter()->query('button', $create ? 'Add' : 'Update')->one()->click();
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
@@ -1285,6 +1285,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$form->checkValue($data['options_tab']);
 			}
 		}
+
 		$dialog->close();
 	}
 }
