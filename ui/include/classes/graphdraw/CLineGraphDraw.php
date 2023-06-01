@@ -327,7 +327,7 @@ class CLineGraphDraw extends CGraphDraw {
 				cj - count of missed in one go
 				dx - offset to first value (count to last existing point)
 			*/
-			for ($ci = 0, $cj = 0; $ci < $this->sizeX; $ci++) {
+			for ($ci = 0, $cj = 0; $ci <= $this->sizeX; $ci++) {
 				if (!array_key_exists($ci, $data['count']) || ($data['count'][$ci] == 0)) {
 					$data['count'][$ci] = 0;
 					$data['shift_min'][$ci] = 0;
@@ -410,7 +410,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 					$prev_data = &$this->data[$item2['itemid']];
 
-					for ($ci = 0; $ci < $this->sizeX; $ci++) {
+					for ($ci = 0; $ci <= $this->sizeX; $ci++) {
 						foreach (['min', 'max', 'avg'] as $var_name) {
 							$shift_var_name = 'shift_'.$var_name;
 							$curr_shift = &$curr_data[$shift_var_name];
@@ -2141,8 +2141,8 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// for each X
 			$prevDraw = true;
-			for ($i = 1, $j = 0; $i < $this->sizeX; $i++) { // new point
-				if ($data['count'][$i] == 0 && $i != $this->sizeX - 1) {
+			for ($i = 1, $j = 0; $i <= $this->sizeX; $i++) { // new point
+				if ($data['count'][$i] == 0 && $i != $this->sizeX) {
 					continue;
 				}
 
