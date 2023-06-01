@@ -330,10 +330,11 @@ class CHistFunctionParser extends CParser {
 					$_parameters[$num]['match'] .= $source[$p];
 					$_parameters[$num]['length']++;
 
-					if($this->options['no_backslash_escaping']) {
+					if ($this->options['no_backslash_escaping']) {
 						if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 							$state = self::STATE_END;
 						}
+
 						break;
 					}
 

@@ -46,6 +46,14 @@ class C64ImportConverter extends CConverter {
 			$data['zabbix_export']['templates'] = self::convertTemplates($data['zabbix_export']['templates']);
 		}
 
+		if (array_key_exists('triggers', $data['zabbix_export'])) {
+			$data['zabbix_export']['triggers'] = self::convertTriggers($data['zabbix_export']['triggers']);
+		}
+
+		if (array_key_exists('maps', $data['zabbix_export'])) {
+			$data['zabbix_export']['maps'] = self::convertMaps($data['zabbix_export']['maps']);
+		}
+
 		return $data;
 	}
 
@@ -94,6 +102,24 @@ class C64ImportConverter extends CConverter {
 	}
 
 	/**
+	 * Convert maps.
+	 *
+	 * @param array $maps
+	 *
+	 * @return array
+	 */
+	private static function convertMaps(array $maps): array {
+		foreach ($maps as &$map) {
+			if (array_key_exists('selements', $map)) {
+				$map['selements'] = self::convertSelements($map['selements']);
+			}
+		}
+		unset($map);
+
+		return $maps;
+	}
+
+	/**
 	 * Convert items.
 	 *
 	 * @param array $items
@@ -106,7 +132,7 @@ class C64ImportConverter extends CConverter {
 				$item['triggers'] = self::convertTriggers($item['triggers']);
 			}
 
-			if ($item['type'] === 'CALCULATED' && array_key_exists('params', $item)) {
+			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
 				$item['params'] = self::convertExpression($item['params']);
 			}
 		}
@@ -146,13 +172,54 @@ class C64ImportConverter extends CConverter {
 				$item_prototype['trigger_prototypes'] = self::convertTriggers($item_prototype['trigger_prototypes']);
 			}
 
-			if ($item_prototype['type'] === 'CALCULATED' && array_key_exists('params', $item_prototype)) {
+			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
+					&& array_key_exists('params', $item_prototype)) {
 				$item_prototype['params'] = self::convertExpression($item_prototype['params']);
 			}
 		}
 		unset($item_prototype);
 
 		return $item_prototypes;
+	}
+
+	/**
+	 * Convert map selements.
+	 *
+	 * @param array $selements
+	 *
+	 * @return array
+	 */
+	private static function convertSelements(array $selements): array {
+		foreach ($selements as &$selement) {
+			if (array_key_exists('elements', $selement)) {
+				$selement['elements'] = self::convertElements($selement['elements']);
+			}
+		}
+		unset($selement);
+
+		return $selements;
+	}
+
+	/**
+	 * Convert elements.
+	 *
+	 * @param array $elements
+	 *
+	 * @return array
+	 */
+	private static function convertElements(array $elements): array {
+		foreach ($elements as &$element) {
+			if (array_key_exists('expression', $element)) {
+				$element['expression'] = self::convertExpression($element['expression']);
+			}
+
+			if (array_key_exists('recovery_expression', $element)) {
+				$element['recovery_expression'] = self::convertExpression($element['recovery_expression']);
+			}
+		}
+		unset($element);
+
+		return $elements;
 	}
 
 	/**
@@ -166,6 +233,10 @@ class C64ImportConverter extends CConverter {
 		foreach ($triggers as &$trigger) {
 			if (array_key_exists('expression', $trigger)) {
 				$trigger['expression'] = self::convertExpression($trigger['expression']);
+			}
+
+			if (array_key_exists('recovery_expression', $trigger)) {
+				$trigger['recovery_expression'] = self::convertExpression($trigger['recovery_expression']);
 			}
 		}
 		unset($trigger);
@@ -181,38 +252,32 @@ class C64ImportConverter extends CConverter {
 	 * @return string
 	 */
 	private static function convertExpression(string $expression): string {
-		$convert_functions = ['count', 'countunique','find', 'logeventid', 'logsource'];
-
 		if (self::$parser->parse($expression) != CParser::PARSE_SUCCESS) {
 			return $expression;
 		}
 
 		$tokens = self::$parser->getResult()->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
-		$convert_params = [];
+		$convert_parameters = [];
 
 		foreach ($tokens as $token) {
-			if (!in_array($token['data']['function'], $convert_functions)) {
-				continue;
-			}
-
 			foreach ($token['data']['parameters'] as $parameter) {
 				if ($parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
-					&& strpos($parameter['match'], '\\') !== false) {
-					$convert_params[] = $parameter;
+						&& strpos($parameter['match'], '\\') !== false) {
+					$convert_parameters[] = $parameter;
 				}
 			}
 		}
 
-		if (!$convert_params) {
+		if (!$convert_parameters) {
 			return $expression;
 		}
 
-		foreach (array_reverse($convert_params) as $param) {
+		foreach (array_reverse($convert_parameters) as $parameter) {
 			$expression = substr_replace(
 				$expression,
-				strtr($param['match'], ['\\"' => '\\"', '\\' => '\\\\']),
-				$param['pos'],
-				$param['length']
+				strtr($parameter['match'], ['\\"' => '\\"', '\\' => '\\\\']),
+				$parameter['pos'],
+				$parameter['length']
 			);
 		}
 
