@@ -66,10 +66,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
 
 		// Close the hintbox.
-		$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+		$hintbox->query('class:btn-overlay-close')->one()->click()->waitUntilNotPresent();
 
 		// Check confirmation popup.
-		foreach (['button:Cancel', 'class:overlay-close-btn', 'button:Ok'] as $button) {
+		foreach (['button:Cancel', 'class:btn-overlay-close', 'button:Ok'] as $button) {
 			$form->fill(['Enable HTTP authentication' => true]);
 			$dialog = COverlayDialogElement::find()->one();
 			$this->assertEquals('Confirm changes', $dialog->getTitle());

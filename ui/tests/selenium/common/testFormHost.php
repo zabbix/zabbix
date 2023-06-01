@@ -319,7 +319,7 @@ class testFormHost extends CWebTest {
 		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Close host form popup to avoid unexpected alert in further cases.
@@ -2129,7 +2129,7 @@ class testFormHost extends CWebTest {
 					);
 
 					// Close the hint-box.
-					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [

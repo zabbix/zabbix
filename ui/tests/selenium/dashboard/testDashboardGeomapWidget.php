@@ -180,7 +180,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		$form->query('xpath:.//label[text()="Initial view"]/a')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 	}
 

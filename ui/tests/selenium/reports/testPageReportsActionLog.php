@@ -737,7 +737,7 @@ class testPageReportsActionLog extends CWebTest {
 		);
 
 		// Close hintbox.
-		$hintbox->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotPresent();
+		$hintbox->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
 	}
 
 	/**

@@ -97,7 +97,7 @@ class COverlayDialogElement extends CElement {
 	 * Close overlay dialog.
 	 */
 	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click();
+		$this->query('class:btn-overlay-close')->one()->click();
 		$this->ensureNotPresent();
 	}
 
