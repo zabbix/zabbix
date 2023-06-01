@@ -20,7 +20,7 @@
 
 
 /**
- * Controller class containing operations for adding and updating discovery checks.
+ * Controller class containing operations for adding conditions.
  */
 class CControllerCorrelationConditionEdit extends CController {
 
