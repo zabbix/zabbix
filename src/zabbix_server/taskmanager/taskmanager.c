@@ -20,12 +20,12 @@
 #include "taskmanager.h"
 
 #include "../db_lengths.h"
+#include "../events/events.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "log.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
-#include "../events.h"
 #include "../actions.h"
 #include "zbxexport.h"
 #include "zbxdiag.h"
@@ -132,7 +132,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 		{
 			ZBX_STR2UINT64(triggerid, row[2]);
 			zbx_vector_uint64_append(&triggerids, triggerid);
-			DCconfig_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
+			zbx_dc_config_lock_triggers_by_triggerids(&triggerids, &locked_triggerids);
 
 			/* close the problem if source trigger was successfully locked or */
 			/* if the trigger doesn't exist, but event still exists */
@@ -142,11 +142,11 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 				ZBX_STR2UINT64(eventid, row[1]);
 				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
 
-				DCconfig_unlock_triggers(&locked_triggerids);
+				zbx_dc_config_unlock_triggers(&locked_triggerids);
 
 				ret = SUCCEED;
 			}
-			else if (FAIL == DCconfig_trigger_exists(triggerid))
+			else if (FAIL == zbx_dc_config_trigger_exists(triggerid))
 			{
 				zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
 						taskid);
@@ -1617,6 +1617,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_PROXY_CONFIG_CACHE_RELOAD};
 
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
@@ -1638,7 +1639,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_setproctitle("%s [started, idle %d sec]", get_process_type_string(process_type), sleeptime);
 
-	zbx_rtc_subscribe(process_type, process_num, taskmanager_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), taskmanager_args_in->config_timeout,
+			&rtc);
 
 	while (ZBX_IS_RUNNING())
 	{

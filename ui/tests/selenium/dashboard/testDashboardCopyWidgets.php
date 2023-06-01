@@ -573,7 +573,9 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->page->open('zabbix.php?action=module.list');
 		$this->query('class:list-table')->asTable()->one()->findRow('Name', $data['module_name'])
 				->query('link', 'Enabled')->one()->click();
+
 		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Module disabled');
 
 		// Open dashboard and execute the required action with the disabled module widget.
 		$this->page->open($url)->waitUntilReady();

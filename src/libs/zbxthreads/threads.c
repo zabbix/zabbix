@@ -22,11 +22,20 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+#include "zbxwin32.h"
+
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-	return thread_args->entry(thread_args);
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_seh_handler(GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
@@ -284,3 +293,24 @@ long int	zbx_get_thread_id(void)
 	return (long int)getpid();
 #endif
 }
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+void	zbx_pthread_init_attr(pthread_attr_t *attr)
+{
+	if (0 != pthread_attr_init(attr))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize thread attributes: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_STACKSIZE
+	if (0 != pthread_attr_setstacksize(attr, HAVE_STACKSIZE * ZBX_KIBIBYTE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set thread stack size: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+#endif
+}
+#endif

@@ -35,43 +35,61 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1'
+			'initial_load' => 'in 0,1',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
-		$filter = [
-			'groupids' => getSubGroups($this->fields_values['groupids']),
-			'exclude_groupids' => getSubGroups($this->fields_values['exclude_groupids']),
-			'hostids' => $this->fields_values['hostids'],
-			'problem' => $this->fields_values['problem'],
-			'severities' => $this->fields_values['severities'],
-			'show_type' => $this->fields_values['show_type'],
-			'layout' => $this->fields_values['layout'],
-			'show_suppressed' => $this->fields_values['show_suppressed'],
-			'hide_empty_groups' => $this->fields_values['hide_empty_groups'],
-			'show_opdata' => $this->fields_values['show_opdata'],
-			'ext_ack' => $this->fields_values['ext_ack'],
-			'show_timeline' => $this->fields_values['show_timeline'],
-			'evaltype' => $this->fields_values['evaltype'],
-			'tags' => $this->fields_values['tags']
-		];
-
-		$data = getSystemStatusData($filter);
-
-		if ($filter['show_type'] == Widget::SHOW_TOTALS) {
-			$data['groups'] = getSystemStatusTotals($data);
+		// Editing template dashboard?
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+			$this->setResponse(new CControllerResponseData([
+				'name' => $this->getInput('name', $this->widget->getDefaultName()),
+				'error' => _('No data.'),
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				]
+			]));
 		}
+		else {
+			$filter = [
+				'groupids' => !$this->isTemplateDashboard() ? getSubGroups($this->fields_values['groupids']) : null,
+				'exclude_groupids' => !$this->isTemplateDashboard()
+					? getSubGroups($this->fields_values['exclude_groupids'])
+					: null,
+				'hostids' => !$this->isTemplateDashboard()
+					? $this->fields_values['hostids']
+					: [$this->getInput('dynamic_hostid')],
+				'problem' => $this->fields_values['problem'],
+				'severities' => $this->fields_values['severities'],
+				'show_type' => !$this->isTemplateDashboard() ? $this->fields_values['show_type'] : Widget::SHOW_TOTALS,
+				'layout' => $this->fields_values['layout'],
+				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'hide_empty_groups' => !$this->isTemplateDashboard() ? $this->fields_values['hide_empty_groups'] : null,
+				'show_opdata' => $this->fields_values['show_opdata'],
+				'ext_ack' => $this->fields_values['ext_ack'],
+				'show_timeline' => $this->fields_values['show_timeline'],
+				'evaltype' => $this->fields_values['evaltype'],
+				'tags' => $this->fields_values['tags']
+			];
 
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'initial_load' => (bool) $this->getInput('initial_load', 0),
-			'data' => $data,
-			'filter' => $filter,
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			],
-			'allowed' => $data['allowed']
-		]));
+			$data = getSystemStatusData($filter);
+
+			if ($filter['show_type'] == Widget::SHOW_TOTALS) {
+				$data['groups'] = getSystemStatusTotals($data);
+			}
+
+			$this->setResponse(new CControllerResponseData([
+				'name' => $this->getInput('name', $this->widget->getDefaultName()),
+				'error' => null,
+				'initial_load' => (bool) $this->getInput('initial_load', 0),
+				'data' => $data,
+				'filter' => $filter,
+				'user' => [
+					'debug_mode' => $this->getDebugMode()
+				],
+				'allowed' => $data['allowed']
+			]));
+		}
 	}
 }

@@ -24,6 +24,7 @@
 #include "zbxtime.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
+#define ZBX_ES_LOG_MSG_LIMIT	8000
 
 /* this macro can be used in time intensive C functions to check for script timeout execution */
 #define ZBX_ES_CHECK_TIMEOUT(ctx, env)									\
@@ -51,7 +52,10 @@ struct zbx_es_env
 	jmp_buf		loc;
 
 	int		http_req_objects;
-	size_t		log_size;
+
+	int		logged_msgs;
+
+	const char	*config_source_ip;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);

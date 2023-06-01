@@ -22,12 +22,14 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "log.h"
+#include "zbx_dbversion_constants.h"
 
 #if defined(HAVE_MYSQL)
 #	include "mysql.h"
 #	include "errmsg.h"
 #	include "mysqld_error.h"
 #elif defined(HAVE_ORACLE)
+#	include "zbxcrypto.h"
 #	include "zbxdbschema.h"
 #	include "oci.h"
 #elif defined(HAVE_POSTGRESQL)
@@ -39,35 +41,6 @@
 #if defined(HAVE_SQLITE3)
 #	include "zbxmutexs.h"
 #endif
-
-#define ZBX_MYSQL_MIN_VERSION				50728
-#define ZBX_MYSQL_MIN_VERSION_STR			"5.07.28"
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION			80030
-#define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR		"8.00.30"
-#define ZBX_MYSQL_MAX_VERSION				80099
-#define ZBX_MYSQL_MAX_VERSION_STR			"8.00.x"
-
-#define ZBX_MARIA_MIN_VERSION				100200
-#define ZBX_MARIA_MIN_VERSION_STR			"10.02.00"
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION			100500
-#define ZBX_MARIA_MIN_SUPPORTED_VERSION_STR		"10.05.00"
-#define ZBX_MARIA_MAX_VERSION				101099
-#define ZBX_MARIA_MAX_VERSION_STR			"10.10.xx"
-
-#define ZBX_POSTGRESQL_MIN_VERSION			100009
-#define ZBX_POSTGRESQL_MIN_VERSION_STR			"10.9"
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION		130000
-#define ZBX_POSTGRESQL_MIN_SUPPORTED_VERSION_STR	"13.0"
-#define ZBX_POSTGRESQL_MAX_VERSION			159999
-#define ZBX_POSTGRESQL_MAX_VERSION_STR			"15.x"
-
-#define ZBX_ORACLE_MIN_VERSION				1201000200
-#define ZBX_ORACLE_MIN_VERSION_STR			"Database 12c Release 12.01.00.02.x"
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION		1900000000
-#define ZBX_ORACLE_MIN_SUPPORTED_VERSION_STR		"Database 19c Release 19.x.x"
-#define ZBX_ORACLE_MAX_VERSION				2199000000
-#define ZBX_ORACLE_MAX_VERSION_STR			"Database 21c Release 21.x.x"
-
 struct zbx_db_result
 {
 #if defined(HAVE_MYSQL)
@@ -99,7 +72,7 @@ static int		txn_end_error = ZBX_DB_OK;	/* transaction result */
 
 static char		*last_db_strerror = NULL;	/* last database error message */
 
-extern int		CONFIG_LOG_SLOW_QUERIES;
+static int		config_log_slow_queries;
 
 static int		db_auto_increment;
 
@@ -914,11 +887,13 @@ out:
 	return ret;
 }
 
-int	zbx_db_init_basic(const char *dbname, const char *const dbschema, char **error)
+int	zbx_db_init_basic(const char *dbname, const char *const dbschema, int log_slow_queries, char **error)
 {
 #ifdef HAVE_SQLITE3
 	zbx_stat_t	buf;
-
+#endif
+	config_log_slow_queries = log_slow_queries;
+#ifdef HAVE_SQLITE3
 	if (0 != zbx_stat(dbname, &buf))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot open database file \"%s\": %s", dbname, zbx_strerror(errno));
@@ -1259,6 +1234,7 @@ static sb4 db_bind_dynamic_cb(dvoid *ctxp, OCIBind *bindp, ub4 iter, ub4 index, 
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_CUID:
+		case ZBX_TYPE_BLOB:
 			*bufpp = context->rows[iter][context->position].str;
 			*alenp = ((size_t *)context->data)[iter];
 			break;
@@ -1348,6 +1324,28 @@ int	zbx_db_bind_parameter_dyn(zbx_db_bind_context_t *context, int position, unsi
 			context->data = sizes;
 			data_type = SQLT_LNG;
 			break;
+		case ZBX_TYPE_BLOB:
+			sizes = (size_t *)zbx_malloc(NULL, sizeof(size_t) * rows_num);
+			context->size_max = 0;
+
+			for (i = 0; i < rows_num; i++)
+			{
+				size_t	dst_len;
+				size_t	src_len = strlen(rows[i][position].str) * 3 / 4 + 1;
+				char	*dst = (char*)zbx_malloc(NULL, src_len);
+
+				zbx_base64_decode(rows[i][position].str, (char *)dst, src_len, &dst_len);
+				sizes[i] = dst_len;
+				zbx_free(rows[i][position].str);
+				rows[i][position].str = dst;
+
+				if (sizes[i] > context->size_max)
+					context->size_max = sizes[i];
+			}
+
+			context->data = sizes;
+			data_type = SQLT_BIN;
+			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -1425,6 +1423,20 @@ out:
 }
 #endif
 
+#if defined(HAVE_MYSQL)
+void	zbx_mysql_escape_bin(const char *src, char *dst, size_t size)
+{
+	mysql_real_escape_string(conn, dst, src, size);
+}
+#elif defined(HAVE_POSTGRESQL)
+void	zbx_postgresql_escape_bin(const char *src, char **dst, size_t size)
+{
+	size_t	dst_size;
+
+	*dst = (char*)PQescapeByteaConn(conn, (const unsigned char*)src, size, &dst_size);
+}
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Execute SQL statement. For non-select statements only.            *
@@ -1449,7 +1461,7 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -1590,10 +1602,10 @@ lbl_exec:
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;
-		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+		if (sec > (double)config_log_slow_queries / 1000.0)
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
@@ -1632,7 +1644,7 @@ zbx_db_result_t	zbx_db_vselect(const char *fmt, va_list args)
 	char		*error = NULL;
 #endif
 
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 		sec = zbx_time();
 
 	sql = zbx_dvsprintf(sql, fmt, args);
@@ -1891,10 +1903,10 @@ lbl_get_table:
 	if (0 == txn_level)
 		zbx_mutex_unlock(sqlite_access);
 #endif	/* HAVE_SQLITE3 */
-	if (0 != CONFIG_LOG_SLOW_QUERIES)
+	if (0 != config_log_slow_queries)
 	{
 		sec = zbx_time() - sec;
-		if (sec > (double)CONFIG_LOG_SLOW_QUERIES / 1000.0)
+		if (sec > (double)config_log_slow_queries / 1000.0)
 			zabbix_log(LOG_LEVEL_WARNING, "slow query: " ZBX_FS_DBL " sec, \"%s\"", sec, sql);
 	}
 
@@ -2581,6 +2593,15 @@ void	zbx_db_version_json_create(struct zbx_json *json, struct zbx_db_version_inf
 	}
 
 	zbx_json_addint64(json, "flag", info->flag);
+#ifdef HAVE_ORACLE
+	if (0 != info->tables_json.buffer_offset)
+	{
+		zbx_json_addobject(json, "schema_diff");
+		if (0 != strcmp(info->tables_json.buffer, "{}"))
+			zbx_json_addraw(json, "tables", info->tables_json.buffer);
+		zbx_json_close(json);
+	}
+#endif
 	zbx_json_close(json);
 
 	if (NULL != info->extension)
@@ -2721,13 +2742,13 @@ void	zbx_dbms_version_info_extract(struct zbx_db_version_info_t *version_info)
 	{
 		version_info->database = "MariaDB";
 
-		version_info->min_version = ZBX_MARIA_MIN_VERSION;
-		version_info->max_version = ZBX_MARIA_MAX_VERSION;
-		version_info->min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION;
+		version_info->min_version = ZBX_MARIADB_MIN_VERSION;
+		version_info->max_version = ZBX_MARIADB_MAX_VERSION;
+		version_info->min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION;
 
-		version_info->friendly_min_version = ZBX_MARIA_MIN_VERSION_STR;
-		version_info->friendly_max_version = ZBX_MARIA_MAX_VERSION_STR;
-		version_info->friendly_min_supported_version = ZBX_MARIA_MIN_SUPPORTED_VERSION_STR;
+		version_info->friendly_min_version = ZBX_MARIADB_MIN_VERSION_STR;
+		version_info->friendly_max_version = ZBX_MARIADB_MAX_VERSION_STR;
+		version_info->friendly_min_supported_version = ZBX_MARIADB_MIN_SUPPORTED_VERSION_STR;
 	}
 	else
 	{

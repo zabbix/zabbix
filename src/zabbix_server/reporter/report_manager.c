@@ -460,20 +460,23 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 		zbx_db_insert_t		db_insert;
 
 		session_local.userid = userid;
+		session_local.sid = zbx_create_token(0);
+		session_local.cookie = report_create_cookie(manager, session_local.sid);
+		session_local.db_lastaccess = now;
+		session_local.lastaccess = now;
+
 		session = (zbx_rm_session_t *)zbx_hashset_insert(&manager->sessions, &session_local,
 				sizeof(session_local));
-
-		session->sid = zbx_create_token(0);
-		session->cookie = report_create_cookie(manager, session->sid);
-		session->db_lastaccess = now;
 
 		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
 		zbx_db_insert_add_values(&db_insert, session->sid, userid, now, ZBX_SESSION_ACTIVE);
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
-
-	session->lastaccess = now;
+	else
+	{
+		session->lastaccess = now;
+	}
 
 	return session;
 }

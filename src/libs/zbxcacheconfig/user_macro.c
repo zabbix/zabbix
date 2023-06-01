@@ -33,8 +33,6 @@ ZBX_PTR_VECTOR_IMPL(um_host, zbx_um_host_t *)
 
 #define ZBX_MACRO_NO_KVS_VALUE	"*UNKNOWN*"
 
-extern unsigned char	program_type;
-
 typedef enum
 {
 	ZBX_UM_UPDATE_HOST,
@@ -455,7 +453,7 @@ static void	um_macro_kv_remove(zbx_um_macro_t *macro, zbx_dc_macro_kv_t *mkv)
  *                                                                               *
  *********************************************************************************/
 static void	um_macro_register_kvs(zbx_um_macro_t *macro, const char *location,
-		const zbx_config_vault_t *config_vault)
+		const zbx_config_vault_t *config_vault, unsigned char program_type)
 {
 	zbx_dc_kvs_path_t	*kvs_path, kvs_path_local;
 	zbx_dc_kv_t		*kv, kv_local;
@@ -615,10 +613,11 @@ out:
  *                            updated and deleted rows                           *
  *             offset       - [IN] macro column offset in row                    *
  *             config_vault - [IN]                                               *
+ *             program_type - [IN]                                               *
  *                                                                               *
  *********************************************************************************/
 static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int offset,
-		const zbx_config_vault_t *config_vault)
+		const zbx_config_vault_t *config_vault, unsigned char program_type)
 {
 	unsigned char		tag;
 	int			ret, i;
@@ -734,7 +733,7 @@ static void	um_cache_sync_macros(zbx_um_cache_t *cache, zbx_dbsync_t *sync, int 
 		(*pmacro)->context_op = context_op;
 
 		if (ZBX_MACRO_VALUE_VAULT == type)
-			um_macro_register_kvs(*pmacro, row[offset + 1], config_vault);
+			um_macro_register_kvs(*pmacro, row[offset + 1], config_vault, program_type);
 		else
 			(*pmacro)->value = dc_value;
 
@@ -853,7 +852,8 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
  *                                                                               *
  *********************************************************************************/
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault)
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
+		unsigned char program_type)
 {
 	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
 			0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
@@ -869,8 +869,8 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 
 	cache->revision = revision;
 
-	um_cache_sync_macros(cache, gmacros, 1, config_vault);
-	um_cache_sync_macros(cache, hmacros, 2, config_vault);
+	um_cache_sync_macros(cache, gmacros, 1, config_vault, program_type);
+	um_cache_sync_macros(cache, hmacros, 2, config_vault, program_type);
 	um_cache_sync_hosts(cache, htmpls);
 
 	return cache;

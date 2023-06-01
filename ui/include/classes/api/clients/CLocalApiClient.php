@@ -174,90 +174,12 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		if (strlen($auth) == 64) {
-			$this->tokenAuthentication($auth);
-			return;
-		}
+		$auth_data = strlen($auth) == 64 ? ['token' => $auth] : ['sessionid' => $auth];
 
-		$user = $this->serviceFactory->getObject('user')->checkAuthentication(['sessionid' => $auth]);
+		$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
 		}
-	}
-
-	/**
-	 * Authenticates user based on token.
-	 *
-	 * @param string $auth_token
-	 *
-	 * @throws APIException
-	 */
-	protected function tokenAuthentication(string $auth_token) {
-		$api_tokens = DB::select('token', [
-			'output' => ['userid', 'expires_at', 'tokenid'],
-			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
-		]);
-
-		if (!$api_tokens) {
-			usleep(10000);
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		[['expires_at' => $expires_at, 'userid' => $userid, 'tokenid' => $tokenid]] = $api_tokens;
-
-		if ($expires_at != 0 && $expires_at < time()) {
-			throw new APIException(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
-		}
-
-		[['roleid' => $roleid, 'username' => $username, 'name' => $name, 'surname' => $surname]] = DB::select('users', [
-			'output' => ['roleid', 'username', 'name', 'surname'],
-			'userids' => $userid
-		]);
-
-		if (!$roleid) {
-			usleep(10000);
-			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		[$type] = DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type');
-
-		$db_usrgrps = DBselect(
-			'SELECT g.debug_mode,g.users_status'.
-			' FROM usrgrp g,users_groups ug'.
-			' WHERE g.usrgrpid=ug.usrgrpid'.
-				' AND ug.userid='.$userid
-		);
-
-		$debug_mode = GROUP_DEBUG_MODE_DISABLED;
-		while ($db_usrgrp = DBfetch($db_usrgrps)) {
-			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-
-			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-				$debug_mode = GROUP_DEBUG_MODE_ENABLED;
-				break;
-			}
-		}
-
-		CApiService::$userData = [
-			'userid' => $userid,
-			'username' => $username,
-			'name' => $name,
-			'surname' => $surname,
-			'type' => $type,
-			'roleid' => $roleid,
-			'userip' => CWebUser::getIp(),
-			'sessionid' => $auth_token,
-			'debug_mode' => $debug_mode
-		];
-
-		$this->debug = ($debug_mode == GROUP_DEBUG_MODE_ENABLED);
-
-		DB::update('token', [
-			'values' => ['lastaccess' => time()],
-			'where' => ['tokenid' => $tokenid]
-		]);
 	}
 
 	/**

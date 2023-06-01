@@ -40,7 +40,7 @@
 					this._clone();
 				}
 				else if (e.target.classList.contains('js-delete-hostgroup')) {
-					this._delete();
+					this._delete(e.target);
 				}
 			});
 		}
@@ -76,7 +76,13 @@
 			post(curl.getUrl(), {name: fields.name});
 		}
 
-		_delete() {
+		_delete(button) {
+			const confirm_text = button.getAttribute('confirm');
+
+			if (!confirm(confirm_text)) {
+				return;
+			}
+
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'hostgroup.delete');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',

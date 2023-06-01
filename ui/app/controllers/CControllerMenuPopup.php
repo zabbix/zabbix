@@ -58,13 +58,12 @@ class CControllerMenuPopup extends CController {
 				break;
 
 			case 'history':
-			case 'item':
 				$rules = [
-					'itemid' => 'required|db items.itemid',
-					'backurl' => 'required|string'
+					'itemid' => 'required|db items.itemid'
 				];
 				break;
 
+			case 'item':
 			case 'item_prototype':
 				$rules = [
 					'itemid' => 'required|db items.itemid',
@@ -357,7 +356,8 @@ class CControllerMenuPopup extends CController {
 				'isExecutable' => $is_executable,
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)
+				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
+				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
 			];
 		}
 

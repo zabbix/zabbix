@@ -12,7 +12,7 @@ endif
 COMMON_SRC = \
 	../../zbxmocktest.h
 
-COMMON_FLAGS = -I@top_srcdir@/tests
+COMMON_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
@@ -41,6 +41,7 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
@@ -57,7 +58,8 @@ COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a
+	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 if SERVER
 SERVER_COMMON_LIB = \
@@ -65,7 +67,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
-	$(top_srcdir)/src/zabbix_server/dbsyncer/libzbxdbsyncer.a \
+	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
 	$(top_srcdir)/src/zabbix_server/discoverer/libzbxdiscoverer.a \
 	$(top_srcdir)/src/zabbix_server/pinger/libzbxpinger.a \
@@ -80,7 +82,7 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
 	$(top_srcdir)/src/zabbix_server/taskmanager/libzbxtaskmanager.a \
 	$(top_srcdir)/src/zabbix_server/ipmi/libipmi.a \
-	$(top_srcdir)/src/zabbix_server/odbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -95,7 +97,6 @@ SERVER_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
-	$(top_srcdir)/src/zabbix_server/availability/libavailability.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
@@ -115,7 +116,7 @@ DBselect_uint64_LDADD = \
 
 DBselect_uint64_LDADD += @SERVER_LIBS@
 
-DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@
+DBselect_uint64_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBselect_uint64_CFLAGS = $(COMMON_FLAGS)
 
@@ -129,7 +130,7 @@ DBadd_condition_alloc_LDADD = \
 
 DBadd_condition_alloc_LDADD += @SERVER_LIBS@
 
-DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@
+DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 
@@ -139,7 +140,6 @@ if PROXY
 PROXY_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
-	$(top_srcdir)/src/zabbix_proxy/libzbxproxy.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
@@ -159,7 +159,7 @@ PROXY_COMMON_LIB = \
 	$(top_srcdir)/src/libs/zbxsysinfo/linux/libspechostnamesysinfo.a \
 	$(COMMON_LIB) \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a
-	
+
 
 
 DBadd_condition_alloc_SOURCES = \
@@ -171,7 +171,7 @@ DBadd_condition_alloc_LDADD = \
 
 DBadd_condition_alloc_LDADD += @PROXY_LIBS@
 
-DBadd_condition_alloc_LDFLAGS = @PROXY_LDFLAGS@
+DBadd_condition_alloc_LDFLAGS = @PROXY_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 

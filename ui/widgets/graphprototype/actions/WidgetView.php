@@ -72,8 +72,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+		$is_dynamic_item = ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -111,7 +110,7 @@ class WidgetView extends CControllerWidgetIterator {
 		$graphs_collected = [];
 
 		// Do not collect graphs while editing a template dashboard.
-		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 			$graphs_created_all = API::Graph()->get([
 				'output' => ['graphid', 'name'],
 				'hostids' => [$graph_prototype['discoveryRule']['hostid']],
@@ -124,7 +123,7 @@ class WidgetView extends CControllerWidgetIterator {
 			// Collect graphs based on the graph prototype.
 			foreach ($graphs_created_all as $graph) {
 				if ($graph['graphDiscovery']['parent_graphid'] === $graph_prototype['graphid']) {
-					$prepend_host_name = $is_template_dashboard
+					$prepend_host_name = $this->isTemplateDashboard()
 						? false
 						: count($graph['hosts']) == 1 || ($is_dynamic_item && $dynamic_hostid != 0);
 
@@ -172,7 +171,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$host_names = array_column($graph_prototype['hosts'], 'name', 'hostid');
 			$host_name = $host_names[$graph_prototype['discoveryRule']['hostid']];
 
-			$widget_name = $is_template_dashboard
+			$widget_name = $this->isTemplateDashboard()
 				? $graph_prototype['name']
 				: $host_name.NAME_DELIMITER.$graph_prototype['name'];
 		}
@@ -195,8 +194,7 @@ class WidgetView extends CControllerWidgetIterator {
 			'selectDiscoveryRule' => ['hostid']
 		];
 
-		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+		$is_dynamic_item = ($this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 
@@ -234,7 +232,7 @@ class WidgetView extends CControllerWidgetIterator {
 		$items_collected = [];
 
 		// Do not collect items while editing a template dashboard.
-		if (!$is_template_dashboard || $this->hasInput('dynamic_hostid')) {
+		if (!$this->isTemplateDashboard() || $this->hasInput('dynamic_hostid')) {
 			$items_created_all = API::Item()->get([
 				'output' => ['itemid', 'name'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
@@ -250,7 +248,7 @@ class WidgetView extends CControllerWidgetIterator {
 				}
 			}
 			foreach ($items_created as $item) {
-				$items_collected[$item['itemid']] = $is_template_dashboard
+				$items_collected[$item['itemid']] = $this->isTemplateDashboard()
 					? $item['name']
 					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
@@ -290,7 +288,7 @@ class WidgetView extends CControllerWidgetIterator {
 			$widget_name = $this->getInput('name');
 		}
 		else {
-			$widget_name = $is_template_dashboard
+			$widget_name = $this->isTemplateDashboard()
 				? $item_prototype['name']
 				: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item_prototype['name'];
 		}

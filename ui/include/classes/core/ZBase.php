@@ -351,6 +351,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/html',
 			$this->root_dir.'/include/classes/html/svg',
 			$this->root_dir.'/include/classes/html/widgets',
+			$this->root_dir.'/include/classes/html/widgets/fields',
 			$this->root_dir.'/include/classes/html/interfaces',
 			$this->root_dir.'/include/classes/parsers',
 			$this->root_dir.'/include/classes/parsers/results',

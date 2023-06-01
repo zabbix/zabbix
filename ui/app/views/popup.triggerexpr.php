@@ -53,7 +53,14 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'item_description',
-	'writeonly' => '1'
+	'writeonly' => '1',
+	'value_types' => [
+		ITEM_VALUE_TYPE_FLOAT,
+		ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_LOG,
+		ITEM_VALUE_TYPE_UINT64,
+		ITEM_VALUE_TYPE_TEXT
+	]
 ];
 
 if ($data['context'] === 'host') {
@@ -95,7 +102,14 @@ if ($data['item_required']) {
 				'dstfrm' => $expression_form->getName(),
 				'dstfld1' => 'itemid',
 				'dstfld2' => 'item_description',
-				'parent_discoveryid' => $data['parent_discoveryid']
+				'parent_discoveryid' => $data['parent_discoveryid'],
+				'value_types' => [
+					ITEM_VALUE_TYPE_FLOAT,
+					ITEM_VALUE_TYPE_STR,
+					ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT
+				]
 			]).');')
 			->removeId();
 	}

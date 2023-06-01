@@ -22,8 +22,10 @@
 
 #include "zbxcomms.h"
 #include "zbxjson.h"
+#include "zbxdbhigh.h"
 
-int	send_list_of_active_checks(zbx_socket_t *sock, char *request, int config_timeout);
-int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp, int config_timeout);
-
+int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_events_funcs_t *events_cbs,
+		int config_timeout);
+int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *jp,
+		const zbx_events_funcs_t *events_cbs, int config_timeout);
 #endif

@@ -147,6 +147,12 @@
 			color: $font-selected-color;
 		}
 	}
+
+	.sortable-dragging {
+		.sortable-item {
+			opacity: 1;
+		}
+	}
 }
 
 .dashboard-navigation-controls {

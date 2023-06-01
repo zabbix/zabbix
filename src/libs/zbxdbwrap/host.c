@@ -931,7 +931,7 @@ static void	DBdelete_action_conditions(int conditiontype, zbx_uint64_t elementid
 		zbx_vector_uint64_uniq(&actionids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update actions set status=%d where",
-				ACTION_STATUS_DISABLED);
+				ZBX_ACTION_STATUS_DISABLED);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "actionid", actionids.values,
 				actionids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
@@ -1389,6 +1389,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids)
 		zbx_vector_str_append(&hk_history, "history_uint");
 		zbx_vector_str_append(&hk_history, "history_log");
 		zbx_vector_str_append(&hk_history, "history_text");
+		zbx_vector_str_append(&hk_history, "history_bin");
 	}
 
 	if (ZBX_HK_MODE_REGULAR == trends_mode)

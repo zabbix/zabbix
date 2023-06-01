@@ -534,7 +534,7 @@ static void	eval_moving_average(const zbx_vector_history_record_t *x, int n, int
 
 static double	find_stl_median(zbx_vector_history_record_t *v)
 {
-	zbx_vector_history_record_sort(v, (zbx_compare_func_t)history_record_float_compare);
+	zbx_vector_history_record_sort(v, (zbx_compare_func_t)zbx_history_record_float_compare);
 
 	if (0 == v->values_num % 2)
 		return (v->values[v->values_num / 2 - 1].value.dbl + v->values[v->values_num / 2].value.dbl) / 2.0;

@@ -1308,19 +1308,18 @@ static int	DBpatch_2010157(void)
 static int	DBpatch_2010158(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"host_discovery", "hostid", 0,
-		{
-			{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"host", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"host_discovery", "hostid", 0,
+				{
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"parent_itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"host", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1363,15 +1362,14 @@ static int	DBpatch_2010163(void)
 static int	DBpatch_2010164(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"interface_discovery", "interfaceid", 0,
-		{
-			{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"interface_discovery", "interfaceid", 0,
+				{
+					{"interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_interfaceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1395,18 +1393,17 @@ static int	DBpatch_2010166(void)
 static int	DBpatch_2010167(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"group_prototype", "group_prototypeid", 0,
-		{
-			{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"group_prototype", "group_prototypeid", 0,
+				{
+					{"group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{NULL}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }
@@ -1441,18 +1438,17 @@ static int	DBpatch_2010171(void)
 static int	DBpatch_2010172(void)
 {
 	const zbx_db_table_t	table =
-	{
-		"group_discovery", "groupid", 0,
-		{
-			{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-			{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-			{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-			{NULL}
-		},
-		NULL
-	};
+			{"group_discovery", "groupid", 0,
+				{
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"parent_group_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{NULL}
+				},
+				NULL
+			};
 
 	return DBcreate_table(&table);
 }

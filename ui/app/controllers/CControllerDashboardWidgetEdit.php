@@ -34,17 +34,18 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldMultiSelectHost,
 	CWidgetFieldMultiSelectItem,
 	CWidgetFieldMultiSelectItemPrototype,
+	CWidgetFieldMultiSelectMap,
 	CWidgetFieldMultiSelectMediaType,
 	CWidgetFieldMultiSelectService,
 	CWidgetFieldMultiSelectSla,
-	CWidgetFieldMultiSelectUser,
-	CWidgetFieldSelectResource};
+	CWidgetFieldMultiSelectUser
+};
 
 class CControllerDashboardWidgetEdit extends CController {
 
 	private ?CWidget $widget;
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
@@ -75,12 +76,6 @@ class CControllerDashboardWidgetEdit extends CController {
 			}
 		}
 
-		if ($ret && $this->hasInput('templateid') && !$this->widget->hasTemplateSupport()) {
-			error(_('Widget type is not supported in this context.'));
-
-			$ret = false;
-		}
-
 		if (!$ret) {
 			$this->setResponse(
 				(new CControllerResponseData([
@@ -108,7 +103,7 @@ class CControllerDashboardWidgetEdit extends CController {
 		$deprecated_types = [];
 
 		/** @var CWidget $widget */
-		foreach (APP::ModuleManager()->getWidgets($this->hasInput('templateid')) as $widget) {
+		foreach (APP::ModuleManager()->getWidgets() as $widget) {
 			if (!$widget->isDeprecated()) {
 				$known_types[$widget->getId()] = $widget->getDefaultName();
 			}
@@ -120,9 +115,9 @@ class CControllerDashboardWidgetEdit extends CController {
 		natcasesort($known_types);
 		natcasesort($deprecated_types);
 
-		$form = $this->widget->getForm($this->getInput('fields', []),
-			$this->hasInput('templateid') ? $this->getInput('templateid') : null
-		);
+		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
+
+		$form = $this->widget->getForm($this->getInput('fields', []), $templateid);
 
 		// Transforms corrupted data to default values.
 		$form->validate();
@@ -132,6 +127,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			'type' => $this->getInput('type'),
 			'known_types' => $known_types,
 			'deprecated_types' => $deprecated_types,
+			'templateid' => $templateid,
 			'fields' => $form->getFields(),
 			'view_mode' => $this->getInput('view_mode', ZBX_WIDGET_VIEW_MODE_NORMAL),
 			'unique_id' => $this->hasInput('unique_id') ? $this->getInput('unique_id') : null,
@@ -139,6 +135,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				? $this->getInput('dashboard_page_unique_id')
 				: null,
 			'captions' => $this->getCaptions($form),
+			'url' => $this->widget->getUrl(),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -149,42 +146,7 @@ class CControllerDashboardWidgetEdit extends CController {
 	 * Prepares mapped list of names for all required resources.
 	 */
 	private function getCaptions(CWidgetForm $form): array {
-		$captions = ['simple' => [], 'ms' => []];
-
-		foreach ($form->getFields() as $field) {
-			if ($field instanceof CWidgetFieldSelectResource) {
-				$resource_type = $field->getResourceType();
-				$id = $field->getValue();
-
-				if (!array_key_exists($resource_type, $captions['simple'])) {
-					$captions['simple'][$resource_type] = [];
-				}
-
-				if ($id != 0 && $resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
-					$captions['simple'][$resource_type][$id] = _('Inaccessible map');
-				}
-			}
-		}
-
-		foreach ($captions['simple'] as $resource_type => &$list) {
-			if (!$list) {
-				continue;
-			}
-
-			if ($resource_type == CWidgetFieldSelectResource::RESOURCE_TYPE_SYSMAP) {
-				$maps = API::Map()->get([
-					'sysmapids' => array_keys($list),
-					'output' => ['sysmapid', 'name']
-				]);
-
-				if ($maps) {
-					foreach ($maps as $map) {
-						$list[$map['sysmapid']] = $map['name'];
-					}
-				}
-			}
-		}
-		unset($list);
+		$captions = [];
 
 		// Prepare data for CMultiSelect controls.
 		$ids = [
@@ -198,7 +160,8 @@ class CControllerDashboardWidgetEdit extends CController {
 			'sla' => [],
 			'user' => [],
 			'action' => [],
-			'media_type' => []
+			'media_type' => [],
+			'sysmap' => []
 		];
 
 		foreach ($form->getFields() as $field) {
@@ -246,15 +209,19 @@ class CControllerDashboardWidgetEdit extends CController {
 				$key = 'media_types';
 				$var = 'media_type';
 			}
+			elseif ($field instanceof CWidgetFieldMultiSelectMap) {
+				$key = 'sysmaps';
+				$var = 'sysmap';
+			}
 			else {
 				continue;
 			}
 
 			$field_name = $field->getName();
-			$captions['ms'][$key][$field_name] = [];
+			$captions[$key][$field_name] = [];
 
 			foreach ($field->getValue() as $id) {
-				$captions['ms'][$key][$field_name][$id] = ['id' => $id];
+				$captions[$key][$field_name][$id] = ['id' => $id];
 				$ids[$var][$id][] = $field_name;
 			}
 		}
@@ -268,7 +235,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_groups as $groupid => $group) {
 				foreach ($ids['group'][$groupid] as $field_name) {
-					$captions['ms']['groups'][$field_name][$groupid]['name'] = $group['name'];
+					$captions['groups'][$field_name][$groupid]['name'] = $group['name'];
 				}
 			}
 		}
@@ -282,7 +249,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_hosts as $hostid => $host) {
 				foreach ($ids['host'][$hostid] as $field_name) {
-					$captions['ms']['hosts'][$field_name][$hostid]['name'] = $host['name'];
+					$captions['hosts'][$field_name][$hostid]['name'] = $host['name'];
 				}
 			}
 		}
@@ -298,7 +265,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_items as $itemid => $item) {
 				foreach ($ids['item'][$itemid] as $field_name) {
-					$captions['ms']['items'][$field_name][$itemid] += [
+					$captions['items'][$field_name][$itemid] += [
 						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -316,7 +283,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_graphs as $graphid => $graph) {
 				foreach ($ids['graph'][$graphid] as $field_name) {
-					$captions['ms']['graphs'][$field_name][$graphid] += [
+					$captions['graphs'][$field_name][$graphid] += [
 						'name' => $graph['name'],
 						'prefix' => $graph['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -334,7 +301,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_item_prototypes as $itemid => $item) {
 				foreach ($ids['prototype_item'][$itemid] as $field_name) {
-					$captions['ms']['item_prototypes'][$field_name][$itemid] += [
+					$captions['item_prototypes'][$field_name][$itemid] += [
 						'name' => $item['name'],
 						'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 					];
@@ -355,7 +322,7 @@ class CControllerDashboardWidgetEdit extends CController {
 				$host_names = array_column($graph['hosts'], 'name', 'hostid');
 
 				foreach ($ids['prototype_graph'][$graphid] as $field_name) {
-					$captions['ms']['graph_prototypes'][$field_name][$graphid] += [
+					$captions['graph_prototypes'][$field_name][$graphid] += [
 						'name' => $graph['name'],
 						'prefix' => $host_names[$graph['discoveryRule']['hostid']].NAME_DELIMITER
 					];
@@ -372,7 +339,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_services as $serviceid => $service) {
 				foreach ($ids['service'][$serviceid] as $field_name) {
-					$captions['ms']['services'][$field_name][$serviceid] += [
+					$captions['services'][$field_name][$serviceid] += [
 						'name' => $service['name']
 					];
 				}
@@ -388,7 +355,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_slas as $slaid => $sla) {
 				foreach ($ids['sla'][$slaid] as $field_name) {
-					$captions['ms']['slas'][$field_name][$slaid] += [
+					$captions['slas'][$field_name][$slaid] += [
 						'name' => $sla['name']
 					];
 				}
@@ -404,7 +371,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_users as $userid => $user) {
 				foreach ($ids['user'][$userid] as $field_name) {
-					$captions['ms']['users'][$field_name][$userid] += [
+					$captions['users'][$field_name][$userid] += [
 						'name' => getUserFullname($user)
 					];
 				}
@@ -420,7 +387,7 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_actions as $actionid => $action) {
 				foreach ($ids['action'][$actionid] as $field_name) {
-					$captions['ms']['actions'][$field_name][$actionid] += [
+					$captions['actions'][$field_name][$actionid] += [
 						'name' => $action['name']
 					];
 				}
@@ -436,8 +403,24 @@ class CControllerDashboardWidgetEdit extends CController {
 
 			foreach ($db_media_types as $mediatypeid => $media_type) {
 				foreach ($ids['media_type'][$mediatypeid] as $field_name) {
-					$captions['ms']['media_types'][$field_name][$mediatypeid] += [
+					$captions['media_types'][$field_name][$mediatypeid] += [
 						'name' => $media_type['name']
+					];
+				}
+			}
+		}
+
+		if ($ids['sysmap']) {
+			$db_sysmaps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($ids['sysmap']),
+				'preservekeys' => true
+			]);
+
+			foreach ($db_sysmaps as $sysmapid => $sysmap) {
+				foreach ($ids['sysmap'][$sysmapid] as $field_name) {
+					$captions['sysmaps'][$field_name][$sysmapid] += [
+						'name' => $sysmap['name']
 					];
 				}
 			}
@@ -454,10 +437,11 @@ class CControllerDashboardWidgetEdit extends CController {
 			'slas' => _('Inaccessible SLA'),
 			'users' => _('Inaccessible user'),
 			'actions' => _('Inaccessible action'),
-			'media_types' => _('Inaccessible media type')
+			'media_types' => _('Inaccessible media type'),
+			'sysmaps' => _('Inaccessible map')
 		];
 
-		foreach ($captions['ms'] as $resource_type => &$fields_captions) {
+		foreach ($captions as $resource_type => &$fields_captions) {
 			foreach ($fields_captions as &$field_captions) {
 				$n = 0;
 

@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $discovery_check_types = discovery_check_type2str();
@@ -120,6 +121,10 @@ $form_list = (new CFormList())
 			->setAttribute('maxlength', 64)
 			->disableAutocomplete(),
 		'row_dcheck_snmpv3_privpassphrase'
+	)
+	->addRow((new CLabel(_('Allow redirect'), 'allow_redirect')),
+		(new CCheckBox('allow_redirect'))->setChecked($data['params']['allow_redirect'] == 1),
+		'row_dcheck_allow_redirect'
 	);
 
 $form->addItem([

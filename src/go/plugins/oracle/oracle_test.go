@@ -35,8 +35,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/plugin"
-	"zabbix.com/pkg/zbxerr"
 )
 
 type TestConfig struct {

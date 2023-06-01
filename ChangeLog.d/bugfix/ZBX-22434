@@ -1,1 +1,0 @@
-...G...... [ZBX-22434] fixed race condition when starting Zabbix agent 2 with loadable plugins (esneiders)

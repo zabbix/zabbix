@@ -22,7 +22,7 @@
 #include "zbxdbwrap.h"
 #include "zbx_rtc_constants.h"
 
-int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, int code, const unsigned char *data, char **result)
+int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result)
 {
 	ZBX_UNUSED(data);
 	ZBX_UNUSED(result);
@@ -52,16 +52,25 @@ int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, int code, const unsigned char
 int	rtc_process(const char *option, int config_timeout, char **error)
 {
 	zbx_uint32_t	code = ZBX_RTC_UNKNOWN;
-	char			*data = NULL;
+	char		*data = NULL;
+	int		ret = FAIL;
+	struct zbx_json	j;
 
-	if (SUCCEED != zbx_rtc_parse_options(option, &code, &data, error))
-		return FAIL;
+	zbx_json_init(&j, 1024);
+
+	if (SUCCEED != zbx_rtc_parse_options(option, &code, &j, error))
+		goto out;
 
 	if (ZBX_RTC_UNKNOWN == code)
 	{
 		*error = zbx_dsprintf(NULL, "unknown option \"%s\"", option);
-		return FAIL;
+		goto out;
 	}
 
-	return zbx_rtc_async_exchange(&data, code, config_timeout, error);
+	data = zbx_strdup(NULL, j.buffer);
+	ret = zbx_rtc_async_exchange(&data, code, config_timeout, error);
+out:
+	zbx_json_free(&j);
+
+	return ret;
 }

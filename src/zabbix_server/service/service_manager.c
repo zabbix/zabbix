@@ -111,8 +111,6 @@ typedef struct
 }
 zbx_service_manager_t;
 
-/*#define ZBX_AVAILABILITY_MANAGER_DELAY		1*/
-
 static void	event_free(zbx_event_t *event)
 {
 	zbx_vector_ptr_clear_ext(&event->tags, (zbx_clean_func_t)zbx_free_tag);
@@ -911,7 +909,7 @@ static void	sync_actions(zbx_service_manager_t *service_manager, int revision)
 	result = zbx_db_select("select actionid,evaltype,formula from actions "
 				"where eventsource=%d"
 					" and status=%d",
-			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE);
+			EVENT_SOURCE_SERVICE, ZBX_ACTION_STATUS_ACTIVE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1031,7 +1029,7 @@ static void	sync_action_conditions(zbx_service_manager_t *service_manager, int r
 				" where c.actionid=a.actionid"
 					" and a.eventsource=%d"
 					" and a.status=%d",
-			EVENT_SOURCE_SERVICE, ACTION_STATUS_ACTIVE);
+			EVENT_SOURCE_SERVICE, ZBX_ACTION_STATUS_ACTIVE);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{

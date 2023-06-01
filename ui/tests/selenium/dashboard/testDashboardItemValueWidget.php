@@ -336,7 +336,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				// Check fields' lengths.
 				$field_lenghts = [
 					'Name' =>  255,
-					'id:description' => 255,
+					'id:description' => 2048,
 					'id:desc_size' => 3,
 					'id:decimal_places' => 2,
 					'id:decimal_size' => 3,
@@ -597,23 +597,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
-						['threshold' => '0.00001']
-					],
-					'error' => [
-						'Invalid parameter "Thresholds/1/threshold": a number has too many fractional digits.'
-					]
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Type' => 'Item value',
-						'Item' => 'Available memory in %',
-						'Advanced configuration' => true
-					],
-					'thresholds' => [
-						['threshold' => '9999999999999999']
+						['threshold' => '1.79E+400']
 					],
 					'error' => [
 						'Invalid parameter "Thresholds/1/threshold": a number is too large.'
@@ -709,7 +693,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => [
-							'values' => 'Available memory',
+							'values' => 'Linux: Available memory',
 							'context' => [
 								'values' => 'ЗАББИКС Сервер',
 								'context' => 'Zabbix servers'
@@ -1045,6 +1029,13 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$saved_form->checkValue(['Advanced configuration' => false]);
+				$saved_form->fill(['Advanced configuration' => true]);
+			}
 			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
 			// As form is quite complex, show_header field should be checked separately.

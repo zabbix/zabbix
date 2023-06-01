@@ -110,6 +110,8 @@
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
+
+		$('z-select[name="value_type"]').trigger('change');
 	}
 
 	jQuery(document).ready(function($) {
@@ -157,12 +159,34 @@
 			interface_ids_by_types[interface.type].push(interface.interfaceid);
 		}
 
+		$('z-select[name="value_type"]').change(function() {
+			const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY?>,
+				binary_selected = this.value == ITEM_VALUE_TYPE_BINARY,
+				disable_binary = $('#type').val() != <?= ITEM_TYPE_DEPENDENT ?>;
+
+			this.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+			document.querySelector('z-select[name="value_type_steps"]')
+				.getOptionByValue(ITEM_VALUE_TYPE_BINARY)
+				.hidden = disable_binary;
+
+			if (binary_selected && disable_binary) {
+				this.value = this.getOptions().find((option) => option.value != ITEM_VALUE_TYPE_BINARY).value;
+				$('#type').trigger('change');
+
+				return false;
+			}
+		});
+
 		$('#type')
 			.change(function() {
 				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
 				setAuthTypeLabel();
+
+				if (item_type_lookup.form !== null) {
+					item_type_lookup.update();
+				}
 			})
 			.trigger('change');
 
@@ -260,10 +284,6 @@
 
 			this.updateKeyTypeSuggestions();
 
-			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
-				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
-			});
-
 			this.item_tab_type_field.addEventListener('change', (e) => {
 				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
 
@@ -280,6 +300,11 @@
 						this.form.querySelector('#trends_mode_1').disabled = true;
 					}
 				}
+			});
+
+			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
+				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
+				this.item_tab_type_field.dispatchEvent(new Event('change'));
 			});
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
@@ -401,6 +426,12 @@
 			}
 
 			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		},
+
+		update() {
+			this.inferred_type = null;
+			this.last_lookup = '';
+			this.lookup(this.key_field.value, false);
 		}
 	};
 </script>

@@ -27,7 +27,7 @@
 
 #include "mock_service.h"
 
-zbx_uint64_t __wrap_DCget_nextid(const char *table_name, int num);
+zbx_uint64_t __wrap_zbx_dc_get_nextid(const char *table_name, int num);
 void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
@@ -37,18 +37,6 @@ void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint6
 int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 void	__wrap_zbx_clean_events(void);
 int	__wrap_zbx_interface_availability_is_set(const void *ia);
-
-void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
-{
-	ZBX_UNUSED(tm_start);
-	ZBX_UNUSED(table_group);
-}
-
-void	__wrap_zbx_config_get(void *cfg, int flags)
-{
-	ZBX_UNUSED(cfg);
-	ZBX_UNUSED(flags);
-}
 
 /* stubs to satisfy hard link dependenceies */
 
@@ -343,7 +331,7 @@ void	mock_destroy_service_cache(void)
 
 /* function stubs to cut off library dependencies */
 
-zbx_uint64_t	__wrap_DCget_nextid(const char *table_name, int num)
+zbx_uint64_t	__wrap_zbx_dc_get_nextid(const char *table_name, int num)
 {
 	ZBX_UNUSED(table_name);
 	ZBX_UNUSED(num);

@@ -427,8 +427,8 @@ switch ($data['method']) {
 					'limit' => $limit
 				]);
 
-				if (array_key_exists('context', $data) && strpos('system', $data['search']) !== false) {
-					array_unshift($users, ['userid' => 0, 'username' => 'System', 'name' => '', 'surname' => '']);
+				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
+					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
 				}
 
 				if ($users) {
@@ -697,6 +697,26 @@ switch ($data['method']) {
 					}
 				}
 				break;
+
+			case 'sysmaps':
+				$sysmaps = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($sysmaps) {
+					CArrayHelper::sort($sysmaps, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$sysmaps = array_slice($sysmaps, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($sysmaps, ['sysmapid' => 'id']);
+				}
+				break;
 		}
 		break;
 
@@ -738,6 +758,10 @@ switch ($data['method']) {
 					]);
 
 					$hostids = array_keys($hosts);
+				}
+
+				if (array_key_exists('hostid', $data)) {
+					$hostids = $data['hostid'];
 				}
 
 				$options = [

@@ -22,11 +22,25 @@
 #include "zbxstr.h"
 #include "log.h"
 #include "zbxip.h"
+#include "zbxfile.h"
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	include "zbxwin32.h"
+#endif
+
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#include <shlwapi.h>
+#else
+#include <libgen.h>
+#endif
 
 static const char	*program_type_str = NULL;
+static const char	*main_cfg_file = NULL;
 
 static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int level, int optional, int strict,
 		int noexit);
+
+ZBX_PTR_VECTOR_IMPL(addr_ptr, zbx_addr_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -140,7 +154,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 		goto trim;
 	}
 
-	if (NULL != strchr(p + 1, PATH_SEPARATOR))
+	if (NULL != strchr(p + 1, ZBX_PATH_SEPARATOR))
 	{
 		zbx_error("%s: glob pattern should be the last component of the path", glob);
 		return FAIL;
@@ -156,7 +170,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 
 		p--;
 	}
-	while (PATH_SEPARATOR != *p);
+	while (ZBX_PATH_SEPARATOR != *p);
 
 	*path = zbx_strdup(NULL, glob);
 	(*path)[p - glob] = '\0';
@@ -291,6 +305,52 @@ out:
 }
 #endif
 
+static char	*expand_include_path(char *raw_path)
+{
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	wchar_t	*wraw_path;
+
+	wraw_path = zbx_utf8_to_unicode(raw_path);
+
+	if (TRUE == PathIsRelativeW(wraw_path))
+	{
+		wchar_t	*wconfig_path, dir_buf[_MAX_DIR];
+		char	*dir_utf8, *result = NULL;
+
+		zbx_free(wraw_path);
+
+		wconfig_path = zbx_utf8_to_unicode(main_cfg_file);
+		_wsplitpath(wconfig_path, NULL, dir_buf, NULL, NULL);
+
+		zbx_free(wconfig_path);
+
+		dir_utf8 = zbx_unicode_to_utf8(dir_buf);
+		result = zbx_dsprintf(result, "%s%s", dir_utf8, raw_path);
+
+		zbx_free(raw_path);
+		zbx_free(dir_utf8);
+
+		return result;
+	}
+
+	zbx_free(wraw_path);
+#else
+	if ('/' != *raw_path)
+	{
+		char	*cfg_file, *path;
+
+		cfg_file = zbx_strdup(NULL, main_cfg_file);
+		path = zbx_dsprintf(NULL, "%s/%s", dirname(cfg_file), raw_path);
+		zbx_free(cfg_file);
+
+		zbx_free(raw_path);
+
+		return path;
+	}
+#endif
+	return raw_path;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: parse "Include=..." line in configuration file                    *
@@ -313,6 +373,8 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (SUCCEED != parse_glob(cfg_file, &path, &pattern))
 		goto clean;
+
+	path = expand_include_path(path);
 
 	if (0 != zbx_stat(path, &sb))
 	{
@@ -557,9 +619,10 @@ error:
 	return FAIL;
 }
 
-void	zbx_init_library_cfg(unsigned char program_type)
+void	zbx_init_library_cfg(unsigned char program_type, const char *cfg_file)
 {
 	program_type_str = get_program_type_string(program_type);
+	main_cfg_file = cfg_file;
 }
 
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict, int noexit)
@@ -597,21 +660,18 @@ void	zbx_addr_free(zbx_addr_t *addr)
 	zbx_free(addr);
 }
 
-void	zbx_addr_copy(zbx_vector_ptr_t *addr_to, const zbx_vector_ptr_t *addr_from)
+void	zbx_addr_copy(zbx_vector_addr_ptr_t *addr_to, const zbx_vector_addr_ptr_t *addr_from)
 {
 	int	j;
 
 	for (j = 0; j < addr_from->values_num; j++)
 	{
-		const zbx_addr_t	*addr;
-		zbx_addr_t		*addr_ptr;
+		const zbx_addr_t	*addr = addr_from->values[j];
+		zbx_addr_t		*addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 
-		addr = (const zbx_addr_t *)addr_from->values[j];
-
-		addr_ptr = zbx_malloc(NULL, sizeof(zbx_addr_t));
 		addr_ptr->ip = zbx_strdup(NULL, addr->ip);
 		addr_ptr->port = addr->port;
-		zbx_vector_ptr_append(addr_to, addr_ptr);
+		zbx_vector_addr_ptr_append(addr_to, addr_ptr);
 	}
 }
 
@@ -631,15 +691,15 @@ static int	addr_compare_func(const void *d1, const void *d2)
  *          using a callback function                                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *name, add_serveractive_host_f cb,
-		zbx_vector_str_t *hostnames, void *data, char **error)
+int	zbx_set_data_destination_hosts(const char *str, unsigned short port, const char *name,
+		add_serveractive_host_f cb, zbx_vector_str_t *hostnames, void *data, char **error)
 {
 	char			*r, *r_node;
-	zbx_vector_ptr_t	addrs, cluster_addrs;
+	zbx_vector_addr_ptr_t	addrs, cluster_addrs;
 	int			ret = SUCCEED;
 
-	zbx_vector_ptr_create(&addrs);
-	zbx_vector_ptr_create(&cluster_addrs);
+	zbx_vector_addr_ptr_create(&addrs);
+	zbx_vector_addr_ptr_create(&cluster_addrs);
 
 	do
 	{
@@ -668,7 +728,7 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 						" is invalid", name, str);
 				ret = FAIL;
 			}
-			else if (SUCCEED == zbx_vector_ptr_search(&addrs, addr, addr_compare_func))
+			else if (SUCCEED == zbx_vector_addr_ptr_search(&addrs, addr, addr_compare_func))
 			{
 				*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\""
 						" specified more than once", name, str);
@@ -681,8 +741,8 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 				str = r_node + 1;
 			}
 
-			zbx_vector_ptr_append(&cluster_addrs, addr);
-			zbx_vector_ptr_append(&addrs, addr);
+			zbx_vector_addr_ptr_append(&cluster_addrs, addr);
+			zbx_vector_addr_ptr_append(&addrs, addr);
 
 			if (FAIL == ret)
 				goto fail;
@@ -701,9 +761,9 @@ int	zbx_set_data_destination_hosts(char *str, unsigned short port, const char *n
 	}
 	while (NULL != r);
 fail:
-	zbx_vector_ptr_destroy(&cluster_addrs);
-	zbx_vector_ptr_clear_ext(&addrs, (zbx_clean_func_t)zbx_addr_free);
-	zbx_vector_ptr_destroy(&addrs);
+	zbx_vector_addr_ptr_destroy(&cluster_addrs);
+	zbx_vector_addr_ptr_clear_ext(&addrs, zbx_addr_free);
+	zbx_vector_addr_ptr_destroy(&addrs);
 
 	return ret;
 }

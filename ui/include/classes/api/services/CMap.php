@@ -2444,7 +2444,7 @@ class CMap extends CMapElement {
 
 			if ($this->outputIsRequested('tags', $options['selectSelements']) && $selements) {
 				$db_tags = DBselect(
-					'SELECT selementid, tag, value, operator'.
+					'SELECT selementid,tag,value,operator'.
 					' FROM sysmaps_element_tag'.
 					' WHERE '.dbConditionInt('selementid', array_keys($selements))
 				);

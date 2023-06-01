@@ -130,9 +130,6 @@ jQuery(function() {
 
 			graph.data('widget')._pauseUpdating();
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
-
 			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
 
@@ -143,6 +140,10 @@ jQuery(function() {
 			});
 
 			repositionHintBox(e, graph);
+
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
@@ -765,7 +766,7 @@ jQuery(function() {
 					.append(hint_body)
 					.append(triggers_length > data.hintMaxRows
 						? makeHintBoxFooter(data.hintMaxRows, triggers_length)
-						:null
+						: null
 					);
 
 				graph.data('simpleTriggersHintbox', true);

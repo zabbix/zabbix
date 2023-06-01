@@ -33,7 +33,7 @@
 
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
-static void	dump_item(const DC_ITEM *item)
+static void	dump_item(const zbx_dc_item_t *item)
 {
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 	{
@@ -146,7 +146,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const zbx_config_comms_args_t *config_comms, int config_startup_time)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
-	DC_ITEM				item;
+	zbx_dc_item_t			item;
 	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
 	struct zbx_json_parse		jp_interface, jp_host, jp_details, jp_script_params;
 	AGENT_RESULT			result;
@@ -163,7 +163,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
 	item.key = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_");
 
-	if (0 != proxy_hostid && FAIL == is_item_processed_by_server(item.type, item.key))
+	if (0 != proxy_hostid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
 	{
 		ret = zbx_tm_execute_task_data(jp_data->start, (size_t)(jp_data->end - jp_data->start + 1),
 				proxy_hostid, info);

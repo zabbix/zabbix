@@ -37,6 +37,7 @@ class CWidgetFieldNumericBox extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules(['type' => API_NUMERIC, 'length' => 255]);
+			->setValidationRules(['type' => API_NUMERIC])
+			->setMaxLength(255);
 	}
 }

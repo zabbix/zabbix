@@ -203,7 +203,8 @@ class testDashboardTopHostsWidget extends CWebTest {
 							'Aggregation interval' => '20y',
 							'Item' => 'Available memory'
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #4 several item columns with different display, time shift, min/max and history data.
@@ -822,6 +823,12 @@ class testDashboardTopHostsWidget extends CWebTest {
 		if (array_key_exists('tags', $data)) {
 			$this->setTagSelector('id:tags_table_tags');
 			$this->setTags($data['tags']);
+		}
+
+		// Take a screenshot to test draggable object position of columns.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+			$this->assertScreenshot($form->query('id:list_columns')->waitUntilPresent()->one(), 'Top hosts columns');
 		}
 
 		$form->fill($data['main_fields']);
@@ -1737,7 +1744,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	public function testDashboardTopHostsWidget_CheckInfoMessages() {
 		$warnings = ['.//span[@id="tophosts-column-aggregate-function-warning"]', './/span[@id="tophosts-column-display-warning"]',
 				'.//span[@id="tophosts-column-thresholds-warning"]'];
-		$info = '//label[@for="history"]';
+		$history_data = '//span[@id="tophosts-column-history-data-warning"]';
 		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -1750,18 +1757,15 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
 
 		// Check that no warning icon displayed before adding fields.
+		$warnings = array_merge($warnings, [$history_data]);
+
 		foreach ($warnings as $warning) {
 			$this->assertFalse($column_form->query('xpath:'.$warning)->one()->isVisible());
 		}
 
-
-		// Check that History data hint ID is visible.
-		$this->assertTrue($column_form->query('xpath:'.$info.'/a')->one()->isVisible());
-
 		// Adding those fields new info icons appear.
-		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar']);
+		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar', 'History data' => 'Trends']);
 		$column_form->query('button:Add')->one()->click();
-		$warnings = array_merge($warnings, [$info]);
 
 		// Check warning and info icon message.
 		foreach ($warnings as $warning) {
@@ -1769,7 +1773,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 			// Check hint-box.
 			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-			$hintbox = ($warning === $info)
+			$hintbox = ($warning === $history_data)
 					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 					: 'With this setting only numeric items will be displayed in this column.';
 			$this->assertEquals($hintbox, $hint->one()->getText());

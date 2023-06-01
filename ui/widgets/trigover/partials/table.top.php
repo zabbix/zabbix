@@ -21,7 +21,9 @@
 
 /**
  * @var CPartial $this
+ * @var array $data
  */
+
 $table = (new CTableInfo())
 	->makeVerticalRotation()
 	->setHeadingColumn(0);

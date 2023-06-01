@@ -39,6 +39,7 @@ class CRedirectButton extends CSimpleButton {
 	 * Set the URL and confirmation message.
 	 *
 	 * If the confirmation is set, a confirmation pop up will appear before redirecting to the URL.
+	 * If CSRF token is present in Url, the data will be submitted with POST request.
 	 *
 	 * @param string|CUrl $url
 	 * @param string|null $confirmation
@@ -47,6 +48,10 @@ class CRedirectButton extends CSimpleButton {
 	 */
 	public function setUrl($url, $confirmation = null) {
 		if ($url instanceof CUrl) {
+			if ($url->hasArgument(CCsrfTokenHelper::CSRF_TOKEN_NAME)) {
+				$this->setAttribute('data-post', 1);
+			}
+
 			$url = $url->getUrl();
 		}
 

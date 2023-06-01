@@ -291,7 +291,6 @@ const char	*zbx_json_strerror(void);
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_clean(struct zbx_json *j);
-void	zbx_json_cleanarray(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
@@ -354,20 +353,10 @@ typedef union
 }
 zbx_jsonobj_data_t;
 
-typedef struct
-{
-	char		*path;	/* the path that was indexed - for example @.a.b.c */
-	zbx_hashset_t	objects;
-}
-zbx_jsonobj_index_t;
-
 struct zbx_jsonobj
 {
 	zbx_json_type_t		type;
 	zbx_jsonobj_data_t	data;
-
-	zbx_jsonobj_index_t	*index;
-	int			index_num;	/* used by root object - number of indexed children */
 };
 
 typedef struct
@@ -377,15 +366,19 @@ typedef struct
 }
 zbx_jsonobj_el_t;
 
+typedef struct zbx_jsonpath_index zbx_jsonpath_index_t;
+
 int	zbx_jsonpath_compile(const char *path, zbx_jsonpath_t *jsonpath);
 int	zbx_jsonpath_query(const struct zbx_json_parse *jp, const char *path, char **output);
+int	zbx_jsonobj_query_ext(zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output);
 void	zbx_jsonpath_clear(zbx_jsonpath_t *jsonpath);
+
+zbx_jsonpath_index_t	*zbx_jsonpath_index_create(char **error);
+void	zbx_jsonpath_index_free(zbx_jsonpath_index_t *index);
 
 int	zbx_jsonobj_open(const char *data, zbx_jsonobj_t *obj);
 void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, zbx_jsonobj_t *obj);
-
-void	zbx_jsonobj_disable_indexing(zbx_jsonobj_t *obj);
 
 #endif /* ZABBIX_ZJSON_H */

@@ -28,8 +28,10 @@
 
 typedef struct
 {
-	int			config_timeout;
-	int			config_unavailable_delay;
+	int	config_timeout;
+	int	config_unavailable_delay;
+	int	config_unreachable_period;
+	int	config_unreachable_delay;
 }
 zbx_thread_ipmi_manager_args;
 

@@ -802,6 +802,32 @@ class testFormWebStep extends CLegacyWebTest {
 					'code' => 404,
 					'dbCheck' => true
 				]
+			],
+			// Take a screenshots
+			[
+				[
+					'expected' => TEST_GOOD,
+					'name' => 'Take a screenshots',
+					'step_name' => 'Fill all step form',
+					'url' => 'http://www.zabbix.com',
+					'post' => [
+						['name' => 'post', 'value' => 'test_post'],
+						['name' => 'post2', 'value' => 'test_post2'],
+						['name' => 'post3', 'value' => 'test_post3']
+					],
+					'query' => [
+						['name' => 'query', 'value' => 'test_query'],
+						['name' => 'query2', 'value' => 'test_query2'],
+						['name' => 'query3', 'value' => 'test_query3']
+					],
+					'headers' => [
+						['name' => 'header', 'value' => 'test_header'],
+						['name' => 'header2', 'value' => 'test_header2'],
+						['name' => 'header3', 'value' => 'test_header3']
+					],
+					'timeout' => 3600,
+					'screenshot' => true
+				]
 			]
 		];
 	}
@@ -963,6 +989,21 @@ class testFormWebStep extends CLegacyWebTest {
 
 		if (array_key_exists('code', $data)) {
 			$this->zbxTestInputType('status_codes',$data['code']);
+		}
+
+		// Take a screenshot to test draggable object position for query, post and headers fields.
+		if (array_key_exists('screenshot', $data)) {
+			$this->page->removeFocus();
+
+			foreach (['Post fields', 'Headers', 'Query fields'] as $field) {
+				$form = $this->query('id:http_step')->asForm()->one();
+
+				if ($field === 'Query fields') {
+					COverlayDialogElement::find()->one()->scrollToTop();
+				}
+
+				$this->assertScreenshot($form->getField($field), $field);
+			}
 		}
 
 		if ($data['expected'] != TEST_ERROR) {

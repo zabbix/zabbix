@@ -42,10 +42,7 @@ class CWidgetFieldDatePicker extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_STR)
-			->setValidationRules([
-				'type' => API_STRING_UTF8,
-				'length' => DB::getFieldLength('widget_field', 'value_str')
-			]);
+			->setMaxLength(255);
 	}
 
 	public function setFlags(int $flags): self {

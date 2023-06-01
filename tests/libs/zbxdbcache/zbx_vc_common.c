@@ -29,8 +29,6 @@
 #include "valuecache_test.h"
 #include "mocks/valuecache/valuecache_mock.h"
 
-extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
-
 static void	zbx_vc_test_check_result(zbx_uint64_t cache_hits, zbx_uint64_t cache_misses)
 {
 	zbx_uint64_t	expected_hits, expected_misses;
@@ -64,12 +62,12 @@ void	zbx_vc_common_test_func(
 	ZBX_UNUSED(state);
 
 	/* set small cache size to force smaller cache free request size (5% of cache size) */
-	CONFIG_VALUE_CACHE_SIZE = ZBX_KIBIBYTE;
+	set_zbx_config_value_cache_size(ZBX_KIBIBYTE);
 
 	err = zbx_locks_create(&error);
 	zbx_mock_assert_result_eq("Lock initialization failed", SUCCEED, err);
 
-	err = zbx_vc_init(&error);
+	err = zbx_vc_init(get_zbx_config_value_cache_size(), &error);
 	zbx_mock_assert_result_eq("Value cache initialization failed", SUCCEED, err);
 
 	zbx_vc_enable();

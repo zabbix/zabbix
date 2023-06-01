@@ -210,8 +210,19 @@ class CConfigurationImportcompare {
 			}
 
 			foreach ($before as $b_key => $before_entity) {
-				if ($before_entity['uuid'] == $after_entity['uuid']
-						|| $before_entity['uniqueness'] == $after_entity['uniqueness']) {
+				if (array_key_exists('uuid', $before_entity) && $before_entity['uuid'] === $after_entity['uuid']) {
+					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
+
+					$same_entities[$b_key]['before'] = $before_entity;
+					$same_entities[$b_key]['after'] = $after_entity;
+
+					unset($before[$b_key], $after[$a_key]);
+					continue 2;
+				}
+			}
+
+			foreach ($before as $b_key => $before_entity) {
+				if ($before_entity['uniqueness'] === $after_entity['uniqueness']) {
 					unset($before_entity['uniqueness'], $after_entity['uniqueness']);
 					$before_entity['uuid'] = $after_entity['uuid'];
 
@@ -262,7 +273,6 @@ class CConfigurationImportcompare {
 	private function addUniquenessParameterByEntityType(array $entities, string $type): array {
 		foreach ($entities as &$entity) {
 			foreach ($this->unique_fields_keys_by_type[$type] as $unique_field_key) {
-
 				$unique_values = $this->getUniqueValuesByFieldPath($entity, $unique_field_key);
 
 				$entity['uniqueness'][] = $unique_values;
@@ -287,7 +297,7 @@ class CConfigurationImportcompare {
 	private function getUniqueValuesByFieldPath(array $entity, $field_key_path) {
 		if (is_array($field_key_path)) {
 			foreach ($field_key_path as $sub_key => $sub_field) {
-				if ($sub_key != 'numeric_keys') {
+				if ($sub_key !== 'numeric_keys') {
 					$sub_entities = $entity[$sub_key];
 				}
 				else {
