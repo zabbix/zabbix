@@ -1014,8 +1014,7 @@ class CHistoryManager {
 		];
 
 		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$period = $time_to - $time_from;
 
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
@@ -1025,15 +1024,14 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*((doc[\'clock\'].value.getMillis()/1000+params.delta)%params.size))'.
-					'/params.size)';
+			$formula = "Math.floor(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
 
 			$script = [
 				'inline' => $formula,
 				'params' => [
 					'width' => (int)$width,
-					'delta' => $delta,
-					'size' => $size
+					'time_from' => $time_from,
+					'period' => $period
 				]
 			];
 			$aggs = [
@@ -1082,7 +1080,7 @@ class CHistoryManager {
 						foreach ($item['group_by_script']['buckets'] as $point) {
 							$results[$item['key']]['data'][] = [
 								'itemid' => $item['key'],
-								'i' => $point['key'],
+								'i' => (int) $point['key'],
 								'count' => $point['doc_count'],
 								'min' => $point['min_value']['value'],
 								'avg' => $point['avg_value']['value'],
