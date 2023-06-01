@@ -105,11 +105,11 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
-parse_item_key_LDADD += @SERVER_LIBS@
+parse_item_key_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS)
 
-parse_item_key_LDFLAGS = @SERVER_LDFLAGS@
+parse_item_key_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-parse_item_key_CFLAGS = -I@top_srcdir@/tests
+parse_item_key_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 check_service_test_LDADD = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
@@ -144,10 +144,10 @@ check_service_test_LDADD = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
 
-check_service_test_LDADD += @SERVER_LIBS@
+check_service_test_LDADD += @SERVER_LIBS@ $(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 check_service_test_LDFLAGS = @SERVER_LDFLAGS@ \
-	-Wl,--wrap=tcp_expect
-check_service_test_CFLAGS = -I@top_srcdir@/tests
+	-Wl,--wrap=tcp_expect $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+check_service_test_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif
 
 if AGENT
@@ -186,7 +186,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
-	$(top_srcdir)/tests/libzbxmockdata.a
+	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS)
 
 zbx_execute_agent_check_SOURCES = \
 	zbx_execute_agent_check.c \
@@ -213,9 +214,10 @@ zbx_execute_agent_check_WRAP_FUNCS = \
 
 zbx_execute_agent_check_LDADD += @AGENT_LIBS@
 
-zbx_execute_agent_check_LDFLAGS = @AGENT_LDFLAGS@ $(zbx_execute_agent_check_WRAP_FUNCS)
+zbx_execute_agent_check_LDFLAGS = @AGENT_LDFLAGS@ $(zbx_execute_agent_check_WRAP_FUNCS) $(CMOCKA_LDFLAGS) \
+	$(YAML_LDFLAGS)
 
-zbx_execute_agent_check_CFLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests
+zbx_execute_agent_check_CFLAGS = -DZABBIX_DAEMON -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 # zbx_execute_agent_check_http
 
@@ -232,9 +234,10 @@ zbx_execute_agent_check_http_WRAP_FUNCS = \
 
 zbx_execute_agent_check_http_LDADD += @AGENT_LIBS@
 
-zbx_execute_agent_check_http_LDFLAGS = @AGENT_LDFLAGS@
+zbx_execute_agent_check_http_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-zbx_execute_agent_check_http_CFLAGS = $(zbx_execute_agent_check_http_WRAP_FUNCS) -I@top_srcdir@/tests
+zbx_execute_agent_check_http_CFLAGS = $(zbx_execute_agent_check_http_WRAP_FUNCS) -I@top_srcdir@/tests $(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS)
 
 # check_key_access_rules
 
@@ -250,8 +253,8 @@ check_key_access_rules_LDADD = $(COMMON_LIB_FILES) \
 
 check_key_access_rules_LDADD += @AGENT_LIBS@
 
-check_key_access_rules_LDFLAGS = @AGENT_LDFLAGS@
+check_key_access_rules_LDFLAGS = @AGENT_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-check_key_access_rules_CFLAGS = -I@top_srcdir@/tests
+check_key_access_rules_CFLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
 endif

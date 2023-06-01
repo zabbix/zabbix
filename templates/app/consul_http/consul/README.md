@@ -154,7 +154,7 @@ In case of Open Source version service namespace will be set to 'None'.
 |----|-----------|----|-----------------------|
 |Consul: HTTP request: ["{#HTTP_METHOD}"], p90|<p>The 90 percentile of how long it takes to service the given HTTP request for the given verb.</p>|Dependent item|consul.http.api.p90["{#HTTP_METHOD}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Consul: HTTP request: ["{#HTTP_METHOD}"], p50|<p>The 50 percentile (median) of how long it takes to service the given HTTP request for the given verb.</p>|Dependent item|consul.http.api.p50["{#HTTP_METHOD}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Consul: HTTP request: ["{#HTTP_METHOD}"], rate|<p>Thr number of HTTP request for the given verb per second.</p>|Dependent item|consul.http.api.rate["{#HTTP_METHOD}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(consul_api_http_count{method = "{#HTTP_METHOD}"})`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
+|Consul: HTTP request: ["{#HTTP_METHOD}"], rate|<p>The number of HTTP request for the given verb per second.</p>|Dependent item|consul.http.api.rate["{#HTTP_METHOD}"]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `SUM(consul_api_http_count{method = "{#HTTP_METHOD}"})`</p><p>⛔️Custom on fail: Discard value</p></li><li>Change per second</li></ul>|
 
 ### LLD rule Raft server metrics discovery
 

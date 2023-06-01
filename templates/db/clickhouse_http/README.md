@@ -53,7 +53,7 @@ If you don't need authentication - remove headers from HTTP-Agent type items
 |----|-----------|-------|
 |{$CLICKHOUSE.USER}||`zabbix`|
 |{$CLICKHOUSE.PASSWORD}||`zabbix_pass`|
-|{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of smth for trigger expression</p>|`5`|
+|{$CLICKHOUSE.NETWORK.ERRORS.MAX.WARN}|<p>Maximum number of network errors for trigger expression</p>|`5`|
 |{$CLICKHOUSE.PORT}|<p>The port of ClickHouse HTTP endpoint</p>|`8123`|
 |{$CLICKHOUSE.SCHEME}|<p>Request scheme which may be http or https</p>|`http`|
 |{$CLICKHOUSE.LLD.FILTER.DB.MATCHES}|<p>Filter of discoverable databases</p>|`.*`|
