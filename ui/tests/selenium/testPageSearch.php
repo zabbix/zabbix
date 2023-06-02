@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 
 /**
- * @backup hosts
+ * @backup hstgrp
  *
  * @onBefore prepareData
  */
@@ -33,29 +33,64 @@ class testPageSearch extends CWebTest {
 
 	use TableTrait;
 
+	private static $search_string = 'Test object';
+
 	private static $widget_params = [
 		'hosts' => [
 			'key' => 'hosts',
 			'selector_id' => 'search_hosts_widget',
 			'title' => 'Hosts',
-			'table_columns' => ['Host', 'IP', 'DNS', 'Latest data', 'Problems', 'Graphs', 'Screens', 'Web',
-				'Applications', 'Items', 'Triggers', 'Graphs', 'Discovery', 'Web']
+			'columns' => [
+				['name' => 'Host', 'skip_text_check' => true, 'href' => 'hosts.php?form=update'],
+				['name' => 'IP', 'skip_text_check' => true],
+				['name' => 'DNS', 'skip_text_check' => true],
+				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
+				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
+				['name' => 'Graphs', 'href' => 'zabbix.php?action=charts.view'],
+				['name' => 'Screens', 'href' => 'host_screen.php?hostid='],
+				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
+				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
+				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
+				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
+				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
+				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
+				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1']
+			]
 		],
 		'hostgroups' => [
 			'key' => 'host_groups',
 			'selector_id' => 'search_hostgroup_widget',
 			'title' => 'Host groups',
-			'table_columns' => ['Host group', 'Latest data', 'Problems', 'Web', 'Hosts', 'Templates']
+			'columns' => [
+				['name' => 'Host group', 'skip_text_check' => true, 'href' => 'hostgroups.php?form=update'],
+				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
+				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
+				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
+				['name' => 'Hosts', 'href' => 'hosts.php?filter_set=1'],
+				['name' => 'Templates', 'href' => 'templates.php?filter_set=1']
+			]
 		],
 		'templates' => [
 			'key' => 'templates',
 			'selector_id' => 'search_templates_widget',
 			'title' => 'Templates',
-			'table_columns' => ['Template', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Web']
+			'columns' => [
+				['name' => 'Template', 'skip_text_check' => true, 'href' => 'templates.php?form=update'],
+				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
+				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
+				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
+				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
+				['name' => 'Screens', 'href' => 'screenconf.php?templateid='],
+				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
+				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids']
+			]
 		]
 	];
 
 	public static function prepareData() {
+
+		$hostGroupId = CDataHelper::call('hostgroup.create', [['name' => self::$search_string.' Hostgroup']])['groupids'][0];
+
 		CDataHelper::createHosts([
 			[
 				'host' => 'emoji visible name',
@@ -100,6 +135,28 @@ class testPageSearch extends CWebTest {
 					'dns' => '',
 					'port' => '10050'
 				]
+			],
+			[
+				'host' => self::$search_string.' Host',
+				'groups' => [
+					'groupid' => $hostGroupId
+				],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				]
+			]
+		]);
+		CDataHelper::createTemplates([
+			[
+				'host' => self::$search_string.' Template',
+				'groups' => [
+					'groupid' => $hostGroupId
+				]
 			]
 		]);
 	}
@@ -119,29 +176,42 @@ class testPageSearch extends CWebTest {
 		$this->verifyThatSuggestionsNotShown();
 
 		// Check suggestion highlighting.
-		$search_string = 'host';
-		$search_field->fill($search_string);
+		$search_field->fill(self::$search_string);
 		$this->assertEquals(null, $search_button->getAttribute('disabled'));
 		$highlighted_text = $this->query('xpath://ul[@class="search-suggest"]//span[@class="suggest-found"]')->waitUntilVisible()->one()->getText();
-		$this->assertEquals($search_string, strtolower($highlighted_text));
+		$this->assertEquals(strtolower(self::$search_string), strtolower($highlighted_text));
 
 		// Check that suggestions disappear after deleting input.
 		$search_field->fill('');
 		$this->verifyThatSuggestionsNotShown();
 		$this->assertEquals('true', $search_button->getAttribute('disabled'));
 
-		$search_field->fill($search_string);
+		$search_field->fill(self::$search_string);
 		$search_button->waitUntilReady()->click();
-		$this->assertEquals('Search: '.$search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
+		$this->assertEquals('Search: '.self::$search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
 
 		// Assert result widget layout.
 		foreach (self::$widget_params as $wp) {
 			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
 			$widget = $this->query($widget_selector)->one();
-
 			$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
-			$this->assertEquals($wp['table_columns'], $this->query($widget_selector.'//table//th')->all()->asText());
 
+			// Check column names.
+			$this->assertEquals(array_column($wp['columns'], 'name'), $this->query($widget_selector.'//table//th')->all()->asText());
+
+			// Check table links.
+			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
+			foreach ($wp['columns'] as $col_num => $column){
+				if (isset($column['href'])) {
+					// The same column name is sometimes used twice so need to access by index.
+					$link = $table_first_row->query('xpath:./td['.($col_num + 1).']//a')->one();
+					// Link text matches the column name the vast majority of time.
+					if (!(isset($column['skip_text_check']) && $column['skip_text_check'])) {
+						$this->assertEquals($column['name'], $link->getText());
+					}
+					$this->assertStringContainsString($column['href'], $link->getAttribute('href'));
+				}
+			}
 		}
 	}
 
