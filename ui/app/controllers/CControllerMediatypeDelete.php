@@ -69,6 +69,15 @@ class CControllerMediatypeDelete extends CController {
 				'title' => _n('Cannot delete media type', 'Cannot delete media types', $deleted),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
+
+			$mediatypes = API::MediaType()->get([
+				'output' => [],
+				'mediatypeids' => $mediatypeids,
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			$output['keepids'] = array_keys($mediatypes);
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

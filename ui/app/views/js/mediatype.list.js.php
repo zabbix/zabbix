@@ -197,6 +197,7 @@
 							postMessageError(response.error.title);
 						}
 
+						uncheckTableRows('mediatype', response.keepids ?? []);
 						postMessageDetails('error', response.error.messages);
 					}
 					else if ('success' in response) {
@@ -205,8 +206,9 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('mediatype');
 					}
-					uncheckTableRows('mediatype');
 
 					location.href = location.href;
 				})
