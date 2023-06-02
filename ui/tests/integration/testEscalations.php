@@ -1033,7 +1033,7 @@ HEREDOC;
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_execute()', true, 95, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, "Executing command '".self::COMMAND_PROBLEM."'",
 				true, 10, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_command_results(), ret 0 parsed 1',
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_command_results(), parsed 1',
 				true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_execute()', true, 10, 3);
 
@@ -1047,7 +1047,7 @@ HEREDOC;
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'In escalation_recover()', true, 200);
 		$this->waitForLogLineToBePresent(self::COMPONENT_AGENT, "Executing command '".self::COMMAND_RECOVERY."'",
 				true, 10, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_command_results(), ret 0 parsed 1',
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_process_command_results(), parsed 1',
 				true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of escalation_recover()', true);
 

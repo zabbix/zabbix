@@ -121,11 +121,9 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		int config_timeout)
 {
 	char	*info = NULL;
-	int	ret, data_ret, commands_ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	data_ret = zbx_process_agent_history_data(sock, jp, ts, &info);
 
 	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
