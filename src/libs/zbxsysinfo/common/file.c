@@ -430,9 +430,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
-		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
-		zbx_free(utf8);
+		zbx_str_memcpy_alloc(&contents, &contents_alloc, &contents_offset, read_buf, nbytes);
 	}
 
 	if (-1 == nbytes)	/* error occurred */
@@ -447,11 +445,15 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (0 == contents_offset) /* empty file */
 	{
-		zbx_free(contents);
-		contents = zbx_strdup(contents, "");
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
+	}
+	else
+	{
+		utf8 = convert_to_utf8(contents, contents_offset, encoding);
+		SET_TEXT_RESULT(result, utf8);
 	}
 
-	SET_TEXT_RESULT(result, contents);
+	zbx_free(contents);
 
 	ret = SYSINFO_RET_OK;
 err:
