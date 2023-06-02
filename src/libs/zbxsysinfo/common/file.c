@@ -440,20 +440,11 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != contents_offset)
-		contents_offset -= zbx_rtrim(contents, "\r\n");
-
-	if (0 == contents_offset) /* empty file */
-	{
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
-	}
-	else
-	{
-		utf8 = convert_to_utf8(contents, contents_offset, encoding);
-		SET_TEXT_RESULT(result, utf8);
-	}
-
+	utf8 = convert_to_utf8(contents, contents_offset, encoding);
 	zbx_free(contents);
+	zbx_rtrim_utf8(utf8, "\r\n");
+
+	SET_TEXT_RESULT(result, utf8);
 
 	ret = SYSINFO_RET_OK;
 err:
