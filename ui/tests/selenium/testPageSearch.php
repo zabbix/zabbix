@@ -88,7 +88,7 @@ class testPageSearch extends CWebTest {
 	];
 
 	public static function prepareData() {
-
+		// This is needed so that all links in Search results are active.
 		$hostGroupId = CDataHelper::call('hostgroup.create', [['name' => self::$search_string.' Hostgroup']])['groupids'][0];
 
 		CDataHelper::createHosts([
@@ -151,6 +151,7 @@ class testPageSearch extends CWebTest {
 				]
 			]
 		]);
+
 		CDataHelper::createTemplates([
 			[
 				'host' => self::$search_string.' Template',
@@ -212,6 +213,21 @@ class testPageSearch extends CWebTest {
 					$this->assertStringContainsString($column['href'], $link->getAttribute('href'));
 				}
 			}
+
+			// Check expanding functionality.
+			$widget_body = $widget->query('class:body')->one();
+			$collapse_button = $widget->query('class:btn-widget-collapse')->one();
+			$this->assertEquals('Collapse', $collapse_button->getAttribute('title'));
+
+			$collapse_button->click();
+			$widget_body->waitUntilNotVisible();
+			$this->assertFalse($widget_body->isDisplayed());
+			$this->assertEquals('Expand', $collapse_button->getAttribute('title'));
+
+			$expand_button = $widget->query('class:btn-widget-expand')->one();
+			$expand_button->click();
+			$widget_body->waitUntilVisible();
+			$this->assertTrue($widget_body->isDisplayed());
 		}
 	}
 
