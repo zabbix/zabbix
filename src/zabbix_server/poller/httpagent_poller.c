@@ -49,7 +49,7 @@ static void	httpagent_context_clean(zbx_httpagent_context *httpagent_context)
 	zbx_http_context_destroy(&httpagent_context->http_context);
 }
 
-int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
+static int	async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
 {
 	char			*error = NULL;
 	int			ret;
@@ -109,7 +109,58 @@ fail:
 	return NOTSUPPORTED;
 }
 
-static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
+static void	async_check_items(evutil_socket_t fd, short events, void *arg)
+{
+	zbx_dc_item_t		item, *items;
+	AGENT_RESULT		results[ZBX_MAX_HTTPAGENT_ITEMS];
+	int			errcodes[ZBX_MAX_HTTPAGENT_ITEMS];
+	zbx_timespec_t		timespec;
+	int			i, num;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	items = &item;
+	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
+			poller_config->processing, &items);
+
+	if (0 == num)
+		goto exit;
+
+	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
+
+	for (i = 0; i < num; i++)
+		errcodes[i] = async_check_httpagent(&items[i], &results[i], poller_config);
+
+	zbx_timespec(&timespec);
+
+	/* process item values */
+	for (i = 0; i < num; i++)
+	{
+		if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
+		{
+			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
+
+			zbx_vector_uint64_append(&poller_config->itemids, items[i].itemid);
+			zbx_vector_int32_append(&poller_config->errcodes, errcodes[i]);
+			zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
+		}
+	}
+
+	zbx_preprocessor_flush();
+	zbx_clean_items(items, num, results);
+	zbx_dc_config_clean_items(items, NULL, num);
+
+	if (items != &item)
+		zbx_free(items);
+exit:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
+
+	poller_config->queued += num;
+}
+
+static void	process_item_result(CURL *easy_handle, CURLcode err)
 {
 	long			response_code;
 	char			*error, *out = NULL;
@@ -132,7 +183,6 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &httpagent_context->http_context, err, &response_code,
 			&out, &error) && SUCCEED == zbx_handle_response_code(status_codes, response_code, out, &error))
 	{
-
 		SET_TEXT_RESULT(&result, out);
 		out = NULL;
 		zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
@@ -164,57 +214,6 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	async_get_poller_items(evutil_socket_t fd, short events, void *arg)
-{
-	zbx_dc_item_t		item, *items;
-	AGENT_RESULT		results[ZBX_MAX_HTTPAGENT_ITEMS];
-	int			errcodes[ZBX_MAX_HTTPAGENT_ITEMS];
-	zbx_timespec_t		timespec;
-	int			i, num;
-	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	items = &item;
-	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
-			poller_config->processing, &items);
-
-	if (0 == num)
-		goto exit;
-
-	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
-
-	for (i = 0; i < num; i++)
-		errcodes[i] = async_httpagent_add(&items[i], &results[i], poller_config);
-
-	zbx_timespec(&timespec);
-
-	/* process item values */
-	for (i = 0; i < num; i++)
-	{
-		if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
-		{
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
-
-			zbx_vector_uint64_append(&poller_config->itemids, items[i].itemid);
-			zbx_vector_int32_append(&poller_config->errcodes, errcodes[i]);
-			zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
-		}
-	}
-
-	zbx_preprocessor_flush();
-	zbx_clean_items(items, num, results);
-	zbx_dc_config_clean_items(items, NULL, num);
-
-	if (items != &item)
-		zbx_free(items);
-exit:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
-
-	poller_config->queued += num;
-}
-
 static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 {
 	int	nextcheck;
@@ -233,7 +232,7 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 	zbx_vector_int32_clear(&poller_config->errcodes);
 
 	if (FAIL != nextcheck && nextcheck <= time(NULL))
-		event_active(poller_config->async_get_poller_items_timer, 0, 0);
+		event_active(poller_config->async_check_items_timer, 0, 0);
 }
 
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
@@ -262,7 +261,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	last_stat_time = time(NULL);
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
-	http_agent_poller_init(&poller_config, poller_args_in, async_get_poller_items, async_httpagent_done);
+	http_agent_poller_init(&poller_config, poller_args_in, async_check_items, process_item_result);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -273,8 +272,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
-		if (0 == evtimer_pending(poller_config.async_get_poller_items_timer, &tv_pending))
-			evtimer_add(poller_config.async_get_poller_items_timer, &tv);
+		if (0 == evtimer_pending(poller_config.async_check_items_timer, &tv_pending))
+			evtimer_add(poller_config.async_check_items_timer, &tv);
 
 		event_base_loop(poller_config.base, EVLOOP_ONCE);
 
