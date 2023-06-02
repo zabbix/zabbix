@@ -32,7 +32,8 @@ class CControllerMediatypeList extends CController {
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
-			'filter_status' =>	'in -1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'filter_status' =>	'in -1,'.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'page' =>			'ge 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -129,7 +130,7 @@ class CControllerMediatypeList extends CController {
 		}
 
 		// pager
-		$data['page'] = getRequest('page', 1);
+		$data['page'] = $this->getInput('page', 1);
 		CPagerHelper::savePage('mediatype.list', $data['page']);
 		$data['paging'] = CPagerHelper::paginate($data['page'], $data['mediatypes'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
