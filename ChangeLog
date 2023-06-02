@@ -1,8 +1,23 @@
 Changes for 6.4.4rc1
 
 New features:
+.........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
+........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
+..F....... [ZBX-22594] fixed fatal error when requests contains invalid authentication parameters (miks)
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+..F....... [ZBX-22691] fixed action operations edit form opening wrong operation details popup window (Ivo)
+.........T [ZBX-21593] optimised preprocessing steps in both templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
+...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted connection in Zabbix agent 2 (kprutkovs)
+.......PS. [ZBX-22314] fixed OpenSSL, yaml, cmocka compiling in a non-standard location (askolmeisters)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template; improved the check for double template linkage and related error messages (epulke, jfreibergs, vmaksimovs)
+A.F....... [ZBX-22254] fixed support of special characters in LDAP group pattern (gcalenko)
+........S. [ZBX-22571] fixed service not equal action condition not working as expected (vso)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+.........T [ZBX-22698] fixed spelling mistakes in templates (egordymov)
+..F....... [ZBX-21883] changed map widgets select map field to multiselect (agriscenko, Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.3
