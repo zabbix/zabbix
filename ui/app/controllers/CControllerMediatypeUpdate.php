@@ -183,6 +183,7 @@ class CControllerMediatypeUpdate extends CController {
 		}
 
 		$result = API::Mediatype()->update($mediatype);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Media type updated');

@@ -55,6 +55,7 @@ class CControllerMediatypeDelete extends CController {
 		$result = API::Mediatype()->delete($mediatypeids);
 
 		$deleted = count($mediatypeids);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _n('Media type deleted', 'Media types deleted', $deleted);

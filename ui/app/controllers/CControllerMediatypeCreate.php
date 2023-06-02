@@ -179,6 +179,7 @@ class CControllerMediatypeCreate extends CController {
 		}
 
 		$result = API::Mediatype()->create($mediatype);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _('Media type added');

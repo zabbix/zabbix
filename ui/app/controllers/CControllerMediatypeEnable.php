@@ -78,8 +78,8 @@ class CControllerMediatypeEnable extends CController {
 		}
 
 		$result = $mediatypes ? API::Mediatype()->update($mediatypes) : null;
-
 		$updated = $result ? count($mediatypes) : count($mediatypeids);
+		$output = [];
 
 		if ($result) {
 			if ($incomplete_configurations) {

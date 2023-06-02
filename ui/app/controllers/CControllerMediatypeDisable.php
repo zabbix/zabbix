@@ -61,6 +61,7 @@ class CControllerMediatypeDisable extends CController {
 		$result = API::Mediatype()->update($mediatypes);
 
 		$updated = count($mediatypes);
+		$output = [];
 
 		if ($result) {
 			$output['success']['title'] = _n('Media type disabled', 'Media types disabled', $updated);
