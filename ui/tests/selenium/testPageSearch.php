@@ -41,21 +41,21 @@ class testPageSearch extends CWebTest {
 			'selector_id' => 'search_hosts_widget',
 			'title' => 'Hosts',
 			'columns' => [
-				['name' => 'Host', 'skip_text_check' => true, 'href' => 'hosts.php?form=update'],
+				['name' => 'Host', 'skip_text_check' => true, 'href' => 'zabbix.php?action=host.edit'],
 				['name' => 'IP', 'skip_text_check' => true],
 				['name' => 'DNS', 'skip_text_check' => true],
 				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
 				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
 				['name' => 'Graphs', 'href' => 'zabbix.php?action=charts.view'],
-				['name' => 'Screens', 'href' => 'host_screen.php?hostid='],
+				['name' => 'Dashboards', 'href' => 'zabbix.php?action=host.dashboard.view'],
 				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
 				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
 				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
 				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
 				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
 				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1']
-			]
+			],
+			'column_names' => ['Host', 'IP', 'DNS', 'Monitoring', 'Configuration']
 		],
 		'hostgroups' => [
 			'key' => 'host_groups',
@@ -66,9 +66,10 @@ class testPageSearch extends CWebTest {
 				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
 				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
 				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Hosts', 'href' => 'hosts.php?filter_set=1'],
+				['name' => 'Hosts', 'href' => 'zabbix.php?action=host.list'],
 				['name' => 'Templates', 'href' => 'templates.php?filter_set=1']
-			]
+			],
+			'column_names' => ['Host group', 'Monitoring', 'Configuration']
 		],
 		'templates' => [
 			'key' => 'templates',
@@ -76,14 +77,14 @@ class testPageSearch extends CWebTest {
 			'title' => 'Templates',
 			'columns' => [
 				['name' => 'Template', 'skip_text_check' => true, 'href' => 'templates.php?form=update'],
-				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
 				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
 				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
 				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
-				['name' => 'Screens', 'href' => 'screenconf.php?templateid='],
+				['name' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list'],
 				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
 				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids']
-			]
+			],
+			'column_names' => ['Template', 'Configuration']
 		]
 	];
 
@@ -198,7 +199,7 @@ class testPageSearch extends CWebTest {
 			$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
 
 			// Check column names.
-			$this->assertEquals(array_column($wp['columns'], 'name'), $this->query($widget_selector.'//table//th')->all()->asText());
+			$this->assertEquals($wp['column_names'], $this->query($widget_selector.'//table//th')->all()->asText());
 
 			// Check table links.
 			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
@@ -325,7 +326,7 @@ class testPageSearch extends CWebTest {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
 			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
-				'WHERE h.status=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
+				'WHERE h.status=0 AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
 				'OR i.dns LIKE \'%'.$data['search_string'].'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
 			$db_count = [];
@@ -364,7 +365,7 @@ class testPageSearch extends CWebTest {
 			}
 
 			// Assert table stats.
-			$footer_text =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$footer_text =  $widget->query('xpath:.//ul[@class="dashboard-widget-foot"]//li')->one()->getText();
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
 		}
 	}
