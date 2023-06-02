@@ -235,6 +235,46 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 		event_active(poller_config->async_check_items_timer, 0, 0);
 }
 
+static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
+		event_callback_fn async_check_items_callback)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_vector_uint64_create(&poller_config->itemids);
+	zbx_vector_int32_create(&poller_config->lastclocks);
+	zbx_vector_int32_create(&poller_config->errcodes);
+
+	if (NULL == (poller_config->base = event_base_new()))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
+		exit(EXIT_FAILURE);
+	}
+
+	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
+	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
+	poller_config->poller_type = poller_args_in->poller_type;
+
+	if (NULL == (poller_config->async_check_items_timer = evtimer_new(poller_config->base,
+			async_check_items_callback, poller_config)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot create async items timer event");
+		exit(EXIT_FAILURE);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static void	http_agent_poller_destroy(zbx_poller_config_t *poller_config)
+{
+	event_base_free(poller_config->base);
+	zbx_vector_uint64_clear(&poller_config->itemids);
+	zbx_vector_int32_clear(&poller_config->lastclocks);
+	zbx_vector_int32_clear(&poller_config->errcodes);
+	zbx_vector_uint64_destroy(&poller_config->itemids);
+	zbx_vector_int32_destroy(&poller_config->lastclocks);
+	zbx_vector_int32_destroy(&poller_config->errcodes);
+}
+
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
@@ -261,7 +301,9 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	last_stat_time = time(NULL);
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
-	http_agent_poller_init(&poller_config, poller_args_in, async_check_items, process_item_result);
+
+	http_agent_poller_init(&poller_config, poller_args_in, async_check_items);
+	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_item_result);
 
 	while (ZBX_IS_RUNNING())
 	{
