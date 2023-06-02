@@ -94,6 +94,42 @@ if (array_key_exists('templates', $data['filter'])) {
 
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
+	switch ($options['itemtype']) {
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_AGENT;
+			break;
+
+		case ITEM_TYPE_SIMPLE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SIMPLE_CHECK;
+			break;
+
+		case ITEM_TYPE_SNMPTRAP:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SNMP_TRAP;
+			break;
+
+		case ITEM_TYPE_INTERNAL:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_INTERNAL;
+			break;
+
+		case ITEM_TYPE_DB_MONITOR:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_DB_MONITOR;
+			break;
+
+		case ITEM_TYPE_IPMI:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_IPMI_AGENT;
+			break;
+
+		case ITEM_TYPE_JMX:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_JMX_AGENT;
+			break;
+
+		default:
+			$popup_doc_url = CDocHelper::POPUP_STANDARD_ITEMS;
+	}
+
+	$output['doc_url'] = CDocHelper::getUrl($popup_doc_url);
+
 	$types_select = (new CSelect('itemtype'))
 		->setId('itemtype')
 		->setFocusableElementId('label-itemtype')
@@ -441,7 +477,22 @@ switch ($data['popup_type']) {
 
 					popup_generic.closePopup(event);
 				');
-			$table->addRow([$name, $item['description']]);
+
+			if (is_array($item['documentation_link'])) {
+				$item_doc_link = CDocHelper::POPUP_STANDARD_ITEMS.$item['documentation_link'][$options['itemtype']];
+			}
+			else {
+				$item_doc_link = substr($item['documentation_link'], 0, 1) === '/'
+					? CDocHelper::POPUP_STANDARD_ITEMS.$item['documentation_link']
+					: $item['documentation_link'];
+			}
+
+			$documentation_link = (new CLink(null, CDocHelper::getUrl($item_doc_link)))
+				->setTitle(_('Help'))
+				->addClass(ZBX_STYLE_ICON_DOC_LINK)
+				->setTarget('_blank');
+
+			$table->addRow([$name, $item['description'], $documentation_link]);
 		}
 		unset($data['table_records']);
 		break;

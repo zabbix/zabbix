@@ -329,7 +329,8 @@ class CControllerPopupGeneric extends CController {
 				'allowed_src_fields' => 'key',
 				'table_columns' => [
 					_('Key'),
-					_('Name')
+					_('Name'),
+					''
 				]
 			],
 			'graphs' => [
