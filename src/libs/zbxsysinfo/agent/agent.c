@@ -21,6 +21,7 @@
 
 #include "modbtype.h"
 
+
 extern char			*CONFIG_HOSTNAMES;
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern char			*CONFIG_HOST_METADATA;
@@ -32,7 +33,7 @@ static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_variant(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_agent[] =
+static zbx_metric	parameters_agent[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"agent.hostname",	0,		agent_hostname,		NULL},
@@ -43,6 +44,12 @@ ZBX_METRIC	parameters_agent[] =
 	{"modbus.get",		CF_HAVEPARAMS,	modbus_get,		"tcp://127.0.0.1"},
 	{NULL}
 };
+
+zbx_metric	*get_parameters_agent(void)
+{
+	return parameters_agent;
+}
+
 
 static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

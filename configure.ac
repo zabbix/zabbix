@@ -1029,6 +1029,7 @@ openbsd*)
 	;;
 *)
 	ARCH="unknown"
+	AC_DEFINE([ZBX_UNKNOWN_ARCH], 1, [Define to 1 if unsupported architecture was detected.])
 	;;
 esac
 

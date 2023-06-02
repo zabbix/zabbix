@@ -73,8 +73,8 @@ const char	*usage_message[] = {};
 unsigned char	program_type	= 0x80;
 const char	*help_message[] = {};
 
-ZBX_METRIC	parameters_agent[] = {NULL};
-ZBX_METRIC	parameters_specific[] = {NULL};
+zbx_metric	parameters_agent[] = {NULL};
+zbx_metric	parameters_specific[] = {NULL};
 
 int	zbx_procstat_collector_started(void)
 {

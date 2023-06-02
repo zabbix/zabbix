@@ -22,6 +22,6 @@
 
 #include "zbxsysinfo.h"
 
-extern ZBX_METRIC	parameters_agent[];
+zbx_metric	*get_parameters_agent(void);
 
 #endif /* ZABBIX_SYSINFO_AGENT_H */

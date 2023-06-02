@@ -22,7 +22,7 @@
 
 #include "zbxwinservice.h"
 
-ZBX_METRIC	parameters_specific[] =
+static zbx_metric	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"vfs.fs.size",		CF_HAVEPARAMS,	vfs_fs_size,		"c:,free"},
@@ -80,3 +80,8 @@ ZBX_METRIC	parameters_specific[] =
 
 	{NULL}
 };
+
+zbx_metric	*get_parameters_specific(void)
+{
+	return parameters_specific;
+}

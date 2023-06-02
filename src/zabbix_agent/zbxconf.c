@@ -241,7 +241,7 @@ static int	load_config_user_params(const char *config_file)
 void	reload_user_parameters(unsigned char process_type, int process_num, const char *config_file)
 {
 	char		*error = NULL;
-	ZBX_METRIC	*metrics_fallback = NULL;
+	zbx_metric	*metrics_fallback = NULL;
 
 	zbx_strarr_init(&CONFIG_USER_PARAMETERS);
 

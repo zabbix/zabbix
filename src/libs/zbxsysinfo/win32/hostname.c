@@ -19,13 +19,10 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+//#include "hostname.h"
 
 #include "log.h"
 #include "zbxstr.h"
-
-ZBX_METRIC	parameter_hostname =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
 
 static void	retrieve_hostname(char *buffer, int len, char **error)
 {

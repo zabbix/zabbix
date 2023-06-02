@@ -110,7 +110,7 @@ typedef struct
 	int		(*function)(AGENT_REQUEST *request, AGENT_RESULT *result);
 	char		*test_param;	/* item test parameters; user parameter items keep command here */
 }
-ZBX_METRIC;
+zbx_metric;
 
 /* SET RESULT */
 
@@ -353,7 +353,7 @@ int	zbx_module_api_version(void);
 int	zbx_module_init(void);
 int	zbx_module_uninit(void);
 void	zbx_module_item_timeout(int timeout);
-ZBX_METRIC	*zbx_module_item_list(void);
+zbx_metric	*zbx_module_item_list(void);
 ZBX_HISTORY_WRITE_CBS	zbx_module_history_write_cbs(void);
 
 #endif
