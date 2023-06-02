@@ -434,8 +434,9 @@ run:
 					for _, client := range m.clients {
 						if len(client.pluginsInfo) == 0 {
 							delete(m.clients, client.ID())
+						} else {
+							client.commandCleanup()
 						}
-						client.commandCleanup()
 					}
 					cleaned = now
 				}

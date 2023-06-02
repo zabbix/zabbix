@@ -276,7 +276,6 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 }
 
 // command registry cleanup
-// TODO: add all client hourly command cleanup to manager
 func (c *client) commandCleanup() {
 	now := time.Now()
 	for id, expire := range c.commands {
@@ -287,7 +286,6 @@ func (c *client) commandCleanup() {
 }
 
 func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink resultcache.Writer, now time.Time) {
-
 	if _, ok := c.commands[id]; ok {
 		return
 	}
