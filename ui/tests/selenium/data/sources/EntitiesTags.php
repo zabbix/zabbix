@@ -944,6 +944,74 @@ class EntitiesTags {
 			]
 		]);
 
+		// Create connectors.
+		CDataHelper::call('connector.create', [
+			[
+				'name' => 'Connector with tags for updating',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'connector action',
+						'operator' => 2,
+						'value' => 'connector update'
+					],
+					[
+						'tag' => 'connector tag without value'
+					],
+					[
+						'tag' => 'connector test',
+						'operator' => 0,
+						'value' => 'connector update'
+					]
+				]
+			],
+			[
+				'name' => 'Connector with tags for cloning',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'connector a',
+						'operator' => 2,
+						'value' => ':connector a'
+					],
+					[
+						'tag' => 'connector action',
+						'operator' => 0,
+						'value' => 'connector clone'
+					],
+					[
+						'tag' => 'connector tag without value',
+						'operator' => 2
+					],
+					[
+						'tag' => 'connector common tag on host and element',
+						'operator' => 0,
+						'value' => 'connector common value'
+					]
+				]
+			],
+			[
+				'name' => 'Connector for removing tags',
+				'url' => '{$URL}',
+				'tags' => [
+					[
+						'tag' => 'tag remove',
+						'operator' => 0,
+						'value' => 'tag remove'
+					],
+					[
+						'tag' => 'connector tag',
+						'operator' => 2,
+						'value' => 'tag remove'
+					],
+					[
+						'tag' => 'connector tag',
+						'operator' => 2
+					]
+				]
+			]
+		]);
+
 		$result = array_merge_recursive($hosts, $templates);
 
 		return $result;

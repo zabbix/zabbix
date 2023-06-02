@@ -122,7 +122,7 @@ Don't forget to change macros {$JENKINS.URL}.
 |Jenkins: CPU Load|<p>The system load on the Jenkins master as reported by the JVM's Operating System JMX bean. The calculation of system load is operating system dependent. Typically this is the sum of the number of processes that are currently running plus the number that are waiting to run. This is typically comparable against the number of CPU cores.</p>|Dependent item|jenkins.system.cpu.load<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['system.cpu.load'].value`</p></li></ul>|
 |Jenkins: Uptime|<p>The number of seconds since the Jenkins master JVM started.</p>|Dependent item|jenkins.system.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['vm.uptime.milliseconds'].value`</p></li><li><p>Custom multiplier: `0.001`</p></li></ul>|
 |Jenkins: File descriptor ratio|<p>The ratio of used to total file descriptors</p>|Dependent item|jenkins.descriptor.ratio<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.['vm.file.descriptor.ratio'].value`</p></li><li><p>Custom multiplier: `100`</p></li></ul>|
-|Jenkins: Service ping||HTTP agent|jenkins.ping<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Regular expression: `{$JENKINS.PING.REPLY}$ 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
+|Jenkins: Service ping||HTTP agent|jenkins.ping<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Regular expression: `{$JENKINS.PING.REPLY} 1`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `30m`</p></li></ul>|
 
 ### Triggers
 

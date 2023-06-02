@@ -435,7 +435,7 @@ zabbix_export:
         - uuid: b0da0c4856a645ca8ef03405d2d8d4a5
           name: 'PostgreSQL: Get connections sum'
           key: 'pgsql.connections.sum["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: |
@@ -447,7 +447,7 @@ zabbix_export:
         - uuid: b44f263fb33e461e8c3d700fb7688c7b
           name: 'PostgreSQL: Get dbstat'
           key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: |
@@ -459,7 +459,7 @@ zabbix_export:
         - uuid: 7cee21f6225340ef80e9cdef7ce20b10
           name: 'PostgreSQL: Get locks'
           key: 'pgsql.locks["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: |
@@ -530,7 +530,7 @@ zabbix_export:
         - uuid: 47bf580e1e4e48cf9c0e94fcf90288ac
           name: 'PostgreSQL: Get queries'
           key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Collect all metrics by query execution time'
@@ -668,7 +668,7 @@ zabbix_export:
         - uuid: ff26a1c256bd40978f49a7a025538aa1
           name: 'PostgreSQL: Get transactions'
           key: 'pgsql.transactions["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Collect metrics by transaction execution time'
@@ -737,7 +737,7 @@ zabbix_export:
           name: 'PostgreSQL: Get WAL'
           key: 'pgsql.wal.stat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
           delay: 5m
-          history: 1h
+          history: '0'
           trends: '0'
           value_type: TEXT
           description: 'Master item to collect WAL metrics'
@@ -776,7 +776,7 @@ zabbix_export:
                 formulaid: A
           item_prototypes:
             - uuid: 69575e9785184ef5be2502e3cc282220
-              name: 'DB {#DBNAME}: Database size'
+              name: 'DB [{#DBNAME}]: Database size'
               key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]'
               delay: 15m
               history: 7d
@@ -788,7 +788,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 615e6567a85e421bb06ab8cac0eaba69
-              name: 'DB {#DBNAME}: Blocks hit per second'
+              name: 'DB [{#DBNAME}]: Blocks hit per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
               delay: '0'
@@ -798,19 +798,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].blks_hit'
+                    - $.blks_hit
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: cache
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 9136517d08b447869e5b8f5fd684c3b9
-              name: 'DB {#DBNAME}: Disk blocks read per second'
+              name: 'DB [{#DBNAME}]: Disk blocks read per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
               delay: '0'
@@ -820,19 +820,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].blks_read'
+                    - $.blks_read
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: a76f6d28995441ff9fe28bbc09445e64
-              name: 'DB {#DBNAME}: Detected conflicts per second'
+              name: 'DB [{#DBNAME}]: Detected conflicts per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.conflicts.rate["{#DBNAME}"]'
               delay: '0'
@@ -842,12 +842,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].conflicts'
+                    - $.conflicts
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -856,8 +856,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 3b51f02258bd4e02829f04ca016dd01d
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Too many recovery conflicts'
-                  event_name: 'DB {#DBNAME}: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB [{#DBNAME}]: Too many recovery conflicts'
+                  event_name: 'DB [{#DBNAME}]: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
                   description: |
                     The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.
@@ -866,7 +866,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: b874cc2dd80643208c2479ad25fae0ac
-              name: 'DB {#DBNAME}: Detected deadlocks per second'
+              name: 'DB [{#DBNAME}]: Detected deadlocks per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.deadlocks.rate["{#DBNAME}"]'
               delay: '0'
@@ -876,12 +876,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].deadlocks'
+                    - $.deadlocks
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: deadlocks
@@ -890,14 +890,35 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 3bee63fa04d94586937e22aafab9bdd8
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Deadlock occurred'
-                  event_name: 'DB {#DBNAME}: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB [{#DBNAME}]: Deadlock occurred'
+                  event_name: 'DB [{#DBNAME}]: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
                   tags:
                     - tag: scope
                       value: availability
+            - uuid: 52c20fc8faad42ae8d255990ce14d3cd
+              name: 'DB [{#DBNAME}]: Get dbstat'
+              type: DEPENDENT
+              key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get dbstat metrics for {#DBNAME}'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}'']'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+              tags:
+                - tag: component
+                  value: raw
+                - tag: database
+                  value: '{#DBNAME}'
             - uuid: d235ead54c8b41f9a91398c75383e5d7
-              name: 'DB {#DBNAME}: Temp_bytes written per second'
+              name: 'DB [{#DBNAME}]: Temp_bytes written per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_bytes.rate["{#DBNAME}"]'
               delay: '0'
@@ -907,19 +928,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].temp_bytes'
+                    - $.temp_bytes
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: af4e35eee1764d3f97d9c1218867f885
-              name: 'DB {#DBNAME}: Temp_files created per second'
+              name: 'DB [{#DBNAME}]: Temp_files created per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
               delay: '0'
@@ -928,19 +949,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].temp_files'
+                    - $.temp_files
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 35c6f93aefe4439bbc36f2f358440b16
-              name: 'DB {#DBNAME}: Tuples deleted per second'
+              name: 'DB [{#DBNAME}]: Tuples deleted per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_deleted.rate["{#DBNAME}"]'
               delay: '0'
@@ -950,19 +971,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tup_deleted'
+                    - $.tup_deleted
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 92f33d96f8a348088cdba593c0e66929
-              name: 'DB {#DBNAME}: Tuples fetched per second'
+              name: 'DB [{#DBNAME}]: Tuples fetched per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_fetched.rate["{#DBNAME}"]'
               delay: '0'
@@ -972,19 +993,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tup_fetched'
+                    - $.tup_fetched
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 8c03c87a44fe43928c32087ca7561e88
-              name: 'DB {#DBNAME}: Tuples inserted per second'
+              name: 'DB [{#DBNAME}]: Tuples inserted per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_inserted.rate["{#DBNAME}"]'
               delay: '0'
@@ -994,19 +1015,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tup_inserted'
+                    - $.tup_inserted
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: f6d378f4e38e455fa5a12467fe977657
-              name: 'DB {#DBNAME}: Tuples returned per second'
+              name: 'DB [{#DBNAME}]: Tuples returned per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_returned.rate["{#DBNAME}"]'
               delay: '0'
@@ -1016,19 +1037,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tup_returned'
+                    - $.tup_returned
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 4c8de8c1064d43ffa18c4f37fead37f7
-              name: 'DB {#DBNAME}: Tuples updated per second'
+              name: 'DB [{#DBNAME}]: Tuples updated per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.tup_updated.rate["{#DBNAME}"]'
               delay: '0'
@@ -1038,19 +1059,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tup_updated'
+                    - $.tup_updated
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 81c33f5b3c31475fa5f28f4ad149a328
-              name: 'DB {#DBNAME}: Commits per second'
+              name: 'DB [{#DBNAME}]: Commits per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_commit.rate["{#DBNAME}"]'
               delay: '0'
@@ -1060,19 +1081,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].xact_commit'
+                    - $.xact_commit
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: transactions
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 8e5080186d034323be21473099b0b0ce
-              name: 'DB {#DBNAME}: Rollbacks per second'
+              name: 'DB [{#DBNAME}]: Rollbacks per second'
               type: DEPENDENT
               key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
               delay: '0'
@@ -1082,19 +1103,19 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].xact_rollback'
+                    - $.xact_rollback
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
               master_item:
-                key: 'pgsql.dbstat["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}"]'
+                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: transactions
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: df9dd9bac2a54f1085b29fb22b394a1f
-              name: 'DB {#DBNAME}: Frozen XID before avtovacuum %'
+              name: 'DB [{#DBNAME}]: Frozen XID before avtovacuum %'
               type: DEPENDENT
               key: 'pgsql.frozenxid.prc_before_av["{#DBNAME}"]'
               delay: '0'
@@ -1102,7 +1123,7 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                reventing Transaction ID Wraparound Failures
+                Preventing Transaction ID Wraparound Failures
                 https://www.postgresql.org/docs/current/routine-vacuuming.html#VACUUM-FOR-WRAPAROUND
               preprocessing:
                 - type: JSONPATH
@@ -1116,7 +1137,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 44ddd66ea37449cb8fab6979b98dfd3c
-              name: 'DB {#DBNAME}: Frozen XID before stop %'
+              name: 'DB [{#DBNAME}]: Frozen XID before stop %'
               type: DEPENDENT
               key: 'pgsql.frozenxid.prc_before_stop["{#DBNAME}"]'
               delay: '0'
@@ -1140,8 +1161,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 709df9c1e29a4ff68a3de9423ff7ae58
                   expression: 'last(/PostgreSQL by Zabbix agent/pgsql.frozenxid.prc_before_stop["{#DBNAME}"])<{$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound'
-                  event_name: 'DB {#DBNAME}: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
+                  name: 'DB [{#DBNAME}]: VACUUM FREEZE is required to prevent wraparound'
+                  event_name: 'DB [{#DBNAME}]: VACUUM FREEZE is required to prevent wraparound (frozen XID less than {$PG.FROZENXID_PCT_STOP.MIN.HIGH:"{#DBNAME}"} %)'
                   priority: AVERAGE
                   description: |
                     Preventing Transaction ID Wraparound Failures
@@ -1150,9 +1171,9 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: ddf6d0b7b5fe4cbbb540687051b8e5f5
-              name: 'DB {#DBNAME}: Get frozen XID'
+              name: 'DB [{#DBNAME}]: Get frozen XID'
               key: 'pgsql.frozenxid["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
-              history: 1h
+              history: '0'
               trends: '0'
               value_type: TEXT
               tags:
@@ -1161,7 +1182,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 3d0acf4b45fc4a72bb2a214222f93f2a
-              name: 'DB {#DBNAME}: Locks total'
+              name: 'DB [{#DBNAME}]: Locks total'
               type: DEPENDENT
               key: 'pgsql.locks.total["{#DBNAME}"]'
               delay: '0'
@@ -1181,14 +1202,35 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: ef7d3c9866df44aa9b378e7f125a34de
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.locks.total["{#DBNAME}"],5m)>{$PG.LOCKS.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Number of locks is too high'
-                  event_name: 'DB {#DBNAME}: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB [{#DBNAME}]: Number of locks is too high'
+                  event_name: 'DB [{#DBNAME}]: Number of locks is too high (over {$PG.LOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: availability
+            - uuid: ac226e85268c463786e297944339ccf5
+              name: 'DB [{#DBNAME}]: Get queries'
+              type: DEPENDENT
+              key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+              delay: '0'
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              description: 'Get locks metrics for {#DBNAME}'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[''{#DBNAME}'']'
+                  error_handler: DISCARD_VALUE
+              master_item:
+                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+              tags:
+                - tag: component
+                  value: raw
+                - tag: database
+                  value: '{#DBNAME}'
             - uuid: 939ab05c71ed4be9979662203ebba980
-              name: 'DB {#DBNAME}: Queries slow maintenance count'
+              name: 'DB [{#DBNAME}]: Queries slow maintenance count'
               type: DEPENDENT
               key: 'pgsql.queries.mro.slow_count["{#DBNAME}"]'
               delay: '0'
@@ -1197,16 +1239,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].mro_slow_count'
+                    - $.mro_slow_count
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: bbc8f9bf86394cf28e0c2db44ee4711d
-              name: 'DB {#DBNAME}: Queries max maintenance time'
+              name: 'DB [{#DBNAME}]: Queries max maintenance time'
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_max["{#DBNAME}"]'
               delay: '0'
@@ -1216,16 +1258,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].mro_time_max'
+                    - $.mro_time_max
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: f1427228bfa14ad3b7bb9d63bcfaec59
-              name: 'DB {#DBNAME}: Queries sum maintenance time'
+              name: 'DB [{#DBNAME}]: Queries sum maintenance time'
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
               delay: '0'
@@ -1235,16 +1277,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].mro_time_sum'
+                    - $.mro_time_sum
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 5d937f46f4684f1e8253ec62e0f75379
-              name: 'DB {#DBNAME}: Queries slow query count'
+              name: 'DB [{#DBNAME}]: Queries slow query count'
               type: DEPENDENT
               key: 'pgsql.queries.query.slow_count["{#DBNAME}"]'
               delay: '0'
@@ -1253,9 +1295,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].query_slow_count'
+                    - $.query_slow_count
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -1264,14 +1306,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: facc8f6976664da4ad5567d270f0f311
                   expression: 'min(/PostgreSQL by Zabbix agent/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}'
-                  name: 'DB {#DBNAME}: Too many slow queries'
-                  event_name: 'DB {#DBNAME}: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
+                  name: 'DB [{#DBNAME}]: Too many slow queries'
+                  event_name: 'DB [{#DBNAME}]: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
                   tags:
                     - tag: scope
                       value: performance
             - uuid: 044cc16d0a2f46b28d88eff86c33b30b
-              name: 'DB {#DBNAME}: Queries max query time'
+              name: 'DB [{#DBNAME}]: Queries max query time'
               type: DEPENDENT
               key: 'pgsql.queries.query.time_max["{#DBNAME}"]'
               delay: '0'
@@ -1281,16 +1323,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].query_time_max'
+                    - $.query_time_max
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: c6232400b39c4564a30a403859ffb4ee
-              name: 'DB {#DBNAME}: Queries sum query time'
+              name: 'DB [{#DBNAME}]: Queries sum query time'
               type: DEPENDENT
               key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
               delay: '0'
@@ -1300,16 +1342,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].query_time_sum'
+                    - $.query_time_sum
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: f7099043ea6345f0a5531f70f9573a3e
-              name: 'DB {#DBNAME}: Queries slow transaction count'
+              name: 'DB [{#DBNAME}]: Queries slow transaction count'
               type: DEPENDENT
               key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
               delay: '0'
@@ -1318,16 +1360,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tx_slow_count'
+                    - $.tx_slow_count
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: c6800ca30a564766ba745e875cb4e929
-              name: 'DB {#DBNAME}: Queries max transaction time'
+              name: 'DB [{#DBNAME}]: Queries max transaction time'
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_max["{#DBNAME}"]'
               delay: '0'
@@ -1337,16 +1379,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tx_time_max'
+                    - $.tx_time_max
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 0eda974576794768ac9ddc592ff27e19
-              name: 'DB {#DBNAME}: Queries sum transaction time'
+              name: 'DB [{#DBNAME}]: Queries sum transaction time'
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
               delay: '0'
@@ -1356,16 +1398,16 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$[''{#DBNAME}''].tx_time_sum'
+                    - $.tx_time_sum
               master_item:
-                key: 'pgsql.queries["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{$PG.QUERY_ETIME.MAX.WARN}"]'
+                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: cafcc00cce824c33a321da0e9ecc7f6e
-              name: 'DB {#DBNAME}: Index scans per second'
+              name: 'DB [{#DBNAME}]: Index scans per second'
               type: DEPENDENT
               key: 'pgsql.scans.idx.rate["{#DBNAME}"]'
               delay: '0'
@@ -1386,7 +1428,7 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: f07396ca9d224e1b819f22efe6c4259d
-              name: 'DB {#DBNAME}: Sequential scans per second'
+              name: 'DB [{#DBNAME}]: Sequential scans per second'
               type: DEPENDENT
               key: 'pgsql.scans.seq.rate["{#DBNAME}"]'
               delay: '0'
@@ -1408,9 +1450,9 @@ zabbix_export:
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 4bf92e4b0fed4d32b808b299d9e1fb0c
-              name: 'DB {#DBNAME}: Get scans'
+              name: 'DB [{#DBNAME}]: Get scans'
               key: 'pgsql.scans["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{#DBNAME}"]'
-              history: 1h
+              history: '0'
               trends: '0'
               value_type: TEXT
               description: 'Number of scans done for table/index in the database'
@@ -1421,7 +1463,7 @@ zabbix_export:
                   value: '{#DBNAME}'
           graph_prototypes:
             - uuid: 3f8124b817f2437096c620d62ec2e055
-              name: 'DB {#DBNAME}: Block hit/read'
+              name: 'DB [{#DBNAME}]: Block hit/read'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1434,7 +1476,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.blks_read.rate["{#DBNAME}"]'
             - uuid: 6bd0a0d65b8d43ad946b145cf8a8b533
-              name: 'DB {#DBNAME}: Database size'
+              name: 'DB [{#DBNAME}]: Database size'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1442,7 +1484,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.db.size["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DB}","{#DBNAME}"]'
             - uuid: 41e765d906324595a396d8985b204ff5
-              name: 'DB {#DBNAME}: Events'
+              name: 'DB [{#DBNAME}]: Events'
               ymin_type_1: FIXED
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1466,7 +1508,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.xact_rollback.rate["{#DBNAME}"]'
             - uuid: 2b260fdf7623476095429434b5c79041
-              name: 'DB {#DBNAME}: Locks'
+              name: 'DB [{#DBNAME}]: Locks'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1474,7 +1516,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.locks.total["{#DBNAME}"]'
             - uuid: 8a60a92b41b146f49145b86bab559b2e
-              name: 'DB {#DBNAME}: Queries'
+              name: 'DB [{#DBNAME}]: Queries'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1513,7 +1555,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
             - uuid: 93518b06f71e46ada3dabefa1726b867
-              name: 'DB {#DBNAME}: Slow queries'
+              name: 'DB [{#DBNAME}]: Slow queries'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1531,7 +1573,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.queries.tx.slow_count["{#DBNAME}"]'
             - uuid: 779b872280ad46c7a6cdf95c2df7c646
-              name: 'DB {#DBNAME}: Temp files'
+              name: 'DB [{#DBNAME}]: Temp files'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -1545,7 +1587,7 @@ zabbix_export:
                     host: 'PostgreSQL by Zabbix agent'
                     key: 'pgsql.dbstat.temp_files.rate["{#DBNAME}"]'
             - uuid: f10be22e3bac4d66936c34ec99446c64
-              name: 'DB {#DBNAME}: Tuples'
+              name: 'DB [{#DBNAME}]: Tuples'
               ymin_type_1: FIXED
               graph_items:
                 - color: 199C0D
@@ -1641,7 +1683,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Tuples'
+                        name: 'DB [{#DBNAME}]: Tuples'
                 - type: graphprototype
                   x: '12'
                   width: '12'
@@ -1657,7 +1699,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Events'
+                        name: 'DB [{#DBNAME}]: Events'
                 - type: graphprototype
                   'y': '5'
                   width: '12'
@@ -1673,7 +1715,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Block hit/read'
+                        name: 'DB [{#DBNAME}]: Block hit/read'
                 - type: graphprototype
                   x: '12'
                   'y': '5'
@@ -1690,7 +1732,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Temp files'
+                        name: 'DB [{#DBNAME}]: Temp files'
                 - type: graphprototype
                   'y': '10'
                   width: '12'
@@ -1706,7 +1748,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Locks'
+                        name: 'DB [{#DBNAME}]: Locks'
                 - type: graphprototype
                   x: '12'
                   'y': '10'
@@ -1723,7 +1765,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Database size'
+                        name: 'DB [{#DBNAME}]: Database size'
                 - type: graphprototype
                   'y': '15'
                   width: '12'
@@ -1739,7 +1781,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Queries'
+                        name: 'DB [{#DBNAME}]: Queries'
                 - type: graphprototype
                   x: '12'
                   'y': '15'
@@ -1756,7 +1798,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'PostgreSQL by Zabbix agent'
-                        name: 'DB {#DBNAME}: Slow queries'
+                        name: 'DB [{#DBNAME}]: Slow queries'
         - uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
           pages:

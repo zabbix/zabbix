@@ -2637,7 +2637,7 @@ zabbix_export:
                 REMOTE_COPY_SYNC (5) - track remote copy group synchronizations;
                 REMOTE_COPY_REVERSE (6) - track the reversal of a remote copy group;
                 REMOTE_COPY_FAILOVER (7) - track the change-over of a secondary volume group to a primaryvolume group;REMOTE_COPY_RECOVER (8) - track synchronization start after a failover operation from originalsecondary cluster to original primary cluster;
-                REMOTE_COPY_RESTORE (9) - tracks the restoration process for groups that have already beenrecovered;
+                REMOTE_COPY_RESTORE (9) - tracks the restoration process for groups that have already been recovered;
                 COMPACT_CPG (10) - track space consolidation in CPGs;
                 COMPACT_IDS (11) - track space consolidation in logical disks;
                 SNAPSHOT_ACCOUNTING (12) - track progress of snapshot space usage accounting;
@@ -3345,7 +3345,7 @@ zabbix_export:
                 IMPORTING (21) - importing a volume.
                 CONVERTING (22) - converting a volume.
                 INVALID (23) - invalid.
-                EXCLUSIVE (24) -lLocal storage system has exclusive access to the volume.
+                EXCLUSIVE (24) - local storage system has exclusive access to the volume.
                 CONSISTENT (25) - volume is being imported consistently along with other volumes in the VV set.
                 STANDBY (26) - volume in standby mode.
                 SD_META_INCONSISTENT (27) - SD Meta Inconsistent.

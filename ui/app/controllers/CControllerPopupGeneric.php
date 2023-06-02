@@ -1567,11 +1567,12 @@ class CControllerPopupGeneric extends CController {
 				break;
 
 			case 'sysmaps':
-				$options += [
-					'output' => API_OUTPUT_EXTEND
-				];
+				$records = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'preservekeys' => true
+				]);
 
-				$records = API::Map()->get($options);
+				$records = CArrayHelper::renameObjectsKeys($records, ['sysmapid' => 'id']);
 
 				CArrayHelper::sort($records, ['name']);
 				break;

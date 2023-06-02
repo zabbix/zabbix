@@ -786,12 +786,24 @@ class CSvgGraphHelper {
 			}
 		}
 
+		if ($problem_options['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
+			$itemids = [];
+
+			foreach ($metrics as $metric) {
+				$itemids += $metric['options']['aggregate_function'] != AGGREGATE_NONE
+					? array_column($metric['items'], 'itemid', 'itemid')
+					: [$metric['itemid'] => $metric['itemid']];
+			}
+			$itemids = array_values($itemids);
+		}
+		else {
+			$itemids = null;
+		}
+
 		$options['objectids'] = array_keys(API::Trigger()->get([
 			'output' => [],
 			'hostids' => $options['hostids'] ?? null,
-			'itemids' => $problem_options['graph_item_problems']
-				? array_unique(array_column($metrics, 'itemid'))
-				: null,
+			'itemids' => $itemids,
 			'monitored' => true,
 			'preservekeys' => true
 		]));

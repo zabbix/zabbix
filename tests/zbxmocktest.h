@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <setjmp.h>
+#include <stdint.h>
 #include <cmocka.h>
 
 /* hint to a compiler that cmocka _fail returns immediately, so it does not raise 'uninitialized variable' warnings */

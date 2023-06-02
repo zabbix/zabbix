@@ -1,31 +1,32 @@
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2013-10-10 08:26+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"PO-Revision-Date: 2023-05-29 01:49+0000\n"
+"Last-Translator: Muhammad Kamri Sapsuha <kamri1302@gmail.com>\n"
 "Language-Team: none\n"
 "Language: id\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.5.1.3\n"
+"X-Generator: Pontoon\n"
 "X-POOTLE-MTIME: 1381386369.000000\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr ""
+msgstr "\"%1$s\" tanggal harus kurang dari \"%2$s\" tanggal."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
 #: include/classes/db/PostgresqlDbBackend.php:96
 #, c-format
 msgid "\"%1$s\" instead \"%2$s\""
-msgstr ""
+msgstr "\"%1$s\" sebagai pengganti \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:323
 #: include/classes/import/validators/C10XmlValidator.php:341
@@ -43,44 +44,44 @@ msgstr ""
 #: include/classes/import/validators/C62XmlValidator.php:2050
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" diharapkan"
 
 #: include/classes/api/services/CReport.php:229
 #: include/classes/api/services/CReport.php:636
 #, c-format
 msgid "\"%1$s\" must be an empty string or greater than \"%2$s\"."
-msgstr ""
+msgstr "\"%1$s\" harus berupa string kosong atau lebih besar dari \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr ""
+msgstr "\"%1$s\" nilai harus kurang dari atau sama dengan nilai \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
 #: include/classes/import/validators/C10XmlValidator.php:405
 msgid "\"host:key\" pair is expected"
-msgstr ""
+msgstr "\"host:key\" berpasangan diharapkan"
 
 #: include/classes/api/services/CItemGeneral.php:2299
 msgid "\"hostid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"hostid\" item dependen dan item master harus sama"
 
 #: include/classes/api/services/CItemGeneral.php:2306
 msgid "\"ruleid\" of dependent item and master item should match"
-msgstr ""
+msgstr "\"ruleid\" item dependen dan item master harus sama"
 
 #: include/forms.inc.php:1334
 #: include/views/configuration.host.discovery.edit.php:901
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.path.to.node"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
 msgid "%1$d characters exceeds maximum length of %2$d characters"
-msgstr ""
+msgstr "%1$d karakter melebihi panjang maksimum %2$d karakter"
 
 #: include/func.inc.php:488
 #, c-format
@@ -92,7 +93,7 @@ msgstr[0] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr ""
+msgstr "%1$d pencocokkan untuk %2$s ditemukan"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
@@ -103,7 +104,7 @@ msgstr[0] ""
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr ""
+msgstr "%1$d masalah terpilih."
 
 #: chart4.php:94
 #, c-format
@@ -113,13 +114,13 @@ msgstr "%1$s (tahun %2$s)"
 #: include/classes/core/CModuleManager.php:228
 #, c-format
 msgid "%1$s - thrown by module located at %2$s."
-msgstr ""
+msgstr "%1$s - dilemparkan oleh modul yang terletak di %2$s."
 
 #: include/classes/api/services/CItemGeneral.php:2654
 #: include/classes/import/readers/CXmlImportReader.php:46
 #, c-format
 msgid "%1$s [Line: %2$s | Column: %3$s]"
-msgstr ""
+msgstr "%1$s [Baris: %2$s | Kolom: %3$s]"
 
 #: include/actions.inc.php:1893
 #, c-format
@@ -131,12 +132,12 @@ msgstr[0] ""
 #: jsLoader.php:328
 #, c-format
 msgid "%1$s characters"
-msgstr ""
+msgstr "%1$s karakter"
 
 #: jsLoader.php:329
 #, c-format
 msgid "%1$s characters remaining"
-msgstr ""
+msgstr "%1$s karakter tersisa"
 
 #: app/views/popup.acknowledge.edit.php:60
 #: app/views/popup.acknowledge.edit.php:65
@@ -148,7 +149,7 @@ msgstr[0] ""
 #: app/views/popup.usergroupmapping.edit.php:90
 #, c-format
 msgid "%1$s group pattern"
-msgstr ""
+msgstr "%1$s pola grup"
 
 #: include/maps.inc.php:410
 #, c-format
@@ -197,7 +198,7 @@ msgstr[0] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s preselected, use down,up arrow keys and enter to select"
-msgstr ""
+msgstr "%1$s telah dipilih sebelumnya, gunakan tombol panah atas,bawah dan enter untuk memilih"
 
 #: include/maps.inc.php:340 include/maps.inc.php:344 include/maps.inc.php:351
 #: include/maps.inc.php:400
@@ -241,39 +242,39 @@ msgstr[0] ""
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, Severity, %2$s"
-msgstr ""
+msgstr "%1$s, Severiti, %2$s"
 
 #: jsLoader.php:342
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, read only"
-msgstr ""
+msgstr "%1$s, baca saja"
 
 #: jsLoader.php:388
 #, c-format
 msgctxt "screen reader"
 msgid "%1$s, selected"
-msgstr ""
+msgstr "%1$s, terpilih"
 
 #: app/controllers/CControllerMediatypeEnable.php:93
 #, c-format
 msgid "%1$s. %2$s: %3$s. %4$s."
-msgstr ""
+msgstr "%1$s. %2$s: %3$s. %4$s."
 
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%1$s.php class harus memperpanjang %2$s untuk modul yang terletak di %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
 msgid "%1$s: %2$s"
-msgstr ""
+msgstr "%1$s: %2$s"
 
 #: include/classes/graph/CSvgGraph.php:1262
 #, c-format
 msgid "%1$sth percentile: %2$s"
-msgstr ""
+msgstr "%1$sth persentil: %2$s"
 
 #: include/func.inc.php:1947
 #, c-format
@@ -291,29 +292,29 @@ msgstr[0] "%d perangkat"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: app/partials/popup.operations.php:56
 msgid "(0 - infinitely)"
-msgstr ""
+msgstr "(0 - tak terhingga)"
 
 #: app/partials/popup.operations.php:67
 msgid "(0 - use action default)"
-msgstr ""
+msgstr "(0 - gunakan tindakan default)"
 
 #: include/views/configuration.hostgroups.list.php:37
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Hanya super admin yang bisa membuat grup)"
 
 #: app/partials/configuration.tags.tab.php:84
 #: app/partials/hostmacros.inherited.list.html.php:190
 #: app/partials/hostmacros.list.html.php:87
 msgid "(created by host discovery)"
-msgstr ""
+msgstr "(dibuat oleh host discovery)"
 
 #: app/partials/configuration.host.edit.html.php:131
 msgid "(linked by host discovery)"
-msgstr ""
+msgstr "(ditautkan oleh host discovery)"
 
 #: app/partials/configuration.host.edit.html.php:275
 #: app/views/popup.itemtestedit.view.php:241
@@ -324,7 +325,7 @@ msgstr "(tanpa proxy)"
 
 #: include/classes/setup/CSetupWizard.php:494
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - gunakan port default"
 
 #: include/triggers.inc.php:1594
 msgid "0 or 1"
@@ -342,19 +343,19 @@ msgstr "10 detik"
 
 #: include/views/reports.toptriggers.php:118 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 trigger tersibuk"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:184
 msgid "12-hour"
-msgstr ""
+msgstr "12-jam"
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:183
 msgid "24-hour"
-msgstr ""
+msgstr "24-jam"
 
 #: app/views/popup.sla.edit.php:100 include/classes/helpers/CSlaHelper.php:243
 msgid "24x7"
-msgstr ""
+msgstr "24x7"
 
 #: app/views/administration.queue.overview.php:49
 #: app/views/administration.queue.overview.proxy.php:49
@@ -382,11 +383,11 @@ msgstr "500 isi terbaru"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<string kosong>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<nama label>"
 
 #: include/views/monitoring.sysmap.edit.php:129
 msgid "<manual>"
@@ -396,47 +397,47 @@ msgstr "<petunjuk>"
 #: include/views/js/item.preprocessing.js.php:218
 #: include/views/js/item.preprocessing.js.php:227
 msgid "<metric name>{<label name>=\"<label value>\", ...} == <value>"
-msgstr ""
+msgstr "<metric name>{<label name>=\"<label value>\", ...} == <value>"
 
 #: app/views/administration.script.edit.php:111
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<sub-menu/sub-menu/...>"
 
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
-msgstr ""
+msgstr "TAMBAH OVERRIDE"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "JAM ALARM"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
-msgstr ""
+msgstr "API akses"
 
 #: app/controllers/CControllerPopupGeneric.php:333
 #: app/views/administration.userrole.edit.php:287
 msgid "API methods"
-msgstr ""
+msgstr "API metode"
 
 #: app/controllers/CControllerAuditLogList.php:210
 msgid "API token"
-msgstr ""
+msgstr "API token"
 
 #: include/classes/api/services/CToken.php:299
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr ""
+msgstr "API token \"%1$s\" sudah ada untuk userid \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:109
 #: app/controllers/CControllerTokenCreate.php:131
 msgid "API token added"
-msgstr ""
+msgstr "API token ditambahkan"
 
 #: app/controllers/CControllerTokenDelete.php:67
 msgid "API token deleted"
@@ -455,12 +456,12 @@ msgstr[0] ""
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
-msgstr ""
+msgstr "API token kadaluwarsa."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:138
 msgid "API token updated"
-msgstr ""
+msgstr "API token diperbaharui"
 
 #: app/controllers/CControllerPopupTokenEdit.php:114
 #: app/controllers/CControllerPopupTokenView.php:74
@@ -472,19 +473,19 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:396 include/html.inc.php:820
 #: include/html.inc.php:900
 msgid "API tokens"
-msgstr ""
+msgstr "API tokens"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:251
 msgid "Above value"
-msgstr ""
+msgstr "Nilai diatas"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:370
 msgid "Abscissa"
-msgstr ""
+msgstr "Abscissa"
 
 #: include/func.inc.php:1578
 msgid "Access denied"
-msgstr ""
+msgstr "Akses ditolak"
 
 #: sysmap.php:81
 msgid "Access denied!"
@@ -493,27 +494,27 @@ msgstr "Akses ditolak!"
 #: app/views/administration.user.edit.php:603
 #: app/views/administration.userrole.edit.php:273
 msgid "Access to API"
-msgstr ""
+msgstr "Akses ke API"
 
 #: app/views/administration.user.edit.php:456
 #: app/views/administration.userrole.edit.php:83
 msgid "Access to UI elements"
-msgstr ""
+msgstr "Akses ke UI elemen"
 
 #: app/views/administration.user.edit.php:632
 #: app/views/administration.userrole.edit.php:322
 msgid "Access to actions"
-msgstr ""
+msgstr "Akses ke tindakan"
 
 #: app/views/administration.user.edit.php:574
 #: app/views/administration.userrole.edit.php:224
 msgid "Access to modules"
-msgstr ""
+msgstr "Akses ke modul"
 
 #: app/views/administration.user.edit.php:478
 #: app/views/administration.userrole.edit.php:136
 msgid "Access to services"
-msgstr ""
+msgstr "Akses ke servis"
 
 #: app/views/hintbox.eventlist.php:76
 #: app/views/monitoring.widget.problems.view.php:66 include/actions.inc.php:161
@@ -526,7 +527,7 @@ msgstr "Ack"
 #: app/views/monitoring.widget.problems.view.php:81
 msgctxt "compact table header"
 msgid "Ack"
-msgstr ""
+msgstr "Ack"
 
 #: app/views/popup.acknowledge.edit.php:83 jsLoader.php:353
 msgid "Acknowledge"
@@ -534,7 +535,7 @@ msgstr "Pemberitahuan"
 
 #: include/classes/helpers/CRoleHelper.php:463
 msgid "Acknowledge problems"
-msgstr ""
+msgstr "Akui masalah"
 
 #: app/views/popup.condition.common.php:684 include/actions.inc.php:2075
 #: include/events.inc.php:196
@@ -547,7 +548,7 @@ msgstr "Pemberitahuan event MASALAH"
 
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
-msgstr ""
+msgstr "Peristiwa TERSELESAIKAN yang diakui"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -624,17 +625,17 @@ msgstr "Tindakan"
 #: app/views/monitoring.widget.actionlog.view.php:37
 msgctxt "compact table header"
 msgid "Action"
-msgstr ""
+msgstr "Tindakan"
 
 #: include/classes/api/services/CAction.php:2688
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Tindakan \"%1$s\" sudah tersedia."
 
 #: include/classes/api/services/CRole.php:761
 #, c-format
 msgid "Action \"%2$s\" is not available for user role \"%1$s\"."
-msgstr ""
+msgstr "Tindakan \"%2$s\" tidak tersedia untuk user role \"%1$s\"."
 
 #: actionconf.php:301
 msgid "Action added"
@@ -643,7 +644,7 @@ msgstr "Aksi ditambahkan"
 #: include/classes/core/ZBase.php:500
 #, c-format
 msgid "Action class %1$s must extend %2$s class."
-msgstr ""
+msgstr "Tindakan class %1$s harus memperpanjang %2$s class."
 
 #: actionconf.php:323
 msgid "Action deleted"
@@ -664,13 +665,13 @@ msgstr[0] ""
 #: include/classes/widgets/CWidgetConfig.php:52
 #: include/views/administration.auditacts.list.php:27
 msgid "Action log"
-msgstr ""
+msgstr "Log tindakan"
 
 #: app/views/administration.script.edit.php:102
 #: app/views/administration.script.list.php:52
 #: app/views/administration.script.list.php:91
 msgid "Action operation"
-msgstr ""
+msgstr "Operasi tindakan"
 
 #: actionconf.php:293
 msgid "Action updated"
@@ -679,7 +680,7 @@ msgstr "Aksi diperbarui"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr ""
+msgstr "Tindakan dengan ID \"%1$s\" tidak tersedia."
 
 #: app/views/administration.mediatype.edit.php:283
 #: app/views/configuration.discovery.edit.php:80
@@ -701,7 +702,7 @@ msgstr "Aksi"
 #: app/views/monitoring.widget.problems.view.php:82
 msgctxt "compact table header"
 msgid "Actions"
-msgstr ""
+msgstr "Tindakan"
 
 #: app/partials/administration.ha.nodes.php:50
 #: app/views/administration.proxy.edit.php:74
@@ -718,7 +719,7 @@ msgstr "Aktif"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr ""
+msgstr "Cek aktif"
 
 #: include/views/configuration.maintenance.edit.php:112
 #: include/views/configuration.maintenance.list.php:91 maintenance.php:44
@@ -883,39 +884,39 @@ msgstr "Tambah"
 
 #: app/views/js/administration.mediatype.edit.js.php:133
 msgid "Add (message type limit reached)"
-msgstr ""
+msgstr "Tambah (batas tipe pesan tercapai)"
 
 #: jsLoader.php:149
 msgid "Add a new widget"
-msgstr ""
+msgstr "Tambahkan widget baru"
 
 #: jsLoader.php:204
 msgid "Add child element"
-msgstr ""
+msgstr "Tambahkan elemen child"
 
 #: widgets/navtree/Widget.php:39
 msgid "Add child elements"
-msgstr ""
+msgstr "Tambahkan elemen-elemen child"
 
 #: app/partials/service.list.edit.php:120
 msgid "Add child service"
-msgstr ""
+msgstr "Tambahkan servis child"
 
 #: app/views/js/popup.service.edit.js.php:401
 msgid "Add child services"
-msgstr ""
+msgstr "Tambahkan servis-servis child"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from"
-msgstr ""
+msgstr "Tambahkan dari"
 
 #: app/partials/configuration.valuemap.php:51
 msgid "Add from host"
-msgstr ""
+msgstr "Tambahkan dari host"
 
 #: app/partials/configuration.valuemap.php:47
 msgid "Add from template"
-msgstr ""
+msgstr "Tambahkan dari templat"
 
 #: include/actions.inc.php:686 include/actions.inc.php:1029
 msgid "Add host"
@@ -925,46 +926,46 @@ msgstr "Tambah host"
 #: include/views/configuration.trigger.prototype.edit.php:685
 #: include/views/configuration.triggers.edit.php:669
 msgid "Add host trigger"
-msgstr ""
+msgstr "Tambahkan trigger host"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr ""
+msgstr "Tambahkan kolom item"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
 msgid "Add missing"
-msgstr ""
+msgstr "Tambahkan hilang"
 
 #: jsLoader.php:205
 msgid "Add multiple maps"
-msgstr ""
+msgstr "Tambahkan beberapa peta"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr ""
+msgstr "Tambahkan data set baru"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:267
 msgid "Add new interface"
-msgstr ""
+msgstr "Tambahkan interface baru"
 
 #: include/classes/widgets/CWidgetHelper.php:906
 msgid "Add new override"
-msgstr ""
+msgstr "Tambahkan override baru"
 
 #: app/views/js/configuration.dashboard.edit.js.php:202
 #: app/views/js/monitoring.dashboard.view.js.php:290
 msgid "Add page"
-msgstr ""
+msgstr "Tambahkan halaman"
 
 #: app/views/js/popup.service.edit.js.php:431
 msgid "Add parent services"
-msgstr ""
+msgstr "Tambahkan servis parent"
 
 #: include/classes/helpers/CRoleHelper.php:461
 msgid "Add problem comments"
-msgstr ""
+msgstr "Tambahkan komentar masalah"
 
 #: app/views/popup.massupdate.trigger.php:101
 #: include/views/configuration.graph.edit.php:410
@@ -974,19 +975,19 @@ msgstr "Tambah bentuk dasar"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr ""
+msgstr "Tambahkan laporan terjadwal"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
-msgstr ""
+msgstr "Tambahkan servis"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:68
 msgid "Add submaps"
-msgstr ""
+msgstr "Tambahkan subpeta"
 
 #: app/controllers/CControllerFavouriteDelete.php:69 include/html.inc.php:153
 msgid "Add to favorites"
-msgstr ""
+msgstr "Tambah ke favorit"
 
 #: include/actions.inc.php:1033
 msgid "Add to host group"
@@ -998,40 +999,40 @@ msgstr "Tambahkan ke grup host"
 
 #: app/partials/scheduledreport.subscription.php:42
 msgid "Add user"
-msgstr ""
+msgstr "Tambah user"
 
 #: app/partials/scheduledreport.subscription.php:46
 msgid "Add user group"
-msgstr ""
+msgstr "Tambah user grup"
 
 #: app/views/js/configuration.dashboard.edit.js.php:198
 #: app/views/js/monitoring.dashboard.view.js.php:286
 #: app/views/monitoring.dashboard.widget.edit.php:35
 msgid "Add widget"
-msgstr ""
+msgstr "Tambah widget"
 
 #: app/controllers/CControllerAuditLogList.php:356
 #: app/controllers/CControllerPopupImportCompare.php:161
 msgid "Added"
-msgstr ""
+msgstr "Ditambahkan"
 
 #: jsLoader.php:340
 #, c-format
 msgctxt "screen reader"
 msgid "Added, %1$s"
-msgstr ""
+msgstr "Ditambahkan, %1$s"
 
 #: app/views/popup.service.statusrule.edit.php:94
 msgid "Additional rule"
-msgstr ""
+msgstr "Aturan tambahan"
 
 #: app/views/popup.service.edit.php:182
 msgid "Additional rules"
-msgstr ""
+msgstr "Aturan-aturan tambahan"
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Address"
-msgstr ""
+msgstr "Alamat"
 
 #: include/hosts.inc.php:63 include/users.inc.php:53
 msgid "Admin"
@@ -1045,7 +1046,7 @@ msgstr "Administrasi"
 #: app/views/popup.service.edit.php:158
 #: include/classes/widgets/forms/CWidgetFormItem.php:69
 msgid "Advanced configuration"
-msgstr ""
+msgstr "Konfigurasi lanjutan"
 
 #: include/views/monitoring.sysmap.edit.php:160
 msgid "Advanced labels"
@@ -1053,11 +1054,11 @@ msgstr "Advanced labels"
 
 #: app/views/popup.import.php:175
 msgid "Advanced options"
-msgstr ""
+msgstr "Opsi lanjutan"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:252
 msgid "After value"
-msgstr ""
+msgstr "Nilai setelah"
 
 #: include/events.inc.php:288
 msgid "Age"
@@ -1075,19 +1076,19 @@ msgstr "Agen"
 
 #: include/classes/data/CItemData.php:818
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Pemeriksaan ketersediaan agen. Tidak mengembalikan apa pun - tidak tersedia; 1 - tersedia"
 
 #: app/views/configuration.host.list.php:197
 msgid "Agent encryption"
-msgstr ""
+msgstr "Enkripsi agen"
 
 #: include/classes/data/CItemData.php:810
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Metadata host agen. Mengembalikan string"
 
 #: include/classes/data/CItemData.php:814
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Nama host agen. Mengembalikan string"
 
 #: include/views/inventory.host.view.php:64
 msgid "Agent interfaces"
@@ -1095,38 +1096,38 @@ msgstr "Agen interfaces"
 
 #: include/classes/data/CItemData.php:822
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Cek varian agen. Pengembalian 1 - untuk agen Zabbix; 2 - untuk agen Zabbix 2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
-msgstr ""
+msgstr "Agregat"
 
 #: app/views/popup.triggerexpr.php:109
 msgid "Aggregate functions"
-msgstr ""
+msgstr "Fungsi agregat"
 
 #: app/views/popup.tophosts.column.edit.php:120
 #: include/classes/widgets/CWidgetHelper.php:1289
 msgid "Aggregation function"
-msgstr ""
+msgstr "Fungsi agregasi"
 
 #: app/views/popup.tophosts.column.edit.php:139
 #: include/classes/widgets/CWidgetHelper.php:1308
 msgid "Aggregation interval"
-msgstr ""
+msgstr "Interval agregasi"
 
 #: include/actions.inc.php:2106
 msgid "Alert message"
-msgstr ""
+msgstr "Pesan peringatan"
 
 #: include/classes/helpers/CMenuHelper.php:283
 #: include/classes/helpers/CRoleHelper.php:338
 msgid "Alerts"
-msgstr ""
+msgstr "Peringatan"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1116
 msgid "Algorithm"
-msgstr ""
+msgstr "Algoritma"
 
 #: include/hosts.inc.php:114
 msgid "Alias"
@@ -1134,7 +1135,7 @@ msgstr "alias"
 
 #: include/views/monitoring.sysmap.constructor.php:75
 msgid "Align map elements"
-msgstr ""
+msgstr "Sejajarkan elemen peta"
 
 #: app/controllers/CControllerAuditLogList.php:172
 #: app/controllers/CControllerAuditLogList.php:173
@@ -1157,21 +1158,21 @@ msgstr "Semua"
 
 #: app/views/monitoring.dashboard.view.php:186
 msgid "All dashboards"
-msgstr ""
+msgstr "Semua dashboard"
 
 #: app/views/monitoring.charts.view.php:83
 msgid "All graphs"
-msgstr ""
+msgstr "Semua grafik"
 
 #: app/partials/administration.usergroup.grouprights.html.php:46
 #: app/views/administration.user.edit.php:429
 #: app/views/administration.user.edit.php:435
 msgid "All groups"
-msgstr ""
+msgstr "Semua grup"
 
 #: app/views/monitoring.host.dashboard.view.php:120 include/html.inc.php:305
 msgid "All hosts"
-msgstr ""
+msgstr "Semua host"
 
 #: jsLoader.php:284
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -1179,39 +1180,39 @@ msgstr "Semua tautan harus memiliki \"Nama\" dan \"URL\""
 
 #: include/html.inc.php:516
 msgid "All maps"
-msgstr ""
+msgstr "Semua peta"
 
 #: include/views/configuration.trigger.prototype.edit.php:514
 #: include/views/configuration.triggers.edit.php:543
 msgid "All problems"
-msgstr ""
+msgstr "Semua masalah"
 
 #: include/views/configuration.trigger.prototype.edit.php:515
 #: include/views/configuration.triggers.edit.php:544
 msgid "All problems if tag values match"
-msgstr ""
+msgstr "Semua masalah jika nilai tag cocok"
 
 #: app/controllers/CControllerServiceListGeneral.php:150
 msgid "All services"
-msgstr ""
+msgstr "Semua servis"
 
 #: app/partials/administration.usergroup.tagfilters.html.php:47
 msgid "All tags"
-msgstr ""
+msgstr "Semua tag"
 
 #: include/html.inc.php:267
 msgid "All templates"
-msgstr ""
+msgstr "Semua templat"
 
 #: app/views/administration.userrole.edit.php:291
 msgid "Allow list"
-msgstr ""
+msgstr "Daftar diizinkan"
 
 #: app/views/popup.massupdate.trigger.php:60 include/triggers.inc.php:991
 #: include/views/configuration.trigger.prototype.edit.php:527
 #: include/views/configuration.triggers.edit.php:556
 msgid "Allow manual close"
-msgstr ""
+msgstr "Izinkan menutup secara manual"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1222,65 +1223,65 @@ msgstr "Host yang diizinkan"
 
 #: app/views/administration.user.edit.php:623
 msgid "Allowed methods"
-msgstr ""
+msgstr "Metode yang diizinkan"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "Juga digunakan sebagai label legenda untuk set data agregat."
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Atau, anda dapat menginstalnya secara manual:"
 
 #: include/classes/data/CItemData.php:1623
 msgid "Amount of guest physical memory that is swapped out to the swap space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Jumlah memori fisik guest yang ditukar ke ruang swap, \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global mesin virtual VMware"
 
 #: include/classes/data/CItemData.php:1442
 msgid "Amount of guest physical memory that is swapped out to the swap space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Jumlah memori fisik guest yang ditukar ke ruang swap, <url> - URL layanan VMware, <uuid> - nama host mesin virtual VMware"
 
 #: include/classes/data/CItemData.php:1643
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Jumlah memori fisik host yang digunakan untuk mencadangkan halaman memori fisik tamu, \"url\" - URL layanan VMware, \"uuid\" - pengenal unik global mesin virtual VMware"
 
 #: include/classes/data/CItemData.php:1462
 msgid "Amount of host physical memory consumed for backing up guest physical memory pages, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Jumlah memori fisik host yang digunakan untuk mencadangkan halaman memori fisik tamu, <url> - URL layanan VMware, <uuid> - nama host mesin virtual VMware"
 
 #: include/classes/api/services/CItemGeneral.php:1544
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Aturan LLD dengan kunci \"%1$s\" sudah ada di host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1543
 #, c-format
 msgid "An LLD rule with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Aturan LLD dengan kunci \"%1$s\" sudah ada di templat \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1538
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Prototipe item dengan kunci \"%1$s\" sudah ada di host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1537
 #, c-format
 msgid "An item prototype with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Prototipe item dengan kunci \"%1$s\" sudah ada di templat \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1532
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the host \"%2$s\"."
-msgstr ""
+msgstr "Item dengan kunci \"%1$s\" sudah ada di host \"%2$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:1531
 #, c-format
 msgid "An item with key \"%1$s\" already exists on the template \"%2$s\"."
-msgstr ""
+msgstr "Item dengan kunci \"%1$s\" sudah ada di templat \"%2$s\"."
 
 #: include/classes/widgets/forms/CWidgetFormClock.php:73
 msgid "Analog"
-msgstr ""
+msgstr "Analog"
 
 #: app/partials/popup.operations.php:240
 #: app/views/configuration.correlation.edit.php:119
@@ -1292,7 +1293,7 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:183
 #: include/views/configuration.triggers.edit.php:383
 msgid "And"
-msgstr ""
+msgstr "Dan"
 
 #: app/partials/monitoring.host.filter.php:32
 #: app/partials/monitoring.latest.filter.php:93
@@ -1315,11 +1316,11 @@ msgstr ""
 #: include/views/configuration.maintenance.edit.php:143
 #: include/views/js/monitoring.sysmaps.js.php:242
 msgid "And/Or"
-msgstr ""
+msgstr "Dan/Atau"
 
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
-msgstr ""
+msgstr "Tahunan"
 
 #: app/partials/monitoring.host.filter.php:127
 #: app/views/administration.mediatype.list.php:60
@@ -1368,11 +1369,11 @@ msgstr "Terapkan"
 
 #: include/views/configuration.hostgroups.edit.php:48
 msgid "Apply permissions and tag filters to all subgroups"
-msgstr ""
+msgstr "Terapkan izin dan filter tag ke semua subgrup"
 
 #: app/partials/configuration.templategroup.edit.html.php:47
 msgid "Apply permissions to all subgroups"
-msgstr ""
+msgstr "Terapkan izin untuk semua subgrup"
 
 #: include/views/configuration.maintenance.list.php:71
 #: include/views/configuration.maintenance.list.php:105
@@ -1382,7 +1383,7 @@ msgstr "Menjelang"
 
 #: include/classes/widgets/CWidgetHelper.php:1443
 msgid "Approximation"
-msgstr ""
+msgstr "Perkiraan"
 
 #: include/func.inc.php:239
 msgid "Apr"
@@ -1394,15 +1395,15 @@ msgstr "April"
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
-msgstr ""
+msgstr "Apakah anda yakin ingin mengahapus filter ini?"
 
 #: app/views/js/administration.macros.edit.js.php:86
 msgid "Are you sure you want to delete?"
-msgstr ""
+msgstr "Apakah anda yakin ingin mengahapus?"
 
 #: include/classes/html/CButtonQMessage.php:52
 msgid "Are you sure you want to perform this action?"
-msgstr ""
+msgstr "Apakah anda yakin ingin melakukan tindakan ini?"
 
 #: include/views/js/monitoring.sysmaps.js.php:122
 msgid "Area size"
@@ -1414,12 +1415,12 @@ msgstr "Jenis area"
 
 #: include/items.inc.php:1835
 msgid "Arithmetic"
-msgstr ""
+msgstr "Aritmetika"
 
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "Seperti adanya"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1428,7 +1429,7 @@ msgstr "Sebagai teks biasa"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "Asersi"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1449,12 +1450,12 @@ msgstr[0] ""
 #: include/maintenances.inc.php:112
 #, c-format
 msgid "At %1$s:%2$s on %3$s %4$s of every %5$s"
-msgstr ""
+msgstr "Pada %1$s:%2$s di %3$s %4$s setiap %5$s"
 
 #: include/maintenances.inc.php:121
 #, c-format
 msgid "At %1$s:%2$s on day %3$s of every %4$s"
-msgstr ""
+msgstr "Pada %1$s:%2$s di hari %3$s setiap %4$s"
 
 #: app/views/popup.maintenance.period.php:154
 msgid "At (hour:minute)"
@@ -1462,102 +1463,102 @@ msgstr "Pada (jam:menit)"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:125
 msgid "At least one LDAP server must exist."
-msgstr ""
+msgstr "Setidaknya satu server LDAP harus ada."
 
 #: app/views/administration.userrole.edit.php:117
 msgid "At least one UI element must be checked."
-msgstr ""
+msgstr "Setidaknya satu elemen UI harus diperiksa."
 
 #: include/classes/api/services/CRole.php:487
 #, c-format
 msgid "At least one UI element must be enabled for user role \"%1$s\"."
-msgstr ""
+msgstr "Setidaknya satu elemen UI harus diaktifkan untuk user role \"%1$s\"."
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "Setidaknya satu tindakan wajib dilakukan."
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "Setidaknya satu user aktif harus ada dengan role \"%1$s\"."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "Setidaknya satu hari dalam seminggu atau satu hari dalam sebulan harus ditentukan."
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
 #: include/views/configuration.maintenance.edit.php:247
 msgid "At least one host group or host must be selected."
-msgstr ""
+msgstr "Setidaknya satu grup host atau host harus dipilih."
 
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "Setidaknya satu host atau templat harus ditentukan."
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
-msgstr ""
+msgstr "Setidaknya salah satu dari MySQL, PostgreSQL atau Oracle harus didukung."
 
 #: app/views/configuration.correlation.edit.php:161
 msgid "At least one operation must be selected."
-msgstr ""
+msgstr "Setidaknya satu operasi harus dipilih."
 
 #: include/views/configuration.action.edit.php:522
 msgid "At least one operation must exist."
-msgstr ""
+msgstr "Setidaknya satu operasi harus ada."
 
 #: include/classes/api/services/CHostGroup.php:1594
 #, c-format
 msgid "At least one parameter \"%1$s\" or \"%2$s\" must be enabled."
-msgstr ""
+msgstr "Setidaknya satu parameter \"%1$s\" atau \"%2$s\" harus diaktifkan."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "Setidaknya satu operasi pembaruan atau pesan wajib dilakukan"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
-msgstr ""
+msgstr "Setidaknya satu operasi pembaruan atau pesan harus ada."
 
 #: app/partials/popup.operations.php:75
 msgid "At least one user or user group must be selected."
-msgstr ""
+msgstr "Setidaknya satu user atau grup user harus dipilih."
 
 #: include/classes/api/services/CReport.php:343
 msgid "At least one user or user group must be specified."
-msgstr ""
+msgstr "Setidaknya satu user atau grup user harus ditentukan."
 
 #: app/views/administration.mediatype.edit.php:342
 msgid "Attempt interval"
-msgstr ""
+msgstr "Interval upaya"
 
 #: app/views/administration.mediatype.edit.php:337 httpconf.php:43
 #: include/views/configuration.httpconf.edit.php:78
 #: include/views/configuration.httpconf.list.php:141
 msgid "Attempts"
-msgstr ""
+msgstr "Upaya"
 
 #: app/views/administration.authentication.edit.php:520
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "Atribut"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "Atribusi"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "Atribusi HTML"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "Atribusi teks"
 
 #: app/views/administration.housekeeping.edit.php:179
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1571,11 +1572,11 @@ msgstr "Audit"
 #: app/views/reports.auditlog.list.php:78
 #: include/classes/helpers/CMenuHelper.php:253 include/html.inc.php:892
 msgid "Audit log"
-msgstr ""
+msgstr "Log audit"
 
 #: app/views/administration.housekeeping.edit.php:180
 msgid "Audit settings"
-msgstr ""
+msgstr "Pengaturan audit"
 
 #: include/func.inc.php:243
 msgid "Aug"
@@ -1587,11 +1588,11 @@ msgstr "Agustus"
 
 #: app/views/popup.token.view.php:46
 msgid "Auth token"
-msgstr ""
+msgstr "Auth token"
 
 #: app/views/administration.authentication.edit.php:281
 msgid "AuthN requests"
-msgstr ""
+msgstr "Permintaan AuthN"
 
 #: app/controllers/CControllerAuditLogList.php:211
 #: app/views/administration.authentication.edit.php:323
@@ -1613,7 +1614,7 @@ msgstr "Algoritma otentikasi"
 #: include/classes/api/services/CUser.php:2022
 #, c-format
 msgid "Authentication failed: %1$s."
-msgstr ""
+msgstr "Otentikasi gagal: %1$s."
 
 #: app/views/administration.script.edit.php:131
 #: app/views/popup.massupdate.item.php:169
@@ -1627,38 +1628,38 @@ msgstr "Metode otentikasi"
 #: app/views/popup.discovery.check.php:103
 #: app/views/popup.itemtestedit.view.php:202
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Frasa sandi otentikasi"
 
 #: app/partials/configuration.host.interface.row.php:143
 #: app/views/popup.discovery.check.php:96
 #: app/views/popup.itemtestedit.view.php:191
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Protokol otentikasi"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:395
 #: app/controllers/CControllerAuthenticationUpdate.php:403
 msgid "Authentication settings updated"
-msgstr ""
+msgstr "Pengaturan autentikasi diperbarui"
 
 #: app/views/administration.module.edit.php:40
 #: app/views/administration.module.list.php:77
 msgid "Author"
-msgstr ""
+msgstr "Author"
 
 #: app/views/administration.miscconfig.edit.php:87
 msgid "Authorization"
-msgstr ""
+msgstr "Otorisasi"
 
 #: app/views/popup.tophosts.column.edit.php:162
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:48
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:154
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:226
 msgctxt "history source selection method"
 msgid "Auto"
-msgstr ""
+msgstr "Auto"
 
 #: app/views/administration.user.edit.php:261
 msgid "Auto-login"
@@ -1666,11 +1667,11 @@ msgstr "Login-otomatis"
 
 #: include/classes/api/services/CUser.php:1012
 msgid "Auto-login and auto-logout options cannot be enabled together."
-msgstr ""
+msgstr "Opsi login otomatis dan logout otomatis tidak dapat diaktifkan bersamaan."
 
 #: app/views/administration.user.edit.php:266
 msgid "Auto-logout"
-msgstr ""
+msgstr "Auto-logout"
 
 #: app/partials/configuration.host.edit.html.php:360
 #: app/partials/popup.operations.php:228
@@ -1698,16 +1699,16 @@ msgstr "Pemilihan ikon otomatis"
 #: include/classes/helpers/CMediatypeHelper.php:189
 #: include/classes/helpers/CMenuHelper.php:249 include/html.inc.php:890
 msgid "Autoregistration"
-msgstr ""
+msgstr "Pendaftaran otomatis"
 
 #: include/classes/helpers/CMenuHelper.php:209
 #: include/views/configuration.action.list.php:36
 msgid "Autoregistration actions"
-msgstr ""
+msgstr "Tindakan pendaftaran otomatis"
 
 #: app/views/administration.housekeeping.edit.php:87
 msgid "Autoregistration data storage period"
-msgstr ""
+msgstr "Periode penyimpanan data pendaftaran otomatis"
 
 #: app/partials/monitoring.host.view.html.php:36
 #: app/views/configuration.host.list.php:196
@@ -1729,7 +1730,7 @@ msgstr "Tersedia"
 #: app/views/monitoring.widget.hostavail.view.php:37
 msgctxt "compact table header"
 msgid "Available"
-msgstr ""
+msgstr "Tersedia"
 
 #: app/views/administration.trigdisplay.edit.php:128 jsLoader.php:179
 msgid "Average"
@@ -1737,32 +1738,32 @@ msgstr "Rata-rata"
 
 #: include/classes/data/CItemData.php:1715
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Jumlah rata-rata permintaan baca yang menonjol ke disk virtual selama interval pengumpulan , \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global mesin virtual VMware, \"instance\" - instance perangkat disk"
 
 #: include/classes/data/CItemData.php:1522
 msgid "Average number of outstanding read requests to the virtual disk during the collection interval , <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Jumlah rata-rata permintaan baca yang menonjol ke disk virtual selama interval pengumpulan , <url> - URL layanan VMware, <uuid> - Nama host mesin virtual VMware, <instance> - instance perangkat disk"
 
 #: include/classes/data/CItemData.php:1735
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance"
-msgstr ""
+msgstr "Jumlah rata-rata permintaan tulis yang menonjol ke disk virtual selama interval pengumpulan, \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global mesin virtual VMware, \"instance\" - instance perangkat disk"
 
 #: include/classes/data/CItemData.php:1542
 msgid "Average number of outstanding write requests to the virtual disk during the collection interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance"
-msgstr ""
+msgstr "Jumlah rata-rata permintaan tulis yang menonjol ke disk virtual selama interval pengumpulan, <url> - URL layanan VMware, <uuid> - nama host mesin virtual VMware, <instance> - instance perangkat disk"
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "Hindari kata sandi yang mudah ditebak"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
-msgstr ""
+msgstr "Axis"
 
 #: include/classes/setup/CSetupWizard.php:334
 #: include/classes/setup/CSetupWizard.php:755
 msgid "Back"
-msgstr ""
+msgstr "Kembali"
 
 #: app/views/administration.image.edit.php:74
 #: app/views/administration.image.list.php:52
@@ -1773,7 +1774,7 @@ msgstr "Latar belakang"
 #: include/classes/widgets/forms/CWidgetFormItem.php:384
 #: include/views/js/monitoring.sysmaps.js.php:582
 msgid "Background color"
-msgstr ""
+msgstr "Warna latar belakang"
 
 #: include/views/monitoring.sysmap.edit.php:123
 msgid "Background image"
@@ -1784,7 +1785,7 @@ msgstr "Gambar latar belakang"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "Bar"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1794,27 +1795,27 @@ msgstr "Base DN"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "Warna dasar"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Dasar"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "Bearer"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
-msgstr ""
+msgstr "Bearer token"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "Nilai sebelum"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "Nilai dibawah"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1827,11 +1828,11 @@ msgstr "Bind password"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "Bits to shift"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "Fungsi bitwise"
 
 #: app/views/administration.user.list.php:144
 msgid "Blocked"
@@ -1839,28 +1840,28 @@ msgstr "Diblokir"
 
 #: include/classes/core/ZBase.php:358
 msgid "Blue"
-msgstr ""
+msgstr "Biru"
 
 #: app/views/popup.httpstep.php:160
 #: include/views/configuration.host.discovery.edit.php:400
 #: include/views/configuration.item.edit.php:458
 #: include/views/configuration.item.prototype.edit.php:436
 msgid "Body"
-msgstr ""
+msgstr "Body"
 
 #: app/views/popup.httpstep.php:162
 #: include/views/configuration.host.discovery.edit.php:402
 #: include/views/configuration.item.edit.php:460
 #: include/views/configuration.item.prototype.edit.php:438
 msgid "Body and headers"
-msgstr ""
+msgstr "Body and headers"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:131
 #: include/classes/widgets/forms/CWidgetFormItem.php:212
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "Tebal"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:804
 #: include/views/js/monitoring.sysmaps.js.php:894
@@ -1869,27 +1870,27 @@ msgstr "Garis tebal"
 
 #: include/items.inc.php:1848
 msgid "Boolean to decimal"
-msgstr ""
+msgstr "Boolean ke desimal"
 
 #: include/views/js/monitoring.sysmaps.js.php:421
 msgid "Border"
-msgstr ""
+msgstr "Tepi"
 
 #: include/views/js/monitoring.sysmaps.js.php:613
 msgid "Border color"
-msgstr ""
+msgstr "Warna tepi"
 
 #: include/views/js/monitoring.sysmaps.js.php:591
 msgid "Border type"
-msgstr ""
+msgstr "Tipe tepi"
 
 #: include/views/js/monitoring.sysmaps.js.php:603
 msgid "Border width"
-msgstr ""
+msgstr "Lebar tepi"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "Kedua kata sandi harus sama."
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1903,19 +1904,19 @@ msgstr "Bawah"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "Bawah N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
-msgstr ""
+msgstr "Memajukan"
 
 #: jsLoader.php:275
 msgid "Bring to front"
-msgstr ""
+msgstr "Bawa ke depan"
 
 #: include/locales.inc.php:34
 msgid "Bulgarian (bg_BG)"
-msgstr ""
+msgstr "Bulgarian (bg_BG)"
 
 #: report2.php:195
 msgid "By host"
@@ -1931,7 +1932,7 @@ msgstr "Berdasarkan contoh trigger"
 #: app/views/configuration.host.list.php:405
 #: app/views/configuration.host.list.php:408
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: app/views/hintbox.eventlist.php:116
 #: app/views/monitoring.widget.problems.view.php:109
@@ -1939,72 +1940,72 @@ msgstr ""
 #: include/classes/screens/CScreenProblem.php:969
 #: include/classes/screens/CScreenProblem.php:1180 include/events.inc.php:376
 msgid "CLOSING"
-msgstr ""
+msgstr "MENUTUP"
 
 #: include/classes/data/CItemData.php:1066
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Informasi CPU. Mengembalikan string atau integer"
 
 #: include/classes/data/CItemData.php:1042
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Beban CPU. Mengembalikan float"
 
 #: include/classes/data/CItemData.php:1603
 msgid "CPU time spent waiting for swap-in, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
-msgstr ""
+msgstr "Waktu CPU yang dihabiskan untuk menunggu swap-in, \"url\" - URL layanan VMware, \"uuid\" - Pengidentifikasi unik global mesin virtual VMware, \"instance\" - instance CPU"
 
 #: include/classes/data/CItemData.php:1422
 msgid "CPU time spent waiting for swap-in, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - CPU instance"
-msgstr ""
+msgstr "Waktu CPU yang dihabiskan untuk menunggu swap-in, <url> - URL layanan VMware, <uuid> - Nama host mesin virtual VMware, <instance> - Instance CPU"
 
 #: include/classes/data/CItemData.php:1407
 msgid "CPU usage as a percentage during the interval depends on power management or HT, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval bergantung pada manajemen daya atau HT, \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global VMware hypervisor"
 
 #: include/classes/data/CItemData.php:1274
 msgid "CPU usage as a percentage during the interval depends on power management or HT, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval bergantung pada manajemen daya atau HT, <url> - URL layanan VMware, <uuid> - nama host hypervisor VMware"
 
 #: include/classes/data/CItemData.php:1399
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval, \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global VMware hypervisor"
 
 #: include/classes/data/CItemData.php:1607
 msgid "CPU usage as a percentage during the interval, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval, \"url\" - URL layanan VMware, \"uuid\" - pengidentifikasi unik global mesin virtual VMware"
 
 #: include/classes/data/CItemData.php:1266
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval, <url> - URL layanan VMware, <uuid> - nama host hypervisor VMware"
 
 #: include/classes/data/CItemData.php:1426
 msgid "CPU usage as a percentage during the interval, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "Penggunaan CPU sebagai persentase selama interval, <url> - URL layanan VMware, <uuid> - nama host mesin virtual VMware"
 
 #: include/classes/data/CItemData.php:1559
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, \"url\" - VMware service URL, \"rpid\" - VMware resource pool id"
-msgstr ""
+msgstr "Penggunaan CPU dalam hertz selama interval pada VMware Resource Pool, \"url\" - URL layanan VMware, \"rpid\" - ID resource pool VMware"
 
 #: include/classes/data/CItemData.php:1429
 msgid "CPU usage in hertz during the interval on VMware Resource Pool, <url> - VMware service URL, <rpid> - VMware resource pool id"
-msgstr ""
+msgstr "Penggunaan CPU dalam hertz selama interval pada VMware Resource Pool, <url> - URL layanan VMware, <rpid> - ID resource pool VMware"
 
 #: include/classes/data/CItemData.php:1054
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Persentase penggunaan CPU. Mengembalikan float"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "CRLF"
 
 #: include/items.inc.php:1828
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV ke JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:352
 msgid "CUID is expected"
-msgstr ""
+msgstr "CUID diharapkan"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:179
 #: include/views/configuration.graph.edit.php:254
@@ -2013,7 +2014,7 @@ msgstr "Dihitung"
 
 #: jsLoader.php:232
 msgid "Calendar"
-msgstr ""
+msgstr "Kalender"
 
 #: include/hosts.inc.php:60
 msgid "Callback"
@@ -2056,20 +2057,20 @@ msgstr "Batal"
 #: app/controllers/CControllerTokenCreate.php:65
 #: app/controllers/CControllerTokenCreate.php:140
 msgid "Cannot add API token"
-msgstr ""
+msgstr "Tidak dapat menambah API token"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
 #: include/classes/api/services/CGraph.php:545
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph \"%2$s\"."
-msgstr ""
+msgstr "Tidak dapat menambahkan item non-numerik \"%1$s\" ke grafik \"%2$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:471
 #: include/classes/api/services/CGraphPrototype.php:535
 #, c-format
 msgid "Cannot add a non-numeric item \"%1$s\" to graph prototype \"%2$s\"."
-msgstr ""
+msgstr "Tidak dapat menambahkan item non-numerik \"%1$s\" ke prototipe grafik \"%2$s\"."
 
 #: actionconf.php:302
 msgid "Cannot add action"
@@ -2077,12 +2078,12 @@ msgstr "Tidak dapat menambah aksi"
 
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot add correlation"
-msgstr ""
+msgstr "Tidak dapat menambahkan korelasi"
 
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "Tidak dapat menambahkan halaman dashboard: jumlah maksimum %1$d halaman dashboard telah ditambahkan."
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -2105,7 +2106,7 @@ msgstr "Tidak dapat menambah grafik"
 
 #: graphs.php:227
 msgid "Cannot add graph prototype"
-msgstr ""
+msgstr "Tidak dapat menambahkan prototipe grafik"
 
 #: hostgroups.php:114
 msgid "Cannot add group"
@@ -2119,11 +2120,11 @@ msgstr "Tidak dapat menambah host"
 #: app/controllers/CControllerHostGroupCreate.php:40
 #: app/controllers/CControllerHostGroupCreate.php:70
 msgid "Cannot add host group"
-msgstr ""
+msgstr "Tidak dapat menambah grup host"
 
 #: host_prototypes.php:304
 msgid "Cannot add host prototype"
-msgstr ""
+msgstr "Tidak dapat menambahkan prototipe host"
 
 #: app/controllers/CControllerImageCreate.php:41
 #: app/controllers/CControllerImageCreate.php:101
@@ -2137,7 +2138,7 @@ msgstr "Tidak dapat menambah item"
 
 #: disc_prototypes.php:553
 msgid "Cannot add item prototype"
-msgstr ""
+msgstr "Tidak dapat menambahkan prototipe item"
 
 #: maintenance.php:123
 msgid "Cannot add maintenance"
@@ -2146,7 +2147,7 @@ msgstr "Tidak dapat menambah perawatan"
 #: include/classes/api/services/CMap.php:1559
 #, c-format
 msgid "Cannot add map element of the map \"%1$s\" due to circular reference."
-msgstr ""
+msgstr "Tidak dapat menambahkan elemen peta dari peta \"%1$s\" karena referensi sirkuler."
 
 #: app/controllers/CControllerMediatypeCreate.php:76
 #: app/controllers/CControllerMediatypeCreate.php:165
@@ -2167,7 +2168,7 @@ msgstr "Tidak dapat menambah lebih dari satu item dengan tipe \"Graph sum\" pada
 #: include/classes/api/services/CGraphPrototype.php:40
 #, c-format
 msgid "Cannot add more than one item with type \"Graph sum\" on graph prototype \"%1$s\"."
-msgstr ""
+msgstr "Tidak dapat menambahkan lebih dari satu item dengan tipe \"Jumlah grafik\" pada prototipe grafik \"%1$s\"."
 
 #: sysmaps.php:214
 msgid "Cannot add network map"
@@ -2185,7 +2186,7 @@ msgstr "Tidak dapat menambah ekspresi reguler"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "Tidak dapat menambahkan laporan terjadwal"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2194,7 +2195,7 @@ msgstr "Tidak dapat menambah skrip"
 
 #: app/views/monitoring.widget.navtreeitem.edit.php:63
 msgid "Cannot add submaps. Max depth reached."
-msgstr ""
+msgstr "Tidak dapat menambahkan subpeta. Kedalaman maksimum tercapai."
 
 #: templates.php:205
 msgid "Cannot add template"
@@ -2203,7 +2204,7 @@ msgstr "Tidak dapat menambah template"
 #: app/controllers/CControllerTemplateGroupCreate.php:40
 #: app/controllers/CControllerTemplateGroupCreate.php:70
 msgid "Cannot add template group"
-msgstr ""
+msgstr "Tidak dapat menambahkan grup template"
 
 #: triggers.php:306
 msgid "Cannot add trigger"
@@ -2211,7 +2212,7 @@ msgstr "Tidak dapat menambah trigger"
 
 #: trigger_prototypes.php:257
 msgid "Cannot add trigger prototype"
-msgstr ""
+msgstr "Tidak dapat menambahkan prototipe pemicu"
 
 #: app/controllers/CControllerUserCreate.php:63
 #: app/controllers/CControllerUserCreate.php:119
@@ -2221,58 +2222,58 @@ msgstr "Tidak dapat menambah user"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "Tidak dapat menambahkan grup user"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
-msgstr ""
+msgstr "Tidak dapat menambahkan skenario web"
 
 #: jsLoader.php:129
 msgid "Cannot add widget: no widgets available."
-msgstr ""
+msgstr "Tidak dapat menambahkan widget: widget tidak tersedia."
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "Tidak dapat menambahkan widget: tidak cukup ruang kosong di dashboard."
 
 #: include/classes/api/services/CItem.php:1532
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of host \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Tidak dapat menetapkan bidang inventaris \"%1$s\" ke item dengan kunci \"%2$s\" dari host \"%3$s\", karena sudah diisi oleh item dengan kunci \"%4$s\"."
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\""
-msgstr ""
+msgstr "Tidak dapat menetapkan bidang inventaris \"%1$s\" ke item dengan kunci \"%2$s\" dari template \"%3$s\", karena telah diisi oleh item dengan kunci \"%4$s\""
 
 #: include/classes/api/services/CItem.php:1531
 #, c-format
 msgid "Cannot assign the inventory field \"%1$s\" to the item with key \"%2$s\" of template \"%3$s\", because it is already populated by the item with key \"%4$s\"."
-msgstr ""
+msgstr "Tidak dapat menetapkan bidang inventaris \"%1$s\" ke item dengan kunci \"%2$s\" dari template \"%3$s\", karena telah diisi oleh item dengan kunci \"%4$s\"."
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "Tidak dapat dihapus"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
-msgstr ""
+msgstr "Tidak dapat mengikat secara anonim ke server LDAP."
 
 #: include/classes/validators/CLdapAuthValidator.php:78
 msgid "Cannot bind to LDAP server."
-msgstr ""
+msgstr "Tidak dapat mengikat ke server LDAP."
 
 #: include/forms.inc.php:1932 include/forms.inc.php:1939
 #: include/forms.inc.php:1949 include/forms.inc.php:1983
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "Tidak dapat membuat pohon ekspresi: %1$s."
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "Tidak dapat mengubah tipe user dari role sendiri."
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
@@ -2295,19 +2296,19 @@ msgstr "Tidak dapat meng-klon prototipe trigger."
 #: include/classes/api/services/CEvent.php:848
 #, c-format
 msgid "Cannot close problem: %1$s."
-msgstr ""
+msgstr "Tidak dapat menutup masalah: %1$s."
 
 #: include/classes/validators/CLdapAuthValidator.php:77
 msgid "Cannot connect to LDAP server."
-msgstr ""
+msgstr "Tidak dapat terhubung ke server LDAP."
 
 #: include/classes/setup/CSetupWizard.php:593
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Tidak dapat terhubung ke database."
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "Tidak dapat mengonversi data POST:"
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2322,12 +2323,12 @@ msgstr[0] ""
 #: include/classes/api/services/CDiscoveryRule.php:2475
 #, c-format
 msgid "Cannot copy item prototype with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Tidak dapat menyalin prototipe item dengan kunci \"%1$s\" tanpa item masternya dengan kunci \"%2$s\"."
 
 #: include/items.inc.php:590
 #, c-format
 msgid "Cannot copy item with key \"%1$s\" without its master item with key \"%2$s\"."
-msgstr ""
+msgstr "Tidak dapat menyalin item dengan kunci \"%1$s\" tanpa item masternya dengan kunci \"%2$s\"."
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
@@ -2337,7 +2338,7 @@ msgstr[0] ""
 #: include/triggers.inc.php:246
 #, c-format
 msgid "Cannot copy trigger \"%1$s\", because it has multiple hosts in the expression."
-msgstr ""
+msgstr "Tidak dapat menyalin pemicu \"%1$s\", karena memiliki banyak host dalam ekspresi."
 
 #: include/triggers.inc.php:226
 #, c-format
@@ -2347,12 +2348,12 @@ msgstr "Tidak dapat menyalin trigger \"%1$s:%2$s\", karena memiliki host lebih d
 #: app/controllers/CControllerSlaCreate.php:69
 #: app/controllers/CControllerSlaCreate.php:127
 msgid "Cannot create SLA"
-msgstr ""
+msgstr "Tidak dapat membuat SLA"
 
 #: include/classes/api/services/CHostPrototype.php:1110
 #, c-format
 msgid "Cannot create a host prototype on a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Tidak dapat membuat prototipe host pada host yang ditemukan \"%1$s\"."
 
 #: include/db.inc.php:34
 msgid "Cannot create another database connection."
@@ -2366,7 +2367,7 @@ msgstr "Tidak dapat membuat dependensi melingkar."
 #: app/controllers/CControllerConnectorCreate.php:89
 #: app/controllers/CControllerConnectorCreate.php:164
 msgid "Cannot create connector"
-msgstr ""
+msgstr "Tidak dapat membuat konektor"
 
 #: include/classes/api/services/CTrigger.php:985
 msgid "Cannot create dependency on trigger itself."
@@ -2374,7 +2375,7 @@ msgstr "Tidak dapat membuat dependensi pada trigger itu sendiri."
 
 #: include/classes/api/services/CTriggerPrototype.php:758
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Tidak dapat membuat dependensi pada prototipe pemicu itu sendiri."
 
 #: app/controllers/CControllerDiscoveryCreate.php:47
 #: app/controllers/CControllerDiscoveryCreate.php:92
@@ -2388,35 +2389,35 @@ msgstr "Tidak dapat membuat ikon peta"
 #: app/controllers/CControllerMaintenanceCreate.php:72
 #: app/controllers/CControllerMaintenanceCreate.php:150
 msgid "Cannot create maintenance period"
-msgstr ""
+msgstr "Tidak dapat membuat periode pemeliharaan"
 
 #: app/controllers/CControllerProxyConfigRefresh.php:79
 msgid "Cannot create request"
-msgstr ""
+msgstr "Tidak dapat membuat permintaan"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "Tidak dapat membuat laporan terjadwal"
 
 #: app/controllers/CControllerServiceCreate.php:96
 #: app/controllers/CControllerServiceCreate.php:184
 msgid "Cannot create service"
-msgstr ""
+msgstr "Tidak dapat membuat layanan"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "Tidak dapat membuat layanan \"%1$s\": %2$s."
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Tidak dapat membuat file konfigurasi."
 
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "Tidak dapat membuat role user"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2440,7 +2441,7 @@ msgstr "Tidak dapat menghapus aksi"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "Tidak dapat menghapus role user yang ditetapkan \"%1$s\"."
 
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
@@ -2460,7 +2461,7 @@ msgstr[0] ""
 
 #: include/classes/api/services/CUserDirectory.php:383
 msgid "Cannot delete default user directory."
-msgstr ""
+msgstr "Tidak dapat menghapus direktori user default."
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2468,7 +2469,6 @@ msgid "Cannot delete dependency"
 msgstr "Tidak dapat menghapus dependency"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Tidak dapat menghapus aturan discovery"

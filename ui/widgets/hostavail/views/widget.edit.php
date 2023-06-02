@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+		new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
 	)
 	->addField(
 		new CWidgetFieldCheckBoxListView($data['fields']['interface_type'])

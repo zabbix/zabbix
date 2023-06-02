@@ -6,3 +6,6 @@ libzbxtaskmanager_a_SOURCES = \
 	proxy_tasks.c \
 	taskmanager.c \
 	taskmanager.h
+
+libzbxtaskmanager_a_CFLAGS = \
+	$(TLS_CFLAGS)

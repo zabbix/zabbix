@@ -2,6 +2,9 @@
 
 noinst_LIBRARIES = libpreprocessor.a
 
+libpreprocessor_a_CFLAGS = \
+	$(TLS_CFLAGS)
+
 libpreprocessor_a_SOURCES = \
 	preproc_manager.c \
 	preproc_manager.h \

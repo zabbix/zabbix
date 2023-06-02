@@ -1927,29 +1927,13 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 					ha_get_failover_delay(&info, client);
 					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE:
-					if (SUCCEED != zabbix_increase_log_level())
-					{
-						zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
-								" maximum level has been already set");
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
-								zabbix_get_log_level_string());
-					}
+					zabbix_increase_log_level();
+					zabbix_report_log_level_change();
 					zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_LOGLEVEL_INCREASE, NULL, 0);
 					break;
 				case ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE:
-					if (SUCCEED != zabbix_decrease_log_level())
-					{
-						zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
-								" minimum level has been already set");
-					}
-					else
-					{
-						zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
-								zabbix_get_log_level_string());
-					}
+					zabbix_decrease_log_level();
+					zabbix_report_log_level_change();
 					zbx_ipc_client_send(client, ZBX_IPC_SERVICE_HA_LOGLEVEL_DECREASE, NULL, 0);
 					break;
 			}

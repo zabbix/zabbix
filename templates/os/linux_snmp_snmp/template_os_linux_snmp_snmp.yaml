@@ -102,6 +102,30 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
+        - uuid: da392895de1c447eb5d3f1f950360639
+          name: 'Linux: SNMP walk EtherLike-MIB interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.10.7.2.1.19,1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2]'
+          key: net.if.duplex.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 661b9bbeb1f146da9c0d9bfa8e5f26d5
+          name: 'Linux: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.31.1.1.1.6,1.3.6.1.2.1.31.1.1.1.10,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.31.1.1.1.15]'
+          key: net.if.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 85a597b741bb4e6e8fa9806e8737caf4
           name: 'Linux: SNMP traps (fallback)'
           type: SNMP_TRAP
@@ -184,19 +208,24 @@ zabbix_export:
               value: cpu
         - uuid: f835f2d2e65c4efc8934a61870d907ca
           name: 'Linux: Number of CPUs'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.25.3.3.1.1]'
+          type: DEPENDENT
           key: 'system.cpu.num[snmp]'
+          delay: '0'
           history: 7d
-          description: |
-            MIB: HOST-RESOURCES-MIB
-            Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD
+          description: 'Count the number of CPU cores by counting number of cores discovered in hrProcessorTable using LLD.'
           preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.2.1.25.3.3.1.1
+                - '0'
             - type: JAVASCRIPT
               parameters:
                 - |
                   //count the number of cores
                   return JSON.parse(value).length;
+          master_item:
+            key: system.cpu.walk
           tags:
             - tag: component
               value: cpu
@@ -214,6 +243,20 @@ zabbix_export:
           tags:
             - tag: component
               value: cpu
+        - uuid: fb2a968ed48f4c6287da2b06bc3b95f3
+          name: 'Linux: SNMP walk system CPUs'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.25.3.3.1.1,1.3.6.1.4.1.2021.11.53.0,1.3.6.1.4.1.2021.11.52.0,1.3.6.1.4.1.2021.11.50.0,1.3.6.1.4.1.2021.11.64.0,1.3.6.1.4.1.2021.11.61.0,1.3.6.1.4.1.2021.11.51.0,1.3.6.1.4.1.2021.11.54.0,1.3.6.1.4.1.2021.11.56.0,1.3.6.1.4.1.2021.11.65.0,1.3.6.1.4.1.2021.11.66.0]'
+          key: system.cpu.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            Discovering system CPUs.
+          tags:
+            - tag: component
+              value: raw
         - uuid: abd4d4b7097644478329b578dfa7bf09
           name: 'Linux: System description'
           type: SNMP_AGENT
@@ -402,6 +445,32 @@ zabbix_export:
               value: memory
             - tag: component
               value: storage
+        - uuid: 94c5ede90a50467989a4559e51c0bcef
+          name: 'Linux: SNMP walk block devices'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.4.1.2021.13.15.1.1.2,1.3.6.1.4.1.2021.13.15.1.1.5,1.3.6.1.4.1.2021.13.15.1.1.6,1.3.6.1.4.1.2021.13.15.1.1.9]'
+          key: vfs.dev.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: 'Block devices are discovered from UCD-DISKIO-MIB::diskIOTable (http://net-snmp.sourceforge.net/docs/mibs/ucdDiskIOMIB.html#diskIOTable).'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 8ad72047f03a452f9698254fe6b4ffd2
+          name: 'Linux: SNMP walk mounted filesystems'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.25.2.3.1.3,1.3.6.1.2.1.25.2.3.1.2,1.3.6.1.2.1.25.2.3.1.4,1.3.6.1.2.1.25.2.3.1.5,1.3.6.1.2.1.25.2.3.1.6]'
+          key: vfs.fs.walk
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          description: |
+            MIB: HOST-RESOURCES-MIB
+            HOST-RESOURCES-MIB::hrStorage discovery.
+          tags:
+            - tag: component
+              value: raw
         - uuid: ad8a3857e8b04dffbc0c052a0d36fe08
           name: 'Linux: Available memory'
           type: CALCULATED
@@ -547,9 +616,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 528c02f7e0414cb5a97def6702fceb2a
               name: 'Linux: CPU guest time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.65.0
+              type: DEPENDENT
               key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -557,6 +626,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 Guest time - the time spent on running a virtual CPU for a guest operating system.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.65.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -565,14 +638,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: ce514c83afb345b2b0f3b85d6ec89dc3
               name: 'Linux: CPU guest nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.66.0
+              type: DEPENDENT
               key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -580,6 +655,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time spent on running a niced guest (a virtual CPU for guest operating systems under the control of the Linux kernel).
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.66.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -588,14 +667,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: 394bffd2086545af806f4ad990f853a1
               name: 'Linux: CPU idle time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.53.0
+              type: DEPENDENT
               key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -603,6 +684,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent doing nothing.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.53.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -611,14 +696,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: 88e9044abe71483a8670b572517ff4ad
               name: 'Linux: CPU interrupt time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.56.0
+              type: DEPENDENT
               key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -626,6 +713,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing hardware interrupts.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.56.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -634,14 +725,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: 87d1467c79cc4a3d8e5caf3b35de7e17
               name: 'Linux: CPU iowait time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.54.0
+              type: DEPENDENT
               key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -649,6 +742,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been waiting for I/O to complete.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.54.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -657,14 +754,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: d35896698d2a459fb682eb170e7005de
               name: 'Linux: CPU nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.51.0
+              type: DEPENDENT
               key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -672,6 +771,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that have been niced.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.51.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -680,14 +783,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: b48b79d7c2464bd996776477e55ce724
               name: 'Linux: CPU softirq time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.61.0
+              type: DEPENDENT
               key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -695,6 +800,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of time the CPU has been servicing software interrupts.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.61.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -703,14 +812,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: f0e15f783b434cc49c97681e15def25c
               name: 'Linux: CPU steal time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.64.0
+              type: DEPENDENT
               key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -718,6 +829,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The amount of "stolen" CPU from this virtual machine by the hypervisor for other tasks, such as running another virtual machine.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.64.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -726,14 +841,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: 9f063ab6a217459e9e1ae95cc77071ff
               name: 'Linux: CPU system time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.52.0
+              type: DEPENDENT
               key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -741,6 +858,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running the kernel and its processes.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.52.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -749,14 +870,16 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
             - uuid: e07c1afe5f8c4db0bae364933df3e571
               name: 'Linux: CPU user time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.50.0
+              type: DEPENDENT
               key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
@@ -764,6 +887,10 @@ zabbix_export:
                 MIB: UCD-SNMP-MIB
                 The time the CPU has spent running users' processes that are not niced.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - 1.3.6.1.4.1.2021.11.50.0
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -772,6 +899,8 @@ zabbix_export:
                     - |
                       //to get utilization in %, divide by N, where N is number of cores.
                       return value/{#CPU.COUNT}
+              master_item:
+                key: system.cpu.walk
               tags:
                 - tag: component
                   value: cpu
@@ -877,10 +1006,9 @@ zabbix_export:
                   return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
         - uuid: c29a7bbfba3441b1b155e68cbe44a685
           name: 'Network interfaces discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFADMINSTATUS},1.3.6.1.2.1.2.2.1.7,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2,{#IFTYPE},1.3.6.1.2.1.2.2.1.3]'
+          type: DEPENDENT
           key: net.if.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -930,10 +1058,9 @@ zabbix_export:
           item_prototypes:
             - uuid: 772ca56d1df84c33847fb3de9a2fa048
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -943,9 +1070,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.13.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -955,18 +1091,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 23d5c37a8a66495c81babc76085dd0d0
               name: 'Interface {#IFNAME}({#IFALIAS}): Inbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.14.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -976,22 +1120,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 229e36fe673e43c0a69f942c086fea97
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets received on the interface, including framing characters. This object is a 64-bit version of ifInOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1001,10 +1150,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: bbaad86407a349ed81b3b329e0754cdb
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets discarded'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
@@ -1014,9 +1162,18 @@ zabbix_export:
                 Discontinuities in the value of this counter can occur at re-initialization of the management system,
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.19.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1026,18 +1183,26 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 184b63fa8f184915a8bd365afebae00f
               name: 'Interface {#IFNAME}({#IFALIAS}): Outbound packets with errors'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               description: |
                 MIB: IF-MIB
                 For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol.  For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.20.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 3m
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1047,22 +1212,27 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: ad64f09ccd88467f811499ef17096c0a
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
-              delay: 3m
+              delay: '0'
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
                 The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system, and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
                 - type: MULTIPLIER
                   parameters:
                     - '8'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1072,10 +1242,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 54b1b171187b44c2a0b8dfadf06f9b00
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
-              delay: 5m
+              delay: '0'
               history: 7d
               trends: '0'
               units: bps
@@ -1083,12 +1252,18 @@ zabbix_export:
                 MIB: IF-MIB
                 An estimate of the interface's current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n' then the speed of the interface is somewhere in the range of `n-500,000' to`n+499,999'.  For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '1000000'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1098,9 +1273,9 @@ zabbix_export:
                   value: '{#IFNAME}'
             - uuid: 4aaabfdfeeac4c779255fd8b5a4550f4
               name: 'Interface {#IFNAME}({#IFALIAS}): Operational status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -1114,6 +1289,13 @@ zabbix_export:
                 - It should remain in the notPresent(6) state if the interface has missing(typically, hardware) components.
               valuemap:
                 name: 'IF-MIB::ifOperStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1142,10 +1324,9 @@ zabbix_export:
                       value: availability
             - uuid: ce0a2b8f62ff4591b5e3bc8b348bf946
               name: 'Interface {#IFNAME}({#IFALIAS}): Interface type'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
-              delay: 1h
+              delay: '0'
               history: 7d
               trends: '0'
               description: |
@@ -1156,9 +1337,15 @@ zabbix_export:
               valuemap:
                 name: 'IF-MIB::ifType'
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.2.2.1.3.{#SNMPINDEX}'
+                    - '0'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
+              master_item:
+                key: net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1280,12 +1467,37 @@ zabbix_export:
                   item:
                     host: 'Linux by SNMP'
                     key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
+          master_item:
+            key: net.if.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFADMINSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.7
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+                - '{#IFTYPE}'
+                - 1.3.6.1.2.1.2.2.1.3
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 3943b515dcfc4321be0e15eb99eb0077
           name: 'EtherLike-MIB Discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.2.1.10.7.2.1.19,{#IFOPERSTATUS},1.3.6.1.2.1.2.2.1.8,{#IFALIAS},1.3.6.1.2.1.31.1.1.1.18,{#IFNAME},1.3.6.1.2.1.31.1.1.1.1,{#IFDESCR},1.3.6.1.2.1.2.2.1.2]'
+          type: DEPENDENT
           key: net.if.duplex.discovery
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1293,15 +1505,18 @@ zabbix_export:
                 value: '1'
                 formulaid: A
               - macro: '{#SNMPVALUE}'
-                value: (2|3)
+                operator: EXISTS
                 formulaid: B
+              - macro: '{#SNMPVALUE}'
+                value: (2|3)
+                formulaid: C
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with up(1) Operational Status are discovered.'
           item_prototypes:
             - uuid: cc55ecff67a044b3a6cd17136757fc32
               name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               description: |
                 MIB: EtherLike-MIB
@@ -1331,6 +1546,13 @@ zabbix_export:
                 Reference: [IEEE 802.3 Std.], 30.3.1.1.32,aDuplexStatus.
               valuemap:
                 name: 'EtherLike-MIB::dot3StatsDuplexStatus'
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: net.if.duplex.walk
               tags:
                 - tag: component
                   value: network
@@ -1348,29 +1570,34 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: performance
+          master_item:
+            key: net.if.duplex.walk
           preprocessing:
-            - type: JAVASCRIPT
+            - type: SNMP_WALK_TO_JSON
               parameters:
-                - |
-                  try {
-                      var data = JSON.parse(value);
-                  }
-                  catch (error) {
-                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
-                  }
-                  var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
-                  data.forEach(function (element) {
-                      fields.forEach(function (field) {
-                          element[field] = element[field] || '';
-                      });
-                  });
-                  return JSON.stringify(data);
+                - '{#SNMPVALUE}'
+                - 1.3.6.1.2.1.10.7.2.1.19
+                - '0'
+                - '{#IFOPERSTATUS}'
+                - 1.3.6.1.2.1.2.2.1.8
+                - '0'
+                - '{#IFALIAS}'
+                - 1.3.6.1.2.1.31.1.1.1.18
+                - '0'
+                - '{#IFNAME}'
+                - 1.3.6.1.2.1.31.1.1.1.1
+                - '0'
+                - '{#IFDESCR}'
+                - 1.3.6.1.2.1.2.2.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 57792d6e2b4e40a8a285848525bec38d
           name: 'Block devices discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#DEVNAME},1.3.6.1.4.1.2021.13.15.1.1.2]'
+          type: DEPENDENT
           key: 'vfs.dev.discovery[snmp]'
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1385,9 +1612,9 @@ zabbix_export:
           item_prototypes:
             - uuid: b136adad88154c31a123b46522b41191
               name: '{#DEVNAME}: Disk read rate'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.dev.read.rate[diskIOReads.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '!r/s'
@@ -1395,9 +1622,15 @@ zabbix_export:
                 MIB: UCD-DISKIO-MIB
                 The number of read accesses from this device since boot.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.2021.13.15.1.1.5.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              master_item:
+                key: vfs.dev.walk
               tags:
                 - tag: component
                   value: storage
@@ -1405,15 +1638,22 @@ zabbix_export:
                   value: '{#DEVNAME}'
             - uuid: b1fb6665c96b4c9f999b3803d45eea3e
               name: '{#DEVNAME}: Disk utilization'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.dev.util[diskIOLA1.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '%'
               description: |
                 MIB: UCD-DISKIO-MIB
                 The 1 minute average load of disk (%)
+              preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.2021.13.15.1.1.9.{#SNMPINDEX}'
+                    - '0'
+              master_item:
+                key: vfs.dev.walk
               tags:
                 - tag: component
                   value: storage
@@ -1421,9 +1661,9 @@ zabbix_export:
                   value: '{#DEVNAME}'
             - uuid: 147ad615fd544ab39494ce829da0bb14
               name: '{#DEVNAME}: Disk write rate'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               value_type: FLOAT
               units: '!w/s'
@@ -1431,9 +1671,15 @@ zabbix_export:
                 MIB: UCD-DISKIO-MIB
                 The number of write accesses from this device since boot.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.4.1.2021.13.15.1.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+              master_item:
+                key: vfs.dev.walk
               tags:
                 - tag: component
                   value: storage
@@ -1453,12 +1699,22 @@ zabbix_export:
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.dev.write.rate[diskIOWrites.{#SNMPINDEX}]'
+          master_item:
+            key: vfs.dev.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#DEVNAME}'
+                - 1.3.6.1.4.1.2021.13.15.1.1.2
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 0ba976a284574157b2b51f103a324d43
           name: 'Mounted filesystem discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
+          type: DEPENDENT
           key: 'vfs.fs.discovery[snmp]'
-          delay: 1h
+          delay: '0'
           filter:
             evaltype: AND
             conditions:
@@ -1550,9 +1806,9 @@ zabbix_export:
                   value: '{#FSNAME}'
             - uuid: 9117a148b85c4593a3df470a1e023573
               name: '{#FSNAME}: Total space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
@@ -1561,9 +1817,15 @@ zabbix_export:
                 This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
                 For example, the amount of main storage allocated to a buffer pool might be modified or the amount of disk space allocated to virtual storage might be modified.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              master_item:
+                key: vfs.fs.walk
               tags:
                 - tag: component
                   value: storage
@@ -1571,18 +1833,24 @@ zabbix_export:
                   value: '{#FSNAME}'
             - uuid: 04168e44dd0f4d3c96496c3fadd13fde
               name: '{#FSNAME}: Used space'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+              type: DEPENDENT
               key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+              delay: '0'
               history: 7d
               units: B
               description: |
                 MIB: HOST-RESOURCES-MIB
                 The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
               preprocessing:
+                - type: SNMP_WALK_VALUE
+                  parameters:
+                    - '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
+                    - '0'
                 - type: MULTIPLIER
                   parameters:
                     - '{#ALLOC_UNITS}'
+              master_item:
+                key: vfs.fs.walk
               tags:
                 - tag: component
                   value: storage
@@ -1654,6 +1922,23 @@ zabbix_export:
                   item:
                     host: 'Linux by SNMP'
                     key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+          master_item:
+            key: vfs.fs.walk
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - '{#FSNAME}'
+                - 1.3.6.1.2.1.25.2.3.1.3
+                - '0'
+                - '{#FSTYPE}'
+                - 1.3.6.1.2.1.25.2.3.1.2
+                - '0'
+                - '{#ALLOC_UNITS}'
+                - 1.3.6.1.2.1.25.2.3.1.4
+                - '0'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: os
