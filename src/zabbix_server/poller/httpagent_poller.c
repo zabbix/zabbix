@@ -17,6 +17,153 @@
 #include "zbxtypes.h"
 #include "httpagent_async.h"
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	unsigned char	value_type;
+	unsigned char	flags;
+	unsigned char	state;
+	char		*posts;
+	char		*status_codes;
+}
+zbx_dc_item_context_t;
+
+typedef struct
+{
+	zbx_poller_config_t	*poller_config;
+	zbx_http_context_t	http_context;
+	zbx_dc_item_context_t	item_context;
+}
+zbx_httpagent_context;
+
+static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
+{
+	zbx_http_context_create(&httpagent_context->http_context);
+}
+
+static void	httpagent_context_clean(zbx_httpagent_context *httpagent_context)
+{
+	zbx_free(httpagent_context->item_context.status_codes);
+	zbx_free(httpagent_context->item_context.posts);
+	zbx_http_context_destroy(&httpagent_context->http_context);
+}
+
+int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
+{
+	char			*error = NULL;
+	int			ret;
+	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
+	CURLcode		err;
+	CURLMcode		merr;
+
+	httpagent_context_create(httpagent_context);
+
+	httpagent_context->poller_config = poller_config;
+	httpagent_context->item_context.itemid = item->itemid;
+	httpagent_context->item_context.hostid = item->host.hostid;
+	httpagent_context->item_context.value_type = item->value_type;
+	httpagent_context->item_context.flags = item->flags;
+	httpagent_context->item_context.state = item->state;
+	httpagent_context->item_context.posts = item->posts;
+	item->posts = NULL;
+	httpagent_context->item_context.status_codes = item->status_codes;
+	item->status_codes = NULL;
+
+	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
+			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,
+			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
+			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
+			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
+			item->output_format, poller_config->config_source_ip, &error)))
+	{
+		SET_MSG_RESULT(result, error);
+
+		goto fail;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(httpagent_context->http_context.easyhandle, CURLOPT_PRIVATE,
+			httpagent_context)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set pointer to private data: %s",
+				curl_easy_strerror(err)));
+
+		goto fail;
+	}
+
+	if (CURLM_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
+			httpagent_context->http_context.easyhandle)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot add a standard curl handle to the multi stack: %s",
+				curl_multi_strerror(merr)));
+
+		goto fail;
+	}
+
+	poller_config->processing++;
+	return SUCCEED;
+fail:
+	httpagent_context_clean(httpagent_context);
+	zbx_free(httpagent_context);
+
+	return NOTSUPPORTED;
+}
+
+void	async_httpagent_done(CURL *easy_handle, CURLcode err)
+{
+	long			response_code;
+	char			*error, *out = NULL;
+	AGENT_RESULT		result;
+	char			*status_codes;
+	zbx_httpagent_context	*httpagent_context;
+	zbx_dc_item_context_t	*item_context;
+	zbx_timespec_t		timespec;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
+
+	zbx_timespec(&timespec);
+
+	zbx_init_agent_result(&result);
+	status_codes = httpagent_context->item_context.status_codes;
+	item_context = &httpagent_context->item_context;
+
+	if (SUCCEED == zbx_http_handle_response(easy_handle, &httpagent_context->http_context, err, &response_code,
+			&out, &error) && SUCCEED == zbx_handle_response_code(status_codes, response_code, out, &error))
+	{
+
+		SET_TEXT_RESULT(&result, out);
+		out = NULL;
+		zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
+				item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+	}
+	else
+	{
+		SET_MSG_RESULT(&result, error);
+		zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
+				item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+	}
+
+	zbx_free_agent_result(&result);
+	zbx_free(out);
+
+	zbx_vector_uint64_append(&httpagent_context->poller_config->itemids, httpagent_context->item_context.itemid);
+	zbx_vector_int32_append(&httpagent_context->poller_config->errcodes, SUCCEED);
+	zbx_vector_int32_append(&httpagent_context->poller_config->lastclocks, timespec.sec);
+
+	httpagent_context->poller_config->processing--;
+	httpagent_context->poller_config->processed++;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, httpagent_context->item_context.itemid);
+
+	curl_multi_remove_handle(httpagent_context->poller_config->curl_handle, easy_handle);
+	httpagent_context_clean(httpagent_context);
+	zbx_free(httpagent_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static void	async_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
