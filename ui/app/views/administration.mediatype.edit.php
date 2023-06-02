@@ -400,7 +400,8 @@ $message_template = (new CTemplateTag('message-templates-row-tmpl'))
 // Message templates tab.
 $message_templates_form_grid = (new CFormGrid())
 	->setId('messageTemplatesFormlist')
-	->addItem(
+	->addItem([
+		(new CLabel(_('Message templates')))->addClass(ZBX_STYLE_WORDBREAK),
 		(new CFormField(
 			(new CTable())
 				->addStyle('width: 100%;')
@@ -425,7 +426,7 @@ $message_templates_form_grid = (new CFormGrid())
 			->setId('message-templates')
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	)
+	])
 	->addItem($message_template);
 
 // Media options tab.
