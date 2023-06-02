@@ -35,8 +35,17 @@ else {
 	$operations_table->setHeader([_('Details'), _('Action')]);
 }
 
-$i = 0;
-foreach ($data['action']['operations'] as $operation) {
+if (array_key_exists('descriptions', $data)) {
+	if (array_key_exists('operation', $data['descriptions'])) {
+		$data['descriptions'] = $data['descriptions']['operation'];
+	}
+
+	$details_column = getActionOperationDescriptions(
+		$data['action']['operations'], $data['eventsource'], $data['descriptions']
+	);
+}
+
+foreach ($data['action']['operations'] as $i => $operation) {
 	if (!str_in_array($operation['operationtype'], $data['allowedOperations'][ACTION_OPERATION])) {
 		continue;
 	}
@@ -72,14 +81,6 @@ foreach ($data['action']['operations'] as $operation) {
 			);
 	}
 
-	if (array_key_exists('operation', $data['descriptions'])) {
-		$data['descriptions'] = $data['descriptions']['operation'];
-	}
-
-	$details_column = getActionOperationDescriptions(
-		$data['action']['operations'], $data['eventsource'], $data['descriptions']
-	)[$i];
-
 	// Create hidden input fields for each row.
 	$hidden_data = array_filter($operation, function ($key) {
 		return !in_array($key, [
@@ -113,7 +114,7 @@ foreach ($data['action']['operations'] as $operation) {
 	if (in_array($data['eventsource'], [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE])) {
 		$operations_table->addRow([
 			$esc_steps_txt,
-			(new CCol($details_column))->addClass(ZBX_STYLE_WORDBREAK),
+			(new CCol($details_column[$i]))->addClass(ZBX_STYLE_WORDBREAK),
 			$esc_delay_txt,
 			$esc_period_txt,
 			$buttons
@@ -121,12 +122,10 @@ foreach ($data['action']['operations'] as $operation) {
 	}
 	else {
 		$operations_table->addRow([
-			$details_column,
+			$details_column[$i],
 			$buttons
 		], null, 'operations_'.$i)->addClass(ZBX_STYLE_WORDBREAK);
 	}
-
-	$i++;
 }
 
 $operations_table->addItem(
