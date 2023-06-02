@@ -3,6 +3,9 @@ Changes for 5.0.36rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.35
