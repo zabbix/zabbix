@@ -45,7 +45,7 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 **Plugins.Mysql.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the mysql certificate or certificate chain.
 *Default value:* 
 
-**Plugins.Mysql.Sessions.*.TLSKeyFile** — Full pathname of a file containing the mysql private key.
+**Plugins.Mysql.Sessions.<session_name>.TLSKeyFile** — Full pathname of a file containing the mysql private key.
 *Default value:* 
 
 ### Configuring connection
