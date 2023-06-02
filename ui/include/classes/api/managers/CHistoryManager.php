@@ -1014,6 +1014,8 @@ class CHistoryManager {
 		];
 
 		if ($width !== null) {
+			$period = $time_to - $time_from;
+
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
 				'max' => [
@@ -1021,12 +1023,15 @@ class CHistoryManager {
 				]
 			];
 
+			// Clock value is divided by 1000 as it is stored as milliseconds.
+			$formula = "Math.floor(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
+
 			$script = [
-				'inline' => "Math.floor(params.multiplier*(doc['clock'].value.getMillis()-params.time_from))",
+				'inline' => $formula,
 				'params' => [
-					// Timestamps are multiplied by 1000 as "clock" value is stored as milliseconds.
-					'multiplier' => $width / (($time_to - $time_from) * 1000),
-					'time_from' => $time_from * 1000
+					'width' => (int)$width,
+					'time_from' => $time_from,
+					'period' => $period
 				]
 			];
 			$aggs = [
@@ -1115,10 +1120,10 @@ class CHistoryManager {
 		$sql_select_extra = '';
 
 		if ($width !== null) {
-			$multiplier = $width / ($time_to - $time_from);
+			$period = $time_to - $time_from;
 
 			// Required for 'group by' support of Oracle.
-			$calc_field = 'round('.$multiplier.'*('.zbx_dbcast_2bigint('clock').'-'.$time_from.'),0)';
+			$calc_field = 'round('.$width.'*('.zbx_dbcast_2bigint('clock').'-'.$time_from.')/'.$period.',0)';
 
 			$sql_select_extra = ','.$calc_field.' AS i';
 			$group_by .= ','.$calc_field;
