@@ -20,7 +20,6 @@
 #include "zbxxml.h"
 
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxvariant.h"
 #include "zbxstr.h"

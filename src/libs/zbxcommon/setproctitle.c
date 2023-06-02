@@ -22,7 +22,6 @@
 ** were used in development of this file. Thanks to PostgreSQL developers!
 **/
 
-#include "log.h"
 #include "zbxcommon.h"
 
 #if defined(__linux__)				/* Linux */

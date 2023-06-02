@@ -21,7 +21,6 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "log.h"
 #include "vfs_file.h"
 #include "dir.h"
 #include "net.h"

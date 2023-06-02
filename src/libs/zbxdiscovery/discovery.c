@@ -20,7 +20,6 @@
 #include "zbxdiscovery.h"
 
 #include "zbxserver.h"
-#include "log.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxserialize.h"
