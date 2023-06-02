@@ -1021,14 +1021,12 @@ class CHistoryManager {
 				]
 			];
 
-			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = "Math.floor(params.multiplier*(doc['clock'].value.getMillis()/1000-params.time_from))";
-
 			$script = [
-				'inline' => $formula,
+				'inline' => "Math.floor(params.multiplier*(doc['clock'].value.getMillis()-params.time_from))",
 				'params' => [
-					'multiplier' => $width / ($time_to - $time_from),
-					'time_from' => $time_from
+					// Timestamps are multiplied by 1000 as "clock" value is stored as milliseconds.
+					'multiplier' => $width / (($time_to - $time_from) * 1000),
+					'time_from' => $time_from * 1000
 				]
 			];
 			$aggs = [
