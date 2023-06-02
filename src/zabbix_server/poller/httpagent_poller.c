@@ -109,7 +109,7 @@ fail:
 	return NOTSUPPORTED;
 }
 
-void	async_httpagent_done(CURL *easy_handle, CURLcode err)
+static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 {
 	long			response_code;
 	char			*error, *out = NULL;
@@ -262,7 +262,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	last_stat_time = time(NULL);
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
-	http_agent_poller_init(&poller_config, poller_args_in, async_items);
+	http_agent_poller_init(&poller_config, poller_args_in, async_items, async_httpagent_done);
 
 	while (ZBX_IS_RUNNING())
 	{
