@@ -19,7 +19,6 @@
 
 #include "zbxdbsyncer.h"
 
-#include "log.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"

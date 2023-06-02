@@ -19,7 +19,6 @@
 
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxcachevalue.h"
 #include "evalfunc.h"
 #include "zbxeval.h"
