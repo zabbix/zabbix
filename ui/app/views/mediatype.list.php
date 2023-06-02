@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('administration.mediatype.list.js.php');
+$this->includeJsFile('mediatype.list.js.php');
 $this->addJsFile('multilineinput.js');
 
 $html_page = (new CHtmlPage())

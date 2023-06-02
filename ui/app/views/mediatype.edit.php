@@ -553,7 +553,7 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('administration.mediatype.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
