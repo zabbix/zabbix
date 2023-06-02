@@ -266,13 +266,6 @@ class testFormTemplateDashboards extends CWebTest {
 					'refresh_interval' => 'Default (1 minute)',
 					'fields' => [
 						[
-							'field' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
-							]
-						],
-						[
 							'field' => 'Recipients',
 							'type' => 'multiselect'
 						],
@@ -287,8 +280,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Status',
 							'type' => 'checkbox_list',
-							'labels' => ['In progress', 'Sent/Executed', 'Failed'],
-							'values' => ['id:statuses_0' => false, 'id:statuses_1' => false, 'id:statuses_2' => false]
+							'checkboxes' => ['In progress' => false, 'Sent/Executed' => false, 'Failed' => false]
 						],
 						[
 							'field' => 'Search string',
@@ -329,17 +321,16 @@ class testFormTemplateDashboards extends CWebTest {
 					'refresh_interval' => 'Default (15 minutes)',
 					'fields' => [
 						[
-							'field' => 'Name',
-							'attributes' => [
-								'placeholder' => 'default',
-								'maxlength' => 255
-							]
-						],
-						[
 							'field' => 'Time type',
 							'type' => 'dropdown',
 							'possible_values' => ['Local time', 'Server time', 'Host time'],
 							'value' => 'Local time'
+						],
+						[
+							'field' => 'Clock type',
+							'type' => 'radio_button',
+							'possible_values' => ['Analog', 'Digital'],
+							'value' => 'Analog'
 						]
 					],
 					'hidden_fields' => [
@@ -360,14 +351,107 @@ class testFormTemplateDashboards extends CWebTest {
 							'type' => 'color_picker'
 						],
 						[
+							'field' => 'Date',
+							'type' => 'complex_field',
+							'contents' => [
+								[
+									'field' => 'Size',
+									'locator' => 'id:date_size',
+									'value' => 20,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								]
+							]
+						],
+						[
 							'field' => 'Time',
-							'screenshot' => true
+							'type' => 'complex_field',
+							'contents' => [
+								[
+									'field' => 'Size',
+									'locator' => 'id:time_size',
+									'value' => 30,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								],
+								[
+									'field' => 'Seconds',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field' => 'Format',
+									'type' => 'radio_button',
+									'possible_values' => ['24-hour', '12-hour'],
+									'value' => '24-hour'
+								]
+							]
+						],
+						[
+							'field' => 'Time zone',
+							'type' => 'complex_field',
+							'contents' => [
+								[
+									'field' => 'Size',
+									'locator' => 'id:tzone_size',
+									'value' => 20,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								]
+							]
 						]
 					],
 					'change_values' => [
 						'Time type' => 'Host time',
 						'Clock type' => 'Digital',
 						'Advanced configuration' => true
+					],
+					'second_change' => [
+						'change_fields' => [
+							'id:show_1' => true,
+							'id:show_3' => true
+						],
+						'check_fields' => [
+							[
+								'field' => 'Show',
+								'type' => 'checkbox_list',
+								'checkboxes' => ['Date' => false, 'Time' => true, 'Time zone' => false],
+								'mandatory' => true
+							]
+						]
 					]
 				]
 			],
@@ -399,17 +483,19 @@ class testFormTemplateDashboards extends CWebTest {
 							'attributes' => [
 								'placeholder' => '40.6892494,-74.0466891',
 								'maxlength' => 255
-							],
-							'hint' => [
-								'locator' => 'class:icon-help-hint',
-								'text' => "Comma separated center coordinates and zoom level to display when the widget ".
-										"is initially loaded.\n".
-										"Supported formats:\n".
-										"<lat>,<lng>,<zoom>\n".
-										"<lat>,<lng>\n\n".
-										"The maximum zoom level is \"0\".\n".
-										"Initial view is ignored if the default view is set."
 							]
+						]
+					],
+					'hints' => [
+						[
+							'locator' => 'class:icon-help-hint',
+							'text' => "Comma separated center coordinates and zoom level to display when the widget ".
+									"is initially loaded.\n".
+									"Supported formats:\n".
+									"<lat>,<lng>,<zoom>\n".
+									"<lat>,<lng>\n\n".
+									"The maximum zoom level is \"0\".\n".
+									"Initial view is ignored if the default view is set."
 						]
 					]
 				]
@@ -505,13 +591,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Interface type',
 							'type' => 'checkbox_list',
-							'labels' => ['Zabbix agent', 'SNMP', 'JMX', 'IPMI'],
-							'values' => [
-								'id:interface_type_1' => false,
-								'id:interface_type_2' => false,
-								'id:interface_type_3' => false,
-								'id:interface_type_4' => false
-							]
+							'checkboxes' => ['Zabbix agent' => false, 'SNMP' => false, 'JMX' => false, 'IPMI' => false]
 						],
 						[
 							'field' => 'Layout',
@@ -540,8 +620,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Show',
 							'type' => 'checkbox_list',
-							'labels' => ['Description', 'Time', 'Value', 'Change indicator'],
-							'values' => ['id:show_1' => true, 'id:show_2' => true, 'id:show_3' => true, 'id:show_4' => true],
+							'checkboxes' => ['Description' => true, 'Time' => true, 'Value' => true, 'Change indicator' => true],
 							'mandatory' => true
 						],
 
@@ -549,15 +628,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'hidden_fields' => [
 						[
 							'field' => 'Desctiption',
-							'screenshot' => true,
-							'hint' => [
-								'locator' => 'class:icon-help-hint',
-								'text' => "Supported macros:\n".
-										"{HOST.*}\n".
-										"{ITEM.*}\n".
-										"{INVENTORY.*}\n".
-										"User macros"
-							]
+							'screenshot' => true
 						],
 						[
 							'field' => 'Value',
@@ -579,15 +650,25 @@ class testFormTemplateDashboards extends CWebTest {
 							'field' => 'Thresholds',
 							'type' => 'table',
 							'headers' => ['Threshold', 'Action'],
-							'buttons' => ['Add'],
-							'hint' => [
-								'locator' => 'id:item-value-thresholds-warning',
-								'text' => 'This setting applies only to numeric data.'
-							]
+							'buttons' => ['Add']
 						]
 					],
 					'change_values' => [
 						'Advanced configuration' => true
+					],
+					'hints' => [
+						[
+							'locator' => 'id:item-value-thresholds-warning',
+							'text' => 'This setting applies only to numeric data.'
+						],
+						[
+							'locator' => 'class:icon-help-hint',
+							'text' => "Supported macros:\n".
+									"{HOST.*}\n".
+									"{ITEM.*}\n".
+									"{INVENTORY.*}\n".
+									"User macros"
+						]
 					]
 				]
 			],
@@ -682,14 +763,13 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Severity',
 							'type' => 'checkbox_list',
-							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-							'values' => [
-								'id:severities_0' => false,
-								'id:severities_1' => false,
-								'id:severities_2' => false,
-								'id:severities_3' => false,
-								'id:severities_4' => false,
-								'id:severities_5' => false
+							'checkboxes' => [
+								'Not classified' => false,
+								'Information' => false,
+								'Warning' => false,
+								'Average' => false,
+								'High' => false,
+								'Disaster' => false
 							]
 						],
 						[
@@ -732,14 +812,13 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Severity',
 							'type' => 'checkbox_list',
-							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-							'values' => [
-								'id:severities_0' => false,
-								'id:severities_1' => false,
-								'id:severities_2' => false,
-								'id:severities_3' => false,
-								'id:severities_4' => false,
-								'id:severities_5' => false
+							'checkboxes' => [
+								'Not classified' => false,
+								'Information' => false,
+								'Warning' => false,
+								'Average' => false,
+								'High' => false,
+								'Disaster' => false
 							]
 						],
 						[
@@ -841,14 +920,13 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Severity',
 							'type' => 'checkbox_list',
-							'labels' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
-							'values' => [
-								'id:severities_0' => false,
-								'id:severities_1' => false,
-								'id:severities_2' => false,
-								'id:severities_3' => false,
-								'id:severities_4' => false,
-								'id:severities_5' => false
+							'checkboxes' => [
+								'Not classified' => false,
+								'Information' => false,
+								'Warning' => false,
+								'Average' => false,
+								'High' => false,
+								'Disaster' => false
 							]
 						],
 						[
@@ -911,7 +989,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'From',
-							'type' => 'date_picker',
+							'type' => 'composite_input',
 							'attributes' => [
 								'maxlength' => 255,
 								'placeholder' =>'YYYY-MM-DD'
@@ -919,7 +997,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'To',
-							'type' => 'date_picker',
+							'type' => 'composite_input',
 							'attributes' => [
 								'maxlength' => 255,
 								'placeholder' =>'YYYY-MM-DD'
@@ -1030,9 +1108,11 @@ class testFormTemplateDashboards extends CWebTest {
 							'value' => 'Left'
 						]
 					],
-					'hint' => [
-						'locator' => 'xpath:.//a[@class="icon-info status-yellow"]',
-						'text' => 'Widget is deprecated.'
+					'hints' => [
+						[
+							'locator' => 'xpath:.//a[@class="icon-info status-yellow"]',
+							'text' => 'Widget is deprecated.'
+						]
 					]
 				]
 			]
@@ -1053,24 +1133,136 @@ class testFormTemplateDashboards extends CWebTest {
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$widget_dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
-		$widget_dialog->fill(['Type' => $data['type']]);
-		COverlayDialogElement::find()->waitUntilReady();
+		$widget_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$widget_form->fill(['Type' => $data['type']]);
 
-		// Check form fields and their attributes based on field type.
-		foreach ($data['fields'] as $field_details) {
-			$field = $widget_dialog->getField($field_details['name']);
-			$default_value = CTestArrayHelper::get($field_details, 'value', '');
+		$refresh_intervals = array_merge([$data['refresh_interval']], ['No refresh', '10 seconds', '30 seconds',
+			'1 minute', '2 minutes', '10 minutes', '15 minutes']
+		);
+		$common_fields = [
+			[
+				'field' => 'Name',
+				'attributes' => [
+					'placeholder' => 'default',
+					'maxlength' => 255
+				]
+			],
+			[
+				'field' => 'Refresh interval',
+				'type' => 'dropdown',
+				'possible_values' => $refresh_intervals,
+				'value' => $data['refresh_interval']
+			]
+		];
+		$data['fields'] = array_merge($common_fields, $data['fields']);
 
-			switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
-				case 'input':
-				case 'checkbox':
-					$this->assertEquals($default_value, $field->getValue());
-					if (array_key_exists('attributes', $field_details)) {
-						foreach ($field_details['attributes'] as $attribute => $value) {
-							$this->assertEquals($value, $field->getAttribute($attribute));
+		$this->checkFormFields($data['fields'], $widget_form);
+
+		foreach (['hidden_fields', 'disabled_fields'] as $no_access_fields) {
+			if (array_key_exists($no_access_fields, $data)) {
+				foreach ($data[$no_access_fields] as $no_access_field) {
+					$form_field = $widget_form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($no_access_field['field'])
+							."]/following-sibling::div[1]")->one(false);
+
+					if ($no_access_fields === 'hidden_fields') {
+						$this->assertFalse($form_field->isDisplayed());
+					}
+					else {
+						$this->assertFalse($form_field->isEnabled());
+					}
+				}
+
+				/**
+				 * There is no widget in data provider that has both hidden and disabled fields, so change_values is
+				 * filled and field check is performed within the foreach loop.
+				 */
+				$widget_form->fill($data['change_values']);
+
+				// In case if no access fields need to be filled to expand the form, they are checked before being filled.
+				if (array_key_exists('second_change', $data)) {
+					// Check default configuration of field before changing its value.
+					$this->checkFormFields($data['second_change']['check_fields'], $widget_form);
+
+					// Exclude the checked field from further checks and fill data.
+					foreach ($data['second_change']['check_fields'] as $checked_field) {
+						foreach ($data[$no_access_fields] as $i => $all_fields) {
+							if ($checked_field['field'] === $all_fields['field']) {
+								unset($data[$no_access_fields][$i]);
+							}
 						}
 					}
+
+					$widget_form->fill($data['second_change']['change_fields']);
+				}
+
+				$this->checkFormFields($data[$no_access_fields], $widget_form);
+			}
+		}
+
+		if (array_key_exists('hints', $data)) {
+			foreach ($data['hints'] as $hint) {
+				// Open hint and check text.
+				$widget_form->query($hint['locator'])->one()->click();
+				$hint_dialog = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent()->one();
+				$this->assertEquals($hint['text'], $hint_dialog->one()->getText());
+
+				// Close hint.
+				$hint_dialog->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint_dialog->waitUntilNotPresent();
+			}
+
+		}
+
+		$this->assertTrue($widget_form->getField('Show header')->getValue());
+
+		// Close editing dashboard so that next test case would not fail with "Unexpected alert" error.
+		$this->closeDialogue();
+	}
+
+	private function checkFormFields($fields, $widget_form) {
+		// Check form fields and their attributes based on field type.
+		foreach ($fields as $field_details) {
+			$field = $widget_form->getField($field_details['field']);
+
+			if (CTestArrayHelper::get($field_details, 'type') === 'complex_field') {
+				foreach ($field_details['contents'] as $sub_field_details) {
+					$sub_field = $field->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field']).
+							"]/following-sibling::div[1]")->one();
+					$this->checkFieldParameters($sub_field_details, $field, $sub_field);
+				}
+			}
+			else {
+				$this->checkFieldParameters($field_details, $widget_form, $field);
+			}
+
+
+		}
+	}
+
+	private function checkFieldParameters($field_details, $widget_form, $field) {
+		$default_value = CTestArrayHelper::get($field_details, 'value', '');
+
+		switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
+				case 'input':
+				case 'checkbox':
+					$element = (array_key_exists('locator', $field_details))
+						? $field->query($field_details['locator'])->one()
+						: $field;
+
+					$this->assertEquals($default_value, $element->getValue());
+
+					if (array_key_exists('attributes', $field_details)) {
+						foreach ($field_details['attributes'] as $attribute => $value) {
+							$this->assertEquals($value, $element->getAttribute($attribute));
+						}
+					}
+
+					if (array_key_exists('symbol_after', $field_details)) {
+						$this->assertEquals($field_details['symbol_after'],$element-> query('xpath:./following-sibling::text()[1]')
+								->one()->getText()
+						);
+					}
+
 					break;
 
 				case 'multiselect':
@@ -1088,12 +1280,35 @@ class testFormTemplateDashboards extends CWebTest {
 					$this->assertEquals($default_value, $field->getValue());
 					$this->assertEquals($field_details['possible_values'], $field->getLabels()->asText());
 					break;
-			}
-		}
-		$this->assertTrue($widget_dialog->getField('Show header')->getValue());
 
-		// Close editing dashboard so that next test case would not fail with "Unexpected alert" error.
-		$this->closeDialogue();
+				case 'checkbox_list':
+					$checkbox_list = $field->asCheckboxList();
+
+					foreach ($field_details['checkboxes'] as $label => $value) {
+						$this->assertEquals($value, $checkbox_list->query("xpath:.//label[text()=".
+								CXPathHelper::escapeQuotes($label)."]/../input")->one()->asCheckbox()->isChecked()
+						);
+					}
+
+					break;
+
+				case 'composite_input':
+					$input = $field->getInput();
+					$this->assertEquals($default_value, $input->getValue());
+
+					if (array_key_exists('attributes', $field_details)) {
+						foreach ($field_details['attributes'] as $attribute => $value) {
+							$this->assertEquals($value, $input->getAttribute($attribute));
+						}
+					}
+
+					$this->assertTrue($field->query('name:date_'.lcfirst($field_details['field']).'_calendar')->one()->isClickable());
+
+					break;
+			}
+
+			$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
+			$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
 	}
 
 	public static function getDashboardPropertiesData() {
