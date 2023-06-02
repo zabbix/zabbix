@@ -19,7 +19,6 @@
 
 #include "zbxprometheus.h"
 
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxeval.h"
 #include "zbxexpr.h"

@@ -21,7 +21,6 @@
 
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
-#include "log.h"
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxnix.h"

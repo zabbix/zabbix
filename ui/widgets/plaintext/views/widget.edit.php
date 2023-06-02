@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(
-		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['ms']['items']['itemids']))
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemids'], $data['captions']['items']['itemids']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,

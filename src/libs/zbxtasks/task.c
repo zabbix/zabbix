@@ -19,7 +19,6 @@
 
 #include "zbxtasks.h"
 
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxjson.h"
 

@@ -496,8 +496,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
-	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN], tmp[MAX_STRING_LEN],
-				exp_delimiter;
+	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
+				tmp[MAX_STRING_LEN] = {0}, exp_delimiter;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;

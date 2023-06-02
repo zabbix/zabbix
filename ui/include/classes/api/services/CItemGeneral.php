@@ -590,53 +590,55 @@ abstract class CItemGeneral extends CApiService {
 				continue;
 			}
 
-			$tpl_items = array_column(array_intersect_key($items, array_flip($indexes)), null, 'hostid');
-			$templateids = array_keys($tpl_items);
-			$template_count = count($templateids) - 1;
+			$hostids = [];
 
-			for ($i = 0; $i < $template_count - 1; $i++) {
-				for ($j = $i + 1; $j < $template_count; $j++) {
-					$same_hosts = array_intersect_key($tpl_links[$templateids[$i]], $tpl_links[$templateids[$j]]);
+			foreach ($indexes as $i) {
+				$templateid = $items[$i]['hostid'];
+				$same_hosts = array_intersect_key($tpl_links[$templateid], $hostids);
 
-					if ($same_hosts) {
-						$same_host = reset($same_hosts);
+				if ($same_hosts) {
+					$same_host = reset($same_hosts);
 
-						$hosts = DB::select('hosts', [
-							'output' => ['hostid', 'host'],
-							'hostids' => [$templateids[$i], $templateids[$j], $same_host['hostid']],
-							'preservekeys' => true
-						]);
+					$templateid_first = $hostids[$same_host['hostid']];
+					$templateid_second = $templateid;
 
-						$target_is_host = in_array($same_host['status'],
-							[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
-						);
+					$hosts = DB::select('hosts', [
+						'output' => ['hostid', 'host'],
+						'hostids' => [$templateid_first, $templateid_second, $same_host['hostid']],
+						'preservekeys' => true
+					]);
 
-						switch ($tpl_items[$templateids[$i]]['flags']) {
-							case ZBX_FLAG_DISCOVERY_NORMAL:
-									$error = $target_is_host
-									? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
+					$target_is_host = in_array($same_host['status'],
+						[HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]
+					);
 
-							case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+					switch ($items[$i]['flags']) {
+						case ZBX_FLAG_DISCOVERY_NORMAL:
 								$error = $target_is_host
-									? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
+								? _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit items with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 
-							case ZBX_FLAG_DISCOVERY_RULE:
-								$error = $target_is_host
-									? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
-									: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
-								break;
-						}
+						case ZBX_FLAG_DISCOVERY_PROTOTYPE:
+							$error = $target_is_host
+								? _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit item prototypes with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
-							$hosts[$templateids[$i]]['host'], $hosts[$templateids[$j]]['host'],
-							$hosts[$same_host['hostid']]['host']
-						));
+						case ZBX_FLAG_DISCOVERY_RULE:
+							$error = $target_is_host
+								? _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on host "%4$s".')
+								: _('Cannot inherit LDD rules with key "%1$s" of both "%2$s" and "%3$s" templates, because the key must be unique on template "%4$s".');
+							break;
 					}
+
+					self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $key,
+						$hosts[$templateid_first]['host'], $hosts[$templateid_second]['host'],
+						$hosts[$same_host['hostid']]['host']
+					));
 				}
+
+				$hostids += array_fill_keys(array_keys($tpl_links[$templateid]), $templateid);
 			}
 		}
 	}
@@ -737,6 +739,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 
 			case ZBX_FLAG_DISCOVERY_RULE:
 				switch ($upd_db_item['flags']) {
@@ -758,6 +761,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit LLD rule with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 
 			case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 				switch ($upd_db_item['flags']) {
@@ -779,6 +783,7 @@ abstract class CItemGeneral extends CApiService {
 							: _('Cannot inherit item prototype with key "%1$s" of template "%2$s" to template "%3$s", because a discovered item with the same key already exists.');
 						break 2;
 				}
+				break;
 		}
 
 		if ($error) {
