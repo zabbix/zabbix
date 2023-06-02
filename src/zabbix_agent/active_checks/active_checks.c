@@ -52,8 +52,6 @@ extern char			*CONFIG_HOST_INTERFACE_ITEM;
 extern int			CONFIG_BUFFER_SEND;
 extern int			CONFIG_BUFFER_SIZE;
 
-#define COMMANDS_BUFFER_SIZE	10
-
 typedef struct
 {
 	char		*host;
@@ -72,13 +70,15 @@ typedef struct
 }
 active_buffer_element_t;
 
-typedef struct
+ZBX_PTR_VECTOR_DECL(command_result_ptr, struct zbx_command_result *)
+typedef struct zbx_command_result
 {
+	zbx_uint64_t	id;
 	char		*value;
 	unsigned char	state;
-	zbx_uint64_t	id;
 }
-active_commands_buffer_element_t;
+zbx_command_result_t;
+ZBX_PTR_VECTOR_IMPL(command_result_ptr, zbx_command_result_t *)
 
 typedef struct
 {
@@ -90,25 +90,18 @@ typedef struct
 }
 active_buffer_t;
 
-typedef struct
-{
-	active_commands_buffer_element_t	*commands;
-	int					count;
-}
-active_commands_buffer_t;
-
 typedef struct _zbx_active_command_t zbx_active_command_t;
 ZBX_PTR_VECTOR_DECL(active_command_ptr, zbx_active_command_t *)
 struct _zbx_active_command_t
 {
-	char			*key;
 	zbx_uint64_t		command_id;
+	char			*key;
 	unsigned char		state;
 };
 ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
 
 static ZBX_THREAD_LOCAL active_buffer_t			buffer;
-static ZBX_THREAD_LOCAL active_commands_buffer_t	commands_buffer;
+static ZBX_THREAD_LOCAL	zbx_vector_command_result_ptr_t	command_results;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t		active_metrics;
 static ZBX_THREAD_LOCAL	zbx_vector_active_command_ptr_t	active_commands;
 static ZBX_THREAD_LOCAL zbx_hashset_t			commands_hash;
@@ -149,15 +142,7 @@ static void	init_active_metrics(void)
 		buffer.first_error = 0;
 	}
 
-	if (NULL == commands_buffer.commands)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "commands buffer: first allocation for %d elements", COMMANDS_BUFFER_SIZE);
-		sz = (size_t)COMMANDS_BUFFER_SIZE * sizeof(active_commands_buffer_element_t);
-		commands_buffer.commands = (active_commands_buffer_element_t *)zbx_malloc(commands_buffer.commands, sz);
-		memset(commands_buffer.commands, 0, sz);
-		buffer.count = 0;
-	}
-
+	zbx_vector_command_result_ptr_create(&command_results);
 	zbx_vector_ptr_create(&active_metrics);
 	zbx_vector_active_command_ptr_create(&active_commands);
 	zbx_hashset_create(&commands_hash, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
@@ -191,28 +176,51 @@ static void	free_active_command(zbx_active_command_t *command)
 	zbx_free(command);
 }
 
-static void	reset_command_hash(void)
+static void	free_command_result(zbx_command_result_t *result)
 {
-	int			i;
-	zbx_hashset_iter_t	iter;
+	zbx_free(result->value);
+	zbx_free(result);
+}
+
+static void	clean_command_hash(void)
+{
 	zbx_cmd_hash_t		*cmd_hash;
+	zbx_hashset_iter_t	iter;
 
 	zbx_hashset_iter_reset(&commands_hash, &iter);
 
 	while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
-		zbx_hashset_iter_remove(&iter);
-
-	for (i = 0; i < active_commands.values_num; i++)
 	{
-		zbx_active_command_t	*command;
+		int			i;
+		zbx_uint64_t		id;
+		zbx_active_command_t	*command, command_loc;
+		zbx_command_result_t	*result, result_loc;
 
-		command = (zbx_active_command_t *)active_commands.values[i];
+		if (cmd_hash->ttl > time(NULL))
+			continue;
 
-		zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
-		free_active_command(command);
-		i--;
+		id = cmd_hash->id;
+		command_loc.command_id = id;
+		result_loc.id = id;
+
+		if (FAIL != (i = zbx_vector_active_command_ptr_search(&active_commands, &command_loc,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			command = (zbx_active_command_t *)active_commands.values[i];
+			zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
+			free_active_command(command);
+		}
+
+		if (FAIL != (i = zbx_vector_command_result_ptr_search(&command_results, &result_loc,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			result = (zbx_command_result_t *)command_results.values[i];
+			zbx_vector_command_result_ptr_remove_noorder(&command_results, i);
+			free_command_result(result);
+		}
+
+		zbx_hashset_iter_remove(&iter);
 	}
-
 }
 
 #ifdef _WINDOWS
@@ -226,7 +234,10 @@ static void	free_active_metrics(void)
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
 
-	zbx_vector_active_command_ptr_clear_ext(&active_commands, (zbx_clean_func_t)free_active_command);
+	zbx_vector_command_result_ptr_clear_ext(&command_results, (zbx_clean_func_t)free_command_result);
+	zbx_vector_command_result_ptr_destroy(&command_results);
+
+	zbx_vector_active_command_ptr_clear_ext(&active_commands, (zbx_clean_func_t)free_command_result);
 	zbx_vector_active_command_ptr_destroy(&active_commands);
 	zbx_hashset_destroy(&commands_hash);
 
@@ -431,6 +442,38 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	return ret;
 }
 
+static void clear_commands(void)
+{
+	int			i;
+
+	for (i = 0; i < active_commands.values_num; i++)
+	{
+		zbx_active_command_t	*command;
+
+		command = (zbx_active_command_t *)active_commands.values[i];
+
+		zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
+		free_active_command(command);
+		i--;
+	}
+}
+
+static void clear_command_results(void)
+{
+	int			i;
+
+	for (i = 0; i < command_results.values_num; i++)
+	{
+		zbx_command_result_t	*result;
+
+		result = (zbx_command_result_t *)command_results.values[i];
+
+		zbx_vector_command_result_ptr_remove_noorder(&command_results, i);
+		free_command_result(result);
+		i--;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
@@ -507,7 +550,19 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	}
 
 	if (*config_revision_local > config_revision)
-		reset_command_hash();
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_cmd_hash_t		*cmd_hash;
+
+		zbx_hashset_iter_reset(&commands_hash, &iter);
+
+		while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
+			zbx_hashset_iter_remove(&iter);
+
+		clear_commands();
+
+		clear_command_results();
+	}
 
 	*config_revision_local = config_revision;
 
@@ -684,36 +739,13 @@ out:
 static int	parse_list_of_commands(char *str)
 {
 	const char		*p;
-	zbx_active_command_t	*command;
 	char			*cmd = NULL, tmp[MAX_STRING_LEN], *key = NULL;
-	int			i, ret = FAIL, commands_num = 0;
+	int			ret = FAIL, commands_num = 0;
 	zbx_uint64_t		command_id;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	size_t			cmd_alloc = 0, key_alloc;
-	zbx_cmd_hash_t		*cmd_hash;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	/* remove executed commands */
-	for (i = 0; i < active_commands.values_num; i++)
-	{
-		command = (zbx_active_command_t *)active_commands.values[i];
-
-		if (NULL == (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_search(&commands_hash, &command->command_id)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-
-			return ret;
-		}
-
-		if (cmd_hash->ttl > time(NULL))
-			continue;
-
-		zbx_hashset_remove_direct(&commands_hash, cmd_hash);
-		zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
-		free_active_command(command);
-		i--;	/* consider the same index on the next run */
-	}
 
 	if (SUCCEED != zbx_json_open(str, &jp))
 	{
@@ -751,7 +783,7 @@ static int	parse_list_of_commands(char *str)
 				continue;
 			}
 
-			if (SUCCEED != (ret = zbx_quote_key_param(&cmd, 0)))
+			if (SUCCEED != zbx_quote_key_param(&cmd, 0))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Invalid command \"%s\"", cmd);
 				continue;
@@ -776,9 +808,9 @@ static int	parse_list_of_commands(char *str)
 
 			commands_num++;
 		}
-
-		ret = SUCCEED;
 	}
+
+	ret = SUCCEED;
 out:
 	zbx_free(key);
 	zbx_free(cmd);
@@ -925,7 +957,6 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 			if (SUCCEED == (ret = zbx_tcp_recv(&s)))
 			{
-				int	ret_checks, ret_cmds;
 				zabbix_log(LOG_LEVEL_DEBUG, "got [%s]", s.buffer);
 
 				if (SUCCEED != last_ret)
@@ -934,13 +965,17 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
 							((zbx_addr_t *)addrs->values[0])->port);
 				}
-				ret_checks = parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local);
-				ret_cmds = parse_list_of_commands(s.buffer);
 
-				if (FAIL == ret_checks && FAIL == ret_cmds)
+				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
+						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
+								zbx_json_strerror());
+				}
+
+				if (SUCCEED != parse_list_of_commands(s.buffer))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s",
 							zbx_json_strerror());
 				}
 			}
@@ -1084,28 +1119,28 @@ ret:
 
 static int format_command_results(struct zbx_json *json)
 {
-	int					i;
-	active_commands_buffer_element_t	*el;
+	int			i;
+	zbx_command_result_t	*result;
 
-	if (0 == commands_buffer.count)
+	if (0 == command_results.values_num)
 		return FAIL;
 
 	zbx_json_addarray(json, ZBX_PROTO_TAG_COMMANDS);
 
-	for (i = 0; i < commands_buffer.count; i++)
+	for (i = 0; i < command_results.values_num; i++)
 	{
-		el = &commands_buffer.commands[i];
+		result = (zbx_command_result_t *)command_results.values[i];
 
-		if (NULL == el->value)
+		if (NULL == result->value)
 			continue;
 
 		zbx_json_addobject(json, NULL);
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, el->id);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, result->id);
 
-		if (ITEM_STATE_NOTSUPPORTED == el->state)
-			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, el->value, ZBX_JSON_TYPE_STRING);
+		if (ITEM_STATE_NOTSUPPORTED == result->state)
+			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value, ZBX_JSON_TYPE_STRING);
 		else
-			zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, result->value, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(json);
 	}
@@ -1158,21 +1193,6 @@ static void clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_pe
 			buffer.first_error = now;
 		}
 	}
-}
-
-static void clear_command_results(void)
-{
-	int					i;
-	active_commands_buffer_element_t	*el;
-
-	for (i = 0; i < commands_buffer.count; i++)
-	{
-		el = &commands_buffer.commands[i];
-
-		zbx_free(el->value);
-	}
-
-	commands_buffer.count = 0;
 }
 
 /******************************************************************************
@@ -1450,51 +1470,22 @@ out:
 	return ret;
 }
 
-static void	process_remote_command_value(zbx_vector_addr_ptr_t *addrs, const char *host, const char *key,
-		const char *value, zbx_uint64_t id, unsigned char state, const zbx_config_tls_t *config_tls,
-		int config_timeout, const char *config_source_ip)
+static void	process_remote_command_value(const char *host, const char *key, const char *value, zbx_uint64_t id,
+		unsigned char state)
 {
-	active_commands_buffer_element_t	*el = NULL;
+	zbx_command_result_t	*result;
 
-	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
-	{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __func__, host, key, ZBX_NULL2STR(value));
 
-		/* log a dummy lastlogsize to keep the same record format for simpler parsing */
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' lastlogsize:null value:'%s'", __func__, host, key,
-				ZBX_NULL2STR(value));
-	}
+	result = (zbx_command_result_t *)zbx_malloc(NULL, sizeof(zbx_command_result_t));
 
-	if (COMMANDS_BUFFER_SIZE > commands_buffer.count)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "commands_buffer: new element %d", commands_buffer.count);
-		el = &commands_buffer.commands[commands_buffer.count];
-		commands_buffer.count++;
-	}
-	else
-	{
-		el = &commands_buffer.commands[0];
-
-		if (NULL != el)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "remove element 0 ");
-
-			zbx_free(el->value);
-		}
-
-		memmove(&commands_buffer.commands[0], &commands_buffer.commands[1], COMMANDS_BUFFER_SIZE - 1);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "commands buffer full: new element %d", commands_buffer.count - 1);
-
-		el = &commands_buffer.commands[COMMANDS_BUFFER_SIZE - 1];
-	}
-
-	memset(el, 0, sizeof(active_commands_buffer_element_t));
+	memset(result, 0, sizeof(zbx_command_result_t));
 	if (NULL != value)
-		el->value = zbx_strdup(NULL, value);
+		result->value = zbx_strdup(NULL, value);
 
-	el->id = id;
-	el->state = state;
-	send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
+	result->id = id;
+	result->state = state;
+	zbx_vector_command_result_ptr_append(&command_results, result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1581,19 +1572,19 @@ out:
 	return ret;
 }
 
-static int	process_command(zbx_vector_addr_ptr_t *addrs, zbx_active_command_t *command,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip, char **error)
+static void	process_command(zbx_active_command_t *command)
 {
 	int		ret;
 	AGENT_RESULT	result;
-	char		**pvalue;
+	char		**pvalue, *error = NULL;
+;
 
 	zbx_init_agent_result(&result);
 
 	if (SUCCEED != (ret = zbx_execute_agent_check(command->key, 0, &result)))
 	{
 		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
-			*error = zbx_strdup(*error, *pvalue);
+			error = zbx_strdup(error, *pvalue);
 		goto out;
 	}
 
@@ -1601,13 +1592,23 @@ static int	process_command(zbx_vector_addr_ptr_t *addrs, zbx_active_command_t *c
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", command->key, *pvalue);
 
-		process_remote_command_value(addrs, CONFIG_HOSTNAME, command->key, *pvalue, command->command_id,
-				command->state, config_tls, config_timeout, config_source_ip);
+		process_remote_command_value(CONFIG_HOSTNAME, command->key, *pvalue, command->command_id,
+				command->state);
 	}
 out:
 	zbx_free_agent_result(&result);
 
-	return ret;
+	if (SUCCEED != ret)
+	{
+		const char	*perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
+
+		command->state = ITEM_STATE_NOTSUPPORTED;
+
+		process_remote_command_value(CONFIG_HOSTNAME, command->key, perror, command->command_id,
+				command->state);
+
+		zbx_free(error);
+	}
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
@@ -1655,35 +1656,17 @@ static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, con
 static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip)
 {
-	char	*error = NULL;
 	int	i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, addrs->values[0]->ip,
 			addrs->values[0]->port);
 
 	for (i = 0; i < active_commands.values_num; i++)
-	{
-		int			ret;
-		zbx_active_command_t	*command = (zbx_active_command_t *)active_commands.values[i];
+		process_command((zbx_active_command_t *)active_commands.values[i]);
 
-		ret = process_command(addrs, command, config_tls, config_timeout, config_source_ip, &error);
+	clear_commands();
 
-		if (SUCCEED != ret)
-		{
-			const char	*perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
-
-			command->state = ITEM_STATE_NOTSUPPORTED;
-
-			process_remote_command_value(addrs, CONFIG_HOSTNAME, command->key, perror, command->command_id,
-					command->state, config_tls, config_timeout, config_source_ip);
-
-			zbx_free(error);
-		}
-
-		zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
-		free_active_command(command);
-		i--;	/* consider the same index on the next run */
-	}
+	send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2027,7 +2010,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 		if (now > (lash_cmd_hash_check + SEC_PER_HOUR))
 		{
-			reset_command_hash();
+			clean_command_hash();
 			lash_cmd_hash_check = now;
 		}
 	}

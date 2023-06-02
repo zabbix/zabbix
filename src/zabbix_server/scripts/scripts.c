@@ -54,7 +54,6 @@ typedef struct
 	zbx_uint64_t		maxid;
 	int			commands_num;
 	zbx_hashset_t		commands;
-
 }
 zbx_remote_commands_t;
 
@@ -198,9 +197,6 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 	if (NULL != (command = (zbx_rc_command_t *)zbx_hashset_search(&remote_commands->commands,
 			&command_loc)))
 	{
-		command->value = NULL;
-		command->error = NULL;
-
 		if (NULL != value && NULL == (command->value = remote_commands_shared_strdup(value)))
 		{
 			command->flag |= REMOTE_COMMAND_RESULT_OOM;
@@ -222,9 +218,9 @@ static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err
 	return ret;
 }
 
-int	zbx_process_command_results(struct zbx_json_parse *jp)
+void	zbx_process_command_results(struct zbx_json_parse *jp)
 {
-	int			ret = FAIL, values_num = 0, parsed_num = 0, results_num = 0;
+	int			values_num = 0, parsed_num = 0, results_num = 0;
 	const char		*pnext = NULL;
 	struct zbx_json_parse	jp_commands, jp_command;
 	char 			*str = NULL, *value = NULL, *error = NULL;
@@ -233,7 +229,7 @@ int	zbx_process_command_results(struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands)))
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands))
 		goto out;
 
 	if (NULL == pnext)
@@ -282,22 +278,19 @@ int	zbx_process_command_results(struct zbx_json_parse *jp)
 			results_num++;
 	}
 	while (NULL != (pnext = zbx_json_next(&jp_command, pnext)));
-
-	ret = SUCCEED;
 out:
 	zbx_free(str);
 	zbx_free(value);
 	zbx_free(error);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret %d parsed %d values received %d results inserted %d", __func__,
-			ret, parsed_num, values_num, results_num);
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), parsed %d values received %d results inserted %d", __func__,
+			parsed_num, values_num, results_num);
 }
 
 void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid)
 {
 	zbx_hashset_iter_t	iter_comands;
 	zbx_rc_command_t	*command;
+	int			has_commands = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -305,7 +298,6 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 	if (0 == remote_commands->commands_num)
 		goto out;
 
-	zbx_json_addarray(json, ZBX_PROTO_TAG_COMMANDS);
 	zbx_hashset_iter_reset(&remote_commands->commands, &iter_comands);
 
 	while (NULL != (command = (zbx_rc_command_t *)zbx_hashset_iter_next(&iter_comands)))
@@ -313,6 +305,12 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 		if (hostid == command->hostid)
 		{
 			int	wait = 0;
+
+			if (0 == has_commands)
+			{
+				zbx_json_addarray(json, ZBX_PROTO_TAG_COMMANDS);
+				has_commands = 1;
+			}
 
 			zbx_json_addobject(json, NULL);
 			zbx_json_addstring(json, ZBX_PROTO_TAG_COMMAND, command->command, ZBX_JSON_TYPE_STRING);
@@ -327,6 +325,9 @@ void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t host
 			remote_commands->commands_num--;
 		}
 	}
+
+	if (0 != has_commands)
+		zbx_json_close(json);
 out:
 	commands_unlock();
 
