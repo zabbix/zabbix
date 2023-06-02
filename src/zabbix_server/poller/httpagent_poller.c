@@ -1,3 +1,4 @@
+#include "log.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxhttp.h"
@@ -95,7 +96,6 @@ static int	async_httpagent_add(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_po
 	httpagent_context->item_context.status_codes = item->status_codes;
 	item->status_codes = NULL;
 
-
 	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
 			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,
 			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
@@ -144,6 +144,8 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	zbx_dc_item_context_t	*item_context;
 	zbx_timespec_t		timespec;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	
 	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
 
 	zbx_timespec(&timespec);
@@ -178,9 +180,13 @@ static void	async_httpagent_done(CURL *easy_handle, CURLcode err)
 	httpagent_context->poller_config->processing--;
 	httpagent_context->poller_config->processed++;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, httpagent_context->item_context.itemid);
+
 	curl_multi_remove_handle(curl_handle, easy_handle);
 	httpagent_context_clean(httpagent_context);
 	zbx_free(httpagent_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	poller_requeue_items(zbx_poller_config_t *poller_config)
@@ -189,10 +195,12 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 
 	if (0 == poller_config->itemids.values_num)
 		return;
-
+	
 	zbx_dc_poller_requeue_items(poller_config->itemids.values, poller_config->lastclocks.values,
 			poller_config->errcodes.values, poller_config->itemids.values_num,
 			ZBX_POLLER_TYPE_HTTPAGENT, &nextcheck);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() requeued:%d", __func__, poller_config->itemids.values_num);
 
 	zbx_vector_uint64_clear(&poller_config->itemids);
 	zbx_vector_int32_clear(&poller_config->lastclocks);
@@ -209,30 +217,37 @@ static void	check_multi_info(void)
 
 	while (NULL != (message = curl_multi_info_read(curl_handle, &pending)))
 	{
-		switch(message->msg)
+		zabbix_log(LOG_LEVEL_DEBUG, "pending cURL messages:%d", pending);
+
+		switch (message->msg)
 		{
 			case CURLMSG_DONE:
 				async_httpagent_done(message->easy_handle, message->data.result);
 				break;
 			default:
-				fprintf(stderr, "CURLMSG default\n");
+				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%d", message->msg);
 				break;
 		}
 	}
 }
 
-static void on_timeout(evutil_socket_t fd, short events, void *arg)
+static void	on_timeout(evutil_socket_t fd, short events, void *arg)
 {
-	int running_handles;
+	int	running_handles;
 
-	printf("on_timeout\n");
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
 	check_multi_info();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 {
-	if(timeout_ms < 0)
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout:%ld", __func__, timeout_ms);
+
+	if(0 > timeout_ms)
 	{
 		evtimer_del(curl_timeout);
 	}
@@ -240,7 +255,7 @@ static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 	{
 		struct timeval tv;
 
-		if(timeout_ms == 0)
+		if(0 == timeout_ms)
 			timeout_ms = 1;	/* 0 means directly call socket_action, but we will do it in a bit */
 
 		tv.tv_sec = timeout_ms / 1000;
@@ -254,19 +269,25 @@ static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 
 static void	curl_perform(int fd, short event, void *arg)
 {
-	int		running_handles;
-	int		flags = 0;
+	int			running_handles;
+	int			flags = 0;
 	zbx_curl_context_t	*context;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if(event & EV_READ)
 		flags |= CURL_CSELECT_IN;
 	if(event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
 
-	context = (zbx_curl_context_t *) arg;
+	context = (zbx_curl_context_t *)arg;
 	curl_multi_socket_action(curl_handle, context->sockfd, flags, &running_handles);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "running_handles:%d", running_handles);
+
 	check_multi_info();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd)
@@ -287,12 +308,14 @@ static void	destroy_curl_context(zbx_curl_context_t *context)
 	free(context);
 }
 
-static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
+static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
 {
 	zbx_curl_context_t	*curl_context;
 	int			events = 0;
-	zabbix_log(LOG_LEVEL_TRACE, "action:%d", action);
-	switch(action)
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() action:%d", __func__, action);
+
+	switch (action)
 	{
 		case CURL_POLL_IN:
 		case CURL_POLL_OUT:
@@ -314,18 +337,20 @@ static int handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 			event_add(curl_context->event, NULL);
 
 		break;
-	case CURL_POLL_REMOVE:
-		if(socketp)
-		{
-			event_del(((zbx_curl_context_t*) socketp)->event);
-			destroy_curl_context((zbx_curl_context_t*) socketp);
-			curl_multi_assign(curl_handle, s, NULL);
-		}
-		break;
-	default:
-		break;
+		case CURL_POLL_REMOVE:
+			if (NULL != socketp)
+			{
+				event_del(((zbx_curl_context_t*) socketp)->event);
+				destroy_curl_context((zbx_curl_context_t*) socketp);
+				curl_multi_assign(curl_handle, s, NULL);
+			}
+			break;
+		default:
+			break;
 
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return 0;
 }
