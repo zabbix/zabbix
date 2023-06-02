@@ -1641,11 +1641,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 		zbx_history_record_vector_create(&values);
 
-		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts) &&
-				0 < values.values_num)
+		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts))
 		{
-			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
-			zbx_vector_dbl_append(results_vector, result);
+			if (0 < values.values_num)
+			{
+				evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+				zbx_vector_dbl_append(results_vector, result);
+			}
+			else if (ZBX_VALUE_FUNC_COUNT == item_func)
+				zbx_vector_dbl_append(results_vector, 0);
 		}
 
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);
