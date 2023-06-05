@@ -884,11 +884,14 @@ form {
 		padding-bottom: 0;
 	}
 
-	.btn-icon {
+	.btn-icon,
+	.icon {
 		&:not(:first-child) {
 			margin-left: 5px;
 		}
+	}
 
+	.btn-icon {
 		&.btn-small {
 			top: 1px;
 			vertical-align: text-bottom;

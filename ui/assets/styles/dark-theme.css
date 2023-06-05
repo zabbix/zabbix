@@ -4790,7 +4790,8 @@ form.is-loading {
   .table-forms .dynamic-row-control > td {
     padding-top: 0;
     padding-bottom: 0; }
-  .table-forms .btn-icon:not(:first-child) {
+  .table-forms .btn-icon:not(:first-child),
+  .table-forms .icon:not(:first-child) {
     margin-left: 5px; }
   .table-forms .btn-icon.btn-small {
     top: 1px;
