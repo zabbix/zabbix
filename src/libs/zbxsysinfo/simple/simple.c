@@ -19,6 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+#include "simple.h"
 
 #include "../common/net.h"
 #include "ntp.h"
@@ -511,5 +512,5 @@ static zbx_metric	parameters_simple[] =
 
 zbx_metric	*get_parameters_simple(void)
 {
-	return &parameters_simple;
+	return &parameters_simple[0];
 }

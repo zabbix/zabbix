@@ -47,9 +47,8 @@ static zbx_metric	parameters_agent[] =
 
 zbx_metric	*get_parameters_agent(void)
 {
-	return parameters_agent;
+	return &parameters_agent[0];
 }
-
 
 static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

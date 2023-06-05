@@ -32,5 +32,5 @@ static zbx_metric	parameters_common_http[] =
 
 zbx_metric	*get_parameters_common_http(void)
 {
-	return &parameters_common_http;
+	return &parameters_common_http[0];
 }

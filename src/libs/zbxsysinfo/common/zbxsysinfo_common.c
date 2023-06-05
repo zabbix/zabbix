@@ -53,7 +53,7 @@ static zbx_metric	parameters_common_local[] =
 
 zbx_metric	*get_parameters_common_local(void)
 {
-	return &parameters_common_local;
+	return &parameters_common_local[0];
 }
 
 static zbx_metric	parameters_common[] =
@@ -99,7 +99,7 @@ static zbx_metric	parameters_common[] =
 
 zbx_metric	*get_parameters_common(void)
 {
-	return &parameters_common;
+	return &parameters_common[0];
 }
 
 static const char	*user_parameter_dir = NULL;
