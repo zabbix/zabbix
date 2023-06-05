@@ -25,7 +25,9 @@ class CHtmlUrlValidator {
 	 * URL is validated if schema validation is enabled by CSettingsHelper::VALIDATE_URI_SCHEMES parameter.
 	 *
 	 * Relative URL should start with .php file name.
-	 * Absolute URL schema must match the URI schemes comma separated list stored in the DB.
+	 * Absolute URL schema must match schemes mentioned in ZBX_URL_VALID_SCHEMES comma separated list.
+	 *
+	 * @static
 	 *
 	 * @param string $url                              URL string to validate.
 	 * @param array  $options
@@ -43,7 +45,7 @@ class CHtmlUrlValidator {
 	 *
 	 * @return bool
 	 */
-	public static function validate(string $url, array $options = []): bool {
+	public static function validate($url, array $options = []) {
 		$options += [
 			'allow_user_macro' => true,
 			'allow_event_tags_macro' => false,
@@ -92,7 +94,7 @@ class CHtmlUrlValidator {
 			}
 		}
 
-		$url_parts = parse_url(preg_replace('/[\r\n\t]/', '', $url));
+		$url_parts = parse_url($url);
 		if (!$url_parts) {
 			return false;
 		}
@@ -107,11 +109,13 @@ class CHtmlUrlValidator {
 			if (array_key_exists('host', $url_parts)) {
 				return true;
 			}
-
-			return array_key_exists('path', $url_parts) && $url_parts['path'] !== '/';
+			else {
+				return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '/');
+			}
 		}
-
-		return array_key_exists('path', $url_parts) && $url_parts['path'] !== '';
+		else {
+			return (array_key_exists('path', $url_parts) && $url_parts['path'] !== '');
+		}
 	}
 
 	/**
@@ -123,8 +127,8 @@ class CHtmlUrlValidator {
 	 */
 	public static function validateSameSite(string $url): bool {
 		$root_path = __DIR__.'/../../../';
-		preg_match('/^\/?(?<filename>[a-z0-9_.]+\.php)(\?.*)?$/i', $url, $url_parts);
+		preg_match('/^\/?(?<filename>[a-z0-9\_\.]+\.php)(\?.*)?$/i', $url, $url_parts);
 
-		return array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']);
+		return (array_key_exists('filename', $url_parts) && file_exists($root_path.$url_parts['filename']));
 	}
 }

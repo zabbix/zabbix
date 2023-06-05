@@ -94,11 +94,6 @@ class CDashboardPage extends CBaseComponent {
 
 		this._widgets = new Map();
 
-		this._original_properties = {
-			name: this._data.name,
-			display_period: this._data.display_period
-		};
-
 		this._grid_min_rows = 0;
 		this._grid_pad_rows = 2;
 
@@ -272,17 +267,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	isUnsaved() {
-		if (this._is_unsaved) {
-			return true;
-		}
-
-		for (const [name, value] of Object.entries(this._original_properties)) {
-			if (value != this._data[name]) {
-				return true;
-			}
-		}
-
-		return false;
+		return this._is_unsaved;
 	}
 
 	// Data interface methods.
@@ -408,8 +393,6 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	replaceWidget(widget, widget_data) {
-		this._is_unsaved = true;
-
 		this.deleteWidget(widget, {is_batch_mode: true});
 
 		return this.addWidget(widget_data);

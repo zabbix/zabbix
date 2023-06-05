@@ -598,9 +598,6 @@ class testFormTemplateDashboards extends CWebTest {
 		$form->submit();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
-
-		// Close the opened alert so that the next running scenario would not fail.
-		$this->page->acceptAlert();
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
