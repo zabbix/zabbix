@@ -95,7 +95,7 @@ class testPageSearch extends CWebTest {
 		CDataHelper::createHosts([
 			[
 				'host' => 'emoji visible name',
-				'name' => '🙂⭐️',
+				'name' => '🙂🙃',
 				'groups' => [
 					'groupid' => '6'
 				],
@@ -259,14 +259,14 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => '⭐️',
-					'hosts' => [['Host' => '🙂⭐️']]
+					'search_string' => '🙃',
+					'hosts' => [['Host' => '🙂🙃']]
 				]
 			],
 			[
 				[
 					'search_string' => 'emoji visible name',
-					'hosts' => [['Host' => "🙂⭐️\n(emoji visible name)"]]
+					'hosts' => [['Host' => "🙂🙃\n(emoji visible name)"]]
 				]
 			],
 			[
@@ -296,7 +296,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '99.99.99.99',
-					'hosts' => [['Host' => '🙂⭐️', 'IP' => '99.99.99.99', 'DNS' => '']]
+					'hosts' => [['Host' => '🙂🙃', 'IP' => '99.99.99.99', 'DNS' => '']]
 
 				]
 			],
@@ -337,7 +337,7 @@ class testPageSearch extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
-		$form->query('id:search')->one()->fill($data['search_string']);
+		$form->fill(['id:search' => $data['search_string']]);
 		$form->submit();
 
 		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
@@ -403,8 +403,8 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				[
-					'search_string' => '⭐️',
-					'expected_suggestions' => ['🙂⭐️']
+					'search_string' => '🙃',
+					'expected_suggestions' => ['🙂🙃']
 				]
 			],
 			[
@@ -436,7 +436,7 @@ class testPageSearch extends CWebTest {
 	public function testPageSearch_VerifySearchSuggestions($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
-		$form->query('id:search')->one()->fill($data['search_string']);
+		$form->fill(['id:search' => $data['search_string']]);
 
 		$item_selector = 'xpath://ul[@class="search-suggest"]//li';
 

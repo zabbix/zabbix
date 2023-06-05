@@ -437,7 +437,8 @@ class CFormElement extends CElement {
 	 */
 	protected function setUTFValue($element, $value) {
 		if (!is_array($value) && preg_match('/[\x{10000}-\x{10FFFF}]/u', $value) === 1) {
-			CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($value).';', [$element]);
+			$script = 'arguments[0].value = '.json_encode($value).'; arguments[0].dispatchEvent(new Event("keyup"));';
+			CElementQuery::getDriver()->executeScript($script, [$element]);
 		}
 		else {
 			$element->fill($value);
