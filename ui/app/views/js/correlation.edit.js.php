@@ -35,16 +35,16 @@ window.correlation_edit_popup = new class {
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
-				const params = {
-					row_index: this.form.querySelectorAll('#condition_table .label').length
-				};
-				const overlay = PopUp('correlation.condition.edit', params, {
+				const overlay = PopUp('correlation.condition.edit', {}, {
 					dialogueid: 'correlationConditionForm',
 					dialogue_class: 'modal-popup-medium'
 				});
 
 				// Get values from condition popup.
 				overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
+					// Always recount from first row.
+					e.detail.row_index = 0;
+
 					this.#addConditionRow(e.detail);
 				});
 			}
@@ -110,7 +110,7 @@ window.correlation_edit_popup = new class {
 	#addConditionRow(condition) {
 		const row_ids = [];
 
-		this.form.querySelectorAll('#condition_table tr').forEach((row) => row_ids.push(row.id));
+		this.form.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
 
 		if (condition.groupids) {
 			Object.keys(condition.groupids).map(key => {
@@ -190,7 +190,7 @@ window.correlation_edit_popup = new class {
 				condition.data = this.#getConditionData(condition)[1];
 				condition.conditiontype = condition.type;
 
-				document
+				this.form
 					.querySelector('#condition_table tbody')
 					.insertAdjacentHTML('beforeend', template.evaluate(condition));
 
@@ -271,48 +271,39 @@ window.correlation_edit_popup = new class {
 	#checkConditionRow(condition) {
 		const result = [];
 
-		[...document.getElementById('condition_table').getElementsByTagName('tr')].map(element => {
+		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].map(element => {
 			const table_row = element.getElementsByTagName('td')[2];
+			const type = table_row.getElementsByTagName('input')[0].value;
+			let value;
+			let value2;
 
-			if (table_row !== undefined) {
-				const type = table_row.getElementsByTagName('input')[0].value;
-				let value;
-				let value2;
+			switch (parseInt(type)) {
+				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
+				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
+					value = table_row.getElementsByTagName('input')[2].value;
+					result.push(condition.type === type && condition.tag === value);
+					break;
 
-				switch (parseInt(type)) {
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-						value = table_row.getElementsByTagName('input')[2].value;
-						result.push(condition.type === type && condition.tag === value);
-						break;
+				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
+				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
+					value = table_row.getElementsByTagName('input')[2].value;
+					value2 = table_row.getElementsByTagName('input')[3].value;
+					result.push(condition.type === type && condition.tag === value && condition.value === value2);
+					break;
 
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
-					case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-						value = table_row.getElementsByTagName('input')[2].value;
-						value2 = table_row.getElementsByTagName('input')[3].value;
-						result.push(condition.type === type && condition.tag === value && condition.value === value2);
-						break;
+				case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
+					value = table_row.getElementsByTagName('input')[2].value;
+					value2 = table_row.getElementsByTagName('input')[3].value;
+					result.push(condition.type === type && condition.oldtag === value
+						&& condition.newtag === value2
+					);
+					break;
 
-					case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-						value = table_row.getElementsByTagName('input')[2].value;
-						value2 = table_row.getElementsByTagName('input')[3].value;
-						result.push(condition.type === type && condition.oldtag === value
-							&& condition.newtag === value2
-						);
-						break;
-
-					case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-						value = table_row.getElementsByTagName('input')[2].value;
-						result.push(condition.type === type && condition.groupid === value);
-						break;
-				}
-
-				if (condition.row_index == element.dataset.row_index) {
-					condition.row_index++;
-				}
+				case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
+					value = table_row.getElementsByTagName('input')[2].value;
+					result.push(condition.type === type && condition.groupid === value);
+					break;
 			}
-
-			result.push(false);
 		});
 
 		return result;

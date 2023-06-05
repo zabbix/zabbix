@@ -40,8 +40,7 @@ class CControllerCorrelationConditionCheck extends CController {
 			'oldtag' =>		'db corr_condition_tagpair.oldtag|string',
 			'newtag' =>		'db corr_condition_tagpair.newtag|string',
 			'value' =>		'db corr_condition_tagvalue.value|string',
-			'groupids' =>	'array_id',
-			'row_index' =>	'int32'
+			'groupids' =>	'array_id'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -92,7 +91,6 @@ class CControllerCorrelationConditionCheck extends CController {
 			'value' => $this->getInput('value', ''),
 			'groupids' => $this->hasInput('groupids') ? $this->getGroups($this->getInput('groupids')) : '',
 			'operator_name' => CCorrelationHelper::getLabelByOperator($this->getInput('operator')),
-			'row_index' => $this->getInput('row_index', 0),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]

@@ -30,7 +30,6 @@ $form = (new CForm())
 	->setId('correlationConditionForm')
 	->setName('conditions')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('row_index', $data['row_index'])
 	->addVar('type', $data['type'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
