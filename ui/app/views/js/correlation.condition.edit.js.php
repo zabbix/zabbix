@@ -33,6 +33,14 @@ window.correlation_condition_popup = new class {
 
 		this.form.querySelector('#condition-type')
 			.onchange = () => reloadPopup(this.form, 'correlation.condition.edit');
+
+		const $event_ms = $('#groupids_');
+
+		$event_ms.on('change', () => {
+			$event_ms.multiSelect('setDisabledEntries',
+				[...this.form.querySelectorAll('[name^="groupids[]"]')].map((input) => input.value)
+			);
+		});
 	}
 
 	submit() {
