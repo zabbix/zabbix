@@ -61,7 +61,7 @@ $form
 				getTimeFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-time')
 			)
 			->addFieldsGroup(
-				getTimeZoneFieldsGroupViews($form, $data['fields'])->addRowClass('fields-group-tzone')
+				getTimeZoneFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-tzone')
 			)
 			->addClass('js-fieldset-adv-conf')
 	)
