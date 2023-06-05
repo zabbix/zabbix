@@ -1568,7 +1568,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
 	{
 		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
+		goto clean;
 	}
 
 	if (COUNT_UNIQUE == unique)
@@ -1607,7 +1607,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 		if (FAIL == zbx_execute_count_with_pattern(pattern, item->value_type, &pdata, &values, limit, &count,
 				error))
 		{
-			goto out;
+			goto clean;
 		}
 	}
 	else
@@ -1619,9 +1619,9 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	zbx_variant_set_dbl(value, count);
 
 	ret = SUCCEED;
-out:
+clean:
 	zbx_clear_count_pattern(&pdata);
-
+out:
 	zbx_free(operator);
 	zbx_free(pattern);
 
