@@ -97,7 +97,7 @@ void	zbx_async_poller_add_task(zbx_async_poller_t *poller, int fd, void *data, i
 	task->rx_event = event_new(poller->ev, fd, EV_READ, async_event, (void *)task);
 	task->tx_event = event_new(poller->ev, fd, EV_WRITE, async_event, (void *)task);
 
-	// call initialization event
+	/* call initialization event */
 	async_event(fd, 0, task);
 }
 
@@ -127,7 +127,7 @@ int	chat_task_process(short event, void *data)
 
 	if (0 == event)
 	{
-		// initialization
+		/* initialization */
 		struct sockaddr_un	addr;
 
 		memset(&addr, 0, sizeof(addr));
