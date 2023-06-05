@@ -33,19 +33,13 @@ import (
 	"zabbix.com/pkg/version"
 )
 
-const (
-	MaxCmdBufferSize = 10
-)
-
 type MemoryCache struct {
 	*cacheData
-	results          []*AgentData
-	cresults         []*AgentCommands
-	maxBufferSize    int32
-	maxCmdBufferSize int32
-	totalValueNum    int32
-	totalCmdValueNum int32
-	persistValueNum  int32
+	results         []*AgentData
+	cresults        []*AgentCommands
+	maxBufferSize   int32
+	totalValueNum   int32
+	persistValueNum int32
 }
 
 func (c *MemoryCache) upload(u Uploader) (err error) {
@@ -113,7 +107,6 @@ func (c *MemoryCache) upload(u Uploader) (err error) {
 
 	c.totalValueNum = 0
 	c.persistValueNum = 0
-	c.totalCmdValueNum = 0
 
 	return
 }
@@ -146,15 +139,7 @@ func (c *MemoryCache) addResult(result *AgentData) {
 }
 
 func (c *MemoryCache) addCommandResult(result *AgentCommands) {
-	full := c.totalCmdValueNum >= c.maxCmdBufferSize
 	c.cresults = append(c.cresults, result)
-	c.totalCmdValueNum++
-
-	if c.totalCmdValueNum >= c.maxCmdBufferSize {
-		if !full && c.uploader != nil {
-			c.flushOutput(c.uploader)
-		}
-	}
 }
 
 // insertResult attempts to insert the received result into results slice by replacing existing value.
@@ -190,11 +175,6 @@ func (c *MemoryCache) insertResult(result *AgentData) {
 
 	copy(c.results[index:], c.results[index+1:])
 	c.results[len(c.results)-1] = result
-}
-
-func (c *MemoryCache) insertCommandResult(result *AgentCommands) {
-	copy(c.cresults[0:], c.cresults[1:])
-	c.cresults[len(c.cresults)-1] = result
 }
 
 func (c *MemoryCache) write(r *plugin.Result) {
@@ -261,11 +241,7 @@ func (c *MemoryCache) writeCommand(cr *CommandResult) {
 		Value: value,
 		Error: err}
 
-	if c.totalCmdValueNum >= c.maxCmdBufferSize {
-		c.insertCommandResult(cmd)
-	} else {
-		c.addCommandResult(cmd)
-	}
+	c.addCommandResult(cmd)
 }
 
 func (c *MemoryCache) run() {
@@ -294,7 +270,6 @@ func (c *MemoryCache) run() {
 
 func (c *MemoryCache) updateOptions(options *agent.AgentOptions) {
 	c.maxBufferSize = int32(options.BufferSize)
-	c.maxCmdBufferSize = MaxCmdBufferSize
 	c.timeout = options.Timeout
 }
 
