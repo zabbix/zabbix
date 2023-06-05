@@ -224,6 +224,9 @@ $(OUTPUTDIR)\sysinfo_vfs_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\vfs_file.c
 $(OUTPUTDIR)\sysinfo_dir.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dir.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\sysinfo_common.o: $(TOPDIR)\src\libs\zbxsysinfo\common\zbxsysinfo_common.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 

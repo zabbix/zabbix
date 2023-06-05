@@ -51,7 +51,7 @@
 #endif
 
 #ifdef WITH_SPECIFIC_METRICS
-//#	include "specsysinfo.h"
+#	include "specsysinfo.h"
 #endif
 
 typedef struct

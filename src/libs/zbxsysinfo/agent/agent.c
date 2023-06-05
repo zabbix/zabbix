@@ -18,6 +18,7 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "agent.h"
 
 #include "modbtype.h"
 
