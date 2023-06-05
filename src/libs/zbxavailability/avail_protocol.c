@@ -19,7 +19,7 @@
 
 #include "zbxserialize.h"
 #include "zbxavailability.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 
 void	zbx_availability_serialize_interface(unsigned char **data, size_t *data_alloc, size_t *data_offset,

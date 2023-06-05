@@ -21,7 +21,7 @@
 
 #include <signal.h>
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxexec.h"
 #include "zbxstr.h"

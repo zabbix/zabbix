@@ -20,7 +20,7 @@
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"

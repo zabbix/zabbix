@@ -21,7 +21,7 @@
 
 #include "zbxcommon.h"
 #include "zbxjson.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxtime.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)

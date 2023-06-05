@@ -23,7 +23,7 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "pid.h"
 #include "zbx_rtc_constants.h"
 

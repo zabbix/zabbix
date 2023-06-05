@@ -22,7 +22,7 @@
 #include "trigger_dep_linking.h"
 
 #include "zbxeval.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"

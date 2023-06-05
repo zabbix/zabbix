@@ -25,7 +25,7 @@
 
 #include "zbxstr.h"
 #include "zbxregexp.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

@@ -23,7 +23,7 @@
 
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxregexp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"

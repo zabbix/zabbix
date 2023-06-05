@@ -19,7 +19,7 @@
 
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
-#include "log.h"
+#include "zbxlog.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01

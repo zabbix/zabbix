@@ -20,7 +20,7 @@
 #include "telnet_run.h"
 
 #include "zbxcomms.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnum.h"
 
 /*

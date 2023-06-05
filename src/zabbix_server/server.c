@@ -28,7 +28,7 @@
 
 #include "cfg.h"
 #include "zbxdbupgrade.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 #include "zbxmodules.h"

@@ -24,7 +24,7 @@
 #include "../logfiles/persistent_state.h"
 
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"

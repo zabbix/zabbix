@@ -19,7 +19,7 @@
 
 #include "zbxconf.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxstr.h"
 #include "zbxparam.h"
