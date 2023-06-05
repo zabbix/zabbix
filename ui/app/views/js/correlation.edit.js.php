@@ -42,9 +42,6 @@ window.correlation_edit_popup = new class {
 
 				// Get values from condition popup.
 				overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-					// Always recount from first row.
-					e.detail.row_index = 0;
-
 					this.#addConditionRow(e.detail);
 				});
 			}
@@ -111,6 +108,8 @@ window.correlation_edit_popup = new class {
 		const row_ids = [];
 
 		this.form.querySelectorAll('#condition_table tr[id^=conditions_]').forEach((row) => row_ids.push(row.id));
+
+		condition.row_index ??= 0;
 
 		if (condition.groupids) {
 			Object.keys(condition.groupids).map(key => {
