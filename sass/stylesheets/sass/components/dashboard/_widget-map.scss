@@ -66,8 +66,9 @@ div.dashboard-widget-map {
 	}
 }
 
-[theme=hc-dark],
-[theme=hc-light] {
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-map {
 		.btn-back-map-container {
 			a {

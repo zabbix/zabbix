@@ -3697,19 +3697,6 @@ div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown {
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
   background: transparent; }
 
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child),
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
-  border-left: 1px solid #dfe4e7; }
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-total,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
-  background: transparent; }
-
 .dashboard-widget-inaccessible {
   display: grid;
   align-items: center;
@@ -3840,10 +3827,6 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 .dashboard-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
-[theme=hc-dark] div.dashboard-widget-item a:link,
-[theme=hc-light] div.dashboard-widget-item a:link {
-  border-bottom: none; }
-
 div.dashboard-widget-map .sysmap-widget-container {
   overflow: hidden;
   height: 100%;
@@ -3886,10 +3869,6 @@ div.dashboard-widget-map .btn-back-map-container {
       width: 28px;
       height: 24px;
       vertical-align: middle; }
-
-[theme=hc-dark] div.dashboard-widget-map .btn-back-map-container a,
-[theme=hc-light] div.dashboard-widget-map .btn-back-map-container a {
-  border-bottom: 0; }
 
 @keyframes fadein {
   from {
@@ -4063,20 +4042,6 @@ div.dashboard-widget-navtree .treeview {
     border-left-color: #0275b8; }
   div.dashboard-widget-navtree .treeview:hover .arrow-down, div.dashboard-widget-navtree .treeview:focus .arrow-down {
     border-top-color: #0275b8; }
-
-[theme=hc-dark] div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row,
-[theme=hc-light] div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
-  min-width: 410px; }
-
-[theme=hc-dark] div.dashboard-widget-problemsbysv .by-severity-widget > div,
-[theme=hc-light] div.dashboard-widget-problemsbysv .by-severity-widget > div {
-  min-width: 65px;
-  padding-left: 42px; }
-  [theme=hc-dark] div.dashboard-widget-problemsbysv .by-severity-widget > div::before,
-  [theme=hc-light] div.dashboard-widget-problemsbysv .by-severity-widget > div::before {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; }
 
 div.dashboard-widget-slareport .date-vertical {
   writing-mode: vertical-lr;

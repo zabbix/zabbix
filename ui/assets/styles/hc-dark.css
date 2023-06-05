@@ -3654,17 +3654,12 @@ div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown {
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
   background: transparent; }
 
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child),
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
+div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px solid #444444; }
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-[theme=hc-dark] div.dashboard-widget-hostavail .host-avail-widget .host-avail-total,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
-[theme=hc-light] div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
+div.dashboard-widget-hostavail .host-avail-widget .host-avail-true,
+div.dashboard-widget-hostavail .host-avail-widget .host-avail-false,
+div.dashboard-widget-hostavail .host-avail-widget .host-avail-unknown,
+div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
   background: transparent; }
 
 .dashboard-widget-inaccessible {
@@ -3797,8 +3792,7 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 .dashboard-widget-item .svg-arrow-up-down {
   fill: #3DC51D; }
 
-[theme=hc-dark] div.dashboard-widget-item a:link,
-[theme=hc-light] div.dashboard-widget-item a:link {
+div.dashboard-widget-item a:link {
   border-bottom: none; }
 
 div.dashboard-widget-map .sysmap-widget-container {
@@ -3844,8 +3838,7 @@ div.dashboard-widget-map .btn-back-map-container {
       height: 24px;
       vertical-align: middle; }
 
-[theme=hc-dark] div.dashboard-widget-map .btn-back-map-container a,
-[theme=hc-light] div.dashboard-widget-map .btn-back-map-container a {
+div.dashboard-widget-map .btn-back-map-container a {
   border-bottom: 0; }
 
 @keyframes fadein {
@@ -4021,16 +4014,13 @@ div.dashboard-widget-navtree .treeview {
   div.dashboard-widget-navtree .treeview:hover .arrow-down, div.dashboard-widget-navtree .treeview:focus .arrow-down {
     border-top-color: #f8f8f8; }
 
-[theme=hc-dark] div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row,
-[theme=hc-light] div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
+div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   min-width: 410px; }
 
-[theme=hc-dark] div.dashboard-widget-problemsbysv .by-severity-widget > div,
-[theme=hc-light] div.dashboard-widget-problemsbysv .by-severity-widget > div {
+div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;
   padding-left: 42px; }
-  [theme=hc-dark] div.dashboard-widget-problemsbysv .by-severity-widget > div::before,
-  [theme=hc-light] div.dashboard-widget-problemsbysv .by-severity-widget > div::before {
+  div.dashboard-widget-problemsbysv .by-severity-widget > div::before {
     display: flex;
     flex-direction: column;
     justify-content: center; }

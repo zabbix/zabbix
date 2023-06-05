@@ -1,7 +1,6 @@
-// Widget view.
+// Modifications by themes.
 
-[theme=hc-dark],
-[theme=hc-light] {
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-problemsbysv {
 		.by-severity-widget {
 			> div {

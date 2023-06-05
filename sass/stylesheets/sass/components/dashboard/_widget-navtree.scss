@@ -221,8 +221,9 @@ div.dashboard-widget-navtree {
 	}
 }
 
-[theme=hc-dark],
-[theme=hc-light] {
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
 	div.dashboard-widget-navtree {
 		.navtree {
 			.tree {
