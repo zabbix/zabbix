@@ -32,21 +32,28 @@ class CSVGGauge {
 
 	static MINMAX_DEFAULT_SIZE = 5;
 
-	constructor(container, options) {
+	constructor(container, padding, options) {
 		this.options = options;
+		this.padding = padding;
 
 		this.svg = document.createElementNS(this.constructor.SVGNS, 'svg');
 		this.svg.classList.add('svg-gauge');
 
 		container.appendChild(this.svg);
 
+		this.g = document.createElementNS(this.constructor.SVGNS, 'g');
+
+		this.svg.appendChild(this.g);
+
+		this.g.setAttribute('transform', `translate(${padding.left} ${padding.top})`);
+
 		// Contains all the elements - description, value, min/max, thresholds ...
 		this.elements = {};
 
-		this.widgetContents = this.svg.closest('.dashboard-widget-gauge');
-
 		// Set background color of widget
-		this.widgetContents.style.backgroundColor = this.options.bg_color ? '#' + this.options.bg_color : '';
+		if (this.options.bg_color !== '') {
+			this.svg.style.backgroundColor = `#${this.options.bg_color}`;
+		}
 
 		this.isValueSet = false;
 
@@ -69,17 +76,17 @@ class CSVGGauge {
 	}
 
 	setSize({width, height}) {
-		this.width = width;
-		this.height = height;
+		this.svg.setAttribute('width', width);
+		this.svg.setAttribute('height', height);
+
+		this.width = width - this.padding.left - this.padding.right;
+		this.height = height - this.padding.top - this.padding.bottom;
 
 		// Starting point - center coordinates of arc
 		this.x = this.width / 2;
 		this.y = this.height / 2;
 
-		this.svg.setAttribute('width', this.width);
-		this.svg.setAttribute('height', this.height);
-
-		this.widgetContents.style.fontSize = this.height * this.constructor.FONT_SIZE_RATIO + 'px';
+		this.svg.style.fontSize = `${(this.height * this.constructor.FONT_SIZE_RATIO).toFixed(2)}px`;
 
 		this.minMaxSize = this.options.minmax.size || this.constructor.MINMAX_DEFAULT_SIZE;
 
@@ -175,11 +182,11 @@ class CSVGGauge {
 			container.style.fontSize = this.options.description.size / linesTexts.length + '%';
 			container.style.fontWeight = this.options.description.is_bold ? 'bold' : 'normal';
 			container.style.fill = this.options.description.color ? '#' + this.options.description.color : '';
-			this.svg.appendChild(container);
+			this.g.appendChild(container);
 
 			for (let i = 0; i < linesTexts.length; i++) {
 				let line = document.createElementNS(this.constructor.SVGNS, 'tspan');
-				line.setAttribute('x', '50%');
+				line.setAttribute('x', this.x);
 				container.appendChild(line);
 
 				// Simulate new line
@@ -340,7 +347,7 @@ class CSVGGauge {
 		if (!container) {
 			container = document.createElementNS(this.constructor.SVGNS, 'g');
 			container.classList.add('svg-gauge-threshold-arc-container');
-			this.svg.appendChild(container);
+			this.g.appendChild(container);
 
 			this.elements.threshold_arc_container = {
 				node: container
@@ -399,7 +406,7 @@ class CSVGGauge {
 		if (!container) {
 			container = document.createElementNS(this.constructor.SVGNS, 'g');
 			container.classList.add('svg-gauge-thresholds-labels');
-			this.svg.appendChild(container);
+			this.g.appendChild(container);
 
 			this.elements.thresholds_labels = {
 				node: container,
@@ -481,7 +488,7 @@ class CSVGGauge {
 		if (!container) {
 			container = document.createElementNS(this.constructor.SVGNS, 'g');
 			container.classList.add('svg-gauge-value-arc-container');
-			this.svg.appendChild(container);
+			this.g.appendChild(container);
 
 			this.elements.value_arc_container = {
 				node: container
@@ -541,8 +548,8 @@ class CSVGGauge {
 		if (!container) {
 			container = document.createElementNS(this.constructor.SVGNS, 'text');
 			container.classList.add('svg-gauge-value-container');
-			container.setAttribute('x', '50%');
-			this.svg.appendChild(container);
+			container.setAttribute('x', this.x);
+			this.g.appendChild(container);
 
 			if (this.options.units.show) {
 				const value = document.createElementNS(this.constructor.SVGNS, 'tspan');
@@ -566,15 +573,15 @@ class CSVGGauge {
 					container.appendChild(units);
 				}
 				else if (this.options.units.position === this.constructor.UNITS_POSITION_ABOVE) {
-					value.setAttribute('x', '50%');
-					units.setAttribute('x', '50%');
+					value.setAttribute('x', this.x);
+					units.setAttribute('x', this.x);
 
 					container.appendChild(units);
 					container.appendChild(value);
 				}
 				else if (this.options.units.position === this.constructor.UNITS_POSITION_BELOW) {
-					value.setAttribute('x', '50%');
-					units.setAttribute('x', '50%');
+					value.setAttribute('x', this.x);
+					units.setAttribute('x', this.x);
 
 					container.appendChild(value);
 					container.appendChild(units);
@@ -617,7 +624,7 @@ class CSVGGauge {
 					container.classList.add(`svg-gauge-${key}`);
 					container.style.fontSize = this.minMaxSize + '%';
 					container.style.textAlign = key === 'min' ? 'right' : 'left';
-					this.svg.appendChild(container);
+					this.g.appendChild(container);
 				}
 
 				const bbox = container.getBBox();
@@ -649,7 +656,7 @@ class CSVGGauge {
 			else {
 				path = document.createElementNS(this.constructor.SVGNS, 'path');
 				path.classList.add('svg-gauge-needle');
-				this.svg.appendChild(path);
+				this.g.appendChild(path);
 
 				const pathDefinition = this.#defineNeedle();
 				path.setAttribute('d', pathDefinition);
@@ -951,7 +958,7 @@ class CSVGGauge {
 			// Move value element to the bottom of svg tree, so it can be shown on top of arc
 			const clone = container;
 			container.remove();
-			this.svg.appendChild(clone);
+			this.g.appendChild(clone);
 		}
 	}
 

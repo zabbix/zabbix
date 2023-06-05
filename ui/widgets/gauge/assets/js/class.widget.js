@@ -20,19 +20,16 @@
 
 class CWidgetGauge extends CWidget {
 
-	onInitialize() {
-		this.gauge_container = null;
-		this.gauge = null;
-	}
+	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V = 8;
+	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H = 10;
 
-	onStart() {
-		this.gauge_container = document.createElement('div');
-		this._body.appendChild(this.gauge_container);
+	onInitialize() {
+		this.gauge = null;
 	}
 
 	onResize() {
 		if (this._state === WIDGET_STATE_ACTIVE && this.gauge !== null) {
-			this.gauge.setSize(this.#getGaugeContainerSize());
+			this.gauge.setSize(super._getContentsSize());
 		}
 	}
 
@@ -53,23 +50,35 @@ class CWidgetGauge extends CWidget {
 	}
 
 	setContents(response) {
-		if (this.gauge === null) {
-			if (!('config' in response)) {
-				this._has_contents = false;
-				throw new Error('Unexpected server error.');
-			}
-
-			this.gauge = new CSVGGauge(this.gauge_container, response.config);
-			this.gauge.setSize(this.#getGaugeContainerSize());
-
-			this._has_contents = true;
-		}
-
-		this.gauge.setValue({
+		const value_data = {
 			value: response.value,
 			value_text: response.value_text,
 			units_text: response.units_text
-		});
+		};
+
+		if (this.gauge !== null) {
+			this.gauge.setValue(value_data);
+
+			return;
+		}
+
+		if (!('config' in response)) {
+			throw new Error('Unexpected server error.');
+		}
+
+		const use_padding_top = this.getViewMode() === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
+			|| response.config.bg_color !== '';
+
+		const padding = {
+			top: use_padding_top ? this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V : 0,
+			right: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
+			bottom: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+			left: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
+		};
+
+		this.gauge = new CSVGGauge(this._body, padding, response.config);
+		this.gauge.setSize(super._getContentsSize());
+		this.gauge.setValue(value_data);
 	}
 
 	getActionsContextMenu({can_paste_widget}) {
@@ -100,9 +109,9 @@ class CWidgetGauge extends CWidget {
 
 		menu_actions.items.push({
 			label: t('Download image'),
-			disabled: !this._has_contents,
+			disabled: this.gauge === null,
 			clickCallback: () => {
-				downloadSvgImage(this.gauge.svg, 'gauge.png');
+				downloadSvgImage(this.gauge.getSVGElement(), 'gauge.png');
 			}
 		});
 
@@ -110,15 +119,6 @@ class CWidgetGauge extends CWidget {
 	}
 
 	hasPadding() {
-		return true;
-	}
-
-	#getGaugeContainerSize() {
-		const computed_style = getComputedStyle(this.gauge_container);
-
-		const width = Math.floor(parseFloat(computed_style.width));
-		const height = Math.floor(parseFloat(computed_style.height));
-
-		return {width, height};
+		return false;
 	}
 }

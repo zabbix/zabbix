@@ -826,7 +826,9 @@ function downloadSvgImage(svg, file_name) {
 	}).join('');
 
 	jQuery.map(['background-color', 'font-family', 'font-size', 'color'], function (key) {
-		$clone.css(key, $container.css(key));
+		if ($clone.css(key) === '') {
+			$clone.css(key, $container.css(key));
+		}
 	});
 
 	canvas.width = $dom_node.width()

@@ -88,14 +88,12 @@ form.dashboard-widget-gauge {
 	}
 }
 
-// Widget view only.
+// Widget view.
 
 div.dashboard-widget-gauge {
 	.dashboard-grid-widget-body {
-		> div {
-			height: 100%;
-			padding: 0 10px;
-			overflow: hidden;
+		svg {
+			display: block;
 		}
 	}
 }
