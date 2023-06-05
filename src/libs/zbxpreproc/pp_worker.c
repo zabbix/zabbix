@@ -23,7 +23,6 @@
 #include "pp_execute.h"
 
 #include "zbxcommon.h"
-#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
