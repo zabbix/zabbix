@@ -231,13 +231,7 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands))
 		goto out;
 
-	if (NULL == pnext)
-	{
-		if (NULL == (pnext = zbx_json_next(&jp_commands, pnext)))
-			goto out;
-	}
-
-	do
+	while (NULL != (pnext = zbx_json_next(&jp_commands, pnext)))
 	{
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_command))
 		{
@@ -276,7 +270,6 @@ void	zbx_process_command_results(struct zbx_json_parse *jp)
 		if (SUCCEED == remote_commands_insert_result(id, value, error))
 			results_num++;
 	}
-	while (NULL != (pnext = zbx_json_next(&jp_command, pnext)));
 out:
 	zbx_free(str);
 	zbx_free(value);
