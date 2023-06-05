@@ -110,7 +110,7 @@ class CControllerMediatypeCreate extends CController {
 
 				$smtp_email = $this->getInput('smtp_email', '');
 
-				$mediatype['provider'] = $this->getInput('provider', CMediatypeHelper::EMAIL_PROVIDER_SMTP);
+				$mediatype['provider'] = $this->hasInput('provider') ? $this->getInput('provider') : null;
 				$mediatype['smtp_server'] = $this->getInput('smtp_server', '');
 				$mediatype['smtp_email'] = $smtp_email;
 				$mediatype['passwd'] = $this->getInput('passwd', '');
@@ -176,6 +176,10 @@ class CControllerMediatypeCreate extends CController {
 					);
 				}
 				break;
+		}
+
+		if ($mediatype['type'] != MEDIA_TYPE_EMAIL) {
+			$mediatype['provider'] = CMediatypeHelper::EMAIL_PROVIDER_SMTP;
 		}
 
 		$result = API::Mediatype()->create($mediatype);
