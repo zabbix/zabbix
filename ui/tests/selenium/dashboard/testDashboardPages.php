@@ -296,6 +296,7 @@ class testDashboardPages extends CWebTest {
 		$page_menu->select('Properties');
 		$this->checkPageProperties();
 		$this->query('id:dashboard-cancel')->one()->click();
+		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check Stop/Start slideshow.
