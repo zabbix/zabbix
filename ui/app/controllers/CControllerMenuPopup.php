@@ -277,9 +277,9 @@ class CControllerMenuPopup extends CController {
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
 					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
+						$url['url'] = 'javascript: alert('.
+							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
+						');';
 						unset($url['target'], $url['rel']);
 					}
 				}
@@ -406,6 +406,25 @@ class CControllerMenuPopup extends CController {
 	}
 
 	/**
+	 * Validates URLs for supported schemes.
+	 *
+	 * @param array  $urls
+	 * @param array  $urls[]['url']
+	 *
+	 * @return array
+	 */
+	private static function sanitizeMapElementUrls(array $urls): array {
+		foreach ($urls as &$url) {
+			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
+				$url['url'] = 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');';
+			}
+		}
+		unset($url);
+
+		return $urls;
+	}
+
+	/**
 	 * Combines map URLs with element's URLs and performs other modifications with the URLs.
 	 *
 	 * @param array  $selement
@@ -434,10 +453,6 @@ class CControllerMenuPopup extends CController {
 		foreach ($selement['urls'] as $url_nr => $url) {
 			if ($url['name'] === '' || $url['url'] === '') {
 				unset($selement['urls'][$url_nr]);
-			}
-			elseif (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false]) === false) {
-				$selement['urls'][$url_nr]['url'] = 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-					zbx_jsvalue($url['url'], false, false)).'\');';
 			}
 		}
 
@@ -509,7 +524,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 
@@ -529,7 +544,7 @@ class CControllerMenuPopup extends CController {
 							$menu_data['show_suppressed'] = true;
 						}
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						if ($selement['tags']) {
 							$menu_data['evaltype'] = $selement['evaltype'];
@@ -639,7 +654,7 @@ class CControllerMenuPopup extends CController {
 						}
 
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 
 						return $menu_data;
@@ -649,7 +664,7 @@ class CControllerMenuPopup extends CController {
 							'type' => 'map_element_image'
 						];
 						if ($selement['urls']) {
-							$menu_data['urls'] = $selement['urls'];
+							$menu_data['urls'] = self::sanitizeMapElementUrls($selement['urls']);
 						}
 						return $menu_data;
 				}
@@ -885,9 +900,9 @@ class CControllerMenuPopup extends CController {
 			if (array_key_exists('urls', $menu_data)) {
 				foreach ($menu_data['urls'] as &$url) {
 					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert(\''.
-							_s('Provided URL "%1$s" is invalid.', zbx_jsvalue($url['url'], false, false)).
-						'\');';
+						$url['url'] = 'javascript: alert('.
+							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
+						');';
 						unset($url['target'], $url['rel']);
 					}
 				}
