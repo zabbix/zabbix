@@ -1024,7 +1024,7 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = "Math.floor(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
+			$formula = "Math.round(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
 
 			$script = [
 				'inline' => $formula,
@@ -1080,7 +1080,7 @@ class CHistoryManager {
 						foreach ($item['group_by_script']['buckets'] as $point) {
 							$results[$item['key']]['data'][] = [
 								'itemid' => $item['key'],
-								'i' => (int) $point['key'],
+								'i' => $point['key'],
 								'count' => $point['doc_count'],
 								'min' => $point['min_value']['value'],
 								'avg' => $point['avg_value']['value'],
