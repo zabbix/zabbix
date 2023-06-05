@@ -28,7 +28,8 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('correlation')))->removeId())
 	->setId('correlationForm')
 	->setName('correlations')
-	->addVar('correlationid', $data['correlationid']);
+	->addVar('correlationid', $data['correlationid'])
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $form_grid = (new CFormGrid())
 	->addItem([
