@@ -210,7 +210,7 @@ class HttpResponse {
 	private function wrapUserData(array $user_data): array {
 		$data = [
 			'schemas'	=> [User::SCIM_SCHEMA],
-			'id' 		=> $user_data['userid'],
+			'id' 		=> $user_data['userid']
 		];
 
 		if (array_key_exists('username', $user_data)) {
