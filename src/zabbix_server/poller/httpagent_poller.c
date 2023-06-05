@@ -16,6 +16,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "httpagent_async.h"
+#include "../../libs/zbxasyncpoller/asyncpoller.h"
 
 typedef struct
 {
@@ -288,6 +289,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	struct timeval		tv = {1, 0};
 	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
+	zbx_async_poller_t	poller;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -304,6 +306,8 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 
 	http_agent_poller_init(&poller_config, poller_args_in, async_check_items);
 	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_item_result);
+
+	zbx_async_poller_init(&poller, poller_config.base);
 
 	while (ZBX_IS_RUNNING())
 	{
