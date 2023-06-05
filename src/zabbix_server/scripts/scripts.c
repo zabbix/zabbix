@@ -132,14 +132,14 @@ out:
 
 static char	*remote_commands_shared_strdup(const char *str)
 {
-	char		*strdup;
+	char		*new_str;
 	zbx_uint64_t	len;
 
 	len = strlen(str) + 1;
-	strdup = (char *)__remote_commands_shmem_malloc_func(NULL, len);
-	memcpy(strdup, str, len);
+	new_str = (char *)__remote_commands_shmem_malloc_func(NULL, len);
+	memcpy(new_str, str, len);
 
-	return strdup;
+	return new_str;
 }
 
 /******************************************************************************
