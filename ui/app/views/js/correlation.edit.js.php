@@ -270,37 +270,36 @@ window.correlation_edit_popup = new class {
 	#checkConditionRow(condition) {
 		const result = [];
 
-		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].map(element => {
-			const table_row = element.getElementsByTagName('td')[2];
-			const type = table_row.getElementsByTagName('input')[0].value;
-			let value;
-			let value2;
+		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].map((element) => {
+			const type = element.querySelector('input[name*="type"]').value;
 
 			switch (parseInt(type)) {
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-					value = table_row.getElementsByTagName('input')[2].value;
-					result.push(condition.type === type && condition.tag === value);
+					result.push(condition.type === type
+						&& condition.tag === element.querySelector('input[name*="tag"]').value
+					);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-					value = table_row.getElementsByTagName('input')[2].value;
-					value2 = table_row.getElementsByTagName('input')[3].value;
-					result.push(condition.type === type && condition.tag === value && condition.value === value2);
+					result.push(condition.type === type
+						&& condition.tag === element.querySelector('input[name*="tag"]').value
+						&& condition.value === element.querySelector('input[name*="value"]').value
+					);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-					value = table_row.getElementsByTagName('input')[2].value;
-					value2 = table_row.getElementsByTagName('input')[3].value;
-					result.push(condition.type === type && condition.oldtag === value
-						&& condition.newtag === value2
+					result.push(condition.type === type
+						&& condition.oldtag === element.querySelector('input[name*="oldtag"]').value
+						&& condition.newtag === element.querySelector('input[name*="newtag"]').value
 					);
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-					value = table_row.getElementsByTagName('input')[2].value;
-					result.push(condition.type === type && condition.groupid === value);
+					result.push(condition.type === type
+						&& condition.groupid === element.querySelector('input[name*="groupid"]').value
+					);
 					break;
 			}
 		});
