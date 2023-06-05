@@ -128,13 +128,23 @@ window.mediatype_edit_popup = new class {
 
 		// Set maxsessions value.
 		const maxsessions_type = this.form.querySelector(`input[name='maxsessions_type']:checked`).value;
-		const maxsessions = this.form.querySelector('#maxsessions').value;
 
-		if (maxsessions_type === 'one') {
-			fields.maxsessions = 1;
-		}
-		else if (maxsessions_type === 'custom' && maxsessions.trim() === '') {
-			fields.maxsessions = 0;
+		switch (maxsessions_type) {
+			case 'one':
+				fields.maxsessions = 1;
+				break;
+
+			case 'unlimited':
+				fields.maxsessions = 0;
+				break;
+
+			case 'custom':
+				fields.maxsessions = this.form.querySelector('#maxsessions').value;
+				break;
+
+			default:
+				fields.maxsessions = maxsessions_type;
+				break;
 		}
 
 		const curl = new Curl('zabbix.php');
