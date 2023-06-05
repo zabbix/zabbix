@@ -35,11 +35,11 @@ class CControllerMediatypeMessageCheck extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
-			'message_type' =>		'required|in '.implode(',', $this->message_types),
-			'subject' =>			'db media_type_message.subject',
-			'message' =>			'db media_type_message.message'
+			'type' =>			'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
+			'content_type' =>	'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
+			'message_type' =>	'required|in '.implode(',', $this->message_types),
+			'subject' =>		'db media_type_message.subject',
+			'message' =>		'db media_type_message.message'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -57,14 +57,14 @@ class CControllerMediatypeMessageCheck extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
 	/**
 	 * @throws JsonException
 	 */
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),

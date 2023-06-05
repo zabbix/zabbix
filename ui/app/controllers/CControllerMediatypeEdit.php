@@ -21,6 +21,9 @@
 
 class CControllerMediatypeEdit extends CController {
 
+	/**
+	 * @var array
+	 */
 	private $mediatype = [];
 
 	protected function init(): void {
@@ -29,7 +32,7 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeid' =>	'db media_type.mediatypeid'
+			'mediatypeid' => 'db media_type.mediatypeid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,9 +59,9 @@ class CControllerMediatypeEdit extends CController {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
 					'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security', 'smtp_verify_peer',
-					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts',
-					'attempt_interval', 'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu',
-					'event_menu_url', 'event_menu_name', 'parameters', 'description', 'provider'
+					'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval',
+					'content_type', 'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url',
+					'event_menu_name', 'parameters', 'description', 'provider'
 				],
 				'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 				'mediatypeids' => $this->getInput('mediatypeid'),

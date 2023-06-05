@@ -29,13 +29,13 @@ class CControllerMediatypeMessageEdit extends CController {
 	 */
 	protected $message_types = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 
 		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
@@ -61,11 +61,11 @@ class CControllerMediatypeMessageEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),

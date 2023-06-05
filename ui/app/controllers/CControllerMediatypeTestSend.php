@@ -28,7 +28,7 @@ class CControllerMediatypeTestSend extends CController {
 	 */
 	private $mediatype;
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
 			'sendto' =>			'string|not_empty',
@@ -53,7 +53,7 @@ class CControllerMediatypeTestSend extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
@@ -62,7 +62,7 @@ class CControllerMediatypeTestSend extends CController {
 	 *
 	 * @return bool
 	 */
-	protected function validateMediaType() {
+	protected function validateMediaType(): bool {
 		$mediatypes = API::MediaType()->get([
 			'output' => ['type', 'status'],
 			'mediatypeids' => $this->getInput('mediatypeid')
@@ -108,7 +108,7 @@ class CControllerMediatypeTestSend extends CController {
 		return $ret;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		switch ($this->mediatype['type']) {

@@ -27,7 +27,7 @@ class CControllerMediatypeDisable extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'mediatypeids' =>	'required|array_db media_type.mediatypeid'
+			'mediatypeids' => 'required|array_db media_type.mediatypeid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,6 +58,7 @@ class CControllerMediatypeDisable extends CController {
 				'status' => MEDIA_TYPE_STATUS_DISABLED
 			];
 		}
+
 		$result = API::Mediatype()->update($mediatypes);
 
 		$updated = count($mediatypes);

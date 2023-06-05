@@ -78,7 +78,6 @@ class CControllerMediatypeList extends CController {
 			'active_tab' => CProfile::get('web.media_types.filter.active', 1)
 		];
 
-		// get media types
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['mediatypes'] = API::Mediatype()->get([
 			'output' => ['mediatypeid', 'name', 'type', 'smtp_server', 'smtp_helo', 'smtp_email', 'exec_path',
@@ -90,13 +89,13 @@ class CControllerMediatypeList extends CController {
 			'filter' => [
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
-			'limit' => $limit,
 			'editable' => true,
+			'limit' => $limit,
 			'preservekeys' => true
 		]);
 
 		if ($data['mediatypes']) {
-			// get media types used in actions
+			// Get media types used in actions.
 			$actions = API::Action()->get([
 				'output' => ['actionid', 'name', 'eventsource'],
 				'selectOperations' => ['operationtype', 'opmessage'],
@@ -106,14 +105,14 @@ class CControllerMediatypeList extends CController {
 			foreach ($data['mediatypes'] as &$mediaType) {
 				$mediaType['typeid'] = $mediaType['type'];
 				$mediaType['type'] = CMediatypeHelper::getMediaTypes($mediaType['type']);
-				$mediaType['listOfActions'] = [];
+				$mediaType['list_of_actions'] = [];
 
 				foreach ($actions as $action) {
 					foreach ($action['operations'] as $operation) {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
 								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
 
-							$mediaType['listOfActions'][$action['actionid']] = [
+							$mediaType['list_of_actions'][$action['actionid']] = [
 								'actionid' => $action['actionid'],
 								'name' => $action['name'],
 								'eventsource' => $action['eventsource']
@@ -122,11 +121,11 @@ class CControllerMediatypeList extends CController {
 					}
 				}
 
-				order_result($mediaType['listOfActions'], 'name');
+				CArrayHelper::sort($mediaType['list_of_actions'], ['name']);
 			}
 			unset($mediaType);
 
-			order_result($data['mediatypes'], $sort_field, $sort_order);
+			CArrayHelper::sort($data['mediatypes'], [['field' => $sort_field, 'order' => $sort_order]]);
 		}
 
 		// pager

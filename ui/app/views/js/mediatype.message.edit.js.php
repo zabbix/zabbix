@@ -31,12 +31,12 @@ window.mediatype_message_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-		this._initActions();
+		this.#initActions();
 	}
 
-	_initActions() {
+	#initActions() {
 		this.form.querySelector('#message_type').onchange = (e) => {
-			const message_template = this._getDefaultMessageTemplate(e.target.value);
+			const message_template = this.#getDefaultMessageTemplate(e.target.value);
 
 			if (this.form.querySelector('#subject') !== null) {
 				this.form.querySelector('#subject').value = message_template.subject;
@@ -46,7 +46,7 @@ window.mediatype_message_popup = new class {
 		};
 	}
 
-	_getDefaultMessageTemplate(message_type) {
+	#getDefaultMessageTemplate(message_type) {
 		const message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
 		const media_type = this.form.querySelector('#type').value;
 		const message_format = document.querySelector(`input[name='content_type']:checked`). value;
@@ -75,10 +75,16 @@ window.mediatype_message_popup = new class {
 		const fields = getFormFields(this.form);
 
 		curl.setArgument('action', 'mediatype.message.check');
-		this._post(curl.getUrl(), fields);
+		this.#post(curl.getUrl(), fields);
 	}
 
-	_post(url, data) {
+	/**
+	 * Sends a POST request to the specified URL with the provided data and handles the response.
+	 *
+	 * @param {callback} url   The URL to send the POST request to.
+	 * @param {object}   data  Data to send with the POST request.
+	 */
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -111,10 +117,9 @@ window.mediatype_message_popup = new class {
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
+
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.finally(() => this.overlay.unsetLoading());
 	}
 }

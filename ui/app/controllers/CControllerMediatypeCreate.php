@@ -25,7 +25,7 @@ class CControllerMediatypeCreate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'name' =>					'required|db media_type.name|not_empty',
@@ -168,9 +168,7 @@ class CControllerMediatypeCreate extends CController {
 				$parameters = $this->getInput('parameters_webhook', []);
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
-					$mediatype['parameters'] = array_map(function ($name, $value) {
-							return compact('name', 'value');
-						},
+					$mediatype['parameters'] = array_map(static fn($name, $value) => compact('name', 'value'),
 						$parameters['name'],
 						$parameters['value']
 					);

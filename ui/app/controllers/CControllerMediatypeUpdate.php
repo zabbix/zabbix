@@ -25,7 +25,7 @@ class CControllerMediatypeUpdate extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>			'fatal|required|db media_type.mediatypeid',
 			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
@@ -85,11 +85,11 @@ class CControllerMediatypeUpdate extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES));
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$db_defaults = DB::getDefaults('media_type');
 
 		$mediatype = [
@@ -172,9 +172,7 @@ class CControllerMediatypeUpdate extends CController {
 				$mediatype['parameters'] = [];
 
 				if (array_key_exists('name', $parameters) && array_key_exists('value', $parameters)) {
-					$mediatype['parameters'] = array_map(function ($name, $value) {
-							return compact('name', 'value');
-						},
+					$mediatype['parameters'] = array_map(static fn($name, $value) => compact('name', 'value'),
 						$parameters['name'],
 						$parameters['value']
 					);

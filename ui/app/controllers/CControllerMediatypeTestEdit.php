@@ -21,11 +21,11 @@
 
 class CControllerMediatypeTestEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' => 'fatal|required|db media_type.mediatypeid'
 		];
@@ -45,11 +45,11 @@ class CControllerMediatypeTestEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$mediatype = API::MediaType()->get([
 			'output' => ['type', 'name', 'status', 'parameters'],
 			'mediatypeids' => $this->getInput('mediatypeid')
