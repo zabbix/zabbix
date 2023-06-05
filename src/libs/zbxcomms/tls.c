@@ -3033,35 +3033,41 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 }
 
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, short *event, char **error)
 {
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
+	unsigned char	repeated;
 
-#if defined(HAVE_OPENSSL_WITH_PSK)
-	char	psk_buf[HOST_TLS_PSK_LEN / 2];
-#endif
-
-	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
-	s->tls_ctx->ctx = NULL;
+	if (NULL == s->tls_ctx)
+	{
+		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
+		s->tls_ctx->ctx = NULL;
+		repeated = 0;
+	}
+	else
+		repeated = 1;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __func__,
-				ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
-
-		if (NULL == ctx_cert)
+		if (0 == repeated)
 		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
-					" loaded");
-			goto out;
-		}
+			zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __func__,
+					ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
 
-		if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_cert)))
-		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
-			zbx_tls_error_msg(error, &error_alloc, &error_offset);
-			goto out;
+			if (NULL == ctx_cert)
+			{
+				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
+						" loaded");
+				goto out;
+			}
+
+			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_cert)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
+				zbx_tls_error_msg(error, &error_alloc, &error_offset);
+				goto out;
+			}
 		}
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -3069,17 +3075,20 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __func__, ZBX_NULL2EMPTY_STR(tls_arg1));
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (NULL == ctx_psk)
+		if (0 == repeated)
 		{
-			*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
-			goto out;
-		}
+			if (NULL == ctx_psk)
+			{
+				*error = zbx_strdup(*error, "cannot connect with TLS and PSK: no valid PSK loaded");
+				goto out;
+			}
 
-		if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_psk)))
-		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
-			zbx_tls_error_msg(error, &error_alloc, &error_offset);
-			goto out;
+			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_psk)))
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
+				zbx_tls_error_msg(error, &error_alloc, &error_offset);
+				goto out;
+			}
 		}
 
 		if (NULL == tls_arg2)	/* PSK is not set from DB */
@@ -3101,22 +3110,25 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
 			/* passive checks, for a server when it connects to a passive proxy) */
 
-			int	psk_len;
-
-			if (0 >= (psk_len = zbx_hex2bin((const unsigned char *)tls_arg2, (unsigned char *)psk_buf,
-					sizeof(psk_buf))))
+			if (0 == repeated)
 			{
-				*error = zbx_strdup(*error, "invalid PSK");
-				goto out;
+				if (0 >= (s->tls_ctx->psk_len = zbx_hex2bin((const unsigned char *)tls_arg2,
+						(unsigned char *)s->tls_ctx->psk_buf, sizeof(s->tls_ctx->psk_buf))))
+				{
+					*error = zbx_strdup(*error, "invalid PSK");
+					goto out;
+				}
+
+				s->tls_ctx->identity_len = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
 			}
 
 			/* some data reside in stack but it will be available at the time when a PSK client callback */
 			/* function copies the data into buffers provided by OpenSSL within the callback */
 			psk_identity_for_cb = tls_arg1;			/* string is on stack */
 			/* NULL check to silence analyzer warning */
-			psk_identity_len_for_cb = (NULL == tls_arg1 ? 0 : strlen(tls_arg1));
-			psk_for_cb = psk_buf;				/* buffer is on stack */
-			psk_len_for_cb = (size_t)psk_len;
+			psk_identity_len_for_cb = s->tls_ctx->identity_len;
+			psk_for_cb = s->tls_ctx->psk_buf;				/* buffer is on stack */
+			psk_len_for_cb = (size_t)s->tls_ctx->psk_len;
 		}
 #else
 		*error = zbx_strdup(*error, "cannot connect with TLS and PSK: support for PSK was not compiled in");
@@ -3130,17 +3142,20 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out1;
 	}
 
-	if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
-			s->tls_ctx->ctx, server_name))
+	if (0 == repeated)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
-	}
+		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
+				s->tls_ctx->ctx, server_name))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
+		}
 
-	/* set our connected TCP socket to TLS context */
-	if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
-	{
-		*error = zbx_strdup(*error, "cannot set socket for TLS context");
-		goto out;
+		/* set our connected TCP socket to TLS context */
+		if (1 != SSL_set_fd(s->tls_ctx->ctx, s->socket))
+		{
+			*error = zbx_strdup(*error, "cannot set socket for TLS context");
+			goto out;
+		}
 	}
 
 	/* TLS handshake */
@@ -3155,6 +3170,23 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
 			break;
+
+		if (NULL != event)
+		{
+			switch (ssl_err)
+			{
+				case SSL_ERROR_WANT_READ:
+					*event = POLLIN;
+					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_READ", __func__, 
+							zbx_result_string(ret));
+					break;
+				case SSL_ERROR_WANT_WRITE:
+					*event = POLLOUT;
+					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_WRITE", __func__,
+							zbx_result_string(ret));
+					break;
+			}
+		}
 
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{

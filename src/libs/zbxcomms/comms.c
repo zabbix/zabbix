@@ -524,6 +524,8 @@ static int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, 
 		goto out;
 	}
 
+	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
+
 	zbx_socket_set_deadline(s, timeout);
 
 	ret = SUCCEED;
@@ -576,7 +578,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
-		if (SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
+		if (SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, NULL, &error))
 		{
 			zbx_tcp_close(s);
 			zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
@@ -588,7 +590,6 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	ZBX_UNUSED(tls_arg1);
 	ZBX_UNUSED(tls_arg2);
 #endif
-	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
 
 	ret = SUCCEED;
 out:

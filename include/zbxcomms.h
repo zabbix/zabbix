@@ -22,6 +22,8 @@
 
 #include "zbxalgo.h"
 #include "zbxtime.h"
+#include <stddef.h>
+#include <stdint.h>
 
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */
@@ -166,6 +168,11 @@ typedef struct
 	gnutls_psk_server_credentials_t	psk_server_creds;
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
+#if defined(HAVE_OPENSSL_WITH_PSK)
+	char	psk_buf[HOST_TLS_PSK_LEN / 2];
+	int	psk_len;
+	int	identity_len;
+#endif
 #endif
 } zbx_tls_context_t;
 #endif
