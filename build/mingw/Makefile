@@ -52,6 +52,7 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dns.o \
 	$(OUTPUTDIR)\sysinfo_vfs_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
+	$(OUTPUTDIR)\sysinfo_common.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
 	$(OUTPUTDIR)\symbols.o \
