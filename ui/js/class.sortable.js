@@ -363,11 +363,7 @@ class CSortable extends CBaseComponent {
 
 		const drag_item = this._drag_item;
 
-		const insert_before_item = this._drag_item_index < items.length ? items[this._drag_item_index] : null;
-
-		const is_order_changed = drag_item.nextElementSibling !== insert_before_item;
-
-		this._list.insertBefore(drag_item, insert_before_item);
+		this._list.insertBefore(drag_item, this._drag_item_index < items.length ? items[this._drag_item_index] : null);
 
 		drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		drag_item.style.left = '';
@@ -398,7 +394,7 @@ class CSortable extends CBaseComponent {
 
 		this.fire(SORTABLE_EVENT_DRAG_END, {item: drag_item});
 
-		if (is_order_changed) {
+		if (this._drag_item_index !== this._drag_item_index_original) {
 			this.fire(SORTABLE_EVENT_SORT);
 		}
 	}
