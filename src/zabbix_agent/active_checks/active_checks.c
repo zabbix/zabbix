@@ -96,7 +96,6 @@ struct _zbx_active_command_t
 {
 	zbx_uint64_t		command_id;
 	char			*key;
-	unsigned char		state;
 };
 ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
 
@@ -388,7 +387,6 @@ static void	add_command(const char *key, zbx_uint64_t id)
 
 		command->key = zbx_strdup(NULL, key);
 		command->command_id = id;
-		command->state = ITEM_STATE_NORMAL;
 		zbx_vector_active_command_ptr_append(&active_commands, command);
 	}
 
@@ -1425,24 +1423,20 @@ out:
 	return ret;
 }
 
-static void	process_remote_command_value(const char *host, const char *key, const char *value, zbx_uint64_t id,
-		unsigned char state)
+static void	process_remote_command_value(const char *host, const char *value, zbx_uint64_t id, unsigned char state)
 {
 	zbx_command_result_t	*result;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s:%s' value:'%s'", __func__, host, key, ZBX_NULL2STR(value));
-
 	result = (zbx_command_result_t *)zbx_malloc(NULL, sizeof(zbx_command_result_t));
 
-	memset(result, 0, sizeof(zbx_command_result_t));
 	if (NULL != value)
 		result->value = zbx_strdup(NULL, value);
+	else
+		result->value = NULL;
 
 	result->id = id;
 	result->state = state;
 	zbx_vector_command_result_ptr_append(&command_results, result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
@@ -1531,38 +1525,27 @@ static void	process_command(zbx_active_command_t *command)
 {
 	int		ret;
 	AGENT_RESULT	result;
-	char		**pvalue, *error = NULL;
+	char		**pvalue, *empty = "", *error = ZBX_NOTSUPPORTED_MSG;
+	unsigned char	state = ITEM_STATE_NORMAL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:%s", __func__, command->key);
 
 	zbx_init_agent_result(&result);
 
 	if (SUCCEED != (ret = zbx_execute_agent_check(command->key, 0, &result)))
 	{
-		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
-			error = zbx_strdup(error, *pvalue);
-		goto out;
+		state = ITEM_STATE_NOTSUPPORTED;
+		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))
+			pvalue = &error;
 	}
+	else if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+		pvalue = &empty;
 
-	if (NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", command->key, *pvalue);
+	process_remote_command_value(CONFIG_HOSTNAME, *pvalue, command->command_id, state);
 
-		process_remote_command_value(CONFIG_HOSTNAME, command->key, *pvalue, command->command_id,
-				command->state);
-	}
-out:
 	zbx_free_agent_result(&result);
 
-	if (SUCCEED != ret)
-	{
-		const char	*perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
-
-		command->state = ITEM_STATE_NOTSUPPORTED;
-
-		process_remote_command_value(CONFIG_HOSTNAME, command->key, perror, command->command_id,
-				command->state);
-
-		zbx_free(error);
-	}
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%d result:%s", __func__, state, *pvalue);
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
