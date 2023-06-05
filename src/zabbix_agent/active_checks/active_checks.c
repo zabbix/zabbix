@@ -192,24 +192,12 @@ static void	clean_command_hash(void)
 	while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
 	{
 		int			i;
-		zbx_uint64_t		id;
-		zbx_active_command_t	*command, command_loc;
 		zbx_command_result_t	*result, result_loc;
 
 		if (cmd_hash->ttl > time(NULL))
 			continue;
 
-		id = cmd_hash->id;
-		command_loc.command_id = id;
-		result_loc.id = id;
-
-		if (FAIL != (i = zbx_vector_active_command_ptr_search(&active_commands, &command_loc,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
-		{
-			command = (zbx_active_command_t *)active_commands.values[i];
-			zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
-			free_active_command(command);
-		}
+		result_loc.id = cmd_hash->id;
 
 		if (FAIL != (i = zbx_vector_command_result_ptr_search(&command_results, &result_loc,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
