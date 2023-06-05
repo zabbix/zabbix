@@ -406,69 +406,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => 'Host for widget 1'
-					],
-					'expected' => 'Host for widget 1'
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2'
-						]
-					],
-					'expected' => [
-						'Host for widget 1',
-						'Host for widget 2'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2',
-							'Host for widget 3'
-						]
-					],
-					'expected' => [
-						'Host for widget 1',
-						'Host for widget 2',
-						'Host for widget 3',
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2',
-							'Host for widget 3',
-							'Host for widget 4'
-						]
-					],
-					'expected' => [
-						'Host for widget 1',
-						'Host for widget 2',
-						'Host for widget 3',
-						'Host for widget 4'
-					]
-				]
-			],
-			[
-				[
-					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2',
-							'Host for widget 3',
-							'Host for widget 4',
-							'Host for widget 5'
-						]
+						'host' => 'Host for widget'
 					],
 					'expected' => [
 						'Host for widget 1',
@@ -482,36 +420,44 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			[
 				[
 					'Data set' => [
-						'host' => [
-							'Host for widget 1',
-							'Host for widget 2',
-							'Host for widget 3',
-							'Host for widget 4',
-							'Host for widget 5'
-						]
+						'host' => 'Host for widget 1',
+						'item' => 'Item'
 					],
 					'expected' => [
-						'Host for widget 1',
-						'Host for widget 2',
-						'Host for widget 3',
-						'Host for widget 4',
-						'Host for widget 5'
+						'Item for Graph 1_1',
+						'Item for Graph 1_2',
+						'Item for Graph 1_3',
+						'Item for Graph 1_4',
+						'Item for Graph 1_5'
 					]
 				]
 			],
 			[
 				[
 					'Data set' => [
-						'host' => [
-							'Host for widget'
-						]
+						'host' => 'Host for widget*',
+						'item' => 'Item'
 					],
 					'expected' => [
-						'Host for widget 1',
-						'Host for widget 2',
-						'Host for widget 3',
-						'Host for widget 4',
-						'Host for widget 5'
+						'Item for Graph 1_1',
+						'Item for Graph 1_2',
+						'Item for Graph 1_3',
+						'Item for Graph 1_4',
+						'Item for Graph 1_5',
+						'Item for Graph 2_1',
+						'Item for Graph 2_2',
+						'Item for Graph 2_3',
+						'Item for Graph 2_4',
+						'Item for Graph 2_5',
+						'Item for Graph 3_1',
+						'Item for Graph 3_2',
+						'Item for Graph 3_3',
+						'Item for Graph 3_4',
+						'Item for Graph 3_5',
+						'Item for Graph 4_1',
+						'Item for Graph 4_2',
+						'Item for Graph 4_3',
+						'Item for Graph 4_4'
 					]
 				]
 			]
@@ -531,7 +477,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$form->fill(['Type' => 'Graph']);
-		$mergedtext = null;
+		$mergedtext = array();
 
 		if (CTestArrayHelper::isAssociative($data['Data set'])) {
 			$data['Data set'] = [$data['Data set']];
@@ -541,12 +487,15 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			if (array_key_exists('item', $data_set)) {
 				$mapping = [
 					'item' => 'xpath://input[@placeholder="item pattern"]',
-					'host' => 'xpath://div[@id="or_0_hosts_"]/..'
+					'host' => 'xpath://div[@id="ds_0_hosts_"]/..'
+
 				];
+				var_dump('test');
 			} else {
 				$mapping = [
 					'host' => 'xpath://input[@placeholder="host pattern"]'
 				];
+				var_dump('test2');
 			}
 
 			foreach ($mapping as $field => $selector) {
@@ -554,31 +503,51 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 				unset($data_set[$field]);
 			}
 			$form->fill($data_set);
-			$hosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
-					->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
-			$count = str_word_count($hosttext, 1, '1234567890');
-			$i = intval($count[0]);
 
-			if ($i >= '20') {
-				$this->fail('Reduce the amount of test data or suggestion window is broken.');
-			} else {
-				for ($x = 0; $x < $i; $x++) {
-					$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-					$newhosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
-							->one()->waitUntilTextPresent('widget')->getText();
-					$mergedtext = $mergedtext."".$newhosttext;
-					var_dump($mergedtext);
+			if (count($data_set) >= 2) {
+				$itemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
+						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
+				$count = str_word_count($itemtext, 1, '1234567890');
+				$i = intval($count[2]) - 1;
+
+				if ($i < 0 ) {
+					$i = intval($count[0]) - 1;
+				}
+
+				var_dump($i);
+
+				if ($i >= '20') {
+					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
+				} else {
+					for ($x = 0; $x < $i; $x++) {
+						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
+						$newitemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
+								->one()->waitUntilTextPresent('Graph')->getText();
+						array_push($mergedtext, $newitemtext);
+						//var_dump($mergedtext);
+					}
+					$this->assertEquals($data['expected'], $mergedtext);
 
 				}
-				$this->assertEquals($data['expected'], $mergedtext);
+			} else {
+				$hosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
+						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
+				$count = str_word_count($hosttext, 1, '1234567890');
+				$i = intval($count[0]) - 1;
+
+				if ($i >= '20') {
+					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
+				} else {
+					for ($x = 0; $x < $i; $x++) {
+						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
+						$newhosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
+								->one()->waitUntilTextPresent('widget')->getText();
+						array_push($mergedtext, $newhosttext);
+						//var_dump($mergedtext);
+					}
+					$this->assertEquals($data['expected'], $mergedtext);
+				}
 			}
 		}
-
-		//'xpath://input[@placeholder="host pattern"]' => 'Host for widget 1',
-		//'xpath://input[@placeholder="item pattern"]' => '*'
-
-		//$element = $form->query('xpath://div[@class="selected"]/..')->one()->waitUntilReady();
-		//$this->query('xpath://input[@placeholder="host pattern"]')->one()->fill($data['Data set']['host']);
-
 	}
 }
