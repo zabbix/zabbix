@@ -104,7 +104,7 @@ class testPageSearch extends CWebTest {
 					'main' => 1,
 					'useip' => 1,
 					'ip' => '99.99.99.99',
-					'dns' => '',
+					'dns' => 'testdns.example.com',
 					'port' => '10050'
 				]
 			],
@@ -112,14 +112,6 @@ class testPageSearch extends CWebTest {
 				'host' => STRING_128,
 				'groups' => [
 					'groupid' => '6'
-				],
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 0,
-					'ip' => '127.0.0.1',
-					'dns' => 'testdns.example.com',
-					'port' => '10050'
 				]
 			],
 			[
@@ -127,28 +119,12 @@ class testPageSearch extends CWebTest {
 				'name' => 'ZaBbiX зАБбИкс āēīõšŗ',
 				'groups' => [
 					'groupid' => '6'
-				],
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
 				]
 			],
 			[
 				'host' => self::$search_string.' Host',
 				'groups' => [
 					'groupid' => $hostGroupId
-				],
-				'interfaces' => [
-					'type' => 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '127.0.0.1',
-					'dns' => '',
-					'port' => '10050'
 				]
 			]
 		]);
@@ -296,7 +272,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => '99.99.99.99',
-					'hosts' => [['Host' => '🙂🙃', 'IP' => '99.99.99.99', 'DNS' => '']]
+					'hosts' => [['Host' => '🙂🙃', 'IP' => '99.99.99.99', 'DNS' => 'testdns.example.com']]
 
 				]
 			],
@@ -309,7 +285,7 @@ class testPageSearch extends CWebTest {
 			[
 				[
 					'search_string' => 'testdns.example.com',
-					'hosts' => [['Host' => STRING_128, 'IP' => '127.0.0.1', 'DNS' => 'testdns.example.com']]
+					'hosts' => [['Host' => '🙂🙃', 'IP' => '99.99.99.99', 'DNS' => 'testdns.example.com']]
 				]
 			]
 		];
@@ -325,7 +301,7 @@ class testPageSearch extends CWebTest {
 		if (CTestArrayHelper::get($data, 'count_from_db')) {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
-			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
+			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h LEFT JOIN interface i on i.hostid=h.hostid '.
 				'WHERE h.status=0 AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
 				'OR i.dns LIKE \'%'.$data['search_string'].'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
