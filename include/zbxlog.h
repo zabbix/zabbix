@@ -31,7 +31,7 @@
 #define ZBX_OPTION_LOGTYPE_FILE		"file"
 #define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
-#define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
+#define ZBX_LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
 void	__zbx_update_env(double time_now);
 

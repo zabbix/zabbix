@@ -113,7 +113,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			{
 				int	now = (int)time(NULL);
 
-				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
+				if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;
