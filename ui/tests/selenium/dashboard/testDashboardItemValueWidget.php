@@ -1168,7 +1168,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
+			$dashboard->waitUntilReady()->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
 		}
 
 		if ($save_dashboard) {

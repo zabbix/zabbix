@@ -1035,6 +1035,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
 
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
+		COverlayDialogElement::find()->waitUntilReady();
 		$form->fill($data['fields']);
 		$this->page->removeFocus();
 		COverlayDialogElement::find()->waitUntilReady();
@@ -1181,7 +1182,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$data['fields']['Name'] = trim($data['fields']['Name']);
 				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
-				CDashboardElement::find()->asDashboard()->one()->getWidget($name)->waitUntilVisible();
+				CDashboardElement::find()->asDashboard()->one()->waitUntilReady()->getWidget($name)->waitUntilVisible();
 			}
 			$this->query('button:Save changes')->one()->click();
 
