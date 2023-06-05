@@ -57,7 +57,7 @@ $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
 				'#{condition_name}', ' ', new CTag('em', true, '#{data}')
 			]))
 				->addClass(ZBX_STYLE_WORDWRAP)
-				->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+				->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 			(new CCol([
 				$remove_button,
 				(new CInput('hidden'))
@@ -86,7 +86,7 @@ $condition_hostgroup_template = (new CTemplateTag('condition-hostgr-row-tmpl'))-
 			'#{condition_name}', ' ', new CTag('em', true, '#{data}')
 		]))
 			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol([
 			$remove_button,
 			(new CInput('hidden'))
@@ -116,7 +116,7 @@ $condition_tag_pair_template = (new CTemplateTag('condition-tag-pair-row-tmpl'))
 			'#{condition_name2}', ' ', new CTag('em', true, '#{data_new_tag}')
 		]))
 			->addClass(ZBX_STYLE_WORDWRAP)
-			->addStyle(ZBX_TEXTAREA_BIG_WIDTH),
+			->addStyle(ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol([
 			$remove_button,
 			(new CInput('hidden'))
@@ -174,7 +174,7 @@ $condition_old_new_tag_template = (new CTemplateTag('condition-old-new-tag-row-t
 // Create condition table.
 $condition_table = (new CTable())
 	->setId('condition_table')
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Name'), _('Action')])
 	->addItem([
 		$condition_tag_template,
@@ -205,7 +205,7 @@ foreach ($data['conditions'] as $condition) {
 	$condition_table->addRow([
 			$label_span,
 			(new CCol(CCorrelationHelper::getConditionDescription($condition, $data['group_names'])))
-				->addClass(ZBX_STYLE_TABLE_FORMS_OVERFLOW_BREAK),
+				->addClass(ZBX_STYLE_WORDWRAP),
 			(new CCol([
 				(new CButton('remove', _('Remove')))
 					->addClass('js-condition-remove')
@@ -253,12 +253,14 @@ $form_grid
 				(new CDiv([
 					(new CSpan())->setId('expression'),
 					(new CTextBox('formula', $data['formula']))
-						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setWidth('298')
 						->setId('formula')
 						->setAttribute('placeholder', 'A or (B and C) ...')
 				]))
 					->addClass(ZBX_STYLE_CELL)
 					->addClass(ZBX_STYLE_CELL_EXPRESSION)
+					->addStyle('max-width: 298px;')
+					->addStyle('white-space: initial;')
 			]
 		)
 	])
@@ -266,7 +268,8 @@ $form_grid
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
 		(new CDiv($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->setAriaRequired()
 	])
 	->addItem([
