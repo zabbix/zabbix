@@ -388,17 +388,10 @@ char 	*socket_poll_error(short revents)
  *           and if successful change socket back to blocking mode.           *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, socklen_t addrlen, char **error)
+static int	zbx_socket_connect_wait(zbx_socket_t *s, char **error)
 {
 	int		rc;
 	zbx_pollfd_t	pd;
-
-	if (ZBX_PROTO_ERROR == connect(s->socket, addr, addrlen) && SUCCEED != zbx_socket_had_nonblocking_error())
-	{
-		*error = zbx_dsprintf(*error, "cannot connect to address: %s",
-				strerror_from_system(zbx_socket_last_error()));
-		return FAIL;
-	}
 
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
@@ -430,27 +423,14 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: connect the socket of the specified type to external host         *
- *                                                                            *
- * Parameters: s - [OUT] socket descriptor                                    *
- *                                                                            *
- * Return value: SUCCEED - connected successfully                             *
- *               FAIL - an error occurred                                     *
- *                                                                            *
- ******************************************************************************/
-static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+static int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, const char *tls_arg1)
 {
-	int		ret = FAIL, flags;
-	struct addrinfo	*ai = NULL, hints;
-	struct addrinfo	*ai_bind = NULL;
-	char		service[8], *error = NULL;
+	int		flags, ret = FAIL;
+	char		service[8];
+	struct addrinfo	*ai = NULL, hints, *ai_bind = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	const char	*server_name = NULL;
-#endif
+
 	zbx_socket_clean(s);
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
@@ -535,35 +515,16 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		goto out;
 	}
 
-	zbx_socket_set_deadline(s, timeout);
-
-	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, (socklen_t)ai->ai_addrlen, &error))
+	if (ZBX_PROTO_ERROR == connect(s->socket, ai->ai_addr, ai->ai_addrlen) &&
+			SUCCEED != zbx_socket_had_nonblocking_error())
 	{
+		zbx_set_socket_strerror("cannot connect to address: %s",
+				strerror_from_system(zbx_socket_last_error()));
 		func_socket_close(s);
-		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
-		zbx_free(error);
 		goto out;
 	}
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
-	{
-		server_name = ip;
-	}
-
-	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
-			SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
-	{
-		zbx_tcp_close(s);
-		zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
-		zbx_free(error);
-		goto out;
-	}
-#else
-	ZBX_UNUSED(tls_arg1);
-	ZBX_UNUSED(tls_arg2);
-#endif
-	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
+	zbx_socket_set_deadline(s, timeout);
 
 	ret = SUCCEED;
 out:
@@ -573,6 +534,64 @@ out:
 	if (NULL != ai_bind)
 		freeaddrinfo(ai_bind);
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: connect the socket of the specified type to external host         *
+ *                                                                            *
+ * Parameters: s - [OUT] socket descriptor                                    *
+ *                                                                            *
+ * Return value: SUCCEED - connected successfully                             *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+{
+	int		ret = FAIL;
+	char		*error = NULL;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	const char	*server_name = NULL;
+#endif
+	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, tls_connect, tls_arg1))
+		goto out;
+
+	if (SUCCEED != zbx_socket_connect_wait(s, &error))
+	{
+		void		(*func_socket_close)(zbx_socket_t *s);
+
+		func_socket_close = (SOCK_STREAM == type ? zbx_tcp_close : zbx_udp_close);
+		func_socket_close(s);
+
+		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
+		zbx_free(error);
+		goto out;
+	}
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
+		server_name = ip;
+
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
+	{
+		if (SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, &error))
+		{
+			zbx_tcp_close(s);
+			zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
+			zbx_free(error);
+			goto out;
+		}
+	}
+#else
+	ZBX_UNUSED(tls_arg1);
+	ZBX_UNUSED(tls_arg2);
+#endif
+	zbx_strlcpy(s->peer, ip, sizeof(s->peer));
+
+	ret = SUCCEED;
+out:
 	return ret;
 }
 
