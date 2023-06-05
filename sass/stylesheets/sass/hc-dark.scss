@@ -528,12 +528,9 @@ a.link-action {
 		border-bottom-color: rgba($link-hover-color, .5);
 	}
 
-	&:active {
-		color: $link-hover-color;
-		border-bottom-color: $link-hover-color;
-	}
-
+	&:active,
 	&:focus {
+		margin-bottom: -3px;
 		color: $link-hover-color;
 		border-bottom: 3px solid $link-hover-color;
 	}

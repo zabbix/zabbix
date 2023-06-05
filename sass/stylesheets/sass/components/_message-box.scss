@@ -31,16 +31,7 @@ output {
 
 	.link-action {
 		margin-right: 10px;
-		line-height: 1.1;
-
-		&:focus {
-			margin-bottom: -3px;
-		}
-
-		&,
-		&:hover {
-			margin-bottom: -2px;
-		}
+		line-height: 14px;
 	}
 
 	.msg-details {

@@ -79,6 +79,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 
 .link-action {
 	@extend %link-action-style;
+
 	color: $font-color;
 	cursor: pointer;
 
@@ -88,6 +89,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 
 	&:hover {
+		margin-bottom: -1px;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, .35);
 	}
@@ -97,12 +99,14 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 	}
 
 	&:focus {
+		margin-bottom: -2px;
 		outline: none;
 		border-bottom: 2px solid rgba($link-hover-color, .35);
 	}
 }
 
 %link-action-style {
+	margin-bottom: -1px;
 	border-bottom: 1px dotted;
 	text-decoration: none;
 }

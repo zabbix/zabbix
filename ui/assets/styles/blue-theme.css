@@ -2792,11 +2792,7 @@ output {
     font-size: 1.167em; }
   output .link-action {
     margin-right: 10px;
-    line-height: 1.1; }
-    output .link-action:focus {
-      margin-bottom: -3px; }
-    output .link-action, output .link-action:hover {
-      margin-bottom: -2px; }
+    line-height: 14px; }
   output .msg-details {
     width: 100%; }
     output .msg-details:not(:first-child) {
@@ -4243,13 +4239,16 @@ div.dashboard-widget-url .widget-url {
   .link-action:visited {
     color: #1f2c33; }
   .link-action:hover {
+    margin-bottom: -1px;
     color: #0275b8;
     border-bottom: 1px solid rgba(2, 117, 184, 0.35); }
   .link-action:focus {
+    margin-bottom: -2px;
     outline: none;
     border-bottom: 2px solid rgba(2, 117, 184, 0.35); }
 
 .link-action, .link-action:visited, .link-action:active {
+  margin-bottom: -1px;
   border-bottom: 1px dotted;
   text-decoration: none; }
 
