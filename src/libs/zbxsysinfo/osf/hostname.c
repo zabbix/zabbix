@@ -19,7 +19,6 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
-//#include "hostname.h"
 
 #ifdef HAVE_SYS_UTSNAME_H
 #	include <sys/utsname.h>

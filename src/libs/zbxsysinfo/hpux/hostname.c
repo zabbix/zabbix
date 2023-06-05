@@ -19,7 +19,6 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
-//#include "hostname.h"
 
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

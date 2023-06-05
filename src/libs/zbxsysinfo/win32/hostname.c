@@ -19,7 +19,6 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
-//#include "hostname.h"
 
 #include "log.h"
 #include "zbxstr.h"

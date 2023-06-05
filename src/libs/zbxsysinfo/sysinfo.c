@@ -39,7 +39,7 @@
 #endif
 
 #ifdef WITH_COMMON_METRICS
-#include "common/zbxsysinfo_common.h"
+#	include "common/zbxsysinfo_common.h"
 #endif
 
 #ifdef WITH_HTTP_METRICS

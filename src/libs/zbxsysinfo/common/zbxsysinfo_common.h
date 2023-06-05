@@ -22,9 +22,6 @@
 
 #include "module.h"
 
-//extern zbx_metric	parameters_common[];
-//extern zbx_metric	parameters_common_local[];
-
 zbx_metric	*get_parameters_common(void);
 zbx_metric	*get_parameters_common_local(void);
 
