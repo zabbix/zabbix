@@ -490,12 +490,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					'host' => 'xpath://div[@id="ds_0_hosts_"]/..'
 
 				];
-				var_dump('test');
+				//var_dump('test');
 			} else {
 				$mapping = [
 					'host' => 'xpath://input[@placeholder="host pattern"]'
 				];
-				var_dump('test2');
+				//var_dump('test2');
 			}
 
 			foreach ($mapping as $field => $selector) {
@@ -513,8 +513,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 				if ($i < 0 ) {
 					$i = intval($count[0]) - 1;
 				}
-
-				var_dump($i);
+				//var_dump($i);
 
 				if ($i >= '20') {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
