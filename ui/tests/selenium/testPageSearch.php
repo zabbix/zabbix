@@ -40,51 +40,51 @@ class testPageSearch extends CWebTest {
 			'key' => 'hosts',
 			'selector_id' => 'search_hosts_widget',
 			'title' => 'Hosts',
+			'column_groups' => ['Host', 'IP', 'DNS', 'Monitoring', 'Configuration'],
 			'columns' => [
-				['name' => 'Host', 'skip_text_check' => true, 'href' => 'zabbix.php?action=host.edit'],
-				['name' => 'IP', 'skip_text_check' => true],
-				['name' => 'DNS', 'skip_text_check' => true],
-				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
-				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
-				['name' => 'Graphs', 'href' => 'zabbix.php?action=charts.view'],
-				['name' => 'Dashboards', 'href' => 'zabbix.php?action=host.dashboard.view'],
-				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
-				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
-				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
-				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
-				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1']
-			],
-			'column_names' => ['Host', 'IP', 'DNS', 'Monitoring', 'Configuration']
+				['href' => 'zabbix.php?action=host.edit'],
+				[],
+				[],
+				['text' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
+				['text' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
+				['text' => 'Graphs', 'href' => 'zabbix.php?action=charts.view'],
+				['text' => 'Dashboards', 'href' => 'zabbix.php?action=host.dashboard.view'],
+				['text' => 'Web', 'href' => 'zabbix.php?action=web.view'],
+				['text' => 'Items', 'href' => 'items.php?filter_set=1'],
+				['text' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
+				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
+				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
+				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1']
+			]
 		],
 		'hostgroups' => [
 			'key' => 'host_groups',
 			'selector_id' => 'search_hostgroup_widget',
 			'title' => 'Host groups',
+			'column_groups' => ['Host group', 'Monitoring', 'Configuration'],
 			'columns' => [
-				['name' => 'Host group', 'skip_text_check' => true, 'href' => 'hostgroups.php?form=update'],
-				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
-				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
-				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Hosts', 'href' => 'zabbix.php?action=host.list'],
-				['name' => 'Templates', 'href' => 'templates.php?filter_set=1']
-			],
-			'column_names' => ['Host group', 'Monitoring', 'Configuration']
+				['href' => 'hostgroups.php?form=update'],
+				['text' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
+				['text' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
+				['text' => 'Web', 'href' => 'zabbix.php?action=web.view'],
+				['text' => 'Hosts', 'href' => 'zabbix.php?action=host.list'],
+				['text' => 'Templates', 'href' => 'templates.php?filter_set=1']
+			]
 		],
 		'templates' => [
 			'key' => 'templates',
 			'selector_id' => 'search_templates_widget',
 			'title' => 'Templates',
+			'column_groups' => ['Template', 'Configuration'],
 			'columns' => [
-				['name' => 'Template', 'skip_text_check' => true, 'href' => 'templates.php?form=update'],
-				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
-				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
-				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
-				['name' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list'],
-				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
-				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids']
-			],
-			'column_names' => ['Template', 'Configuration']
+				['href' => 'templates.php?form=update'],
+				['text' => 'Items', 'href' => 'items.php?filter_set=1'],
+				['text' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
+				['text' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
+				['text' => 'Dashboards', 'href' => 'zabbix.php?action=template.dashboard.list'],
+				['text' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
+				['text' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids']
+			]
 		]
 	];
 
@@ -175,7 +175,7 @@ class testPageSearch extends CWebTest {
 			$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
 
 			// Check column names.
-			$this->assertEquals($wp['column_names'], $this->query($widget_selector.'//table//th')->all()->asText());
+			$this->assertEquals($wp['column_groups'], $this->query($widget_selector.'//table//th')->all()->asText());
 
 			// Check table links.
 			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
@@ -183,9 +183,9 @@ class testPageSearch extends CWebTest {
 				if (isset($column['href'])) {
 					// The same column name is sometimes used twice so need to access by index.
 					$link = $table_first_row->query('xpath:./td['.($col_num + 1).']//a')->one();
-					// Link text matches the column name the vast majority of time.
-					if (!(isset($column['skip_text_check']) && $column['skip_text_check'])) {
-						$this->assertEquals($column['name'], $link->getText());
+
+					if (isset($column['text'])) {
+						$this->assertEquals($column['text'], $link->getText());
 					}
 					$this->assertStringContainsString($column['href'], $link->getAttribute('href'));
 				}
