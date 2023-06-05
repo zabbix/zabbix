@@ -1922,8 +1922,11 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #endif
 		}
 
-		process_active_commands(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-				activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
+		if (0 != active_commands.values_num)
+		{
+			process_active_commands(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
+		}
 
 		if (now >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
