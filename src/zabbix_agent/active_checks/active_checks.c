@@ -1532,7 +1532,6 @@ static void	process_command(zbx_active_command_t *command)
 	int		ret;
 	AGENT_RESULT	result;
 	char		**pvalue, *error = NULL;
-;
 
 	zbx_init_agent_result(&result);
 
