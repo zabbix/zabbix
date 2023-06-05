@@ -1005,6 +1005,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 {
 	int			rule_count = 0, delay, i;
 	char			*delay_str = NULL;
+	zbx_uint64_t		queue_checks_count = 0;
 	zbx_dc_um_handle_t	*um_handle;
 	time_t			now;
 	zbx_dc_drule_t		*drule;
@@ -1017,7 +1018,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 
 	while (ZBX_IS_RUNNING() && NULL != (drule = zbx_dc_drule_next(now, nextcheck)))
 	{
-		zbx_uint64_t		queue_capacity;
+		zbx_uint64_t		queue_capacity, queue_capacity_local;
 		zbx_discoverer_job_t	cmp = {.druleid = drule->druleid};
 
 		discoverer_queue_lock(&dmanager.queue);
@@ -1025,6 +1026,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
 		discoverer_queue_unlock(&dmanager.queue);
+		queue_capacity_local = queue_capacity - queue_checks_count;
 
 		if (i != FAIL || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
 		{
@@ -1069,14 +1071,10 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 			zbx_hashset_create(&drule_check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
 
-			discoverer_queue_lock(&dmanager.queue);
-			queue_capacity = DISCOVERER_QUEUE_MAX_SIZE - dmanager.queue.pending_checks_count;
-			discoverer_queue_unlock(&dmanager.queue);
-
-			process_rule(drule, &queue_capacity, &tasks, &drule_check_counts);
+			process_rule(drule, &queue_capacity_local, &tasks, &drule_check_counts);
 			zbx_hashset_iter_reset(&tasks, &iter);
 
-			if (0 == queue_capacity)
+			if (0 == queue_capacity_local)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "discoverer queue is full, skipping discovery rule '%s'",
 						drule->name);
@@ -1088,6 +1086,8 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 				zbx_hashset_destroy(&drule_check_counts);
 				goto next;
 			}
+
+			queue_checks_count = queue_capacity - queue_capacity_local;
 
 			job = discoverer_job_create(drule, config_timeout);
 
@@ -1438,7 +1438,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			job->workers_used++;
-			queue->pending_checks_count -=  NULL != task->ips ?
+			queue->pending_checks_count -= NULL != task->ips ?
 					(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
 					(zbx_uint64_t)task->dchecks.values_num;
 
