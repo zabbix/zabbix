@@ -356,7 +356,7 @@ class testFormTemplateDashboards extends CWebTest {
 							'contents' => [
 								[
 									'field' => 'Size',
-									'locator' => 'id:date_size',
+									'element_locator' => 'id:date_size',
 									'value' => 20,
 									'attributes' => [
 										'maxlength' => 3
@@ -366,6 +366,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
+									'element_locator' => 'id:date_bold',
 									'value' => false
 								],
 								[
@@ -377,10 +378,12 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Time',
 							'type' => 'complex_field',
+							// TODO: remove flag when issue in framework is solved (complex field + radio button).
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-time"]',
 							'contents' => [
 								[
 									'field' => 'Size',
-									'locator' => 'id:time_size',
+									'element_locator' => 'id:time_size',
 									'value' => 30,
 									'attributes' => [
 										'maxlength' => 3
@@ -390,6 +393,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
+									'element_locator' => 'id:time_bold',
 									'value' => false
 								],
 								[
@@ -399,11 +403,13 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Seconds',
 									'type' => 'checkbox',
+									'element_locator' => 'id:time_sec',
 									'value' => true
 								],
 								[
 									'field' => 'Format',
 									'type' => 'radio_button',
+									'element_locator' => 'id:time_format',
 									'possible_values' => ['24-hour', '12-hour'],
 									'value' => '24-hour'
 								]
@@ -412,10 +418,11 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Time zone',
 							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-tzone"]',
 							'contents' => [
 								[
 									'field' => 'Size',
-									'locator' => 'id:tzone_size',
+									'element_locator' => 'id:tzone_size',
 									'value' => 20,
 									'attributes' => [
 										'maxlength' => 3
@@ -425,6 +432,7 @@ class testFormTemplateDashboards extends CWebTest {
 								[
 									'field' => 'Bold',
 									'type' => 'checkbox',
+									'element_locator' => 'id:tzone_bold',
 									'value' => false
 								],
 								[
@@ -549,7 +557,8 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Graph prototype',
-							'type' => 'multiselect'
+							'type' => 'multiselect',
+							'mandatory' => true
 						],
 						[
 							'field' => 'Show legend',
@@ -561,14 +570,16 @@ class testFormTemplateDashboards extends CWebTest {
 							'value' => 2,
 							'attributes' => [
 								'maxlength' => 2
-							]
+							],
+							'mandatory' => true
 						],
 						[
 							'field' => 'Rows',
 							'value' => 1,
 							'attributes' => [
 								'maxlength' => 2
-							]
+							],
+							'mandatory' => true
 						]
 					],
 					'hidden_fields' => [
@@ -627,7 +638,7 @@ class testFormTemplateDashboards extends CWebTest {
 					],
 					'hidden_fields' => [
 						[
-							'field' => 'Desctiption',
+							'field' => 'Description',
 							'screenshot' => true
 						],
 						[
@@ -1133,7 +1144,8 @@ class testFormTemplateDashboards extends CWebTest {
 
 		// Select the required type of widget.
 		$this->query('button:Add')->one()->waitUntilClickable()->click();
-		$widget_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$widget_dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$widget_form = $widget_dialog->asForm();
 		$widget_form->fill(['Type' => $data['type']]);
 
 		$refresh_intervals = array_merge([$data['refresh_interval']], ['No refresh', '10 seconds', '30 seconds',
@@ -1154,7 +1166,7 @@ class testFormTemplateDashboards extends CWebTest {
 				'value' => $data['refresh_interval']
 			]
 		];
-		$data['fields'] = array_merge($common_fields, $data['fields']);
+		$data['fields'] = array_merge($common_fields, CTestArrayHelper::get($data, 'fields', []));
 
 		$this->checkFormFields($data['fields'], $widget_form);
 
@@ -1176,6 +1188,7 @@ class testFormTemplateDashboards extends CWebTest {
 				 * There is no widget in data provider that has both hidden and disabled fields, so change_values is
 				 * filled and field check is performed within the foreach loop.
 				 */
+				$widget_form->invalidate();
 				$widget_form->fill($data['change_values']);
 
 				// In case if no access fields need to be filled to expand the form, they are checked before being filled.
@@ -1195,6 +1208,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$widget_form->fill($data['second_change']['change_fields']);
 				}
 
+				$widget_dialog->waitUntilReady();
 				$this->checkFormFields($data[$no_access_fields], $widget_form);
 			}
 		}
@@ -1204,7 +1218,7 @@ class testFormTemplateDashboards extends CWebTest {
 				// Open hint and check text.
 				$widget_form->query($hint['locator'])->one()->click();
 				$hint_dialog = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent()->one();
-				$this->assertEquals($hint['text'], $hint_dialog->one()->getText());
+				$this->assertEquals($hint['text'], $hint_dialog->getText());
 
 				// Close hint.
 				$hint_dialog->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
@@ -1222,13 +1236,19 @@ class testFormTemplateDashboards extends CWebTest {
 	private function checkFormFields($fields, $widget_form) {
 		// Check form fields and their attributes based on field type.
 		foreach ($fields as $field_details) {
-			$field = $widget_form->getField($field_details['field']);
+			// Field locator is temporary workaround until issue in framework is not solved (complex field + radio button).
+			if (array_key_exists('field_locator', $field_details)) {
+				$field = $widget_form->query($field_details['field_locator'])->one();
+			}
+			else {
+				$field = $widget_form->getField($field_details['field']);
+			}
 
 			if (CTestArrayHelper::get($field_details, 'type') === 'complex_field') {
 				foreach ($field_details['contents'] as $sub_field_details) {
 					$sub_field = $field->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field']).
 							"]/following-sibling::div[1]")->one();
-					$this->checkFieldParameters($sub_field_details, $field, $sub_field);
+					$this->checkFieldParameters($sub_field_details, null, $sub_field);
 				}
 			}
 			else {
@@ -1241,14 +1261,12 @@ class testFormTemplateDashboards extends CWebTest {
 
 	private function checkFieldParameters($field_details, $widget_form, $field) {
 		$default_value = CTestArrayHelper::get($field_details, 'value', '');
+		$element = (array_key_exists('element_locator', $field_details))
+			? $field->query($field_details['element_locator'])->one()
+			: $field;
 
 		switch (CTestArrayHelper::get($field_details, 'type', 'input')) {
 				case 'input':
-				case 'checkbox':
-					$element = (array_key_exists('locator', $field_details))
-						? $field->query($field_details['locator'])->one()
-						: $field;
-
 					$this->assertEquals($default_value, $element->getValue());
 
 					if (array_key_exists('attributes', $field_details)) {
@@ -1258,31 +1276,37 @@ class testFormTemplateDashboards extends CWebTest {
 					}
 
 					if (array_key_exists('symbol_after', $field_details)) {
-						$this->assertEquals($field_details['symbol_after'],$element-> query('xpath:./following-sibling::text()[1]')
-								->one()->getText()
+						$this->assertEquals($field_details['symbol_after'], CElementQuery::getDriver()
+								->executeScript('return arguments[0].nextSibling.textContent;', [$element])
 						);
 					}
 
 					break;
 
+				case 'checkbox':
+					$element = $element->asCheckbox();
+					$this->assertEquals($default_value, $element->getValue());
+					break;
+
 				case 'multiselect':
 					$default_value = '';
-					$this->assertEquals($default_value, $field->getValue());
-					$this->assertEquals('type here to search', $field->query('xpath:.//input')->one()->getAttribute('placeholder'));
+					$this->assertEquals($default_value, $element->getValue());
+					$this->assertEquals('type here to search', $element->query('xpath:.//input')->one()->getAttribute('placeholder'));
 					break;
 
 				case 'dropdown':
-					$this->assertEquals($default_value, $field->getValue());
-					$this->assertEquals($field_details['possible_values'], $field->getOptions()->asText());
+					$this->assertEquals($default_value, $element->getValue());
+					$this->assertEquals($field_details['possible_values'], $element->getOptions()->asText());
 					break;
 
 				case 'radio_button':
-					$this->assertEquals($default_value, $field->getValue());
-					$this->assertEquals($field_details['possible_values'], $field->getLabels()->asText());
+					$element = $element->asSegmentedRadio();
+					$this->assertEquals($default_value, $element->getValue());
+					$this->assertEquals($field_details['possible_values'], $element->getLabels()->asText());
 					break;
 
 				case 'checkbox_list':
-					$checkbox_list = $field->asCheckboxList();
+					$checkbox_list = $element->asCheckboxList();
 
 					foreach ($field_details['checkboxes'] as $label => $value) {
 						$this->assertEquals($value, $checkbox_list->query("xpath:.//label[text()=".
@@ -1303,12 +1327,20 @@ class testFormTemplateDashboards extends CWebTest {
 					}
 
 					$this->assertTrue($field->query('name:date_'.lcfirst($field_details['field']).'_calendar')->one()->isClickable());
-
 					break;
+
+				case 'color_picker':
+					$element = $element->asColorPicker();
+					$this->assertEquals($default_value, $element->getValue());
+					break;
+
 			}
 
-			$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
-			$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
+			// Complex field elements don't have mandatory fields, so no use wasting time on checkingif they are mandatory.
+			if ($widget_form) {
+				$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
+				$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
+			}
 	}
 
 	public static function getDashboardPropertiesData() {
