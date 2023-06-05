@@ -329,7 +329,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
 

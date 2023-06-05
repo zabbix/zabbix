@@ -386,7 +386,7 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
