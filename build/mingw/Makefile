@@ -52,7 +52,6 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dns.o \
 	$(OUTPUTDIR)\sysinfo_vfs_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
-	$(OUTPUTDIR)\sysinfo_common.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
 	$(OUTPUTDIR)\symbols.o \
@@ -223,9 +222,6 @@ $(OUTPUTDIR)\sysinfo_vfs_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\vfs_file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_dir.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dir.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\sysinfo_common.o: $(TOPDIR)\src\libs\zbxsysinfo\common\zbxsysinfo_common.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_alias.o: $(TOPDIR)\src\libs\zbxsysinfo\alias\alias.c
