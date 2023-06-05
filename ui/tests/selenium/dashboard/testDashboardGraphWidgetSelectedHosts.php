@@ -479,10 +479,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$form->fill(['Type' => 'Graph']);
 		$mergedtext = array();
 
+		// Check if array is associative.
 		if (CTestArrayHelper::isAssociative($data['Data set'])) {
 			$data['Data set'] = [$data['Data set']];
 		}
 
+		// Change mapping of associative arrays from data set.
 		foreach ($data['Data set'] as $data_set) {
 			if (array_key_exists('item', $data_set)) {
 				$mapping = [
@@ -490,40 +492,52 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					'host' => 'xpath://div[@id="ds_0_hosts_"]/..'
 
 				];
-				//var_dump('test');
 			} else {
 				$mapping = [
 					'host' => 'xpath://input[@placeholder="host pattern"]'
 				];
-				//var_dump('test2');
 			}
 
+			// Put new mappings into data set and fill it in the form.
 			foreach ($mapping as $field => $selector) {
 				$data_set = [$selector => $data_set[$field]] + $data_set;
 				unset($data_set[$field]);
 			}
 			$form->fill($data_set);
 
+			// In case array which is filled contains more than 2 keys.
 			if (count($data_set) >= 2) {
+
+				// Get text from html, which from which later count for cycle is used.
 				$itemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
 						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
+
+				// Count words in the text which was queried.
 				$count = str_word_count($itemtext, 1, '1234567890');
+
+				// In case data is more than 20, in sentence 3rd word is used as the count for "for cycle" iteration.
 				$i = intval($count[2]) - 1;
 
+				// In case HTML texts first word contains the number of iterations we use it instead of third.
 				if ($i < 0 ) {
 					$i = intval($count[0]) - 1;
 				}
-				//var_dump($i);
 
+				// In any case, suggestion bar max values are up to 20, so in case, when there's more, either test data should be reduced,
+				// or suggestion bar is broken.
 				if ($i >= '20') {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
 				} else {
 					for ($x = 0; $x < $i; $x++) {
+						// When data are filled in field, suggestion bar pops, in order to be sure that all expected data are provided,
+						// we go through each of the suggestion, put it in array and then compare to the expected data from data provider.
 						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
 						$newitemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
 								->one()->waitUntilTextPresent('Graph')->getText();
+
+						// Put text from suggestion into previously defined empty array.
+						// Function merges/combines arrays by putting newest value in the end of array.
 						array_push($mergedtext, $newitemtext);
-						//var_dump($mergedtext);
 					}
 					$this->assertEquals($data['expected'], $mergedtext);
 
