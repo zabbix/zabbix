@@ -143,7 +143,6 @@
 						postMessageOk(response['system-message-ok']);
 					}
 
-					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
 				.catch((error) => {
@@ -169,6 +168,8 @@
 		},
 
 		cancelEditing() {
+			this.disableNavigationWarning();
+
 			const curl = new Curl('zabbix.php', false);
 
 			curl.setArgument('action', 'template.dashboard.list');
