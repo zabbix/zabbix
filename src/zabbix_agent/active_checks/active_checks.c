@@ -430,38 +430,6 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	return ret;
 }
 
-static void clear_commands(void)
-{
-	int			i;
-
-	for (i = 0; i < active_commands.values_num; i++)
-	{
-		zbx_active_command_t	*command;
-
-		command = (zbx_active_command_t *)active_commands.values[i];
-
-		zbx_vector_active_command_ptr_remove_noorder(&active_commands, i);
-		free_active_command(command);
-		i--;
-	}
-}
-
-static void clear_command_results(void)
-{
-	int			i;
-
-	for (i = 0; i < command_results.values_num; i++)
-	{
-		zbx_command_result_t	*result;
-
-		result = (zbx_command_result_t *)command_results.values[i];
-
-		zbx_vector_command_result_ptr_remove_noorder(&command_results, i);
-		free_command_result(result);
-		i--;
-	}
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Parse list of active checks received from server                  *
@@ -547,9 +515,8 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
 			zbx_hashset_iter_remove(&iter);
 
-		clear_commands();
-
-		clear_command_results();
+		zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
+		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 	}
 
 	*config_revision_local = config_revision;
@@ -1274,7 +1241,7 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		clear_metric_results(addrs, prep_vec, now, ret);
 
 	if (SUCCEED == ret && SUCCEED == ret_commands)
-		clear_command_results();
+		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 ret:
 	zbx_json_free(&json);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -1652,7 +1619,7 @@ static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_conf
 	for (i = 0; i < active_commands.values_num; i++)
 		process_command((zbx_active_command_t *)active_commands.values[i]);
 
-	clear_commands();
+	zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
 
 	send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
 
