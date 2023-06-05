@@ -270,7 +270,7 @@ $form_grid
 			->setAriaRequired()
 	])
 	->addItem([
-		new CLabel(_('Description')),
+		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -305,7 +305,7 @@ $form_grid
 		new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())
 	])
 	->addItem([
-		new CLabel(_('Enabled')),
+		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', ZBX_CORRELATION_ENABLED))
 				->setChecked($data['status'] == ZBX_CORRELATION_ENABLED)
