@@ -78,7 +78,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int ti
 	task->process_cb = process_cb;
 	task->free_cb = clear_cb;
 	task->timeout_event = evtimer_new(ev,  async_event, (void *)task);
-	
+
 	evtimer_add(task->timeout_event, &tv);
 
 	task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
