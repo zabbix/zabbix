@@ -792,18 +792,18 @@ a.link-action {
 	log-disaster-bg: $zi-stop-sign
 ) {
 	// Dynamically generated classes:
-	// .na-bg,
-	// .normal-bg,
-	// .info-bg,
-	// .average-bg,
-	// .warning-bg,
-	// .high-bg,
-	// .disaster-bg,
-	// .log-na-bg,
-	// .log-info-bg,
-	// .log-warning-bg,
-	// .log-high-bg,
-	// .log-disaster-bg
+	//  .na-bg,
+	//  .normal-bg,
+	//  .info-bg,
+	//  .average-bg,
+	//  .warning-bg,
+	//  .high-bg,
+	//  .disaster-bg,
+	//  .log-na-bg,
+	//  .log-info-bg,
+	//  .log-warning-bg,
+	//  .log-high-bg,
+	//  .log-disaster-bg
 	.#{$type} {
 		@extend %severity-icon;
 

@@ -2884,17 +2884,13 @@ output {
     opacity: 0;
     cursor: pointer;
     -webkit-appearance: none;
-    /* Hides the slider so that custom slider can be made */
-    -moz-appearance: none;
-    /* Hides the slider so that custom slider can be made */
-    /* Special styling for WebKit/Blink */ }
+    -moz-appearance: none; }
     .range-control input[type=range]:focus {
       outline: none; }
     .range-control input[type=range]::-webkit-slider-thumb, .range-control input[type=range]::-moz-range-thumb {
       height: 10px;
       width: 10px;
       margin-top: 1px;
-      /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
       opacity: 0; }
     .range-control input[type=range]::-webkit-slider-runnable-track {
       height: 10px;
@@ -3230,9 +3226,7 @@ section {
   padding: 0;
   border: 0 none;
   background-color: transparent;
-  margin: 0;
-  /* All tab filters content container */
-  /* Top navigation labels */ }
+  margin: 0; }
   .filter-container.tabfilter-container .form-buttons [name="filter_new"],
   .filter-container.tabfilter-container .form-buttons [name="filter_update"] {
     margin-right: 20px; }
@@ -5047,10 +5041,23 @@ z-select button.focusable,
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
+.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
+.safari textarea[readonly] {
   color: #7d7d7d;
   background-color: #000000 !important;
   border-color: #5a5a5a; }
+
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari z-select[disabled] button, z-select[disabled] .safari button,
+.safari .z-select[disabled] button,
+.z-select[disabled] .safari button, .safari z-select[readonly] button, z-select[readonly] .safari button,
+.safari .z-select[readonly] button,
+.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span, .safari .checkbox-radio[readonly] + label span, .checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
+.safari textarea[readonly] {
+  -webkit-text-fill-color: #7d7d7d; }
+.safari input[readonly],
+.safari textarea[readonly] {
+  -webkit-text-fill-color: #ffffff !important; }
 
 .inaccessible .subfilter-enabled {
   color: black; }
