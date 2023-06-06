@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-07 18:05+0000\n"
+"PO-Revision-Date: 2023-05-31 09:24+0000\n"
 "Last-Translator: Hugo <hugopedrosantos@gmail.com>\n"
 "Language-Team: none\n"
 "Language: pt_PT\n"
@@ -279,7 +279,7 @@ msgstr "%1$s. %2$s: %3$s. %4$s."
 #: include/classes/core/CModuleManager.php:153
 #, c-format
 msgid "%1$s.php class must extend %2$s for module located at %3$s."
-msgstr ""
+msgstr "%1$s.php classe deve estender %2$s para módulo localizado em %3$s."
 
 #: app/controllers/CControllerMediatypeEnable.php:108
 #, c-format
@@ -569,6 +569,11 @@ msgstr "Eventos PROBLEMA reconhecidos"
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
 msgstr "Reconhcer problemas RESOLVIDOS"
+
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1961,6 +1966,11 @@ msgstr "Búlgaro (bg_BG)"
 #: report2.php:195
 msgid "By host"
 msgstr "Por host"
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
 
 #: report2.php:196
 msgid "By trigger template"
@@ -3411,6 +3421,11 @@ msgstr "Não é possível ligar o modelo \"%1$s\" ao servidor \"%2$s\" devido à
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Não é possível ligar o modelo \"%1$s\" ao servidor \"%2$s\" devido à expressão do gatilho \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3431,6 +3446,11 @@ msgstr "Não é possível ligar o modelo \"%1$s\" ao protótipo de servidor \"%2
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Não é possível ligar o modelo \"%1$s\" ao protótipo de servidor \"%2$s\" devido à expressão do gatilho \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3462,6 +3482,41 @@ msgstr "Não é possível ligar o modelo \"%1$s\" ao modelo \"%2$s\" devido à e
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Não é possível ligar o modelo \"%1$s\" ao modelo \"%2$s\", pois ocorreria uma ligação circular (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format

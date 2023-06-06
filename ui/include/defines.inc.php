@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha1');
+define('ZABBIX_VERSION',		'7.0.0alpha2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050022);
+define('ZABBIX_DB_VERSION',		6050024);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1077,6 +1077,10 @@ define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
 define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
 
+define('ZBX_ACK_STATUS_ALL',	0);
+define('ZBX_ACK_STATUS_UNACK',	1);
+define('ZBX_ACK_STATUS_ACK',	2);
+
 define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
 define('ZBX_PROBLEM_UPDATE_ACKNOWLEDGE',		0x02);
@@ -1558,6 +1562,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
+define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);

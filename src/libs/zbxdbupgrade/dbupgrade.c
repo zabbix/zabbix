@@ -21,7 +21,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "log.h"
 #include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
 #include "zbxdb.h"

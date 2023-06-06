@@ -27,7 +27,7 @@
  */
 
 $groupids = array_key_exists('groupids', $data['fields'])
-	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
 	: null;
 
 (new CWidgetFormView($data))
@@ -37,12 +37,12 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField($groupids)
 	->addField(array_key_exists('exclude_groupids', $data['fields'])
 		? new CWidgetFieldMultiSelectGroupView($data['fields']['exclude_groupids'],
-			$data['captions']['ms']['groups']['exclude_groupids']
+			$data['captions']['groups']['exclude_groupids']
 		)
 		: null
 	)
 	->addField(array_key_exists('hostids', $data['fields'])
-		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 		: null
 	)
@@ -76,9 +76,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_suppressed'])
 	)
-	->addField(
-		new CWidgetFieldCheckBoxView($data['fields']['unacknowledged'])
-	)
+	->addItem(getAcknowledgementStatusFieldsGroupViews($data['fields']))
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['sort_triggers'])
 	)
@@ -96,3 +94,17 @@ $groupids = array_key_exists('groupids', $data['fields'])
 		]
 	], JSON_THROW_ON_ERROR).');')
 	->show();
+
+function getAcknowledgementStatusFieldsGroupViews(array $fields): array {
+	$acknowledgement_status_field = new CWidgetFieldRadioButtonListView($fields['acknowledgement_status']);
+	$acknowledged_by_me_field = new CWidgetFieldCheckBoxView($fields['acknowledged_by_me']);
+
+	return [
+		new CLabel(_('Acknowledgement status')),
+		new CFormField(new CHorList([
+			$acknowledgement_status_field->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getLabel()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$acknowledged_by_me_field->getView()
+		]))
+	];
+}

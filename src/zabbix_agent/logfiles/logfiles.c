@@ -19,7 +19,6 @@
 
 #include "logfiles.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"

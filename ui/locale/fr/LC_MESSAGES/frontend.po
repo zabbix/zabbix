@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-22 19:25+0000\n"
+"PO-Revision-Date: 2023-05-29 17:52+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -570,6 +570,11 @@ msgstr "Événements PROBLÈME acquittés"
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
 msgstr "Événements RÉSOLUS acquittés"
+
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr "Etat de l'acquittement"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1962,6 +1967,11 @@ msgstr "Bulgare (bg_BG)"
 #: report2.php:195
 msgid "By host"
 msgstr "Par hôte"
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr "Par moi"
 
 #: report2.php:196
 msgid "By trigger template"
@@ -3412,6 +3422,11 @@ msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" en raison de 
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" en raison de l'expression du déclencheur \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3432,6 +3447,11 @@ msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" en 
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" en raison de l'expression du déclencheur \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3463,6 +3483,41 @@ msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\" en raison de 
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\" car une liaison circulaire (%3$s) se produirait."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -5183,7 +5238,7 @@ msgstr "Nombre de lignes correspondantes dans la supervision de fichier de log. 
 
 #: include/classes/data/CItemData.php:1808
 msgid "Count of network checks enqueued in the discovery queue."
-msgstr ""
+msgstr "Nombre de contrôles réseau mis en file d'attente dans la file d'attente de découverte."
 
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
@@ -13105,7 +13160,7 @@ msgstr "Niveau de zoom maximal"
 
 #: app/views/configuration.discovery.edit.php:83
 msgid "Maximum concurrent checks"
-msgstr ""
+msgstr "Contrôles simultanés maximum"
 
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
@@ -14048,7 +14103,7 @@ msgstr "Nouvelle expression régulière"
 #: app/views/administration.script.edit.php:372
 #: app/views/administration.script.edit.php:412
 msgid "New script"
-msgstr ""
+msgstr "Nouveau script"
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"

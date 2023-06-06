@@ -1408,6 +1408,7 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
+	zbx_init_library_common(zbx_log_impl);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip);
@@ -1427,7 +1428,6 @@ int	main(int argc, char **argv)
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
-
 
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
