@@ -81,18 +81,18 @@ $html_page = (new CHtmlPage())
 	);
 
 // create form
-$mediaTypeForm = (new CForm())->setName('mediaTypesForm');
+$media_type_form = (new CForm())->setName('mediaTypesForm');
 
 // create table
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'mediatype.list')
 	->getUrl();
 
-$mediaTypeTable = (new CTableInfo())
+$media_type_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_media_types'))
-				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
+				->onClick("checkAll('".$media_type_form->getName()."', 'all_media_types', 'mediatypeids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder'], $url),
@@ -104,28 +104,28 @@ $mediaTypeTable = (new CTableInfo())
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
 
-foreach ($data['mediatypes'] as $mediaType) {
-	switch ($mediaType['typeid']) {
+foreach ($data['mediatypes'] as $media_type) {
+	switch ($media_type['typeid']) {
 		case MEDIA_TYPE_EMAIL:
-			if ($mediaType['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
+			if ($media_type['provider'] == CMediatypeHelper::EMAIL_PROVIDER_SMTP) {
 				$details =
-					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
-					_('SMTP helo').NAME_DELIMITER.'"'.$mediaType['smtp_helo'].'", '.
-					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'].'"';
+					_('SMTP server').NAME_DELIMITER.'"'.$media_type['smtp_server'].'", '.
+					_('SMTP helo').NAME_DELIMITER.'"'.$media_type['smtp_helo'].'", '.
+					_('email').NAME_DELIMITER.'"'.$media_type['smtp_email'].'"';
 			}
 			else {
 				$details =
-					_('SMTP server').NAME_DELIMITER.'"'.$mediaType['smtp_server'].'", '.
-					_('email').NAME_DELIMITER.'"'.$mediaType['smtp_email'] . '"';
+					_('SMTP server').NAME_DELIMITER.'"'.$media_type['smtp_server'].'", '.
+					_('email').NAME_DELIMITER.'"'.$media_type['smtp_email'] . '"';
 			}
 			break;
 
 		case MEDIA_TYPE_EXEC:
-			$details = _('Script name').NAME_DELIMITER.'"'.$mediaType['exec_path'].'"';
+			$details = _('Script name').NAME_DELIMITER.'"'.$media_type['exec_path'].'"';
 			break;
 
 		case MEDIA_TYPE_SMS:
-			$details = _('GSM modem').NAME_DELIMITER.'"'.$mediaType['gsm_modem'].'"';
+			$details = _('GSM modem').NAME_DELIMITER.'"'.$media_type['gsm_modem'].'"';
 			break;
 
 		default:
@@ -135,8 +135,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 	// action list
 	$actionLinks = [];
-	if (!empty($mediaType['list_of_actions'])) {
-		foreach ($mediaType['list_of_actions'] as $action) {
+	if (!empty($media_type['list_of_actions'])) {
+		foreach ($media_type['list_of_actions'] as $action) {
 			$actionLinks[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
 				->setAttribute('data-actionid', $action['actionid'])
@@ -153,38 +153,38 @@ foreach ($data['mediatypes'] as $mediaType) {
 	$actionColumn->setAttribute('style', 'white-space: normal;');
 
 	$statusLink = 'zabbix.php'.
-		'?action='.($mediaType['status'] == MEDIA_TYPE_STATUS_DISABLED
+		'?action='.($media_type['status'] == MEDIA_TYPE_STATUS_DISABLED
 			? 'mediatype.enable'
 			: 'mediatype.disable'
 		).
-		'&mediatypeids[]='.$mediaType['mediatypeid'];
+		'&mediatypeids[]='.$media_type['mediatypeid'];
 
-	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
+	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
 			->addClass(ZBX_STYLE_GREEN)
 			->addClass('js-disable')
-			->setAttribute('data-mediatypeid', (int) $mediaType['mediatypeid'])
+			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
 		: (new CLink(_('Disabled')))
 			->addClass(ZBX_STYLE_RED)
 			->addClass('js-enable')
-			->setAttribute('data-mediatypeid', (int) $mediaType['mediatypeid']);
+			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId()
-		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		->setAttribute('data-mediatypeid', $mediaType['mediatypeid'])
+		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+		->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
 		->addClass('js-test-edit');
 
-	$name = (new CLink($mediaType['name']))
+	$name = (new CLink($media_type['name']))
 		->addClass('js-edit')
-		->setAttribute('data-mediatypeid', $mediaType['mediatypeid']);
+		->setAttribute('data-mediatypeid', $media_type['mediatypeid']);
 
 	// append row
-	$mediaTypeTable->addRow([
-		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
+	$media_type_table->addRow([
+		new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
-		CMediatypeHelper::getMediaTypes($mediaType['typeid']),
+		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
 		$actionColumn,
 		$details,
@@ -193,8 +193,8 @@ foreach ($data['mediatypes'] as $mediaType) {
 }
 
 // append table to form
-$mediaTypeForm->addItem([
-	$mediaTypeTable,
+$media_type_form->addItem([
+	$media_type_table,
 	$data['paging'],
 	new CActionButtonList('action', 'mediatypeids', [
 		'mediatype.enable' => [
@@ -229,7 +229,7 @@ $mediaTypeForm->addItem([
 
 // append form to widget
 $html_page
-	->addItem($mediaTypeForm)
+	->addItem($media_type_form)
 	->show();
 
 (new CScriptTag('view.init();'))

@@ -79,7 +79,7 @@ class CControllerMediatypeMessageEdit extends CController {
 		if (!$this->hasInput('message_type')) {
 			$diff = array_diff($this->message_types, $data['message_types']);
 			$diff = reset($diff);
-			$data['message_type'] = $diff ? $diff : CMediatypeHelper::MSG_TYPE_PROBLEM;
+			$data['message_type'] = $diff ?: CMediatypeHelper::MSG_TYPE_PROBLEM;
 			$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
 				$data['content_type']
 			);

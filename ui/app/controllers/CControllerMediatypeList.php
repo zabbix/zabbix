@@ -102,17 +102,17 @@ class CControllerMediatypeList extends CController {
 				'mediatypeids' => array_keys($data['mediatypes'])
 			]);
 
-			foreach ($data['mediatypes'] as &$mediaType) {
-				$mediaType['typeid'] = $mediaType['type'];
-				$mediaType['type'] = CMediatypeHelper::getMediaTypes($mediaType['type']);
-				$mediaType['list_of_actions'] = [];
+			foreach ($data['mediatypes'] as &$media_type) {
+				$media_type['typeid'] = $media_type['type'];
+				$media_type['type'] = CMediatypeHelper::getMediaTypes($media_type['type']);
+				$media_type['list_of_actions'] = [];
 
 				foreach ($actions as $action) {
 					foreach ($action['operations'] as $operation) {
 						if ($operation['operationtype'] == OPERATION_TYPE_MESSAGE
-								&& $operation['opmessage']['mediatypeid'] == $mediaType['mediatypeid']) {
+								&& $operation['opmessage']['mediatypeid'] == $media_type['mediatypeid']) {
 
-							$mediaType['list_of_actions'][$action['actionid']] = [
+							$media_type['list_of_actions'][$action['actionid']] = [
 								'actionid' => $action['actionid'],
 								'name' => $action['name'],
 								'eventsource' => $action['eventsource']
@@ -121,9 +121,9 @@ class CControllerMediatypeList extends CController {
 					}
 				}
 
-				CArrayHelper::sort($mediaType['list_of_actions'], ['name']);
+				CArrayHelper::sort($media_type['list_of_actions'], ['name']);
 			}
-			unset($mediaType);
+			unset($media_type);
 
 			CArrayHelper::sort($data['mediatypes'], [['field' => $sort_field, 'order' => $sort_order]]);
 		}

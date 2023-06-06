@@ -26,10 +26,13 @@
 
 window.mediatype_message_popup = new class {
 
-	init() {
+	init({message_templates}) {
 		this.overlay = overlays_stack.getById('mediatype-message-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.message_templates = Object.fromEntries(
+			message_templates.map((obj, index) => [index, { ...obj }])
+		);
 
 		this.#initActions();
 	}
@@ -46,8 +49,15 @@ window.mediatype_message_popup = new class {
 		};
 	}
 
+	/**
+	 * Retrieves the default message template based on the specified message_type.
+	 *
+	 * @param {string} message_type  Message type value.
+	 *
+	 * @returns {object}
+	 */
 	#getDefaultMessageTemplate(message_type) {
-		const message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
+		const message_templates = this.message_templates;
 		const media_type = this.form.querySelector('#type').value;
 		const message_format = document.querySelector(`input[name='content_type']:checked`). value;
 

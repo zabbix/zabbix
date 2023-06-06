@@ -492,7 +492,8 @@ $form
 	->addItem($parameters_exec_template)
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
-				'mediatype' => $data
+				'mediatype' => $data,
+				'message_templates' => CMediatypeHelper::getAllMessageTemplates()
 			]).');'))->setOnDocumentReady()
 	);
 

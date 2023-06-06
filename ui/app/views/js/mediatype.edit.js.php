@@ -21,13 +21,12 @@
 
 /**
  * @var CView $this
- * @var array $data
  */
 ?>
 
 window.mediatype_edit_popup = new class {
 
-	init({mediatype}) {
+	init({mediatype, message_templates}) {
 		this.overlay = overlays_stack.getById('media-type-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -35,7 +34,9 @@ window.mediatype_edit_popup = new class {
 		this.mediatype = mediatype;
 		this.row_num = 0;
 		this.message_template_list = {};
-		this.message_templates = <?= json_encode(CMediatypeHelper::getAllMessageTemplates(), JSON_FORCE_OBJECT) ?>;
+		this.message_templates = Object.fromEntries(
+			message_templates.map((obj, index) => [index, { ...obj }])
+		);
 
 		this.#loadView(mediatype);
 		this.#initActions();
@@ -53,11 +54,11 @@ window.mediatype_edit_popup = new class {
 			this.row_num++;
 		}
 
-		this.#populateMessageTemplates(<?= json_encode(array_values($data['message_templates'])) ?>);
+		this.#populateMessageTemplates(this.mediatype['message_templates']);
 
-		this.form.querySelector('#message-templates').addEventListener('click', (event) => {
-			this.#editMessageTemplate(event);
-		});
+		this.form.querySelector('#message-templates').addEventListener('click', (event) =>
+			this.#editMessageTemplate(event)
+		);
 
 		this.form.querySelector('.element-table-add').addEventListener('click', () => {
 			this.#addExecParam();
@@ -557,9 +558,7 @@ window.mediatype_edit_popup = new class {
 
 		const authentication = this.form.querySelector('#smtp_authentication');
 
-		authentication.onchange = () => {
-			this.#loadAuthenticationFields(provider);
-		};
+		authentication.onchange = () => this.#loadAuthenticationFields(provider);
 
 		this.#loadAuthenticationFields(provider);
 

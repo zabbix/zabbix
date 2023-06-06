@@ -104,7 +104,9 @@ $form
 	->addItem($form_grid)
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	->addItem(
-		(new CScriptTag('mediatype_message_popup.init();'))->setOnDocumentReady()
+		(new CScriptTag('mediatype_message_popup.init('.json_encode([
+				'message_templates' => CMediatypeHelper::getAllMessageTemplates()
+			]).');'))->setOnDocumentReady()
 	);
 
 $output = [
