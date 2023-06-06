@@ -40,7 +40,8 @@ $form = (new CForm())
 		->setArgument('moduleids[]', $data['moduleid'])
 		->getUrl()
 	)
-	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
+	->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // create module tab
 $module_tab = (new CFormList())
