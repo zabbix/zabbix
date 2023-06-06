@@ -72,7 +72,7 @@ static void	agent_context_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->result);
 }
 
-int	agent_task_process(short event, void *data)
+static int	agent_task_process(short event, void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
@@ -178,7 +178,7 @@ int	agent_task_process(short event, void *data)
 	return ZBX_ASYNC_TASK_STOP;
 }
 
-void	agent_task_free(void *data)
+static void	agent_task_free(void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
@@ -283,10 +283,14 @@ static int	async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poll
 	poller_config->processing++;
 	zbx_async_poller_add_task(poller_config->base, agent_context->s.socket, agent_context,
 			agent_context->poller_config->config_timeout, agent_task_process, agent_task_free);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
+
 	return SUCCEED;
 out:
 	agent_context_clean(agent_context);
 	zbx_free(agent_context);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -547,7 +551,6 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	struct timeval		tv = {1, 0};
 	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
-	zbx_async_poller_t	poller;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */

@@ -21,12 +21,7 @@
 #define ZABBIX_ASYNCPOLLER_H
 
 #include "zbxcommon.h"
-
-#define ZBX_ASYNC_EVENT_CLOSE	0x0001
-#define ZBX_ASYNC_EVENT_READ	0x0002
-#define ZBX_ASYNC_EVENT_WRITE	0x0004
-#define ZBX_ASYNC_EVENT_ERROR	0x0008
-#define ZBX_ASYNC_EVENT_TIMEOUT	0x0010
+#include "event.h"
 
 typedef enum
 {
@@ -40,29 +35,7 @@ zbx_async_task_state_t;
 typedef int (*zbx_async_task_process_cb_t)(short event, void *data);
 typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
-typedef struct zbx_async_poller zbx_async_poller_t;
 
-typedef struct
-{
-	void		*data;
-
-	zbx_async_task_process_cb_t	process_cb;
-	zbx_async_task_clear_cb_t	free_cb;
-
-	struct event	*tx_event;
-	struct event	*rx_event;
-	struct event	*timeout_event;
-}
-zbx_async_task_t;
-
-
-struct zbx_async_poller
-{
-	struct event_base	*ev;
-	struct event		*ev_timer;
-};
-
-void	zbx_async_poller_init(zbx_async_poller_t *poller, struct event_base *ev);
 void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
 		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 
