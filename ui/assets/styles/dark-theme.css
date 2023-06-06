@@ -6236,10 +6236,6 @@ svg {
   .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
     margin-right: 5px; }
 
-::placeholder {
-  color: #9d9d9d;
-  opacity: 1; }
-
 .icon-action-command,
 .icon-action-close,
 .icon-action-msg,
