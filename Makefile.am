@@ -136,6 +136,18 @@ css_icons:
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
+modules_build:
+	for i in src/modules/*/Makefile; do \
+		dir=$${i%/Makefile}; \
+		$(MAKE) -C $$dir; \
+	done
+
+modules_clean:
+	for i in src/modules/*/Makefile; do \
+		dir=$${i%/Makefile}; \
+		$(MAKE) -C $$dir clean; \
+	done
+
 ## cmocka test support
 if TESTS
 WRAP_DB_FUNCS = \
@@ -181,12 +193,12 @@ tests_build:
 	cd tests && \
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS)"
 
-tests: tests_build
+tests: tests_build modules_build
 	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
-clean: clean-recursive
+clean: clean-recursive modules_clean
 	cd tests && $(MAKE) clean
 endif
 
-.PHONY: test tests clean
+.PHONY: test tests clean modules_build modules_clean
