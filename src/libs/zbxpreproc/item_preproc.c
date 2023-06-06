@@ -20,7 +20,6 @@
 #include "item_preproc.h"
 
 #include "zbxregexp.h"
-#include "zbxlog.h"
 #include "zbxembed.h"
 #include "zbxprometheus.h"
 #include "zbxvariant.h"
