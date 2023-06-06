@@ -67,7 +67,7 @@ static void	*es_malloc(void *udata, duk_size_t size)
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
-			env->error = zbx_dsprintf(env->error, "cannot allocate memory");
+			env->error = zbx_strdup(env->error, "cannot allocate memory");
 
 		return NULL;
 	}
@@ -99,7 +99,7 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 	if (env->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
-			env->error = zbx_dsprintf(env->error, "cannot allocate memory");
+			env->error = zbx_strdup(env->error, "cannot allocate memory");
 
 		return NULL;
 	}
