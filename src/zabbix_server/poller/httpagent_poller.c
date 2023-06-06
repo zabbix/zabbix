@@ -411,13 +411,13 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		}
 	}
 
-	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
 	zbx_dc_config_clean_items(items, NULL, num);
 
 	if (items != &item)
 		zbx_free(items);
 exit:
+	zbx_preprocessor_flush();
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	poller_config->queued += num;
