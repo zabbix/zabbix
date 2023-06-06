@@ -1632,7 +1632,9 @@ textarea {
 	}
 	padding: 4px 5px;
 	margin: 0;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -2548,6 +2550,21 @@ $icon-widget-btn: (
 		color: $input-disabled-placeholder-color;
 		-webkit-text-fill-color: $input-disabled-placeholder-color;
 		opacity: 1;
+	}
+}
+
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
 	}
 }
 

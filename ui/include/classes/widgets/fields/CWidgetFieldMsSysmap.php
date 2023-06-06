@@ -19,23 +19,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+class CWidgetFieldMsSysmap extends CWidgetFieldMs {
 
-class testAPIInfo extends CAPITest {
-	public function testAPIInfo_VersionWithAuth() {
-		$error = [
-			'code' => -32602,
-			'message' => 'Invalid params.',
-			'data' => 'The "apiinfo.version" method must be called without the "auth" parameter.'
-		];
+	public function __construct($name, $label) {
+		parent::__construct($name, $label);
 
-		$this->call('apiinfo.version', [], $error);
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$this->disableAuthorization();
-		$result = $this->call('apiinfo.version', []);
-
-		$this->assertSame('6.0.19', $result['result']);
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
 	}
 }
