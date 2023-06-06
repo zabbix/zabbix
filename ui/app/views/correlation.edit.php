@@ -26,8 +26,7 @@
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('correlation')))->removeId())
-	->setId('correlationForm')
-	->setName('correlations')
+	->setId('correlation-form')
 	->addVar('correlationid', $data['correlationid'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
@@ -266,7 +265,7 @@ $form_grid
 	])
 	->addItem([
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
-		(new CDiv($condition_table))
+		(new CFormField($condition_table))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
@@ -284,7 +283,7 @@ $form_grid
 		new CLabel(_('Operations')),
 		new CFormField(
 			(new CCheckBoxList())
-				->setVertical(true)
+				->setVertical()
 				->setOptions([
 					[
 						'label' => _('Close old events'),
@@ -304,8 +303,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(''),
-		new CDiv((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())
+		new CFormField((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())
 	])
 	->addItem([
 		new CLabel(_('Enabled'), 'status'),

@@ -27,7 +27,7 @@
 $inline_js = getPagePostJs().$this->readJsFile('correlation.condition.edit.js.php');
 
 $form = (new CForm())
-	->setId('correlationConditionForm')
+	->setId('correlation-condition-form')
 	->setName('conditions')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('conditiontype', $data['conditiontype'])

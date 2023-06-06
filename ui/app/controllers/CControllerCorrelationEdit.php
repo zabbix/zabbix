@@ -32,7 +32,7 @@ class CControllerCorrelationEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'correlationid' =>	'db correlation.correlationid'
+			'correlationid' => 'db correlation.correlationid'
 		];
 
 		$ret = $this->validateInput($fields);

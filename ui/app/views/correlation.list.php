@@ -67,7 +67,7 @@ $html_page = (new CHtmlPage())
 		->addVar('action', 'correlation.list')
 	);
 
-$form = (new CForm())->setName('correlationsForm');
+$form = (new CForm())->setName('correlations-form');
 
 $url = (new CUrl('zabbix.php'))
 	->setArgument('action', 'correlation.list')

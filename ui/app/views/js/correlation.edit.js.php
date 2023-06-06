@@ -27,7 +27,7 @@
 window.correlation_edit_popup = new class {
 
 	init({correlation}) {
-		this.overlay = overlays_stack.getById('correlationForm');
+		this.overlay = overlays_stack.getById('correlation-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.correlation = correlation;
@@ -36,7 +36,7 @@ window.correlation_edit_popup = new class {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
 				const overlay = PopUp('correlation.condition.edit', {}, {
-					dialogueid: 'correlationConditionForm',
+					dialogueid: 'correlation-condition-form',
 					dialogue_class: 'modal-popup-medium'
 				});
 
