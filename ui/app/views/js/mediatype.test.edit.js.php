@@ -24,107 +24,150 @@
  */
 ?>
 
-/**
- * Send media type test data to server and get a response.
- *
- * @param {Overlay} overlay
- */
-function mediatypeTestSend(overlay) {
-	var $form = overlay.$dialogue.find('form'),
-		$form_fields = $form.find('#sendto, #subject, #message'),
-		data = $form.serialize(),
-		url = new Curl($form.attr('action'));
+window.mediatype_test_edit_popup = new class {
 
-	$form.trimValues(['#sendto', '#subject', '#message']);
-	$form_fields.prop('disabled', true);
-	$('#mediatypetest_log').addClass('<?= ZBX_STYLE_DISABLED ?>');
+	init() {
+		this.overlay = overlays_stack.getById('mediatype_test_edit');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
-	overlay.setLoading();
-	overlay.xhr = jQuery.ajax({
-		url: url.getUrl(),
-		data: data,
-		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-			if ('error' in ret) {
-				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
-
-				message_box.insertBefore($form);
-			}
-			else if ('success' in ret) {
-				const message_box = makeMessageBox('good', ret.success.messages, ret.success.title);
-
-				message_box.insertBefore($form);
-			}
-
-			if ('response' in ret) {
-				jQuery('#webhook_response_value', $form).val(ret.response.value);
-				jQuery('#webhook_response_type', $form).text(ret.response.type);
-			}
-
-			if ('debug' in ret) {
-				$('#mediatypetest_log').removeClass('disabled');
-				sessionStorage.setItem('mediatypetest', JSON.stringify(ret.debug));
-			}
-
-			overlay.unsetLoading();
-			$form_fields.prop('disabled', false);
-		},
-		error: function(request, status, error) {
-			if (request.status == 200) {
-				overlay.unsetLoading();
-				$form_fields.prop('disabled', false);
-				alert(error);
-			}
-			else if (window.document.forms['mediatypetest_form']) {
-				var request = this,
-					retry = function() {
-						if (window.document.forms['mediatypetest_form']) {
-							overlay.xhr = jQuery.ajax(request);
-						}
-					};
-
-				// Retry with 2s interval.
-				setTimeout(retry, 2000);
-			}
-		},
-		dataType: 'json',
-		type: 'post'
-	});
-}
-
-function openLogPopup(opener) {
-	if ($(opener).hasClass('<?= ZBX_STYLE_DISABLED ?>')) {
-		return;
+		if (this.form.querySelector('#mediatypetest_log')) {
+			this.form.querySelector('#mediatypetest_log').addEventListener('click', (event) =>
+				this.#openLogPopup(event.target)
+			);
+		}
 	}
 
-	var debug = JSON.parse(sessionStorage.getItem('mediatypetest')||'null'),
-		$content = $('<div>'),
-		$logitems = $('<div>', {class: 'logitems'}),
-		$footer = $('<div>', {class: 'logtotalms'});
+	submit() {
+		const fields = getFormFields(this.form);
+		const curl = new Curl('zabbix.php');
 
-	if (debug) {
-		debug.log.forEach(function (entry) {
-			$('<pre>').text(entry.ms + ' ' + entry.level + ' ' + entry.message).appendTo($logitems);
+		curl.setArgument('action', 'mediatype.test.send');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('mediatype'), JSON_THROW_ON_ERROR) ?>
+		);
+
+		document.querySelector('#mediatypetest_log').classList.add('<?= ZBX_STYLE_DISABLED ?>');
+
+		// Trim fields.
+		for (let key in fields) {
+			if(['sendto', 'subject', 'message'].includes(key)) {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		this.overlay.setLoading();
+
+		this.#post(curl.getUrl(), fields, (response) => {
+			const message_box = makeMessageBox('good', response.success.messages, response.success.title);
+
+			message_box.insertBefore(this.form);
 		});
-		$footer.text(<?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms');
-		$content.append($logitems);
 	}
 
-	overlayDialogue({
-		'title': <?= json_encode(_('Media type test log')) ?>,
-		'content': $content,
-		'class': 'modal-popup modal-popup-generic debug-modal position-middle',
-		'footer': $footer,
-		'buttons': [
-			{
-				'title': <?= json_encode(_('Ok')) ?>,
-				'cancel': true,
-				'focused': true,
-				'action': () => {}
-			}
-		]
-	}, opener);
-}
+	/**
+	 * Opens Media type test log popup.
+	 *
+	 * @param {string} trigger_element  Element that triggered the opening of the popup.
+	 */
+	#openLogPopup(trigger_element) {
+		if (trigger_element.classList.contains('<?= ZBX_STYLE_DISABLED ?>')) {
+			return;
+		}
 
-sessionStorage.removeItem('mediatypetest');
+		const debug = JSON.parse(sessionStorage.getItem('mediatypetest') || 'null');
+		const content = document.createElement('div');
+		const logitems = document.createElement('div');
+		const footer = document.createElement('div');
+
+		if (debug) {
+			debug.log.forEach(function (entry) {
+				var preElement = document.createElement('pre');
+				preElement.textContent = entry.ms + ' ' + entry.level + ' ' + entry.message;
+				logitems.appendChild(preElement);
+			});
+
+			footer.textContent = <?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms';
+			content.appendChild(logitems);
+		}
+
+		overlayDialogue({
+			'title': <?= json_encode(_('Media type test log')) ?>,
+			'content': content,
+			'class': 'modal-popup modal-popup-generic debug-modal position-middle',
+			'footer': footer,
+			'buttons': [
+				{
+					'title': <?= json_encode(_('Ok')) ?>,
+					'cancel': true,
+					'focused': true,
+					'action': function () {}
+				}
+			]
+		}, trigger_element);
+	}
+
+	/**
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 *
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 */
+	#post(url, data, success_callback) {
+		fetch(url, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('debug' in response) {
+					$('#mediatypetest_log').removeClass('disabled');
+					sessionStorage.setItem('mediatypetest', JSON.stringify(response.debug));
+				}
+
+				if ('response' in response) {
+					// Set 'webhook_response_value' input field value
+					const response_value_element = document.querySelector('#webhook_response_value');
+					if (response_value_element) {
+						response_value_element.value = response.response.value;
+					}
+
+					// Set 'webhook_response_type' text element value
+					const response_type_element = document.querySelector('#webhook_response_type');
+					if (response_type_element) {
+						response_type_element.textContent = response.response.type;
+					}
+				}
+
+				if ('error' in response) {
+					throw { error: response.error };
+				}
+
+				return response;
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+				this.form.parentNode.insertBefore(message_box, this.form);
+			})
+			.finally(() => this.overlay.unsetLoading());
+	}
+}

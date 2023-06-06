@@ -27,6 +27,7 @@
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatype')))->removeId())
 	->setName('mediatypetest_form')
+	->setId('mediatype_test_edit')
 	->addVar('action', 'mediatype.test.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem(getMessages());
@@ -102,7 +103,6 @@ switch ($data['type']) {
 						(new CLinkAction(_('Open log')))
 							->setId('mediatypetest_log')
 							->addClass(ZBX_STYLE_DISABLED)
-							->onClick('openLogPopup(this)')
 					))
 				])
 			]);
@@ -139,11 +139,16 @@ switch ($data['type']) {
 			]);
 }
 
-$form->addItem($form_grid);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('mediatype_test_edit_popup.init('.json_encode([
+		]).');'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('mediatype.test.edit.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.test.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -151,7 +156,7 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'return mediatypeTestSend(overlay);'
+			'action' => 'mediatype_test_edit_popup.submit();'
 		]
 	]
 ];

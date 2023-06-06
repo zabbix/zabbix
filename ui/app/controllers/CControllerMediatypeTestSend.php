@@ -28,6 +28,10 @@ class CControllerMediatypeTestSend extends CController {
 	 */
 	private $mediatype;
 
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
 	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',

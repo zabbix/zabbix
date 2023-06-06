@@ -47,9 +47,11 @@
 					this.#edit({mediatypeid: e.target.dataset.mediatypeid});
 				}
 				else if (e.target.classList.contains('js-test-edit')) {
-					PopUp('mediatype.test.edit',
-						{mediatypeid: e.target.dataset.mediatypeid},
-						{dialogue_class: 'modal-popup-medium'}
+					PopUp('mediatype.test.edit', {mediatypeid: e.target.dataset.mediatypeid},
+						{
+							dialogue_class: 'modal-popup-medium',
+							dialogueid: 'mediatype_test_edit'
+						}
 					);
 				}
 				else if (e.target.classList.contains('js-action-edit')) {
