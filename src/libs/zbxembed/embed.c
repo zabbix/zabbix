@@ -66,12 +66,8 @@ static void	*es_malloc(void *udata, duk_size_t size)
 
 	if (env->total_alloc + size + 8 > ZBX_ES_MEMORY_LIMIT)
 	{
-
 		if (NULL == env->ctx)
-		{
-			env->error = zbx_dsprintf(env->error, "cannot allocate memory, requested " ZBX_FS_SIZE_T
-					" bytes", env->total_alloc + size + 8);
-		}
+			env->error = zbx_dsprintf(env->error, "cannot allocate memory");
 
 		return NULL;
 	}
@@ -103,10 +99,7 @@ static void	*es_realloc(void *udata, void *ptr, duk_size_t size)
 	if (env->total_alloc + size + 8 - old_size > ZBX_ES_MEMORY_LIMIT)
 	{
 		if (NULL == env->ctx)
-		{
-			env->error = zbx_dsprintf(env->error, "cannot allocate memory, requested " ZBX_FS_SIZE_T
-					" bytes", env->total_alloc + size + 8);
-		}
+			env->error = zbx_dsprintf(env->error, "cannot allocate memory");
 
 		return NULL;
 	}
@@ -664,8 +657,10 @@ out:
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated memory: "
-			ZBX_FS_SIZE_T, __func__, zbx_result_string(ret), ZBX_NULL2EMPTY_STR(*error),
-			es->env->total_alloc, es->env->max_total_alloc);
+			ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
+			ZBX_NULL2EMPTY_STR(*error), es->env->total_alloc, es->env->max_total_alloc,
+			ZBX_ES_MEMORY_LIMIT);
+	es->env->max_total_alloc = 0;
 
 	return ret;
 }
