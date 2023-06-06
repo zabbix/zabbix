@@ -85,6 +85,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 				'GUI', 'Autoregistration', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros',
 				'Value mapping', 'Working time', 'Trigger severities', 'Trigger displaying options', 'Modules', 'Other'
 		], $popup_menu->getItems()->asText());
+		$popup_menu->close();
 
 		// Check if the New regular expression button is clickable.
 		$this->assertTrue($this->query('button:New regular expression')->one()->isClickable());
@@ -97,17 +98,22 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$name_list[] = ["Name" => $name];
 		}
 		$this->assertTableHasData($name_list);
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->one()->getText());
 
-		// Check the Delete button.
+		$selected_counter = $this->query('id:selected_count')->one();
+		$this->assertEquals('0 selected', $selected_counter->getText());
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
+
+		$this->query('xpath://td/input[@type="checkbox"]')->one()->click();
+		$this->assertEquals('1 selected', $selected_counter->getText());
+		$this->assertTrue($this->query('button:Delete')->one()->isEnabled());
 	}
 
 	/**
 	 * Test pressing mass delete button but then cancelling.
 	 */
 	public function testPageAdministrationGeneralRegexp_DeleteCancel() {
-		$this->calculateHash();
+		$hash_regexps = CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid;');
+		$hash_expressions = CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid;');
 
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('name:all-regexes')->one()->click();
@@ -116,7 +122,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 
 		// Make sure nothing has been deleted.
-		$this->verifyHash();
+		$this->assertEquals($hash_regexps, CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid;'));
+		$this->assertEquals($hash_expressions, CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid;'));
 
 	}
 
@@ -130,7 +137,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
 
 		// Delete a regexp.
-		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('id:regexids_'.$regexp['regexpid'])->one()->click();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
@@ -149,7 +156,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
 		// Delete all regexps.
-		$this->page->login()->open('zabbix.php?action=regex.list');
+		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('name:all-regexes')->one()->click();
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
