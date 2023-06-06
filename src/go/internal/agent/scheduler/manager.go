@@ -251,7 +251,11 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 		params := []string{rc.Command, wait}
 
 		if !keyaccess.CheckRules("system.run", params) {
-			log.Warningf("Remote command '%s' is not allowed", rc.Command)
+			log.Debugf("Remote command '%s' is not allowed", rc.Command)
+
+			update.sink.WriteCommand(&resultcache.CommandResult{ID: rc.Id, Error: errors.New("Unsupported item key.")})
+			update.sink.Flush()
+
 			continue
 		}
 
@@ -266,6 +270,10 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 
 		} else {
 			log.Warningf("Remote commands cannot be executed, plugin \"system.run\" is unavailable")
+
+			update.sink.WriteCommand(&resultcache.CommandResult{ID: rc.Id, Error: errors.New("Unsupported item key.")})
+			update.sink.Flush()
+
 			break
 		}
 	}
