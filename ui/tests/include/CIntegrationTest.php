@@ -380,9 +380,14 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on failed wait operation
 	 */
 	protected static function waitForShutdown($component, array $child_pids) {
-		if (!self::checkPidKilled($component)) {
-			throw new Exception('Failed to wait for component "'.$component.'" to stop.');
-		}
+	//		if (!self::checkPidKilled($component)) {
+	$arrFiles = scandir(self::getPidPath($component));
+	$debug = var_export($arrFiles, true);
+
+	$logfile = var_export(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)), true);
+
+			throw new Exception('Failed to wait for component "'.$component.'" to stop. FILES: '. $debug, " ; SERVER LOGS: ". $logfile);
+//		}
 
 		$failed_pids = [];
 
