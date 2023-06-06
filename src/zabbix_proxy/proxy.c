@@ -238,7 +238,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
-	1 /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
+	1 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -461,6 +462,11 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
 	}
 	else
 		return FAIL;
@@ -953,6 +959,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{NULL}
 	};
@@ -1635,6 +1643,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(httpagent_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_AGENT_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
 				zbx_thread_start(httpagent_poller_thread, &thread_args, &threads[i]);
 				break;

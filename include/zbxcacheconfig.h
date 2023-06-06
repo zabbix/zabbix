@@ -38,7 +38,8 @@
 #define	ZBX_POLLER_TYPE_HISTORY		5
 #define	ZBX_POLLER_TYPE_ODBC		6
 #define	ZBX_POLLER_TYPE_HTTPAGENT	7
-#define	ZBX_POLLER_TYPE_COUNT		8	/* number of poller types */
+#define	ZBX_POLLER_TYPE_AGENT		8
+#define	ZBX_POLLER_TYPE_COUNT		9	/* number of poller types */
 
 typedef enum
 {
@@ -53,6 +54,7 @@ zbx_session_type_t;
 #define ZBX_MAX_POLLER_ITEMS		128	/* MAX(ZBX_MAX_JAVA_ITEMS, ZBX_MAX_SNMP_ITEMS) */
 #define ZBX_MAX_PINGER_ITEMS		128
 #define ZBX_MAX_HTTPAGENT_ITEMS		1000
+#define ZBX_MAX_AGENT_ITEMS		1000
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 

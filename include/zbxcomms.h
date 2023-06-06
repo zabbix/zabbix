@@ -215,6 +215,9 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
 
+int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout, unsigned int tls_connect, const char *tls_arg1);
+
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
 #define ZBX_TCP_LARGE			0x04

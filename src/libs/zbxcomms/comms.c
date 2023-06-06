@@ -423,7 +423,7 @@ static int	zbx_socket_connect_wait(zbx_socket_t *s, char **error)
 	return SUCCEED;
 }
 
-static int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, const char *tls_arg1)
 {
 	int		flags, ret = FAIL;

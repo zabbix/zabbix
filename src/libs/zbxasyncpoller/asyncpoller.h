@@ -63,6 +63,8 @@ struct zbx_async_poller
 };
 
 void	zbx_async_poller_init(zbx_async_poller_t *poller, struct event_base *ev);
+void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
+		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
 
 
 #endif

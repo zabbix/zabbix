@@ -38,7 +38,6 @@ static void	async_poller_timeout_cb(evutil_socket_t fd, short what, void *arg)
 
 }
 
-
 void	zbx_async_poller_init(zbx_async_poller_t *poller, struct event_base *ev)
 {
 	poller->ev = ev;
@@ -80,7 +79,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 		event_add(task->tx_event, NULL);
 }
 
-void	zbx_async_poller_add_task(zbx_async_poller_t *poller, int fd, void *data, int timeout,
+void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
 		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb)
 {
 	zbx_async_task_t	*task;
@@ -90,12 +89,12 @@ void	zbx_async_poller_add_task(zbx_async_poller_t *poller, int fd, void *data, i
 	task->process_cb = process_cb;
 	task->free_cb = clear_cb;
 
-	evtimer_new(poller->ev,  async_event, (void *)task);
+	task->timeout_event = evtimer_new(ev,  async_event, (void *)task);
 	struct timeval	tv = {timeout, 0};
 	evtimer_add(task->timeout_event, &tv);
 
-	task->rx_event = event_new(poller->ev, fd, EV_READ, async_event, (void *)task);
-	task->tx_event = event_new(poller->ev, fd, EV_WRITE, async_event, (void *)task);
+	task->rx_event = event_new(ev, fd, EV_READ, async_event, (void *)task);
+	task->tx_event = event_new(ev, fd, EV_WRITE, async_event, (void *)task);
 
 	/* call initialization event */
 	async_event(fd, 0, task);
@@ -192,6 +191,7 @@ void	chat_task_free(void *data)
 	zbx_free(task);
 }
 
+/*
 static chat_task_t	*create_task(void)
 {
 	chat_task_t		*task;
@@ -221,6 +221,7 @@ static chat_task_t	*create_task(void)
 
 	return task;
 }
+*/
 
 
 void	test(void)

@@ -3179,12 +3179,12 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 					*event = POLLIN;
 					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_READ", __func__,
 							zbx_result_string(ret));
-					break;
+					return FAIL;
 				case SSL_ERROR_WANT_WRITE:
 					*event = POLLOUT;
 					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_WRITE", __func__,
 							zbx_result_string(ret));
-					break;
+					return FAIL;
 			}
 		}
 

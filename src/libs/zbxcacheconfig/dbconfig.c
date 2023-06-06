@@ -259,7 +259,6 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				return ZBX_POLLER_TYPE_PINGER;
 			}
 			ZBX_FALLTHROUGH;
-		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
@@ -295,6 +294,12 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
+		case ITEM_TYPE_ZABBIX:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_AGENT;		
+
 	}
 
 	return ZBX_NO_POLLER;
@@ -10710,6 +10715,10 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			if (0 == (max_items = ZBX_MAX_HTTPAGENT_ITEMS - processing))
+				goto out;
+			break;
+		case ZBX_POLLER_TYPE_AGENT:
+			if (0 == (max_items = ZBX_MAX_AGENT_ITEMS - processing))
 				goto out;
 			break;
 		default:

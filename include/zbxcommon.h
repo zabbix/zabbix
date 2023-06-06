@@ -308,7 +308,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
 #define ZBX_PROCESS_TYPE_DISCOVERYMANAGER	39
 #define ZBX_PROCESS_TYPE_HTTPAGENT_POLLER	40
-#define ZBX_PROCESS_TYPE_COUNT			41	/* number of process types */
+#define ZBX_PROCESS_TYPE_AGENT_POLLER		41
+#define ZBX_PROCESS_TYPE_COUNT			42	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
