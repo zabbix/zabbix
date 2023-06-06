@@ -940,7 +940,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'SMTP helo' => '  !@#$%%^&*(.com  ',
 						'Authentication' => 'Username and password',
 						'Username' => '   χρήστης  ',
-						'Description' => '   test  ',
+						'Description' => '   test  '
 					],
 					'options_tab' => [
 						'id:maxsessions_type' => 'Custom',
