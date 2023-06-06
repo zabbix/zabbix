@@ -41,7 +41,7 @@ zbx_httpagent_context;
 typedef enum
 {
 	ZABBIX_AGENT_STEP_CONNECT_WAIT = 0,
-	ZABBIX_AGENT_STEP_SEND, 
+	ZABBIX_AGENT_STEP_SEND,
 	ZABBIX_AGENT_STEP_RECV
 }
 zbx_zabbix_agent_step_t;
@@ -167,12 +167,11 @@ int	agent_task_process(short event, void *data)
 				agent_context->ret = SUCCEED;
 				return ZBX_ASYNC_TASK_STOP;
 			}
-			else 
+			else
 			{
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 			}
-				
 			break;
 	}
 

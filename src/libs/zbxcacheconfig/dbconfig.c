@@ -298,8 +298,7 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
 				break;
 
-			return ZBX_POLLER_TYPE_AGENT;		
-
+			return ZBX_POLLER_TYPE_AGENT;
 	}
 
 	return ZBX_NO_POLLER;
