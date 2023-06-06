@@ -516,6 +516,7 @@ func (t *commandTask) perform(s Scheduler) {
 		t.output.WriteCommand(cr)
 		t.output.Flush()
 
+		s.FinishTask(t)
 	}()
 }
 

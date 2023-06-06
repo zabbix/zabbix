@@ -302,6 +302,9 @@ func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink res
 			taskBase: taskBase{plugin: p, active: true},
 			options:  &agent.Options,
 		}
+
+		log.Debugf("[%d] created configurator task for plugin %s", c.id, p.name())
+
 		_ = task.reschedule(now)
 		p.enqueueTask(task)
 	}
@@ -313,6 +316,8 @@ func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink res
 		output:   sink,
 	}
 
+	log.Debugf("[%d] created remote command task for plugin '%s' command '%s'", c.id, p.name(), params)
+
 	_ = task.reschedule(now)
 	p.enqueueTask(task)
 
@@ -321,7 +326,9 @@ func (c *client) addCommand(p *pluginAgent, id uint64, params []string, sink res
 		p.refcount++
 		c.pluginsInfo[p] = info
 	}
-	info.used = now
+
+	// set 'used' time in future to avoid expiring system.run plugin when updating metrics
+	info.used = now.Add(time.Hour)
 
 	log.Debugf("scheduled remote command(%d) '%s'", id, params[0])
 }

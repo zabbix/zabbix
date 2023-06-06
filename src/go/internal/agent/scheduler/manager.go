@@ -267,7 +267,6 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 			} else {
 				m.pluginQueue.Update(p)
 			}
-
 		} else {
 			log.Warningf("Remote commands cannot be executed, plugin \"system.run\" is unavailable")
 
@@ -277,8 +276,6 @@ func (m *Manager) processCommandRequest(update *commandRequest) {
 			break
 		}
 	}
-
-	m.cleanupClient(c, update.now)
 }
 
 // processQueue processes queued plugins/tasks
