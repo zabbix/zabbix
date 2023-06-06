@@ -467,7 +467,9 @@ if ($data['action'] === 'user.edit') {
 		);
 	}
 	else {
-		$permissions_form_list->addRow(new CLabel(_('Role'), 'roleid_ms'), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark($data['roleid_required']),
+			$role_multiselect
+		);
 	}
 
 	if ($data['roleid']) {
