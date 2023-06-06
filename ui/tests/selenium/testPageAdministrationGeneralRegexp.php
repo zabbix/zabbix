@@ -26,41 +26,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
 	use TableTrait;
-	private $sqlHashRegexps = '';
-	private $oldHashRegexps = '';
-	private $sqlHashExpressions = '';
-	private $oldHashExpressions = '';
-
-	/**
-	 * Calculates a hash for the data in regexps table.
-	 *
-	 * @param $conditions Optional WHERE clause for the data query.
-	 */
-	private function calculateHash($conditions = null) {
-		$this->sqlHashRegexps =
-			'SELECT * FROM regexps'.
-			($conditions ? ' WHERE '.$conditions : '').
-			' ORDER BY regexpid';
-		$this->oldHashRegexps = CDBHelper::getHash($this->sqlHashRegexps);
-
-		$this->sqlHashExpressions =
-			'SELECT * FROM expressions'.
-			($conditions ? ' WHERE '.$conditions : '').
-			' ORDER BY expressionid';
-		$this->oldHashExpressions = CDBHelper::getHash($this->sqlHashExpressions);
-	}
-
-	/**
-	 * Verify that data in regexps table has not changed since last hash calculation.
-	 */
-	private function verifyHash() {
-		$this->assertEquals($this->oldHashRegexps, CDBHelper::getHash($this->sqlHashRegexps));
-		$this->assertEquals($this->oldHashExpressions, CDBHelper::getHash($this->sqlHashExpressions));
-	}
-
-	public static function allRegexps() {
-		return CDBHelper::getDataProvider('SELECT regexpid FROM regexps');
-	}
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -72,7 +37,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	/**
-	 * Test the layout for the Regular expressions page.
+	 * Test the layout and general functionality.
 	 */
 	public function testPageAdministrationGeneralRegexp_Layout() {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
@@ -112,8 +77,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	 * Test pressing mass delete button but then cancelling.
 	 */
 	public function testPageAdministrationGeneralRegexp_DeleteCancel() {
-		$hash_regexps = CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid;');
-		$hash_expressions = CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid;');
+		$hash_regexps = CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid');
+		$hash_expressions = CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid');
 
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 		$this->query('name:all-regexes')->one()->click();
@@ -122,18 +87,87 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 
 		// Make sure nothing has been deleted.
-		$this->assertEquals($hash_regexps, CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid;'));
-		$this->assertEquals($hash_expressions, CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid;'));
+		$this->assertEquals($hash_regexps, CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid'));
+		$this->assertEquals($hash_expressions, CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid'));
 
+	}
+
+
+	public static function getRegexDeleteData()
+	{
+		return [
+			// #0 Delete one regex.
+			[
+				[
+					'regex_name' => ['1_regexp_1'],
+					'message_title' => 'Regular expression deleted'
+				]
+			],
+			// #1 Delete several regex.
+			[
+				[
+					'regex_name' => ['1_regexp_2', '2_regexp_1', '2_regexp_2'],
+					'message_title' => 'Regular expressions deleted'
+				]
+			],
+			// #2 Delete ALL regex.
+			[
+				[
+					'regex_name' => [''],
+					'message_title' => 'Regular expressions deleted'
+				]
+			]
+		];
 	}
 
 	/**
 	 * Test deleting all regexps one by one.
 	 *
-	 * @dataProvider allRegexps
+	 * @dataProvider getRegexDeleteData
 	 * @backupOnce regexps
 	 */
-	public function testPageAdministrationGeneralRegexp_MassDelete($regexp) {
+	public function testPageAdministrationGeneralRegexp_MassDelete($data) {
+		// Delete a regexp.
+		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
+		$expected_regexps = $this->getTableResult('Name');
+
+		$regexids = [];
+		foreach ($data['regex_name'] as $regex) {
+			if ($regex === '') {
+				$this->query('name:all-regexes')->asCheckbox()->one()->check();
+			}
+			else {
+				$regexids[] = CDBHelper::getValue('SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regex));
+				$this->query('class:list-table')->asTable()->one()->findRow('Name', $regex)->select();
+				// Remove regex from expected values.
+				$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
+			}
+		}
+
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+
+		// Check the result.
+		$this->page->assertTitle('Configuration of regular expressions');
+		$this->assertMessage(TEST_GOOD, $data['message_title']);
+
+		if ($data['regex_name'] === ['']) {
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps'));
+			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM expressions'));
+			$this->assertTableData();
+		}
+		else {
+			foreach ($regexids as $regexid) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.zbx_dbstr($regexid)));
+				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM expressions WHERE regexpid='.zbx_dbstr($regexid)));
+			}
+
+			$this->assertTableDataColumn($expected_regexps);
+		}
+		/*
+
+
 		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
 
 		// Delete a regexp.
@@ -146,7 +180,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 		$this->assertMessage(TEST_GOOD, 'Regular expression deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.$regexp['regexpid']));
-		$this->verifyHash();
+		$this->verifyHash();*/
 	}
 
 	/**
