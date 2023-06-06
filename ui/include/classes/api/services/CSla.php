@@ -1016,7 +1016,7 @@ class CSla extends CApiService {
 			return [];
 		}
 
-		$services_slas_resource_sql = 'SELECT DISTINCT st.serviceid, sst.slaid'.
+		$services_slas_resource_sql = 'SELECT DISTINCT st.serviceid,sst.slaid'.
 			' FROM service_tag st, sla_service_tag sst'.
 			' WHERE sst.tag=st.tag'.
 				' AND ('.

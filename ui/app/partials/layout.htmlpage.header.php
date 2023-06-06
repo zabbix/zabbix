@@ -54,6 +54,8 @@ $show_gui_messaging = !defined('ZBX_PAGE_NO_MENU') || $data['web_layout_mode'] =
 
 $modules_assets = APP::ModuleManager()->getAssets();
 
+$tz_offsets = array_column((new DateTime())->getTimezone()->getTransitions(0, ZBX_MAX_DATE), 'offset', 'ts');
+
 $page_header->addCssFile('assets/styles/'.$page_header->getTheme().'.css');
 
 foreach ($modules_assets as $module_id => $assets) {
@@ -67,7 +69,7 @@ foreach ($modules_assets as $module_id => $assets) {
 
 $page_header
 	->addJavaScript('
-		const PHP_TZ_OFFSET = '.date('Z').';
+		const PHP_TZ_OFFSETS = '.json_encode($tz_offsets).';
 		const PHP_ZBX_FULL_DATE_TIME = "'.ZBX_FULL_DATE_TIME.'";
 	')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())

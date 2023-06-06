@@ -184,14 +184,14 @@ class CSvgGraph extends CSvg {
 		$this->left_y_min = $options['axes']['left_y_min'];
 		$this->left_y_max = $options['axes']['left_y_max'];
 		$this->left_y_units = $options['axes']['left_y_units'] !== null
-			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units'])))
+			? trim(preg_replace('/\s+/', ' ', $options['axes']['left_y_units']))
 			: null;
 
 		$this->show_right_y_axis = $options['axes']['show_right_y_axis'];
 		$this->right_y_min = $options['axes']['right_y_min'];
 		$this->right_y_max = $options['axes']['right_y_max'];
 		$this->right_y_units = $options['axes']['right_y_units'] !== null
-			? htmlspecialchars(trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units'])))
+			? trim(preg_replace('/\s+/', ' ', $options['axes']['right_y_units']))
 			: null;
 
 		$this->show_x_axis = $options['axes']['show_x_axis'];

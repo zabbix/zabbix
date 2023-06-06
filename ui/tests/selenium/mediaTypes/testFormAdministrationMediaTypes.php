@@ -829,28 +829,27 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment the below case when ZBX-21915 is fixed.
-//			// Offise365 relay email with all possible parameters defined.
-//			[
-//				[
-//					'mediatype_tab' => [
-//						'Name' => 'Office365 relay with all possible parameters',
-//						'Email provider' => 'Office365 relay',
-//						'Email' => 'office365@zabbix.com',
-//						'Authentication' => 'Email and password',
-//						'Password' => '1',
-//						'Message format' => 'Plain text',
-//						'Description' => 'One more time: If only χρήστης was παράδειγμα then everyone would be happy',
-//						'Enabled' => false
-//					],
-//					'options_tab' => [
-//						'id:maxsessions_type' => 'Custom',
-//						'id:maxsessions' => 4,
-//						'Attempts' => 3,
-//						'Attempt interval' => 2
-//					]
-//				]
-//			],
+			// Offise365 relay email with all possible parameters defined.
+			[
+				[
+					'mediatype_tab' => [
+						'Name' => 'Office365 relay with all possible parameters',
+						'Email provider' => 'Office365 relay',
+						'Email' => 'office365@zabbix.com',
+						'Authentication' => 'Email and password',
+						'Password' => '1',
+						'Message format' => 'Plain text',
+						'Description' => 'One more time: If only χρήστης was παράδειγμα then everyone would be happy',
+						'Enabled' => false
+					],
+					'options_tab' => [
+						'id:maxsessions_type' => 'Custom',
+						'id:maxsessions' => 4,
+						'Attempts' => 3,
+						'Attempt interval' => 2
+					]
+				]
+			],
 			[
 				[
 					'mediatype_tab' => [

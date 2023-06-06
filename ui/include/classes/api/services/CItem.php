@@ -85,7 +85,8 @@ class CItem extends CItemGeneral {
 		ITEM_VALUE_TYPE_STR => ['valuemapid', 'inventory_link'],
 		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
 		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid', 'inventory_link'],
-		ITEM_VALUE_TYPE_TEXT => ['inventory_link']
+		ITEM_VALUE_TYPE_TEXT => ['inventory_link'],
+		ITEM_VALUE_TYPE_BINARY => []
 	];
 
 	/**
@@ -524,13 +525,16 @@ class CItem extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -564,7 +568,9 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkValueMaps($items);
 		self::checkInventoryLinks($items);
@@ -634,7 +640,6 @@ class CItem extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -657,8 +662,8 @@ class CItem extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -668,6 +673,7 @@ class CItem extends CItemGeneral {
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
 			if ($db_item['templateid'] != 0) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -686,7 +692,7 @@ class CItem extends CItemGeneral {
 				$api_input_rules = self::getDiscoveredValidationRules();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['value_type']));
+				$item += array_intersect_key($db_item, array_flip(['type', 'value_type']));
 
 				$api_input_rules = self::getValidationRules();
 			}
@@ -701,12 +707,13 @@ class CItem extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags']);
 
 		self::validateUniqueness($items);
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkInventoryLinks($items, $db_items);
@@ -720,12 +727,19 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -759,7 +773,8 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -789,6 +804,8 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getDiscoveredValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_DISCOVERED],
@@ -1135,15 +1152,11 @@ class CItem extends CItemGeneral {
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
 			array $upd_db_items): array {
-		$parent_indexes = [];
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
 
-		foreach ($items as $i => &$item) {
-			if (!array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
+		foreach ($items as &$item) {
+			unset($item['uuid']);
 			$item = self::unsetNestedObjectIds($item);
-			$parent_indexes[$item['itemid']] = $i;
 		}
 		unset($item);
 
@@ -1200,8 +1213,8 @@ class CItem extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'inventory_link', 'logtimefmt', 'description', 'status'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -1709,42 +1722,43 @@ class CItem extends CItemGeneral {
 			$result = $relationMap->mapOne($result, $itemDiscoveries, 'itemDiscovery');
 		}
 
-		// adding history data
-		$requestedOutput = [];
-		if ($this->outputIsRequested('lastclock', $options['output'])) {
-			$requestedOutput['lastclock'] = true;
-		}
-		if ($this->outputIsRequested('lastns', $options['output'])) {
-			$requestedOutput['lastns'] = true;
-		}
-		if ($this->outputIsRequested('lastvalue', $options['output'])) {
-			$requestedOutput['lastvalue'] = true;
-		}
-		if ($this->outputIsRequested('prevvalue', $options['output'])) {
-			$requestedOutput['prevvalue'] = true;
-		}
-		if ($requestedOutput) {
+		$requested_output = array_filter([
+			'lastclock' => $this->outputIsRequested('lastclock', $options['output']),
+			'lastns' => $this->outputIsRequested('lastns', $options['output']),
+			'lastvalue' => $this->outputIsRequested('lastvalue', $options['output']),
+			'prevvalue' => $this->outputIsRequested('prevvalue', $options['output'])
+		]);
+
+		if ($requested_output) {
 			$history = Manager::History()->getLastValues($result, 2, timeUnitToSeconds(CSettingsHelper::get(
 				CSettingsHelper::HISTORY_PERIOD
 			)));
-			foreach ($result as &$item) {
-				$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
-				$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
-				$no_value = in_array($item['value_type'],
-						[ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT]) ? '' : '0';
 
-				if (isset($requestedOutput['lastclock'])) {
-					$item['lastclock'] = $lastHistory ? $lastHistory['clock'] : '0';
+			foreach ($result as &$item) {
+				$last_history = null;
+				$prev_history = null;
+				$no_value = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]) ? '0' : '';
+
+				if (array_key_exists($item['itemid'], $history)) {
+					[$last_history, $prev_history] = $history[$item['itemid']] + [null, null];
+
+					if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+						if ($last_history) {
+							$last_history['value'] = base64_encode($last_history['value']);
+						}
+
+						if ($prev_history) {
+							$prev_history['value'] = base64_encode($prev_history['value']);
+						}
+					}
 				}
-				if (isset($requestedOutput['lastns'])) {
-					$item['lastns'] = $lastHistory ? $lastHistory['ns'] : '0';
-				}
-				if (isset($requestedOutput['lastvalue'])) {
-					$item['lastvalue'] = $lastHistory ? $lastHistory['value'] : $no_value;
-				}
-				if (isset($requestedOutput['prevvalue'])) {
-					$item['prevvalue'] = $prevHistory ? $prevHistory['value'] : $no_value;
-				}
+
+				$item += array_intersect_key([
+					'lastclock' => $last_history ? $last_history['clock'] : '0',
+					'lastns' => $last_history ? $last_history['ns'] : '0',
+					'lastvalue' => $last_history ? $last_history['value'] : $no_value,
+					'prevvalue' => $prev_history ? $prev_history['value'] : $no_value
+				], $requested_output);
 			}
 			unset($item);
 		}
@@ -1965,7 +1979,7 @@ class CItem extends CItemGeneral {
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
 				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
-			array_push($table_names, 'history', 'history_log', 'history_str', 'history_text', 'history_uint');
+			$table_names = array_merge($table_names, CHistoryManager::getTableName());
 		}
 
 		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1

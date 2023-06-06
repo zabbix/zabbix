@@ -30,48 +30,63 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'initial_load' => 'in 0,1'
+			'initial_load' => 'in 0,1',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'initial_load' => (bool) $this->getInput('initial_load', 0),
-			'style' => $this->fields_values['style'],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		$trigger_options = [
-			'skipDependent' => ($this->fields_values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
-			'only_true' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
-			'filter' => [
-				'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
-			]
-		];
+		// Editing template dashboard?
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+			$data['error'] = _('No data.');
+		}
+		else {
+			$data += [
+				'error' => null,
+				'initial_load' => (bool) $this->getInput('initial_load', 0),
+				'style' => $this->fields_values['style'],
+				'is_template_dashboard' => $this->isTemplateDashboard()
+			];
 
-		$problem_options = [
-			'show_suppressed' => $this->fields_values['show_suppressed'],
-			'show_recent' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
-			'tags' => array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']
-				? $this->fields_values['tags']
-				: null,
-			'evaltype' => array_key_exists('evaltype', $this->fields_values)
-				? $this->fields_values['evaltype']
-				: TAG_EVAL_TYPE_AND_OR
-		];
+			$trigger_options = [
+				'skipDependent' => ($this->fields_values['show'] == TRIGGERS_OPTION_ALL) ? null : true,
+				'only_true' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
+				'filter' => [
+					'value' => $this->fields_values['show'] == TRIGGERS_OPTION_IN_PROBLEM ? TRIGGER_VALUE_TRUE : null
+				]
+			];
 
-		$host_options = [
-			'hostids' => $this->fields_values['hostids'] ?: null
-		];
+			$problem_options = [
+				'show_suppressed' => $this->fields_values['show_suppressed'],
+				'show_recent' => $this->fields_values['show'] == TRIGGERS_OPTION_RECENT_PROBLEM ? true : null,
+				'tags' => array_key_exists('tags', $this->fields_values) && $this->fields_values['tags']
+					? $this->fields_values['tags']
+					: null,
+				'evaltype' => array_key_exists('evaltype', $this->fields_values)
+					? $this->fields_values['evaltype']
+					: TAG_EVAL_TYPE_AND_OR
+			];
 
-		[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
-			$data['hosts_by_name'], $data['exceeded_limit']
-		] = getTriggersOverviewData(getSubGroups($this->fields_values['groupids']), $host_options, $trigger_options,
-			$problem_options
-		);
+			if ($this->isTemplateDashboard()) {
+				$groupids = [];
+				$host_options['hostids'] = [$this->getInput('dynamic_hostid')];
+			}
+			else {
+				$groupids = $this->fields_values['groupids'];
+				$host_options['hostids'] = $this->fields_values['hostids'] ?: null;
+			}
+
+			[$data['db_hosts'], $data['db_triggers'], $data['dependencies'], $data['triggers_by_name'],
+				$data['hosts_by_name'], $data['exceeded_limit']
+			] = getTriggersOverviewData(getSubGroups($groupids), $host_options, $trigger_options, $problem_options);
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

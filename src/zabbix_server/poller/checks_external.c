@@ -19,7 +19,6 @@
 
 #include "checks_external.h"
 
-#include "log.h"
 #include "zbxexec.h"
 #include "zbxsysinfo.h"
 
@@ -38,7 +37,7 @@ extern char	*CONFIG_EXTERNALSCRIPTS;
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result)
+int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;

@@ -5,7 +5,9 @@
 	"name": "Favorite maps",
 	"namespace": "FavMaps",
 	"version": "1.0",
-	"author": "Zabbix SIA",
+	"author": "Zabbix",
+	"description": "Displays shortcuts to the most needed network maps (marked as favorite).",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/favorite_maps",
 	"widget": {
 		"size": {
 			"width": 4,

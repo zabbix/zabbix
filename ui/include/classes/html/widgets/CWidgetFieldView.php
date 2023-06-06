@@ -27,6 +27,11 @@ abstract class CWidgetFieldView {
 
 	protected string $form_name = '';
 
+	protected array $class = [];
+	protected array $label_class = [];
+
+	protected bool $has_label = true;
+
 	protected ?CTag $hint = null;
 	protected $help_hint;
 
@@ -48,18 +53,23 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function removeLabel(): self {
+		$this->has_label = false;
+
+		return $this;
+	}
+
 	public function getLabel(): ?CLabel {
 		$label = $this->field->getLabel();
 
-		if ($label === null) {
+		if ($label === null || !$this->has_label) {
 			return null;
 		}
 
-		return new CLabel([
-			$label,
-			$this->hint,
-			$this->help_hint !== null ? makeHelpIcon($this->help_hint) : null
-		], zbx_formatDomId($this->field->getName()));
+		return (new CLabel([$label, $this->hint, $this->help_hint !== null ? makeHelpIcon($this->help_hint) : null]))
+			->setFor(zbx_formatDomId($this->field->getName()))
+			->setAsteriskMark($this->isRequired())
+			->addClass($this->label_class ? implode(' ', $this->label_class) : null);
 	}
 
 	/**
@@ -67,6 +77,33 @@ abstract class CWidgetFieldView {
 	 */
 	public function getView() {
 		return null;
+	}
+
+	public function getClass(): ?string {
+		return $this->class ? implode(' ', $this->class) : null;
+	}
+
+	public function addClass(?string $class): self {
+		if ($class !== null) {
+			$this->class[] = $class;
+		}
+
+		return $this;
+	}
+
+	public function addLabelClass(?string $label_class): self {
+		if ($label_class !== null) {
+			$this->label_class[] = $label_class;
+		}
+
+		return $this;
+	}
+
+	public function addRowClass(?string $row_class): self {
+		$this->addLabelClass($row_class);
+		$this->addClass($row_class);
+
+		return $this;
 	}
 
 	public function getJavaScript(): string {

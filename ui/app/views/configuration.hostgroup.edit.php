@@ -33,7 +33,7 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 $data += [
 	'buttons' => ($data['groupid'] == 0)
 		? [
-			(new CSubmit('add', _('Add')))->addClass('js-create-hostgroup'),
+			new CSubmit('add', _('Add')),
 			$cancel_button
 		]
 		: [

@@ -28,6 +28,7 @@ $this->includeJsFile('configuration.templategroup.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Template groups'))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATE_GROUPS_LIST))
 	->setControls((new CTag('nav', true, (new CList())
 		->addItem(CWebUser::getType() == USER_TYPE_SUPER_ADMIN
 			? (new CSimpleButton(_('Create template group')))
@@ -82,7 +83,7 @@ foreach ($data['groups'] as $group) {
 		$n++;
 
 		if ($n > $data['config']['max_in_table']) {
-			$templates_output[] = ' &hellip;';
+			$templates_output[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -105,7 +106,7 @@ foreach ($data['groups'] as $group) {
 
 	$template_count = $data['groupCounts'][$group['groupid']]['templates'];
 
-	$name = (new CLink(CHtml::encode($group['name']),
+	$name = (new CLink($group['name'],
 		(new CUrl('zabbix.php'))
 			->setArgument('action', 'templategroup.edit')
 			->setArgument('groupid', $group['groupid'])

@@ -172,8 +172,7 @@ if ($data['change_password']) {
 		$current_password->setAttribute('autofocus', 'autofocus');
 	}
 
-	if ($data['action'] === 'userprofile.edit'
-			|| CWebUser::$data['userid'] == $data['userid'] && CWebUser::$data['roleid'] == USER_TYPE_SUPER_ADMIN) {
+	if (CWebUser::$data['userid'] == $data['userid']) {
 		$user_form_list
 			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
 	}
@@ -196,8 +195,11 @@ if ($data['change_password']) {
 		->addRow('', _('Password is not mandatory for non internal authentication type.'));
 }
 else {
-	$change_password_enabled = $data['internal_authentication'] && !$data['readonly']
-		&& ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== ZBX_GUEST_USER);
+	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
+
+	if ($change_password_enabled && $data['action'] === 'user.edit') {
+		$change_password_enabled = $data['db_user']['username'] !== ZBX_GUEST_USER;
+	}
 
 	$hint = !$change_password_enabled
 		? $hint = (makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.')))
@@ -316,9 +318,8 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow(_('URL (after login)'),
-		(new CTextBox('url', $data['url']))
+		(new CTextBox('url', $data['url'], false, DB::getFieldLength('users', 'url')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('maxlength', DB::getFieldLength('users', 'url'))
 	);
 
 $tabs->addTab('userTab', _('User'), $user_form_list);
@@ -354,16 +355,7 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 				->setEnabled(!$data['readonly']);
 		}
 		else {
-			$media_name = new CDiv([
-				$media['name'],
-				(new CSpan([
-					' ',
-					makeWarningIcon(
-						_('Media type disabled by Administration.')
-					)
-				]))
-			]);
-
+			$media_name = new CDiv([$media['name'], makeWarningIcon(_('Media type disabled by Administration.'))]);
 			$status = (new CDiv(_('Disabled')))->addClass(ZBX_STYLE_RED);
 		}
 
@@ -474,7 +466,9 @@ if ($data['action'] === 'user.edit') {
 		);
 	}
 	else {
-		$permissions_form_list->addRow(new CLabel(_('Role'), 'roleid_ms'), $role_multiselect);
+		$permissions_form_list->addRow((new CLabel(_('Role'), 'roleid_ms'))->setAsteriskMark($data['roleid_required']),
+			$role_multiselect
+		);
 	}
 
 	if ($data['roleid']) {
@@ -495,7 +489,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];
@@ -508,7 +502,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];

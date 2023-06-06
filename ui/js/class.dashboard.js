@@ -35,7 +35,7 @@ const DASHBOARD_EVENT_EDIT = 'dashboard-edit';
 const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
 const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated';
 
-class CDashboard extends CBaseComponent {
+class CDashboard {
 
 	constructor(target, {
 		containers,
@@ -59,7 +59,7 @@ class CDashboard extends CBaseComponent {
 		dynamic_hostid,
 		csrf_token = null
 	}) {
-		super(target);
+		this._target = target;
 
 		this._containers = {
 			grid: containers.grid,
@@ -111,13 +111,6 @@ class CDashboard extends CBaseComponent {
 		this._selected_dashboard_page = null;
 
 		this._busy_conditions = new Set();
-
-		this._original_properties = {
-			name: this._data.name,
-			userid: this._data.userid,
-			display_period: this._data.display_period,
-			auto_start: this._data.auto_start
-		};
 
 		this._async_timeout_ms = 50;
 
@@ -453,27 +446,6 @@ class CDashboard extends CBaseComponent {
 	isUnsaved() {
 		if (this._is_unsaved) {
 			return true;
-		}
-
-		for (const [name, value] of Object.entries(this._original_properties)) {
-			if (value != this._data[name]) {
-				return true;
-			}
-		}
-
-		if (!this._is_kiosk_mode) {
-			const dashboard_pages_data = Array.from(this._dashboard_pages.values());
-			const tabs = [...this._tabs.getList().children];
-
-			if (tabs.length != dashboard_pages_data.length) {
-				return true;
-			}
-
-			for (let i = 0; i < dashboard_pages_data.length; i++) {
-				if (dashboard_pages_data[i].tab !== tabs[i]) {
-					return true;
-				}
-			}
 		}
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
@@ -1140,6 +1112,8 @@ class CDashboard extends CBaseComponent {
 
 		return new Promise((resolve) => resolve(this._promiseApplyProperties(properties)))
 			.then(() => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				this.fire(DASHBOARD_EVENT_APPLY_PROPERTIES);
@@ -1218,6 +1192,8 @@ class CDashboard extends CBaseComponent {
 		return Promise.resolve()
 			.then(() => this._promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
 			.catch((exception) => {
@@ -1376,6 +1352,11 @@ class CDashboard extends CBaseComponent {
 				}
 			}, {capture: true});
 
+			for (const fieldset of
+					form.querySelectorAll(`fieldset.${CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSIBLE}`)) {
+				new CFormFieldsetCollapsible(fieldset);
+			}
+
 			try {
 				new TabIndicators();
 			}
@@ -1450,6 +1431,8 @@ class CDashboard extends CBaseComponent {
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
@@ -2023,6 +2006,10 @@ class CDashboard extends CBaseComponent {
 				this._updateNavigationButtons();
 			},
 
+			tabsSort: () => {
+				this._is_unsaved = true;
+			},
+
 			tabsClick: (e) => {
 				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
 
@@ -2152,6 +2139,7 @@ class CDashboard extends CBaseComponent {
 
 			this._tabs.on(SORTABLE_EVENT_DRAG_START, this._events.tabsDragStart);
 			this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
+			this._tabs.on(SORTABLE_EVENT_SORT, this._events.tabsSort);
 
 			this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
 			this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);
@@ -2181,5 +2169,48 @@ class CDashboard extends CBaseComponent {
 		if (this._time_period !== null) {
 			jQuery.subscribe('timeselector.rangeupdate', this._events.timeSelectorRangeUpdate);
 		}
+	}
+
+	/**
+	 * Attach event listener to dashboard events.
+	 *
+	 * @param {string}			type
+	 * @param {function}		listener
+	 * @param {Object|false}	options
+	 *
+	 * @returns {CDashboard}
+	 */
+	on(type, listener, options = false) {
+		this._target.addEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Detach event listener from dashboard events.
+	 *
+	 * @param {string}			type
+	 * @param {function}		listener
+	 * @param {Object|false}	options
+	 *
+	 * @returns {CDashboard}
+	 */
+	off(type, listener, options = false) {
+		this._target.removeEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Dispatch dashboard event.
+	 *
+	 * @param {string}	type
+	 * @param {Object}	detail
+	 * @param {Object}	options
+	 *
+	 * @returns {boolean}
+	 */
+	fire(type, detail = {}, options = {}) {
+		return this._target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }

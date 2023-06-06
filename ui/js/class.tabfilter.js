@@ -733,6 +733,8 @@ class CTabFilter extends CBaseComponent {
 			stop: (_, ui) => {
 				const $item = ui.item;
 
+				ui.item[0].classList.remove(TABFILTERITEM_STYLE_FOCUSED);
+
 				/**
 				 * Remove inline style position, left and top that stay after sortable.
 				 * This styles broken tabs layout.
@@ -746,7 +748,8 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 			axis: 'x',
-			containment: 'parent'
+			containment: 'parent',
+			helper : 'clone'
 		});
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;

@@ -22,11 +22,20 @@
 #include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+#include "zbxwin32.h"
+
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-	return thread_args->entry(thread_args);
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_seh_handler(GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
@@ -70,12 +79,12 @@ void	zbx_child_fork(pid_t *pid)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGCHLD);
 
-	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
 	/* set process id instead of returning, this is to avoid race condition when signal arrives before return */
 	*pid = zbx_fork();
 
-	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == *pid)
@@ -237,7 +246,7 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
 	sigaddset(&set, SIGCHLD);
-	sigprocmask(SIG_BLOCK, &set, NULL);
+	zbx_sigmask(SIG_BLOCK, &set, NULL);
 
 	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
@@ -284,3 +293,24 @@ long int	zbx_get_thread_id(void)
 	return (long int)getpid();
 #endif
 }
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+void	zbx_pthread_init_attr(pthread_attr_t *attr)
+{
+	if (0 != pthread_attr_init(attr))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize thread attributes: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_STACKSIZE
+	if (0 != pthread_attr_setstacksize(attr, HAVE_STACKSIZE * ZBX_KIBIBYTE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set thread stack size: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+#endif
+}
+#endif

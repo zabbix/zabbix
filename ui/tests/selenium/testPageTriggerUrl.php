@@ -50,7 +50,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_High',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100035',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100035&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
@@ -67,7 +67,7 @@ class testPageTriggerUrl extends CWebTest {
 				[
 					'trigger' => '1_trigger_Not_classified',
 					'links' => [
-						'Problems' => 'zabbix.php?action=problem.view&filter_name=&triggerids%5B%5D=100032',
+						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
 						'Trigger' => 'triggers.php?form=update&triggerid=100032&context=host',
 						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],

@@ -65,14 +65,14 @@ class CZabbixServer {
 	/**
 	 * Zabbix server host name.
 	 *
-	 * @var string
+	 * @var string|null
 	 */
 	protected $host;
 
 	/**
 	 * Zabbix server port number.
 	 *
-	 * @var string
+	 * @var int|null
 	 */
 	protected $port;
 
@@ -350,6 +350,9 @@ class CZabbixServer {
 					'proxyid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 				]],
 				'count' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]	// API_FLOAT 0-n
+			]],
+			'server stats' =>			['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'version' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 			]]
 		]];
 
@@ -610,7 +613,7 @@ class CZabbixServer {
 						$dErrorMsg = _s("Connection to Zabbix server \"%1\$s\" failed. Possible reasons:\n1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n2. Incorrect DNS server configuration.\n", $host_port);
 				}
 
-				$this->error = $dErrorMsg.$errorMsg;
+				$this->error = rtrim($dErrorMsg.$errorMsg);
 			}
 
 			$this->socket = $socket;

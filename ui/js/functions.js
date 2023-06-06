@@ -812,7 +812,7 @@ function downloadSvgImage(svg, file_name) {
 		canvas = document.createElement('canvas'),
 		labels = $dom_node.next('.svg-graph-legend'),
 		$clone = $dom_node.clone(),
-		$container = $dom_node.closest('.dashboard-grid-widget-content'),
+		$container = $dom_node.closest('.dashboard-grid-widget-contents'),
 		image = new Image,
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),

@@ -18,8 +18,6 @@
 **/
 
 #include "zbxcommon.h"
-#include "log.h"
-#include "setproctitle.h"
 #include "zbxthreads.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
@@ -335,31 +333,6 @@ void	zbx_version(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set process title                                                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_setproctitle(const char *fmt, ...)
-{
-#if defined(HAVE_FUNCTION_SETPROCTITLE) || defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	char	title[MAX_STRING_LEN];
-	va_list	args;
-
-	va_start(args, fmt);
-	zbx_vsnprintf(title, sizeof(title), fmt, args);
-	va_end(args);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() title:'%s'", __func__, title);
-#endif
-
-#if defined(HAVE_FUNCTION_SETPROCTITLE)
-	setproctitle("%s", title);
-#elif defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	setproctitle_set_status(title);
-#endif
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
  *                                                                            *
  * Parameters: hostname - [IN] hostname string to be checked                  *
@@ -563,61 +536,6 @@ unsigned int	zbx_alarm_off(void)
 int	zbx_alarm_timed_out(void)
 {
 	return (0 == zbx_timed_out ? FAIL : SUCCEED);
-}
-
-/* Since 2.26 the GNU C Library will detect when /etc/resolv.conf has been modified and reload the changed */
-/* configuration. For performance reasons manual reloading should be avoided when unnecessary. */
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
-/******************************************************************************
- *                                                                            *
- * Purpose: react to "/etc/resolv.conf" update                                *
- *                                                                            *
- * Comments: it is intended to call this function in the end of each process  *
- *           main loop. The purpose of calling it at the end (instead of the  *
- *           beginning of main loop) is to let the first initialization of    *
- *           libc resolver proceed internally.                                *
- *                                                                            *
- ******************************************************************************/
-static void	update_resolver_conf(void)
-{
-#define ZBX_RESOLV_CONF_FILE	"/etc/resolv.conf"
-
-	static time_t	mtime = 0;
-	zbx_stat_t	buf;
-
-	if (0 == zbx_stat(ZBX_RESOLV_CONF_FILE, &buf) && mtime != buf.st_mtime)
-	{
-		mtime = buf.st_mtime;
-
-		if (0 != res_init())
-			zabbix_log(LOG_LEVEL_WARNING, "update_resolver_conf(): res_init() failed");
-	}
-
-#undef ZBX_RESOLV_CONF_FILE
-}
-#endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
- *          log file after rotation                                           *
- *                                                                            *
- * Parameters: time_now - [IN] the time for compare in seconds                *
- *                                                                            *
- ******************************************************************************/
-void	__zbx_update_env(double time_now)
-{
-	static double	time_update = 0;
-
-	/* handle /etc/resolv.conf update and log rotate less often than once a second */
-	if (1.0 < time_now - time_update)
-	{
-		time_update = time_now;
-		zbx_handle_log();
-#if !defined(_WINDOWS) && defined(HAVE_RESOLV_H) && defined(__GLIBC__) && __GLIBC__ == 2 && __GLIBC_MINOR__ < 26
-		update_resolver_conf();
-#endif
-	}
 }
 
 /******************************************************************************

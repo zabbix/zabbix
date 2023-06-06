@@ -965,7 +965,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 			$this->zbxTestAcceptAlert();
 
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototypes deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger prototype deleted');
 			$this->assertEquals(0, CDBHelper::getCount("SELECT triggerid FROM triggers where description = '".$description."'"));
 		}
 	}

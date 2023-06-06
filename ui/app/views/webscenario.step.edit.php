@@ -83,7 +83,7 @@ $form_grid = (new CFormGrid())
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
@@ -135,7 +135,7 @@ $form_grid = (new CFormGrid())
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('post_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
@@ -185,7 +185,7 @@ $form_grid = (new CFormGrid())
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
@@ -227,7 +227,7 @@ $form_grid = (new CFormGrid())
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)

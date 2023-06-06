@@ -24,7 +24,6 @@
 #include "../db_lengths.h"
 #include "zbxself.h"
 #include "zbxnix.h"
-#include "base64.h"
 #include "../zbxreport.h"
 #include "zbxcrypto.h"
 #include "../alerter/alerter.h"
@@ -412,7 +411,7 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 	}
 
 	zbx_json_addraw(&j, ZBX_PROTO_TAG_SIGN, out_str);
-	str_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
+	zbx_base64_encode_dyn(j.buffer, &cookie, j.buffer_size);
 
 	zbx_json_clean(&j);
 	zbx_free(out_str);
@@ -444,7 +443,7 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 
 	if (NULL != (session = (zbx_rm_session_t *)zbx_hashset_search(&manager->sessions, &userid)))
 	{
-		DB_RESULT	result;
+		zbx_db_result_t	result;
 
 		result = zbx_db_select("select NULL from sessions where sessionid='%s'", session->sid);
 		if (NULL == zbx_db_fetch(result))
@@ -461,20 +460,23 @@ static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
 		zbx_db_insert_t		db_insert;
 
 		session_local.userid = userid;
+		session_local.sid = zbx_create_token(0);
+		session_local.cookie = report_create_cookie(manager, session_local.sid);
+		session_local.db_lastaccess = now;
+		session_local.lastaccess = now;
+
 		session = (zbx_rm_session_t *)zbx_hashset_insert(&manager->sessions, &session_local,
 				sizeof(session_local));
-
-		session->sid = zbx_create_token(0);
-		session->cookie = report_create_cookie(manager, session->sid);
-		session->db_lastaccess = now;
 
 		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
 		zbx_db_insert_add_values(&db_insert, session->sid, userid, now, ZBX_SESSION_ACTIVE);
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
-
-	session->lastaccess = now;
+	else
+	{
+		session->lastaccess = now;
+	}
 
 	return session;
 }
@@ -945,8 +947,8 @@ static void	rm_report_update_usergroups(zbx_rm_report_t *report, const zbx_vecto
  ******************************************************************************/
 static void	rm_update_cache_settings(zbx_rm_t *manager)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1016,8 +1018,8 @@ static void	rm_dequeue_report(zbx_rm_t *manager, zbx_rm_report_t *report)
  ******************************************************************************/
 static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	reportids;
 	zbx_hashset_iter_t	iter;
 	zbx_rm_report_t		*report, report_local;
@@ -1181,8 +1183,8 @@ static void	rm_update_cache_reports(zbx_rm_t *manager, int now)
  ******************************************************************************/
 static void	rm_update_cache_reports_params(zbx_rm_t *manager)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_rm_report_t		*report = NULL;
 	zbx_vector_ptr_pair_t	params;
 
@@ -1242,8 +1244,8 @@ static void	rm_update_cache_reports_params(zbx_rm_t *manager)
  ******************************************************************************/
 static void	rm_update_cache_reports_users(zbx_rm_t *manager)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_rm_report_t		*report = NULL;
 	zbx_vector_recipient_t	users;
 	zbx_vector_uint64_t	users_excl;
@@ -1314,8 +1316,8 @@ static void	rm_update_cache_reports_users(zbx_rm_t *manager)
  ******************************************************************************/
 static void	rm_update_cache_reports_usergroups(zbx_rm_t *manager)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_rm_report_t		*report = NULL;
 	zbx_vector_recipient_t	usergroups;
 
@@ -1508,8 +1510,8 @@ static void	zbx_report_dst_free(zbx_report_dst_t *dst)
  ******************************************************************************/
 static void	rm_get_report_dimensions(zbx_uint64_t dashboardid, int *width, int *height)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		y_max = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dashboardid:" ZBX_FS_UI64, __func__, dashboardid);
@@ -1558,8 +1560,8 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_vector_uint64_t	mediatypeids;
 	zbx_vector_ptr_t	dsts;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_report_dst_t	*dst;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() url:%s", __func__, job->url);
@@ -1776,8 +1778,8 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 static int	rm_report_create_usergroup_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int now,
 		const zbx_vector_ptr_pair_t *params, int width, int height, zbx_vector_ptr_t *jobs, char **error)
 {
-	DB_ROW			row;
-	DB_RESULT		result;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
 	zbx_vector_uint64_t	ids;
 	int			i, ret = FAIL;
 	char			*sql = NULL;

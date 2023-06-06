@@ -106,6 +106,32 @@ class testInitialConfSync extends CIntegrationTest
 				'delete' => '0'
 			]
 		],
+
+		/* Where the number 95 came from ?
+		Need to go through the confsync_hosts.xml and confsync_tmpl.xml,
+		count number of items, item prototypes and discovery rules for hosts
+		and templates that get imported by those hosts.
+		However, the following needs to be accounted:
+		a) every httpstep in web scenarios have 6 hidden items
+		b) item prototypes in discovery rules are ignored by configuration syncer
+			(ZBX_FLAG_DISCOVERY_PROTOTYPE = 2)
+
+		With that approach we get the following:
+
+		1) HostInventoryAutomatic -> 3 items
+		2) HostMultilevelTmpl -> 9 items, (1 items, also inherits bbbtmpl, which inherits
+					'SampleTemplate', which has 1 item, 1 item prototype (ignored
+					as it is part of the discovery rule), 1 discovery rule,
+					1 httpstep(6 items)))
+		3) HostWithDiscovery -> 1 items (1 item prototype(ignored as it is part of the discovery
+					rule), 1 discovery rule)
+		4) HostWithItems -> 28 items
+		5) HostWithMacros -> 3 items
+		6) HostWithTemplate -> 8 items (inherits 'SampleTemplate')
+		7) HostWithWebScenario -> 7 items (1 item + httpstep(6 items))
+		8) HostWithComprehensiveTemplate -> 36 items (inherits 'Comprehensive Template')
+		3 + 9 + 1 + 28 + 3 + 8 + 7 + 36 = 95 */
+
 		[
 			'items' =>
 			[
@@ -412,7 +438,7 @@ class testInitialConfSync extends CIntegrationTest
 				"insert" =>
 				"0",
 				"update" =>
-				"88",
+				"86",
 				"delete" =>
 				"0"
 			]
@@ -1085,11 +1111,11 @@ class testInitialConfSync extends CIntegrationTest
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
 		$data = explode("\n", $log);
 
-		$sync_lines = preg_grep('/DCsync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
+		$sync_lines = preg_grep('/zbx_dc_sync_configuration.*\([0-9]+\/[0-9]+\/[0-9]+\)\.$/', $data);
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ DCsync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",
 				"/:sql:[0-9]+\.[0-9]+sec/"
@@ -1138,7 +1164,7 @@ class testInitialConfSync extends CIntegrationTest
 
 	private function getStringPoolCount() {
 		$log = file_get_contents(self::getLogPath(self::COMPONENT_SERVER));
-		preg_match('/DCsync_configuration\(\)\s+strings\s+:\s*(\d+)/', $log, $result);
+		preg_match('/zbx_dc_sync_configuration\(\)\s+strings\s+:\s*(\d+)/', $log, $result);
 		return $result[1];
 	}
 
@@ -1785,7 +1811,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		self::startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_initial, $got);
@@ -1805,7 +1831,7 @@ class testInitialConfSync extends CIntegrationTest
 		self::clearLog(self::COMPONENT_SERVER);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_old = $this->getStringPoolCount();
 
 		self::stopComponent(self::COMPONENT_SERVER);
@@ -1813,7 +1839,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		self::startComponent(self::COMPONENT_SERVER);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 		$stringpool_new = $this->getStringPoolCount();
 
 		$this->assertEquals($stringpool_old, $stringpool_new);
@@ -1878,7 +1904,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_update, $got);
@@ -1900,7 +1926,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of DCsync_configuration()", true, 30, 1);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 30, 1);
 
 		$got = $this->parseSyncResults();
 		$this->assertEquals($this->expected_delete, $got);

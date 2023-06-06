@@ -122,8 +122,8 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 {
 	static int		status_limit = 2;
 	zbx_uint64_t		status_filter[] = {ALERT_STATUS_NEW, ALERT_STATUS_NOT_SENT};
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		alertid, mediatypeid, objectid, eventid, p_eventid;
@@ -221,19 +221,27 @@ static int	am_db_get_alerts(zbx_vector_ptr_t *alerts)
 	return ret;
 }
 
-#define ZBX_UPDATE_STR(dst, src, ret)			\
-	if (NULL == dst || 0 != strcmp(dst, src))	\
-	{						\
-		dst = zbx_strdup(dst, src);		\
-		ret = SUCCEED;				\
-	}
+#define ZBX_UPDATE_STR(dst, src, ret)				\
+	do							\
+	{							\
+		if (NULL == dst || 0 != strcmp(dst, src))	\
+		{						\
+			dst = zbx_strdup(dst, src);		\
+			ret = SUCCEED;				\
+		}						\
+	}							\
+	while(0)
 
-#define ZBX_UPDATE_VALUE(dst, src, ret)			\
-	if (dst != src)					\
-	{						\
-		dst = src;				\
-		ret = SUCCEED;				\
-	}
+#define ZBX_UPDATE_VALUE(dst, src, ret)	\
+	do				\
+	{				\
+		if (dst != src)		\
+		{			\
+			dst = src;	\
+			ret = SUCCEED;	\
+		}			\
+	}				\
+	while(0)
 
 /******************************************************************************
  *                                                                            *
@@ -309,8 +317,8 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 static void	am_db_update_mediatypes(zbx_am_db_t *amdb, const zbx_uint64_t *mediatypeids, int mediatypeids_num,
 		zbx_vector_ptr_t *mediatypes)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	int			type, maxsessions, maxattempts;
@@ -476,8 +484,8 @@ static void	event_tags_free(zbx_event_tags_t *event_tags)
  ******************************************************************************/
 static void	am_db_update_event_tags(zbx_uint64_t eventid, const char *params, zbx_vector_events_tags_t *events_tags)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	struct zbx_json_parse	jp, jp_tags;
 	const char		*pnext = NULL;
 	char			key[ZBX_DB_TAG_NAME_LEN * 4 + 1], value[ZBX_DB_TAG_VALUE_LEN * 4 + 1];
@@ -577,8 +585,8 @@ static void	am_db_validate_tags_for_update(zbx_vector_events_tags_t *update_even
 {
 	int			index, i, j;
 	zbx_tag_t		tag_local, *tag;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_event_tags_t	*local_event_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -827,8 +835,8 @@ static void	am_db_remove_expired_mediatypes(zbx_am_db_t *amdb)
  ******************************************************************************/
 static void	am_db_update_watchdog(zbx_am_db_t *amdb)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			medias_num = 0;
 	zbx_am_media_t		*media;
 	zbx_vector_uint64_t	mediatypeids;

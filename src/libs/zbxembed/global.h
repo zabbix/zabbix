@@ -21,7 +21,9 @@
 #define ZABBIX_GLOBAL_H
 
 #include "zbxembed.h"
+#include "duktape.h"
 
 void	es_init_global_functions(zbx_es_t *es);
+char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len);
 
 #endif

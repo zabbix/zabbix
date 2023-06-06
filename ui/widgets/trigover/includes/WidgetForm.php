@@ -45,14 +45,16 @@ class WidgetForm extends CWidgetForm {
 					TRIGGERS_OPTION_ALL => _('Any')
 				]))->setDefault(TRIGGERS_OPTION_RECENT_PROBLEM)
 			)
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			)
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
 			)
 			->addField(
-				new CWidgetFieldMultiSelectHost('hostids', _('Hosts'))
-			)
-			->addField(
-				(new CWidgetFieldRadioButtonList('evaltype', _('Tags'), [
+				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
 					TAG_EVAL_TYPE_AND_OR => _('And/Or'),
 					TAG_EVAL_TYPE_OR => _('Or')
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
@@ -64,10 +66,14 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldCheckBox('show_suppressed', _('Show suppressed problems'))
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('style', _('Hosts location'), [
-					STYLE_LEFT => _('Left'),
-					STYLE_TOP => _('Top')
-				]))->setDefault(STYLE_LEFT)
+				(new CWidgetFieldRadioButtonList(
+					'style',
+					$this->isTemplateDashboard() ? _('Host location') : _('Hosts location'),
+					[
+						STYLE_LEFT => _('Left'),
+						STYLE_TOP => _('Top')
+					]
+				))->setDefault(STYLE_LEFT)
 			);
 	}
 }

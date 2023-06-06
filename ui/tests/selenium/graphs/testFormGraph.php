@@ -287,7 +287,8 @@ class testFormGraph extends testFormGraphs {
 								'yaxisside' => 'Left'
 							]
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[

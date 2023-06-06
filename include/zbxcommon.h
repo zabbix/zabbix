@@ -230,9 +230,9 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	/* the number of defined value types */
-	ITEM_VALUE_TYPE_MAX,
-	ITEM_VALUE_TYPE_NONE,
+	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+				/* upper bound for iteration. Do not forget to update when adding new types. */
+	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);
@@ -306,7 +306,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_ODBCPOLLER		36
 #define ZBX_PROCESS_TYPE_CONNECTORMANAGER	37
 #define ZBX_PROCESS_TYPE_CONNECTORWORKER	38
-#define ZBX_PROCESS_TYPE_COUNT			39	/* number of process types */
+#define ZBX_PROCESS_TYPE_DISCOVERYMANAGER	39
+#define ZBX_PROCESS_TYPE_COUNT			40	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -378,7 +379,7 @@ zbx_script_t;
 #define ZBX_SCRIPT_EXECUTE_ON_PROXY	2	/* fall back to execution on server if target not monitored by proxy */
 
 #define POLLER_DELAY		5
-#define DISCOVERER_DELAY	60
+#define DISCOVERER_DELAY	5
 
 #define HOUSEKEEPER_STARTUP_DELAY	30	/* in minutes */
 
@@ -445,7 +446,7 @@ while (0)
 /* to avoid dependency on libzbxnix.a */
 #define	THIS_SHOULD_NEVER_HAPPEN_NO_BACKTRACE									\
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
-			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
 extern const char	*progname;
 extern const char	title_message[];
@@ -538,8 +539,9 @@ zbx_proxy_suppress_t;
 #define ZBX_RTC_GET_SCOPE(task)	(int)(((unsigned int)task & ZBX_RTC_SCOPE_MASK) >> ZBX_RTC_SCOPE_SHIFT)
 #define ZBX_RTC_GET_DATA(task)	(int)(((unsigned int)task & ZBX_RTC_DATA_MASK) >> ZBX_RTC_DATA_SHIFT)
 
-#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	((msg << ZBX_RTC_MSG_SHIFT) | (scope << ZBX_RTC_SCOPE_SHIFT) | \
-	(data << ZBX_RTC_DATA_SHIFT))
+#define ZBX_RTC_MAKE_MESSAGE(msg, scope, data)	(((zbx_uint32_t)msg << ZBX_RTC_MSG_SHIFT) | \
+						((zbx_uint32_t)scope << ZBX_RTC_SCOPE_SHIFT) | \
+						((zbx_uint32_t)data << ZBX_RTC_DATA_SHIFT))
 
 #define ZBX_KIBIBYTE		1024
 #define ZBX_MEBIBYTE		1048576
@@ -605,9 +607,9 @@ wchar_t	*zbx_oemcp_to_unicode(const char *oemcp_string);
 /* string functions that could not be moved into libzbxstr.a because they */
 /* are used by libzbxcommon.a END */
 
-/* future proctitle library */
+char	**zbx_setproctitle_init(int argc, char **argv);
 void	zbx_setproctitle(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
-/* future proctitle library END */
+void	zbx_setproctitle_deinit(void);
 
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
@@ -628,33 +630,11 @@ void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeou
 #if defined(_WINDOWS) || defined(__MINGW32__)
 typedef struct __stat64	zbx_stat_t;
 int	__zbx_stat(const char *path, zbx_stat_t *buf);
-int	__zbx_open(const char *pathname, int flags);
 #else
 typedef struct stat	zbx_stat_t;
 #endif	/* _WINDOWS */
 
-typedef struct
-{
-	zbx_fs_time_t	modification_time;	/* time of last modification */
-	zbx_fs_time_t	access_time;		/* time of last access */
-	zbx_fs_time_t	change_time;		/* time of last status change */
-}
-zbx_file_time_t;
-
-int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding);
-int	zbx_is_regular_file(const char *path);
-char	*zbx_fgets(char *buffer, int size, FILE *fp);
-int	zbx_write_all(int fd, const char *buf, size_t n);
-
 int	MAIN_ZABBIX_ENTRY(int flags);
-
-zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data);
-zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data);
-
-zbx_uint32_t	zbx_letoh_uint32(zbx_uint32_t data);
-zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data);
 
 unsigned char	get_interface_type_by_item_type(unsigned char type);
 
@@ -731,45 +711,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_PREPROC_FAIL_SET_VALUE	2
 #define ZBX_PREPROC_FAIL_SET_ERROR	3
 
-#define ZBX_HTTPFIELD_HEADER		0
-#define ZBX_HTTPFIELD_VARIABLE		1
-#define ZBX_HTTPFIELD_POST_FIELD	2
-#define ZBX_HTTPFIELD_QUERY_FIELD	3
 
-#define ZBX_POSTTYPE_RAW		0
-#define ZBX_POSTTYPE_FORM		1
-#define ZBX_POSTTYPE_JSON		2
-#define ZBX_POSTTYPE_XML		3
-#define ZBX_POSTTYPE_NDJSON		4
-
-#define ZBX_RETRIEVE_MODE_CONTENT	0
-#define ZBX_RETRIEVE_MODE_HEADERS	1
-#define ZBX_RETRIEVE_MODE_BOTH		2
-
-void	__zbx_update_env(double time_now);
-
-#ifdef _WINDOWS
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	ZBX_UNUSED(info);				\
-}							\
-while (0)
-#else
-#define zbx_update_env(info, time_now)			\
-							\
-do							\
-{							\
-	__zbx_update_env(time_now);			\
-	zbx_prof_update(info, time_now);		\
-}							\
-while (0)
-#endif
-
-#define ZBX_PROBLEM_SUPPRESSED_FALSE	0
-#define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
@@ -799,5 +741,79 @@ zbx_uint64_t	suffix2factor(char c);
 #define ZBX_MESSAGE_BUF_SIZE	1024
 
 char	*zbx_strerror(int errnum);
+
+#if !defined(_WINDOWS)
+#	if defined(HAVE_LIBPTHREAD)
+#		define zbx_sigmask	pthread_sigmask
+#	else
+#		define zbx_sigmask	sigprocmask
+#	endif
+#endif
+
+#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+static type	varname = defvalue; \
+static type	get_##varname(void) \
+{ \
+	return varname; \
+}
+
+#define ZBX_PROPERTY_DECL_CONST(type, varname, defvalue) \
+static type	varname = defvalue; \
+static const type	get_##varname(void) \
+{ \
+	return varname; \
+}
+
+#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
+#define LOG_LEVEL_CRIT		1
+#define LOG_LEVEL_ERR		2
+#define LOG_LEVEL_WARNING	3
+#define LOG_LEVEL_DEBUG		4
+#define LOG_LEVEL_TRACE		5
+
+#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
+
+#define ZBX_CHECK_LOG_LEVEL(level)			\
+		((LOG_LEVEL_INFORMATION != (level) &&	\
+		((level) > zbx_get_log_level() || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
+
+#ifdef HAVE___VA_ARGS__
+#	define ZBX_ZABBIX_LOG_CHECK
+#	define zabbix_log(level, ...)									\
+													\
+	do												\
+	{												\
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
+			zbx_log_handle(level, __VA_ARGS__);						\
+	}												\
+	while (0)
+#else
+#	define zabbix_log zbx_log_handle
+#endif
+
+typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
+
+void	zbx_init_library_common(zbx_log_func_t log_func);
+void	zbx_log_handle(int level, const char *fmt, ...);
+int	zbx_get_log_level(void);
+void	zbx_set_log_level(int level);
+const char	*zbx_get_log_component_name(void);
+
+#ifndef _WINDOWS
+void		zabbix_increase_log_level(void);
+void		zabbix_decrease_log_level(void);
+void		zabbix_report_log_level_change(void);
+const char	*zabbix_get_log_level_string(void);
+
+typedef struct
+{
+	int		level;
+	const char	*name;
+}
+zbx_log_component_t;
+
+void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
+void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+#endif
 
 #endif

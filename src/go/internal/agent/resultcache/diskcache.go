@@ -169,7 +169,12 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 
 	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
 		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
-		" FROM data_%d ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
+		" FROM data_%d"+
+		" UNION ALL"+
+		" SELECT "+
+		"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
+		" FROM log_%d"+
+		" ORDER BY id LIMIT ?", c.serverID, c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
 		return nil, 0, 0, err
 	}
@@ -181,36 +186,14 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 		}
 		result.persistent = false
 		results = append(results, result)
+		if result.LastLogsize == nil {
+			maxDataId = result.Id
+		} else {
+			maxLogId = result.Id
+		}
 	}
 	if err = rows.Err(); err != nil {
 		return nil, 0, 0, err
-	}
-	dataLen := len(results)
-	if dataLen != 0 {
-		maxDataId = results[dataLen-1].Id
-	}
-
-	if dataLen != DataLimit {
-		if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
-			"id,itemid,lastlogsize,mtime,state,value,eventsource,eventid,eventseverity,eventtimestamp,clock,ns"+
-			" FROM log_%d ORDER BY id LIMIT ?", c.serverID), DataLimit-len(results)); err != nil {
-			c.Errf("cannot select from log table: %s", err.Error())
-			return nil, 0, 0, err
-		}
-		for rows.Next() {
-			if result, err = c.resultFetch(rows); err != nil {
-				rows.Close()
-				return nil, 0, 0, err
-			}
-			result.persistent = true
-			results = append(results, result)
-		}
-		if err = rows.Err(); err != nil {
-			return nil, 0, 0, err
-		}
-		if len(results) != dataLen {
-			maxLogId = results[len(results)-1].Id
-		}
 	}
 
 	return results, maxDataId, maxLogId, nil

@@ -24,8 +24,9 @@ const ZBX_STYLE_SORTABLE_ITEM = 'sortable-item';
 const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'sortable-drag-handle';
 const ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
 
-const SORTABLE_EVENT_DRAG_START = 'drag_start';
-const SORTABLE_EVENT_DRAG_END = 'drag_end';
+const SORTABLE_EVENT_DRAG_START = 'sortable-drag-start';
+const SORTABLE_EVENT_DRAG_END = 'sortable-drag-end';
+const SORTABLE_EVENT_SORT = 'sortable-sort';
 
 class CSortable extends CBaseComponent {
 
@@ -362,9 +363,7 @@ class CSortable extends CBaseComponent {
 
 		const drag_item = this._drag_item;
 
-		this._list.insertBefore(drag_item,
-			(this._drag_item_index < items.length) ? items[this._drag_item_index] : null
-		);
+		this._list.insertBefore(drag_item, this._drag_item_index < items.length ? items[this._drag_item_index] : null);
 
 		drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
 		drag_item.style.left = '';
@@ -394,6 +393,10 @@ class CSortable extends CBaseComponent {
 		}
 
 		this.fire(SORTABLE_EVENT_DRAG_END, {item: drag_item});
+
+		if (this._drag_item_index !== this._drag_item_index_original) {
+			this.fire(SORTABLE_EVENT_SORT);
+		}
 	}
 
 	/**
@@ -495,7 +498,7 @@ class CSortable extends CBaseComponent {
 	 */
 	_cancelDragging() {
 		if (this._drag_item !== null) {
-			// Simulate dropping the item at it's original position.
+			// Simulate dropping the item at its original position.
 
 			this._drag_item_index = this._drag_item_index_original;
 
@@ -796,21 +799,22 @@ class CSortable extends CBaseComponent {
 					return;
 				}
 
-				const reference_item = e.key === 'ArrowLeft'
-					? e.target.previousElementSibling
-					: (e.target.nextElementSibling ? e.target.nextElementSibling.nextElementSibling : null);
-
-				// Leftmost item already focused?
-				if (e.key === 'ArrowLeft' && reference_item === null) {
+				if (e.key === 'ArrowLeft' && e.target.previousElementSibling === null
+						|| e.key === 'ArrowRight' && e.target.nextElementSibling === null) {
 					return;
 				}
 
-				this.insertItemBefore(e.target, reference_item);
+				this.insertItemBefore(e.target, e.key === 'ArrowLeft'
+					? e.target.previousElementSibling
+					: e.target.nextElementSibling.nextElementSibling
+				);
 
 				e.preventDefault();
 
 				// Re-focus the moved item.
 				e.target.focus();
+
+				this.fire(SORTABLE_EVENT_SORT);
 			},
 
 			listFocusIn: (e) => {

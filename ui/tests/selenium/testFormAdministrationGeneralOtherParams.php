@@ -117,7 +117,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 		}
 
 		$limits = [
-			'url' => 255,
+			'url' => 2048,
 			'login_attempts' => 2,
 			'login_block' => 32,
 			'uri_valid_schemes' => 255,

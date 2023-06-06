@@ -28,14 +28,59 @@
 	const view = new class {
 
 		init() {
+			this.#initActions();
+		}
+
+		#initActions() {
+			document.getElementById('js-create').addEventListener('click', () => this.#edit());
+
+			document.getElementById('js-massdelete').addEventListener('click', (e) => {
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			});
+
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-action-edit')) {
-					this._edit({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+					this.#editAction({actionid: e.target.dataset.actionid, eventsource: e.target.dataset.eventsource});
+				}
+
+				if (e.target.classList.contains('js-edit')) {
+					this.#edit({scriptid: e.target.dataset.scriptid});
 				}
 			})
 		}
 
-		_edit(parameters = {}) {
+		#edit(parameters = {}) {
+			const overlay = PopUp('script.edit', parameters, {
+				dialogueid: 'script-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('script');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('script');
+
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+
+		#editAction(parameters = {}) {
 			const overlay = PopUp('popup.action.edit', parameters, {
 				dialogueid: 'action-edit',
 				dialogue_class: 'modal-popup-large',
@@ -63,13 +108,33 @@
 			});
 		}
 
-		_post(target, actionids, url) {
+		#delete(target, scriptids) {
+			const confirmation = scriptids.length > 1
+				? <?= json_encode(_('Delete selected scripts?')) ?>
+				: <?= json_encode(_('Delete selected script?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+
+			curl.setArgument('action', 'script.delete');
+
+			this.#post(target, scriptids, curl);
+		}
+
+		#post(target, scriptids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('script')) ?>
+			);
+
 			target.classList.add('is-loading');
 
-			return fetch(url, {
+			return fetch(url.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({actionids: actionids})
+				body: JSON.stringify({scriptids: scriptids})
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -77,6 +142,7 @@
 						if ('title' in response.error) {
 							postMessageError(response.error.title);
 						}
+						uncheckTableRows('script', response.keepids ?? []);
 
 						postMessageDetails('error', response.error.messages);
 					}
@@ -86,6 +152,8 @@
 						if ('messages' in response.success) {
 							postMessageDetails('success', response.success.messages);
 						}
+
+						uncheckTableRows('script');
 					}
 
 					location.href = location.href;

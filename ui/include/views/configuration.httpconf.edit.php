@@ -65,11 +65,8 @@ if ($data['templates']) {
 
 $name_text_box = (new CTextBox('name', $data['name'], $data['templated'], DB::getFieldLength('httptest', 'name')))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAriaRequired();
-
-if (!$data['templated']) {
-	$name_text_box->setAttribute('autofocus', 'autofocus');
-}
+	->setAriaRequired()
+	->setAttribute('autofocus', 'autofocus');
 
 $scenario_tab
 	->addItem([
@@ -150,7 +147,7 @@ $scenario_tab
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
@@ -192,7 +189,7 @@ $scenario_tab
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
 							->setAttribute('placeholder', _('name')),
-						'&rArr;',
+						RARR(),
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)

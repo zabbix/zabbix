@@ -30,7 +30,7 @@
 
 void	zbx_mock_test_entry(void **state)
 {
-	DC_ITEM		item;
+	zbx_dc_item_t	item;
 	const char	*test_type = NULL;
 	int		returned_code, expected_code;
 	char 		*error = NULL;

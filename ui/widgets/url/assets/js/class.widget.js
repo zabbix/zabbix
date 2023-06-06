@@ -20,7 +20,7 @@
 
 class CWidgetUrl extends CWidget {
 
-	_hasPadding() {
+	hasPadding() {
 		return false;
 	}
 }

@@ -61,14 +61,16 @@
 	}
 
 	const item_form = {
-		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types}) {
+		init({interfaces, value_type_by_keys, keys_by_item_type, testable_item_types, field_switches, interface_types,
+				discovered_item}) {
 			this.interfaces = interfaces;
 			this.testable_item_types = testable_item_types;
 			this.field_switches = field_switches;
 			this.interface_types = interface_types;
+			this.discovered_item = discovered_item === undefined ? false : discovered_item;
 
 			if (typeof value_type_by_keys !== 'undefined' && typeof keys_by_item_type !== 'undefined') {
-				item_type_lookup.init(value_type_by_keys, keys_by_item_type);
+				item_type_lookup.init(value_type_by_keys, keys_by_item_type, this.discovered_item);
 			}
 		}
 	}
@@ -108,6 +110,8 @@
 
 		$('label[for=interfaceid]').toggleClass('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>', !interface_optional);
 		$('input[name=interfaceid]').prop('aria-required', !interface_optional);
+
+		$('z-select[name="value_type"]').trigger('change');
 	}
 
 	jQuery(document).ready(function($) {
@@ -155,12 +159,34 @@
 			interface_ids_by_types[interface.type].push(interface.interfaceid);
 		}
 
+		$('z-select[name="value_type"]').change(function() {
+			const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY?>,
+				binary_selected = this.value == ITEM_VALUE_TYPE_BINARY,
+				disable_binary = $('#type').val() != <?= ITEM_TYPE_DEPENDENT ?>;
+
+			this.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+			document.querySelector('z-select[name="value_type_steps"]')
+				.getOptionByValue(ITEM_VALUE_TYPE_BINARY)
+				.hidden = disable_binary;
+
+			if (binary_selected && disable_binary) {
+				this.value = this.getOptions().find((option) => option.value != ITEM_VALUE_TYPE_BINARY).value;
+				$('#type').trigger('change');
+
+				return false;
+			}
+		});
+
 		$('#type')
 			.change(function() {
 				updateItemFormElements();
 				organizeInterfaces(interface_ids_by_types, item_interface_types, parseInt(this.value, 10));
 
 				setAuthTypeLabel();
+
+				if (item_type_lookup.form !== null) {
+					item_type_lookup.update();
+				}
 			})
 			.trigger('change');
 
@@ -246,7 +272,7 @@
 		inferred_type: null,
 		item_type: null,
 
-		init(value_type_by_keys, keys_by_item_type) {
+		init(value_type_by_keys, keys_by_item_type, discovered_item) {
 			this.value_type_by_keys = value_type_by_keys;
 			this.keys_by_item_type = keys_by_item_type;
 			this.form = document.querySelector('#item-form, #item-prototype-form');
@@ -254,12 +280,9 @@
 			this.item_tab_type_field = this.form.querySelector('[name=value_type]');
 			this.preprocessing_tab_type_field = this.form.querySelector('[name=value_type_steps]');
 			this.item_type = this.form.querySelector('[name=type]');
+			this.discovered_item = discovered_item;
 
 			this.updateKeyTypeSuggestions();
-
-			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
-				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
-			});
 
 			this.item_tab_type_field.addEventListener('change', (e) => {
 				this.preprocessing_tab_type_field.value = this.item_tab_type_field.value;
@@ -267,7 +290,7 @@
 				this.updateHintDisplay();
 
 				// 'Do not keep trends' for Calculated with string-types of information is forced on Item save.
-				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?>) {
+				if (this.item_type.value == <?=ITEM_TYPE_CALCULATED ?> && !this.discovered_item) {
 					if (e.target.value == <?= ITEM_VALUE_TYPE_FLOAT ?>
 							|| e.target.value == <?= ITEM_VALUE_TYPE_UINT64 ?>) {
 						this.form.querySelector('#trends_mode_1').disabled = false;
@@ -277,6 +300,11 @@
 						this.form.querySelector('#trends_mode_1').disabled = true;
 					}
 				}
+			});
+
+			this.preprocessing_tab_type_field.addEventListener('change', (e) => {
+				this.item_tab_type_field.value = this.preprocessing_tab_type_field.value;
+				this.item_tab_type_field.dispatchEvent(new Event('change'));
 			});
 
 			['change', 'input', 'help_items.paste'].forEach((event_type) => {
@@ -398,6 +426,12 @@
 			}
 
 			this.item_tab_type_field.dispatchEvent(new CustomEvent('change'));
+		},
+
+		update() {
+			this.inferred_type = null;
+			this.last_lookup = '';
+			this.lookup(this.key_field.value, false);
 		}
 	};
 </script>

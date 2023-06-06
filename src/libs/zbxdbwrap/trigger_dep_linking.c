@@ -131,8 +131,8 @@ static int	DBresolve_template_trigger_dependencies(zbx_uint64_t hostid, const zb
 	char				*sql = NULL;
 	int				i, res = SUCCEED;
 	size_t				sql_alloc = 512, sql_offset;
-	DB_RESULT			result;
-	DB_ROW				row;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
 	zbx_vector_uint64_pair_t	dep_list_ids, map_ids;
 	zbx_vector_uint64_t		all_templ_ids;
 
@@ -292,8 +292,8 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 	char			*sql = NULL;
 	int			i, res = SUCCEED;
 	size_t			sql_alloc = 256, sql_offset = 0;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_hashset_t		h;
 	zbx_hashset_iter_t	iter;
 	zbx_trigger_dep_entry_t	*found;

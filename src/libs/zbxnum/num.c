@@ -19,8 +19,6 @@
 
 #include "zbxnum.h"
 
-#include "log.h"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: check if the string is unsigned integer within the specified      *
@@ -169,13 +167,10 @@ int	zbx_double_compare(double a, double b)
 	return fabs(a - b) <= ZBX_DOUBLE_EPSILON ? SUCCEED : FAIL;
 }
 
-int	zbx_validate_value_dbl(double value, int dbl_precision)
+int	zbx_validate_value_dbl(double value)
 {
-	if ((ZBX_DB_DBL_PRECISION_ENABLED == dbl_precision && (value < -1e+308 || value > 1e+308)) ||
-			(ZBX_DB_DBL_PRECISION_ENABLED != dbl_precision && (value <= -1e12 || value >= 1e12)))
-	{
+	if (value < -1e+308 || value > 1e+308)
 		return FAIL;
-	}
 
 	return SUCCEED;
 }

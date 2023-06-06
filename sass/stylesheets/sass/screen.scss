@@ -299,6 +299,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -539,7 +546,6 @@ form {
 			padding-bottom: 0;
 			border-bottom: 0;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
-			color: $font-color;
 			height: 22px;
 			vertical-align: middle;
 			white-space: nowrap;
@@ -1058,6 +1064,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -1510,6 +1520,10 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+
+			.icon-info {
+				margin-left: 5px;
+			}
 		}
 	}
 
@@ -1546,6 +1560,20 @@ form {
 
 			&:last-child {
 				padding-right: 0;
+			}
+
+			.icon-info {
+				margin-left: 5px;
+			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
 			}
 		}
 
@@ -1731,7 +1759,9 @@ input {
 textarea {
 	margin: 0;
 	padding: 4px 5px;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
@@ -1913,10 +1943,6 @@ select {
 	}
 
 	&:focus + label span {
-		border-color: $form-border-focus-color;
-	}
-
-	&:checked:focus + label span {
 		border-color: $form-border-focus-color;
 	}
 
@@ -2671,6 +2697,21 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
+}
+
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -3188,7 +3229,7 @@ $form-icon-btn: (
 	display: table;
 	position: absolute;
 	z-index: 1000;
-	padding: 13px 10px 10px;
+	padding: 17px 10px 10px;
 	background-color: $ui-bg-color;
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
@@ -3214,6 +3255,7 @@ $form-icon-btn: (
 		position: fixed;
 		overflow: hidden;
 		margin: 0 10px;
+		padding: 13px 10px 10px;
 
 		.dashboard-widget-head {
 			margin-bottom: 12px;
@@ -3346,7 +3388,7 @@ $form-icon-btn: (
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(100px, max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
 
 		&.form-grid-1-1 {
 			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
@@ -3360,14 +3402,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {

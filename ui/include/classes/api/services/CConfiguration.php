@@ -129,11 +129,11 @@ class CConfiguration extends CApiService {
 	/**
 	 * Validate input parameters for import() and importcompare() methods.
 	 *
-	 * @param type $params
+	 * @param array $params
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateImport($params): void {
+	protected function validateImport(&$params): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
@@ -209,6 +209,10 @@ class CConfiguration extends CApiService {
 		]];
 		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (mb_substr($params['source'], 0, 1) === pack('H*', 'EFBBBF')) {
+			$params['source'] = mb_substr($params['source'], 1);
 		}
 
 		if (array_key_exists('maps', $params['rules']) && !self::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS)

@@ -137,7 +137,7 @@ css_icons:
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
 ## cmocka test support
-if ZBXCMOCKA
+if TESTS
 WRAP_DB_FUNCS = \
 	-Wl,--wrap=zbx_db_vselect \
 	-Wl,--wrap=zbx_db_select_n_basic \
@@ -166,25 +166,23 @@ WRAP_EXIT = \
 
 WRAP_COMM_FUNCS = \
 	-Wl,--wrap=read \
-	-Wl,--wrap=connect
-
-WRAP_LOG = \
-	-Wl,--wrap=__zbx_zabbix_log
+	-Wl,--wrap=connect \
+	-Wl,--wrap=poll
 
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
 	$(WRAP_EXIT) \
-	$(WRAP_COMM_FUNCS) \
-	$(WRAP_LOG)
+	$(WRAP_COMM_FUNCS)
 
 tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
-	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS) -lcmocka -lyaml"
+	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS)"
 
 tests: tests_build
+	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
 clean: clean-recursive

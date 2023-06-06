@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'6.4.0rc2');
-define('ZABBIX_API_VERSION',	'6.4.0');
-define('ZABBIX_EXPORT_VERSION',	'6.4');
+define('ZABBIX_VERSION',		'7.0.0alpha2');
+define('ZABBIX_API_VERSION',	'7.0.0');
+define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6030193);
+define('ZABBIX_DB_VERSION',		6050024);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -577,6 +577,7 @@ define('ITEM_VALUE_TYPE_STR',		1); // aka Character
 define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
+define('ITEM_VALUE_TYPE_BINARY',	5);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
@@ -973,6 +974,11 @@ define('ZBX_DISCOVERY_DNS',		1);
 define('ZBX_DISCOVERY_IP',		2);
 define('ZBX_DISCOVERY_VALUE',	3);
 
+define('ZBX_DISCOVERY_CHECKS_UNLIMITED',	0);
+define('ZBX_DISCOVERY_CHECKS_ONE',          1);
+define('ZBX_DISCOVERY_CHECKS_CUSTOM',       -1);
+define('ZBX_DISCOVERY_CHECKS_MAX',          999);
+
 define('USER_TYPE_ZABBIX_USER',		1);
 define('USER_TYPE_ZABBIX_ADMIN',	2);
 define('USER_TYPE_SUPER_ADMIN',		3);
@@ -1070,6 +1076,10 @@ define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 
 define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
 define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
+
+define('ZBX_ACK_STATUS_ALL',	0);
+define('ZBX_ACK_STATUS_UNACK',	1);
+define('ZBX_ACK_STATUS_ACK',	2);
 
 define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
@@ -1330,11 +1340,6 @@ define('ZBX_TIMELINE_OFF',	0);
 define('ZBX_TIMELINE_ON',	1);
 
 /**
- * @deprecated use either a literal space " " or a non-breakable space "&nbsp;" instead
- */
-define('SPACE',	'&nbsp;');
-
-/**
  * Symbol used to separate name pairs such as "host: item" or "proxy: host".
  *
  * Should not be used as just a colon.
@@ -1557,6 +1562,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
+define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
@@ -1863,6 +1869,7 @@ define('ZBX_STYLE_BROWSER_LOGO_SAFARI', 'browser-logo-safari');
 define('ZBX_STYLE_BROWSER_WARNING_CONTAINER', 'browser-warning-container');
 define('ZBX_STYLE_BROWSER_WARNING_FOOTER', 'browser-warning-footer');
 define('ZBX_STYLE_CELL', 'cell');
+define('ZBX_STYLE_CELL_EXPRESSION', 'expression-cell');
 define('ZBX_STYLE_CELL_TOP', 'cell-top');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
@@ -1941,6 +1948,7 @@ define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
+define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');
@@ -2230,6 +2238,7 @@ define('ZBX_STYLE_DASHBOARD_LIST_ITEM', 'dashboard-list-item');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] !== 'off');
+define('ZBX_SERVER_PORT_DEFAULT', 10051);
 
 define('ZBX_PROPERTY_INHERITED',	0x01);
 define('ZBX_PROPERTY_OWN',			0x02);

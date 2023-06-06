@@ -22,6 +22,6 @@
 
 #include "zbxcacheconfig.h"
 
-int	zbx_get_value_telnet_test_run(DC_ITEM *item, char **error);
+int	zbx_get_value_telnet_test_run(zbx_dc_item_t *item, char **error);
 
 #endif /*POLLER_GET_VALUE_TELNET_TEST_H*/

@@ -1,6 +1,6 @@
 # Discord webhook
 
-This guide describes how to integrate your Zabbix 6.2 installation with Discord using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
+This guide describes how to integrate your Zabbix 7.0 installation with Discord using the Zabbix webhook feature. This guide will provide instructions on setting up a media type, a user and an action in Zabbix.
 
 ## Setting up Discord Webhook
 
@@ -54,7 +54,7 @@ The "Send to" field must contain Discord webhook URL created before.
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-For more information see [Zabbix](https://www.zabbix.com/documentation/6.2/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
+For more information see [Zabbix](https://www.zabbix.com/documentation/7.0/manual/config/notifications) and [Discord](https://discordapp.com/developers/docs/resources/webhook#execute-webhook) documentations.
 
 ## Supported Versions
-Zabbix 6.2
+Zabbix 7.0

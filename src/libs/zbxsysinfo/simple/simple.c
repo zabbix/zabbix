@@ -29,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 
 #ifdef HAVE_LDAP
@@ -58,12 +57,11 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
-	char	*attrs[2] = {"namingContexts", NULL };
-	char	*attr	 = NULL;
-	char	**valRes = NULL;
-	int	ldapErr = 0;
-
-	zbx_alarm_on(timeout);
+	struct timeval	tm;
+	char		*attrs[2] = {"namingContexts", NULL };
+	char		*attr	 = NULL;
+	char		**valRes = NULL;
+	int		ldapErr = 0;
 
 	*value_int = 0;
 
@@ -74,9 +72,10 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	}
 
 #if defined(LDAP_OPT_SOCKET_BIND_ADDRESSES) && defined(HAVE_LDAP_SOURCEIP)
-	if (NULL != CONFIG_SOURCE_IP)
+	if (NULL != sysinfo_get_config_source_ip())
 	{
-		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES, CONFIG_SOURCE_IP)))
+		if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_SOCKET_BIND_ADDRESSES,
+				sysinfo_get_config_source_ip())))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set source ip address [%s]",
 					ldap_err2string(ldapErr));
@@ -84,6 +83,14 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		}
 	}
 #endif
+	tm.tv_sec = timeout;
+	tm.tv_usec = 0;
+
+	if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_NETWORK_TIMEOUT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set network timeout [%s]", ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
@@ -108,7 +115,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	*value_int = 1;
 lbl_ret:
-	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);
@@ -134,8 +140,8 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 
 	*value_int = 0;
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL,
-			NULL)))
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
@@ -202,9 +208,21 @@ static int	check_https(const char *host, unsigned short port, int timeout, int *
 		goto clean;
 	}
 
-	if (NULL != CONFIG_SOURCE_IP)
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 	{
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE, CONFIG_SOURCE_IP)))
+		zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set cURL option [%d]: %s",
+				__func__, (int)opt, curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
+
+	if (NULL != sysinfo_get_config_source_ip())
+	{
+		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_INTERFACE,
+				sysinfo_get_config_source_ip())))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s: could not set source interface option [%d]: %s",
 					__func__, (int)opt, curl_easy_strerror(err));
@@ -227,29 +245,13 @@ clean:
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	zbx_socket_t	s;
-#ifdef _WINDOWS
-	u_long		argp = 1;
-#else
-	int		flags;
-#endif
+
 	*value_int = 0;
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED,
+			NULL, NULL))
 	{
-#ifdef _WINDOWS
-		ioctlsocket(s.socket, FIONBIO, &argp);	/* non-zero value sets the socket to non-blocking */
-#else
-		flags = fcntl(s.socket, F_GETFL);
-		if (-1 == flags)
-			zabbix_log(LOG_LEVEL_DEBUG, " error in getting the status flag: %s", zbx_strerror(errno));
-
-		if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, " error in setting the status flag: %s",
-				zbx_strerror(errno));
-		}
-#endif
-		if (SUCCEED == zbx_telnet_test_login(s.socket))
+		if (SUCCEED == zbx_telnet_test_login(&s))
 			*value_int = 1;
 		else
 			zabbix_log(LOG_LEVEL_DEBUG, "Telnet check error: no login prompt");

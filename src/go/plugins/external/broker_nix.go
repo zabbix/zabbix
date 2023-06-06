@@ -24,9 +24,10 @@ package external
 
 import (
 	"errors"
+	"io"
 	"net"
 )
 
 func isErrConnectionClosed(err error) bool {
-	return errors.Is(err, net.ErrClosed)
+	return errors.Is(err, net.ErrClosed) || errors.Is(err, io.EOF)
 }

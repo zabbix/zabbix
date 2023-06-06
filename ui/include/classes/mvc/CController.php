@@ -181,6 +181,8 @@ abstract class CController {
 	}
 
 	/**
+	 * @throws Exception
+	 *
 	 * @return array
 	 */
 	private static function getFormInput(): array {
@@ -190,6 +192,11 @@ abstract class CController {
 			$input = $_REQUEST;
 
 			if (hasRequest('formdata')) {
+				if (!hasRequest('data') || !is_string(getRequest('data'))
+						|| !hasRequest('sign') || !is_string(getRequest('sign'))) {
+					throw new Exception(_('Operation cannot be performed due to unauthorized request.'));
+				}
+
 				$data = base64_decode(getRequest('data'));
 				$sign = base64_decode(getRequest('sign'));
 				$request_sign = CEncryptHelper::sign($data);
@@ -406,7 +413,8 @@ abstract class CController {
 	 * @return bool
 	 */
 	private function checkCsrfToken(): bool {
-		if (!is_array($this->raw_input) || !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
+		if (!isRequestMethod('post') || !is_array($this->raw_input)
+				|| !array_key_exists(CCsrfTokenHelper::CSRF_TOKEN_NAME, $this->raw_input)) {
 			return false;
 		}
 

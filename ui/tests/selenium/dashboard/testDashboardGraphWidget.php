@@ -1483,7 +1483,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -1775,7 +1775,7 @@ class testDashboardGraphWidget extends CWebTest {
 							'Problem hosts' => ['Simple form test host', 'ЗАББИКС Сервер'],
 							'Severity' => ['Information', 'Average'],
 							'Problem' => '2_trigger_*',
-							'Tags' => 'Or'
+							'Problem tags' => 'Or'
 						],
 						'tags' => [
 							['name' => 'server', 'value' => 'selenium', 'operator' => 'Equals'],
@@ -2214,7 +2214,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		// If test fails and widget isn't canceled, need to wait until widget appears on the dashboard.
 		sleep(2);
-		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/h4[text()='.
+		$this->assertTrue(!$dashboard->query('xpath:.//div[contains(@class, "dashboard-grid-widget-header")]/h4[text()='.
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
@@ -2313,7 +2313,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
-		$fields = ['Selected items only', 'Severity', 'Problem', 'Tags', 'Problem hosts'];
+		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
 			'id:evaltype',				// Tag type.
 			'id:tags_0_tag',			// Tag name.
@@ -2430,20 +2430,20 @@ class testDashboardGraphWidget extends CWebTest {
 			'Data set' => [
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'Available memory*',
+					'item' => 'Linux: Available memory*',
 					'Aggregation function' => 'avg',
 					'Aggregate' => 'Data set',
 					'Data set label' => '祝你今天過得愉快'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU guest*',
+					'item' => 'Linux: CPU guest*',
 					'Aggregation function' => 'max',
 					'Data set label' => 'Data set only'
 				],
 				[
 					'host' => 'ЗАББИКС Сервер',
-					'item' => 'CPU utilization',
+					'item' => 'Linux: CPU utilization',
 					'Aggregation function' => 'count',
 					'Aggregation interval' => '24h',
 					'Aggregate' => 'Data set'
@@ -2457,7 +2457,7 @@ class testDashboardGraphWidget extends CWebTest {
 				'Data set #3'
 			],
 			'Legend labels' => [
-				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: CPU guest nice time)', 'max(ЗАББИКС Сервер: CPU guest time)',
+				'祝你今天過得愉快', 'max(ЗАББИКС Сервер: Linux: CPU guest nice time)', 'max(ЗАББИКС Сервер: Linux: CPU guest time)',
 				'Data set #3'
 			]
 		];

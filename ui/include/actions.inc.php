@@ -257,7 +257,7 @@ function actionConditionValueToString(array $actions) {
 
 	if ($dCheckIds) {
 		$dChecks = API::DCheck()->get([
-			'output' => ['type', 'key_', 'ports'],
+			'output' => ['type', 'key_', 'ports', 'allow_redirect'],
 			'dcheckids' => $dCheckIds,
 			'selectDRules' => ['name'],
 			'preservekeys' => true
@@ -321,8 +321,9 @@ function actionConditionValueToString(array $actions) {
 							$type = $dChecks[$id]['type'];
 							$key_ = $dChecks[$id]['key_'];
 							$ports = $dChecks[$id]['ports'];
+							$allow_redirect = $dChecks[$id]['allow_redirect'];
 
-							$dCheck = discovery_check2str($type, $key_, $ports);
+							$dCheck = discovery_check2str($type, $key_, $ports, $allow_redirect);
 
 							$result[$i][$j] = $drule['name'].NAME_DELIMITER.$dCheck;
 						}
@@ -355,7 +356,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 	if ($condition_type == CONDITION_TYPE_EVENT_TAG_VALUE) {
 		$description = [_('Value of tag')];
 		$description[] = ' ';
-		$description[] = italic(CHtml::encode($value2));
+		$description[] = italic($value2);
 		$description[] = ' ';
 	}
 	elseif ($condition_type == CONDITION_TYPE_SUPPRESSED) {
@@ -373,7 +374,7 @@ function getConditionDescription($condition_type, $operator, $value, $value2) {
 
 	$description[] = condition_operator2str($operator);
 	$description[] = ' ';
-	$description[] = italic(CHtml::encode($value));
+	$description[] = italic($value);
 
 	return $description;
 }
@@ -675,10 +676,10 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 				order_result($template_list);
 
 				if ($operation['operationtype'] == OPERATION_TYPE_TEMPLATE_ADD) {
-					$result[$i][] = bold(_('Link to templates').': ');
+					$result[$i][] = bold(_('Link templates').': ');
 				}
 				else {
-					$result[$i][] = bold(_('Unlink from templates').': ');
+					$result[$i][] = bold(_('Unlink templates').': ');
 				}
 
 				$result[$i][] = [implode(', ', $template_list), BR()];
@@ -860,8 +861,8 @@ function operation_type2str($type) {
 		OPERATION_TYPE_HOST_DISABLE => _('Disable host'),
 		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
-		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
-		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
+		OPERATION_TYPE_TEMPLATE_ADD => _('Link template'),
+		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
 		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved')
@@ -1736,7 +1737,7 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButton {
 		$table->addRow([
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $severity['clock']),
 			makeActionTableUser($severity, $users),
-			$old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name
+			[$old_severity_name, NBSP(), RARR(), NBSP(), $new_severity_name]
 		]);
 	}
 
@@ -2104,7 +2105,7 @@ function makeActionTableIcon(array $action) {
 
 				$old_severity_name = CSeverityHelper::getName((int) $action['old_severity']);
 				$new_severity_name = CSeverityHelper::getName((int) $action['new_severity']);
-				$hint = $old_severity_name.'&nbsp;&rArr;&nbsp;'.$new_severity_name;
+				$hint = [$old_severity_name, NBSP(), RARR(), NBSP(), $new_severity_name];
 
 				$action_icons[] = makeActionIcon(['button' => true, 'icon' => $action_type, 'hint' => $hint]);
 			}

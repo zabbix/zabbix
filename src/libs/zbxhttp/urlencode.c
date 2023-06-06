@@ -20,7 +20,6 @@
 #include "zbxhttp.h"
 
 #include "zbxnum.h"
-#include "log.h"
 
 /******************************************************************************
  *                                                                            *
@@ -84,7 +83,8 @@ int	zbx_http_url_decode(const char *source, char **result)
 		if ('%' == *source)
 		{
 			/* Percent-decoding */
-			if (FAIL == zbx_is_hex_n_range(source + 1, 2, target, sizeof(char), 0, 0xff))
+			if (0 == isxdigit(source[1]) || 0 == isxdigit(source[2]) ||
+					FAIL == zbx_is_hex_n_range(source + 1, 2, target, sizeof(char), 0, 0xff))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot perform URL decode of '%s' part of string '%s'",
 						source, url);

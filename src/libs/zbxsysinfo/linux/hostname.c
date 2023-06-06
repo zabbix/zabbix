@@ -48,7 +48,7 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	hostname = zbx_strdup(NULL, name.nodename);
 
-	if (FAIL == (rc = hostname_handle_params(request, result, hostname)))
+	if (FAIL == (rc = hostname_handle_params(request, result, &hostname)))
 		zbx_free(hostname);
 
 	return rc;
