@@ -248,23 +248,46 @@ static int	DBpatch_6050022(void)
 
 static int	DBpatch_6050023(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > zbx_db_execute(
+	const char	*sql =
 			"update widget_field"
 			" set name='acknowledgement_status'"
 			" where name='unacknowledged'"
-				" and widgetid in ("
-					"select widgetid"
-					" from widget"
-					" where type='problems'"
-				")"))
-	{
-		return FAIL;
-	}
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='problems'"
+				")";
 
-	return SUCCEED;
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_6050024(void)
+{
+	const char	*sql =
+			"update widget_field"
+			" set name='show_lines'"
+			" where name='count'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
 }
 
 #endif
@@ -297,5 +320,6 @@ DBPATCH_ADD(6050020, 0, 1)
 DBPATCH_ADD(6050021, 0, 1)
 DBPATCH_ADD(6050022, 0, 1)
 DBPATCH_ADD(6050023, 0, 1)
+DBPATCH_ADD(6050024, 0, 1)
 
 DBPATCH_END()
