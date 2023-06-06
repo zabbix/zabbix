@@ -28,6 +28,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif
 
 /******************************************************************************

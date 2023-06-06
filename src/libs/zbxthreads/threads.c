@@ -21,6 +21,7 @@
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #include "zbxwin32.h"
+#include "zbxlog.h"
 
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
