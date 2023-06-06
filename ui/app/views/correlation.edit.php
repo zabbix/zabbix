@@ -199,7 +199,7 @@ foreach ($data['conditions'] as $condition) {
 
 	$label_span = (new CSpan($label))
 		->addClass('label')
-		->setAttribute('data-type', $condition['type'])
+		->setAttribute('data-conditiontype', $condition['type'])
 		->setAttribute('data-formulaid', $label);
 
 	$condition_table->addRow([

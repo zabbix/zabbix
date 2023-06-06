@@ -30,7 +30,7 @@ $form = (new CForm())
 	->setId('correlationConditionForm')
 	->setName('conditions')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('type', $data['type'])
+	->addVar('conditiontype', $data['conditiontype'])
 	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 $condition_type = (int) $data['last_type'];
@@ -39,7 +39,7 @@ $condition_type = (int) $data['last_type'];
 $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Type'), 'label-condition-type'),
-		new CFormField((new CSelect('type'))
+		new CFormField((new CSelect('conditiontype'))
 			->setFocusableElementId('label-condition-type')
 			->setValue($condition_type)
 			->setId('condition-type')
