@@ -60,9 +60,15 @@ window.correlation_edit_popup = new class {
 	 * Checks the conditions list and shows either expression or custom input formula field.
 	 */
 	#processTypeOfCalculation() {
+		const condition_count = this.form.querySelectorAll('#condition_table tr[id^=conditions_]').length;
 		const evaltype = this.form.querySelector('#evaltype');
+
+		if (condition_count <= 1) {
+			evaltype.value = <?= CONDITION_EVAL_TYPE_AND_OR ?>;
+		}
+
+		const show_formula = condition_count > 1 && evaltype.value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 		const evaltype_label = this.form.querySelector('#label-evaltype');
-		const show_formula = evaltype.value == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>;
 		const labels = this.form.querySelectorAll('#condition_table .label');
 		const expression = this.form.querySelector('#expression');
 		const formula = this.form.querySelector('#formula');
