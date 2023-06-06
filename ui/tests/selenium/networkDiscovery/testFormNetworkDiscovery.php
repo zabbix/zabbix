@@ -27,6 +27,12 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 class testFormNetworkDiscovery extends CWebTest {
 
 	/**
+	 * Name of discovery rule for update scenario.
+	 *
+	 */
+	protected static $update_rule = 'Discovery rule for update';
+
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -199,7 +205,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$dialog->close();
 	}
 
-	public function getCreateData() {
+	public function getCommonData() {
 		return [
 			// #0.
 			[
@@ -417,7 +423,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						[
 							'Check type' => 'Zabbix agent',
-							'Port range' => 'test'  ,
+							'Port range' => 'test',
 							'Key' => 'test'
 						]
 					],
@@ -432,7 +438,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Name' => ''
 					],
 					'error_details' => [
-						'Incorrect value for field "name": cannot be empty.' ,
+						'Incorrect value for field "name": cannot be empty.',
 						'Field "dchecks" is mandatory.'
 					]
 				]
@@ -585,22 +591,168 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			],
+			// #22.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Name' => '         Spaces in name     ',
+						'IP range' => '        192.168.251.253-254              ',
+						'Update interval' => '       1h         '
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'Port range' => '    9999     ',
+							'SNMP community' => '   test_community        ',
+							'SNMP OID' => '   test_oid       '
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => '   test_oid       ',
+							'Context name' => '   test_context       ',
+							'Security name' => '   test_security       ',
+							'Security level' => 'authPriv',
+							'Authentication passphrase' => '       auth_pass          ',
+							'Privacy passphrase' => '      priv_pass          '
+						],
+						[
+							'Check type' => 'Zabbix agent',
+							'Key' => '     key[param1, param2]        '
+						]
+					]
+				]
+			]
+		];
+	}
+
+	public function getCreateData() {
+		return [
+			// #23.
+			[
+				[
+					'fields' => [
+						'Name' => STRING_255
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'SNMP community' => STRING_255,
+							'SNMP OID' => STRING_512
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => STRING_512,
+							'Context name' => STRING_255,
+							'Security name' => STRING_64,
+							'Security level' => 'authPriv',
+							'Authentication passphrase' => STRING_64,
+							'Privacy passphrase' => STRING_64
+						],
+						[
+							'Check type' => 'Zabbix agent',
+							'Key' => STRING_2048
+						]
+					]
+				]
+			]
+		];
+	}
+
+	public function getUpdateData() {
+		return [
+			// #23.
+			[
+				[
+					'fields' => [
+						'Name' => 'long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_string_long_stri'
+					],
+					'Checks' => [
+						[
+							'Check type' => 'SNMPv1 agent',
+							'SNMP community' => STRING_255,
+							'SNMP OID' => STRING_512
+						],
+						[
+							'Check type' => 'SNMPv3 agent',
+							'SNMP OID' => STRING_512,
+							'Context name' => STRING_255,
+							'Security name' => STRING_64,
+							'Security level' => 'authPriv',
+							'Authentication passphrase' => STRING_64,
+							'Privacy passphrase' => STRING_64
+						],
+						[
+							'Check type' => 'Zabbix agent',
+							'Key' => STRING_2048
+						]
+					]
+				]
+			]
 		];
 	}
 
 	/**
+	 * @dataProvider getCommonData
 	 * @dataProvider getCreateData
 	 */
 	public function testFormNetworkDiscovery_Create($data) {
+		$this->checkDiscoveryRuleForm($data);
+	}
+
+	/**
+	 * @dataProvider getCommonData
+	 * @dataProvider getUpdateData
+	 */
+	public function testFormNetworkDiscovery_Update($data) {
+		$this->checkDiscoveryRuleForm($data, true);
+	}
+
+	public function checkDiscoveryRuleForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = CDBHelper::getHash('SELECT * from drules');
 		}
 
-		$this->page->login()->open('zabbix.php?action=discovery.edit');
+		if ($update) {
+			$this->page->login()->open('zabbix.php?action=discovery.list');
+			$this->query('link', self::$update_rule)->waitUntilClickable()->one()->click();
+			$old_name = self::$update_rule;
+		}
+		else {
+			$this->page->login()->open('zabbix.php?action=discovery.edit');
+		}
+
 		$form = $this->query('id:discoveryForm')->asForm()->one();
+
+		if ($update && !CTestArrayHelper::get($data, 'expected')) {
+			$data['fields']['Name'] = !CTestArrayHelper::get($data, 'trim')
+					? $data['fields']['Name'].'update'
+					: $data['fields']['Name'].'update       ';
+		}
+
+		// Clear all checks from discovery rule to change them to new ones from data provider.
+		if ($update) {
+			$checks_container = $form->getFieldContainer('Checks');
+			$checks_count = $checks_container->query('xpath:.//td[contains(@id, "dcheckCell_")]')->count();
+
+			for ($i = 1; $i <= $checks_count; $i++) {
+				// After each deletion checks buttons reset their position, so upper items locator is always 1.
+				$remove_button = $checks_container->query('xpath:(.//button[text()="Remove"])[1]')->one();
+				$remove_button->waitUntilClickable()->click();
+				$remove_button->waitUntilNotPresent();
+			}
+		}
 
 		if (CTestArrayHelper::get($data, 'Checks')) {
 			$add_button = $form->getField('Checks')->query('button:Add')->waitUntilClickable()->one();
+
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				foreach ($data['Checks'] as $check) {
+					$check = array_map('trim', $check);
+					$new_checks[] = $check;
+				}
+				$data['Checks'] = $new_checks;
+			}
 
 			foreach ($data['Checks'] as $i => $check) {
 				$add_button->click();
@@ -683,15 +835,26 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot create discovery rule', $data['error_details']);
+			$this->assertMessage(TEST_BAD, 'Cannot'.($update ? ' update': ' create').' discovery rule',
+					$data['error_details']
+			);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+			$this->assertMessage(TEST_GOOD, 'Discovery rule'. ($update ? ' updated': ' created'));
+
+			// Trim trailing and leading spaces in expected values before comparison.
+			if (CTestArrayHelper::get($data, 'trim', false)) {
+				$data['fields'] = array_map('trim', $data['fields']);
+			}
+
+			if ($update) {
+				self::$update_rule = $data['fields']['Name'];
+			}
 
 			// Check saved fields in form.
-			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name', $data['fields']['Name'])
-					->query('tag:a')->waitUntilClickable()->one()->click();
+			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
+					$data['fields']['Name'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
@@ -699,7 +862,8 @@ class testFormNetworkDiscovery extends CWebTest {
 			if (array_key_exists('radios', $data)) {
 				foreach ($data['radios'] as $field => $value) {
 					$this->assertTrue($form->getFieldContainer($field)->query("xpath:.//label[text()=".
-						CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists());
+							CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
+					);
 				}
 			}
 
@@ -708,17 +872,13 @@ class testFormNetworkDiscovery extends CWebTest {
 					zbx_dbstr($data['fields']['Name'])
 			));
 
+			if ($update) {
+				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($old_name)));
+			}
 
-			// Trim trailing and leading spaces in expected values before comparison.
-//				if (CTestArrayHelper::get($data, 'trim', false)) {
-//					$data['fields']['Group name'] = trim($data['fields']['Group name']);
-//				}
-//				$form = $this->openForm($data['fields']['Group name']);
-//				$form->checkValue($data['fields']['Group name']);
-//				// Change group name after succefull update scenario.
-//				if ($action === 'update') {
-//					static::$update_group = $data['fields']['Group name'];
-//				}
+			if ($update && CTestArrayHelper::get($data, 'trim')) {
+				self::$update_rule = str_replace('     ', ' ', self::$update_rule);
+			}
 		}
 	}
 }
