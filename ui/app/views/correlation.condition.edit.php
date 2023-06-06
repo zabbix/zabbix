@@ -89,8 +89,7 @@ switch ($condition_type) {
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'groupids_',
-					'editable' => true
+					'dstfld1' => 'groupids_'
 				]
 			]
 		]))
