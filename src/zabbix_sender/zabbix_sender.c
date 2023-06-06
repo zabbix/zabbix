@@ -401,7 +401,6 @@ typedef struct
 	int				fds[2];
 #endif
 	zbx_config_tls_t		*zbx_config_tls;
-	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
 }
 zbx_thread_sendval_args;
 
@@ -805,6 +804,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 
 		if (0 != i)
 		{
+			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 			sendval_args[i].json = sendval_args[0].json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
@@ -1593,11 +1593,7 @@ int	main(int argc, char **argv)
 		zbx_tls_pass_vars(&sendval_args->tls_vars);
 	}
 #endif
-	for (int i = 0; i < destinations_count; i++)
-	{
-		(sendval_args + i)->zbx_config_tls = zbx_config_tls;
-	}
-	sendval_args->zbx_get_program_type_cb_arg = get_program_type;
+	sendval_args->zbx_config_tls = zbx_config_tls;
 	zbx_json_init(&sendval_args->json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args->json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
 	zbx_json_addarray(&sendval_args->json, ZBX_PROTO_TAG_DATA);
