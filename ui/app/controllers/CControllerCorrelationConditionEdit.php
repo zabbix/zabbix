@@ -73,8 +73,10 @@ class CControllerCorrelationConditionEdit extends CController {
 
 	/**
 	 * Remember the last selected condition.
+	 *
+	 * @return string
 	 */
-	protected function getConditionLastType() {
+	protected function getConditionLastType(): string {
 		$last_type = CProfile::get('popup.condition.events_last_type', ZBX_CORR_CONDITION_OLD_EVENT_TAG);
 
 		if ($this->hasInput('conditiontype') && $this->getInput('conditiontype') != $last_type) {

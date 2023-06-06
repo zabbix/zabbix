@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -24,12 +24,12 @@
  */
 class CControllerPopupConditionOperations extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
@@ -54,11 +54,11 @@ class CControllerPopupConditionOperations extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$this->setResponse(new CControllerResponseData(
 			[
 				'title' => _('New condition'),
