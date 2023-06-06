@@ -167,39 +167,39 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
  *             ts         - [IN] the timestamp                                  *
  *                                                                              *
  *******************************************************************************/
-void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_item_t *item,  unsigned char **data, size_t *data_alloc,
-		size_t *data_offset)
+void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
+		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	zbx_interface_availability_t	in, out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, item->interface.interfaceid, item->itemid, (int)item->type);
+	zabbix_log(LOG_LEVEL_INFORMATION, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
+			__func__, interface->interfaceid, itemid, (int)type);
 
-	zbx_interface_availability_init(&in, item->interface.interfaceid);
-	zbx_interface_availability_init(&out, item->interface.interfaceid);
+	zbx_interface_availability_init(&in, interface->interfaceid);
+	zbx_interface_availability_init(&out, interface->interfaceid);
 
-	if (FAIL == interface_availability_by_item_type(item->type, item->interface.type))
+	if (FAIL == interface_availability_by_item_type(type, interface->type))
 		goto out;
 
-	interface_get_availability(&item->interface, &in);
+	interface_get_availability(interface, &in);
 
-	if (FAIL == zbx_dc_interface_activate(item->interface.interfaceid, ts, &in.agent, &out.agent))
+	if (FAIL == zbx_dc_interface_activate(interface->interfaceid, ts, &in.agent, &out.agent))
 		goto out;
 
 	if (FAIL == update_interface_availability(data, data_alloc, data_offset, &out))
 		goto out;
 
-	interface_set_availability(&item->interface, &out);
+	interface_set_availability(interface, &out);
 
 	if (ZBX_INTERFACE_AVAILABLE_TRUE == in.agent.available)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "resuming %s checks on host \"%s\": connection restored",
-				item_type_agent_string(item->type), item->host.host);
+				item_type_agent_string(type), host);
 	}
 	else
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": interface became available",
-				item_type_agent_string(item->type), item->host.host);
+				item_type_agent_string(type), host);
 	}
 out:
 	zbx_interface_availability_clean(&out);
@@ -858,7 +858,8 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 			case AGENT_ERROR:
 				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
-					zbx_activate_item_interface(&timespec, &items[i], &data, &data_alloc,
+					zbx_activate_item_interface(&timespec, &items[i].interface, items[i].itemid,
+							items[i].type, items[i].host.host, &data, &data_alloc,
 							&data_offset);
 					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}

@@ -17,6 +17,7 @@
 #include "zbxtypes.h"
 #include "httpagent_async.h"
 #include "../../libs/zbxasyncpoller/asyncpoller.h"
+#include "zbx_availability_constants.h"
 
 typedef struct
 {
@@ -65,6 +66,14 @@ typedef struct
 	AGENT_RESULT		result;
 }
 zbx_agent_context;
+typedef struct
+{
+	zbx_dc_interface_t	interface;
+	int			errcode;
+	char			*error;
+	zbx_uint64_t		itemid;
+}
+zbx_interface_status;
 
 static void	agent_context_clean(zbx_agent_context *agent_context)
 {
@@ -182,19 +191,41 @@ static void	agent_task_free(void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
+	zbx_interface_status	*interface_status;
 
 	zbx_timespec(&timespec);
+
+	if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
+			&agent_context->interface.interfaceid)))
+	{
+		zbx_interface_status	interface_status_local = {0};
+
+		interface_status = zbx_hashset_insert(&agent_context->poller_config->interfaces,
+				&interface_status_local, sizeof(interface_status_local));
+	}
 
 	if (SUCCEED == agent_context->ret)
 	{
 		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,agent_context->value_type,
 				agent_context->flags, &agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
+
+		interface_status->interface = agent_context->interface;
+		zbx_free(interface_status->error);
+		interface_status->errcode = SUCCEED;
+		interface_status->itemid = agent_context->itemid;
 	}
 	else
 	{
 		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid, agent_context->value_type,
 					agent_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
 					agent_context->result.msg);
+
+		interface_status->interface = agent_context->interface;
+		interface_status->errcode = agent_context->ret;
+		zbx_free(interface_status->error);
+		interface_status->error = agent_context->result.msg;
+		SET_MSG_RESULT(&agent_context->result, NULL);
+		interface_status->itemid = agent_context->itemid;
 	}
 
 	zbx_vector_uint64_append(&agent_context->poller_config->itemids, agent_context->itemid);
@@ -418,6 +449,57 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		zbx_free(items);
 exit:
 	zbx_preprocessor_flush();
+
+	if (0 != poller_config->interfaces.num_data)
+	{
+		zbx_hashset_iter_t	iter;
+		zbx_interface_status	*interface_status;
+		unsigned char		*data = NULL;
+		size_t			data_alloc = 0, data_offset = 0;
+	
+		zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
+
+		while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
+		{
+			switch (interface_status->errcode)
+			{
+				case SUCCEED:
+				case NOTSUPPORTED:
+				case AGENT_ERROR:
+					zbx_activate_item_interface(&timespec, &interface_status->interface,
+							interface_status->itemid, ITEM_TYPE_ZABBIX, "",
+							&data, &data_alloc, &data_offset);
+					break;
+				case NETWORK_ERROR:
+				case GATEWAY_ERROR:
+				case TIMEOUT_ERROR:
+					/*zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
+							&data_offset, config_unavailable_delay,
+							config_unreachable_period, config_unreachable_delay,
+							results[i].msg);*/
+					break;
+				case CONFIG_ERROR:
+					/* nothing to do */
+					break;
+				case SIG_ERROR:
+					/* nothing to do, execution was forcibly interrupted by signal */
+					break;
+				default:
+					zbx_error("unknown response code returned: %d", errcodes[i]);
+					THIS_SHOULD_NEVER_HAPPEN;
+			}
+
+		}
+
+		zbx_hashset_clear(&poller_config->interfaces);
+
+		if (NULL != data)
+		{
+			zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
+			zbx_free(data);
+		}
+	}
+	
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	poller_config->queued += num;
@@ -498,11 +580,19 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 		event_active(poller_config->async_check_items_timer, 0, 0);
 }
 
+static void	zbx_interface_status_clean(zbx_interface_status *interface_status)
+{
+	zbx_free(interface_status->error);
+}
+
 static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		event_callback_fn async_check_items_callback)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_interface_status_clean,
+			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 	zbx_vector_uint64_create(&poller_config->itemids);
 	zbx_vector_int32_create(&poller_config->lastclocks);
 	zbx_vector_int32_create(&poller_config->errcodes);

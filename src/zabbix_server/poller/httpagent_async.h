@@ -40,6 +40,7 @@ typedef struct
 	zbx_vector_int32_t	lastclocks;
 	CURLM			*curl_handle;
 	struct event_base	*base;
+	zbx_hashset_t		interfaces;
 }
 zbx_poller_config_t;
 
