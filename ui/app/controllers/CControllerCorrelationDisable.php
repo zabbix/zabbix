@@ -65,7 +65,7 @@ class CControllerCorrelationDisable extends CController {
 		$updated = count($correlations);
 
 		if ($result) {
-			$output['success']['title'] = _n('Correlation disabled', 'Correlations disabled', $updated);
+			$output['success']['title'] = _n('Event correlation disabled', 'Event correlations disabled', $updated);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -73,7 +73,7 @@ class CControllerCorrelationDisable extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot disable correlation', 'Cannot disable correlations', $updated),
+				'title' => _n('Cannot disable event correlation', 'Cannot disable event correlations', $updated),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

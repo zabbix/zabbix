@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())->addItem(
-				(new CSimpleButton(_('Create correlation')))->setId('js-create')
+				(new CSimpleButton(_('Create event correlation')))->setId('js-create')
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

@@ -350,7 +350,7 @@ else {
 			'keepOpen' => true,
 			'isSubmit' => false,
 			'action' => 'correlation_edit_popup.clone('.json_encode([
-				'title' => _('New correlation'),
+				'title' => _('New event correlation'),
 				'buttons' => [
 					[
 						'title' => _('Add'),
@@ -370,7 +370,7 @@ else {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete correlation?'),
+			'confirmation' => _('Delete event correlation?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
@@ -380,7 +380,7 @@ else {
 }
 
 $output = [
-	'header' => $data['correlationid'] === null ? _('New correlation') : _('Correlation'),
+	'header' => $data['correlationid'] === null ? _('New event correlation') : _('Event correlation'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,

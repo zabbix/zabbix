@@ -57,7 +57,7 @@ class CControllerCorrelationDelete extends CController {
 		$result = API::Correlation()->delete($correlationids);
 
 		if ($result) {
-			$output['success']['title'] = _n('Correlation deleted', 'Correlations deleted', $deleted);
+			$output['success']['title'] = _n('Event correlation deleted', 'Event correlations deleted', $deleted);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -65,7 +65,7 @@ class CControllerCorrelationDelete extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot delete correlation', 'Cannot delete correlations', $deleted),
+				'title' => _n('Cannot delete event correlation', 'Cannot delete event correlations', $deleted),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 

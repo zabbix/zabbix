@@ -46,7 +46,7 @@ class CControllerCorrelationUpdate extends CController {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
-						'title' => _('Cannot update correlation'),
+						'title' => _('Cannot update event correlation'),
 						'messages' => array_column(get_and_clear_messages(), 'message')
 					]
 				], JSON_THROW_ON_ERROR)])
@@ -106,7 +106,7 @@ class CControllerCorrelationUpdate extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _('Correlation updated');
+			$output['success']['title'] = _('Event correlation updated');
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');
@@ -114,7 +114,7 @@ class CControllerCorrelationUpdate extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot update correlation'),
+				'title' => _('Cannot update event correlation'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

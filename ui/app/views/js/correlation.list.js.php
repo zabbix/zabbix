@@ -91,8 +91,8 @@
 
 		#delete(target, correlationids) {
 			const confirmation = correlationids.length > 1
-				? <?= json_encode(_('Delete selected correlations?')) ?>
-				: <?= json_encode(_('Delete selected correlation?')) ?>;
+				? <?= json_encode(_('Delete selected event correlations?')) ?>
+				: <?= json_encode(_('Delete selected event correlation?')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return;
@@ -107,8 +107,8 @@
 		#enable(target, correlationids, massenable = false) {
 			if (massenable) {
 				const confirmation = correlationids.length > 1
-					? <?= json_encode(_('Enable selected correlations?')) ?>
-					: <?= json_encode(_('Enable selected correlation?')) ?>;
+					? <?= json_encode(_('Enable selected event correlations?')) ?>
+					: <?= json_encode(_('Enable selected event correlation?')) ?>;
 
 				if (!window.confirm(confirmation)) {
 					return;
@@ -124,8 +124,8 @@
 		#disable(target, correlationids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = correlationids.length > 1
-					? <?= json_encode(_('Disable selected correlations?')) ?>
-					: <?= json_encode(_('Disable selected correlation?')) ?>;
+					? <?= json_encode(_('Disable selected event correlations?')) ?>
+					: <?= json_encode(_('Disable selected event correlation?')) ?>;
 
 				if (!window.confirm(confirmation)) {
 					return;
