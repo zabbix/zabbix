@@ -381,7 +381,7 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected static function waitForShutdown($component, array $child_pids) {
 	//		if (!self::checkPidKilled($component)) {
-	$arrFiles = scandir(self::getPidPath($component));
+	$arrFiles = scandir("/tmp");
 	$debug = var_export($arrFiles, true);
 
 	$logfile = var_export(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)), true);
