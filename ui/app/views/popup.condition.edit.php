@@ -103,8 +103,7 @@ switch ($data['type']) {
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'groupids_',
-							'editable' => true
+							'dstfld1' => 'groupids_'
 						]
 					]
 				]))
@@ -248,8 +247,7 @@ switch ($data['type']) {
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'trigger_new_condition',
 								'with_triggers' => true,
-								'real_hosts' => true,
-								'editable' => true
+								'real_hosts' => true
 							]
 						]
 					]))
@@ -265,8 +263,7 @@ switch ($data['type']) {
 								'srcfld1' => 'triggerid',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'trigger_new_condition',
-								'with_triggers' => true,
-								'editable' => true
+								'with_triggers' => true
 							]
 						]
 					]))
@@ -325,8 +322,7 @@ switch ($data['type']) {
 							'srctbl' => 'hosts',
 							'srcfld1' => 'hostid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'host_new_condition',
-							'editable' => true
+							'dstfld1' => 'host_new_condition'
 						]
 					]
 				]))
@@ -363,8 +359,7 @@ switch ($data['type']) {
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'hostgroup_new_condition',
-							'editable' => true
+							'dstfld1' => 'hostgroup_new_condition'
 						]
 					]
 				]))
@@ -472,8 +467,7 @@ switch ($data['type']) {
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'template_new_condition',
-							'editable' => true
+							'dstfld1' => 'template_new_condition'
 						]
 					]
 				]))
@@ -562,8 +556,7 @@ switch ($data['type']) {
 								'srcfld2' => 'name',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'dcheck_new_condition_value',
-								'dstfld2' => 'dcheck',
-								'writeonly' => '1'
+								'dstfld2' => 'dcheck'
 							], JSON_THROW_ON_ERROR).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];

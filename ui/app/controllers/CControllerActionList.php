@@ -111,7 +111,6 @@ class CControllerActionList extends CController {
 				'eventsource' => $data['eventsource'],
 				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
-			'editable' => true,
 			'sortfield' => $sort_field,
 			'sortorder' => $sort_order,
 			'limit' => $limit
