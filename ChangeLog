@@ -1,9 +1,23 @@
 Changes for 7.0.0alpha2
 
 New features:
+.........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 A.F.I..... [ZBXNEXT-2299] implemented problem/event filtering by performed update actions and user; reworked problem filter to support filtering by acknowledgement status and current user (miks)
 
 Bug fixes:
+..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
+........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
+..F....... [ZBX-22594] fixed fatal error when requests contains invalid authentication parameters (miks)
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+..F....... [ZBX-22691] fixed action operations edit form opening wrong operation details popup window (Ivo)
+.........T [ZBX-21593] optimised preprocessing steps in both templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
+...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted connection in Zabbix agent 2 (kprutkovs)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template; improved the check for double template linkage and related error messages (epulke, jfreibergs, vmaksimovs)
+A.F....... [ZBX-22254] fixed support of special characters in LDAP group pattern (gcalenko)
+........S. [ZBX-22571] fixed service not equal action condition not working as expected (vso)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+.........T [ZBX-22698] fixed spelling mistakes in templates (egordymov)
+..F....... [ZBX-21883] changed map widgets select map field to multiselect (agriscenko, Sasha)
 ...G...... [ZBX-22762] fixed race condition in Zabbix agent 2 when reading filesystem (arimdjonoks)
 ...G...... [ZBX-22593] changed representation of boolean item values in wmi.get, wmi.getall items in Zabbix agent 2 to match the format in classic Zabbix agent (mprihodko)
 
@@ -43,6 +57,33 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.4rc1
+
+New features:
+.........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
+
+Bug fixes:
+..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
+........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
+..F....... [ZBX-22594] fixed fatal error when requests contains invalid authentication parameters (miks)
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+..F....... [ZBX-22691] fixed action operations edit form opening wrong operation details popup window (Ivo)
+.........T [ZBX-21593] optimised preprocessing steps in both templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
+...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted connection in Zabbix agent 2 (kprutkovs)
+.......PS. [ZBX-22314] fixed OpenSSL, yaml, cmocka compiling in a non-standard location (askolmeisters)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template; improved the check for double template linkage and related error messages (epulke, jfreibergs, vmaksimovs)
+A.F....... [ZBX-22254] fixed support of special characters in LDAP group pattern (gcalenko)
+........S. [ZBX-22571] fixed service not equal action condition not working as expected (vso)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+.........T [ZBX-22698] fixed spelling mistakes in templates (egordymov)
+..F....... [ZBX-21883] changed map widgets select map field to multiselect (agriscenko, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.3
+
+6.4.3rc1 was released as 6.4.3 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.3rc1
@@ -1251,6 +1292,31 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.19rc1
+
+New features:
+.........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
+
+Bug fixes:
+..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
+........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
+..F....... [ZBX-22681] fixed wrongly displayed revert button for text macros in host, template and host prototype clone form (miks)
+..F....... [ZBX-22594] fixed fatal error when requests contains invalid authentication parameters (miks)
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+.........T [ZBX-21593] optimised preprocessing steps in both templates PostgreSQL by Zabbix agent and PostgreSQL by Zabbix agent 2 (aiantsen)
+...G...... [ZBX-22470] fixed hang on logging when establishing an encrypted connection in Zabbix agent 2 (kprutkovs)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template; improved the check for double template linkage and related error messages (epulke, jfreibergs, vmaksimovs)
+........S. [ZBX-22571] fixed service not equal action condition not working as expected (vso)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
+.........T [ZBX-22698] fixed spelling mistakes in templates (egordymov)
+..F....... [ZBX-21883] changed map widgets select map field to multiselect (agriscenko, Sasha)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.18
+
+6.0.18rc1 was released as 6.0.18 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.18rc1
 
 New features:
@@ -1267,7 +1333,7 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 Bug fixes:
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for Jenkins template (egordymov)
-.........T [ZBX-21910] fixed JavaScri[t in Kubernetes nodes template (egordymov)
+.........T [ZBX-21910] fixed JavaScript in Kubernetes nodes template (egordymov)
 ........S. [ZBX-22773] made NodeAddress use ListenIP and ListenPort if not specified (kprutkovs)
 .......PS. [ZBX-21613] fixed broken database upgrade if more than one Zabbix server at the same time on one database is started (vso)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
@@ -3802,6 +3868,16 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.36rc1
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
+A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
+..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.35
@@ -6605,6 +6681,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.47rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.46

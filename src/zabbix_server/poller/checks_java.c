@@ -19,7 +19,6 @@
 
 #include "checks_java.h"
 
-#include "log.h"
 #include "zbxjson.h"
 #include "zbxsysinfo.h"
 

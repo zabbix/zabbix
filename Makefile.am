@@ -179,16 +179,12 @@ WRAP_COMM_FUNCS = \
 	-Wl,--wrap=connect \
 	-Wl,--wrap=poll
 
-WRAP_LOG = \
-	-Wl,--wrap=__zbx_zabbix_log
-
 COMMON_WRAP_FUNCS = \
 	$(WRAP_DB_FUNCS) \
 	$(WRAP_IO_FUNCS) \
 	$(WRAP_FS_FUNCS) \
 	$(WRAP_EXIT) \
-	$(WRAP_COMM_FUNCS) \
-	$(WRAP_LOG)
+	$(WRAP_COMM_FUNCS)
 
 tests_build:
 	$(MAKE) $(AM_MAKEFLAGS) && \

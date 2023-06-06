@@ -22,7 +22,6 @@
 #include "diskdevices.h"
 
 #include "stats.h"
-#include "log.h"
 #include "zbxmutexs.h"
 
 extern zbx_mutex_t		diskstats_lock;

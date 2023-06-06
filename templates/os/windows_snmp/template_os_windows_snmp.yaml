@@ -490,7 +490,7 @@ zabbix_export:
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and atother times as indicated by the value of ifCounterDiscontinuityTime.
+                The total number of octets received on the interface,including framing characters. Discontinuities in the value of this counter can occur at re-initialization of the management system, and another times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: SNMP_WALK_VALUE
                   parameters:
