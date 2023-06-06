@@ -44,18 +44,29 @@ window.correlation_condition_popup = new class {
 	}
 
 	submit() {
-		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
 
+		switch (parseInt(fields.conditiontype)) {
+			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
+			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
+				fields.tag = fields.tag.trim();
+				break;
+
+			case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
+			case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
+				fields.tag = fields.tag.trim();
+				fields.value = fields.value.trim();
+				break;
+
+			case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
+				fields.oldtag = fields.oldtag.trim();
+				fields.newtag = fields.newtag.trim();
+				break;
+		}
+
+		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'correlation.condition.check');
-
-		if (typeof (fields.value) === 'string') {
-			fields.value = fields.value.trim();
-		}
-
-		if (fields.value2 !== null && typeof(fields.value2) === 'string') {
-			fields.value2 = fields.value2.trim();
-		}
 
 		this.#post(curl.getUrl(), fields);
 	}
@@ -90,7 +101,7 @@ window.correlation_condition_popup = new class {
 				}
 
 				let title,
-				messages;
+					messages;
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
