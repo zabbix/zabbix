@@ -1378,6 +1378,25 @@ class CLineGraphDraw extends CGraphDraw {
 		}
 	}
 
+	private function getLastValue(array $data, int $calc_fnc) {
+		for ($i = $this->sizeX; $i >= 0; $i--) {
+			if ($data['count'][$i] != 0) {
+				switch ($calc_fnc) {
+					case CALC_FNC_MIN:
+						return $data['min'][$i];
+					case CALC_FNC_MAX:
+						return $data['max'][$i];
+					case CALC_FNC_ALL:
+					case CALC_FNC_AVG:
+					default:
+						return $data['avg'][$i];
+				}
+			}
+		}
+
+		return 0;
+	}
+
 	protected function drawLegend() {
 		// if graph is small, we are not drawing legend
 		if (!$this->drawItemsLegend) {
@@ -1454,7 +1473,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$legend->addCell($rowNum, ['text' => '['.$fncRealName.']']);
 				$legend->addCell($rowNum, [
 					'text' => convertUnits([
-						'value' => $this->getLastValue($i),
+						'value' => $this->getLastValue($data, $this->items[$i]['calc_fnc']),
 						'units' => $this->items[$i]['units'],
 						'convert' => ITEM_CONVERT_NO_UNITS
 					]),
