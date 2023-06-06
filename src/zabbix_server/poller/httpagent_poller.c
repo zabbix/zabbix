@@ -456,7 +456,7 @@ exit:
 		zbx_interface_status	*interface_status;
 		unsigned char		*data = NULL;
 		size_t			data_alloc = 0, data_offset = 0;
-	
+
 		zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
 
 		while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
@@ -499,7 +499,7 @@ exit:
 			zbx_free(data);
 		}
 	}
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	poller_config->queued += num;
