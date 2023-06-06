@@ -144,7 +144,7 @@ window.correlation_edit_popup = new class {
 
 					const template = new Template(this.form.querySelector('#condition-hostgr-row-tmpl').innerHTML);
 
-					document
+					this.form
 						.querySelector('#condition_table tbody')
 						.insertAdjacentHTML('beforeend', template.evaluate(element));
 				}
