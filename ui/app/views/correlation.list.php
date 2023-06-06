@@ -26,10 +26,6 @@
 
 $this->includeJsFile('correlation.list.js.php');
 
-if ($data['uncheck']) {
-	uncheckTableRows('correlation');
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Event correlation'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
