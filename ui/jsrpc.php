@@ -458,10 +458,16 @@ switch ($data['method']) {
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if (array_key_exists('enabled_only', $data) && $data['enabled_only']) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'limit' => $limit
 				]);
 
