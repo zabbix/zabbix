@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-31T13:42:47Z'
+  date: '2023-06-07T11:28:24Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -19,7 +19,7 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: 22b61bf7ebba43e8aef544385448d18c
-          name: 'AWS EC2: Check getting of alarms'
+          name: 'AWS EC2: Get alarms check'
           type: DEPENDENT
           key: aws.ec2.alarms.check
           delay: '0'
@@ -1113,7 +1113,7 @@ zabbix_export:
             - tag: component
               value: metadata
         - uuid: 7c264d8d5d934f898f7c745acd429d25
-          name: 'AWS EC2: Check getting of metrics'
+          name: 'AWS EC2: Get metrics check'
           type: DEPENDENT
           key: aws.ec2.metrics.check
           delay: '0'
@@ -1334,7 +1334,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
         - uuid: 3c819ed899c044ae8455266292f65632
-          name: 'AWS EC2: Check getting of volume info'
+          name: 'AWS EC2: Get volumes info check'
           type: DEPENDENT
           key: aws.ec2.volumes.check
           delay: '0'
@@ -1396,7 +1396,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get alarm metrics about state and its reason.'
+              description: 'Get alarm metrics about the state and its reason.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1634,14 +1634,14 @@ zabbix_export:
                 - tag: volume
                   value: '{#VOLUME_ID}'
             - uuid: 6145bf692ea0469eb5583485b6622a59
-              name: 'AWS EBS: ["{#VOLUME_ID}"]: Get volume'
+              name: 'AWS EBS: ["{#VOLUME_ID}"]: Get volume data'
               type: DEPENDENT
               key: 'aws.ec2.ebs.get_volume["{#VOLUME_ID}"]'
               delay: '0'
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Get metrics of the "{#VOLUME_ID}" volume.'
+              description: 'Get data of the "{#VOLUME_ID}" volume.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
