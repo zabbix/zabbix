@@ -185,7 +185,9 @@
 
 			const dashboard_page_index = ZABBIX.Dashboard.getSelectedDashboardPageIndex();
 
-			request_data.page = dashboard_page_index > 0 ? dashboard_page_index + 1 : undefined;
+			if (dashboard_page_index > 0) {
+				request_data.page = dashboard_page_index + 1;
+			}
 
 			request_data.sharing = this.dashboard.sharing;
 
