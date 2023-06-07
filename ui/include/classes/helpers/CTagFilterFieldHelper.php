@@ -34,7 +34,7 @@ class CTagFilterFieldHelper {
 	 *
 	 * @return CTable
 	 */
-	public static function getTagFilterField(array $data = [], array $options = [], bool $allow_empty = false): CTable {
+	public static function getTagFilterField(array $data = [], array $options = []): CTable {
 		$options += [
 			'tag_field_name' => 'filter_tags',
 			'evaltype_field_name' => 'filter_evaltype'
