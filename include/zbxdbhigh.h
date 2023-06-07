@@ -481,7 +481,7 @@ void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
 
-int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhig);
+int	zbx_db_validate_config_features(unsigned char program_type, const zbx_config_dbhigh_t *config_dbhigh);
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 void	zbx_db_validate_config(const zbx_config_dbhigh_t *config_dbhigh);
 #endif
