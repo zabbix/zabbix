@@ -35,7 +35,7 @@ Template needs to use Authorization via API token.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the generated service account token using the command:
 
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
@@ -48,6 +48,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 - /etc/kubernetes/manifests/kube-controller-manager.yaml
 - /etc/kubernetes/manifests/kube-scheduler.yaml
 
+Depending on your Kubernetes distrubution, you might need to adjust `{$KUBE.CONTROL_PLANE.TAINT}` macro (for example, set it to `node-role.kubernetes.io/master` for OpenShift).
 
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
@@ -107,14 +108,16 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
+|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.API.LIVEZ.ENDPOINT}|<p>Kubernetes API livez endpoint /livez</p>|`/livez`|
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
+|{$KUBE.CONTROL_PLANE.TAINT}|<p>Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.</p>|`node-role.kubernetes.io/control-plane`|
 |{$KUBE.CONTROLLER_MANAGER.SCHEME}|<p>Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.CONTROLLER_MANAGER.PORT}|<p>Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.</p>|`10257`|
 |{$KUBE.SCHEDULER.SCHEME}|<p>Kubernetes Scheduler metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
