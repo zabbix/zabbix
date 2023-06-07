@@ -21,7 +21,7 @@ static ZBX_THREAD_LOCAL struct event_base	*base;
 static ZBX_THREAD_LOCAL struct event		*curl_timeout;
 static ZBX_THREAD_LOCAL CURLM			*curl_handle;
 
-static process_item_result_callback_fn	process_item_result;
+static process_httpagent_result_callback_fn	process_httpagent_result;
 
 ZBX_VECTOR_IMPL(int32, int)
 
@@ -68,7 +68,7 @@ static void	check_multi_info(void)
 		switch (message->msg)
 		{
 			case CURLMSG_DONE:
-				process_item_result(message->easy_handle, message->data.result);
+				process_httpagent_result(message->easy_handle, message->data.result);
 				break;
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%d", message->msg);
@@ -177,13 +177,13 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_item_result_callback_fn process_item_result_callback)
+CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_httpagent_result_callback_fn process_httpagent_result_callback)
 {
 	CURLMcode	merr;
 	CURLcode	err;
 
 	base = ev;
-	process_item_result = process_item_result_callback;
+	process_httpagent_result = process_httpagent_result_callback;
 
 	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
 	{

@@ -32,7 +32,7 @@ typedef struct
 }
 zbx_interface_status;
 
-static void	agent_task_free(void *data)
+static void	process_agent_result(void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
@@ -102,7 +102,7 @@ static void	agent_task_free(void *data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-static void	process_item_result(CURL *easy_handle, CURLcode err)
+static void	process_httpagent_result(CURL *easy_handle, CURLcode err)
 {
 	long			response_code;
 	char			*error, *out = NULL;
@@ -184,7 +184,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 			errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i], poller_config);
 		else
-			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config, agent_task_free);
+			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config, process_agent_result);
 	}
 
 	zbx_timespec(&timespec);
@@ -377,7 +377,7 @@ ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 
 	http_agent_poller_init(&poller_config, poller_args_in, async_check_items);
-	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_item_result);
+	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result);
 
 	while (ZBX_IS_RUNNING())
 	{

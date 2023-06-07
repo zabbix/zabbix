@@ -47,9 +47,9 @@ typedef struct
 }
 zbx_poller_config_t;
 
-typedef void (*process_item_result_callback_fn)(CURL *easy_handle, CURLcode err);
+typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err);
 
-CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_item_result_callback_fn process_item_result_callback);
+CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_httpagent_result_callback_fn process_httpagent_result_callback);
 void	zbx_async_httpagent_destroy(void);
 
 #endif
