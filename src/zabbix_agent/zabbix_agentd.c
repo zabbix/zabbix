@@ -149,7 +149,11 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file        Path to the configuration file",
+#ifdef _WINDOWS
+	"                                 (default: \"<directory where zabbix_agentd.exe is located>\\zabbix_agentd.conf\")",
+#else
 	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+#endif
 	"  -f --foreground                Run Zabbix agent in foreground",
 	"  -p --print                     Print known items and exit",
 	"  -t --test item-key             Test specified item and exit",
@@ -347,6 +351,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	char		ch;
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
+	char		*process_name = NULL, *process_path = NULL, *progname_noext = NULL;
 #endif
 	unsigned short	opt_count[256] = {0};
 
@@ -547,8 +552,58 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	if (NULL == config_file)
+	{
+#ifdef _WINDOWS
+#define PATH_BUF_LEN	4096
+		size_t	alloc_len = 0, offset = 0;
+		char	*ptr;
+		wchar_t	szProcessName[PATH_BUF_LEN];
+
+		if (0 == GetModuleFileNameEx(GetCurrentProcess(), NULL, szProcessName, ARRSIZE(szProcessName)))
+		{
+			zbx_error("failed to get Zabbix agent executable file path while initializing default config"
+					" path");
+			ret = FAIL;
+			goto out;
+		}
+
+		process_name = zbx_unicode_to_utf8(szProcessName);
+
+		if (NULL == (ptr = strstr(process_name, progname)))
+		{
+			zbx_error("got unexpected Zabbix agent executable file path '%s' while initializing"
+					" default config path", process_name);
+			ret = FAIL;
+			goto out;
+		}
+
+		zbx_strncpy_alloc(&process_path, &alloc_len, &offset, process_name, ptr - process_name);
+
+		if (NULL == (ptr = strstr(progname, ".")))
+		{
+			zbx_error("failed to get Zabbix agent executable file name with file extension removed for"
+					" program name '%s' while initializing default config path", progname);
+			ret = FAIL;
+			goto out;
+		}
+
+		zbx_strncpy_alloc(&progname_noext, &alloc_len, &offset, progname,
+				ptr - progname);
+
+		alloc_len = 0, offset = 0;
+
+		zbx_snprintf_alloc(&config_file, &alloc_len, &offset, "%s%s.conf", process_path, progname_noext);
+#undef PATH_BUF_LEN
+#else
 		config_file = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
+#endif
+	}
 out:
+#ifdef _WINDOWS
+	zbx_free(process_name);
+	zbx_free(process_path);
+	zbx_free(progname_noext);
+#endif
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
