@@ -22,9 +22,7 @@
 #include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
-/* defined in sysinfo lib */
-extern int	get_cpu_group_num_win32(void);
-extern int	get_numa_node_num_win32(void);
+#	include "../win32/win32_cpu.h"
 #endif
 #include "zbxmutexs.h"
 
@@ -1336,7 +1334,7 @@ static int	get_cpu_status(int pc_status)
  * Return value: SUCCEED if collector started and has at least one CPU        *
  *               FAIL otherwise                                               *
  *                                                                            *
- * Comments: The data returned is designed for item system.cpu.discovery      *
+ * Comments: data returned is designed for item system.cpu.discovery          *
  *                                                                            *
  ******************************************************************************/
 int	get_cpus(zbx_vector_uint64_pair_t *vector)

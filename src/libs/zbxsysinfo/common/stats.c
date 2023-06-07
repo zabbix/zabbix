@@ -118,7 +118,7 @@ return_one:
  * Comments: Unix version allocates memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-int	init_collector_data(char **error)
+int	zbx_init_collector_data(char **error)
 {
 	int	cpu_count, ret = FAIL;
 	size_t	sz, sz_cpu, sz_cpu_phys_util = 0;
@@ -208,7 +208,7 @@ out:
  * Comments: Unix version allocated memory as shared.                         *
  *                                                                            *
  ******************************************************************************/
-void	free_collector_data(void)
+void	zbx_free_collector_data(void)
 {
 #ifdef _WINDOWS
 	zbx_free(collector);

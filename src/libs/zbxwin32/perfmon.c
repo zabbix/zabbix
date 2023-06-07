@@ -21,7 +21,6 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-/*#include "stats.h"*/
 #include "zbxthreads.h"
 #include "log.h"
 
