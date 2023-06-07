@@ -659,6 +659,8 @@ static void	http_agent_poller_destroy(zbx_poller_config_t *poller_config)
 	zbx_vector_uint64_destroy(&poller_config->itemids);
 	zbx_vector_int32_destroy(&poller_config->lastclocks);
 	zbx_vector_int32_destroy(&poller_config->errcodes);
+	zbx_hashset_clear(&poller_config->interfaces);
+	zbx_hashset_destroy(&poller_config->interfaces);
 }
 
 ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
