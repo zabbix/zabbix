@@ -883,8 +883,12 @@ function getConditionFormula(conditions, evalType) {
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
-					:  $(this).closest('tr');
+					: $(this).closest('tr');
 				addRow(table, beforeRow, options);
+
+				if (!options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
 
 				table.trigger('afteradd.dynamicRows', options);
 			});
@@ -896,10 +900,12 @@ function getConditionFormula(conditions, evalType) {
 
 				if (!options.allow_empty && $(options.row, table).length === 0) {
 					table.trigger('beforeadd.dynamicRows', options);
+
 					addRow(table, $(options.add, table).closest('tr'), options);
+					$(options.remove, table).attr('disabled', true);
+
 					table.trigger('afteradd.dynamicRows', options);
 				}
-
 			});
 
 			// disable buttons
@@ -908,12 +914,8 @@ function getConditionFormula(conditions, evalType) {
 				disableRow($(this).closest(options.row));
 			});
 
-			table.on('tableupdate.dynamicRows', options, function() {
-				toggleRemoveButton(table, options);
-			});
-
 			table.on('change', options, function() {
-				if ($(options.row, table).length === 1 && !options.allow_empty) {
+				if (!options.allow_empty) {
 					$(options.remove, table).attr('disabled', false);
 				}
 			});
@@ -959,8 +961,6 @@ function getConditionFormula(conditions, evalType) {
 			++counter;
 		});
 
-		toggleRemoveButton(table, options);
-
 		table.data('dynamicRows').counter = counter;
 	}
 
@@ -995,6 +995,7 @@ function getConditionFormula(conditions, evalType) {
 		if (options.remove_next_sibling) {
 			row.next().remove();
 		}
+
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
@@ -1010,18 +1011,6 @@ function getConditionFormula(conditions, evalType) {
 		row.find('textarea').prop('readonly', true);
 		row.find('input').prop('readonly', true);
 		row.find('button').prop('disabled', true);
-	}
-
-	/**
-	 * Disables remove button
-	 *
-	 * @param {jQuery} table
-	 * @param {jQuery} options
-	 */
-	function toggleRemoveButton(table, options) {
-		if (!options.allow_empty) {
-			$(options.remove, table).attr('disabled', $(options.row, table).length === 1);
-		}
 	}
 }(jQuery));
 
