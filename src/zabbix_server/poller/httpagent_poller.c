@@ -55,6 +55,7 @@ typedef struct
 	unsigned char		flags;
 	unsigned char		state;
 	char			*key;
+	char			*key_orig;
 	zbx_dc_host_t		host;
 	zbx_dc_interface_t	interface;
 	zbx_socket_t		s;
@@ -72,11 +73,14 @@ typedef struct
 	int			errcode;
 	char			*error;
 	zbx_uint64_t		itemid;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
+	char			*key_orig;
 }
 zbx_interface_status;
 
 static void	agent_context_clean(zbx_agent_context *agent_context)
 {
+	zbx_free(agent_context->key_orig);
 	zbx_free(agent_context->key);
 	zbx_free_agent_result(&agent_context->result);
 }
@@ -142,7 +146,7 @@ static int	agent_task_process(short event, void *data)
 			if (0 == (event & EV_WRITE))
 			{
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
-						" unexpected read event when sending [%s]", agent_context->key));
+						" unexpected read event during send"));
 				agent_context->ret = FAIL;
 				return ZBX_ASYNC_TASK_STOP;
 			}
@@ -164,6 +168,8 @@ static int	agent_task_process(short event, void *data)
 		case ZABBIX_AGENT_STEP_RECV:
 			if (0 == (event & EV_READ))
 			{
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
+						" unexpected write event during send"));
 				zabbix_log(LOG_LEVEL_DEBUG, "unexpected read event when reading result of [%s]", agent_context->key);
 				return ZBX_ASYNC_TASK_STOP;
 			}
@@ -192,27 +198,43 @@ static void	agent_task_free(void *data)
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
 	zbx_interface_status	*interface_status;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host.host,
+			agent_context->interface.addr, agent_context->key,
+			zbx_tcp_connection_type_name(agent_context->host.tls_connect));
 
 	zbx_timespec(&timespec);
 
-	if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
-			&agent_context->interface.interfaceid)))
+	/* don't try activating interface if there were no errors detected */
+	if (SUCCEED != agent_context->ret || ZBX_INTERFACE_AVAILABLE_TRUE != agent_context->interface.available ||
+	 		0 != agent_context->interface.errors_from)
 	{
-		zbx_interface_status	interface_status_local = {0};
+		if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
+				&agent_context->interface.interfaceid)))
+		{
+			zbx_interface_status	interface_status_local = {.interface = agent_context->interface};
 
-		interface_status = zbx_hashset_insert(&agent_context->poller_config->interfaces,
-				&interface_status_local, sizeof(interface_status_local));
+			interface_status_local.interface.addr = NULL;
+			interface_status = zbx_hashset_insert(&agent_context->poller_config->interfaces,
+					&interface_status_local, sizeof(interface_status_local));
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "updating existing interface");
+
+		zbx_free(interface_status->error);
+		interface_status->errcode = agent_context->ret;
+		interface_status->itemid = agent_context->itemid;
+		zbx_strlcpy(interface_status->host, agent_context->host.host, sizeof(interface_status->host));
+		zbx_free(interface_status->key_orig);
+		interface_status->key_orig = agent_context->key_orig;
+		agent_context->key_orig = NULL;
 	}
 
 	if (SUCCEED == agent_context->ret)
 	{
 		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,agent_context->value_type,
 				agent_context->flags, &agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
-
-		interface_status->interface = agent_context->interface;
-		zbx_free(interface_status->error);
-		interface_status->errcode = SUCCEED;
-		interface_status->itemid = agent_context->itemid;
 	}
 	else
 	{
@@ -220,12 +242,8 @@ static void	agent_task_free(void *data)
 					agent_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
 					agent_context->result.msg);
 
-		interface_status->interface = agent_context->interface;
-		interface_status->errcode = agent_context->ret;
-		zbx_free(interface_status->error);
 		interface_status->error = agent_context->result.msg;
 		SET_MSG_RESULT(&agent_context->result, NULL);
-		interface_status->itemid = agent_context->itemid;
 	}
 
 	zbx_vector_uint64_append(&agent_context->poller_config->itemids, agent_context->itemid);
@@ -236,11 +254,13 @@ static void	agent_task_free(void *data)
 	agent_context->poller_config->processed++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, agent_context->itemid);
+	ret = agent_context->ret;
 
-	printf("chat_task_free(%p)\n", data);
 	agent_context_clean(agent_context);
 	zbx_tcp_close(&agent_context->s);
 	zbx_free(agent_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
 static int	async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
@@ -262,6 +282,7 @@ static int	async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poll
 	agent_context->interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->interface.dns_orig : agent_context->interface.ip_orig);
 	agent_context->key = item->key;
+	agent_context->key_orig = zbx_strdup(NULL, item->key_orig);
 	item->key = NULL;
 	zbx_init_agent_result(&agent_context->result);
 
@@ -457,6 +478,10 @@ exit:
 		unsigned char		*data = NULL;
 		size_t			data_alloc = 0, data_offset = 0;
 
+		zabbix_log(LOG_LEVEL_DEBUG, "updating:%d interfaces", poller_config->interfaces.num_data);
+	
+		zbx_timespec(&timespec);
+
 		zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
 
 		while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
@@ -467,16 +492,20 @@ exit:
 				case NOTSUPPORTED:
 				case AGENT_ERROR:
 					zbx_activate_item_interface(&timespec, &interface_status->interface,
-							interface_status->itemid, ITEM_TYPE_ZABBIX, "",
-							&data, &data_alloc, &data_offset);
+							interface_status->itemid, ITEM_TYPE_ZABBIX,
+							interface_status->host, &data, &data_alloc, &data_offset);
 					break;
 				case NETWORK_ERROR:
 				case GATEWAY_ERROR:
 				case TIMEOUT_ERROR:
-					/*zbx_deactivate_item_interface(&timespec, &items[i], &data, &data_alloc,
-							&data_offset, config_unavailable_delay,
-							config_unreachable_period, config_unreachable_delay,
-							results[i].msg);*/
+					zbx_deactivate_item_interface(&timespec, &interface_status->interface,
+							interface_status->itemid,
+							ITEM_TYPE_ZABBIX, interface_status->host,
+							interface_status->key_orig, &data, &data_alloc, &data_offset,
+							poller_config->config_unavailable_delay,
+							poller_config->config_unreachable_period,
+							poller_config->config_unreachable_delay,
+							interface_status->error);
 					break;
 				case CONFIG_ERROR:
 					/* nothing to do */
@@ -582,6 +611,7 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 
 static void	zbx_interface_status_clean(zbx_interface_status *interface_status)
 {
+	zbx_free(interface_status->key_orig);
 	zbx_free(interface_status->error);
 }
 
@@ -606,6 +636,9 @@ static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_threa
 	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
 	poller_config->config_timeout = poller_args_in->config_comms->config_timeout;
 	poller_config->poller_type = poller_args_in->poller_type;
+	poller_config->config_unavailable_delay = poller_args_in->config_unavailable_delay;
+	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;
+	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 
 	if (NULL == (poller_config->async_check_items_timer = evtimer_new(poller_config->base,
 			async_check_items_callback, poller_config)))
