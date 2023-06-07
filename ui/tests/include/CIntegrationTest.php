@@ -365,7 +365,7 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
-			sleep(self::WAIT_ITERATION_DELAY);
+			sleep(3 * self::WAIT_ITERATION_DELAY);
 		}
 
 		return false;
