@@ -1067,7 +1067,7 @@ zabbix_export:
                 - uuid: f6c28fa8eef542a786b29d745dd2e56f
                   expression: 'min(/Windows by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                   name: '{#DEVNAME}: Disk read request responses are too high'
-                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                   priority: WARNING
                   description: 'This trigger might indicate the disk {#DEVNAME} saturation.'
                   manual_close: 'YES'
@@ -1429,12 +1429,12 @@ zabbix_export:
           master_item:
             key: vfs.fs.get
           lld_macro_paths:
-            - lld_macro: '{#FSDRIVETYPE}'
-              path: $.fsdrivetype
             - lld_macro: '{#FSNAME}'
               path: $.fsname
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
+            - lld_macro: '{#FSDRIVETYPE}'
+              path: $.fsdrivetype
       tags:
         - tag: class
           value: os
