@@ -501,7 +501,7 @@ if (array_key_exists('render_html', $data)) {
 		}
 
 		// Inventory table.
-		$('#filter-inventory_' + data.uniqid, container).find('.form_row')[0].remove();
+		$('#filter-inventory_' + data.uniqid, container).find('.form_row').remove();
 
 		if (data.inventory.length === 0) {
 			data.inventory.push({'field': '', 'value': ''});

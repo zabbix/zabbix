@@ -256,7 +256,7 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table
-		$('#tags_' + data.uniqid, container).find('.form_row')[0].remove();
+		$('#tags_' + data.uniqid, container).find('.form_row').remove();
 
 		if (data.tags.length === 0) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
