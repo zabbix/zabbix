@@ -894,8 +894,10 @@ function getConditionFormula(conditions, evalType) {
 				// remove the parent row
 				removeRow(table, $(this).closest(options.row), options);
 
-				if (!options.allow_empty && table.find(options.row).length === 0) {
+				if (!options.allow_empty && $(options.row, table).length === 0) {
+					table.trigger('beforeadd.dynamicRows', options);
 					addRow(table, $(options.add, table).closest('tr'), options);
+					table.trigger('afteradd.dynamicRows', options);
 				}
 
 			});
@@ -908,6 +910,12 @@ function getConditionFormula(conditions, evalType) {
 
 			table.on('tableupdate.dynamicRows', options, function() {
 				toggleRemoveButton(table, options);
+			});
+
+			table.on('change', options, function() {
+				if ($(options.row, table).length === 1 && !options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
 			});
 
 			if (typeof options.rows === 'object') {
@@ -1007,54 +1015,14 @@ function getConditionFormula(conditions, evalType) {
 	/**
 	 * Disables remove button
 	 *
-	 * @param table
-	 * @param options
+	 * @param {jQuery} table
+	 * @param {jQuery} options
 	 */
 	function toggleRemoveButton(table, options) {
-		if (!options.allow_empty){
-			if (table.find(options.row).length <= 1) {
-				addInputListeners(table, options);
-				checkInputChanged(table, options);
-			}
-			else {
-				table.find(options.remove).attr('disabled', false);
-			}
+		if (!options.allow_empty) {
+			$(options.remove, table).attr('disabled', $(options.row, table).length === 1);
 		}
 	}
-
-	/**
-	 * Checks if an text input has a value
-	 *
-	 * @param table
-	 * @param options
-	 */
-	function checkInputChanged(table, options) {
-		let counter = 0;
-
-		$(table.find(options.row)[0]).find('input[type="text"]').each(function () {
-			if(this.value !== ''){
-				counter++;
-			}
-		});
-
-		options.last_row_has_changes = counter > 0;
-		table.find(options.remove).attr('disabled', !options.last_row_has_changes);
-	}
-
-	/**
-	 * Adds an listener to the last input
-	 *
-	 * @param table
-	 * @param options
-	 */
-	function addInputListeners(table, options) {
-		$(table.find(options.row)[0]).find('input[type="text"]').each(function () {
-			this.addEventListener('input', function () {
-				checkInputChanged(table, options);
-			});
-		});
-	}
-
 }(jQuery));
 
 jQuery(function ($) {
