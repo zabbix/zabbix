@@ -250,7 +250,7 @@ class CControllerHostEdit extends CController {
 		unset($macro);
 
 		// Reset Secret text macros and set warning for cloned host.
-		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+		if ($this->hasInput('clone')) {
 			foreach ($data['host']['macros'] as &$macro) {
 				if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
 					$macro['deny_revert'] = true;
