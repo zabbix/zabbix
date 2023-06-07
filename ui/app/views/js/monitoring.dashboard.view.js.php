@@ -183,7 +183,9 @@
 
 			const request_data = ZABBIX.Dashboard.save();
 
-			const dashboard_page_index = ZABBIX.Dashboard.getSelectedDashboardPageIndex();
+			const dashboard_page_index = ZABBIX.Dashboard.getDashboardPageIndex(
+				ZABBIX.Dashboard.getSelectedDashboardPage()
+			);
 
 			if (dashboard_page_index > 0) {
 				request_data.page = dashboard_page_index + 1;

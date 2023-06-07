@@ -732,7 +732,7 @@ class CDashboard extends CBaseComponent {
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
 		if (this._data.templateid === null || !this._is_edit_mode) {
-			this._storeSelectedDashboardPage(dashboard_page);
+			this._setInitialDashboardPage(dashboard_page);
 		}
 
 		if (!this._is_edit_mode) {
@@ -831,8 +831,8 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
-	_storeSelectedDashboardPage(dashboard_page) {
-		const dashboard_page_index = this.getSelectedDashboardPageIndex(dashboard_page);
+	_setInitialDashboardPage(dashboard_page) {
+		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
 
 		const url = new URL(location.href);
 
@@ -865,10 +865,11 @@ class CDashboard extends CBaseComponent {
 		return this._selected_dashboard_page;
 	}
 
-	getSelectedDashboardPageIndex(dashboard_page = this._selected_dashboard_page) {
-		const page_data = this._dashboard_pages.get(dashboard_page);
+	getDashboardPageIndex(dashboard_page) {
+		const tabs = [...this._tabs.getList().children];
+		const data = this._dashboard_pages.get(dashboard_page);
 
-		return [...this._tabs.getList().children].indexOf(page_data.tab);
+		return tabs.indexOf(data.tab);
 	}
 
 	save() {
@@ -1768,7 +1769,7 @@ class CDashboard extends CBaseComponent {
 			},
 
 			tabsSort: () => {
-				this._storeSelectedDashboardPage();
+				this._setInitialDashboardPage(this._selected_dashboard_page);
 
 				this._is_unsaved = true;
 			},
