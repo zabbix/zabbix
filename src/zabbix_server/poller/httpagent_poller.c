@@ -208,7 +208,7 @@ static void	agent_task_free(void *data)
 
 	/* don't try activating interface if there were no errors detected */
 	if (SUCCEED != agent_context->ret || ZBX_INTERFACE_AVAILABLE_TRUE != agent_context->interface.available ||
-	 		0 != agent_context->interface.errors_from)
+			0 != agent_context->interface.errors_from)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
 				&agent_context->interface.interfaceid)))
@@ -479,7 +479,7 @@ exit:
 		size_t			data_alloc = 0, data_offset = 0;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "updating:%d interfaces", poller_config->interfaces.num_data);
-	
+
 		zbx_timespec(&timespec);
 
 		zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
