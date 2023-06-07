@@ -82,7 +82,7 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function clear() {
-		$query = $this->query('xpath:.//span[@class="subfilter-disable-btn"]');
+		$query = $this->query('xpath:.//span[@class='.CXPathHelper::fromClass('zi-remove-smaller').']');
 		$query->all()->click();
 		$query->waitUntilNotPresent();
 

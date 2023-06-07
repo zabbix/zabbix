@@ -311,7 +311,7 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 
 		// Check hintbox.
-		$this->query('class:icon-help-hint')->one()->click();
+		$this->query('class:zi-help-filled-small')->one()->click();
 		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
 
 		// Assert text.
