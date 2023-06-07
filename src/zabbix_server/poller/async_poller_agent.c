@@ -156,7 +156,6 @@ int	zbx_agent_task_process(short event, void *data)
 						" failed: TCP successful, cannot establish TLS to [[%s]:%hu]: %s",
 						agent_context->interface.addr, agent_context->interface.port, error));
 					agent_context->ret = NETWORK_ERROR;
-					//zbx_tcp_close(&agent_context->s);
 					zbx_free(error);
 
 					return ZBX_ASYNC_TASK_STOP;
