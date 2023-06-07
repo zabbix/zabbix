@@ -683,7 +683,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_resizeGrid(min_rows = null) {
-		if (min_rows == 0) {
+		if (min_rows === 0) {
 			this._grid_min_rows = 0;
 		}
 		else if (min_rows !== null) {
@@ -691,6 +691,12 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		let num_rows = Math.max(this._grid_min_rows, this._getNumOccupiedRows());
+
+		if (!this._is_edit_mode && num_rows === 0) {
+			this._dashboard_grid.style.height = '';
+
+			return;
+		}
 
 		let height = this._cell_height * num_rows;
 
@@ -709,11 +715,7 @@ class CDashboardPage extends CBaseComponent {
 			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
-		this._dashboard_grid.style.height = '';
-
-		if (num_rows !== 0) {
-			this._dashboard_grid.style.height = `${height}px`;
-		}
+		this._dashboard_grid.style.height = `${height}px`;
 	}
 
 	_getNumOccupiedRows() {
