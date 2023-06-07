@@ -133,10 +133,12 @@ const char	*usage_message[] = {
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static unsigned char	get_program_type(void)
 {
 	return program_type;
 }
+#endif
 
 static int	config_timeout = 3;
 
@@ -804,12 +806,12 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 
 		if (0 != i)
 		{
-			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 			sendval_args[i].json = sendval_args[0].json;
 #if defined(_WINDOWS) && (defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 			sendval_args[i].tls_vars = sendval_args[0].tls_vars;
 #endif
 			sendval_args[i].sync_timestamp = sendval_args[0].sync_timestamp;
+			sendval_args[i].zbx_config_tls = sendval_args[0].zbx_config_tls;
 		}
 
 		destinations[i].thread = &threads[i];
