@@ -1438,9 +1438,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			job->workers_used++;
-			queue->pending_checks_count -= NULL != task->ips ?
-					(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
-					(zbx_uint64_t)task->dchecks.values_num;
+			queue->pending_checks_count -= discoverer_task_check_count_get(task);
 
 			if (0 == job->workers_max || job->workers_used != job->workers_max)
 			{
@@ -1814,7 +1812,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					revisions.values[k].second != job->drule_revision)
 			{
 				zbx_vector_uint64_append(&del_druleids, job->druleid);
-				discoverer_job_tasks_free(job);
+				dmanager.queue.pending_checks_count -= discoverer_job_tasks_free(job);
 			}
 		}
 
