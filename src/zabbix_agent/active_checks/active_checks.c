@@ -1040,25 +1040,25 @@ static int format_metric_results(struct zbx_json *json, int now)
 			if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
 				zbx_json_adduint64(json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
 			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_MTIME, el->mtime);
+				zbx_json_addint64(json, ZBX_PROTO_TAG_MTIME, el->mtime);
 		}
 
 		if (0 != el->timestamp)
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
 
 		if (NULL != el->source)
 			zbx_json_addstring(json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
 
 		if (0 != el->severity)
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
 
 		if (0 != el->logeventid)
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
 
 		zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, el->id);
 
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_NS, el->ts.ns);
+		zbx_json_addint64(json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
+		zbx_json_addint64(json, ZBX_PROTO_TAG_NS, el->ts.ns);
 		zbx_json_close(json);
 	}
 
@@ -1423,7 +1423,7 @@ out:
 	return ret;
 }
 
-static void	process_remote_command_value(const char *host, const char *value, zbx_uint64_t id, unsigned char state)
+static void	process_remote_command_value(const char *value, zbx_uint64_t id, unsigned char state)
 {
 	zbx_command_result_t	*result;
 
@@ -1541,7 +1541,7 @@ static void	process_command(zbx_active_command_t *command)
 	else if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 		pvalue = &empty;
 
-	process_remote_command_value(CONFIG_HOSTNAME, *pvalue, command->command_id, state);
+	process_remote_command_value(*pvalue, command->command_id, state);
 
 	zbx_free_agent_result(&result);
 
