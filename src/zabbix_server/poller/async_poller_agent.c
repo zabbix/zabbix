@@ -25,6 +25,8 @@
 #include "zbx_availability_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxip.h"
+#include "../../libs/zbxcomms/tls.h"
 
 static int	agent_task_process(short event, void *data)
 {
@@ -58,7 +60,7 @@ static int	agent_task_process(short event, void *data)
 				char	*error = NULL;
 				short	event_tls = 0;
 
-				if (SUCCEED != zbx_tls_connect(agent_context->s, agent_context->host.tls_connect,
+				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->host.tls_connect,
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &event_tls, &error))
 				{

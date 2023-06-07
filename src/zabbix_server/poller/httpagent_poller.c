@@ -193,6 +193,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(events);
+
 	items = &item;
 	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
 			poller_config->processing, &items);
