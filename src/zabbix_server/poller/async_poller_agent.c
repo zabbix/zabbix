@@ -199,6 +199,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 			agent_context->interface.addr, agent_context->interface.port,
 			agent_context->poller_config->config_timeout, agent_context->host.tls_connect, agent_context->tls_arg1))
 	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 		goto out;
 	}
 
