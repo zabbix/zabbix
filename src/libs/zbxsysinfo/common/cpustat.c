@@ -27,7 +27,6 @@ extern int	get_cpu_group_num_win32(void);
 extern int	get_numa_node_num_win32(void);
 #endif
 #include "zbxmutexs.h"
-#include "log.h"
 
 /* <sys/dkstat.h> removed in OpenBSD 5.7, only <sys/sched.h> with the same CP_* definitions remained */
 #if defined(OpenBSD) && defined(HAVE_SYS_SCHED_H) && !defined(HAVE_SYS_DKSTAT_H)
@@ -385,7 +384,9 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 
 static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 {
-#if (defined(HAVE_PROC_STAT) || (defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)) || defined(HAVE_KSTAT_H))
+#if (defined(HAVE_PROC_STAT) || defined(HAVE_SYS_PSTAT_H) || \
+		(defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)) || defined(HAVE_KSTAT_H) || \
+		defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME) || defined(HAVE_LIBPERFSTAT))
 	int		idx;
 #endif
 	zbx_uint64_t	counter[ZBX_CPU_STATE_COUNT];

@@ -23,19 +23,18 @@
 #include "log.h"
 #include "zbxnum.h"
 
-extern char    *CONFIG_SOURCE_IP;
-
 /*
  * Example: telnet.run["ls /"]
  */
-int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding)
+int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, int timeout,
+		const char *config_source_ip)
 {
 	zbx_socket_t	s;
-	int		ret = NOTSUPPORTED, flags;
+	int		ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+	if (FAIL == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout,
 			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to TELNET server: %s",
@@ -43,24 +42,10 @@ int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding)
 		goto close;
 	}
 
-	flags = fcntl(s.socket, F_GETFL);
-
-	if (-1 == flags)
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in getting the status flag: %s",
-				zbx_strerror(errno)));
-	}
-
-	if (0 == (flags & O_NONBLOCK) && (-1 == fcntl(s.socket, F_SETFL, flags | O_NONBLOCK)))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, " error in setting the status flag: %s",
-				zbx_strerror(errno)));
-	}
-
-	if (FAIL == zbx_telnet_login(s.socket, item->username, item->password, result))
+	if (FAIL == zbx_telnet_login(&s, item->username, item->password, result))
 		goto tcp_close;
 
-	if (FAIL == zbx_telnet_execute(s.socket, item->params, result, encoding))
+	if (FAIL == zbx_telnet_execute(&s, item->params, result, encoding))
 		goto tcp_close;
 
 	ret = SUCCEED;

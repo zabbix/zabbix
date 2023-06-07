@@ -1030,7 +1030,7 @@ function getMenuPopupItem(options) {
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.triggers.length === 0
+			disabled: options.binary_value_type || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1047,7 +1047,7 @@ function getMenuPopupItem(options) {
 			});
 		}
 
-		if (options.triggers.length) {
+		if (!config_triggers.disabled) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
@@ -1078,7 +1078,8 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl()
+			url: url.getUrl(),
+			disabled: options.binary_value_type
 		});
 
 		url = new Curl('items.php');
@@ -1269,14 +1270,14 @@ function getMenuPopupDropdown(options, trigger_elem) {
 		else if (options.submit_form) {
 			row.url = 'javascript:void(0);';
 			row.clickCallback = () => {
-				var $_form = trigger_elem.closest('form');
+				const form = trigger_elem.closest('form').get(0);
 
-				if (!$_form.data("action")) {
-					$_form.data("action", $_form.attr("action"));
+				if (!form.dataset.action) {
+					form.dataset.action = form.getAttribute('action');
 				}
 
-				$_form.attr("action", item.url);
-				$_form.submit();
+				form.setAttribute('action', item.url);
+				form.submit();
 			}
 		}
 

@@ -324,7 +324,7 @@ static int	WITH_TIMESTAMPS = 0;
 static int	WITH_NS = 0;
 static int	REAL_TIME = 0;
 
-char		*CONFIG_SOURCE_IP = NULL;
+char		*config_source_ip = NULL;
 static char	*ZABBIX_SERVER = NULL;
 static char	*ZABBIX_SERVER_PORT = NULL;
 static char	*ZABBIX_HOSTNAME = NULL;
@@ -700,7 +700,7 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		zbx_tls_take_vars(&sendval_args->tls_vars);
 	}
 #endif
-	if (SUCCEED == zbx_connect_to_server(&sock, CONFIG_SOURCE_IP, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
+	if (SUCCEED == zbx_connect_to_server(&sock, config_source_ip, sendval_args->addrs, CONFIG_SENDER_TIMEOUT,
 			config_timeout, 0, LOG_LEVEL_DEBUG, sendval_args->zbx_config_tls))
 	{
 		if (1 == sendval_args->sync_timestamp)
@@ -951,7 +951,7 @@ static void	zbx_load_config(const char *config_file_in)
 		zbx_free(cfg_hostname);
 	}
 
-	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
+	zbx_fill_from_config_file(&config_source_ip, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -1019,7 +1019,6 @@ static void	parse_commandline(int argc, char **argv)
 			case 'h':
 				zbx_help();
 				exit(EXIT_SUCCESS);
-				break;
 			case 'V':
 				zbx_version();
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -1027,10 +1026,9 @@ static void	parse_commandline(int argc, char **argv)
 				zbx_tls_version();
 #endif
 				exit(EXIT_SUCCESS);
-				break;
 			case 'I':
-				if (NULL == CONFIG_SOURCE_IP)
-					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
+				if (NULL == config_source_ip)
+					config_source_ip = zbx_strdup(config_source_ip, zbx_optarg);
 				break;
 			case 'z':
 				if (NULL == ZABBIX_SERVER)
@@ -1143,7 +1141,6 @@ static void	parse_commandline(int argc, char **argv)
 			default:
 				zbx_usage();
 				exit(EXIT_FAILURE);
-				break;
 		}
 	}
 
@@ -1499,16 +1496,19 @@ int	main(int argc, char **argv)
 	zbx_thread_sendval_args	*sendval_args = NULL;
 	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 
 	progname = get_program_name(argv[0]);
 
-	zbx_init_library_cfg(program_type);
-
 	parse_commandline(argc, argv);
 
 	if (NULL != config_file)
+	{
+		zbx_init_library_cfg(program_type, config_file);
 		zbx_load_config(config_file);
+	}
+
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
 	{
@@ -1869,9 +1869,7 @@ exit:
 	if (ZBX_TCP_SEC_UNENCRYPTED != zbx_config_tls->connect_mode)
 	{
 		zbx_tls_free();
-#if defined(_WINDOWS)
-		zbx_tls_library_deinit();
-#endif
+		zbx_tls_library_deinit(ZBX_TLS_INIT_THREADS);
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);

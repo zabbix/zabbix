@@ -134,7 +134,9 @@ void	zbx_ipc_message_free(zbx_ipc_message_t *message);
 void	zbx_ipc_message_clean(zbx_ipc_message_t *message);
 void	zbx_ipc_message_init(zbx_ipc_message_t *message);
 void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data);
+#ifdef HAVE_OPENIPMI
 void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src);
+#endif
 
 void	zbx_init_library_ipcservice(unsigned char program_type);
 

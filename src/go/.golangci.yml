@@ -177,12 +177,9 @@ linters-settings:
 
 linters:
   enable:
-    - deadcode
     - errcheck
     - megacheck
     - staticcheck
-    - structcheck
-    - varcheck 
     - dupl
     - exhaustive
     - funlen
@@ -232,6 +229,9 @@ linters:
     - sqlclosecheck
     - stylecheck
     - testpackage
+    - deadcode
+    - structcheck
+    - varcheck 
   presets:
     - bugs
     - unused

@@ -108,7 +108,8 @@ $item_type_options = CSelect::createOptionsFromArray([
 	ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
-	ITEM_VALUE_TYPE_TEXT => _('Text')
+	ITEM_VALUE_TYPE_TEXT => _('Text'),
+	ITEM_VALUE_TYPE_BINARY => _('Binary')
 ]);
 $type_mismatch_hint = (new CSpan(makeWarningIcon(_('This type of information may not match the key.'))))
 	->setId('js-item-type-hint')
@@ -247,7 +248,7 @@ $item_tab
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -397,7 +398,7 @@ $item_tab
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -659,8 +660,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
-		(new CFormField((new CTextBox('username', $data['username'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('username', $data['username'], false, DB::getFieldLength('items', 'username')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-username-field')
 	])
@@ -684,8 +685,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
-		(new CFormField((new CTextBox('password', $data['password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('password', $data['password'], false, DB::getFieldLength('items', 'password')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-password-field')
 	])

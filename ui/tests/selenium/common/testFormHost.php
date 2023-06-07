@@ -277,11 +277,11 @@ class testFormHost extends CWebTest {
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level'],
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
 			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase'
+				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
 		];
 
@@ -2094,7 +2094,8 @@ class testFormHost extends CWebTest {
 						['name' => 'Host name', 'value' => self::DISCOVERED_HOST, 'maxlength' => 128, 'enabled' => false],
 						['name' => 'Visible name', 'value' => '', 'maxlength' => 128, 'enabled' => false],
 						['name' => 'id:add_templates_', 'value' => '', 'enabled' => true],
-						['name' => 'Host groups', 'value' => ['Group for discovered host test'], 'enabled' => false],
+						['name' => 'Host groups', 'value' => ['Group created from host prototype 1', 'Group for discovered host test'],
+								'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_ip', 'value' =>  '127.0.0.1',
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' =>  '',

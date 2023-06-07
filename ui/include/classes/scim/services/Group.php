@@ -31,29 +31,18 @@ use SCIM\ScimApiService;
 
 class Group extends ScimApiService {
 
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
-	];
-
-	private const SCIM_GROUP_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
-	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
-	private const SCIM_PATCH_SCEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
-
-	protected array $data = [
-		'schemas' => [self::SCIM_GROUP_SCHEMA]
-	];
+	public const SCIM_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:Group';
 
 	/**
-	 * Returns information on specific group or all groups if no specific information is requested.
+	 * Return all groups information.
+	 * When filter 'id' or 'displayName' is defined will return information for single group.
+	 * If group not found, for filter 'id', will return ZBX_API_ERROR_NO_ENTITY error.
 	 *
-	 * @param array $options        Array with data from request.
-	 * @param array $options['id']  Optional. SCIM group id.
+	 * @param array  $options
+	 * @param string $options['id']           (optional) SCIM group id.
+	 * @param string $options['displayName']  (optional) SCIM group display name.
 	 *
-	 * @return array                Returns group data necessary for GET request SCIM response.
+	 * @return array  Array of groups data when no filters are defined. Single group data for defined filter.
 	 */
 	public function get(array $options = []): array {
 		$this->validateGet($options);
@@ -65,60 +54,51 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$db_scim_group) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+				self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 			}
 
 			$users = $this->getUsersByGroupIds([$options['id']]);
 
-			$this->setData($options['id'], $db_scim_group[0]['name'], $users[$options['id']]);
+			return [
+				'id' => $options['id'],
+				'displayName' =>  $db_scim_group[0]['name'],
+				'users' => $users[$options['id']]
+			];
 		}
-		elseif (array_key_exists('displayName', $options)) {
+
+		if (array_key_exists('displayName', $options)) {
 			$db_scim_group = DB::select('scim_group', [
 				'output' => ['name', 'scim_groupid'],
 				'filter' => ['name' => $options['displayName']]
 			]);
 
 			if (!$db_scim_group) {
-				$this->data = [
-					'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-					'Resources' => []
-				];
+				return [];
 			}
-			else {
-				$users = $this->getUsersByGroupIds([$db_scim_group[0]['scim_groupid']]);
 
-				$this->setData($db_scim_group[0]['scim_groupid'], $db_scim_group[0]['name'],
-					$users[$db_scim_group[0]['scim_groupid']]
-				);
-			}
-		}
-		else {
-			$db_scim_groups = DB::select('scim_group', [
-				'output' => ['name'],
-				'preservekeys' => true
-			]);
-			$total_groups = count($db_scim_groups);
+			$users = $this->getUsersByGroupIds([$db_scim_group[0]['scim_groupid']]);
 
-			$this->data = [
-				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-				'totalResults' => $total_groups,
-				'startIndex' => max($options['startIndex'], 1),
-				'itemsPerPage' => min($total_groups, max($options['count'], 0)),
-				'Resources' => []
+			return [
+				'id' => $db_scim_group[0]['scim_groupid'],
+				'displayName' => $db_scim_group[0]['name'],
+				'users' => $users
 			];
+		}
 
-			if ($db_scim_groups) {
-				$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
+		$db_scim_groups = DB::select('scim_group', [
+			'output' => ['name'],
+			'preservekeys' => true
+		]);
 
-				foreach ($groups_users as $groupid => $group_users) {
-					$this->data['Resources'][] = $this->prepareData(
-						$groupid, $db_scim_groups[$groupid]['name'], $group_users
-					);
-				}
+		if ($db_scim_groups) {
+			$groups_users = $this->getUsersByGroupIds(array_keys($db_scim_groups));
+
+			foreach ($groups_users as $groupid => $users) {
+				$db_scim_groups[$groupid]['users'] = $users;
 			}
 		}
 
-		return $this->data;
+		return $db_scim_groups;
 	}
 
 	/**
@@ -135,23 +115,21 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
 	/**
-	 * Receives information on new SCIM group and its members. Creates new entries in 'scim_group' and
-	 * 'user_scim_group' tables, updates users' user groups mapping based on the SCIM groups and SAML settings.
+	 * Create group, assign users to new group when 'members' is passed in request.
 	 *
-	 * @param array  $options                        Array with data from request.
+	 * @param array  $options
 	 * @param string $options['displayName']         SCIM group name.
 	 * @param array  $options['members']             Array with SCIM group members.
 	 * @param string $options['members'][]['value']  Userid.
 	 *
-	 * @return array                                 Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for created group.
 	 */
 	public function post(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$this->validatePost($options);
 
 		$db_scim_groups = DB::select('scim_group', [
@@ -161,21 +139,26 @@ class Group extends ScimApiService {
 
 		if ($db_scim_groups) {
 			$options['id'] = $db_scim_groups[0]['scim_groupid'];
+
 			return $this->put($options);
 		}
 
 		[$scim_groupid] = DB::insert('scim_group', [['name' => $options['displayName']]]);
 
 		if (!$scim_groupid) {
-			self::exception(self::SCIM_INTERNAL_ERROR, 'Cannot create group '.$options['displayName'].'.');
+			self::exception(ZBX_API_ERROR_INTERNAL, 'Cannot create group '.$options['displayName'].'.');
 		}
 
-		$users = [];
+		$group = [
+			'id' => $scim_groupid,
+			'displayName' =>  $options['displayName'],
+			'users' => []
+		];
 
-		if (array_key_exists('memebers', $options)) {
+		if (array_key_exists('members', $options) && $options['members'] != []) {
+			$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 			$scim_group_members = array_column($options['members'], 'value');
-
-			$users = $this->verifyUserids($scim_group_members, $userdirectoryid);
+			$group['users'] = $this->verifyUserids($scim_group_members, $userdirectoryid);
 
 			foreach ($scim_group_members as $memberid) {
 				$user_group = DB::insert('user_scim_group', [[
@@ -184,7 +167,7 @@ class Group extends ScimApiService {
 				]]);
 
 				if (!$user_group) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot add user '.$memberid.' to group '.$options['displayName'].'.'
 					);
 				}
@@ -193,9 +176,7 @@ class Group extends ScimApiService {
 			}
 		}
 
-		$this->setData($scim_groupid, $options['displayName'], $users);
-
-		return $this->data;
+		return $group;
 	}
 
 	/**
@@ -214,11 +195,11 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
@@ -226,16 +207,14 @@ class Group extends ScimApiService {
 	 * Receives new information on the SCIM group and its members. Updates 'user_scim_group' table, updates users'
 	 * user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
-	 * @param array  $options                        Array with data from request.
+	 * @param array  $options
 	 * @param string $options['id']                  SCIM group id.
 	 * @param array  $options['members']             Array with SCIM group members.
 	 * @param string $options['members'][]['value']  Userid.
 	 *
-	 * @return array                                 Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for updated group.
 	 */
 	public function put(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validatePut($options);
 
 		$db_scim_groups = DB::select('scim_group', [
@@ -244,7 +223,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 		$db_scim_group = $db_scim_groups[0];
 
@@ -255,7 +234,7 @@ class Group extends ScimApiService {
 			]);
 
 			if (!$scim_groupid) {
-				self::exception(self::SCIM_INTERNAL_ERROR,
+				self::exception(ZBX_API_ERROR_INTERNAL,
 					'Cannot update group '.$db_scim_group['name'].' to group '.$options['displayName'].'.'
 				);
 			}
@@ -263,7 +242,9 @@ class Group extends ScimApiService {
 			$db_scim_group['name'] = $options['displayName'];
 		}
 
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$scim_group_members = array_column($options['members'], 'value');
+		$this->verifyUserids($scim_group_members, $userdirectoryid);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
 			'output' => ['userid'],
@@ -281,7 +262,7 @@ class Group extends ScimApiService {
 				]]);
 
 				if (!$scim_user_group) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot add user '.$userid.' to group '.$options['displayName'].'.'
 					);
 				}
@@ -307,9 +288,11 @@ class Group extends ScimApiService {
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
-		$this->setData($options['id'], $db_scim_group['name'], $db_users);
-
-		return $this->data;
+		return [
+			'id' => $options['id'],
+			'displayName' => $db_scim_group['name'],
+			'users' => $db_users
+		];
 	}
 
 	/**
@@ -320,6 +303,7 @@ class Group extends ScimApiService {
 	private function validatePut($options) {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'displayName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'members' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED, 'fields' => [
 				'display' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
@@ -328,18 +312,19 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_GROUP_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
 	/**
 	 * Receives new information on the SCIM group members. Updates 'user_scim_group' table, updates users'
 	 * user groups mapping based on the remaining SCIM groups and SAML settings.
-	 * @param array  $options                                      Array with data from request.
+	 *
+	 * @param array  $options
 	 * @param string $options['id']                                SCIM group id.
 	 * @param array  $options['Operations']                        List of operations that need to be performed.
 	 * @param string $options['Operations'][]['op']                Operation that needs to be performed -'add',
@@ -351,7 +336,7 @@ class Group extends ScimApiService {
 	 *                                                             omitted, in this case all members should be removed.
 	 * @param string $options['Operations'][]['value'][]['value']  User id on which operation should be performed.
 	 *
-	 * @return array  Returns array with data necessary for SCIM response.
+	 * @return array  Array with data for updated group.
 	 *
 	 * @throws APIException
 	 */
@@ -364,10 +349,11 @@ class Group extends ScimApiService {
 		]);
 
 		if (!$db_scim_groups) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 
 		$db_users = [];
+		$db_users_delete = [];
 		$new_userids = [];
 		$del_userids = [];
 		$do_replace = false;
@@ -381,7 +367,7 @@ class Group extends ScimApiService {
 				]);
 
 				if (!$scim_groupid) {
-					self::exception(self::SCIM_INTERNAL_ERROR,
+					self::exception(ZBX_API_ERROR_INTERNAL,
 						'Cannot update group '.$db_scim_groups[0]['name'].' to group '.$operation['value'].'.'
 					);
 				}
@@ -397,7 +383,9 @@ class Group extends ScimApiService {
 
 					case 'remove':
 						if (!$do_replace) {
-							$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							if (array_key_exists('value', $operation)) {
+								$del_userids = array_merge($del_userids, array_column($operation['value'], 'value'));
+							}
 
 							if (!$del_userids) {
 								// Empty 'value' array for 'remove' operation should act as 'replace' operation.
@@ -427,7 +415,8 @@ class Group extends ScimApiService {
 				$new_userids = array_diff($new_userids, array_column($db_userids, 'userid'));
 			}
 
-			$db_users = $this->verifyUserids(array_merge($new_userids, $del_userids), $userdirectoryid);
+			$db_users = $this->verifyUserids($new_userids, $userdirectoryid);
+			$db_users_delete = $this->verifyUserids($del_userids, $userdirectoryid);
 		}
 
 		if ($do_replace) {
@@ -450,13 +439,15 @@ class Group extends ScimApiService {
 			DB::insertBatch('user_scim_group', $values);
 		}
 
-		foreach (array_column($db_users, 'userid') as $db_userid) {
+		foreach (array_column(array_merge($db_users, $db_users_delete), 'userid') as $db_userid) {
 			$this->updateProvisionedUserGroups($db_userid, $userdirectoryid);
 		}
 
-		$this->setData($options['id'], $db_scim_groups[0]['name'], $db_users);
-
-		return $this->data;
+		return [
+			'id' => $options['id'],
+			'displayName' => $db_scim_groups[0]['name'],
+			'users' => $db_users
+		];
 	}
 
 	/**
@@ -466,15 +457,14 @@ class Group extends ScimApiService {
 	 */
 	private function validatePatch(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
-			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'Operations' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
 				'op' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'displayName'], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['replace', 'Replace'])],
 									['else' => true, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['add', 'remove', 'replace', 'Add', 'Remove', 'Replace'])]
 				]],
-				'path' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', ['members', 'externalId', 'displayName'])],
-
 				'value' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'path', 'in' => 'members'], 'type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'fields' => [
 										'value' =>		['type' => API_ID]
@@ -485,11 +475,11 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_PATCH_SCEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(ScimApiService::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		foreach ($options['Operations'] as &$operation) {
@@ -501,14 +491,12 @@ class Group extends ScimApiService {
 	 * Deletes SCIM group from 'scim_group' table. Deletes the users that belong to this group from 'user_scim_group'
 	 * table. Updates users' user groups mapping based on the remaining SCIM groups and SAML settings.
 	 *
-	 * @param array  $options       Array with data from request.
-	 * @param string $options['id]  SCIM group's ID.
+	 * @param array  $options
+	 * @param string $options['id]  SCIM group to be deleted.
 	 *
-	 * @return array                Returns schema parameter in the array if the deletion was successful.
+	 * @return array  Deleted group id.
 	 */
 	public function delete(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validateDelete($options);
 
 		$db_scim_group_members = DB::select('user_scim_group', [
@@ -519,10 +507,10 @@ class Group extends ScimApiService {
 		DB::delete('scim_group', ['scim_groupid' => $options['id']]);
 
 		foreach (array_column($db_scim_group_members, 'userid') as $userid) {
-			$this->updateProvisionedUserGroups($userid, $userdirectoryid);
+			$this->updateProvisionedUserGroups($userid, CAuthenticationHelper::getSamlUserdirectoryidForScim());
 		}
 
-		return $this->data;
+		return [$options['id']];
 	}
 
 	/**
@@ -536,58 +524,8 @@ class Group extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	/**
-	 * Sets $this->data parameter to a necessary value.
-	 *
-	 * @param string $scim_groupid
-	 * @param string $scim_group_name
-	 * @param array  $users            Users that belong to this group.
-	 *
-	 * @return void
-	 */
-	private function setData(string $scim_groupid, string $scim_group_name, array $users = null): void {
-		$this->data += $this->prepareData($scim_groupid, $scim_group_name, $users);
-	}
-
-	/**
-	 * Prepares data array as required for SCIM response.
-	 *
-	 * @param string $scim_groupid
-	 * @param string $scim_group_name
-	 * @param array  $users                Users that belong to this group.
-	 * @param string $users[]['userid']
-	 * @param string $users[]['username']
-	 *
-	 * @return array
-	 *         ['id']
-	 *         ['displayName']
-	 *         ['members']
-	 *         ['members'][]['value']
-	 *         ['members'][]['display']
-	 */
-	private function prepareData(string $scim_groupid, string $scim_group_name, array $users = null): array {
-		$data = [
-			'id' => $scim_groupid,
-			'displayName' => $scim_group_name
-		];
-
-		if ($users !== null) {
-			$members = [];
-			foreach ($users as $user) {
-				$members[] = [
-					'value' => $user['userid'],
-					'display' => $user['username']
-				];
-			}
-
-			$data['members'] = $members;
-		}
-
-		return $data;
 	}
 
 	/**
@@ -661,7 +599,7 @@ class Group extends ScimApiService {
 	/**
 	 * Verifies if provided users exist in the database.
 	 *
-	 * @param array $userids           User ids.
+	 * @param array  $userids          User ids.
 	 * @param string $userdirectoryid  User directory id to which users belong to.
 	 *
 	 * @return array  Returns array with users' id and username.
@@ -676,7 +614,7 @@ class Group extends ScimApiService {
 		]);
 
 		if (count($users) !== count($userids)) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 
 		return $users;

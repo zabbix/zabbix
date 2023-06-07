@@ -22,7 +22,6 @@
 
 #include "module.h"
 
-extern char		*CONFIG_SOURCE_IP;
 extern ZBX_METRIC	parameters_simple[];
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);

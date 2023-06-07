@@ -249,19 +249,15 @@ class CUser extends CApiService {
 		}
 
 		$this->validateCreate($users);
-		$this->createReal($users);
-
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		self::createForce($users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
 
 	/**
-	 * Creates new users.
-	 *
 	 * @param array $users
 	 */
-	protected function createReal(array &$users) {
+	private static function createForce(array &$users): void {
 		$ins_users = [];
 
 		foreach ($users as $user) {
@@ -275,8 +271,17 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		self::updateUsersGroups($users);
+		self::updateGroups($users);
 		self::updateMedias($users);
+
+		if (array_key_exists('ts_provisioned', $users[0])) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
+				CAudit::RESOURCE_USER, $users
+			);
+		}
+		else {
+			self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
+		}
 	}
 
 	/**
@@ -366,9 +371,7 @@ class CUser extends CApiService {
 	 */
 	public function update(array $users) {
 		$this->validateUpdate($users, $db_users);
-		$this->updateReal($users, $db_users);
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		self::updateForce($users, $db_users);
 
 		return ['userids' => array_column($users, 'userid')];
 	}
@@ -560,33 +563,14 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update users.
-	 *
 	 * @param array $users
 	 * @param array $db_users
 	 */
-	private function updateReal(array &$users, array $db_users) {
+	public static function updateForce(array $users, array $db_users): void {
 		$upd_users = [];
-		$fields_strings = array_flip(['username', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url',
-			'lang', 'theme', 'timezone'
-		]);
-		$fields_integers = array_flip(['autologin', 'rows_per_page', 'roleid', 'userdirectoryid', 'ts_provisioned']);
 
 		foreach ($users as $user) {
-			$db_user = $db_users[$user['userid']];
-			$upd_user = [];
-
-			foreach (array_keys(array_intersect_key($user, $fields_strings)) as $field_name) {
-				if ($user[$field_name] !== $db_user[$field_name]) {
-					$upd_user[$field_name] = $user[$field_name];
-				}
-			}
-
-			foreach (array_keys(array_intersect_key($user, $fields_integers)) as $field_name) {
-				if ($user[$field_name] != $db_user[$field_name]) {
-					$upd_user[$field_name] = $user[$field_name];
-				}
-			}
+			$upd_user = DB::getUpdatedValues('users', $user, $db_users[$user['userid']]);
 
 			if ($upd_user) {
 				$upd_users[] = [
@@ -601,15 +585,20 @@ class CUser extends CApiService {
 		}
 
 		self::terminateActiveSessionsOnPasswordUpdate($users);
-		self::updateUsersGroups($users, $db_users);
+		self::updateGroups($users, $db_users);
 		self::updateMedias($users, $db_users);
+
+		if (array_key_exists('ts_provisioned', $users[0])) {
+			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
+				CAudit::RESOURCE_USER, $users, $db_users
+			);
+		}
+		else {
+			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+		}
 	}
 
 	/**
-	 * Add the existing medias and user groups to $db_users whether these are affected by the update.
-	 *
-	 * @static
-	 *
 	 * @param array $users
 	 * @param array $db_users
 	 */
@@ -1055,50 +1044,46 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups" and populate users.usrgrps by "id" property.
-	 *
-	 * @static
-	 *
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
-	private static function updateUsersGroups(array &$users, array $db_users = null): void {
-		$ins_users_groups = [];
-		$del_ids = [];
+	private static function updateGroups(array &$users, array $db_users = null): void {
+		$ins_groups = [];
+		$del_groupids = [];
 
 		foreach ($users as &$user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
 			}
 
-			$db_usrgrps = ($db_users !== null)
+			$db_groups = $db_users !== null
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
 
-			foreach ($user['usrgrps'] as &$usrgrp) {
-				if (array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
-					$usrgrp['id'] = $db_usrgrps[$usrgrp['usrgrpid']]['id'];
-					unset($db_usrgrps[$usrgrp['usrgrpid']]);
+			foreach ($user['usrgrps'] as &$group) {
+				if (array_key_exists($group['usrgrpid'], $db_groups)) {
+					$group['id'] = $db_groups[$group['usrgrpid']]['id'];
+					unset($db_groups[$group['usrgrpid']]);
 				}
 				else {
-					$ins_users_groups[] = [
+					$ins_groups[] = [
 						'userid' => $user['userid'],
-						'usrgrpid' => $usrgrp['usrgrpid']
+						'usrgrpid' => $group['usrgrpid']
 					];
 				}
 			}
-			unset($usrgrp);
+			unset($group);
 
-			$del_ids = array_merge($del_ids, array_column($db_usrgrps, 'id'));
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
 		}
 		unset($user);
 
-		if ($del_ids) {
-			DB::delete('users_groups', ['id' => $del_ids]);
+		if ($del_groupids) {
+			DB::delete('users_groups', ['id' => $del_groupids]);
 		}
 
-		if ($ins_users_groups) {
-			$ids = DB::insertBatch('users_groups', $ins_users_groups);
+		if ($ins_groups) {
+			$groupids = DB::insert('users_groups', $ins_groups);
 		}
 
 		foreach ($users as &$user) {
@@ -1106,12 +1091,12 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			foreach ($user['usrgrps'] as &$usrgrp) {
-				if (!array_key_exists('id', $usrgrp)) {
-					$usrgrp['id'] = array_shift($ids);
+			foreach ($user['usrgrps'] as &$group) {
+				if (!array_key_exists('id', $group)) {
+					$group['id'] = array_shift($groupids);
 				}
 			}
-			unset($usrgrp);
+			unset($group);
 		}
 		unset($user);
 	}
@@ -1119,15 +1104,13 @@ class CUser extends CApiService {
 	/**
 	 * Auxiliary function for updateMedias().
 	 *
-	 * @static
-	 *
 	 * @param array  $medias
 	 * @param string $mediatypeid
 	 * @param string $sendto
 	 *
 	 * @return int
 	 */
-	private static function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
+	private static function findMediaIndex(array $medias, $mediatypeid, $sendto) {
 		foreach ($medias as $index => $media) {
 			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
 				return $index;
@@ -1138,11 +1121,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "media" and populate users.medias by "mediaid" property. Also this function converts "sendto" to the
-	 * string.
-	 *
-	 * @static
-	 *
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
@@ -1156,16 +1134,15 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$db_medias = ($db_users !== null) ? $db_users[$user['userid']]['medias'] : [];
+			$db_medias = $db_users !== null ? $db_users[$user['userid']]['medias'] : [];
 
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);
 
-				$index = self::getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
+				$index = self::findMediaIndex($db_medias, $media['mediatypeid'], $media['sendto']);
 
 				if ($index != -1) {
 					$db_media = $db_medias[$index];
-
 					$upd_media = DB::getUpdatedValues('media', $media, $db_media);
 
 					if ($upd_media) {
@@ -1740,7 +1717,7 @@ class CUser extends CApiService {
 
 		$db_user = $db_users[0];
 
-		$permissions = $this->getUserGroupsPermissions($userid);
+		$permissions = $this->getUserGroupsPermissions($db_user);
 
 		$db_user = $this->addExtraFields($db_user, $permissions);
 		$this->setTimezone($db_user['timezone']);
@@ -1991,12 +1968,10 @@ class CUser extends CApiService {
 		$user = array_intersect_key($idp_user_data, $attrs);
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
 		$users = [$user];
+
 		$this->validateCreate($users);
 		$users[0]['ts_provisioned'] = time();
-		$this->createReal($users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
-			CAudit::RESOURCE_USER, $users
-		);
+		self::createForce($users);
 
 		return reset($users);
 	}
@@ -2049,10 +2024,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		$this->updateReal($users, $db_users);
-		self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
-			CAudit::RESOURCE_USER, $users, $db_users
-		);
+		self::updateForce(array_values($users), $db_users);
 
 		return $user;
 	}
@@ -2060,11 +2032,11 @@ class CUser extends CApiService {
 	/**
 	 * Returns user groups permissions of specific user.
 	 *
-	 * @param string $userid
+	 * @param array $user
 	 *
 	 * @return array
 	 */
-	private function getUserGroupsPermissions(string $userid): array {
+	private function getUserGroupsPermissions(array $user): array {
 		$permissions = [
 			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
 			'users_status' => GROUP_STATUS_ENABLED,
@@ -2078,7 +2050,7 @@ class CUser extends CApiService {
 			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
 			' FROM usrgrp g,users_groups ug'.
 			' WHERE g.usrgrpid=ug.usrgrpid'.
-				' AND ug.userid='.$userid
+				' AND ug.userid='.$user['userid']
 		);
 
 		$has_user_groups = false;
@@ -2091,7 +2063,7 @@ class CUser extends CApiService {
 				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
 			}
 
-			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid) {
+			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid && $user['userdirectoryid'] !== '0') {
 				$permissions['deprovisioned'] = true;
 
 				continue;
@@ -2345,7 +2317,7 @@ class CUser extends CApiService {
 			if ($do_group_check) {
 				// Users with ZBX_AUTH_INTERNAL access attribute 'username' is always case sensitive.
 				foreach($db_users_rows as $db_user_row) {
-					$permissions = $this->getUserGroupsPermissions($db_user_row['userid']);
+					$permissions = $this->getUserGroupsPermissions($db_user_row);
 
 					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
 							|| $db_user_row['username'] === $username) {
@@ -2370,7 +2342,7 @@ class CUser extends CApiService {
 			];
 		}
 
-		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
+		$permissions = $this->getUserGroupsPermissions($db_user);
 
 		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
 			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];

@@ -95,7 +95,10 @@
 		},
 
 		massDeleteHosts(button) {
-			const confirm_text = button.getAttribute('confirm');
+			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
+				? <?= json_encode(_('Delete selected hosts?')) ?>
+				: <?= json_encode(_('Delete selected host?')) ?>;
+
 			if (!confirm(confirm_text)) {
 				return;
 			}

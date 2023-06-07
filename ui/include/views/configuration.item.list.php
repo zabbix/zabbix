@@ -119,7 +119,7 @@ foreach ($data['items'] as $item) {
 	);
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = (new CLink(CHtml::encode($item['discoveryRule']['name']),
+		$description[] = (new CLink($item['discoveryRule']['name'],
 			(new CUrl('disc_prototypes.php'))
 				->setArgument('parent_discoveryid', $item['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
@@ -131,10 +131,10 @@ foreach ($data['items'] as $item) {
 
 	if ($item['type'] == ITEM_TYPE_DEPENDENT) {
 		if ($item['master_item']['type'] == ITEM_TYPE_HTTPTEST) {
-			$description[] = CHtml::encode($item['master_item']['name']);
+			$description[] = $item['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink(CHtml::encode($item['master_item']['name']),
+			$description[] = (new CLink($item['master_item']['name'],
 				(new CUrl('items.php'))
 					->setArgument('form', 'update')
 					->setArgument('hostid', $item['hostid'])
@@ -148,7 +148,7 @@ foreach ($data['items'] as $item) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink(CHtml::encode($item['name']),
+	$description[] = new CLink($item['name'],
 		(new CUrl('items.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $item['hostid'])
@@ -193,7 +193,7 @@ foreach ($data['items'] as $item) {
 		$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
 
 		$trigger_description[] = new CLink(
-			CHtml::encode($trigger['description']),
+			$trigger['description'],
 			(new CUrl('triggers.php'))
 				->setArgument('form', 'update')
 				->setArgument('hostid', key($trigger['hosts']))
@@ -286,7 +286,7 @@ foreach ($data['items'] as $item) {
 		($data['hostid'] == 0) ? $item['host'] : null,
 		(new CCol($description))->addClass(ZBX_STYLE_WORDBREAK),
 		$triggerInfo,
-		(new CDiv(CHtml::encode($item['key_'])))->addClass(ZBX_STYLE_WORDWRAP),
+		(new CDiv($item['key_']))->addClass(ZBX_STYLE_WORDWRAP),
 		$item['delay'],
 		$item['history'],
 		$item['trends'],
@@ -298,8 +298,16 @@ foreach ($data['items'] as $item) {
 }
 
 $button_list = [
-	'item.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected items?'), 'csrf_token' => $csrf_token],
-	'item.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected items?'),
+	'item.massenable' => [
+		'name' => _('Enable'),
+		'confirm_singular' => _('Enable selected item?'),
+		'confirm_plural' => _('Enable selected items?'),
+		'csrf_token' => $csrf_token
+	],
+	'item.massdisable' => [
+		'name' => _('Disable'),
+		'confirm_singular' => _('Disable selected item?'),
+		'confirm_plural' => _('Disable selected items?'),
 		'csrf_token' => $csrf_token
 	]
 ];
@@ -307,12 +315,14 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$massclearhistory = [
 		'name' => _('Clear history'),
-		'confirm' => _('Delete history of selected items?'),
+		'confirm_singular' => _('Delete history of selected item?'),
+		'confirm_plural' => _('Delete history of selected items?'),
 		'csrf_token' => $csrf_token
 	];
 
 	if ($data['config']['compression_status']) {
-		unset($massclearhistory['confirm']);
+		unset($massclearhistory['confirm_singular']);
+		unset($massclearhistory['confirm_plural']);
 	}
 
 	$button_list += [
@@ -346,7 +356,12 @@ $button_list += [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->removeAttribute('id')
 	],
-	'item.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected items?'), 'csrf_token' => $csrf_token]
+	'item.massdelete' => [
+		'name' => _('Delete'),
+		'confirm_singular' => _('Delete selected item?'),
+		'confirm_plural' => _('Delete selected items?'),
+		'csrf_token' => $csrf_token
+	]
 ];
 
 // Append table to form.
