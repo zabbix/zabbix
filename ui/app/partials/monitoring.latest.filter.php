@@ -102,8 +102,6 @@ if(!$data['tags']) {
 	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 
-$tags_count = count($data['tags']);
-
 $i = 0;
 foreach ($data['tags'] as $tag) {
 	$filter_tags_table->addRow([
@@ -131,7 +129,6 @@ foreach ($data['tags'] as $tag) {
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 				->removeId()
-				->setEnabled($tags_count > 1 || ($tag['tag'] !== '' || $tag['value'] !== ''))
 		))->addClass(ZBX_STYLE_NOWRAP)
 	], 'form_row');
 

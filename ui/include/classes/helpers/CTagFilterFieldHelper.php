@@ -45,8 +45,6 @@ class CTagFilterFieldHelper {
 			'tags' => []
 		];
 
-		$tags_count = count($data['tags']);
-
 		$tags_table = (new CTable())->setId('filter-tags');
 
 		$tags_table->addRow(
@@ -85,8 +83,6 @@ class CTagFilterFieldHelper {
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('element-table-remove')
 						->removeId()
-						->setEnabled($allow_empty
-							|| ($tags_count > 1 || ($tag['value'] !== '' || $tag['tag'] !== '' )))
 				))->addClass(ZBX_STYLE_NOWRAP)
 			], 'form_row');
 		}

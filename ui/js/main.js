@@ -863,7 +863,6 @@ function getConditionFormula(conditions, evalType) {
 			allow_empty: false,
 			beforeRow: null,
 			rows: [],
-			last_row_has_input: false,
 			dataCallback: function(data) {
 				return {};
 			}
