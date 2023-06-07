@@ -340,7 +340,9 @@ function PopUp(action, parameters, {
 	trigger_element = document.activeElement,
 	prevent_navigation = false
 } = {}) {
-	var overlay = overlays_stack.getById(dialogueid);
+	hintBox.deleteAll();
+
+	let overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
@@ -898,6 +900,17 @@ function showHideVisible(obj) {
 	else {
 		obj.style.visibility = 'visible';
 	}
+}
+
+/**
+ * Check if element is visible.
+ *
+ * @param {object} element
+ *
+ * @return {boolean}
+ */
+function isVisible(element) {
+	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
 }
 
 /**
