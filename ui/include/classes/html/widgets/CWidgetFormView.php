@@ -164,7 +164,7 @@ class CWidgetFormView {
 					->addItem($this->vars)
 					->addItem($this->form_grid)
 					// Submit button is needed to enable submit event on Enter on inputs.
-					->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;')),
+					->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)),
 				implode('', $this->templates),
 				$this->javascript ? new CScriptTag($this->javascript) : ''
 			]),
