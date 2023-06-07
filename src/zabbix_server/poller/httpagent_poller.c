@@ -112,6 +112,76 @@ fail:
 	return NOTSUPPORTED;
 }
 
+static void	agent_task_free(void *data)
+{
+	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
+	zbx_timespec_t		timespec;
+	zbx_interface_status	*interface_status;
+	int			ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host.host,
+			agent_context->interface.addr, agent_context->key,
+			zbx_tcp_connection_type_name(agent_context->host.tls_connect));
+
+	zbx_timespec(&timespec);
+
+	/* don't try activating interface if there were no errors detected */
+	if (SUCCEED != agent_context->ret || ZBX_INTERFACE_AVAILABLE_TRUE != agent_context->interface.available ||
+			0 != agent_context->interface.errors_from)
+	{
+		if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
+				&agent_context->interface.interfaceid)))
+		{
+			zbx_interface_status	interface_status_local = {.interface = agent_context->interface};
+
+			interface_status_local.interface.addr = NULL;
+			interface_status = zbx_hashset_insert(&agent_context->poller_config->interfaces,
+					&interface_status_local, sizeof(interface_status_local));
+		}
+		else
+			zabbix_log(LOG_LEVEL_DEBUG, "updating existing interface");
+
+		zbx_free(interface_status->error);
+		interface_status->errcode = agent_context->ret;
+		interface_status->itemid = agent_context->itemid;
+		zbx_strlcpy(interface_status->host, agent_context->host.host, sizeof(interface_status->host));
+		zbx_free(interface_status->key_orig);
+		interface_status->key_orig = agent_context->key_orig;
+		agent_context->key_orig = NULL;
+	}
+
+	if (SUCCEED == agent_context->ret)
+	{
+		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,agent_context->value_type,
+				agent_context->flags, &agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
+	}
+	else
+	{
+		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid, agent_context->value_type,
+					agent_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+					agent_context->result.msg);
+
+		interface_status->error = agent_context->result.msg;
+		SET_MSG_RESULT(&agent_context->result, NULL);
+	}
+
+	zbx_vector_uint64_append(&agent_context->poller_config->itemids, agent_context->itemid);
+	zbx_vector_int32_append(&agent_context->poller_config->errcodes, agent_context->ret);
+	zbx_vector_int32_append(&agent_context->poller_config->lastclocks, timespec.sec);
+
+	agent_context->poller_config->processing--;
+	agent_context->poller_config->processed++;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, agent_context->itemid);
+	ret = agent_context->ret;
+
+	zbx_async_check_agent_clean(agent_context);
+	zbx_tcp_close(&agent_context->s);
+	zbx_free(agent_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+}
+
 static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
@@ -137,7 +207,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 			errcodes[i] = async_check_httpagent(&items[i], &results[i], poller_config);
 		else
-			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config);
+			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config, agent_task_free);
 	}
 
 	zbx_timespec(&timespec);

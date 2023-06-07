@@ -23,6 +23,7 @@
 #include "zbxcacheconfig.h"
 #include "httpagent_async.h"
 #include "module.h"
+#include "../../libs/zbxasyncpoller/asyncpoller.h"
 
 typedef enum
 {
@@ -54,9 +55,8 @@ typedef struct
 }
 zbx_agent_context;
 
-int	zbx_agent_task_process(short event, void *data);
-void	zbx_agent_task_free(void *data);
-void	zbx_agent_context_clean(zbx_agent_context *agent_context);
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config);
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config,
+		zbx_async_task_clear_cb_t clear_cb);
+void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
 #endif
