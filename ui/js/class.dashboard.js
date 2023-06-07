@@ -1765,11 +1765,11 @@ class CDashboard extends CBaseComponent {
 				this._selected_dashboard_page.unblockInteraction();
 
 				this._updateNavigationButtons();
-
-				this._storeSelectedDashboardPage();
 			},
 
 			tabsSort: () => {
+				this._storeSelectedDashboardPage();
+
 				this._is_unsaved = true;
 			},
 
