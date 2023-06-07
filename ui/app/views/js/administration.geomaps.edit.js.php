@@ -62,8 +62,6 @@
 
 					attribution_field.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 					attribution_label.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
-
-					hintBox.deleteHint(attribution_label.querySelector('[data-hintbox]'));
 				}
 				else {
 					view.tile_url.readOnly = false;
