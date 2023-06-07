@@ -386,7 +386,7 @@ class CIntegrationTest extends CAPITest {
 
 	$logfile = var_export(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)), true);
 
-			throw new Exception('Failed to wait for component '.$component.' to stop. FILES: '. $debug.' ; SERVER LOGS: '. $logfile);
+	throw new Exception('Failed to wait for component '.$component.' to stop. FILES: '. $debug.' ; SERVER LOGS: '. $logfile. ' FILENAMESEARCH: '. self::getPidPath($component). ' FILEEXISTS: '.(file_exists(self::getPidPath($component)) ? 'true':'false') );
 		}
 
 		$failed_pids = [];
