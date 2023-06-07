@@ -20,7 +20,6 @@
 #include "lld.h"
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
