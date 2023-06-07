@@ -47,7 +47,7 @@ window.mediatype_test_edit_popup = new class {
 			<?= json_encode(CCsrfTokenHelper::get('mediatype'), JSON_THROW_ON_ERROR) ?>
 		);
 
-		document.querySelector('#mediatypetest_log').classList.add('<?= ZBX_STYLE_DISABLED ?>');
+		document.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 
 		// Trim fields.
 		for (let key in fields) {
