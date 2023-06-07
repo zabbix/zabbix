@@ -317,7 +317,7 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-	                                        $name = '#{name}', $color = '#{color}'): CRow {
+											$name = '#{name}', $color = '#{color}'): CRow {
 		return (new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
