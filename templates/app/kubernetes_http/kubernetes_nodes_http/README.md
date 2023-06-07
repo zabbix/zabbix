@@ -14,7 +14,7 @@ For example:
  -  ## Enables use of **Zabbix proxy**
     enabled: false
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -42,7 +42,7 @@ This template has been tested on:
 
 Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F6.4) in your Kubernetes cluster.
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -90,7 +90,7 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.ENDPOINT.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
+|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
