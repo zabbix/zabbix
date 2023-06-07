@@ -874,7 +874,7 @@ function showHideVisible(obj) {
 /**
  * Check if element is visible.
  *
- * @param {Element} element
+ * @param {object} element
  *
  * @return {boolean}
  */
