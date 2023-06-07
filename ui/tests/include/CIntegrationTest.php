@@ -390,7 +390,7 @@ class CIntegrationTest extends CAPITest {
 
 $mydate = date('m/d/Y h:i:s a', time());
 
-	throw new Exception('Failed to wait for component '.$component.' to stop. FILES: '. $debug.' ; SERVER LOGS: '. $logfile. ' FILENAMESEARCH: '. self::getPidPath($component). ' FILEEXISTS: '.(file_exists(self::getPidPath($component)) ? 'true':'false'.' and PID FILE CONTENTS: '.$pidfile. ' and DATE:'.$mydate) );
+	throw new Exception('Failed to wait for component '.$component.' to stop. badger badger FILES: '. $debug.' ; SERVER LOGS: '. $logfile. ' FILENAMESEARCH: '. self::getPidPath($component).' FILEEXISTS: '.((file_exists(self::getPidPath($component)) ? 'true':'false')).' and PID FILE CONTENTS: '.$pidfile.' and DATE:'.$mydate);
 		}
 
 		$failed_pids = [];
