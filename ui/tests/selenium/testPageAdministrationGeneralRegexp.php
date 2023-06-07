@@ -23,6 +23,9 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 require_once dirname(__FILE__).'/traits/TableTrait.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
+/**
+* @backup regexps
+*/
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
 	use TableTrait;
@@ -103,14 +106,14 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 					'message_title' => 'Regular expression deleted'
 				]
 			],
-			// #1 Delete several regex.
+			// #1 Delete several regexes.
 			[
 				[
 					'regex_name' => ['1_regexp_2', '2_regexp_1', '2_regexp_2'],
 					'message_title' => 'Regular expressions deleted'
 				]
 			],
-			// #2 Delete ALL regex.
+			// #2 Delete ALL regexes.
 			[
 				[
 					'regex_name' => [''],
@@ -121,14 +124,14 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	/**
-	 * Test deleting all regexps one by one.
+	 * Test deleting regexps with the mass delete functionality.
 	 *
 	 * @dataProvider getRegexDeleteData
-	 * @backupOnce regexps
 	 */
 	public function testPageAdministrationGeneralRegexp_MassDelete($data) {
 		// Delete a regexp.
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
+		// The list of expected regexes to be shown after deletion.
 		$expected_regexps = $this->getTableResult('Name');
 
 		$regexids = [];
@@ -139,7 +142,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			else {
 				$regexids[] = CDBHelper::getValue('SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regex));
 				$this->query('class:list-table')->asTable()->one()->findRow('Name', $regex)->select();
-				// Remove regex from expected values.
+				// Remove this regex from the expected values.
 				$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
 			}
 		}
@@ -165,39 +168,5 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 			$this->assertTableDataColumn($expected_regexps);
 		}
-		/*
-
-
-		$this->calculateHash('regexpid<>'.$regexp['regexpid']);
-
-		// Delete a regexp.
-		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
-		$this->query('id:regexids_'.$regexp['regexpid'])->one()->click();
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-
-		// Check the result.
-		$this->page->assertTitle('Configuration of regular expressions');
-		$this->assertMessage(TEST_GOOD, 'Regular expression deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.$regexp['regexpid']));
-		$this->verifyHash();*/
-	}
-
-	/**
-	 * Test deleting all regexps at once.
-	 *
-	 * @backupOnce regexps
-	 */
-	public function testPageAdministrationGeneralRegexp_MassDeleteAll() {
-		// Delete all regexps.
-		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
-		$this->query('name:all-regexes')->one()->click();
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-
-		// Check the result.
-		$this->page->assertTitle('Configuration of regular expressions');
-		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps'));
 	}
 }
