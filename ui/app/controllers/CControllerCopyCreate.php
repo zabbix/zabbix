@@ -27,15 +27,16 @@ class CControllerCopyCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'copy_targetids' =>	'required|array|not_empty',
-			'itemids' =>		'array_db items.itemid',
-			'triggerids' =>		'array_db triggers.triggerid',
-			'graphids' =>		'array_db graphs.graphid',
-			'copy_type' =>		'required|in '.implode(',', [
-									COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
-									COPY_TYPE_TO_TEMPLATE_GROUP
-								]),
-			'source' => 'required|in '.implode(',', ['items', 'triggers', 'graphs'])
+			'copy_targetids' =>		'required|array|not_empty',
+			'itemids' =>			'array_db items.itemid',
+			'triggerids' =>			'array_db triggers.triggerid',
+			'triggers_hostid' =>	'db items.hostid',
+			'graphids' =>			'array_db graphs.graphid',
+			'copy_type' =>			'required|in '.implode(',', [
+										COPY_TYPE_TO_HOST_GROUP, COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE,
+										COPY_TYPE_TO_TEMPLATE_GROUP
+									]),
+			'source' => 			'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -205,17 +206,22 @@ class CControllerCopyCreate extends CController {
 	}
 
 	private function copyItems(array $copy_targetids): bool {
-		$itemids = $this->getInput('itemids');
-		$copy_type = $this->getInput('copy_type');
-		$is_template = $copy_type == COPY_TYPE_TO_TEMPLATE || $copy_type == COPY_TYPE_TO_TEMPLATE_GROUP;
+		$src_options = ['itemids' => $this->getInput('itemids')];
+		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
+			? ['templateids' => $copy_targetids]
+			: ['hostids' => $copy_targetids];
 
-		return copyItemsToHosts('itemids', $itemids, $is_template, $copy_targetids);
+		return CItemHelper::copy($src_options, $dst_options);
 	}
 
 	private function copyTriggers(array $copy_targetids): bool {
-		$triggerids = $this->getInput('triggerids');
+		$src_options = ['triggerids' => $this->getInput('triggerids')]
+			+ ($this->hasInput('triggers_hostid') ? ['hostids' => $this->getInput('triggers_hostid')] : []);
+		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
+			? ['templateids' => $copy_targetids]
+			: ['hostids' => $copy_targetids];
 
-		return copyTriggersToHosts($copy_targetids, getRequest('hostid'), $triggerids);
+		return CTriggerHelper::copy($src_options, $dst_options);
 	}
 
 	private function copyGraphs(array $copy_targetids): bool {

@@ -351,6 +351,570 @@ class CDiscoveryRule extends CItemGeneral {
 		return $result;
 	}
 
+	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
+		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+
+		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
+
+		if ($upcased_index !== false) {
+			unset($sqlParts['select'][$upcased_index]);
+		}
+
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+				|| $this->outputIsRequested('error', $options['output'])))
+				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
+				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
+			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
+			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
+
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('state', $options['output'])) {
+				$sqlParts = $this->addQuerySelect('ir.state', $sqlParts);
+			}
+			if ($this->outputIsRequested('error', $options['output'])) {
+				/*
+				 * SQL func COALESCE use for template items because they don't have record
+				 * in item_rtdata table and DBFetch convert null to '0'
+				 */
+				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);
+			}
+
+			// add filter fields
+			if ($this->outputIsRequested('formula', $options['selectFilter'])
+					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
+					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
+
+				$sqlParts = $this->addQuerySelect('i.formula', $sqlParts);
+				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
+			}
+			if ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
+				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
+			}
+
+			if ($options['selectHosts'] !== null) {
+				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
+			}
+		}
+
+		return $sqlParts;
+	}
+
+	protected function addRelatedObjects(array $options, array $result) {
+		$result = parent::addRelatedObjects($options, $result);
+
+		$itemIds = array_keys($result);
+
+		// adding items
+		if (!is_null($options['selectItems'])) {
+			if ($options['selectItems'] != API_OUTPUT_COUNT) {
+				$items = [];
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$items = API::ItemPrototype()->get([
+						'output' => $options['selectItems'],
+						'itemids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
+				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
+			}
+			else {
+				$items = API::ItemPrototype()->get([
+					'discoveryids' => $itemIds,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				]);
+
+				$items = zbx_toHash($items, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
+				}
+			}
+		}
+
+		// adding triggers
+		if (!is_null($options['selectTriggers'])) {
+			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
+				$triggers = [];
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,f.triggerid'.
+					' FROM item_discovery id,items i,functions f'.
+					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=f.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
+				}
+
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$triggers = API::TriggerPrototype()->get([
+						'output' => $options['selectTriggers'],
+						'triggerids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
+				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
+			}
+			else {
+				$triggers = API::TriggerPrototype()->get([
+					'discoveryids' => $itemIds,
+					'countOutput' => true,
+					'groupCount' => true
+				]);
+
+				$triggers = zbx_toHash($triggers, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
+						? $triggers[$itemid]['rowscount']
+						: '0';
+				}
+			}
+		}
+
+		// adding graphs
+		if (!is_null($options['selectGraphs'])) {
+			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
+				$graphs = [];
+				$relationMap = new CRelationMap();
+				$res = DBselect(
+					'SELECT id.parent_itemid,gi.graphid'.
+					' FROM item_discovery id,items i,graphs_items gi'.
+					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
+						' AND id.itemid=i.itemid'.
+						' AND i.itemid=gi.itemid'
+				);
+				while ($relation = DBfetch($res)) {
+					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
+				}
+
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$graphs = API::GraphPrototype()->get([
+						'output' => $options['selectGraphs'],
+						'graphids' => $related_ids,
+						'preservekeys' => true
+					]);
+				}
+
+				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
+			}
+			else {
+				$graphs = API::GraphPrototype()->get([
+					'discoveryids' => $itemIds,
+					'countOutput' => true,
+					'groupCount' => true
+				]);
+
+				$graphs = zbx_toHash($graphs, 'parent_itemid');
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
+						? $graphs[$itemid]['rowscount']
+						: '0';
+				}
+			}
+		}
+
+		// adding hosts
+		if ($options['selectHostPrototypes'] !== null) {
+			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
+				$hostPrototypes = [];
+				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
+				$related_ids = $relationMap->getRelatedIds();
+
+				if ($related_ids) {
+					$hostPrototypes = API::HostPrototype()->get([
+						'output' => $options['selectHostPrototypes'],
+						'hostids' => $related_ids,
+						'nopermissions' => true,
+						'preservekeys' => true
+					]);
+				}
+
+				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
+			}
+			else {
+				$hostPrototypes = API::HostPrototype()->get([
+					'discoveryids' => $itemIds,
+					'nopermissions' => true,
+					'countOutput' => true,
+					'groupCount' => true
+				]);
+				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
+
+				foreach ($result as $itemid => $item) {
+					$result[$itemid]['hostPrototypes'] = array_key_exists($itemid, $hostPrototypes)
+						? $hostPrototypes[$itemid]['rowscount']
+						: '0';
+				}
+			}
+		}
+
+		if ($options['selectFilter'] !== null) {
+			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
+			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
+			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
+
+			$filters = [];
+			foreach ($result as $rule) {
+				$filters[$rule['itemid']] = [
+					'evaltype' => $rule['evaltype'],
+					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
+				];
+			}
+
+			// adding conditions
+			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
+				$conditions = DB::select('item_condition', [
+					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
+					'filter' => ['itemid' => $itemIds],
+					'preservekeys' => true,
+					'sortfield' => ['item_conditionid']
+				]);
+				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
+
+				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
+
+				foreach ($filters as &$filter) {
+					// in case of a custom expression - use the given formula
+					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formula = $filter['formula'];
+					}
+					// in other cases - generate the formula automatically
+					else {
+						// sort the conditions by macro before generating the formula
+						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
+						$conditions = order_macros($conditions, 'macro');
+
+						$formulaConditions = [];
+						foreach ($conditions as $condition) {
+							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
+						}
+						$formula = CConditionHelper::getFormula($formulaConditions, $filter['evaltype']);
+					}
+
+					// generate formulaids from the effective formula
+					$formulaIds = CConditionHelper::getFormulaIds($formula);
+					foreach ($filter['conditions'] as &$condition) {
+						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
+					}
+					unset($condition);
+
+					// generated a letter based formula only for rules with custom expressions
+					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					}
+
+					if ($evalFormulaRequested) {
+						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
+					}
+				}
+				unset($filter);
+			}
+
+			// add filters to the result
+			foreach ($result as &$rule) {
+				$rule['filter'] = $filters[$rule['itemid']];
+			}
+			unset($rule);
+		}
+
+		// Add LLD macro paths.
+		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
+			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
+				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
+				'filter' => ['itemid' => $itemIds]
+			]);
+
+			foreach ($result as &$lld_macro_path) {
+				$lld_macro_path['lld_macro_paths'] = [];
+			}
+			unset($lld_macro_path);
+
+			foreach ($lld_macro_paths as $lld_macro_path) {
+				$itemid = $lld_macro_path['itemid'];
+
+				if (!$this->outputIsRequested('lld_macro_pathid', $options['selectLLDMacroPaths'])) {
+					unset($lld_macro_path['lld_macro_pathid']);
+				}
+				unset($lld_macro_path['itemid']);
+
+				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
+			}
+		}
+
+		// add overrides
+		if ($options['selectOverrides'] !== null && $options['selectOverrides'] != API_OUTPUT_COUNT) {
+			$ovrd_fields = ['itemid', 'lld_overrideid'];
+			$filter_requested = $this->outputIsRequested('filter', $options['selectOverrides']);
+			$operations_requested = $this->outputIsRequested('operations', $options['selectOverrides']);
+
+			if ($filter_requested) {
+				$ovrd_fields = array_merge($ovrd_fields, ['formula', 'evaltype']);
+			}
+
+			$overrides = API::getApiService()->select('lld_override', [
+				'output' => $this->outputExtend($options['selectOverrides'], $ovrd_fields),
+				'filter' => ['itemid' => $itemIds],
+				'preservekeys' => true
+			]);
+
+			if ($filter_requested && $overrides) {
+				$conditions = DB::select('lld_override_condition', [
+					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
+					'filter' => ['lld_overrideid' => array_keys($overrides)],
+					'sortfield' => ['lld_override_conditionid'],
+					'preservekeys' => true
+				]);
+
+				$relation_map = $this->createRelationMap($conditions, 'lld_overrideid', 'lld_override_conditionid');
+
+				foreach ($overrides as &$override) {
+					$override['filter'] = [
+						'evaltype' => $override['evaltype'],
+						'formula' => $override['formula']
+					];
+					unset($override['evaltype'], $override['formula']);
+				}
+				unset($override);
+
+				$overrides = $relation_map->mapMany($overrides, $conditions, 'conditions');
+
+				foreach ($overrides as &$override) {
+					$override['filter'] += ['conditions' => $override['conditions']];
+					unset($override['conditions']);
+
+					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$formula = $override['filter']['formula'];
+					}
+					else {
+						$conditions = zbx_toHash($override['filter']['conditions'], 'lld_override_conditionid');
+						$conditions = order_macros($conditions, 'macro');
+						$formula_conditions = [];
+
+						foreach ($conditions as $condition) {
+							$formula_conditions[$condition['lld_override_conditionid']] = $condition['macro'];
+						}
+
+						$formula = CConditionHelper::getFormula($formula_conditions, $override['filter']['evaltype']);
+					}
+
+					$formulaids = CConditionHelper::getFormulaIds($formula);
+
+					foreach ($override['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = $formulaids[$condition['lld_override_conditionid']];
+						unset($condition['lld_override_conditionid'], $condition['lld_overrideid']);
+					}
+					unset($condition);
+
+					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+						$override['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
+						$override['filter']['eval_formula'] = $override['filter']['formula'];
+					}
+					else {
+						$override['filter']['eval_formula'] = CConditionHelper::replaceNumericIds($formula,
+							$formulaids
+						);
+					}
+				}
+				unset($override);
+			}
+
+			if ($operations_requested && $overrides) {
+				$operations = DB::select('lld_override_operation', [
+					'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
+					'filter' => ['lld_overrideid' => array_keys($overrides)],
+					'sortfield' => ['lld_override_operationid'],
+					'preservekeys' => true
+				]);
+
+				if ($operations) {
+					$opdiscover = DB::select('lld_override_opdiscover', [
+						'output' => ['lld_override_operationid', 'discover'],
+						'filter' => ['lld_override_operationid' => array_keys($operations)]
+					]);
+
+					$item_prototype_objectids = [];
+					$trigger_prototype_objectids = [];
+					$host_prototype_objectids = [];
+
+					foreach ($operations as $operation) {
+						switch ($operation['operationobject']) {
+							case OPERATION_OBJECT_ITEM_PROTOTYPE:
+								$item_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
+
+							case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
+								$trigger_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
+
+							case OPERATION_OBJECT_HOST_PROTOTYPE:
+								$host_prototype_objectids[$operation['lld_override_operationid']] = true;
+								break;
+						}
+					}
+
+					if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
+						$opstatus = DB::select('lld_override_opstatus', [
+							'output' => ['lld_override_operationid', 'status'],
+							'filter' => ['lld_override_operationid' => array_keys(
+								$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
+							)]
+						]);
+					}
+
+					if ($item_prototype_objectids) {
+						$ophistory = DB::select('lld_override_ophistory', [
+							'output' => ['lld_override_operationid', 'history'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
+						$optrends = DB::select('lld_override_optrends', [
+							'output' => ['lld_override_operationid', 'trends'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
+						$opperiod = DB::select('lld_override_opperiod', [
+							'output' => ['lld_override_operationid', 'delay'],
+							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
+						]);
+					}
+
+					if ($trigger_prototype_objectids) {
+						$opseverity = DB::select('lld_override_opseverity', [
+							'output' => ['lld_override_operationid', 'severity'],
+							'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
+						]);
+					}
+
+					if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
+						$optag = DB::select('lld_override_optag', [
+							'output' => ['lld_override_operationid', 'tag', 'value'],
+							'filter' => ['lld_override_operationid' => array_keys(
+								$trigger_prototype_objectids + $host_prototype_objectids + $item_prototype_objectids
+							)]
+						]);
+					}
+
+					if ($host_prototype_objectids) {
+						$optemplate = DB::select('lld_override_optemplate', [
+							'output' => ['lld_override_operationid', 'templateid'],
+							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+						]);
+						$opinventory = DB::select('lld_override_opinventory', [
+							'output' => ['lld_override_operationid', 'inventory_mode'],
+							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
+						]);
+					}
+
+					foreach ($operations as &$operation) {
+						$lld_override_operationid = $operation['lld_override_operationid'];
+
+						if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
+							foreach ($opstatus as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opstatus']['status'] = $row['status'];
+								}
+							}
+						}
+
+						foreach ($opdiscover as $row) {
+							if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+								$operation['opdiscover']['discover'] = $row['discover'];
+							}
+						}
+
+						if ($item_prototype_objectids) {
+							foreach ($ophistory as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['ophistory']['history'] = $row['history'];
+								}
+							}
+
+							foreach ($optrends as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optrends']['trends'] = $row['trends'];
+								}
+							}
+
+							foreach ($opperiod as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opperiod']['delay'] = $row['delay'];
+								}
+							}
+						}
+
+						if ($trigger_prototype_objectids) {
+							foreach ($opseverity as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opseverity']['severity'] = $row['severity'];
+								}
+							}
+						}
+
+						if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
+							foreach ($optag as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
+								}
+							}
+						}
+
+						if ($host_prototype_objectids) {
+							foreach ($optemplate as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['optemplate'][] = ['templateid' => $row['templateid']];
+								}
+							}
+
+							foreach ($opinventory as $row) {
+								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
+									$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
+								}
+							}
+						}
+					}
+					unset($operation);
+				}
+
+				$relation_map = $this->createRelationMap($operations, 'lld_overrideid', 'lld_override_operationid');
+
+				$overrides = $relation_map->mapMany($overrides, $operations, 'operations');
+			}
+
+			foreach ($result as &$row) {
+				$row['overrides'] = [];
+
+				foreach ($overrides as $override) {
+					if (bccomp($override['itemid'], $row['itemid']) == 0) {
+						unset($override['itemid'], $override['lld_overrideid']);
+
+						if ($operations_requested) {
+							foreach ($override['operations'] as &$operation) {
+								unset($operation['lld_override_operationid'], $operation['lld_overrideid']);
+							}
+							unset($operation);
+						}
+
+						$row['overrides'][] = $override;
+					}
+				}
+			}
+			unset($row);
+		}
+
+		return $result;
+	}
+
 	/**
 	 * @param array $items
 	 *
@@ -2534,84 +3098,6 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
-	 *
-	 * @param array $hostids    an array of host or template IDs
-	 *
-	 * @throws APIException if the user doesn't have write permissions for the given hosts.
-	 */
-	protected function checkHostPermissions(array $hostids) {
-		if ($hostids) {
-			$hostids = array_unique($hostids);
-
-			$count = API::Host()->get([
-				'countOutput' => true,
-				'hostids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count == count($hostids)) {
-				return;
-			}
-
-			$count += API::Template()->get([
-				'countOutput' => true,
-				'templateids' => $hostids,
-				'editable' => true
-			]);
-
-			if ($count != count($hostids)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-		}
-	}
-
-	/**
-	 * Copies the given discovery rules to the specified hosts.
-	 *
-	 * @throws APIException if no discovery rule IDs or host IDs are given or
-	 * the user doesn't have the necessary permissions.
-	 *
-	 * @param array $data
-	 * @param array $data['discoveryids']  An array of item ids to be cloned.
-	 * @param array $data['hostids']       An array of host ids were the items should be cloned to.
-	 *
-	 * @return bool
-	 */
-	public function copy(array $data) {
-		// validate data
-		if (!isset($data['discoveryids']) || !$data['discoveryids']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
-		}
-		if (!isset($data['hostids']) || !$data['hostids']) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('No host IDs given.'));
-		}
-
-		$this->checkHostPermissions($data['hostids']);
-
-		// check if the given discovery rules exist
-		$count = $this->get([
-			'countOutput' => true,
-			'itemids' => $data['discoveryids']
-		]);
-
-		if ($count != count($data['discoveryids'])) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		// copy
-		foreach ($data['discoveryids'] as $discoveryid) {
-			foreach ($data['hostids'] as $hostid) {
-				$this->copyDiscoveryRule($discoveryid, $hostid);
-			}
-		}
-
-		return true;
-	}
-
-	/**
 	 * @param array      $templateids
 	 * @param array|null $hostids
 	 */
@@ -2677,292 +3163,83 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Copies all of the triggers from the source discovery to the target discovery rule.
+	 * @deprecated
 	 *
-	 * @param array  $src_discovery       The source discovery rule to copy from.
-	 * @param array  $src_host            The host the source discovery belongs to.
-	 * @param string $src_host['hostid']
-	 * @param string $src_host['host']
-	 * @param array  $dst_host            The host the target discovery belongs to.
-	 * @param string $dst_host['hostid']
-	 * @param string $dst_host['host']
+	 * Copies the given discovery rules to the specified hosts.
 	 *
-	 * @return array
+	 * @param array $data
+	 * @param array $data['discoveryids']  An array of item ids to be cloned.
+	 * @param array $data['hostids']       An array of host ids were the items should be cloned to.
 	 *
-	 * @throws APIException
+	 * @return bool
+	 *
+	 * @throws APIException if no discovery rule IDs or host IDs are given or
+	 * the user doesn't have the necessary permissions.
 	 */
-	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
-		$src_triggers = API::TriggerPrototype()->get([
-			'output' => ['triggerid', 'expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments',
-				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'opdata',
-				'discover', 'event_name'
-			],
-			'selectItems' => ['itemid', 'type'],
-			'selectTags' => ['tag', 'value'],
-			'selectDependencies' => ['triggerid'],
-			'discoveryids' => $src_discovery['itemid']
+	public function copy(array $data) {
+		// validate data
+		if (!isset($data['discoveryids']) || !$data['discoveryids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No discovery rule IDs given.'));
+		}
+		if (!isset($data['hostids']) || !$data['hostids']) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('No host IDs given.'));
+		}
+
+		$this->checkHostPermissions($data['hostids']);
+
+		// check if the given discovery rules exist
+		$count = $this->get([
+			'countOutput' => true,
+			'itemids' => $data['discoveryids']
 		]);
 
-		$dst_triggers = [];
+		if ($count != count($data['discoveryids'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
 
-		foreach ($src_triggers as $i => $src_trigger) {
-			// Skip trigger prototypes with web items and remove them from source.
-			if (httpItemExists($src_trigger['items'])) {
-				unset($src_triggers[$i]);
-			}
-			else {
-				$dst_triggers[] = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url_name',
-					'url', 'status', 'priority', 'comments','type', 'recovery_mode', 'recovery_expression',
-					'correlation_mode', 'correlation_tag', 'opdata', 'discover', 'event_name', 'tags'
-				]));
+		// copy
+		foreach ($data['discoveryids'] as $discoveryid) {
+			foreach ($data['hostids'] as $hostid) {
+				$this->copyDiscoveryRule($discoveryid, $hostid);
 			}
 		}
 
-		if (!$dst_triggers) {
-			return [];
-		}
+		return true;
+	}
 
-		$src_triggers = array_values($src_triggers);
+	/**
+	 * Checks if the current user has access to the given hosts and templates. Assumes the "hostid" field is valid.
+	 *
+	 * @param array $hostids    an array of host or template IDs
+	 *
+	 * @throws APIException if the user doesn't have write permissions for the given hosts.
+	 */
+	protected function checkHostPermissions(array $hostids) {
+		if ($hostids) {
+			$hostids = array_unique($hostids);
 
-		$dst_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_triggers,
-			['sources' => ['expression', 'recovery_expression']]
-		);
+			$count = API::Host()->get([
+				'countOutput' => true,
+				'hostids' => $hostids,
+				'editable' => true
+			]);
 
-		foreach ($dst_triggers as &$trigger) {
-			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $src_host['host'],
-				$dst_host['host']
-			);
+			if ($count == count($hostids)) {
+				return;
+			}
 
-			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
-				$trigger['recovery_expression'] = triggerExpressionReplaceHost($trigger['recovery_expression'],
-					$src_host['host'], $dst_host['host']
+			$count += API::Template()->get([
+				'countOutput' => true,
+				'templateids' => $hostids,
+				'editable' => true
+			]);
+
+			if ($count != count($hostids)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
 				);
 			}
 		}
-		unset($trigger);
-
-		$result = API::TriggerPrototype()->create($dst_triggers);
-
-		if (!$result) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
-		}
-
-		$dst_triggerids = $result['triggerids'];
-		$src_trigger_indexes = array_flip(array_column($src_triggers, 'triggerid'));
-
-		$dst_triggers = [];
-
-		/*
-		 * A check that the trigger-up belongs to the source host needs to be performed on copying the dependencies
-		 * on triggers.
-		 * If it does, we need to check that the triggers with the same description and expression exist on the
-		 * destination host.
-		 * If not, we need to check if the dependencies from destination triggers to these triggers are valid.
-		 */
-		$src_triggerids_up = [];
-
-		foreach ($dst_triggerids as $i => $dst_triggerid) {
-			if (!$src_triggers[$i]['dependencies']) {
-				unset($dst_triggerids[$i]);
-				continue;
-			}
-
-			$dst_triggers[$dst_triggerid] = ['triggerid' => $dst_triggerid];
-
-			foreach ($src_triggers[$i]['dependencies'] as $i2 => $src_trigger_up) {
-				if (array_key_exists($src_trigger_up['triggerid'], $src_trigger_indexes)) {
-					// Add dependency on the trigger prototype of the same LLD rule.
-					$dst_triggers[$dst_triggerid]['dependencies'][] =
-						['triggerid' => $result['triggerids'][$src_trigger_indexes[$src_trigger_up['triggerid']]]];
-
-					unset($src_triggers[$i]['dependencies'][$i2]);
-				}
-				else {
-					$src_triggerids_up[$src_trigger_up['triggerid']] = true;
-				}
-			}
-
-			if (!$src_triggers[$i]['dependencies']) {
-				unset($dst_triggerids[$i]);
-			}
-		}
-
-		if ($src_triggerids_up) {
-			$src_host_triggers_up = DBfetchArrayAssoc(DBselect(
-				'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
-				' FROM triggers t,functions f,items i'.
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND '.dbConditionId('t.triggerid', array_keys($src_triggerids_up)).
-					' AND '.dbConditionId('i.hostid', [$src_host['hostid']])
-			), 'triggerid');
-
-			$src_host_triggers_up = CMacrosResolverHelper::resolveTriggerExpressions($src_host_triggers_up,
-				['sources' => ['expression', 'recovery_expression']]
-			);
-
-			$src_host_dependencies = [];
-			$other_host_dependencies = [];
-
-			foreach ($dst_triggerids as $i => $dst_triggerid) {
-				$src_trigger = $src_triggers[$i];
-
-				foreach ($src_trigger['dependencies'] as $src_trigger_up) {
-					if (array_key_exists($src_trigger_up['triggerid'], $src_host_triggers_up)) {
-						$src_host_dependencies[$src_trigger_up['triggerid']][$src_trigger['triggerid']] = true;
-					}
-					else {
-						// Add dependency on the trigger of the other templates or hosts.
-						$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
-						$other_host_dependencies[$src_trigger_up['triggerid']][$dst_triggerid] = true;
-					}
-				}
-			}
-
-			if ($src_host_dependencies) {
-				$dst_host_triggers = DBfetchArrayAssoc(DBselect(
-					'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
-					' FROM items i,functions f,triggers t'.
-					' WHERE i.itemid=f.itemid'.
-						' AND f.triggerid=t.triggerid'.
-						' AND '.dbConditionId('i.hostid', [$dst_host['hostid']]).
-						' AND '.dbConditionString('t.description',
-							array_unique(array_column($src_host_triggers_up, 'description'))
-						)
-				), 'triggerid');
-
-				$dst_host_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_host_triggers);
-
-				$dst_host_triggerids = [];
-
-				foreach ($dst_host_triggers as $i => $trigger) {
-					$expression = triggerExpressionReplaceHost($trigger['expression'], $dst_host['host'],
-						$src_host['host']
-					);
-					$recovery_expression = $trigger['recovery_expression'];
-
-					if ($recovery_expression !== '') {
-						$recovery_expression = triggerExpressionReplaceHost($trigger['recovery_expression'],
-							$dst_host['host'], $src_host['host']
-						);
-					}
-
-					$dst_host_triggerids[$trigger['description']][$expression][$recovery_expression] =
-						$trigger['triggerid'];
-				}
-
-				foreach ($src_host_triggers_up as $src_trigger_up) {
-					$description = $src_trigger_up['description'];
-					$expression = $src_trigger_up['expression'];
-					$recovery_expression = $src_trigger_up['recovery_expression'];
-
-					if (array_key_exists($description, $dst_host_triggerids)
-							&& array_key_exists($expression, $dst_host_triggerids[$description])
-							&& array_key_exists($recovery_expression, $dst_host_triggerids[$description][$expression])) {
-						$dst_triggerid_up = $dst_host_triggerids[$description][$expression][$recovery_expression];
-
-						foreach ($src_host_dependencies[$src_trigger_up['triggerid']] as $src_triggerid => $foo) {
-							$dst_triggerid = $dst_triggerids[$src_trigger_indexes[$src_triggerid]];
-
-							$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $dst_triggerid_up];
-						}
-					}
-					else {
-						$src_triggerid = key($src_host_dependencies[$src_trigger_up['triggerid']]);
-						$src_trigger = $src_triggers[$src_trigger_indexes[$src_triggerid]];
-
-						$hosts = DB::select('hosts', [
-							'output' => ['status'],
-							'hostids' => $dst_host['hostid']
-						]);
-
-						$error = ($hosts[0]['status'] == HOST_STATUS_TEMPLATE)
-							? _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".')
-							: _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".');
-
-						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $src_trigger['description'],
-							$src_trigger_up['description'], $dst_host['host']
-						));
-					}
-				}
-			}
-
-			if ($other_host_dependencies) {
-				$trigger_hosts = CTriggerGeneral::getTriggerHosts($other_host_dependencies);
-
-				CTriggerGeneral::checkDependenciesOfHostTriggers($other_host_dependencies, $trigger_hosts);
-				CTriggerGeneral::checkDependenciesOfTemplateTriggers($other_host_dependencies, $trigger_hosts);
-			}
-		}
-
-		if ($dst_triggers) {
-			$dst_triggers = array_values($dst_triggers);
-			CTriggerGeneral::updateDependencies($dst_triggers);
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Returns the interface that best matches the given item.
-	 *
-	 * @param array $item_type  An item type
-	 * @param array $interfaces An array of interfaces to choose from
-	 *
-	 * @return array|boolean    The best matching interface;
-	 *							an empty array of no matching interface was found;
-	 *							false, if the item does not need an interface
-	 */
-	public static function findInterfaceForItem($item_type, array $interfaces) {
-		$type = itemTypeInterface($item_type);
-
-		if ($type == INTERFACE_TYPE_OPT) {
-			return false;
-		}
-		elseif ($type == INTERFACE_TYPE_ANY) {
-			return self::findInterfaceByPriority($interfaces);
-		}
-		// the item uses a specific type of interface
-		elseif ($type !== false) {
-			$interface_by_type = [];
-
-			foreach ($interfaces as $interface) {
-				if ($interface['main'] == INTERFACE_PRIMARY) {
-					$interface_by_type[$interface['type']] = $interface;
-				}
-			}
-
-			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
-		}
-		// the item does not need an interface
-		else {
-			return false;
-		}
-	}
-
-	/**
-	 * Return first main interface matched from list of preferred types, or NULL.
-	 *
-	 * @param array $interfaces  An array of interfaces to choose from.
-	 *
-	 * @return ?array
-	 */
-	public static function findInterfaceByPriority(array $interfaces): ?array {
-		$interface_by_type = [];
-
-		foreach ($interfaces as $interface) {
-			if ($interface['main'] == INTERFACE_PRIMARY) {
-				$interface_by_type[$interface['type']] = $interface;
-			}
-		}
-
-		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
-			if (array_key_exists($interface_type, $interface_by_type)) {
-				return $interface_by_type[$interface_type];
-			}
-		}
-
-		return null;
 	}
 
 	/**
@@ -3098,6 +3375,68 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->copyHostPrototypes($discoveryid, $dstDiscovery['itemid']);
 
 		return true;
+	}
+
+	/**
+	 * Returns the interface that best matches the given item.
+	 *
+	 * @param array $item_type  An item type
+	 * @param array $interfaces An array of interfaces to choose from
+	 *
+	 * @return array|boolean    The best matching interface;
+	 *							an empty array of no matching interface was found;
+	 *							false, if the item does not need an interface
+	 */
+	private static function findInterfaceForItem($item_type, array $interfaces) {
+		$type = itemTypeInterface($item_type);
+
+		if ($type == INTERFACE_TYPE_OPT) {
+			return false;
+		}
+		elseif ($type == INTERFACE_TYPE_ANY) {
+			return self::findInterfaceByPriority($interfaces);
+		}
+		// the item uses a specific type of interface
+		elseif ($type !== false) {
+			$interface_by_type = [];
+
+			foreach ($interfaces as $interface) {
+				if ($interface['main'] == INTERFACE_PRIMARY) {
+					$interface_by_type[$interface['type']] = $interface;
+				}
+			}
+
+			return array_key_exists($type, $interface_by_type) ? $interface_by_type[$type] : [];
+		}
+		// the item does not need an interface
+		else {
+			return false;
+		}
+	}
+
+	/**
+	 * Return first main interface matched from list of preferred types, or NULL.
+	 *
+	 * @param array $interfaces  An array of interfaces to choose from.
+	 *
+	 * @return ?array
+	 */
+	private static function findInterfaceByPriority(array $interfaces): ?array {
+		$interface_by_type = [];
+
+		foreach ($interfaces as $interface) {
+			if ($interface['main'] == INTERFACE_PRIMARY) {
+				$interface_by_type[$interface['type']] = $interface;
+			}
+		}
+
+		foreach (self::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
+			if (array_key_exists($interface_type, $interface_by_type)) {
+				return $interface_by_type[$interface_type];
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -3475,6 +3814,233 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
+	 * Copies all of the triggers from the source discovery to the target discovery rule.
+	 *
+	 * @param array  $src_discovery       The source discovery rule to copy from.
+	 * @param array  $src_host            The host the source discovery belongs to.
+	 * @param string $src_host['hostid']
+	 * @param string $src_host['host']
+	 * @param array  $dst_host            The host the target discovery belongs to.
+	 * @param string $dst_host['hostid']
+	 * @param string $dst_host['host']
+	 *
+	 * @return array
+	 *
+	 * @throws APIException
+	 */
+	protected function copyTriggerPrototypes(array $src_discovery, array $src_host, array $dst_host): array {
+		$src_triggers = API::TriggerPrototype()->get([
+			'output' => ['triggerid', 'expression', 'description', 'url_name', 'url', 'status', 'priority', 'comments',
+				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'opdata',
+				'discover', 'event_name'
+			],
+			'selectItems' => ['itemid', 'type'],
+			'selectTags' => ['tag', 'value'],
+			'selectDependencies' => ['triggerid'],
+			'discoveryids' => $src_discovery['itemid']
+		]);
+
+		$dst_triggers = [];
+
+		foreach ($src_triggers as $i => $src_trigger) {
+			// Skip trigger prototypes with web items and remove them from source.
+			if (httpItemExists($src_trigger['items'])) {
+				unset($src_triggers[$i]);
+			}
+			else {
+				$dst_triggers[] = array_intersect_key($src_trigger, array_flip(['expression', 'description', 'url_name',
+					'url', 'status', 'priority', 'comments','type', 'recovery_mode', 'recovery_expression',
+					'correlation_mode', 'correlation_tag', 'opdata', 'discover', 'event_name', 'tags'
+				]));
+			}
+		}
+
+		if (!$dst_triggers) {
+			return [];
+		}
+
+		$src_triggers = array_values($src_triggers);
+
+		$dst_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_triggers,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		foreach ($dst_triggers as &$trigger) {
+			$trigger['expression'] = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+				$trigger['expression'], $src_host['host'], $dst_host['host']
+			);
+
+			if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
+				$trigger['recovery_expression'] = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+					$trigger['recovery_expression'], $src_host['host'], $dst_host['host']
+				);
+			}
+		}
+		unset($trigger);
+
+		$result = API::TriggerPrototype()->create($dst_triggers);
+
+		if (!$result) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot clone trigger prototypes.'));
+		}
+
+		$dst_triggerids = $result['triggerids'];
+		$src_trigger_indexes = array_flip(array_column($src_triggers, 'triggerid'));
+
+		$dst_triggers = [];
+
+		/*
+		 * A check that the trigger-up belongs to the source host needs to be performed on copying the dependencies
+		 * on triggers.
+		 * If it does, we need to check that the triggers with the same description and expression exist on the
+		 * destination host.
+		 * If not, we need to check if the dependencies from destination triggers to these triggers are valid.
+		 */
+		$src_triggerids_up = [];
+
+		foreach ($dst_triggerids as $i => $dst_triggerid) {
+			if (!$src_triggers[$i]['dependencies']) {
+				unset($dst_triggerids[$i]);
+				continue;
+			}
+
+			$dst_triggers[$dst_triggerid] = ['triggerid' => $dst_triggerid];
+
+			foreach ($src_triggers[$i]['dependencies'] as $i2 => $src_trigger_up) {
+				if (array_key_exists($src_trigger_up['triggerid'], $src_trigger_indexes)) {
+					// Add dependency on the trigger prototype of the same LLD rule.
+					$dst_triggers[$dst_triggerid]['dependencies'][] =
+						['triggerid' => $result['triggerids'][$src_trigger_indexes[$src_trigger_up['triggerid']]]];
+
+					unset($src_triggers[$i]['dependencies'][$i2]);
+				}
+				else {
+					$src_triggerids_up[$src_trigger_up['triggerid']] = true;
+				}
+			}
+
+			if (!$src_triggers[$i]['dependencies']) {
+				unset($dst_triggerids[$i]);
+			}
+		}
+
+		if ($src_triggerids_up) {
+			$src_host_triggers_up = DBfetchArrayAssoc(DBselect(
+				'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
+				' FROM triggers t,functions f,items i'.
+				' WHERE t.triggerid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND '.dbConditionId('t.triggerid', array_keys($src_triggerids_up)).
+					' AND '.dbConditionId('i.hostid', [$src_host['hostid']])
+			), 'triggerid');
+
+			$src_host_triggers_up = CMacrosResolverHelper::resolveTriggerExpressions($src_host_triggers_up,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$src_host_dependencies = [];
+			$other_host_dependencies = [];
+
+			foreach ($dst_triggerids as $i => $dst_triggerid) {
+				$src_trigger = $src_triggers[$i];
+
+				foreach ($src_trigger['dependencies'] as $src_trigger_up) {
+					if (array_key_exists($src_trigger_up['triggerid'], $src_host_triggers_up)) {
+						$src_host_dependencies[$src_trigger_up['triggerid']][$src_trigger['triggerid']] = true;
+					}
+					else {
+						// Add dependency on the trigger of the other templates or hosts.
+						$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $src_trigger_up['triggerid']];
+						$other_host_dependencies[$src_trigger_up['triggerid']][$dst_triggerid] = true;
+					}
+				}
+			}
+
+			if ($src_host_dependencies) {
+				$dst_host_triggers = DBfetchArrayAssoc(DBselect(
+					'SELECT DISTINCT t.triggerid,t.description,t.expression,t.recovery_expression'.
+					' FROM items i,functions f,triggers t'.
+					' WHERE i.itemid=f.itemid'.
+						' AND f.triggerid=t.triggerid'.
+						' AND '.dbConditionId('i.hostid', [$dst_host['hostid']]).
+						' AND '.dbConditionString('t.description',
+							array_unique(array_column($src_host_triggers_up, 'description'))
+						)
+				), 'triggerid');
+
+				$dst_host_triggers = CMacrosResolverHelper::resolveTriggerExpressions($dst_host_triggers);
+
+				$dst_host_triggerids = [];
+
+				foreach ($dst_host_triggers as $i => $trigger) {
+					$expression = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+						$trigger['expression'], $dst_host['host'], $src_host['host']
+					);
+					$recovery_expression = $trigger['recovery_expression'];
+
+					if ($recovery_expression !== '') {
+						$recovery_expression = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+							$trigger['recovery_expression'], $dst_host['host'], $src_host['host']
+						);
+					}
+
+					$dst_host_triggerids[$trigger['description']][$expression][$recovery_expression] =
+						$trigger['triggerid'];
+				}
+
+				foreach ($src_host_triggers_up as $src_trigger_up) {
+					$description = $src_trigger_up['description'];
+					$expression = $src_trigger_up['expression'];
+					$recovery_expression = $src_trigger_up['recovery_expression'];
+
+					if (array_key_exists($description, $dst_host_triggerids)
+							&& array_key_exists($expression, $dst_host_triggerids[$description])
+							&& array_key_exists($recovery_expression, $dst_host_triggerids[$description][$expression])) {
+						$dst_triggerid_up = $dst_host_triggerids[$description][$expression][$recovery_expression];
+
+						foreach ($src_host_dependencies[$src_trigger_up['triggerid']] as $src_triggerid => $foo) {
+							$dst_triggerid = $dst_triggerids[$src_trigger_indexes[$src_triggerid]];
+
+							$dst_triggers[$dst_triggerid]['dependencies'][] = ['triggerid' => $dst_triggerid_up];
+						}
+					}
+					else {
+						$src_triggerid = key($src_host_dependencies[$src_trigger_up['triggerid']]);
+						$src_trigger = $src_triggers[$src_trigger_indexes[$src_triggerid]];
+
+						$hosts = DB::select('hosts', [
+							'output' => ['status'],
+							'hostids' => $dst_host['hostid']
+						]);
+
+						$error = ($hosts[0]['status'] == HOST_STATUS_TEMPLATE)
+							? _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the template "%3$s".')
+							: _('Trigger prototype "%1$s" cannot depend on the non-existent trigger "%2$s" on the host "%3$s".');
+
+						self::exception(ZBX_API_ERROR_PARAMETERS, sprintf($error, $src_trigger['description'],
+							$src_trigger_up['description'], $dst_host['host']
+						));
+					}
+				}
+			}
+
+			if ($other_host_dependencies) {
+				$trigger_hosts = CTriggerGeneral::getTriggerHosts($other_host_dependencies);
+
+				CTriggerGeneral::checkDependenciesOfHostTriggers($other_host_dependencies, $trigger_hosts);
+				CTriggerGeneral::checkDependenciesOfTemplateTriggers($other_host_dependencies, $trigger_hosts);
+			}
+		}
+
+		if ($dst_triggers) {
+			$dst_triggers = array_values($dst_triggers);
+			CTriggerGeneral::updateDependencies($dst_triggers);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Copy all of the host prototypes from the source discovery rule to the target discovery rule.
 	 *
 	 * @param string $src_discoveryid
@@ -3557,569 +4123,5 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		API::HostPrototype()->create($dst_host_prototypes);
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
-
-		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
-				|| $this->outputIsRequested('error', $options['output'])))
-				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-				|| (is_array($options['filter']) && array_key_exists('state', $options['filter']))) {
-			$sqlParts['left_join'][] = ['alias' => 'ir', 'table' => 'item_rtdata', 'using' => 'itemid'];
-			$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-		}
-
-		if (!$options['countOutput']) {
-			if ($this->outputIsRequested('state', $options['output'])) {
-				$sqlParts = $this->addQuerySelect('ir.state', $sqlParts);
-			}
-			if ($this->outputIsRequested('error', $options['output'])) {
-				/*
-				 * SQL func COALESCE use for template items because they don't have record
-				 * in item_rtdata table and DBFetch convert null to '0'
-				 */
-				$sqlParts = $this->addQuerySelect(dbConditionCoalesce('ir.error', '', 'error'), $sqlParts);
-			}
-
-			// add filter fields
-			if ($this->outputIsRequested('formula', $options['selectFilter'])
-					|| $this->outputIsRequested('eval_formula', $options['selectFilter'])
-					|| $this->outputIsRequested('conditions', $options['selectFilter'])) {
-
-				$sqlParts = $this->addQuerySelect('i.formula', $sqlParts);
-				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
-			}
-			if ($this->outputIsRequested('evaltype', $options['selectFilter'])) {
-				$sqlParts = $this->addQuerySelect('i.evaltype', $sqlParts);
-			}
-
-			if ($options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect('i.hostid', $sqlParts);
-			}
-		}
-
-		return $sqlParts;
-	}
-
-	protected function addRelatedObjects(array $options, array $result) {
-		$result = parent::addRelatedObjects($options, $result);
-
-		$itemIds = array_keys($result);
-
-		// adding items
-		if (!is_null($options['selectItems'])) {
-			if ($options['selectItems'] != API_OUTPUT_COUNT) {
-				$items = [];
-				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$items = API::ItemPrototype()->get([
-						'output' => $options['selectItems'],
-						'itemids' => $related_ids,
-						'nopermissions' => true,
-						'preservekeys' => true
-					]);
-				}
-
-				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
-			}
-			else {
-				$items = API::ItemPrototype()->get([
-					'discoveryids' => $itemIds,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-
-				$items = zbx_toHash($items, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['items'] = array_key_exists($itemid, $items) ? $items[$itemid]['rowscount'] : '0';
-				}
-			}
-		}
-
-		// adding triggers
-		if (!is_null($options['selectTriggers'])) {
-			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
-				$triggers = [];
-				$relationMap = new CRelationMap();
-				$res = DBselect(
-					'SELECT id.parent_itemid,f.triggerid'.
-					' FROM item_discovery id,items i,functions f'.
-					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
-						' AND id.itemid=i.itemid'.
-						' AND i.itemid=f.itemid'
-				);
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
-				}
-
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$triggers = API::TriggerPrototype()->get([
-						'output' => $options['selectTriggers'],
-						'triggerids' => $related_ids,
-						'preservekeys' => true
-					]);
-				}
-
-				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
-			}
-			else {
-				$triggers = API::TriggerPrototype()->get([
-					'discoveryids' => $itemIds,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-
-				$triggers = zbx_toHash($triggers, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['triggers'] = array_key_exists($itemid, $triggers)
-						? $triggers[$itemid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// adding graphs
-		if (!is_null($options['selectGraphs'])) {
-			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
-				$graphs = [];
-				$relationMap = new CRelationMap();
-				$res = DBselect(
-					'SELECT id.parent_itemid,gi.graphid'.
-					' FROM item_discovery id,items i,graphs_items gi'.
-					' WHERE '.dbConditionInt('id.parent_itemid', $itemIds).
-						' AND id.itemid=i.itemid'.
-						' AND i.itemid=gi.itemid'
-				);
-				while ($relation = DBfetch($res)) {
-					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
-				}
-
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$graphs = API::GraphPrototype()->get([
-						'output' => $options['selectGraphs'],
-						'graphids' => $related_ids,
-						'preservekeys' => true
-					]);
-				}
-
-				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
-			}
-			else {
-				$graphs = API::GraphPrototype()->get([
-					'discoveryids' => $itemIds,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-
-				$graphs = zbx_toHash($graphs, 'parent_itemid');
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['graphs'] = array_key_exists($itemid, $graphs)
-						? $graphs[$itemid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		// adding hosts
-		if ($options['selectHostPrototypes'] !== null) {
-			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
-				$hostPrototypes = [];
-				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
-				$related_ids = $relationMap->getRelatedIds();
-
-				if ($related_ids) {
-					$hostPrototypes = API::HostPrototype()->get([
-						'output' => $options['selectHostPrototypes'],
-						'hostids' => $related_ids,
-						'nopermissions' => true,
-						'preservekeys' => true
-					]);
-				}
-
-				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
-			}
-			else {
-				$hostPrototypes = API::HostPrototype()->get([
-					'discoveryids' => $itemIds,
-					'nopermissions' => true,
-					'countOutput' => true,
-					'groupCount' => true
-				]);
-				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
-
-				foreach ($result as $itemid => $item) {
-					$result[$itemid]['hostPrototypes'] = array_key_exists($itemid, $hostPrototypes)
-						? $hostPrototypes[$itemid]['rowscount']
-						: '0';
-				}
-			}
-		}
-
-		if ($options['selectFilter'] !== null) {
-			$formulaRequested = $this->outputIsRequested('formula', $options['selectFilter']);
-			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
-			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
-
-			$filters = [];
-			foreach ($result as $rule) {
-				$filters[$rule['itemid']] = [
-					'evaltype' => $rule['evaltype'],
-					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
-				];
-			}
-
-			// adding conditions
-			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = DB::select('item_condition', [
-					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
-					'filter' => ['itemid' => $itemIds],
-					'preservekeys' => true,
-					'sortfield' => ['item_conditionid']
-				]);
-				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
-
-				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
-
-				foreach ($filters as &$filter) {
-					// in case of a custom expression - use the given formula
-					if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $filter['formula'];
-					}
-					// in other cases - generate the formula automatically
-					else {
-						// sort the conditions by macro before generating the formula
-						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
-						$conditions = order_macros($conditions, 'macro');
-
-						$formulaConditions = [];
-						foreach ($conditions as $condition) {
-							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
-						}
-						$formula = CConditionHelper::getFormula($formulaConditions, $filter['evaltype']);
-					}
-
-					// generate formulaids from the effective formula
-					$formulaIds = CConditionHelper::getFormulaIds($formula);
-					foreach ($filter['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaIds[$condition['item_conditionid']];
-					}
-					unset($condition);
-
-					// generated a letter based formula only for rules with custom expressions
-					if ($formulaRequested && $filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$filter['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-
-					if ($evalFormulaRequested) {
-						$filter['eval_formula'] = CConditionHelper::replaceNumericIds($formula, $formulaIds);
-					}
-				}
-				unset($filter);
-			}
-
-			// add filters to the result
-			foreach ($result as &$rule) {
-				$rule['filter'] = $filters[$rule['itemid']];
-			}
-			unset($rule);
-		}
-
-		// Add LLD macro paths.
-		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
-			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
-				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
-				'filter' => ['itemid' => $itemIds]
-			]);
-
-			foreach ($result as &$lld_macro_path) {
-				$lld_macro_path['lld_macro_paths'] = [];
-			}
-			unset($lld_macro_path);
-
-			foreach ($lld_macro_paths as $lld_macro_path) {
-				$itemid = $lld_macro_path['itemid'];
-
-				if (!$this->outputIsRequested('lld_macro_pathid', $options['selectLLDMacroPaths'])) {
-					unset($lld_macro_path['lld_macro_pathid']);
-				}
-				unset($lld_macro_path['itemid']);
-
-				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
-			}
-		}
-
-		// add overrides
-		if ($options['selectOverrides'] !== null && $options['selectOverrides'] != API_OUTPUT_COUNT) {
-			$ovrd_fields = ['itemid', 'lld_overrideid'];
-			$filter_requested = $this->outputIsRequested('filter', $options['selectOverrides']);
-			$operations_requested = $this->outputIsRequested('operations', $options['selectOverrides']);
-
-			if ($filter_requested) {
-				$ovrd_fields = array_merge($ovrd_fields, ['formula', 'evaltype']);
-			}
-
-			$overrides = API::getApiService()->select('lld_override', [
-				'output' => $this->outputExtend($options['selectOverrides'], $ovrd_fields),
-				'filter' => ['itemid' => $itemIds],
-				'preservekeys' => true
-			]);
-
-			if ($filter_requested && $overrides) {
-				$conditions = DB::select('lld_override_condition', [
-					'output' => ['lld_override_conditionid', 'macro', 'value', 'lld_overrideid', 'operator'],
-					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => ['lld_override_conditionid'],
-					'preservekeys' => true
-				]);
-
-				$relation_map = $this->createRelationMap($conditions, 'lld_overrideid', 'lld_override_conditionid');
-
-				foreach ($overrides as &$override) {
-					$override['filter'] = [
-						'evaltype' => $override['evaltype'],
-						'formula' => $override['formula']
-					];
-					unset($override['evaltype'], $override['formula']);
-				}
-				unset($override);
-
-				$overrides = $relation_map->mapMany($overrides, $conditions, 'conditions');
-
-				foreach ($overrides as &$override) {
-					$override['filter'] += ['conditions' => $override['conditions']];
-					unset($override['conditions']);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$formula = $override['filter']['formula'];
-					}
-					else {
-						$conditions = zbx_toHash($override['filter']['conditions'], 'lld_override_conditionid');
-						$conditions = order_macros($conditions, 'macro');
-						$formula_conditions = [];
-
-						foreach ($conditions as $condition) {
-							$formula_conditions[$condition['lld_override_conditionid']] = $condition['macro'];
-						}
-
-						$formula = CConditionHelper::getFormula($formula_conditions, $override['filter']['evaltype']);
-					}
-
-					$formulaids = CConditionHelper::getFormulaIds($formula);
-
-					foreach ($override['filter']['conditions'] as &$condition) {
-						$condition['formulaid'] = $formulaids[$condition['lld_override_conditionid']];
-						unset($condition['lld_override_conditionid'], $condition['lld_overrideid']);
-					}
-					unset($condition);
-
-					if ($override['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-						$override['filter']['formula'] = CConditionHelper::replaceNumericIds($formula, $formulaids);
-						$override['filter']['eval_formula'] = $override['filter']['formula'];
-					}
-					else {
-						$override['filter']['eval_formula'] = CConditionHelper::replaceNumericIds($formula,
-							$formulaids
-						);
-					}
-				}
-				unset($override);
-			}
-
-			if ($operations_requested && $overrides) {
-				$operations = DB::select('lld_override_operation', [
-					'output' => ['lld_override_operationid', 'lld_overrideid', 'operationobject', 'operator', 'value'],
-					'filter' => ['lld_overrideid' => array_keys($overrides)],
-					'sortfield' => ['lld_override_operationid'],
-					'preservekeys' => true
-				]);
-
-				if ($operations) {
-					$opdiscover = DB::select('lld_override_opdiscover', [
-						'output' => ['lld_override_operationid', 'discover'],
-						'filter' => ['lld_override_operationid' => array_keys($operations)]
-					]);
-
-					$item_prototype_objectids = [];
-					$trigger_prototype_objectids = [];
-					$host_prototype_objectids = [];
-
-					foreach ($operations as $operation) {
-						switch ($operation['operationobject']) {
-							case OPERATION_OBJECT_ITEM_PROTOTYPE:
-								$item_prototype_objectids[$operation['lld_override_operationid']] = true;
-								break;
-
-							case OPERATION_OBJECT_TRIGGER_PROTOTYPE:
-								$trigger_prototype_objectids[$operation['lld_override_operationid']] = true;
-								break;
-
-							case OPERATION_OBJECT_HOST_PROTOTYPE:
-								$host_prototype_objectids[$operation['lld_override_operationid']] = true;
-								break;
-						}
-					}
-
-					if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-						$opstatus = DB::select('lld_override_opstatus', [
-							'output' => ['lld_override_operationid', 'status'],
-							'filter' => ['lld_override_operationid' => array_keys(
-								$item_prototype_objectids + $trigger_prototype_objectids + $host_prototype_objectids
-							)]
-						]);
-					}
-
-					if ($item_prototype_objectids) {
-						$ophistory = DB::select('lld_override_ophistory', [
-							'output' => ['lld_override_operationid', 'history'],
-							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-						]);
-						$optrends = DB::select('lld_override_optrends', [
-							'output' => ['lld_override_operationid', 'trends'],
-							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-						]);
-						$opperiod = DB::select('lld_override_opperiod', [
-							'output' => ['lld_override_operationid', 'delay'],
-							'filter' => ['lld_override_operationid' => array_keys($item_prototype_objectids)]
-						]);
-					}
-
-					if ($trigger_prototype_objectids) {
-						$opseverity = DB::select('lld_override_opseverity', [
-							'output' => ['lld_override_operationid', 'severity'],
-							'filter' => ['lld_override_operationid' => array_keys($trigger_prototype_objectids)]
-						]);
-					}
-
-					if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
-						$optag = DB::select('lld_override_optag', [
-							'output' => ['lld_override_operationid', 'tag', 'value'],
-							'filter' => ['lld_override_operationid' => array_keys(
-								$trigger_prototype_objectids + $host_prototype_objectids + $item_prototype_objectids
-							)]
-						]);
-					}
-
-					if ($host_prototype_objectids) {
-						$optemplate = DB::select('lld_override_optemplate', [
-							'output' => ['lld_override_operationid', 'templateid'],
-							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
-						]);
-						$opinventory = DB::select('lld_override_opinventory', [
-							'output' => ['lld_override_operationid', 'inventory_mode'],
-							'filter' => ['lld_override_operationid' => array_keys($host_prototype_objectids)]
-						]);
-					}
-
-					foreach ($operations as &$operation) {
-						$lld_override_operationid = $operation['lld_override_operationid'];
-
-						if ($item_prototype_objectids || $trigger_prototype_objectids || $host_prototype_objectids) {
-							foreach ($opstatus as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['opstatus']['status'] = $row['status'];
-								}
-							}
-						}
-
-						foreach ($opdiscover as $row) {
-							if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-								$operation['opdiscover']['discover'] = $row['discover'];
-							}
-						}
-
-						if ($item_prototype_objectids) {
-							foreach ($ophistory as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['ophistory']['history'] = $row['history'];
-								}
-							}
-
-							foreach ($optrends as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['optrends']['trends'] = $row['trends'];
-								}
-							}
-
-							foreach ($opperiod as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['opperiod']['delay'] = $row['delay'];
-								}
-							}
-						}
-
-						if ($trigger_prototype_objectids) {
-							foreach ($opseverity as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['opseverity']['severity'] = $row['severity'];
-								}
-							}
-						}
-
-						if ($trigger_prototype_objectids || $host_prototype_objectids || $item_prototype_objectids) {
-							foreach ($optag as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['optag'][] = ['tag' => $row['tag'], 'value' => $row['value']];
-								}
-							}
-						}
-
-						if ($host_prototype_objectids) {
-							foreach ($optemplate as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['optemplate'][] = ['templateid' => $row['templateid']];
-								}
-							}
-
-							foreach ($opinventory as $row) {
-								if (bccomp($lld_override_operationid, $row['lld_override_operationid']) == 0) {
-									$operation['opinventory']['inventory_mode'] = $row['inventory_mode'];
-								}
-							}
-						}
-					}
-					unset($operation);
-				}
-
-				$relation_map = $this->createRelationMap($operations, 'lld_overrideid', 'lld_override_operationid');
-
-				$overrides = $relation_map->mapMany($overrides, $operations, 'operations');
-			}
-
-			foreach ($result as &$row) {
-				$row['overrides'] = [];
-
-				foreach ($overrides as $override) {
-					if (bccomp($override['itemid'], $row['itemid']) == 0) {
-						unset($override['itemid'], $override['lld_overrideid']);
-
-						if ($operations_requested) {
-							foreach ($override['operations'] as &$operation) {
-								unset($operation['lld_override_operationid'], $operation['lld_overrideid']);
-							}
-							unset($operation);
-						}
-
-						$row['overrides'][] = $override;
-					}
-				}
-			}
-			unset($row);
-		}
-
-		return $result;
 	}
 }

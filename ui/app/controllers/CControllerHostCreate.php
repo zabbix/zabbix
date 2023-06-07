@@ -206,31 +206,16 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			return false;
 		}
 
-		if (!copyItemsToHosts('hostids', [$src_hostid], false, [$hostid])) {
+		if (!CItemHelper::cloneHostItems($src_hostid, $hostid)) {
 			return false;
 		}
 
-		// Copy triggers.
-		if (!copyTriggersToHosts([$hostid], $src_hostid)) {
+		if (!CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)) {
 			return false;
 		}
 
-		// Copy discovery rules.
-		$db_discovery_rules = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
-			'hostids' => $src_hostid,
-			'inherited' => false
-		]);
-
-		if ($db_discovery_rules) {
-			$copy_discovery_rules = API::DiscoveryRule()->copy([
-				'discoveryids' => array_column($db_discovery_rules, 'itemid'),
-				'hostids' => [$hostid]
-			]);
-
-			if (!$copy_discovery_rules) {
-				return false;
-			}
+		if (!CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
+			throw new Exception();
 		}
 
 		// Copy graphs.

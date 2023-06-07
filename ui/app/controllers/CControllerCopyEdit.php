@@ -27,10 +27,11 @@ class CControllerCopyEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'itemids' =>	'array_db items.itemid',
-			'triggerids' =>	'array_db triggers.triggerid',
-			'graphids' =>	'array_db graphs.graphid',
-			'source' =>		'required|in '.implode(',', ['items', 'triggers', 'graphs'])
+			'itemids' =>			'array_db items.itemid',
+			'triggerids' =>			'array_db triggers.triggerid',
+			'triggers_hostid' =>	'db items.hostid',
+			'graphids' =>			'array_db graphs.graphid',
+			'source' =>				'required|in '.implode(',', ['items', 'triggers', 'graphs'])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -98,6 +99,10 @@ class CControllerCopyEdit extends CController {
 			case 'triggers':
 				$data['triggerids'] = $this->getInput('triggerids');
 				$data['element_type'] = 'triggers';
+
+				if ($this->hasInput('triggers_hostid')) {
+					$data['triggers_hostid'] = $this->getInput('triggers_hostid');
+				}
 				break;
 
 			case 'graphs':

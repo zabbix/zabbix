@@ -106,6 +106,12 @@
 				source: 'triggers'
 			};
 
+			const filter_hostids = document.getElementsByName('filter_hostids[]');
+
+			if (filter_hostids.length == 1) {
+				parameters.triggers_hostid = filter_hostids[0].value;
+			}
+
 			return PopUp('copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'

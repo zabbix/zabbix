@@ -350,12 +350,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				throw new Exception();
 			}
 
-			if (!copyItemsToHosts('templateids', [$cloneTemplateId], true, [$input_templateid])) {
+			if (!CItemHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
 			}
 
-			// copy triggers
-			if (!copyTriggersToHosts([$input_templateid], $cloneTemplateId)) {
+			if (!CTriggerHelper::cloneTemplateTriggers($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
 			}
 
@@ -371,23 +370,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 
 			// copy discovery rules
-			$dbDiscoveryRules = API::DiscoveryRule()->get([
-				'output' => ['itemid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			if ($dbDiscoveryRules) {
-				if (!API::DiscoveryRule()->copy([
-					'discoveryids' => zbx_objectValues($dbDiscoveryRules, 'itemid'),
-					'hostids' => [$input_templateid]
-				])) {
-					$result = false;
-				}
-
-				if (!$result) {
-					throw new Exception();
-				}
+			if (!CLldRuleHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
+				throw new Exception();
 			}
 
 			// Copy template dashboards.
