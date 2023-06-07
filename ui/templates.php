@@ -143,14 +143,33 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
 	$warnings = [];
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	// Reset macro type and value.
+	foreach ($macros as &$macro) {
+		if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+			$macro['deny_revert'] = true;
 
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	$secret_macro_reset = false;
+
+	foreach ($macros as &$macro) {
+		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+			$macro = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'value' => ''
+			] + $macro;
+
+			$secret_macro_reset = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	if ($secret_macro_reset) {
 		$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
 	}
 
@@ -591,7 +610,8 @@ if (hasRequest('form')) {
 			$data['macros'] = $data['dbTemplate']['macros'];
 
 			foreach ($data['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+						&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 					$macro['allow_revert'] = true;
 				}
 			}
