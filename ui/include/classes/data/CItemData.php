@@ -892,17 +892,17 @@ final class CItemData {
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]' => [
 				'description' => _('Transform SQL query result into a JSON array for low-level discovery.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'documentation_link' => '/odbc_checks'
+				'documentation_link' => '/odbc_checks#db.odbc.discovery'
 			],
 			'db.odbc.get[<unique short description>,<dsn>,<connection string>]' => [
 				'description' => _('Transform SQL query result into a JSON array.'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
-				'documentation_link' => '/odbc_checks'
+				'documentation_link' => '/odbc_checks#db.odbc.get'
 			],
 			'db.odbc.select[<unique short description>,<dsn>,<connection string>]' => [
 				'description' => _('Return first column of the first row of the SQL query result.'),
 				'value_type' => null,
-				'documentation_link' => '/odbc_checks'
+				'documentation_link' => '/odbc_checks#db.odbc.select'
 			],
 			'eventlog[name,<regexp>,<severity>,<source>,<eventid>,<maxlines>,<mode>]' => [
 				'description' => _('Event log monitoring. Returns log'),
