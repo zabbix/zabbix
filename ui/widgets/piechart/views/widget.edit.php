@@ -98,7 +98,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				])
 				->addItem([
 					$width->getLabel(),
-					(new CFormField([$width->getView(), ' %']))->addClass('field-size')
+					(new CFormField([$width->getView(), ' %']))
 				])
 				->addItem([
 					$stroke->getLabel(),
@@ -112,7 +112,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 					$merge_sectors->getLabel(),
 					(new CFormField([
 						$merge_sectors->getView(), ($merge_percentage->getView())->setWidth(55), ' % ', $merge_color->getView()
-					]))->addClass('field-size')
+					]))
 				])
 
 		)
@@ -124,7 +124,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				])
 				->addItem([
 					$value_size->getLabel(),
-					(new CFormField([$value_size->getView(), ' %']))->addClass('field-size')
+					(new CFormField([$value_size->getView(), ' %']))
 				])
 				->addItem([
 					$decimal_places->getLabel(),

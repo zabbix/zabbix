@@ -2026,7 +2026,7 @@ form.dashboard-widget-piechart .pie-chart-widget-config-tabs .ui-tabs-nav {
   background: #f3f3f3;
   z-index: 3; }
 form.dashboard-widget-piechart .table-forms-container, form.dashboard-widget-piechart .browser-warning-container {
-  margin: -10px 0 0 0;
+  margin: 0 0 0 0;
   border: 1px solid #9f9f9f;
   border-top: none; }
 form.dashboard-widget-piechart .table-forms-separator {
