@@ -41,9 +41,9 @@ window.correlation_edit_popup = new class {
 				});
 
 				// Get values from condition popup.
-				overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
-					this.#addConditionRow(e.detail);
-				});
+				overlay.$dialogue[0].addEventListener('condition.dialogue.submit',
+					(e) => this.#addConditionRow(e.detail)
+				);
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
@@ -339,9 +339,7 @@ window.correlation_edit_popup = new class {
 	submit() {
 		const fields = getFormFields(this.form);
 
-		['name', 'description'].forEach(
-			field => fields[field] = fields[field].trim()
-		);
+		['name', 'description'].forEach((field) => fields[field] = fields[field].trim());
 
 		const curl = new Curl('zabbix.php');
 

@@ -31,20 +31,20 @@
 			this.#initActions();
 		}
 
+		/**
+		 * Creates the event listeners for create, edit, delete, enable, disable single and mass operations.
+		 */
 		#initActions() {
 			document.getElementById('js-create').addEventListener('click', () => this.#edit());
-
-			document.getElementById('js-massdelete').addEventListener('click', (e) => {
-				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
-			});
-
-			document.getElementById('js-massenable').addEventListener('click', (e) => {
-				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
-			});
-
-			document.getElementById('js-massdisable').addEventListener('click', (e) => {
-				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
-			});
+			document.getElementById('js-massdelete').addEventListener('click',
+				(e) => this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			);
+			document.getElementById('js-massenable').addEventListener('click',
+				(e) => this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			);
+			document.getElementById('js-massdisable').addEventListener('click',
+				(e) => this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			);
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit')) {
@@ -59,6 +59,11 @@
 			})
 		}
 
+		/**
+		 * Listens to submit and delete actions from edit form. If gets a successful response, reloads the page.
+		 *
+		 * @param {object} parameters  Parameters to pass to the edit form.
+		 */
 		#edit(parameters = {}) {
 			const overlay = PopUp('correlation.edit', parameters, {
 				dialogueid: 'correlation-form',
@@ -89,6 +94,13 @@
 			});
 		}
 
+		/**
+		 * Shows confirmation window if multiple records are selected for deletion and sends a POST request to
+		 * delete action.
+		 *
+		 * @param {element} target          The target element that will be passed to post.
+		 * @param {array}   correlationids  Event correlation IDs to delete.
+		 */
 		#delete(target, correlationids) {
 			const confirmation = correlationids.length > 1
 				? <?= json_encode(_('Delete selected event correlations?')) ?>
@@ -104,6 +116,15 @@
 			this.#post(target, correlationids, curl);
 		}
 
+		/**
+		 * Shows confirmation window if multiple records are selected for enabling and sends a POST request to enable
+		 * action.
+		 *
+		 * @param {element} target          The target element that will be passed to post.
+		 * @param {array}   correlationids  Event correlation IDs to enable.
+		 * @param {bool}    massdisable     True if footer button is pressed for mass enable action which brings up
+		 *                                  confirmation menu. False if only one element with single link is clicked.
+		 */
 		#enable(target, correlationids, massenable = false) {
 			if (massenable) {
 				const confirmation = correlationids.length > 1
@@ -121,6 +142,15 @@
 			this.#post(target, correlationids, curl);
 		}
 
+		/**
+		 * Shows confirmation window if multiple records are selected for disabling and sends a POST request to disable
+		 * action.
+		 *
+		 * @param {element} target          The target element that will be passed to post.
+		 * @param {array}   correlationids  Event correlation IDs to disable.
+		 * @param {bool}    massdisable     True if footer button is pressed for mass disable action which brings up
+		 *                                  confirmation menu. False if only one element with single link is clicked.
+		 */
 		#disable(target, correlationids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = correlationids.length > 1
@@ -138,6 +168,13 @@
 			this.#post(target, correlationids, curl);
 		}
 
+		/**
+		 * Sends a POST request to the specified URL with the provided data and handles the response.
+		 *
+		 * @param {element} target          The target element that will display a loading state during the request.
+		 * @param {array}   correlationids  Event correlation IDs to send with the POST request.
+		 * @param {object}  url             The URL to send the POST request to.
+		 */
 		#post(target, correlationids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('correlation')) ?>
@@ -179,9 +216,7 @@
 
 					addMessage(message_box);
 				})
-				.finally(() => {
-					target.classList.remove('is-loading');
-				});
+				.finally(() => target.classList.remove('is-loading'));
 		}
 	};
 </script>
