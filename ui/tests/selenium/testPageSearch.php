@@ -179,12 +179,14 @@ class testPageSearch extends CWebTest {
 		$search_button = $form->query('tag:button')->one();
 		$this->assertEquals(255, $search_field->getAttribute('maxlength'));
 		$this->assertEquals('off', $search_field->getAttribute('autocomplete'));
-		$this->assertEquals('true', $search_button->getAttribute('disabled'));
+		$this->assertFalse($search_button->isEnabled());
+		$this->assertFalse($search_button->isClickable());
 		$this->verifyThatSuggestionsNotShown();
 
 		// Check suggestion highlighting.
 		$search_field->fill($this->search_string);
-		$this->assertEquals(null, $search_button->getAttribute('disabled'));
+		$this->assertTrue($search_button->isEnabled());
+		$this->assertTrue($search_button->isClickable());
 		$highlighted_text = $this->query('class:suggest-found')->waitUntilVisible()->one()->getText();
 		$this->assertEquals(strtolower($this->search_string), strtolower($highlighted_text));
 
@@ -192,6 +194,7 @@ class testPageSearch extends CWebTest {
 		$search_field->fill('');
 		$this->verifyThatSuggestionsNotShown();
 		$this->assertFalse($search_button->isEnabled());
+		$this->assertFalse($search_button->isClickable());
 
 		$search_field->fill($this->search_string);
 		$search_button->waitUntilClickable()->click();
@@ -370,22 +373,16 @@ class testPageSearch extends CWebTest {
 		foreach ($this->widgets as $widget_params) {
 			$widget = $this->query($widget_params['selector'])->one();
 
-			// Assert table data.
-			$expected_count = 0;
-			if (isset($data[$widget_params['key']])) {
-				$this->assertTableHasData($data[$widget_params['key']], $widget_params['table_selector']);
-				$expected_count = count($data[$widget_params['key']]);
-			}
-			elseif (CTestArrayHelper::get($data, 'count_from_db', false)) {
-				$expected_count = $db_count[$widget_params['key']];
-			}
-			else {
-				$this->assertTableData(null, $widget_params['table_selector']);
+			// Assert table data, but only if count from DB is not set.
+			if (!CTestArrayHelper::get($data, 'count_from_db')) {
+				$this->assertTableData(($data[$widget_params['key']] ?? []), $widget_params['table_selector']);
 			}
 
 			// Assert table stats.
+			$expected_count = CTestArrayHelper::get($data, 'count_from_db') ? $db_count[$widget_params['key']] :
+					(isset($data[$widget_params['key']]) ? count($data[$widget_params['key']]) : 0);
 			$footer_text = $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
-			// Only a maximum of 100 records can be displayed at once.
+			// Only a maximum of 100 records are displayed at once.
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
 		}
 	}
