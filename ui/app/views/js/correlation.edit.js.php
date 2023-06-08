@@ -52,6 +52,10 @@ window.correlation_edit_popup = new class {
 			}
 		});
 
+		for (let i = 0; i < Object.values(correlation.conditions).length; i++) {
+			this.#addConditionRow(correlation.conditions[i]);
+		}
+
 		this.form.querySelector('#evaltype').onchange = () => this.#processTypeOfCalculation();
 		this.#processTypeOfCalculation();
 	}
@@ -117,20 +121,28 @@ window.correlation_edit_popup = new class {
 
 		condition.row_index ??= 0;
 
+		/*
+		 * When controller passes data ir gives only one group ID for each condition. Condition popup can give multiple
+		 * IDs and then they are split into rows.
+		 */
+		if (condition.groupid) {
+			condition.groupids = condition.groupid;
+		}
+
 		if (condition.groupids) {
-			Object.keys(condition.groupids).map(key => {
+			Object.keys(condition.groupids).forEach((key) => {
 				let element = {...condition, name: condition.groupids[key], value: key};
 
 				element.groupid = key;
 
 				let has_row = this.#checkConditionRow(element);
-				const result = [has_row.some(element => element === true)];
+				const result = [has_row.some((element) => element === true)];
 
 				if (result[0] === true) {
 					return;
 				}
 				else {
-					while (row_ids.some(id => id === `conditions_${condition.row_index}`)) {
+					while (row_ids.some((id) => id === `conditions_${condition.row_index}`)) {
 						element.row_index++;
 						condition.row_index++;
 					}
@@ -155,13 +167,13 @@ window.correlation_edit_popup = new class {
 		else {
 			let has_row = this.#checkConditionRow(condition);
 			let template;
-			const result = [has_row.some(element => element === true)];
+			const result = [has_row.some((element) => element === true)];
 
 			if (result[0] === true) {
 				return;
 			}
 			else {
-				while (row_ids.some(id => id === `conditions_${condition.row_index}`)) {
+				while (row_ids.some((id) => id === `conditions_${condition.row_index}`)) {
 					condition.row_index++;
 				}
 
@@ -267,7 +279,7 @@ window.correlation_edit_popup = new class {
 	}
 
 	/**
-	 * Checks of given condition already exists.
+	 * Checks if given condition already exists.
 	 *
 	 * @param {object} condition  Condition object.
 	 *
@@ -276,7 +288,7 @@ window.correlation_edit_popup = new class {
 	#checkConditionRow(condition) {
 		const result = [];
 
-		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].map((element) => {
+		[...this.form.querySelectorAll('#condition_table tr[id^=conditions_]')].forEach((element) => {
 			const type = element.querySelector('input[name*="type"]').value;
 
 			switch (parseInt(type)) {

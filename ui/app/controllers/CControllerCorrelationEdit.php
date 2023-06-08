@@ -84,21 +84,26 @@ class CControllerCorrelationEdit extends CController {
 	protected function doAction(): void {
 		$data = $this->correlation + DB::getDefaults('correlation') + [
 			'correlationid' => null,
-			'allowedOperations' => CCorrelationHelper::getOperationTypes(),
-			'allowedConditions' => CCorrelationHelper::getConditionTypes(),
 			'op_close_new' => false,
 			'op_close_old' => false,
 			'conditions' => []
 		];
 
-		foreach ($data['conditions'] as $row_index => &$condition) {
+		foreach ($data['conditions'] as &$condition) {
 			$condition += [
-				'row_index' => $row_index
+				'operator' => array_key_exists('operator', $condition)
+					? (int) $condition['operator']
+					: CONDITION_OPERATOR_EQUAL,
+				'conditiontype' => (int) $condition['type']
 			];
+			$condition['operator_name'] = CCorrelationHelper::getLabelByOperator($condition['operator']);
+
+			unset($condition['type']);
 		}
 		unset($condition);
 
 		$groupids = array_column($data['conditions'], 'groupid', 'groupid');
+		$group_names = [];
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
@@ -107,11 +112,16 @@ class CControllerCorrelationEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$data['group_names'] = array_column($groups, 'name', 'groupid');
+			$group_names = array_column($groups, 'name', 'groupid');
 		}
-		else {
-			$data['group_names'] = [];
+
+		foreach ($data['conditions'] as &$condition) {
+			if (array_key_exists('groupid', $condition)
+					&& array_key_exists($condition['groupid'], $group_names)) {
+				$condition['groupid'] = [$condition['groupid'] => $group_names[$condition['groupid']]];
+			}
 		}
+		unset($condition);
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
