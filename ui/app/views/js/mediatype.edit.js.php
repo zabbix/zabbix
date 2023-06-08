@@ -289,14 +289,12 @@ window.mediatype_edit_popup = new class {
 			const overlay = PopUp('mediatype.message.edit', parameters, {
 				dialogue_class: 'modal-popup-medium',
 				dialogueid: 'mediatype-message-form',
-				trigger_element: event.target,
 				prevent_navigation: true
 			});
 
 			overlay.$dialogue[0].addEventListener('message.submit', (e) => {
 				if (row !== null) {
 					this.#addMessageTemplateRow(e.detail, row);
-					row.remove();
 				}
 				else {
 					this.#addMessageTemplateRow(e.detail);
@@ -322,6 +320,7 @@ window.mediatype_edit_popup = new class {
 		}
 		else {
 			row.insertAdjacentHTML('afterend', template.evaluate(input));
+			row.remove();
 		}
 
 		this.message_template_list[input.message_type] = input;

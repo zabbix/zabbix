@@ -106,8 +106,8 @@ window.mediatype_message_popup = new class {
 					throw {error: response.error};
 				}
 
-				this.dialogue.dispatchEvent(new CustomEvent('message.submit', {detail: response}));
 				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.dialogue.dispatchEvent(new CustomEvent('message.submit', {detail: response}));
 			})
 			.catch((exception) => {
 				for (const element of this.form.parentNode.children) {
