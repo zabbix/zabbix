@@ -40,7 +40,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
-	int	ret, i;
+	int	i, ret = FAIL;
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
