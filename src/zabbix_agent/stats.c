@@ -19,7 +19,7 @@
 
 #include "stats.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxtime.h"
 #include "zbxmutexs.h"
 

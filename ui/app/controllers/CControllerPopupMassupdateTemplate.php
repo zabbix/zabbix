@@ -81,6 +81,7 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 		if ($this->hasInput('update')) {
 			$output = [];
 			$templateids = $this->getInput('ids', []);
+			$templates_count = count($templateids);
 			$visible = $this->getInput('visible', []);
 			$macros = array_filter(cleanInheritedMacros($this->getInput('macros', [])),
 				function (array $macro): bool {
@@ -348,14 +349,16 @@ class CControllerPopupMassupdateTemplate extends CControllerPopupMassupdateAbstr
 			}
 			catch (Exception $e) {
 				$result = false;
-				CMessageHelper::setErrorTitle(_('Cannot update templates'));
+				CMessageHelper::setErrorTitle(
+					_n('Cannot update template', 'Cannot update templates', $templates_count)
+				);
 			}
 
 			DBend($result);
 
 			if ($result) {
 				$output = [
-					'title' => _('Templates updated'),
+					'title' => _n('Template updated', 'Templates updated', $templates_count),
 					'script_inline' => (new CScriptTag('sessionStorage.removeItem("cb_templates");'))->toString()
 				];
 				$messages = CMessageHelper::getMessages();

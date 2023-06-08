@@ -71,219 +71,266 @@ $form
 	->show();
 
 function getDatasetTab(CWidgetFormView $form, array $fields): array {
-	$dataset = new CWidgetFieldGraphDataSetView($fields['ds']);
+	$dataset = $form->registerField(new CWidgetFieldGraphDataSetView($fields['ds']));
 
-	return $form->makeCustomField($dataset, [
+	return [
 		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
 		(new CDiv($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
-	]);
+	];
 }
 
 function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
-	$percentile_left = new CWidgetFieldCheckBoxView($fields['percentile_left']);
-	$percentile_left_value = (new CWidgetFieldTextBoxView($fields['percentile_left_value']))
-		->setPlaceholder(_('value'))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
-
-	$percentile_right = new CWidgetFieldCheckBoxView($fields['percentile_right']);
-	$percentile_right_value = (new CWidgetFieldTextBoxView($fields['percentile_right_value']))
-		->setPlaceholder(_('value'))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+	$source = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
+	$simple_triggers = $form->registerField(new CWidgetFieldCheckBoxView($fields['simple_triggers']));
+	$working_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['working_time']));
+	$percentile_left = $form->registerField(new CWidgetFieldCheckBoxView($fields['percentile_left']));
+	$percentile_left_value = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['percentile_left_value']))
+			->setPlaceholder(_('value'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
+	$percentile_right = $form->registerField(new CWidgetFieldCheckBoxView($fields['percentile_right']));
+	$percentile_right_value = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['percentile_right_value']))
+			->setPlaceholder(_('value'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
 		->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField(
-					new CWidgetFieldRadioButtonListView($fields['source'])
-				),
-
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['simple_triggers'])
-				),
-
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['working_time'])
-				)
-			])
+			(new CFormGrid())
+				->addItem([
+					$source->getLabel(),
+					new CFormField($source->getView())
+				])
+				->addItem([
+					$simple_triggers->getLabel(),
+					new CFormField($simple_triggers->getView())
+				])
+				->addItem([
+					$working_time->getLabel(),
+					new CFormField($working_time->getView())
+				])
 		)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField($percentile_left, [
+			(new CFormGrid())
+				->addItem([
 					$percentile_left->getLabel(),
 					new CFormField([
 						$percentile_left->getView(),
 						$percentile_left_value->getView()
 					])
-				]),
-
-				$form->makeCustomField($percentile_right, [
+				])
+				->addItem([
 					$percentile_right->getLabel(),
 					new CFormField([
 						$percentile_right->getView(),
 						$percentile_right_value->getView()
 					])
 				])
-			])
 		);
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	return new CFormGrid([
-		$form->makeCustomField(
-			new CWidgetFieldCheckBoxView($fields['graph_time'])
-		),
+	$graph_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
+	$time_from = $form->registerField(
+		(new CWidgetFieldDatePickerView($fields['time_from']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	);
+	$time_to = $form->registerField(
+		(new CWidgetFieldDatePickerView($fields['time_to']))
+			->setDateFormat(ZBX_FULL_DATE_TIME)
+			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+	);
 
-		$form->makeCustomField(
-			(new CWidgetFieldDatePickerView($fields['time_from']))
-				->setDateFormat(ZBX_FULL_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-		),
-
-		$form->makeCustomField(
-			(new CWidgetFieldDatePickerView($fields['time_to']))
-				->setDateFormat(ZBX_FULL_DATE_TIME)
-				->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
-		)
-	]);
+	return (new CFormGrid())
+		->addItem([
+			$graph_time->getLabel(),
+			new CFormField($graph_time->getView())
+		])
+		->addItem([
+			$time_from->getLabel(),
+			new CFormField($time_from->getView())
+		])
+		->addItem([
+			$time_to->getLabel(),
+			new CFormField($time_to->getView())
+		]);
 }
 
 function getAxesTab(CWidgetFormView $form, array $fields): CDiv {
-	$lefty_units = new CWidgetFieldSelectView($fields['lefty_units']);
-	$lefty_static_units = (new CWidgetFieldTextBoxView($fields['lefty_static_units']))
-		->setPlaceholder(_('value'))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
-
-	$righty_units = new CWidgetFieldSelectView($fields['righty_units']);
-	$righty_static_units = (new CWidgetFieldTextBoxView($fields['righty_static_units']))
-		->setPlaceholder(_('value'))
-		->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
+	$lefty = $form->registerField(new CWidgetFieldCheckBoxView($fields['lefty']));
+	$lefty_min = $form->registerField(
+		(new CWidgetFieldNumericBoxView($fields['lefty_min']))->setPlaceholder(_('calculated'))
+	);
+	$lefty_max = $form->registerField(
+		(new CWidgetFieldNumericBoxView($fields['lefty_max']))->setPlaceholder(_('calculated'))
+	);
+	$lefty_units = $form->registerField(new CWidgetFieldSelectView($fields['lefty_units']));
+	$lefty_static_units = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['lefty_static_units']))
+			->setPlaceholder(_('value'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
+	$righty = $form->registerField(new CWidgetFieldCheckBoxView($fields['righty']));
+	$righty_min = $form->registerField(
+		(new CWidgetFieldNumericBoxView($fields['righty_min']))->setPlaceholder(_('calculated'))
+	);
+	$righty_max = $form->registerField(
+		(new CWidgetFieldNumericBoxView($fields['righty_max']))->setPlaceholder(_('calculated'))
+	);
+	$righty_units = $form->registerField(new CWidgetFieldSelectView($fields['righty_units']));
+	$righty_static_units = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['righty_static_units']))
+			->setPlaceholder(_('value'))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+	);
+	$axisx = $form->registerField(new CWidgetFieldCheckBoxView($fields['axisx']));
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
 		->addClass(ZBX_STYLE_GRID_COLUMNS_3)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['lefty'])
-				),
-
-				$form->makeCustomField(
-					(new CWidgetFieldNumericBoxView($fields['lefty_min']))->setPlaceholder(_('calculated'))
-				),
-
-				$form->makeCustomField(
-					(new CWidgetFieldNumericBoxView($fields['lefty_max']))->setPlaceholder(_('calculated'))
-				),
-
-				$form->makeCustomField($lefty_units, [
+			(new CFormGrid())
+				->addItem([
+					$lefty->getLabel(),
+					new CFormField($lefty->getView())
+				])
+				->addItem([
+					$lefty_min->getLabel(),
+					new CFormField($lefty_min->getView())
+				])
+				->addItem([
+					$lefty_max->getLabel(),
+					new CFormField($lefty_max->getView())
+				])
+				->addItem([
 					$lefty_units->getLabel(),
 					new CFormField([
 						$lefty_units->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$lefty_static_units->getView()
 					])
 				])
-			])
 		)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['righty'])
-				),
-
-				$form->makeCustomField(
-					(new CWidgetFieldNumericBoxView($fields['righty_min']))->setPlaceholder(_('calculated'))
-				),
-
-				$form->makeCustomField(
-					(new CWidgetFieldNumericBoxView($fields['righty_max']))->setPlaceholder(_('calculated'))
-				),
-
-				$form->makeCustomField($righty_units, [
+			(new CFormGrid())
+				->addItem([
+					$righty->getLabel(),
+					new CFormField($righty->getView())
+				])
+				->addItem([
+					$righty_min->getLabel(),
+					new CFormField($righty_min->getView())
+				])
+				->addItem([
+					$righty_max->getLabel(),
+					new CFormField($righty_max->getView())
+				])
+				->addItem([
 					$righty_units->getLabel(),
 					new CFormField([
 						$righty_units->getView()->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 						$righty_static_units->getView()
 					])
 				])
-			])
 		)
 		->addItem(
-			new CFormGrid(
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['axisx'])
-				)
-			)
+			(new CFormGrid())->addItem([
+				$axisx->getLabel(),
+				new CFormField($axisx->getView())
+			])
 		);
 }
 
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
+	$legend = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
+	$legend_statistic = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_statistic']));
+	$legend_lines = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
+	$legend_columns = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
+
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
 		->addClass(ZBX_STYLE_GRID_COLUMNS_2)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['legend'])
-				),
-
-				$form->makeCustomField(
-					new CWidgetFieldCheckBoxView($fields['legend_statistic'])
-				)
-			])
+			(new CFormGrid())
+				->addItem([
+					$legend->getLabel(),
+					new CFormField($legend->getView())
+				])
+				->addItem([
+					$legend_statistic->getLabel(),
+					new CFormField($legend_statistic->getView())
+				])
 		)
 		->addItem(
-			new CFormGrid([
-				$form->makeCustomField(
-					new CWidgetFieldRangeControlView($fields['legend_lines'])
-				),
-
-				$form->makeCustomField(
-					new CWidgetFieldRangeControlView($fields['legend_columns'])
-				)
-			])
+			(new CFormGrid())
+				->addItem([
+					$legend_lines->getLabel(),
+					new CFormField($legend_lines->getView())
+				])
+				->addItem([
+					$legend_columns->getLabel(),
+					new CFormField($legend_columns->getView())
+				])
 		);
 }
 
 function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
-	return new CFormGrid([
-		$form->makeCustomField(
-			new CWidgetFieldCheckBoxView($fields['show_problems'])
-		),
-
-		$form->makeCustomField(
-			new CWidgetFieldCheckBoxView($fields['graph_item_problems'])
-		),
-
-		array_key_exists('problemhosts', $fields)
-			? $form->makeCustomField(
-				(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
-			)
-			: null,
-
-		$form->makeCustomField(
-			new CWidgetFieldSeveritiesView($fields['severities'])
-		),
-
-		$form->makeCustomField(
-			(new CWidgetFieldTextBoxView($fields['problem_name']))->setPlaceholder(_('problem pattern'))
-		),
-
-		$form->makeCustomField(
-			new CWidgetFieldRadioButtonListView($fields['evaltype'])
-		),
-
-		$form->makeCustomField(
-			new CWidgetFieldTagsView($fields['tags'])
+	$show_problems = $form->registerField(new CWidgetFieldCheckBoxView($fields['show_problems']));
+	$graph_item_problems = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_item_problems']));
+	$problemhosts = array_key_exists('problemhosts', $fields)
+		? $form->registerField(
+			(new CWidgetFieldHostPatternSelectView($fields['problemhosts']))->setPlaceholder(_('host pattern'))
 		)
-	]);
+		: null;
+	$severities = $form->registerField(new CWidgetFieldSeveritiesView($fields['severities']));
+	$problem_name = $form->registerField(
+		(new CWidgetFieldTextBoxView($fields['problem_name']))->setPlaceholder(_('problem pattern'))
+	);
+	$evaltype = $form->registerField(new CWidgetFieldRadioButtonListView($fields['evaltype']));
+	$tags = $form->registerField(new CWidgetFieldTagsView($fields['tags']));
+
+	return (new CFormGrid())
+		->addItem([
+			$show_problems->getLabel(),
+			new CFormField($show_problems->getView())
+		])
+		->addItem([
+			$graph_item_problems->getLabel(),
+			new CFormField($graph_item_problems->getView())
+		])
+		->addItem($problemhosts !== null
+			? [
+				$problemhosts->getLabel(),
+				new CFormField($problemhosts->getView())
+			]
+			: null
+		)
+		->addItem([
+			$severities->getLabel(),
+			new CFormField($severities->getView())
+		])
+		->addItem([
+			$problem_name->getLabel(),
+			new CFormField($problem_name->getView())
+		])
+		->addItem([
+			$evaltype->getLabel(),
+			new CFormField($evaltype->getView())
+		])
+		->addItem(
+			new CFormField($tags->getView())
+		);
 }
 
 function getOverridesTab(CWidgetFormView $form, array $fields): CFormGrid {
-	return new CFormGrid(
-		$form->makeCustomField(
-			new CWidgetFieldGraphOverrideView($fields['or'])
-		)
-	);
+	$overrides = $form->registerField(new CWidgetFieldGraphOverrideView($fields['or']));
+
+	return (new CFormGrid())->addItem([
+		$overrides->getLabel(),
+		new CFormField($overrides->getView())
+	]);
 }

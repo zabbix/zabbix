@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -24,348 +24,427 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		let $type = $('#type'),
-			$menu_path = $('#menu-path'),
-			$user_group = $('#user-group'),
-			$host_access = $('#host-access'),
-			$enable_confirmation = $('#enable-confirmation'),
-			$confirmation = $('#confirmation'),
-			$publickey = $('#publickey'),
-			$privatekey = $('#privatekey'),
-			$password = $('#password'),
-			$passphrase = $('#passphrase');
+window.script_edit_popup = new class {
 
-		// Scope change.
-		$('#scope')
-			.change(function() {
-				let scope = $('input[name=scope]:checked').val();
+	init({script}) {
+		this.overlay = overlays_stack.getById('script-form');
+		this.dialogue = this.overlay.$dialogue[0];
+		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.script = script;
+		this.scriptid = script.scriptid;
 
-				if (scope == <?= ZBX_SCRIPT_SCOPE_ACTION ?>) {
-					$menu_path
-						.add($user_group)
-						.add($host_access)
-						.add($enable_confirmation)
-						.add($confirmation)
-						.closest('li')
-						.hide();
+		this.#loadView(script);
+		this.#initActions();
 
-					if ($('input[name=type]:checked').val() == <?= ZBX_SCRIPT_TYPE_URL ?>) {
-						$type
-							.find('[value=' + <?= ZBX_SCRIPT_TYPE_WEBHOOK ?> + ']')
-							.prop('checked', true)
-							.change();
-					}
+		for (const parameter of script.parameters) {
+			this.#addParameter(parameter);
+		}
+	}
 
-					$type
-						.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
-						.closest('li')
-						.hide();
-				}
-				else {
-					$menu_path
-						.add($user_group)
-						.add($host_access)
-						.add($enable_confirmation)
-						.add($confirmation)
-						.closest('li')
-						.show();
+	#initActions() {
+		this.form.querySelector('#scope').dispatchEvent(new Event('change'));
+		this.form.querySelector('#type').dispatchEvent(new Event('change'));
+		this.form.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
 
-					$type
-						.find('[value=' + <?= ZBX_SCRIPT_TYPE_URL ?> + ']')
-						.closest('li')
-						.show();
-				}
-			})
-			.change();
+		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
+			const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
 
-		// Type change.
-		$('#type')
-			.change(function() {
-				let type = $('input[name=type]:checked').val(),
-					$execute_on = $('#execute-on'),
-					$authtype = $('#authtype'),
-					$username = $('#username'),
-					$port = $('#port'),
-					$command_ipmi = $('#commandipmi'),
-					$command = $('#command'),
-					$parameters = $('#row-webhook-parameters'),
-					$script = $('#script'),
-					$timeout = $('#timeout'),
-					$url = $('#url'),
-					$new_window = $('#new_window');
-
-				switch (type) {
-					case '<?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>':
-						if ($command_ipmi.val() !== '') {
-							$command.val($command_ipmi.val());
-							$command_ipmi.val('');
-						}
-
-						$command_ipmi
-							.add($parameters)
-							.add($script)
-							.add($timeout)
-							.add($authtype)
-							.add($username)
-							.add($password)
-							.add($publickey)
-							.add($privatekey)
-							.add($passphrase)
-							.add($port)
-							.add($url)
-							.add($new_window)
-							.closest('li')
-							.hide();
-
-						$execute_on
-							.add($command)
-							.closest('li')
-							.show();
-						break;
-
-					case '<?= ZBX_SCRIPT_TYPE_IPMI ?>':
-						if ($command.val() !== '') {
-							$command_ipmi.val($command.val());
-							$command.val('');
-						}
-
-						$execute_on
-							.add($command)
-							.add($parameters)
-							.add($script)
-							.add($timeout)
-							.add($authtype)
-							.add($username)
-							.add($password)
-							.add($publickey)
-							.add($privatekey)
-							.add($passphrase)
-							.add($port)
-							.add($url)
-							.add($new_window)
-							.closest('li')
-							.hide();
-
-						$command_ipmi
-							.closest('li')
-							.show();
-						break;
-
-					case '<?= ZBX_SCRIPT_TYPE_SSH ?>':
-						if ($command_ipmi.val() !== '') {
-							$command.val($command_ipmi.val());
-							$command_ipmi.val('');
-						}
-
-						$execute_on
-							.add($command_ipmi)
-							.add($parameters)
-							.add($script)
-							.add($timeout)
-							.add($url)
-							.add($new_window)
-							.closest('li')
-							.hide();
-
-							if ($authtype.val() == <?= ITEM_AUTHTYPE_PASSWORD ?>) {
-								$publickey
-									.add($privatekey)
-									.add($passphrase)
-									.closest('li')
-									.hide();
-
-								$command
-									.add($authtype)
-									.add($username)
-									.add($password)
-									.add($port)
-									.closest('li')
-									.show();
-							}
-							else {
-								$password
-									.closest('li')
-									.hide();
-
-								$command
-									.add($authtype)
-									.add($username)
-									.add($publickey)
-									.add($privatekey)
-									.add($passphrase)
-									.add($port)
-									.closest('li')
-									.show();
-							}
-						break;
-
-					case '<?= ZBX_SCRIPT_TYPE_TELNET ?>':
-						if ($command_ipmi.val() !== '') {
-							$command.val($command_ipmi.val());
-							$command_ipmi.val('');
-						}
-
-						$execute_on
-							.add($command_ipmi)
-							.add($parameters)
-							.add($script)
-							.add($timeout)
-							.add($authtype)
-							.add($publickey)
-							.add($privatekey)
-							.add($passphrase)
-							.add($url)
-							.add($new_window)
-							.closest('li')
-							.hide();
-
-						$command
-							.add($username)
-							.add($password)
-							.add($port)
-							.closest('li')
-							.show();
-						break;
-
-					case '<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>':
-						$execute_on
-							.add($command)
-							.add($command_ipmi)
-							.add($authtype)
-							.add($username)
-							.add($password)
-							.add($publickey)
-							.add($privatekey)
-							.add($passphrase)
-							.add($port)
-							.add($url)
-							.add($new_window)
-							.closest('li')
-							.hide();
-
-						$parameters
-							.add($script)
-							.add($timeout)
-							.closest('li')
-							.show();
-						break;
-
-					case '<?= ZBX_SCRIPT_TYPE_URL ?>':
-						$execute_on
-							.add($command)
-							.add($command_ipmi)
-							.add($authtype)
-							.add($username)
-							.add($password)
-							.add($publickey)
-							.add($privatekey)
-							.add($passphrase)
-							.add($port)
-							.add($parameters)
-							.add($script)
-							.add($timeout)
-							.closest('li')
-							.hide();
-
-						$url
-							.add($new_window)
-							.closest('li')
-							.show();
-						break;
-				}
-			})
-			.change();
-
-		// Authtype change.
-		$('#authtype')
-			.change(function() {
-				let type = $('input[name=type]:checked').val();
-
-				if (type == <?= ZBX_SCRIPT_TYPE_SSH ?>) {
-					if ($(this).val() == <?= ITEM_AUTHTYPE_PASSWORD ?>) {
-						$publickey
-							.add($privatekey)
-							.add($passphrase)
-							.closest('li')
-							.hide();
-
-						$password
-							.closest('li')
-							.show();
-					}
-					else {
-						$password
-							.closest('li')
-							.hide();
-
-						$publickey
-							.add($privatekey)
-							.add($passphrase)
-							.closest('li')
-							.show();
-					}
-				}
-			})
-			.change();
-
-		// clone button
-		$('#clone').click(function() {
-			$('#scriptid, #delete, #clone').remove();
-			$('#update').text(<?= json_encode(_('Add')) ?>);
-			$('input[name=scope]').prop('disabled', false);
-			$('#update')
-				.val('script.create')
-				.attr({id: 'add'});
-			$('#name').focus();
+			this.form
+				.querySelector('#parameters-table tbody')
+				.insertAdjacentHTML('beforeend', template.evaluate({}));
 		});
 
-		// confirmation text input
-		$('#confirmation')
-			.keyup(function() {
-				$('#test-confirmation').prop('disabled', (this.value == ''));
-			})
-			.keyup();
+		this.dialogue.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-remove')) {
+				e.target.closest('tr').remove();
+			}
+		});
+	}
 
-		// enable confirmation checkbox
-		$('#enable-confirmation')
-			.change(function() {
-				if (this.checked) {
-					$('#confirmation')
-						.prop('disabled', false)
-						.keyup();
+	/**
+	 * Adds a new row to the Parameters table with the given parameter data (name, value).
+	 *
+	 * @param {object} parameter  The parameter object.
+	 */
+	#addParameter(parameter) {
+		const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
+
+		this.form
+			.querySelector('#parameters-table tbody')
+			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+	}
+
+	/**
+	 * Compiles necessary fields for popup based on scope, type, confirmation and host group type fields.
+	 *
+	 * @param {object} script  The script object.
+	 */
+	#loadView(script) {
+		this.scope = parseInt(script.scope);
+		this.type = parseInt(script.type);
+		this.confirmation = script.enable_confirmation;
+
+		const type = this.form.querySelector('#type');
+
+		// Load scope fields.
+		this.form.querySelector('#scope').onchange = (e) => {
+			this.#hideFormFields('all');
+			this.#loadScopeFields(e);
+			type.dispatchEvent(new Event('change'));
+		};
+
+		// Load type fields.
+		type.onchange = (e) => this.#loadTypeFields(script, e);
+
+		// Update confirmation fields.
+		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
+
+		// Test confirmation button.
+		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
+			executeScript(null, this.form.querySelector('#confirmation').value, e.target)
+		);
+
+		// Host group selection.
+		const hgstype = this.form.querySelector('#hgstype-select');
+		const hostgroup_selection = this.form.querySelector('#host-group-selection');
+
+		hgstype.onchange = () => hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none';
+
+		hgstype.dispatchEvent(new Event('change'));
+		this.form.removeAttribute('style');
+		this.overlay.recoverFocus();
+	}
+
+	clone({title, buttons}) {
+		this.scriptid = null;
+
+		this.overlay.setProperties({title, buttons});
+		this.overlay.unsetLoading();
+		this.overlay.recoverFocus();
+	}
+
+	delete() {
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'script.delete');
+		curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+			<?= json_encode(CCsrfTokenHelper::get('script'), JSON_THROW_ON_ERROR) ?>
+		);
+
+		this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+		});
+	}
+
+	submit() {
+		const fields = getFormFields(this.form);
+
+		for (let key in fields) {
+			if (typeof fields[key] === 'string' && key !== 'confirmation') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		if (typeof fields.parameters !== 'undefined') {
+			fields.parameters.name = fields.parameters.name.map(name => name.trim());
+			fields.parameters.value = fields.parameters.value.map(value => value.trim());
+		}
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', this.scriptid === null ? 'script.create' : 'script.update');
+
+		this.#post(curl.getUrl(), fields, (response) => {
+			overlayDialogueDestroy(this.overlay.dialogueid);
+
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+		});
+	}
+
+	/**
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 *
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 */
+	#post(url, data, success_callback) {
+		fetch(url, {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				return response;
+			})
+			.then(success_callback)
+			.catch((exception) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
+				let title;
+				let messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
 				}
 				else {
-					$('#confirmation, #test-confirmation').prop('disabled', true);
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 				}
+
+				const message_box = makeMessageBox('bad', messages, title)[0];
+
+				this.form.parentNode.insertBefore(message_box, this.form);
 			})
-			.change();
+			.finally(() => this.overlay.unsetLoading());
+	}
 
-		// test confirmation button
-		$('#test-confirmation').click(function() {
-			executeScript(null, $('#confirmation').val(), this);
-		});
+	/**
+	 * Displays or hides fields in the popup based on the value of selected scope.
+	 *
+	 * @param {object} event  The event object.
+	 */
+	#loadScopeFields(event) {
+		if (event.target.value) {
+			this.scope = parseInt(event.target.value);
+		}
 
-		// host group selection
-		$('#hgstype-select')
-			.change(function() {
-				if ($('#hgstype-select').val() == 1) {
-					$('#host-group-selection').show();
+		const url_radio_button = this.form.querySelector(
+			`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`
+		);
+
+		switch (this.scope) {
+			case <?= ZBX_SCRIPT_SCOPE_HOST ?>:
+			case <?= ZBX_SCRIPT_SCOPE_EVENT ?>:
+				const show_fields = [
+					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
+					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
+					'#confirmation-label', '#confirmation-field'
+				];
+
+				show_fields.forEach((field) => {
+					this.form.querySelector(field).style.display = '';
+				});
+
+				url_radio_button.closest('li').style.display = '';
+				break;
+
+			case <?= ZBX_SCRIPT_SCOPE_ACTION ?>:
+				const hide_fields = ['#menu-path', '#menu-path-label'];
+
+				hide_fields.forEach((field) => {
+					this.form.querySelector(field).style.display = 'none';
+				});
+
+				url_radio_button.closest('li').style.display = 'none';
+
+				if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+					const webhook = this.form.querySelector(`#type [value="${<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>}"]`);
+
+					webhook.checked = true;
+					this.type = parseInt(<?= ZBX_SCRIPT_TYPE_WEBHOOK ?>);
 				}
-				else {
-					$('#host-group-selection').hide();
+				break;
+		}
+	}
+
+	/**
+	 * Displays or hides fields in the popup based on the value of selected type.
+	 *
+	 * @param {object} script  The script object.
+	 * @param {object} event   The event object.
+	 */
+	#loadTypeFields(script, event) {
+		if (event.target.value) {
+			this.type = parseInt(event.target.value);
+		}
+
+		let show_fields = [];
+		const hide_fields = [
+			'#command-ipmi-label', '#command-ipmi', '#webhook-parameters', '#webhook-parameters-label',
+			'#js-item-script-field', '#script-label', '#timeout-label', '#timeout-field', '#auth-type-label',
+			'#auth-type', '#username-label', '#username-field', '#password-label', '#password-field',
+			'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label',
+			'#passphrase-field', '#port-label', '#port-field', '#url', '#url-label', '#new-window-label', '#new-window',
+			'#execute-on-label', '#execute-on', '#commands-label', '#commands'
+		];
+
+		hide_fields.forEach((field) => {
+			this.form.querySelector(field).style.display = 'none';
+		})
+
+		const command_ipmi = this.form.querySelector('#commandipmi');
+		const command = this.form.querySelector('#command');
+
+		switch (this.type) {
+			case <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>:
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
 				}
-			})
-			.change();
 
-		// Trim spaces on sumbit.
-		$('#script-form').submit(function() {
-			$(this).trimValues(['#name', '#command', '#commandipmi', '#description', 'input[name^="parameters"]',
-				'input[name="script"]', '#username', '#publickey', '#privatekey', '#menu-path', '#port', '#url'
-			]);
-		});
+				show_fields = ['#execute-on-label', '#execute-on', '#commands-label', '#commands'];
+				break;
 
-		$('#parameters-table').dynamicRows({ template: '#parameters-row' });
-	});
-</script>
+			case <?= ZBX_SCRIPT_TYPE_IPMI ?>:
+				if (command.value !== '') {
+					command_ipmi.value = command.value;
+					command.value = '';
+				}
+
+				show_fields = ['#command-ipmi-label', '#command-ipmi'];
+				break;
+
+			case <?= ZBX_SCRIPT_TYPE_SSH ?>:
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
+				}
+
+				show_fields = [
+					'#auth-type-label', '#auth-type', '#username-label', '#username-field', '#port-label',
+					'#port-field', '#commands-label', '#commands'
+				];
+
+				// Load authentication fields.
+				this.authtype = parseInt(script.authtype);
+
+				const authtype = this.form.querySelector('#authtype');
+
+				authtype.onchange = (e) => this.#loadAuthFields(e);
+				authtype.dispatchEvent(new Event('change'));
+				break;
+
+			case <?= ZBX_SCRIPT_TYPE_TELNET ?>:
+				if (command_ipmi.value !== '') {
+					command.value = command_ipmi.value;
+					command_ipmi.value = '';
+				}
+
+				show_fields = [
+					'#username-label', '#username-field', '#port-label', '#port-field', '#password-label',
+					'#password-field', '#commands-label', '#commands'
+				];
+				break;
+
+			case <?= ZBX_SCRIPT_TYPE_WEBHOOK ?>:
+				show_fields = [
+					'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
+					'#timeout-label', '#timeout-field'
+				];
+
+				break;
+
+			case <?= ZBX_SCRIPT_TYPE_URL ?>:
+				show_fields = ['#url', '#url-label', '#new-window-label', '#new-window'];
+				break;
+		}
+
+		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+	}
+
+	/**
+	 * Displays or hides fields in the popup based on the value of selected authentication method.
+	 * This is relevant only when the script type is SSH.
+	 *
+	 * @param {object} event  The event object.
+	 */
+	#loadAuthFields(event) {
+		this.#hideFormFields('auth');
+
+		let show_fields = [];
+
+		if (event.target.value) {
+			this.authtype = parseInt(event.target.value);
+		}
+
+		switch (this.authtype) {
+			case <?= ITEM_AUTHTYPE_PASSWORD ?>:
+				show_fields = ['#password-label', '#password-field', '#commands-label', '#commands'];
+				break;
+
+			case <?= ITEM_AUTHTYPE_PUBLICKEY ?>:
+				show_fields = [
+					'#publickey-label', '#publickey-field', '#privatekey-label', '#privatekey-field',
+					'#passphrase-label', '#passphrase-field'
+				];
+				break;
+		}
+
+		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+	}
+
+	/**
+	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 *
+	 * @param {object} event  The event object.
+	 */
+	#loadConfirmationFields(event) {
+		if (event.target.value) {
+			this.confirmation = event.target.checked;
+		}
+
+		const confirmation = this.form.querySelector('#confirmation');
+		const test_confirmation = this.form.querySelector('#test-confirmation');
+
+		if (this.confirmation) {
+			confirmation.removeAttribute('disabled');
+
+			confirmation.onkeyup = () => confirmation.value !== ''
+				? test_confirmation.removeAttribute('disabled')
+				: test_confirmation.setAttribute('disabled', 'disabled');
+
+			confirmation.dispatchEvent(new Event('keyup'));
+		}
+		else {
+			confirmation.setAttribute('disabled', 'disabled');
+			test_confirmation.setAttribute('disabled', 'disabled');
+		}
+	}
+
+	/**
+	 * Hides the specified fields from the form based on input parameter type.
+	 *
+	 * @param {string} type  A string indicating the type of fields to hide.
+	 */
+	#hideFormFields(type) {
+		let fields = [];
+
+		if (type === 'auth') {
+			fields = [
+				'#privatekey-label', '#privatekey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label',
+				'#passphrase-field', '#publickey-label', '#publickey-field', '#password-label', '#password-field'
+			];
+		}
+
+		if (type === 'all') {
+			this.form.querySelector(`#type input[type="radio"][value="${<?= ZBX_SCRIPT_TYPE_URL ?>}"]`)
+				.closest('li').style.display = 'none';
+
+			fields = [
+				'#menu-path', '#menu-path-label', '#url', '#url-label', '#new-window-label', '#new-window',
+				'#webhook-parameters', '#webhook-parameters-label', '#js-item-script-field', '#script-label',
+				'#timeout-label', '#timeout-field', '#commands-label', '#commands', '#command-ipmi-label',
+				'#command-ipmi', '#auth-type-label', '#auth-type', '#username-label', '#username-field',
+				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
+				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
+				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
+				'#enable-confirmation-label', '#enable-confirmation-field', '#confirmation-label', '#confirmation-field'
+			];
+		}
+
+		fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+	}
+}

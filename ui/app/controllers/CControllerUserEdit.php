@@ -76,6 +76,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					'rows_per_page', 'url', 'roleid', 'timezone', 'userdirectoryid'
 				],
 				'selectMedias' => ['mediatypeid', 'period', 'sendto', 'severity', 'active'],
+				'selectRole' => ['roleid'],
 				'selectUsrgrps' => ['usrgrpid'],
 				'userids' => $this->getInput('userid'),
 				'editable' => true
@@ -145,6 +146,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['medias'] = $this->user['medias'];
 			$data['db_user']['username'] = $this->user['username'];
 			$data['userdirectoryid'] = $this->user['userdirectoryid'];
+			$data['roleid_required'] = (bool) $this->user['role'];
 
 			if (!$this->getInput('form_refresh', 0)) {
 				$data['roleid'] = $this->user['roleid'];
@@ -152,6 +154,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 		else {
 			$data['change_password'] = true;
+			$data['roleid_required'] = true;
 			$data['roleid'] = $this->getInput('roleid', '');
 		}
 
@@ -169,12 +172,21 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['groups'] = $user_groups
 			? API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name'],
+				'output' => ['usrgrpid', 'name', 'userdirectoryid'],
 				'usrgrpids' => $user_groups
 			])
 			: [];
 		CArrayHelper::sort($data['groups'], ['name']);
 		$data['groups'] = CArrayHelper::renameObjectsKeys($data['groups'], ['usrgrpid' => 'id']);
+
+		$data['internal_auth'] = true;
+
+		foreach ($data['groups'] as $group) {
+			if ($group['userdirectoryid'] != 0) {
+				$data['internal_auth'] = false;
+				break;
+			}
+		}
 
 		if ($data['roleid']) {
 			$roles = API::Role()->get([
@@ -287,8 +299,6 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'output' => ['status'],
 			'preservekeys' => true
 		]);
-
-		$data['internal_authentication'] = CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));

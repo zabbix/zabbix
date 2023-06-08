@@ -35,255 +35,355 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Kube = {
-                  params: {},
-                  pods_limit: 1000,
+                params: {},
+                pods_limit: 1000,
             
-                  setParams: function (params) {
-                      ['api_endpoint', 'token', 'endpoint_name'].forEach(function (field) {
-                          if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                              || params[field] === '') {
-                              throw 'Required param is not set: "' + field + '".';
-                          }
-                      });
+                setParams: function (params) {
+                    ['api_token', 'api_url'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                            || params[field] === '') {
+                            throw 'Required param is not set: "' + field + '".';
+                        }
+                    });
+                    ['endpoint_name', 'pod_filter_labels', 'pod_filter_annotations', 'node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined') {
+                            throw 'Parameter can be empty but not removed: "' + field + '".';
+                        }
+                    });
             
-                      Kube.params = params;
-                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
-                          Kube.params.api_endpoint += '/';
-                      }
-                  },
+                    Kube.params = params;
+                },
             
-                  request: function (query) {
-                      var response,
-                          request = new HttpRequest(),
-                          url = Kube.params.api_endpoint + query;
+                apiRequest: function (query) {
+                    const request = new HttpRequest();
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
+                    request.addHeader('Content-Type: application/json');
+                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                      request.addHeader('Content-Type: application/json');
-                      request.addHeader('Authorization: Bearer ' + Kube.params.token);
+                    const url = Kube.params.api_url + encodeURI(query);
+                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + Kube.params.http_proxy + ' ' + url);
             
-                      Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+                    response = request.get(url);
+                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus());
+                    Zabbix.log(5, response);
             
-                      response = request.get(url);
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                    }
+                    return {
+                        status: request.getStatus(),
+                        response: response
+                    };
+                },
             
-                      Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+                parseFilters: function (filter) {
+                    var pairs = {};
             
-                      if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                          throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                      }
+                    filter.split(/\s*,\s*/).forEach(function (kv) {
+                        if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
+                            var pair = kv.split(/\s*:\s*/);
+                            pairs[pair[0]] = pair[1];
+                        }
+                    });
+                    return pairs;
+                },
             
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                          }
-                      }
+                filter: function (name, data, filters) {
+                    var filtered = true;
+                    if (typeof data === 'object') {
+                        Object.keys(filters).some(function (filter) {
+                            var exclude = filter.match(/^!(.+)/);
+                            if (filter in data || (exclude && exclude[1] in data)) {
+                                if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                    || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                    Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
             
-                      return {
-                          status: request.getStatus(),
-                          response: response
-                      };
-                  },
+                                    filtered = false;
+                                    return true;
+                                }
+                            };
+                        });
+                    }
+                    return filtered;
+                },
             
-                  getNodes: function () {
-                      var result = Kube.request('v1/nodes');
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
             
-                      if (typeof result.response !== 'object'
-                          || typeof result.response.items === 'undefined'
-                          || result.status != 200) {
-                          throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
-                      };
+                        data = data[step];
+                    }
             
-                      return result.response;
-                  },
+                    return data;
+                },
             
-                  getPods: function () {
-                      var result = [],
-                          continue_token;
+                getNodes: function () {
+                    var result = Kube.apiRequest('/api/v1/nodes'),
+                        output = [],
+                        filterNodeLabels = Kube.parseFilters(Kube.params.node_filter_labels),
+                        filterNodeAnnotations = Kube.parseFilters(Kube.params.node_filter_annotations);
+                    if (typeof result.response !== 'object'
+                        || typeof result.response.items === 'undefined'
+                        || result.status != 200) {
+                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    }
             
-                      while (continue_token !== '') {
-                          var data = Kube.request('v1/pods?limit=' + Kube.pods_limit
-                              + ((typeof continue_token !== 'undefined') ? '&continue=' + continue_token : ''));
+                    result.response.items.forEach(function (filternode) {
+                        if (Kube.filter(Kube.getField(filternode, 'metadata.name'), Kube.getField(filternode, 'metadata.labels'), filterNodeLabels)
+                            && Kube.filter(Kube.getField(filternode, 'metadata.name'), Kube.getField(filternode, 'metadata.annotations'), filterNodeAnnotations)) {
+                            Zabbix.log(4, '[ Kubernetes ] Filtered node "' + filternode.metadata.name + '"');
             
-                          if (typeof data.response !== 'object'
-                              || typeof data.response.items === 'undefined'
-                              || data.status != 200) {
-                              throw 'Cannot get pods from Kubernetes API. Check debug log for more information.';
-                          };
+                            output.push({
+                                filternode
+                            });
+                        }
+                    });
             
-                          result.push.apply(result, data.response.items);
-                          continue_token = data.response.metadata.continue || '';
-                      }
+                    return output;
+                },
             
-                      return result;
-                  },
+                getPods: function () {
+                    var result = [],
+                        continue_token,
+                        Pods = [];
             
-                  getEndpointIPs: function () {
-                      var result = Kube.request('v1/endpoints'),
-                          epIPs = {};
+                    while (continue_token !== '') {
+                        var data = Kube.apiRequest('/api/v1/pods?limit=' + Kube.pods_limit
+                            + ((typeof continue_token !== 'undefined') ? '&continue=' + continue_token : ''));
             
-                      if (typeof result.response !== 'object'
-                          || typeof result.response.items === 'undefined'
-                          || result.status != 200) {
-                          throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
-                      };
+                        if (typeof data.response !== 'object'
+                            || typeof data.response.items === 'undefined'
+                            || data.status != 200) {
+                            throw 'Cannot get pods from Kubernetes API. Check debug log for more information.';
+                        };
             
-                      result.response.items.forEach(function (ep) {
-                          if (ep.metadata.name === Kube.params.endpoint_name && Array.isArray(ep.subsets)) {
-                              ep.subsets.forEach(function (subset) {
-                                  if (Array.isArray(subset.addresses)) {
-                                      subset.addresses.forEach(function (addr) {
-                                          epIPs[addr.ip] = '';
-                                      });
-                                  }
-                              });
-                          }
-                      });
+                        result.push.apply(result, data.response.items);
+                        continue_token = data.response.metadata.continue || '';
+                    }
+                    result.forEach(function (pod) {
             
-                      return epIPs;
-                  }
-              },
+                        var containers = {
+                            limits: { cpu: 0, memory: 0 },
+                            requests: { cpu: 0, memory: 0 },
+                            restartCount: 0
+                        },
+                            containerStatuses = [{ restartCount: 0 }];
             
-                  Fmt = {
-                      factors: {
-                          Ki: 1024, K: 1000,
-                          Mi: 1024 ** 2, M: 1000 ** 2,
-                          Gi: 1024 ** 3, G: 1000 ** 3,
-                          Ti: 1024 ** 4, T: 1000 ** 4,
-                      },
+                        if (typeof pod.status.hostIP === 'object'
+                            || typeof pod.status.hostIP === 'undefined') {
+                            pod.status.hostIP = 'none';
+                        };
             
-                      cpuFormat: function (cpu) {
-                          if (typeof cpu === 'undefined') {
-                              return 0;
-                          }
+                        Kube.getField(pod, 'spec.containers').forEach(function (container) {
+                            var limits = container.resources.limits,
+                                requests = container.resources.requests;
             
-                          if (cpu.indexOf('m') > -1) {
-                              return parseInt(cpu) / 1000;
-                          }
+                            if (typeof limits !== 'undefined') {
+                                containers.limits.cpu += Fmt.cpuFormat(limits.cpu);
+                                containers.limits.memory += Fmt.memoryFormat(limits.memory);
+                            }
             
-                          return parseInt(cpu);
-                      },
+                            if (typeof requests !== 'undefined') {
+                                containers.requests.cpu += Fmt.cpuFormat(requests.cpu);
+                                containers.requests.memory += Fmt.memoryFormat(requests.memory);
+                            }
+                        });
             
-                      memoryFormat: function (mem) {
-                          if (typeof mem === 'undefined') {
-                              return 0;
-                          }
+                        if (typeof pod.status.containerStatuses !== 'object'
+                            || typeof pod.status.containerStatuses === 'undefined') {
+                            pod.status.containerStatuses = containerStatuses;
+                        };
+                        pod.status.containerStatuses.forEach(function (container) {
+                            containers.restartCount += container.restartCount;
             
-                          var pair,
-                              factor;
+                        });
             
-                          if (pair = mem.match(/(\d+)(\w*)/)) {
-                              if (factor = Fmt.factors[pair[2]]) {
-                                  return parseInt(pair[1]) * factor;
-                              }
+                        Pods.push({
+                            'name': pod.metadata.name,
+                            'nodeIP': pod.status.hostIP,
+                            'namespace': pod.metadata.namespace,
+                            'labels': pod.metadata.labels,
+                            'annotations': pod.metadata.annotations,
+                            'phase': pod.status.phase,
+                            'conditions': pod.status.conditions,
+                            'startTime': pod.status.startTime,
+                            'containers': containers,
+                            'hostname': 'none'
+                        })
+                    });
+                    return Pods;
+                },
             
-                              return mem;
-                          }
+                getEndpointIPs: function () {
+                    var endpoints = Kube.apiRequest('/api/v1/endpoints');
+                    if (typeof endpoints.response !== 'object'
+                        || typeof endpoints.response.items === 'undefined'
+                        || endpoints.status != 200) {
+                        throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
+                    };
             
-                          return parseInt(mem);
-                      }
+                    endpointIPs = [];
+                    endpoints.response.items.forEach(function (ep) {
+                        if (Kube.getField(ep, 'metadata.name') !== Kube.params.endpoint_name) {
+                            return;
+                        }
+                        if (!Array.isArray(Kube.getField(ep, 'subsets'))) {
+                            return;
+                        }
+                        endpointIPs = ep.subsets;
             
-                  }
+                    });
+                    return endpointIPs;
+                }
+            },
             
-              try {
-                  Kube.setParams(JSON.parse(value));
+                Fmt = {
+                    factors: {
+                        Ki: 1024, K: 1000,
+                        Mi: 1024 ** 2, M: 1000 ** 2,
+                        Gi: 1024 ** 3, G: 1000 ** 3,
+                        Ti: 1024 ** 4, T: 1000 ** 4,
+                    },
             
-                  var nodes = Kube.getNodes(),
-                      pods = Kube.getPods(),
-                      epIPs = Kube.getEndpointIPs();
+                    cpuFormat: function (cpu) {
+                        if (typeof cpu === 'undefined') {
+                            return 0;
+                        }
             
-                  for (idx in nodes.items) {
-                      var internalIP,
-                          nodePodsCount = 0,
-                          nodePods = [],
-                          roles = [];
+                        if (cpu.indexOf('m') > -1) {
+                            return parseInt(cpu) / 1000;
+                        }
             
-                      Object.keys(nodes.items[idx].metadata.labels).forEach(function (label) {
-                          var splitLabel = label.match(/^node-role.kubernetes.io\/([\w\.-]+)/);
+                        return parseInt(cpu);
+                    },
             
-                          if (splitLabel) {
-                              roles.push(splitLabel[1]);
-                          }
-                      });
+                    memoryFormat: function (mem) {
+                        if (typeof mem === 'undefined') {
+                            return 0;
+                        }
             
-                      var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                          return addr.type === 'InternalIP';
-                      });
+                        var pair,
+                            factor;
             
-                      var internalIP = internalIPs.length && internalIPs[0].address;
+                        if (pair = mem.match(/(\d+)(\w*)/)) {
+                            if (factor = Fmt.factors[pair[2]]) {
+                                return parseInt(pair[1]) * factor;
+                            }
             
-                      pods.forEach(function (pod) {
-                          var containers = {
-                              limits: { cpu: 0, memory: 0 },
-                              requests: { cpu: 0, memory: 0 },
-                              restartCount: 0
-                          }
+                            return mem;
+                        }
             
-                          if (pod.status.hostIP === internalIP) {
-                              pod.spec.containers.forEach(function (container) {
-                                  var limits = container.resources.limits,
-                                      requests = container.resources.requests;
+                        return parseInt(mem);
+                    }
             
-                                  nodePodsCount++;
+                }
             
-                                  if (typeof limits !== 'undefined') {
-                                      containers.limits.cpu += Fmt.cpuFormat(limits.cpu);
-                                      containers.limits.memory += Fmt.memoryFormat(limits.memory);
-                                  }
+            try {
+                Kube.setParams(JSON.parse(value));
             
-                                  if (typeof requests !== 'undefined') {
-                                      containers.requests.cpu += Fmt.cpuFormat(requests.cpu);
-                                      containers.requests.memory += Fmt.memoryFormat(requests.memory);
-                                  }
-                              });
+                var nodes = Kube.getNodes(),
+                    pods = Kube.getPods(),
+                    Pods = [],
+                    filterPodLabels = Kube.parseFilters(Kube.params.pod_filter_labels),
+                    filterPodAnnotations = Kube.parseFilters(Kube.params.pod_filter_annotations),
+                    endpointIPs = Kube.getEndpointIPs();
+                for (idx in nodes) {
+                    var nodePodsCount = 0,
+                        endpointpod = [],
+                        roles = [];
+                    Object.keys(nodes[idx].filternode.metadata.labels).forEach(function (label) {
+                        var splitLabel = label.match(/^node-role.kubernetes.io\/([\w\.-]+)/);
             
-                              pod.status.containerStatuses.forEach(function (container) {
-                                  containers.restartCount += container.restartCount;
-                              });
+                        if (splitLabel) {
+                            roles.push(splitLabel[1]);
+                        }
+                    });
+                    var internalIPs = Kube.getField(nodes[idx].filternode, 'status.addresses').filter(function (addr) {
+                        return addr.type === 'InternalIP';
+                    });
+                    var internalIP = internalIPs.length && internalIPs[0].address;
             
-                              nodePods.push({
-                                  name: pod.metadata.name,
-                                  namespace: pod.metadata.namespace,
-                                  labels: pod.metadata.labels,
-                                  annotations: pod.metadata.annotations,
-                                  phase: pod.status.phase,
-                                  conditions: pod.status.conditions,
-                                  startTime: pod.status.startTime,
-                                  containers: containers
-                              })
-                          }
-                      })
-                      delete nodes.items[idx].metadata.managedFields;
-                      delete nodes.items[idx].status.images;
+                    var Hostname = Kube.getField(nodes[idx].filternode, 'status.addresses').filter(function (addr) {
+                        return addr.type === 'Hostname';
+                    });
+                    var Hostname = Hostname.length && Hostname[0].address;
             
-                      nodes.items[idx].status.capacity.cpu = Fmt.cpuFormat(nodes.items[idx].status.capacity.cpu);
-                      nodes.items[idx].status.capacity.memory = Fmt.memoryFormat(nodes.items[idx].status.capacity.memory);
-                      nodes.items[idx].status.allocatable.cpu = Fmt.cpuFormat(nodes.items[idx].status.allocatable.cpu);
-                      nodes.items[idx].status.allocatable.memory = Fmt.memoryFormat(nodes.items[idx].status.allocatable.memory);
+                    pods.forEach(function (pod) {
+                        if (pod.nodeIP !== internalIP) {
+                            return;
+                        }
+                        nodePodsCount++;
+                        pod.hostname = Hostname;
+                        Pods = pods.filter(function (f) {
+                            return (f.hostname !== 'none' || f.phase === 'Pending') && (
+                                Kube.filter(f.name, f.labels, filterPodLabels)
+                                && Kube.filter(f.name, f.annotations, filterPodAnnotations)
+                            );
+                        }
+                        )
+                    });
             
-                      nodes.items[idx].status.podsCount = nodePodsCount;
-                      nodes.items[idx].status.roles = roles.join(', ');
-                      nodes.items[idx].pods = nodePods;
-                  }
+                    endpointIPs.forEach(function (agent) {
+                        for (k in Kube.getField(agent, 'addresses')) {
+                            if (Kube.getField(agent.addresses[k], 'ip') === internalIP) {
+                                endpointpod = Kube.getField(agent.addresses[k], 'targetRef.name')
+                            }
+                            for (k in agent.notReadyAddresses) {
+                                if (agent.notReadyAddresses[k].ip === internalIP) {
+                                    endpointpod = 'notReadyAddresses'
+                                }
+                            }
             
-                  nodes.endpointIPs = epIPs;
+                        }
+                    });
             
-                  return JSON.stringify(nodes);
-              }
-              catch (error) {
-                  error += (String(error).endsWith('.')) ? '' : '.';
-                  Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
-                  return JSON.stringify({ error: error });
-              }
+                    delete nodes[idx].filternode.metadata.managedFields;
+                    delete nodes[idx].filternode.status.images;
+                    nodes[idx].filternode.status.capacity.cpu = Fmt.cpuFormat(nodes[idx].filternode.status.capacity.cpu);
+                    nodes[idx].filternode.status.capacity.memory = Fmt.memoryFormat(nodes[idx].filternode.status.capacity.memory);
+                    nodes[idx].filternode.status.allocatable.cpu = Fmt.cpuFormat(nodes[idx].filternode.status.allocatable.cpu);
+                    nodes[idx].filternode.status.allocatable.memory = Fmt.memoryFormat(nodes[idx].filternode.status.allocatable.memory);
+                    nodes[idx].filternode.status.podsCount = nodePodsCount;
+                    nodes[idx].filternode.status.roles = roles.join(', ');
+                    nodes[idx].filternode.status.agent = endpointpod;
+                    nodes[idx].filternode.internalIP = internalIP;
+                }
+            
+                return JSON.stringify({ nodes, Pods });
+            }
+            catch (error) {
+                error += (String(error).endsWith('.')) ? '' : '.';
+                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+                return JSON.stringify({ error: error });
+            }
           description: 'Collecting and processing cluster nodes data via Kubernetes API.'
           timeout: 10s
           parameters:
-            - name: api_endpoint
+            - name: api_url
               value: '{$KUBE.API.ENDPOINT.URL}'
             - name: endpoint_name
               value: '{$KUBE.NODES.ENDPOINT.NAME}'
-            - name: token
+            - name: api_token
               value: '{$KUBE.API.TOKEN}'
+            - name: pod_filter_labels
+              value: '{$KUBE.POD.FILTER.LABELS}'
+            - name: pod_filter_annotations
+              value: '{$KUBE.POD.FILTER.ANNOTATIONS}'
+            - name: node_filter_labels
+              value: '{$KUBE.NODE.FILTER.LABELS}'
+            - name: node_filter_annotations
+              value: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
+            - name: http_proxy
+              value: '{$KUBE.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -317,114 +417,6 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
-        - uuid: e0b213a441a740e98b8405fd303e0683
-          name: 'Node LLD'
-          type: DEPENDENT
-          key: kube.nodes.lld
-          delay: '0'
-          history: '0'
-          trends: '0'
-          value_type: TEXT
-          description: 'Generation of data for node discovery rules.'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  function parseFilters(filter) {
-                      var pairs = {};
-                  
-                      filter.split(/\s*,\s*/).forEach(function (kv) {
-                          if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
-                              var pair = kv.split(/\s*:\s*/);
-                              pairs[pair[0]] = pair[1];
-                          }
-                      });
-                  
-                      return pairs;
-                  }
-                  
-                  function filter(name, data, filters) {
-                      var filtered = true;
-                  
-                      if (typeof data === 'object') {
-                          Object.keys(filters).some(function (filter) {
-                              var exclude = filter.match(/^!(.+)/);
-                              if (filter in data || (exclude && exclude[1] in data)) {
-                                  if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-                                      || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
-                  
-                                      filtered = false;
-                                      return true;
-                                  }
-                              };
-                          });
-                      }
-                  
-                      return filtered;
-                  }
-                  
-                  try {
-                      var input = JSON.parse(value),
-                          output = [];
-                          api_url = '{$KUBE.API.ENDPOINT.URL}',
-                          hostname = api_url.match(/\/\/(.+):/);
-                  
-                      if (typeof hostname[1] === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
-                          throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                      };
-                  
-                      if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
-                          throw 'Incorrect JSON. Check debug log for more information.';
-                      }
-                  
-                      var filterLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
-                          filterAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}');
-                  
-                      input.items.forEach(function (node) {
-                          if (filter(node.metadata.name, node.metadata.labels, filterLabels)
-                              && filter(node.metadata.name, node.metadata.annotations, filterAnnotations)) {
-                              Zabbix.log(4, '[ Kubernetes discovery ] Filtered node "' + node.metadata.name + '"');
-                  
-                              var internalIPs = node.status.addresses.filter(function (addr) {
-                                  return addr.type === 'InternalIP';
-                              });
-                  
-                              var internalIP = internalIPs.length && internalIPs[0].address;
-                  
-                              if (internalIP in input.endpointIPs) {
-                                  output.push({
-                                      '{#NAME}': node.metadata.name,
-                                      '{#IP}': internalIP,
-                                      '{#ROLES}': node.status.roles,
-                                      '{#ARCH}': node.metadata.labels['kubernetes.io/arch'] || '',
-                                      '{#OS}': node.metadata.labels['kubernetes.io/os'] || '',
-                                      '{#CLUSTER_HOSTNAME}': hostname[1]
-                                  });
-                              }
-                              else {
-                                  Zabbix.log(4, '[ Kubernetes discovery ] Node "' + node.metadata.name + '" is not included in the list of endpoint IPs');
-                              }
-                          }
-                      });
-                  
-                      return JSON.stringify(output);
-                  }
-                  catch (error) {
-                      error += (String(error).endsWith('.')) ? '' : '.';
-                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
-                      throw 'Discovery error: ' + error;
-                  }
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
-          master_item:
-            key: kube.nodes
-          tags:
-            - tag: component
-              value: raw
       discovery_rules:
         - uuid: f408d71f02f645f6a7e24047a57860b6
           name: 'Node discovery'
@@ -805,7 +797,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NAME}")].first()'
+                    - '$.nodes..[?(@.metadata.name == "{#NAME}")].first()'
               master_item:
                 key: kube.nodes
               tags:
@@ -1014,9 +1006,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pods[*].containers.limits.cpu.sum()'
+                    - '$.Pods[?(@.hostname == "{#NAME}")].containers.limits.cpu.sum()'
               master_item:
-                key: 'kube.node.get[{#NAME}]'
+                key: kube.nodes
               tags:
                 - tag: component
                   value: limits
@@ -1036,9 +1028,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pods[*].containers.limits.memory.sum()'
+                    - '$.Pods[?(@.hostname == "{#NAME}")].containers.limits.memory.sum()'
               master_item:
-                key: 'kube.node.get[{#NAME}]'
+                key: kube.nodes
               tags:
                 - tag: component
                   value: limits
@@ -1058,9 +1050,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pods[*].containers.requests.cpu.sum()'
+                    - '$.Pods[?(@.hostname == "{#NAME}")].containers.requests.cpu.sum()'
               master_item:
-                key: 'kube.node.get[{#NAME}]'
+                key: kube.nodes
               tags:
                 - tag: component
                   value: requests
@@ -1080,9 +1072,9 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.pods[*].containers.requests.memory.sum()'
+                    - '$.Pods[?(@.hostname == "{#NAME}")].containers.requests.memory.sum()'
               master_item:
-                key: 'kube.node.get[{#NAME}]'
+                key: kube.nodes
               tags:
                 - tag: component
                   value: requests
@@ -1238,52 +1230,31 @@ zabbix_export:
             - uuid: 646efb7b19f5408dba2f3fe2d6a92213
               name: 'Node [{#NAME}] Allocatable: Pod limits'
               graph_items:
-                - drawtype: BOLD_LINE
+                - sortorder: '1'
+                  drawtype: BOLD_LINE
                   color: 4CAF50
                   item:
                     host: 'Kubernetes nodes by HTTP'
                     key: 'kube.node.allocatable.pods[{#NAME}]'
-                - sortorder: '1'
+                - sortorder: '2'
                   drawtype: BOLD_LINE
                   color: AB47BC
                   item:
                     host: 'Kubernetes nodes by HTTP'
                     key: 'kube.node.capacity.pods[{#NAME}]'
-                - sortorder: '2'
+                - sortorder: '3'
                   drawtype: GRADIENT_LINE
                   color: 1E88E5
                   calc_fnc: MAX
                   item:
                     host: 'Kubernetes nodes by HTTP'
                     key: 'kube.node.used.pods[{#NAME}]'
-          master_item:
-            key: kube.nodes.lld
-        - uuid: 0cf35d7efd2045c2b22d3dd660ebe210
-          name: 'Cluster node discovery'
-          type: DEPENDENT
-          key: kube.node_host.discovery
-          delay: '0'
-          filter:
-            evaltype: AND
-            conditions:
-              - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
-                formulaid: A
-              - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
-              - macro: '{#ROLES}'
-                value: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
-                formulaid: C
-              - macro: '{#ROLES}'
-                value: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
           host_prototypes:
             - uuid: bfcbf26edd704bdfaa65e244a987839e
               host: '{#NAME}'
               name: '{#NAME}'
+              status: DISABLED
+              discover: NO_DISCOVER
               group_links:
                 - group:
                     name: Applications
@@ -1311,7 +1282,39 @@ zabbix_export:
               interfaces:
                 - ip: '{#IP}'
           master_item:
-            key: kube.nodes.lld
+            key: kube.nodes
+          lld_macro_paths:
+            - lld_macro: '{#ARCH}'
+              path: '$.metadata.labels[''kubernetes.io/arch'']'
+            - lld_macro: '{#CLUSTER_HOSTNAME}'
+              path: '$.metadata.labels[''kubernetes.io/hostname'']'
+            - lld_macro: '{#ENDPOINT}'
+              path: $.status.agent
+            - lld_macro: '{#IP}'
+              path: $.internalIP
+            - lld_macro: '{#NAME}'
+              path: $.metadata.name
+            - lld_macro: '{#OS}'
+              path: '$.metadata.labels[''kubernetes.io/os'']'
+            - lld_macro: '{#ROLES}'
+              path: $.status.roles
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.nodes..filternode
+          overrides:
+            - name: 'Endpoints host'
+              step: '1'
+              filter:
+                conditions:
+                  - macro: '{#ENDPOINT}'
+                    value: 'zabbix-agent.*'
+                    formulaid: A
+              operations:
+                - operationobject: HOST_PROTOTYPE
+                  operator: REGEXP
+                  status: ENABLED
+                  discover: DISCOVER
         - uuid: b9dd5b50208e415da509f61ec73451c1
           name: 'Pod discovery'
           type: DEPENDENT
@@ -1504,7 +1507,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.items[?(@.metadata.name == "{#NODE}")].pods[?(@.name == "{#POD}")].first()'
+                    - '$.Pods[?(@.name == "{#POD}")].first()'
               master_item:
                 key: kube.nodes
               tags:
@@ -1583,83 +1586,17 @@ zabbix_export:
                   value: '{#POD}'
           master_item:
             key: kube.nodes
+          lld_macro_paths:
+            - lld_macro: '{#NAMESPACE}'
+              path: $.namespace
+            - lld_macro: '{#NODE}'
+              path: $.hostname
+            - lld_macro: '{#POD}'
+              path: $.name
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  function parseFilters(filter) {
-                      var pairs = {};
-                  
-                      filter.split(/\s*,\s*/).forEach(function (kv) {
-                          if (/([\w\.-]+\/[\w\.-]+):\s*.+/.test(kv)) {
-                              var pair = kv.split(/\s*:\s*/);
-                              pairs[pair[0]] = pair[1];
-                          }
-                      });
-                  
-                      return pairs;
-                  }
-                  
-                  function filter(name, data, filters) {
-                      var filtered = true;
-                  
-                      if (typeof data === 'object') {
-                          Object.keys(filters).some(function (filter) {
-                              var exclude = filter.match(/^!(.+)/);
-                              if (filter in data || (exclude && exclude[1] in data)) {
-                                  if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-                                      || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                      Zabbix.log(4, '[ Kubernetes discovery ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
-                  
-                                      filtered = false;
-                                      return true;
-                                  }
-                              };
-                          });
-                      }
-                  
-                      return filtered;
-                  }
-                  
-                  try {
-                      var input = JSON.parse(value),
-                          output = [];
-                  
-                      if (typeof input !== 'object' || typeof input.items === 'undefined') {
-                          Zabbix.log(4, '[ Kubernetes ] Received incorrect JSON: ' + value);
-                          throw 'Incorrect JSON. Check debug log for more information.';
-                      }
-                  
-                      var filterNodeLabels = parseFilters('{$KUBE.NODE.FILTER.LABELS}'),
-                          filterNodeAnnotations = parseFilters('{$KUBE.NODE.FILTER.ANNOTATIONS}'),
-                          filterPodLabels = parseFilters('{$KUBE.POD.FILTER.LABELS}'),
-                          filterPodAnnotations = parseFilters('{$KUBE.POD.FILTER.ANNOTATIONS}');
-                  
-                      input.items.forEach(function (node) {
-                          if (filter(node.metadata.name, node.metadata.labels, filterNodeLabels)
-                              && filter(node.metadata.name, node.metadata.annotations, filterNodeAnnotations)) {
-                              node.pods.forEach(function (pod) {
-                                  if (filter(pod.name, pod.labels, filterPodLabels)
-                                      && filter(pod.name, pod.annotations, filterPodAnnotations)) {
-                                      Zabbix.log(4, '[ Kubernetes discovery ] Filtered pod "' + pod.name + '"');
-                  
-                                      output.push({
-                                          '{#POD}': pod.name,
-                                          '{#NAMESPACE}': pod.namespace,
-                                          '{#NODE}': node.metadata.name
-                                      });
-                                  }
-                              });
-                          }
-                      });
-                  
-                      return JSON.stringify(output);
-                  }
-                  catch (error) {
-                      error += (String(error).endsWith('.')) ? '' : '.';
-                      Zabbix.log(3, '[ Kubernetes discovery ] ERROR: ' + error);
-                      throw 'Discovery error: ' + error;
-                  }
+                - $.Pods
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1672,10 +1609,12 @@ zabbix_export:
           value: nodes
       macros:
         - macro: '{$KUBE.API.ENDPOINT.URL}'
-          value: 'https://localhost:6443/api'
-          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>/api'
+          value: 'https://localhost:6443'
+          description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
         - macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token.'
+        - macro: '{$KUBE.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
         - macro: '{$KUBE.LLD.FILTER.NODE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable nodes.'
@@ -1688,18 +1627,6 @@ zabbix_export:
         - macro: '{$KUBE.LLD.FILTER.NODE.ROLE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered node by role.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable cluster nodes.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered cluster nodes.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable nodes hosts by role.'
-        - macro: '{$KUBE.LLD.FILTER.NODE_HOST.ROLE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered cluster nodes by role.'
         - macro: '{$KUBE.LLD.FILTER.POD.NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable pods by namespace.'
@@ -1707,16 +1634,16 @@ zabbix_export:
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered pods by namespace.'
         - macro: '{$KUBE.NODE.FILTER.ANNOTATIONS}'
-          description: 'Annotations to filter nodes (regex in values are supported).'
+          description: 'Annotations to filter nodes (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.NODE.FILTER.LABELS}'
-          description: 'Labels to filter nodes (regex in values are supported).'
+          description: 'Labels to filter nodes (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.NODES.ENDPOINT.NAME}'
           value: zabbix-zabbix-helm-chrt-agent
           description: 'Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".'
         - macro: '{$KUBE.POD.FILTER.ANNOTATIONS}'
-          description: 'Annotations to filter pods (regex in values are supported).'
+          description: 'Annotations to filter pods (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.POD.FILTER.LABELS}'
-          description: 'Labels to filter Pods (regex in values are supported).'
+          description: 'Labels to filter Pods (regex in values are supported). See the template''s README.md for details.'
       valuemaps:
         - uuid: 785b20f8979341c4b470870ec8f50414
           name: 'Node conditions'

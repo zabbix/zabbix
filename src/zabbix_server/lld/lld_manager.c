@@ -22,7 +22,7 @@
 #include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "lld_protocol.h"
 #include "zbxstr.h"

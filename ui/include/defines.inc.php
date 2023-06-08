@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha1');
+define('ZABBIX_VERSION',		'7.0.0alpha2');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050013);
+define('ZABBIX_DB_VERSION',		6050024);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -974,6 +974,11 @@ define('ZBX_DISCOVERY_DNS',		1);
 define('ZBX_DISCOVERY_IP',		2);
 define('ZBX_DISCOVERY_VALUE',	3);
 
+define('ZBX_DISCOVERY_CHECKS_UNLIMITED',	0);
+define('ZBX_DISCOVERY_CHECKS_ONE',          1);
+define('ZBX_DISCOVERY_CHECKS_CUSTOM',       -1);
+define('ZBX_DISCOVERY_CHECKS_MAX',          999);
+
 define('USER_TYPE_ZABBIX_USER',		1);
 define('USER_TYPE_ZABBIX_ADMIN',	2);
 define('USER_TYPE_SUPER_ADMIN',		3);
@@ -1071,6 +1076,10 @@ define('ZBX_PROBLEM_SUPPRESSED_TRUE',	1);
 
 define('ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE',	0);
 define('ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE',	1);
+
+define('ZBX_ACK_STATUS_ALL',	0);
+define('ZBX_ACK_STATUS_UNACK',	1);
+define('ZBX_ACK_STATUS_ACK',	2);
 
 define('ZBX_PROBLEM_UPDATE_NONE',				0x00);
 define('ZBX_PROBLEM_UPDATE_CLOSE',				0x01);
@@ -1553,6 +1562,7 @@ if (!defined('JSON_ERROR_SYNTAX')) {
 // API errors
 define('ZBX_API_ERROR_INTERNAL',	111);
 define('ZBX_API_ERROR_PARAMETERS',	100);
+define('ZBX_API_ERROR_NO_ENTITY',	101);
 define('ZBX_API_ERROR_PERMISSIONS',	120);
 define('ZBX_API_ERROR_NO_AUTH',		200);
 define('ZBX_API_ERROR_NO_METHOD',	300);
@@ -1937,6 +1947,7 @@ define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
 define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
 define('ZBX_STYLE_FORM_FIELDS_INLINE', 'form-fields-inline');
 define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
+define('ZBX_STYLE_FORM_SUBMIT_HIDDEN', 'form-submit-hidden');
 define('ZBX_STYLE_GRAPH_WRAPPER', 'graph-wrapper');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREEN_BG', 'green-bg');

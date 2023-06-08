@@ -237,6 +237,8 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		$sysmapIds[] = getRequest('sysmapid');
 	}
 
+	$sysmap_count = count($sysmapIds);
+
 	DBstart();
 
 	$maps = API::Map()->get([
@@ -258,7 +260,11 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 	else {
 		uncheckTableRows(null, zbx_objectValues($maps, 'sysmapid'));
 	}
-	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
+
+	$messageSuccess = _n('Network map deleted', 'Network maps deleted', $sysmap_count);
+	$messageFailed = _n('Cannot delete network map', 'Cannot delete network maps', $sysmap_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*

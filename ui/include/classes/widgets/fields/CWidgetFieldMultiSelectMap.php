@@ -1,3 +1,4 @@
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -14,17 +15,17 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PP_HISTORY_H
-#define ZABBIX_PP_HISTORY_H
 
-#include "zbxpreproc.h"
-#include "zbxtime.h"
-#include "zbxvariant.h"
+namespace Zabbix\Widgets\Fields;
 
-void	pp_history_free(zbx_pp_history_t *history);
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts);
+class CWidgetFieldMultiSelectMap extends CWidgetFieldMultiSelect {
 
-#endif
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label);
+
+		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_MAP);
+	}
+}

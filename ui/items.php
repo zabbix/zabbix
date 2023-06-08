@@ -722,7 +722,12 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && ha
 	if ($result) {
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
-	show_messages($result, _('Items deleted'), _('Cannot delete items'));
+
+	$items_count = count($group_itemid);
+	$messageSuccess = _n('Item deleted', 'Items deleted', $items_count);
+	$messageFailed = _n('Cannot delete item', 'Cannot delete items', $items_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 if (hasRequest('action') && hasRequest('group_itemid') && !$result) {

@@ -25,10 +25,18 @@
 
 typedef struct
 {
+	zbx_jsonobj_t		obj;
+	zbx_jsonpath_index_t	*index;
+}
+zbx_pp_cache_jsonpath_t;
+
+typedef struct
+{
 	zbx_uint32_t	refcount;
 	zbx_variant_t	value;
 	int		type;
 	void		*data;
+	char		*error;
 }
 zbx_pp_cache_t;
 

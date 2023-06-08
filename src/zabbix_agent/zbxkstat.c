@@ -22,7 +22,7 @@
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
 #include "zbxmutexs.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "stats.h"
 #include "zbxstr.h"
 
