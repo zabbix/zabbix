@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ASYNC_POLLER_HTTPAGENT_H
-#define ZABBIX_ASYNC_POLLER_HTTPAGENT_H
+#ifndef ZABBIX_ASYNC_HTTPAGENT_H
+#define ZABBIX_ASYNC_HTTPAGENT_H
 
 #include "zbxcacheconfig.h"
 #include "httpagent_async.h"
