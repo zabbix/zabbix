@@ -1644,12 +1644,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(httpagent_poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_AGENT_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
 				thread_args.args = &poller_args;
-				zbx_thread_start(httpagent_poller_thread, &thread_args, &threads[i]);
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}

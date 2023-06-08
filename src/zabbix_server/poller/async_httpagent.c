@@ -18,7 +18,7 @@
 **/
 
 #include "checks_agent.h"
-#include "async_poller_httpagent.h"
+#include "async_httpagent.h"
 
 #include "log.h"
 #include "zbxsysinfo.h"

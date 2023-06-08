@@ -16,8 +16,8 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "httpagent_async.h"
-#include "async_poller_agent.h"
-#include "async_poller_httpagent.h"
+#include "async_httpagent.h"
+#include "async_agent.h"
 #include "zbx_availability_constants.h"
 #include "checks_agent.h"
 
@@ -349,7 +349,7 @@ static void	http_agent_poller_destroy(zbx_poller_config_t *poller_config)
 	zbx_hashset_destroy(&poller_config->interfaces);
 }
 
-ZBX_THREAD_ENTRY(httpagent_poller_thread, args)
+ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
