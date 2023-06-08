@@ -214,5 +214,15 @@ void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t d
 	pdc_discovery_write_host(data, druleid, ip, dns, status, clock);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write host data into autoregistraion data cache                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		unsigned int connection_type, const char *host_metadata, int flags, int clock)
+{
+	pdc_autoreg_write_host(pdc_cache, host, ip, dns, port, connection_type, host_metadata, flags, clock);
+}
 
 

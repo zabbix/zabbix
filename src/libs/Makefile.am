@@ -3,6 +3,7 @@
 DIST_SUBDIRS = \
 	zbxalgo \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcommon \
@@ -73,6 +74,7 @@ DIST_SUBDIRS = \
 if SERVER
 SERVER_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
@@ -123,6 +125,7 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \

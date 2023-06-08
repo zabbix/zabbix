@@ -10,4 +10,6 @@ libzbxproxydatacache_a_SOURCES = \
 	proxydatacache.c \
 	proxydatacache.h \
 	pdc_discovery.c \
-	pdc_discovery.h
+	pdc_discovery.h \
+	pdc_autoreg.c \
+	pdc_autoreg.h

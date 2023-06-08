@@ -38,6 +38,7 @@
 #include "zbx_item_constants.h"
 #include "zbxcachehistory.h"
 #include "zbxpreproc.h"
+#include "zbxautoreg.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -2742,20 +2743,20 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		zbx_db_register_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
+		zbx_autoreg_prepare_host(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
 				itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)
 	{
 		zbx_db_begin();
-		zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
+		zbx_autoreg_flush_hosts(&autoreg_hosts, proxy_hostid, events_cbs);
 		zbx_db_commit();
 		zbx_dc_config_delete_autoreg_host(&autoreg_hosts);
 	}
 
 	zbx_free(host_metadata);
-	zbx_db_register_host_clean(&autoreg_hosts);
+	zbx_vector_ptr_clear_ext(&autoreg_hosts, (zbx_mem_free_func_t)zbx_autoreg_host_free);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
 
 	if (SUCCEED != ret)
