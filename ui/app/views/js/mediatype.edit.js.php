@@ -128,7 +128,7 @@ window.mediatype_edit_popup = new class {
 
 		// Trim all string type fields.
 		for (let key in fields) {
-			if (typeof fields[key] === 'string') {
+			if (typeof fields[key] === 'string' && key !== 'passwd') {
 				fields[key] = fields[key].trim();
 			}
 		}
