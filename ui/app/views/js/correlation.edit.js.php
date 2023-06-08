@@ -41,13 +41,13 @@ window.correlation_edit_popup = new class {
 				});
 
 				// Get values from condition popup.
-				overlay.$dialogue[0].addEventListener('condition.dialogue.submit',
-					(e) => this.#addConditionRow(e.detail)
-				);
+				overlay.$dialogue[0].addEventListener('condition.dialogue.submit', (e) => {
+					this.#addConditionRow(e.detail);
+					this.#processTypeOfCalculation();
+				});
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
-
 				this.#processTypeOfCalculation();
 			}
 		});
@@ -160,8 +160,6 @@ window.correlation_edit_popup = new class {
 						.querySelector('#condition_table tbody')
 						.insertAdjacentHTML('beforeend', template.evaluate(element));
 				}
-
-				this.#processTypeOfCalculation();
 			});
 		}
 		else {
@@ -212,8 +210,6 @@ window.correlation_edit_popup = new class {
 					.insertAdjacentHTML('beforeend', template.evaluate(condition));
 
 				condition.row_index++;
-
-				this.#processTypeOfCalculation();
 			}
 		}
 	}
