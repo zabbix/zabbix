@@ -23,8 +23,12 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup drules
+ *
+ * @dataSource NetworkDiscovery
  */
 class testFormNetworkDiscovery extends CWebTest {
+
+	use TableTrait;
 
 	/**
 	 * Name of discovery rule for update scenario.
@@ -41,7 +45,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		return ['class' => CMessageBehavior::class];
 	}
 
-	public function testFormNetworkDiscovery_Layout() {
+	private function testFormNetworkDiscovery_Layout() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
@@ -121,7 +125,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				switch ($type) {
 					case 'Zabbix agent':
 						$this->assertEqualsCanonicalizing(['Check type', 'Port range', 'Key'],
-							$checks_form->getLabels(CElementFilter::VISIBLE)->asText()
+								$checks_form->getLabels(CElementFilter::VISIBLE)->asText()
 						);
 						$this->assertEquals(['Port range', 'Key'], $checks_form->getRequiredLabels());
 						$checks_form->checkValue(['Key' => '']);
@@ -150,10 +154,10 @@ class testFormNetworkDiscovery extends CWebTest {
 							],
 							'authNoPriv' => [
 								'values' => ['SNMP OID' => '', 'Context name' => '', 'Security name' => '',
-									'Authentication protocol' => 'MD5', 'Authentication passphrase' => ''
+										'Authentication protocol' => 'MD5', 'Authentication passphrase' => ''
 								],
 								'lengths' => ['SNMP OID' => 512, 'Context name' => 255, 'Security name' => 64,
-									'Authentication passphrase' => 64
+										'Authentication passphrase' => 64
 								],
 								'required' => ['Port range', 'SNMP OID'],
 								'Authentication protocol' => ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512']
@@ -161,11 +165,11 @@ class testFormNetworkDiscovery extends CWebTest {
 
 							'authPriv' => [
 								'values' => ['SNMP OID' => '', 'Context name' => '', 'Security name' => '',
-									'Authentication protocol' => 'MD5', 'Authentication passphrase' => '',
-									'Privacy protocol' => 'DES', 'Privacy passphrase' => ''
+										'Authentication protocol' => 'MD5', 'Authentication passphrase' => '',
+										'Privacy protocol' => 'DES', 'Privacy passphrase' => ''
 								],
 								'lengths' => ['SNMP OID' => 512, 'Context name' => 255, 'Security name' => 64,
-									'Authentication passphrase' => 64, 'Privacy passphrase' => 64
+										'Authentication passphrase' => 64, 'Privacy passphrase' => 64
 								],
 								'required' => ['Port range', 'SNMP OID', 'Privacy passphrase'],
 								'Authentication protocol' => ['MD5', 'SHA1', 'SHA224', 'SHA256', 'SHA384', 'SHA512'],
@@ -174,7 +178,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						];
 
 						$this->assertEquals(array_keys($fields),
-							$checks_form->getField('Security level')->asDropdown()->getOptions()->asText()
+								$checks_form->getField('Security level')->asDropdown()->getOptions()->asText()
 						);
 
 						foreach ($fields as $level => $values) {
@@ -726,21 +730,13 @@ class testFormNetworkDiscovery extends CWebTest {
 
 		if ($update && !CTestArrayHelper::get($data, 'expected')) {
 			$data['fields']['Name'] = !CTestArrayHelper::get($data, 'trim')
-					? $data['fields']['Name'].'update'
-					: $data['fields']['Name'].'update       ';
+				? $data['fields']['Name'].'update'
+				: $data['fields']['Name'].'update       ';
 		}
 
 		// Clear all checks from discovery rule to change them to new ones from data provider.
 		if ($update) {
-			$checks_container = $form->getFieldContainer('Checks');
-			$checks_count = $checks_container->query('xpath:.//td[contains(@id, "dcheckCell_")]')->count();
-
-			for ($i = 1; $i <= $checks_count; $i++) {
-				// After each deletion checks buttons reset their position, so upper items locator is always 1.
-				$remove_button = $checks_container->query('xpath:(.//button[text()="Remove"])[1]')->one();
-				$remove_button->waitUntilClickable()->click();
-				$remove_button->waitUntilNotPresent();
-			}
+			$this->removeAllChecks($form);
 		}
 
 		if (CTestArrayHelper::get($data, 'Checks')) {
@@ -848,6 +844,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				$data['fields'] = array_map('trim', $data['fields']);
 			}
 
+			// Write new name for the next cases.
 			if ($update) {
 				self::$update_rule = $data['fields']['Name'];
 			}
@@ -879,6 +876,217 @@ class testFormNetworkDiscovery extends CWebTest {
 			if ($update && CTestArrayHelper::get($data, 'trim')) {
 				self::$update_rule = str_replace('     ', ' ', self::$update_rule);
 			}
+		}
+	}
+
+	public function getChecksData() {
+		return [
+			// #0 Change checks fields without changing type.
+			[
+				[
+					'Checks' => [
+						[
+							// SNMPv1 agent.
+							'Port range' => 200,
+							'SNMP community' => 'new_test_community',
+							'SNMP OID' => 'new test SNMP OID'
+						],
+						[
+							// SNMPv3 agent.
+							'Port range' => 9999,
+							'SNMP OID' => 'new test SNMP OID _2',
+							'Context name' => 'new test context name',
+							'Security name' => 'new test security name',
+							'Security level' => 'authPriv',
+							'Authentication protocol' => 'SHA224',
+							'Authentication passphrase' => 'new test auth passphrase',
+							'Privacy protocol' => 'AES256',
+							'Privacy passphrase' => 'new test privacy passphrase'
+						],
+						[
+							// Telnet.
+							'Port range' => 205
+						]
+					],
+					'expected_checks' => [
+						'SNMPv1 agent (200) "new test SNMP OID"',
+						'SNMPv3 agent (9999) "new test SNMP OID _2"',
+						'Telnet (205)',
+						'Add'
+					]
+				]
+			],
+			// #1 Change checks fields with changing type and delete some.
+			[
+				[
+					'Checks' => [
+						[
+							'Check type' => 'ICMP ping'
+						],
+						[
+							'Check type' => 'POP',
+							'Port range' => 2020
+						],
+						[
+							'remove' => true
+						]
+					],
+					'expected_checks' => [
+						'ICMP ping',
+						'POP (2020)',
+						'Add'
+					]
+				]
+			],
+			// #2 Add one additional check.
+			[
+				[
+					'Checks' => [
+						[
+							'add' => true,
+							'Check type' => 'SNMPv2 agent',
+							'Port range' => 903,
+							'SNMP community' => 'v2_test_community',
+							'SNMP OID' => ' v2 new test SNMP OID'
+						]
+					],
+					'expected_checks' => [
+						'ICMP ping',
+						'POP (2020)',
+						'SNMPv2 agent (903) "v2 new test SNMP OID"',
+						'Add'
+					]
+				]
+			],
+			// #3 Delete all checks.
+			[
+				[
+					'expected' => TEST_BAD,
+					'Checks' => 'remove all',
+					'error_details' => 'Field "dchecks" is mandatory.'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test scenario for editing just checks without changing any other field in the Discovery rule.
+	 *
+	 * @dataProvider getChecksData
+	 */
+	public function testFormNetworkDiscovery_ChangeChecks($data) {
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * from drules');
+		}
+
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$table = $form->query('id:dcheckList')->asTable()->one();
+
+		if ($data['Checks'] === 'remove all') {
+			$this->removeAllChecks($form);
+		}
+		else {
+			foreach ($data['Checks'] as $i => $check) {
+				if (CTestArrayHelper::get($check, 'add')) {
+					$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
+					$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+					$checks_form = $dialog->asForm();
+					unset ($check['add']);
+					$checks_form->fill($check);
+					$checks_form->submit();
+					$dialog->ensureNotPresent();
+				}
+				elseif (CTestArrayHelper::get($check, 'remove')) {
+					$row = $table->getRow($i);
+					$type_text = $row->getColumn('Type')->getText();
+					$row->query('button:Remove')->one()->waitUntilClickable()->click();
+					$this->assertFalse($table->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($type_text).']')->exists());
+				}
+				else {
+					$this->query('id:dcheckList')->asTable()->one()->getRow($i)
+							->query('button:Edit')->one()->waitUntilClickable()->click();
+					$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+					$checks_form = $dialog->asForm();
+					$checks_form->fill($check);
+					$checks_form->submit();
+					$dialog->ensureNotPresent();
+				}
+			}
+
+			$form->submit();
+
+			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+				$this->assertMessage(TEST_BAD, 'Cannot update discovery rule', $data['error_details']);
+				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+			}
+			else {
+				$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
+
+				// Compare Checks table with the expected result.
+				$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
+						'Discovery rule for changing checks')->query('tag:a')->waitUntilClickable()->one()->click();
+				$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
+			}
+		}
+	}
+
+	public function testFormNetworkDiscovery_Clone() {
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
+		$form = $this->query('id:discoveryForm')->asForm()->one();
+
+		$original_field_values = $form->getFields()->asValues();
+		$original_checks = $this->getTableResult('Type', 'id:dcheckList');
+
+		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
+			$original_radios[] = $checked_radio->getText();
+		}
+
+		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$new_name = 'Cloned Discovery Rule';
+		$form->fill(['Name' => $new_name]);
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Discovery rule created');
+
+		$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
+				$new_name)->query('tag:a')->waitUntilClickable()->one()->click();
+		$form->invalidate();
+
+		// Compare form's simple fields.
+		$original_field_values['Name'] = $new_name;
+		$this->assertEquals($original_field_values, $form->getFields()->asValues());
+
+		// Compare Discovery rule's Checks.
+		$this->assertEquals($original_checks, $this->getTableResult('Type', 'id:dcheckList'));
+
+		// Compare form's radios.
+		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
+			$new_radios[] = $checked_radio->getText();
+		}
+		$this->assertEquals($original_radios, $new_radios);
+
+		// Check Discovery rules in DB.
+		foreach(['Discovery rule for clone', $new_name] as $name) {
+			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($name)));
+		}
+	}
+
+	/**
+	 * @param CFormElement $form    discovery rule's edit form
+	 */
+	private function removeAllChecks($form) {
+		$checks_container = $form->getFieldContainer('Checks');
+		$checks_count = $checks_container->query('xpath:.//td[contains(@id, "dcheckCell_")]')->count();
+
+		for ($i = 0; $i < $checks_count; $i++) {
+			// After each deletion checks buttons reset their position, so upper items locator is always [1].
+			$remove_button = $checks_container->query('xpath:(.//button[text()="Remove"])[1]')->one();
+			$remove_button->waitUntilClickable()->click();
+			$remove_button->waitUntilNotPresent();
 		}
 	}
 }

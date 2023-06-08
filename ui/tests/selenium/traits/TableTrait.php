@@ -192,8 +192,8 @@ trait TableTrait {
 	 *
 	 * @param string $column		Column name, where value should be checked
 	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	private function getTableResult($column, $table_selector = 'class:list-table') {
+		$table = $this->query($table_selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();
