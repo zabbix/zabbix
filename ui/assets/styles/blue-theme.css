@@ -2090,6 +2090,7 @@ form.dashboard-widget-piechart .list-accordion-item {
   form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
   form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
   form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
+  form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-type,
   form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
     display: none; }
   form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-body {

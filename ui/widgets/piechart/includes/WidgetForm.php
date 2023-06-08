@@ -151,7 +151,6 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldTextBox('units_value'))
-					->setFlags(!$this->show_total_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))
