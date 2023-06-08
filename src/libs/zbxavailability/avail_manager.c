@@ -20,7 +20,7 @@
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxipcservice.h"
 #include "zbxnix.h"

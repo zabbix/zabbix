@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxprometheus.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 
 static int	num_params_exp = 0, num_params_rec = 0;

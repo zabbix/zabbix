@@ -21,7 +21,7 @@
 #include "zbxserver.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"

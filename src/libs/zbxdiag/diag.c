@@ -24,7 +24,7 @@
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxnum.h"

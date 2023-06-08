@@ -19,7 +19,7 @@
 
 #include "zbxdbhigh.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnum.h"
 
 /******************************************************************************

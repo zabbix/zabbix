@@ -34,7 +34,7 @@
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "pp_cache.h"
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"

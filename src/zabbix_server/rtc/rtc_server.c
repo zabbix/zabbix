@@ -18,7 +18,7 @@
 **/
 #include "rtc_server.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxdiag.h"
 #include "zbxtypes.h"
 #include "zbxcommon.h"
