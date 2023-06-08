@@ -191,35 +191,13 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertSelements(array $selements): array {
 		foreach ($selements as &$selement) {
-			if (array_key_exists('elements', $selement)) {
-				$selement['elements'] = self::convertElements($selement['elements']);
+			if ($selement['type'] == SYSMAP_ELEMENT_TYPE_TRIGGER && array_key_exists('elements', $selement)) {
+				$selement['elements'] = self::convertTriggers($selement['elements']);
 			}
 		}
 		unset($selement);
 
 		return $selements;
-	}
-
-	/**
-	 * Convert elements.
-	 *
-	 * @param array $elements
-	 *
-	 * @return array
-	 */
-	private static function convertElements(array $elements): array {
-		foreach ($elements as &$element) {
-			if (array_key_exists('expression', $element)) {
-				$element['expression'] = self::convertExpression($element['expression']);
-			}
-
-			if (array_key_exists('recovery_expression', $element)) {
-				$element['recovery_expression'] = self::convertExpression($element['recovery_expression']);
-			}
-		}
-		unset($element);
-
-		return $elements;
 	}
 
 	/**
@@ -231,9 +209,7 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertTriggers(array $triggers): array {
 		foreach ($triggers as &$trigger) {
-			if (array_key_exists('expression', $trigger)) {
-				$trigger['expression'] = self::convertExpression($trigger['expression']);
-			}
+			$trigger['expression'] = self::convertExpression($trigger['expression']);
 
 			if (array_key_exists('recovery_expression', $trigger)) {
 				$trigger['recovery_expression'] = self::convertExpression($trigger['recovery_expression']);
