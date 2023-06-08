@@ -33,65 +33,69 @@ class testPageSearch extends CWebTest {
 
 	use TableTrait;
 
-	private static $search_string = 'Test object';
+	protected $search_string = 'Test object';
 
-	private static $widget_params = [
+	protected $widgets = [
 		'hosts' => [
 			'key' => 'hosts',
-			'selector_id' => 'search_hosts_widget',
+			'selector' => 'id:search_hosts_widget',
+			'table_selector' => "xpath://div[@id='search_hosts_widget']//table",
 			'title' => 'Hosts',
 			'columns' => [
-				['name' => 'Host', 'skip_text_check' => true, 'href' => 'hosts.php?form=update'],
-				['name' => 'IP', 'skip_text_check' => true],
-				['name' => 'DNS', 'skip_text_check' => true],
-				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
-				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
-				['name' => 'Graphs', 'href' => 'zabbix.php?action=charts.view'],
-				['name' => 'Screens', 'href' => 'host_screen.php?hostid='],
-				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
-				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
-				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
-				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
-				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
-				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1']
+				['name' => 'Host', 'text' => 'Test object Host', 'href' => 'hosts.php?form=update&hostid={id}'],
+				['name' => 'IP', 'text' => '127.0.0.1'],
+				['name' => 'DNS', 'text' => 'testdnstwo.example.com'],
+				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view&filter_hostids%5B%5D={id}&filter_set=1'],
+				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view&filter_hostids%5B%5D={id}&filter_set=1'],
+				['name' => 'Graphs', 'href' => 'zabbix.php?action=charts.view&view_as=showgraph&filter_hostids%5B%5D={id}&filter_set=1'],
+				['name' => 'Screens', 'href' => 'host_screen.php?hostid={id}'],
+				['name' => 'Web', 'href' => 'zabbix.php?action=web.view&filter_hostids%5B%5D={id}&filter_set=1'],
+				['name' => 'Applications', 'href' => 'applications.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Items', 'href' => 'items.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}']
 			]
 		],
 		'hostgroups' => [
 			'key' => 'host_groups',
-			'selector_id' => 'search_hostgroup_widget',
+			'selector' => 'id:search_hostgroup_widget',
+			'table_selector' => "xpath://div[@id='search_hostgroup_widget']//table",
 			'title' => 'Host groups',
 			'columns' => [
-				['name' => 'Host group', 'skip_text_check' => true, 'href' => 'hostgroups.php?form=update'],
-				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view'],
-				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view'],
-				['name' => 'Web', 'href' => 'zabbix.php?action=web.view'],
-				['name' => 'Hosts', 'href' => 'hosts.php?filter_set=1'],
-				['name' => 'Templates', 'href' => 'templates.php?filter_set=1']
+				['name' => 'Host group', 'text' => 'Test object Hostgroup', 'href' => 'hostgroups.php?form=update&groupid={id}&hostid=0'],
+				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view&filter_groupids%5B%5D={id}&filter_set=1'],
+				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view&filter_groupids%5B%5D={id}&filter_set=1'],
+				['name' => 'Web', 'href' => 'zabbix.php?action=web.view&filter_groupids%5B%5D={id}&filter_set=1'],
+				['name' => 'Hosts', 'href' => 'hosts.php?filter_set=1&filter_groups%5B0%5D={id}', 'entity_count' => 1],
+				['name' => 'Templates', 'href' => 'templates.php?filter_set=1&filter_groups%5B0%5D={id}', 'entity_count' => 1]
 			]
 		],
 		'templates' => [
 			'key' => 'templates',
-			'selector_id' => 'search_templates_widget',
+			'selector' => 'id:search_templates_widget',
+			'table_selector' => "xpath://div[@id='search_templates_widget']//table",
 			'title' => 'Templates',
 			'columns' => [
-				['name' => 'Template', 'skip_text_check' => true, 'href' => 'templates.php?form=update'],
-				['name' => 'Applications', 'href' => 'applications.php?filter_set=1'],
-				['name' => 'Items', 'href' => 'items.php?filter_set=1'],
-				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1'],
-				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1'],
-				['name' => 'Screens', 'href' => 'screenconf.php?templateid='],
-				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1'],
-				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids']
+				['name' => 'Template', 'text' => 'Test object Template', 'href' => 'templates.php?form=update&&templateid={id}'],
+				['name' => 'Applications', 'href' => 'applications.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Items', 'href' => 'items.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Triggers', 'href' => 'triggers.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Graphs', 'href' => 'graphs.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Screens', 'href' => 'screenconf.php?templateid={id}'],
+				['name' => 'Discovery', 'href' => 'host_discovery.php?filter_set=1&filter_hostids%5B0%5D={id}'],
+				['name' => 'Web', 'href' => 'httpconf.php?filter_set=1&filter_hostids%5B0%5D={id}']
 			]
 		]
 	];
 
-	public static function prepareData() {
-		// This is needed so that all links in Search results are active.
-		$hostGroupId = CDataHelper::call('hostgroup.create', [['name' => self::$search_string.' Hostgroup']])['groupids'][0];
+	public function prepareData() {
+		// This is needed so that all links in Search results are active. Also get IDs for checking links.
+		$response = CDataHelper::call('hostgroup.create', [['name' => $this->search_string.' Hostgroup']]);
+		$this->widgets['hostgroups']['link_id'] = $response['groupids'][0];
 
-		CDataHelper::createHosts([
+		$response = CDataHelper::createHosts([
 			[
 				'host' => 'emoji visible name',
 				'name' => '🙂⭐️',
@@ -137,29 +141,31 @@ class testPageSearch extends CWebTest {
 				]
 			],
 			[
-				'host' => self::$search_string.' Host',
+				'host' => $this->search_string.' Host',
 				'groups' => [
-					'groupid' => $hostGroupId
+					'groupid' => $this->widgets['hostgroups']['link_id']
 				],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
 					'useip' => 1,
 					'ip' => '127.0.0.1',
-					'dns' => '',
+					'dns' => 'testdnstwo.example.com',
 					'port' => '10050'
 				]
 			]
 		]);
+		$this->widgets['hosts']['link_id'] = $response['hostids'][$this->search_string.' Host'];
 
-		CDataHelper::createTemplates([
+		$response = CDataHelper::createTemplates([
 			[
-				'host' => self::$search_string.' Template',
+				'host' => $this->search_string.' Template',
 				'groups' => [
-					'groupid' => $hostGroupId
+					'groupid' => $this->widgets['hostgroups']['link_id']
 				]
 			]
 		]);
+		$this->widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
 	}
 
 	/**
@@ -177,41 +183,50 @@ class testPageSearch extends CWebTest {
 		$this->verifyThatSuggestionsNotShown();
 
 		// Check suggestion highlighting.
-		$search_field->fill(self::$search_string);
+		$search_field->fill($this->search_string);
 		$this->assertEquals(null, $search_button->getAttribute('disabled'));
-		$highlighted_text = $this->query('xpath://ul[@class="search-suggest"]//span[@class="suggest-found"]')->waitUntilVisible()->one()->getText();
-		$this->assertEquals(strtolower(self::$search_string), strtolower($highlighted_text));
+		$highlighted_text = $this->query('class:suggest-found')->waitUntilVisible()->one()->getText();
+		$this->assertEquals(strtolower($this->search_string), strtolower($highlighted_text));
 
 		// Check that suggestions disappear after deleting input.
 		$search_field->fill('');
 		$this->verifyThatSuggestionsNotShown();
-		$this->assertEquals('true', $search_button->getAttribute('disabled'));
+		$this->assertFalse($search_button->isEnabled());
 
-		$search_field->fill(self::$search_string);
-		$search_button->waitUntilReady()->click();
-		$this->assertEquals('Search: '.self::$search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
+		$search_field->fill($this->search_string);
+		$search_button->waitUntilClickable()->click();
+		$this->assertEquals('Search: '.$this->search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
 
 		// Assert result widget layout.
-		foreach (self::$widget_params as $wp) {
-			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
-			$widget = $this->query($widget_selector)->one();
-			$this->assertEquals($wp['title'], $widget->query('xpath:.//h4')->one()->getText());
+		foreach ($this->widgets as $widget_params) {
+			$widget = $this->query($widget_params['selector'])->one();
+			$this->assertEquals($widget_params['title'], $widget->query('xpath:.//h4')->one()->getText());
 
 			// Check column names.
-			$this->assertEquals(array_column($wp['columns'], 'name'), $this->query($widget_selector.'//table//th')->all()->asText());
+			$this->assertEquals(array_column($widget_params['columns'], 'name'),
+					$this->query($widget_params['table_selector']."//th")->all()->asText()
+			);
 
 			// Check table links.
 			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
-			foreach ($wp['columns'] as $col_num => $column){
+
+			foreach ($widget_params['columns'] as $i => $column) {
+				// If no text specified, the column text should match its name.
+				$expected_text = CTestArrayHelper::get($column, 'text', $column['name']);
+				// The same column name is sometimes used twice so need to access column by index.
+				$column_element = $table_first_row->getColumn($i);
+
 				if (isset($column['href'])) {
-					// The same column name is sometimes used twice so need to access by index.
-					$link = $table_first_row->query('xpath:./td['.($col_num + 1).']//a')->one();
-					// Link text matches the column name the vast majority of time.
-					if (!(isset($column['skip_text_check']) && $column['skip_text_check'])) {
-						$this->assertEquals($column['name'], $link->getText());
+					// Sometimes there might be an entity counter next to the link.
+					if(isset($column['entity_count'])){
+						$expected_text .= ' '.$column['entity_count'];
 					}
-					$this->assertStringContainsString($column['href'], $link->getAttribute('href'));
+					// Check that the link href matches.
+					$expected_href = str_replace('{id}', $widget_params['link_id'], $column['href']);
+					$this->assertEquals($expected_href, $column_element->query('tag:a')->one()->getAttribute('href'));
 				}
+
+				$this->assertEquals($expected_text, $column_element->getText());
 			}
 
 			// Check expanding functionality.
@@ -310,12 +325,20 @@ class testPageSearch extends CWebTest {
 					'search_string' => 'testdns.example.com',
 					'hosts' => [['Host' => STRING_128, 'IP' => '127.0.0.1', 'DNS' => 'testdns.example.com']]
 				]
+			],
+			[
+				[
+					'search_string' => 'st obj',
+					'hosts' => [['Host' => 'Test object Host']],
+					'host_groups' => [['Host group' => 'Test object Hostgroup']],
+					'templates' => [['Template' => 'Test object Template']]
+				]
 			]
 		];
 	}
 
 	/**
-	 * Search for an existing Host and check the results page.
+	 * Search for a string and verify the results.
 	 *
 	 * @dataProvider getSearchData
 	 */
@@ -325,8 +348,9 @@ class testPageSearch extends CWebTest {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
 			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
-				'WHERE h.status in (0,1) AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
-				'OR i.dns LIKE \'%'.$data['search_string'].'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
+				'WHERE h.status in (0,1) AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\''.
+				' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\' OR i.dns LIKE \'%'.$data['search_string'].
+				'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
 			$db_count = [];
 			foreach (['hosts' => $host_sql, 'host_groups' => $hostgroup_sql, 'templates' => $template_sql] as $type => $sql) {
@@ -343,28 +367,25 @@ class testPageSearch extends CWebTest {
 		$this->assertEquals('Search: '.$data['search_string'], $title);
 
 		// Verify each widget type.
-		foreach (self::$widget_params as $wp) {
-			$widget_selector = 'xpath://div[@id='.CXPathHelper::escapeQuotes($wp['selector_id']).']';
-			$widget = $this->query($widget_selector)->one();
+		foreach ($this->widgets as $widget_params) {
+			$widget = $this->query($widget_params['selector'])->one();
 
 			// Assert table data.
 			$expected_count = 0;
-			if (isset($data[$wp['key']])) {
-				$this->assertTableHasData($data[$wp['key']],$widget_selector.'//table');
-				$expected_count = count($data[$wp['key']]);
-			}
-			elseif (isset($data[$wp['key'].'_count'])) {
-				$expected_count = $data[$wp['key'].'_count'];
+			if (isset($data[$widget_params['key']])) {
+				$this->assertTableHasData($data[$widget_params['key']], $widget_params['table_selector']);
+				$expected_count = count($data[$widget_params['key']]);
 			}
 			elseif (CTestArrayHelper::get($data, 'count_from_db', false)) {
-				$expected_count = $db_count[$wp['key']];
+				$expected_count = $db_count[$widget_params['key']];
 			}
 			else {
-				$this->assertTableData(null, $widget_selector.'//table');
+				$this->assertTableData(null, $widget_params['table_selector']);
 			}
 
 			// Assert table stats.
-			$footer_text =  $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			$footer_text = $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
+			// Only a maximum of 100 records can be displayed at once.
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
 		}
 	}
@@ -471,7 +492,7 @@ class testPageSearch extends CWebTest {
 	/**
 	 * Verify that the suggestion list is NOT visible.
 	 */
-	private function verifyThatSuggestionsNotShown() {
+	protected function verifyThatSuggestionsNotShown() {
 		try {
 			$this->query('class:search-suggest')->waitUntilVisible(1);
 		}
