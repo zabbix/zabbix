@@ -131,7 +131,7 @@ class CMacroValue extends CInput {
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
-				->setReadonly($readonly);
+				->setReadonly((bool) $readonly);
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
@@ -141,7 +141,7 @@ class CMacroValue extends CInput {
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
-				->setReadonly($readonly);
+				->setReadonly((bool) $readonly);
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
