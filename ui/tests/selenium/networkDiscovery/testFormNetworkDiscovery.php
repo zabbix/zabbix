@@ -51,12 +51,12 @@ class testFormNetworkDiscovery extends CWebTest {
 	/**
 	 * Get discovery rules and checks tables hash values.
 	 */
-	public static function getHash() {
+	private static function getHash() {
 		return CDBHelper::getHash( 'SELECT * FROM drules').
 			CDBHelper::getHash('SELECT * FROM dchecks');
 	}
 
-	private function testFormNetworkDiscovery_Layout() {
+	public function testFormNetworkDiscovery_Layout() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
@@ -723,7 +723,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->checkDiscoveryRuleForm($data, true);
 	}
 
-	public function checkDiscoveryRuleForm($data, $update = false) {
+	private function checkDiscoveryRuleForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$old_hash = $this->getHash();
 		}
