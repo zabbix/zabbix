@@ -371,6 +371,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+#endif
+
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 

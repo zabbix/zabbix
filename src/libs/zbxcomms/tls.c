@@ -370,6 +370,21 @@ static int	tls_is_nonblocking_error(ssize_t err)
 #endif
 
 #if defined(HAVE_OPENSSL)
+static int	tls_socket_event(SSL *ctx, ssize_t ssl_err, short *event)
+{
+	ZBX_UNUSED(ctx);
+	switch (ssl_err)
+	{
+		case SSL_ERROR_WANT_READ:
+			*event = POLLIN;
+			return SUCCEED;
+		case SSL_ERROR_WANT_WRITE:
+			*event = POLLOUT;
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
+}
 /******************************************************************************
  *                                                                            *
  * Purpose: wait for socket to be available for read or write depending on    *
@@ -385,17 +400,8 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 	ZBX_UNUSED(ctx);
 
 	pd.fd = s;
-	switch (ssl_err)
-	{
-		case SSL_ERROR_WANT_READ:
-			pd.events = POLLIN;
-			break;
-		case SSL_ERROR_WANT_WRITE:
-			pd.events = POLLOUT;
-			break;
-		default:
-			return FAIL;
-	}
+
+	tls_socket_event(ctx, ssl_err, &pd.events);
 
 	event = pd.events;
 
@@ -3888,7 +3894,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 	return offset;
 }
 
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
+ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error)
 {
 	ssize_t		n = 0;
 
@@ -3905,6 +3911,12 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, char **error)
 		err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
 		if (SUCCEED != tls_is_nonblocking_error(err))
 			break;
+
+		if (NULL != events)
+		{
+			tls_socket_event(s->tls_ctx->ctx, err, events);
+			return ZBX_PROTO_ERROR;
+		}
 
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 		{

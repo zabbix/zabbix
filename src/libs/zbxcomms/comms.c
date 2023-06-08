@@ -1759,7 +1759,7 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 	{
 		char	*error = NULL;
 
-		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, &error)))
+		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, events, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
 			zbx_free(error);

@@ -133,7 +133,6 @@ static int	agent_task_process(short event, void *data)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "offset:%ld event_local:%d", agent_context->tcp_recv_state.offset, event_local);
 				if (POLLIN & event_local)
 					return ZBX_ASYNC_TASK_READ;
 				if (POLLOUT & event_local)
@@ -222,6 +221,8 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (NULL != agent_context->interface.addr && SUCCEED != zbx_is_ip(agent_context->interface.addr))
 		agent_context->server_name = agent_context->interface.addr;
+	else
+		agent_context->server_name = NULL;
 #else
 	ZBX_UNUSED(tls_arg1);
 	ZBX_UNUSED(tls_arg2);
