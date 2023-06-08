@@ -30,11 +30,7 @@ window.widget_piechart_form = new class {
 
 		this._$overlay_body = jQuery('.overlay-dialogue-body');
 		this._form = document.getElementById('widget-dialogue-form');
-		this._draw = document.getElementById('draw');
-		this._show_value = document.getElementById('show_total');
-		this._units_show = document.getElementById('units_show');
 		this._templateid = templateid;
-
 		this._dataset_wrapper = document.getElementById('data_sets');
 
 		this._$overlay_body.on('scroll', () => {
@@ -46,6 +42,8 @@ window.widget_piechart_form = new class {
 			.on('change', 'input, z-select, .multiselect', (e) => this.onChartConfigChange(e));
 
 		this._datasetTabInit();
+		this._displayingOptionsTabInit();
+		this._toggleDisplayingOptionsFields();
 		this._timePeriodTabInit();
 		this._legendTabInit();
 
@@ -197,6 +195,42 @@ window.widget_piechart_form = new class {
 		this._initDataSetSortable();
 
 		this._initSingleItemSortable(this._getOpenedDataset());
+	}
+
+	_displayingOptionsTabInit() {
+		this._form.querySelector('#displaying_options').onchange = () => {
+			this._toggleDisplayingOptionsFields();
+		};
+	}
+
+	_toggleDisplayingOptionsFields() {
+		const draw_type = this._form.querySelector('[name="draw"]:checked').value;
+		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
+		const is_doughnut = draw_type == <?= PIE_CHART_DRAW_DOUGHNUT ?>;
+		const merge_sectors = document.getElementById('merge_sectors');
+		const total_value_fields = this._form.querySelectorAll(
+			'#value_size, #decimal_places, #units_show, #units_value, #value_bold, #value_color'
+		);
+
+		for (const element of doughnut_config_fields) {
+			element.style.display = is_doughnut ? '' : 'none';
+			for (const input of element.querySelectorAll('input')) {
+				input.disabled = !is_doughnut;
+			}
+		}
+
+		jQuery('#width').rangeControl(
+			is_doughnut ? 'enable' : 'disable'
+		);
+
+		document.getElementById('merge_percentage').disabled = !merge_sectors.checked;
+		document.getElementById('merge_color').disabled = !merge_sectors.checked;
+
+		for (const element of total_value_fields) {
+			element.disabled = !document.getElementById('show_total').checked;
+		}
+
+		document.getElementById('units_value').disabled = !document.getElementById('units_show').checked;
 	}
 
 	_timePeriodTabInit() {

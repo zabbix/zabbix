@@ -45,7 +45,7 @@ class WidgetForm extends CWidgetForm {
 
 	private bool $chart_time_on = false;
 	private bool $legend_on = true;
-	private bool $show_total_on = false;
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 

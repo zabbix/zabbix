@@ -97,8 +97,8 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 					new CFormField($draw->getView())
 				])
 				->addItem([
-					$width->getLabel(),
-					(new CFormField([$width->getView(), ' %']))
+					$width->getLabel()->setId('width_label'),
+					(new CFormField([$width->getView(), ' %']))->setId('width_range')
 				])
 				->addItem([
 					$stroke->getLabel(),
@@ -141,7 +141,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				->addItem([
 					$value_color->getLabel(),
 					new CFormField($value_color->getView())
-				])
+				])->setId('show_total_fields')
 		);
 }
 
