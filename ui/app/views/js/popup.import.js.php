@@ -88,8 +88,8 @@ function openImportComparePopup(overlay) {
 	})
 	.then((response) => response.json())
 	.then((response) => {
-		if ('error' in response) {
-			throw {error: response.error};
+		if ('errors' in response) {
+			throw {error: response.errors};
 		}
 
 		overlayDialogue({
@@ -141,8 +141,8 @@ function submitImportPopup(overlay) {
 	})
 	.then((response) => response.json())
 	.then((response) => {
-		if ('error' in response) {
-			throw {error: response.error};
+		if ('errors' in response) {
+			throw {error: response.errors};
 		}
 
 		postMessageOk(response.title);
