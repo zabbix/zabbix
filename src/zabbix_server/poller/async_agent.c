@@ -28,22 +28,41 @@
 #include "zbxip.h"
 #include "../../libs/zbxcomms/tls.h"
 
+const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
+{
+	switch (step)
+	{
+		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
+			return "CONNECT_WAIT";
+		case ZABBIX_AGENT_STEP_SEND:
+			return "AGENT_STEP_SEND";
+		case ZABBIX_AGENT_STEP_RECV:
+			return "AGENT_STEP_RECV";
+	}
+}
+
+
 static int	agent_task_process(short event, void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
+	short			event_local = 0;
 
 	if (0 == event)
 	{
 		/* initialization */
 		agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d event:%x", __func__, agent_context->step, event);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%x", __func__,
+				get_agent_step_string(agent_context->step), event);
 
 		return ZBX_ASYNC_TASK_WRITE;
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d event:%x", __func__, agent_context->step, event);
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%x", __func__,
+				get_agent_step_string(agent_context->step), event);
+	}
 
 
 	if (0 != (event & EV_TIMEOUT))
@@ -113,16 +132,6 @@ static int	agent_task_process(short event, void *data)
 			}
 			break;
 		case ZABBIX_AGENT_STEP_RECV:
-			if (0 == (event & EV_READ))
-			{
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
-						" unexpected write event during send"));
-				agent_context->ret = NETWORK_ERROR;
-
-				return ZBX_ASYNC_TASK_STOP;
-			}
-			short	event_local = 0;
-
 			if (FAIL != (received_len = zbx_tcp_recv_state(&agent_context->s,
 					&agent_context->tcp_recv_state, agent_context->flags, &event_local)))
 			{
