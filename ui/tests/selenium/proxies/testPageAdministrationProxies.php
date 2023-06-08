@@ -82,10 +82,10 @@ class testPageAdministrationProxies extends CWebTest {
 		$versions = [
 			'active_current' => ['version' => '6.4.0'],
 			'active_unknown' => ['version' => ''],
-			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'yellow', 'hint_text' =>
+			'passive_outdated' => ['version' => '6.2.0 ', 'color' => 'red', 'icon_color' => 'zi-i-warning', 'hint_text' =>
 					'Proxy version is outdated, only data collection and remote execution is available with server version 6.4.0.'
 			],
-			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'red', 'hint_text' =>
+			'passive_unsupported' => ['version' => '5.4.1 ', 'color' => 'red', 'icon_color' => 'zi-i-negative', 'hint_text' =>
 					'Proxy version is not supported by server version 6.4.0.', 'hint_color' => 'red'
 			]
 		];
@@ -101,8 +101,8 @@ class testPageAdministrationProxies extends CWebTest {
 				);
 
 				// Check info-icon color.
-				$this->assertTrue($column->query("xpath:.//a[@class=".
-						CXPathHelper::escapeQuotes("icon-info status-".$parameters['icon_color'])."]")->exists()
+				$this->assertTrue($column->query("xpath:.//button[".CXPathHelper::fromClass($parameters['icon_color'])."]")
+						->exists()
 				);
 
 				// Check version hint.

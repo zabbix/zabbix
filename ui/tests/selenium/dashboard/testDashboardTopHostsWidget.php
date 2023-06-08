@@ -1742,9 +1742,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 	 * Check warning and info messages.
 	 */
 	public function testDashboardTopHostsWidget_CheckInfoMessages() {
-		$warnings = ['.//span[@id="tophosts-column-aggregate-function-warning"]', './/span[@id="tophosts-column-display-warning"]',
-				'.//span[@id="tophosts-column-thresholds-warning"]'];
-		$history_data = '//span[@id="tophosts-column-history-data-warning"]';
+		$label_warnings = ['Aggregation function', 'Display', 'History data', 'Thresholds'];
 		$dashboardid = CDataHelper::get('TopHostsWidget.dashboardids.top_host_create');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
@@ -1757,23 +1755,21 @@ class testDashboardTopHostsWidget extends CWebTest {
 		$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
 
 		// Check that no warning icon displayed before adding fields.
-		$warnings = array_merge($warnings, [$history_data]);
-
-		foreach ($warnings as $warning) {
-			$this->assertFalse($column_form->query('xpath:'.$warning)->one()->isVisible());
+		foreach ($label_warnings as $label) {
+			$this->assertFalse($column_form->getLabel($label)->query('tag:button')->one()->isVisible());
 		}
 
 		// Adding those fields new info icons appear.
 		$column_form->fill(['Aggregation function' => 'min', 'Display' => 'Bar', 'History data' => 'Trends']);
-		$column_form->query('button:Add')->one()->click();
+		$column_form->getField('Thresholds')->query('button:Add')->one()->click();
 
 		// Check warning and info icon message.
-		foreach ($warnings as $warning) {
-			$column_form->query('xpath:'.$warning.'/a')->one()->click();
+		foreach ($label_warnings as $label) {
+			$column_form->getLabel($label)->query('tag:button')->one()->click();
 
 			// Check hint-box.
 			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();
-			$hintbox = ($warning === $history_data)
+			$hintbox = ($label === 'History data')
 					? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
 					: 'With this setting only numeric items will be displayed in this column.';
 			$this->assertEquals($hintbox, $hint->one()->getText());

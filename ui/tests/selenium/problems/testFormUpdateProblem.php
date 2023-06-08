@@ -321,7 +321,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Hintboxes.
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
-				$form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']/a')->one()->click();
+				$form->getLabel($field)->query('tag:button')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
@@ -891,7 +891,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table->waitUntilReloaded();
 
 		// Check suppressed icon and hint.
-		$this->checkIconAndHint($row, 'icon-action-suppress', "Suppressed till: Indefinitely".
+		$this->checkIconAndHint($row, 'zi-eye-off', "Suppressed till: Indefinitely".
 				"\nManually by: Admin (Zabbix Administrator)"
 		);
 
@@ -900,7 +900,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Assert that eye icon stopped blinking.
 		$this->page->refresh();
-		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[@class="icon-action-suppress"]')->exists());
+		$this->assertTrue($row->getColumn('Info')->query('xpath:.//button[not(contains(@class, "js-blink"))]')->exists());
 
 		// Unsuppress problem.
 		$row->getColumn('Update')->query('tag:a')->waitUntilClickable()->one()->click();
@@ -911,7 +911,7 @@ class testFormUpdateProblem extends CWebTest {
 		$table->waitUntilReloaded();
 
 		// Check unsuppressed icon and hint.
-		$this->checkIconAndHint($row, 'icon-action-unsuppress', 'Unsuppressed by: Admin (Zabbix Administrator)');
+		$this->checkIconAndHint($row, 'zi-eye', 'Unsuppressed by: Admin (Zabbix Administrator)');
 
 		// Unsuppress the problem in DB: 'Trigger for icon test'.
 		DBexecute('DELETE FROM event_suppress WHERE event_suppressid=10051');
@@ -919,7 +919,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check that eye icon disappeared.
 		$this->assertFalse($row->getColumn('Info')->query("xpath:.//button[@class=".
-				CXPathHelper::fromClass('icon-action-unsuppress')."]")->exists()
+				CXPathHelper::fromClass('zi-eye')."]")->exists()
 		);
 
 		// Check Suppress/Unsuppress icon in History table.
@@ -932,7 +932,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check Actions hint in Problem row.
 		$row->invalidate();
-		$unsuppress_button = 'xpath:.//button[contains(@class, "icon-action-unsuppress")]';
+		$unsuppress_button = 'xpath:.//button[contains(@class, "zi-eye")]';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue"]')->asOverlayDialog()
 				->one()->waitUntilReady();
@@ -966,7 +966,9 @@ class testFormUpdateProblem extends CWebTest {
 		foreach ([0, 1] as $i)  {
 			$action_row = $table->getRow($i);
 			$this->assertEquals('Admin (Zabbix Administrator)', $action_row->getColumn($user)->getText());
-			$query = ($i === 0) ? 'xpath:.//span[@title="Unsuppressed"]' : 'xpath:.//*[contains(@class, "icon-action-suppress")]';
+			$query = ($i === 0)
+				? 'xpath:.//span[@title="Unsuppressed"]'
+				: 'xpath:.//*['.CXPathHelper::fromClass('zi-eye-off').']';
 			$this->assertTrue($action_row->getColumn($action)->query($query)->exists());
 		}
 	}
@@ -979,7 +981,7 @@ class testFormUpdateProblem extends CWebTest {
 	 */
 	private function checkIconAndHint($row, $class, $text) {
 		// Assert blinking icon in Info column.
-		$icon = $row->getColumn('Info')->query("xpath:.//button[@class='".$class." blink']");
+		$icon = $row->getColumn('Info')->query('class', [$class, 'js-blink']);
 		$this->assertTrue($icon->exists());
 
 		// Check icon hintbox.
@@ -990,6 +992,6 @@ class testFormUpdateProblem extends CWebTest {
 		$hint->asOverlayDialog()->close();
 
 		// Assert non-blinking icon in Actions column.
-		$this->assertTrue($row->getColumn('Actions')->query("xpath:.//button[@class='".$class." cursor-pointer']")->exists());
+		$this->assertTrue($row->getColumn('Actions')->query('xpath:.//button['.CXPathHelper::fromClass($class).']')->exists());
 	}
 }
