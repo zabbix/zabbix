@@ -71,7 +71,6 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 		(new CCol(
 			(new CTextAreaFlexible('macro_rows['.$i++.']', $macro_name, ['readonly' => true]))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-				->disableSpellcheck()
 				->removeId()
 				->removeAttribute('name')
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
