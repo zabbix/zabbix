@@ -20,7 +20,7 @@
 #include "zbxthreads.h"
 #include "zbxcommshigh.h"
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
 #include "zbxmutexs.h"
@@ -1494,7 +1494,7 @@ int	main(int argc, char **argv)
 	char			*error = NULL;
 	int			total_count = 0, succeed_count = 0, ret = FAIL, timestamp, ns;
 	zbx_thread_sendval_args	*sendval_args = NULL;
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
 	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();

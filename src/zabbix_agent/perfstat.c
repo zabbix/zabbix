@@ -19,7 +19,7 @@
 
 #include "perfstat.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxsysinfo.h"
 #include "zbxstr.h"

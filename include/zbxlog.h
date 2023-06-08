@@ -17,21 +17,21 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LOG_H
-#define ZABBIX_LOG_H
+#ifndef ZABBIX_ZBXLOG_H
+#define ZABBIX_ZBXLOG_H
 
 #include "zbxcommon.h"
 
-#define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSTEM		1
-#define LOG_TYPE_FILE		2
-#define LOG_TYPE_CONSOLE	3
+#define ZBX_LOG_TYPE_UNDEFINED	0
+#define ZBX_LOG_TYPE_SYSTEM	1
+#define ZBX_LOG_TYPE_FILE	2
+#define ZBX_LOG_TYPE_CONSOLE	3
 
 #define ZBX_OPTION_LOGTYPE_SYSTEM	"system"
 #define ZBX_OPTION_LOGTYPE_FILE		"file"
 #define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
-#define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
+#define ZBX_LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
 void	__zbx_update_env(double time_now);
 

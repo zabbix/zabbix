@@ -21,7 +21,6 @@
 
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 
 /*
  * 7.0 development database patches

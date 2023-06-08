@@ -19,7 +19,7 @@
 
 #include "eventlog.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxregexp.h"
 #include "winmeta.h"

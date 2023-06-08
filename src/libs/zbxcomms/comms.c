@@ -23,7 +23,7 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
 #endif
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcompress.h"
 #include "zbxstr.h"
 #include "zbxnum.h"

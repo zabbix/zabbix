@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxconf.h"
@@ -298,7 +298,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 char	*opt = NULL;
 
@@ -1433,7 +1433,7 @@ int	main(int argc, char **argv)
 	/* into windows event log while zabbix_log is not ready */
 	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
 		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
 	}
