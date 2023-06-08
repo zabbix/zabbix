@@ -137,6 +137,25 @@ class NetworkDiscovery {
 						'type' => 12
 					]
 				]
+			],
+			[
+				'name' => 'Discovery rule for cancelling scenario',
+				'iprange' => '192.168.15.20-255',
+				'dchecks' => [
+					[
+						// SNMPv3 agent.
+						'type' => 13,
+						'ports' => 130,
+						'key_' => '.1.3.6.1.2.1.1.1.999',
+						'snmpv3_contextname name' => 'cancel_context_name',
+						'snmpv3_securityname' => 'cancel_security_name',
+						'snmpv3_securitylevel' => 2,
+						'snmpv3_authprotocol' => 4,
+						'snmpv3_authpassphrase' => 'cancel_authpassphrase',
+						'snmpv3_privprotocol' => 5,
+						'snmpv3_privpassphrase' => 'cancel_privpassphrase'
+					]
+				]
 			]
 		]);
 	}

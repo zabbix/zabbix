@@ -30,6 +30,9 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	use TableTrait;
 
+	CONST DELETE_RULE = 'Discovery rule to check delete';
+	CONST CANCEL_RULE = 'Discovery rule for cancelling scenario';
+
 	/**
 	 * Name of discovery rule for update scenario.
 	 *
@@ -43,6 +46,14 @@ class testFormNetworkDiscovery extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
+	}
+
+	/**
+	 * Get discovery rules and checks tables hash values.
+	 */
+	public static function getHash() {
+		return CDBHelper::getHash( 'SELECT * FROM drules').
+			CDBHelper::getHash('SELECT * FROM dchecks');
 	}
 
 	private function testFormNetworkDiscovery_Layout() {
@@ -714,7 +725,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function checkDiscoveryRuleForm($data, $update = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * from drules');
+			$old_hash = $this->getHash();
 		}
 
 		if ($update) {
@@ -765,7 +776,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				// After checking error in overlay no need to test further form.
 				if (CTestArrayHelper::get($data, 'dialog_error')) {
 					$this->assertMessage(TEST_BAD, null, $data['dialog_error']);
-					$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+					$this->assertEquals($old_hash, $this->getHash());
 
 					return;
 				}
@@ -834,7 +845,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			$this->assertMessage(TEST_BAD, 'Cannot'.($update ? ' update': ' create').' discovery rule',
 					$data['error_details']
 			);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+			$this->assertEquals($old_hash, $this->getHash());
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, 'Discovery rule'. ($update ? ' updated': ' created'));
@@ -976,7 +987,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	 */
 	public function testFormNetworkDiscovery_ChangeChecks($data) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * from drules');
+			$old_hash = $this->getHash();
 		}
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
@@ -1019,7 +1030,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, 'Cannot update discovery rule', $data['error_details']);
-				$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * from drules'));
+				$this->assertEquals($old_hash, $this->getHash());
 			}
 			else {
 				$this->assertMessage(TEST_GOOD, 'Discovery rule updated');
@@ -1073,6 +1084,104 @@ class testFormNetworkDiscovery extends CWebTest {
 		foreach(['Discovery rule for clone', $new_name] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($name)));
 		}
+	}
+
+	public function testFormNetworkDiscovery_Delete() {
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$this->query('link', self::DELETE_RULE)->waitUntilClickable()->one()->click();
+		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$form->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr(self::DELETE_RULE)));
+	}
+
+	public static function getCancelData() {
+		return [
+			[
+				[
+					'action' => 'Add'
+				]
+			],
+			[
+				[
+					'action' => 'Update'
+				]
+			],
+			[
+				[
+					'action' => 'Clone'
+				]
+			],
+			[
+				[
+					'action' => 'Delete'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking Dicrovery rule form's actions cancelling.
+	 *
+	 * @dataProvider getCancelData
+	 */
+	public function testFormNetworkDiscovery_Cancel($data) {
+		$old_hash = $this->getHash();
+		$new_name = microtime(true).' Cancel '.self::CANCEL_RULE;
+
+		$this->page->login()->open('zabbix.php?action=discovery.list');
+		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
+		$this->query($selector)->waitUntilClickable()->one()->click();
+
+		$form = $this->query('id:discoveryForm')->asForm()->one();
+
+		if ($data['action'] === 'Delete') {
+			$form->query('button:Delete')->waitUntilClickable()->one()->click();
+			$this->page->dismissAlert();
+		}
+		else {
+			// Fill form's fields.
+			$form->fill([
+				'Name' => $new_name,
+				'Discovery by proxy' => 'Passive proxy 1',
+				'Update interval' => '15s',
+				'Enabled' => false
+			]);
+
+			$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
+					->waitUntilClickable()->one()->click();
+			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+			$checks_form = $dialog->asForm();
+			$checks_form->fill([
+				'Check type' => 'SNMPv2 agent',
+				'Port range' => 99,
+				'SNMP community' => 'new cancel community',
+				'SNMP OID' => 'new cancel OID'
+			]);
+			$checks_form->submit();
+			$dialog->ensureNotPresent();
+
+			$radios = [
+				'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
+				'Host name' => 'IP address',
+				'Visible name' => 'DNS name'
+			];
+
+			foreach ($radios as $label => $value) {
+				$form->getFieldContainer($label)->query("xpath:.//label[text()=".
+					CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
+			}
+
+			if ($data['action'] === 'Clone') {
+				$form->query('button', $data['action'])->one()->click();
+			}
+		}
+
+		$form->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$this->page->assertHeader('Discovery rules');
+		$this->assertEquals($old_hash, $this->getHash());
 	}
 
 	/**
