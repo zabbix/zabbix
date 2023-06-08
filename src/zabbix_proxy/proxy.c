@@ -63,6 +63,7 @@
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
+#include "../zabbix_server/scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -1026,6 +1027,8 @@ static void	zbx_on_exit(int ret)
 
 	zbx_db_deinit();
 
+	zbx_deinit_remote_commands_cache();
+
 	/* free vmware support */
 	zbx_vmware_destroy();
 
@@ -1505,6 +1508,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_config_timeout))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
+			exit(EXIT_FAILURE);
+		}
+
+		if (SUCCEED != zbx_init_remote_commands_cache(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
+			zbx_free(error);
 			exit(EXIT_FAILURE);
 		}
 	}
