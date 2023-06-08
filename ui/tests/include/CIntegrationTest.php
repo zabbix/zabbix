@@ -34,6 +34,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
@@ -365,7 +366,7 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
-			sleep(3 * self::WAIT_ITERATION_DELAY);
+			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
 		return false;
@@ -380,17 +381,8 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on failed wait operation
 	 */
 	protected static function waitForShutdown($component, array $child_pids) {
-			if (!self::checkPidKilled($component)) {
-	$arrFiles = scandir("/home/jenkins/workspace/zabbix-dev/integration/runtime");
-	$debug = var_export($arrFiles, true);
-
-	$logfile = var_export(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)), true);
-
-	$pidfile = var_export(file_get_contents(self::getPidPath(self::COMPONENT_SERVER)), true);
-
-$mydate = date('m/d/Y h:i:s a', time());
-
-	throw new Exception('Failed to wait for component '.$component.' to stop. badger badger FILES: '. $debug.' ; SERVER LOGS: '. $logfile. ' FILENAMESEARCH: '. self::getPidPath($component).' FILEEXISTS: '.((file_exists(self::getPidPath($component)) ? 'true':'false')).' and PID FILE CONTENTS: '.$pidfile.' and DATE:'.$mydate);
+		if (!self::checkPidKilled($component)) {
+			throw new Exception('Failed to wait for component "'.$component.'" to stop.');
 		}
 
 		$failed_pids = [];
