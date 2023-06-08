@@ -138,7 +138,7 @@ static int	agent_task_process(short event, void *data)
 					return ZBX_ASYNC_TASK_READ;
 				if (POLLOUT & event_local)
 					return ZBX_ASYNC_TASK_WRITE;
-	
+
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
 						" %s", zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;

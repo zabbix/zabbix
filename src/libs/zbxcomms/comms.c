@@ -1814,7 +1814,6 @@ void	zbx_tcp_recv_state_init(zbx_socket_t *s, zbx_tcp_recv_state_t *tcp_recv_sta
 	tcp_recv_state->offset = 0;
 	tcp_recv_state->expected_len = 16 * ZBX_MEBIBYTE;
 	tcp_recv_state->reserved = 0;
-	
 	tcp_recv_state->expect = ZBX_TCP_EXPECT_HEADER;
 #if defined(_WINDOWS)
 	tcp_recv_state->max_len = ZBX_MAX_RECV_DATA_SIZE;
