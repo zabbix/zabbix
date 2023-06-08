@@ -439,21 +439,10 @@ window.mediatype_edit_popup = new class {
 	#setMaxSessionsType(media_type) {
 		const maxsessions_type = this.form.querySelectorAll(`#maxsessions_type input[type='radio']`);
 
-		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
-			maxsessions_type.forEach((radio) => {
-				if (radio.value === 'one') {
-					radio.checked = true;
-					radio.disabled = false;
-				}
-				else {
-					radio.disabled = true;
-					radio.checked = false;
-				}
-			});
-		}
-		else {
-			maxsessions_type.forEach((radio) => radio.disabled = false);
-		}
+		maxsessions_type.forEach((radio) => {
+			radio.checked = (radio.value === 'one');
+			radio.disabled = (media_type == <?= MEDIA_TYPE_SMS ?> && radio.value !== 'one');
+		});
 	}
 
 	/**
