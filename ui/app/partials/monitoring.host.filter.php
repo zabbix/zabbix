@@ -35,7 +35,7 @@ $filter_tags_table = (new CTable())
 		))->setColSpan(4)
 );
 
-if(!$data['tags']) {
+if (!$data['tags']) {
 	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 }
 

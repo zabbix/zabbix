@@ -156,15 +156,13 @@ $left_column
 			)
 	);
 
-$filter_inventory_table = new CTable();
-$filter_inventory_table->setId('filter-inventory_#{uniqid}');
+$filter_inventory_table = (new CTable())->setId('filter-inventory_#{uniqid}');
+
 $inventories = array_column(getHostInventories(), 'title', 'db_field');
 
 if(!$data['inventory']) {
 	$data['inventory'] = [['field' => '', 'value' => '']];
 }
-
-$inventory_count = count($data['inventory']);
 
 $i = 0;
 foreach ($data['inventory'] as $field) {

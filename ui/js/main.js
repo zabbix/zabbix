@@ -920,7 +920,7 @@ function getConditionFormula(conditions, evalType) {
 				}
 			});
 
-			if (typeof options.rows === 'object') {
+			if (options.rows.length > 0) {
 				var before_row = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');

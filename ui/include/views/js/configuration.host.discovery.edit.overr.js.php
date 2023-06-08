@@ -1056,10 +1056,7 @@
 			}
 		});
 
-		$custom_intervals.dynamicRows({
-			template: '#lldoverride-custom-intervals-row',
-			allow_empty: true
-		});
+		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row', allow_empty: true});
 
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {

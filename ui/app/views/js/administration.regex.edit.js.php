@@ -231,10 +231,7 @@
 		});
 
 		$('#tbl_expr')
-			.dynamicRows({
-				template: '#row-expression-tmpl',
-				allow_empty: true
-			})
+			.dynamicRows({template: '#row-expression-tmpl', allow_empty: true})
 			.on('change', '.js-expression-type-select', (e) => {
 				$(e.target)
 					.closest('[data-index]')
