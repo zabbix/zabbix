@@ -20,7 +20,7 @@
 #include "datasender.h"
 
 #include "zbxcommshigh.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"

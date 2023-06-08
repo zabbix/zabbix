@@ -40,6 +40,7 @@ OBJS = \
 	..\..\..\src\libs\zbxalgo\hashset.o \
 	..\..\..\src\libs\zbxcrypto\endian.o \
 	..\..\..\src\libs\zbxcommon\setproctitle.o \
+	..\..\..\src\libs\zbxcommon\common_log.o \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \

@@ -299,6 +299,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -1752,7 +1759,9 @@ input {
 textarea {
 	margin: 0;
 	padding: 4px 5px;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
@@ -2686,6 +2695,21 @@ $icon-widget-btn: (
 	color: $form-disabled-font-color;
 	background-color: $form-disabled-bg-color !important;
 	border-color: $form-disabled-border-color;
+}
+
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
 }
 
 .inaccessible {

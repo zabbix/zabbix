@@ -17,32 +17,43 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_LOG_H
-#define ZABBIX_LOG_H
+#ifndef ZABBIX_ZBXLOG_H
+#define ZABBIX_ZBXLOG_H
 
 #include "zbxcommon.h"
 
-#define LOG_LEVEL_EMPTY		0	/* printing nothing (if not LOG_LEVEL_INFORMATION set) */
-#define LOG_LEVEL_CRIT		1
-#define LOG_LEVEL_ERR		2
-#define LOG_LEVEL_WARNING	3
-#define LOG_LEVEL_DEBUG		4
-#define LOG_LEVEL_TRACE		5
-
-#define LOG_LEVEL_INFORMATION	127	/* printing in any case no matter what level set */
-
-#define LOG_TYPE_UNDEFINED	0
-#define LOG_TYPE_SYSTEM		1
-#define LOG_TYPE_FILE		2
-#define LOG_TYPE_CONSOLE	3
+#define ZBX_LOG_TYPE_UNDEFINED	0
+#define ZBX_LOG_TYPE_SYSTEM	1
+#define ZBX_LOG_TYPE_FILE	2
+#define ZBX_LOG_TYPE_CONSOLE	3
 
 #define ZBX_OPTION_LOGTYPE_SYSTEM	"system"
 #define ZBX_OPTION_LOGTYPE_FILE		"file"
 #define ZBX_OPTION_LOGTYPE_CONSOLE	"console"
 
-#define LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
+#define ZBX_LOG_ENTRY_INTERVAL_DELAY	60	/* seconds */
 
-extern ZBX_THREAD_LOCAL int	*zbx_plog_level;
+void	__zbx_update_env(double time_now);
+
+#ifdef _WINDOWS
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	ZBX_UNUSED(info);				\
+}							\
+while (0)
+#else
+#define zbx_update_env(info, time_now)			\
+							\
+do							\
+{							\
+	__zbx_update_env(time_now);			\
+	zbx_prof_update(info, time_now);		\
+}							\
+while (0)
+#endif
 
 typedef struct
 {
@@ -52,48 +63,11 @@ typedef struct
 	int	log_file_size;
 } zbx_config_log_t;
 
-#define ZBX_CHECK_LOG_LEVEL(level)			\
-		((LOG_LEVEL_INFORMATION != (level) &&	\
-		((level) > *zbx_plog_level || LOG_LEVEL_EMPTY == (level))) ? FAIL : SUCCEED)
-
-#ifdef HAVE___VA_ARGS__
-#	define ZBX_ZABBIX_LOG_CHECK
-#	define zabbix_log(level, ...)									\
-													\
-	do												\
-	{												\
-		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))						\
-			__zbx_zabbix_log(level, __VA_ARGS__);						\
-	}												\
-	while (0)
-#else
-#	define zabbix_log __zbx_zabbix_log
-#endif
-
 int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
-void	__zbx_zabbix_log(int level, const char *fmt, ...) __zbx_attr_format_printf(2, 3);
+void	zbx_log_impl(int level, const char *fmt, va_list args);
 void	zabbix_close_log(void);
 
-#ifndef _WINDOWS
-void	zabbix_increase_log_level(void);
-void	zabbix_decrease_log_level(void);
-void	zabbix_report_log_level_change(void);
-const char	*zabbix_get_log_level_string(void);
-
-
-typedef struct
-{
-	int		level;
-	const char	*name;
-}
-zbx_log_component_t;
-
-void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
-void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
-
-#endif
-
-char		*strerror_from_system(zbx_syserror_t error);
+char	*strerror_from_system(zbx_syserror_t error);
 
 #ifdef _WINDOWS
 char		*strerror_from_module(zbx_syserror_t error, const wchar_t *module);

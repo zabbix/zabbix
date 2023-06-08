@@ -19,7 +19,6 @@
 
 #include "zbxalgo.h"
 
-#include "log.h"
 
 static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2);
 

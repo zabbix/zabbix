@@ -21,7 +21,6 @@
 #include "server.h"
 #include "actions.h"
 
-#include "log.h"
 #include "operations.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"

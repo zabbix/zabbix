@@ -91,9 +91,10 @@ $form_list->addRow(_('Message'),
 		->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'message'))
 );
 
-$form
-	->addItem($form_list)
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+$form->addItem($form_list);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['title'],

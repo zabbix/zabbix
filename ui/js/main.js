@@ -495,19 +495,19 @@ var hintBox = {
 		jQuery(appendTo).append(box);
 
 		target.observer = new MutationObserver(() => {
-			const node = target instanceof Node ? target : target[0];
+			const element = target instanceof jQuery ? target[0] : target;
 
-			if (document.body.contains(node)) {
-				return;
+			if (!isVisible(element)) {
+				hintBox.deleteHint(target);
 			}
+		});
 
-			hintBox.deleteHint(target);
-		})
-
-		target.observer.observe(document, {
-			childList: true,
-			subtree: true
-		})
+		target.observer.observe(document.body, {
+			attributes: true,
+			attributeFilter: ['style', 'class'],
+			subtree: true,
+			childList: true
+		});
 
 		return box;
 	},
@@ -641,6 +641,16 @@ var hintBox = {
 			target.observer.disconnect();
 
 			delete target.observer;
+		}
+	},
+
+	deleteAll: () => {
+		for (let i = overlays_stack.length - 1; i >= 0; i--) {
+			const overlay = overlays_stack.getById(overlays_stack.stack[i]);
+
+			if (overlay.type === 'hintbox') {
+				hintBox.deleteHint(overlay.element);
+			}
 		}
 	},
 

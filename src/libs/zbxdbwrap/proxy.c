@@ -20,7 +20,6 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"

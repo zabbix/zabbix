@@ -28,7 +28,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxdbhigh.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcompress.h"
 #include "zbxrtc.h"
 #include "zbxcommshigh.h"

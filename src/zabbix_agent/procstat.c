@@ -19,7 +19,6 @@
 
 #include "procstat.h"
 
-#include "log.h"
 #include "stats.h"
 #include "zbxnix.h"
 #include "zbxstr.h"

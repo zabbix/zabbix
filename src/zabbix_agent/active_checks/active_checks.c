@@ -24,7 +24,7 @@
 #include "../logfiles/persistent_state.h"
 
 #include "cfg.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
@@ -345,7 +345,7 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
 	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN], exp_delimiter;
+				tmp[MAX_STRING_LEN] = {0}, exp_delimiter;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;

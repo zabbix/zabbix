@@ -19,7 +19,6 @@
 
 #include "logfiles.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
@@ -32,6 +31,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxtypes.h"	/* ssize_t */
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */

@@ -57,10 +57,10 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('tabfilter')))->removeId())
 	->setName('tabfilter_form')
 	->addVar('action', 'popup.tabfilter.update')
-	->addItem([
-		$form_list,
-		(new CInput('submit', 'submit'))->addStyle('display: none;')
-	]);
+	->addItem($form_list);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['title'],
