@@ -81,7 +81,6 @@ static void	process_agent_result(void *data)
 		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid, agent_context->value_type,
 					agent_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
 					agent_context->result.msg);
-
 		interface_status->error = agent_context->result.msg;
 		SET_MSG_RESULT(&agent_context->result, NULL);
 	}
@@ -255,7 +254,7 @@ exit:
 					/* nothing to do, execution was forcibly interrupted by signal */
 					break;
 				default:
-					zbx_error("unknown response code returned: %d", errcodes[i]);
+					zbx_error("unknown response code returned: %d", interface_status->errcode);
 					THIS_SHOULD_NEVER_HAPPEN;
 			}
 

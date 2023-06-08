@@ -33,14 +33,18 @@ static int	agent_task_process(short event, void *data)
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
 
-	printf("chat_task_process(%x)\n", event);
-
 	if (0 == event)
 	{
 		/* initialization */
 		agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d event:%x", __func__, agent_context->step, event);
+
 		return ZBX_ASYNC_TASK_WRITE;
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d event:%x", __func__, agent_context->step, event);
+
 
 	if (0 != (event & EV_TIMEOUT))
 	{
@@ -48,8 +52,6 @@ static int	agent_task_process(short event, void *data)
 		SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed: timed out during %d", agent_context->step));
 		return ZBX_ASYNC_TASK_STOP;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d event:%x", __func__, agent_context->step, event);
 
 	switch (agent_context->step)
 	{
@@ -72,9 +74,8 @@ static int	agent_task_process(short event, void *data)
 					SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: TCP successful, cannot establish TLS to [[%s]:%hu]: %s",
 						agent_context->interface.addr, agent_context->interface.port, error));
-					agent_context->ret = NETWORK_ERROR;
 					zbx_free(error);
-
+					agent_context->ret = NETWORK_ERROR;
 					return ZBX_ASYNC_TASK_STOP;
 				}
 				else
@@ -89,7 +90,7 @@ static int	agent_task_process(short event, void *data)
 			{
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
 						" unexpected read event during send"));
-				agent_context->ret = FAIL;
+				agent_context->ret = NETWORK_ERROR;
 				return ZBX_ASYNC_TASK_STOP;
 			}
 
@@ -97,13 +98,17 @@ static int	agent_task_process(short event, void *data)
 
 			if (SUCCEED != zbx_tcp_send(&agent_context->s, agent_context->key))
 			{
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
+						" %s", zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 				return ZBX_ASYNC_TASK_STOP;
 			}
 			else
 			{
 				agent_context->step = ZABBIX_AGENT_STEP_RECV;
+				zbx_tcp_recv_state_init(&agent_context->s, &agent_context->tcp_recv_state,
+						agent_context->flags);
+
 				return ZBX_ASYNC_TASK_READ;
 			}
 			break;
@@ -112,21 +117,30 @@ static int	agent_task_process(short event, void *data)
 			{
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
 						" unexpected write event during send"));
-				zabbix_log(LOG_LEVEL_DEBUG, "unexpected read event when reading result of [%s]", agent_context->key);
+				agent_context->ret = NETWORK_ERROR;
+
 				return ZBX_ASYNC_TASK_STOP;
 			}
+			short	event_local = 0;
 
-			if (FAIL != (received_len = zbx_tcp_recv_ext(&agent_context->s, 0, 0)))
+			if (FAIL != (received_len = zbx_tcp_recv_state(&agent_context->s,
+					&agent_context->tcp_recv_state, agent_context->flags, &event_local)))
 			{
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->ret,
 						agent_context->interface.addr, &agent_context->result);
-				zabbix_log(LOG_LEVEL_DEBUG, "received");
 				agent_context->ret = SUCCEED;
 				return ZBX_ASYNC_TASK_STOP;
 			}
 			else
 			{
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
+				zabbix_log(LOG_LEVEL_INFORMATION, "offset:%ld event_local:%d", agent_context->tcp_recv_state.offset, event_local);
+				if (POLLIN & event_local)
+					return ZBX_ASYNC_TASK_READ;
+				if (POLLOUT & event_local)
+					return ZBX_ASYNC_TASK_WRITE;
+	
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
+						" %s", zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 			}
 			break;

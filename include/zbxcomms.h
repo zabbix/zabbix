@@ -205,6 +205,20 @@ typedef struct
 }
 zbx_socket_t;
 
+typedef struct
+{
+	ssize_t		nbytes;
+	size_t		buf_dyn_bytes;
+	size_t		buf_stat_bytes;
+	size_t		offset;
+	zbx_uint64_t	expected_len;
+	zbx_uint64_t	reserved;
+	zbx_uint64_t	max_len;
+	unsigned char	expect;
+	int		protocol_version;
+}
+zbx_tcp_recv_state_t;
+
 const char	*zbx_socket_strerror(void);
 
 #ifndef _WINDOWS
@@ -259,11 +273,14 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
-ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len);
+ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events);
 ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
+
+void	zbx_tcp_recv_state_init(zbx_socket_t *s, zbx_tcp_recv_state_t *tcp_recv_state, unsigned char flags);
+ssize_t	zbx_tcp_recv_state(zbx_socket_t *s, zbx_tcp_recv_state_t *state, unsigned char flags, short *events);
 
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);

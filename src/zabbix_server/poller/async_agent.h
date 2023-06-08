@@ -47,6 +47,7 @@ typedef struct
 	zbx_dc_host_t		host;
 	zbx_dc_interface_t	interface;
 	zbx_socket_t		s;
+	zbx_tcp_recv_state_t	tcp_recv_state;
 	zbx_zabbix_agent_step_t	step;
 	char			*server_name;
 	const char		*tls_arg1;

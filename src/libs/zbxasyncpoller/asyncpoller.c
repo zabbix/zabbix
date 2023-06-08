@@ -57,6 +57,8 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	ZBX_UNUSED(fd);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (ZBX_ASYNC_TASK_STOP == (ret = task->process_cb(what, task->data)))
 		async_task_remove(task);
 
@@ -65,6 +67,8 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 
 	if (ZBX_ASYNC_TASK_WRITE == ret)
 		event_add(task->tx_event, NULL);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
