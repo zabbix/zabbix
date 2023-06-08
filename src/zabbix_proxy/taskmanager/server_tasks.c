@@ -27,7 +27,7 @@
  *                                                                            *
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
- * Parameters: tasks         - [OUT] the tasks to execute                     *
+ * Parameters: tasks         - [OUT] tasks to execute                         *
  *             proxy_hostid  - [IN] (ignored)                                 *
  *             compatibility - [IN] (ignored)                                 *
  *                                                                            *

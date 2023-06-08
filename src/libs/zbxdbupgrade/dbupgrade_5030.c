@@ -21,7 +21,6 @@
 #include "dbupgrade_macros.h"
 
 #include "zbxeval.h"
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxregexp.h"
 #include "zbxalgo.h"

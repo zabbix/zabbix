@@ -323,7 +323,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 					'fields' => [
 						'Name' => 'Group, unucknowledged filter',
 						'Host groups' => 'Group for Problems Widgets',
-						'Show unacknowledged only' => true
+						'Acknowledgement status' => 'Unacknowledged'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
@@ -636,7 +636,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						'Name' => 'Host, operational data - With problem name, Show unacknowledged',
 						'Hosts' => 'Host for Problems Widgets',
 						'Show operational data' => 'With problem name',
-						'Show unacknowledged only' => true
+						'Acknowledgement status' => 'Unacknowledged'
 					],
 					'result' => [
 						['Problem • Severity' => 'Trigger for widget 2 log'],
