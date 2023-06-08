@@ -196,7 +196,7 @@ $condition_table = (new CTable())
 $form_grid
 	->addItem([
 		(new CLabel(_('Type of calculation'), 'evaltype_select'))->setId('label-evaltype'),
-		new CFormField(
+		(new CFormField(
 			[
 				(new CDiv(
 					(new CSelect('evaltype'))
@@ -214,16 +214,16 @@ $form_grid
 				(new CDiv([
 					(new CSpan())->setId('expression'),
 					(new CTextBox('formula', $data['formula']))
-						->setWidth('298')
+						->addStyle('width: 100%;')
 						->setId('formula')
 						->setAttribute('placeholder', 'A or (B and C) ...')
 				]))
 					->addClass(ZBX_STYLE_CELL)
 					->addClass(ZBX_STYLE_CELL_EXPRESSION)
-					->addStyle('max-width: 298px;')
+					->addStyle('width: 100%;')
 					->addStyle('white-space: initial;')
 			]
-		)
+		))->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	])
 	->addItem([
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
