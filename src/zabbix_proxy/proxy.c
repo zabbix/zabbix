@@ -1480,6 +1480,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
+	if (FAIL == zbx_pdc_init(ZBX_MEBIBYTE * 128, SEC_PER_DAY, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy data cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 

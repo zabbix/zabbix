@@ -2380,7 +2380,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
 				service->dns, service->port, service->status, service->value, service->itemtime,
 				add_event_cb);
 	}
@@ -2395,13 +2395,13 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
 				service->dns, service->port, service->status, service->value, service->itemtime,
 				add_event_cb);
 	}
 
 	service = services->values[(*processed_num)++];
-	zbx_discovery_update_host(&dhost, service->status, service->itemtime, add_event_cb);
+	zbx_discovery_update_host(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
 
 	ret = SUCCEED;
 fail:
