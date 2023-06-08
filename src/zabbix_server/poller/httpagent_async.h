@@ -24,29 +24,6 @@
 #include "event.h"
 #include "zbxhttp.h"
 
-ZBX_VECTOR_DECL(int32, int)
-
-typedef struct
-{
-	unsigned char		poller_type;
-	int			processed;
-	int			queued;
-	int			processing;
-	int			config_unavailable_delay;
-	int			config_unreachable_delay;
-	int			config_unreachable_period;
-	int			config_timeout;
-	const char		*config_source_ip;
-	struct event		*async_check_items_timer;
-	zbx_vector_uint64_t	itemids;
-	zbx_vector_int32_t	errcodes;
-	zbx_vector_int32_t	lastclocks;
-	CURLM			*curl_handle;
-	struct event_base	*base;
-	zbx_hashset_t		interfaces;
-}
-zbx_poller_config_t;
-
 typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err);
 
 CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_httpagent_result_callback_fn process_httpagent_result_callback);

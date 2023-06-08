@@ -23,8 +23,6 @@ static ZBX_THREAD_LOCAL CURLM			*curl_handle;
 
 static process_httpagent_result_callback_fn	process_httpagent_result;
 
-ZBX_VECTOR_IMPL(int32, int)
-
 typedef struct
 {
 	struct event *event;

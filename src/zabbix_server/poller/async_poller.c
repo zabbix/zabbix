@@ -21,6 +21,7 @@
 #include "zbx_availability_constants.h"
 #include "checks_agent.h"
 
+ZBX_VECTOR_IMPL(int32, int)
 typedef struct
 {
 	zbx_dc_interface_t	interface;

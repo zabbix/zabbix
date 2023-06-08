@@ -24,6 +24,7 @@
 #include "httpagent_async.h"
 #include "module.h"
 #include "../../libs/zbxasyncpoller/asyncpoller.h"
+#include "async_poller.h"
 
 typedef enum
 {
