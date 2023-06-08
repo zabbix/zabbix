@@ -24,8 +24,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Return value:  SUCCEED - the char is allowed in the item key               *
- *                FAIL - otherwise                                            *
+ * Return value:  SUCCEED - char is allowed in the item key                   *
+ *                FAIL    - otherwise                                         *
  *                                                                            *
  * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
  *           !!! Don't forget to sync the code with PHP !!!                   *
@@ -56,7 +56,7 @@ int	zbx_is_key_char(unsigned char c)
  * Return value: returns FAIL only if no key is present (length 0),           *
  *               or the whole string is invalid. SUCCEED otherwise.           *
  *                                                                            *
- * Comments: the pointer is advanced to the first invalid character even if   *
+ * Comments: The pointer is advanced to the first invalid character even if   *
  *           FAIL is returned (meaning there is a syntax error in item key).  *
  *           If necessary, the caller must keep a copy of pointer original    *
  *           value.                                                           *
@@ -162,16 +162,16 @@ succeed:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the string is double                                     *
+ * Purpose: checks if the string is double                                    *
  *                                                                            *
- * Parameters: str   - string to check                                        *
- *             flags - extra options including:                               *
- *                       ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes              *
+ * Parameters: str   - [IN] string to check                                   *
+ *             flags - [IN] extra options including:                          *
+ *                          ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes           *
  *                                                                            *
  * Return value:  SUCCEED - the string is double                              *
- *                FAIL - otherwise                                            *
+ *                FAIL    - otherwise                                         *
  *                                                                            *
- * Comments: the function automatically processes suffixes K, M, G, T and     *
+ * Comments: function automatically processes suffixes K, M, G, T and         *
  *           s, m, h, d, w                                                    *
  *                                                                            *
  ******************************************************************************/
@@ -193,9 +193,9 @@ int	zbx_is_double_suffix(const char *str, unsigned char flags)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert string to double                                          *
+ * Purpose: converts string to double                                         *
  *                                                                            *
- * Parameters: str - string to convert                                        *
+ * Parameters: str - [IN] string to convert                                   *
  *                                                                            *
  * Return value: converted double value                                       *
  *                                                                            *
@@ -214,12 +214,12 @@ double	zbx_str2double(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse a suffixed number like "12.345K"                            *
+ * Purpose: parses a suffixed number like "12.345K"                           *
  *                                                                            *
- * Parameters: number - [IN] start of number                                  *
+ * Parameters: number - [IN]  start of number                                 *
  *             len    - [OUT] length of parsed number                         *
  *                                                                            *
- * Return value: SUCCEED - the number was parsed successfully                 *
+ * Return value: SUCCEED - number was parsed successfully                     *
  *               FAIL    - invalid number                                     *
  *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
@@ -240,11 +240,11 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if pattern matches the specified value                      *
+ * Purpose: checks if pattern matches the specified value                     *
  *                                                                            *
- * Parameters: value    - [IN] the value to match                             *
- *             pattern  - [IN] the pattern to match                           *
- *             op       - [IN] the matching operator                          *
+ * Parameters: value    - [IN] value to match                                 *
+ *             pattern  - [IN] pattern to match                               *
+ *             op       - [IN] matching operator                              *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *

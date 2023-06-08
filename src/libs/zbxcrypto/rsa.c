@@ -47,13 +47,12 @@ static void	pem_replace_spaces(char *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: receive PEM container with arbitrary newlines, validate if        *
+ * Purpose: Receives PEM container with arbitrary newlines, validate if       *
  *          contains necessary newlines after header and before footer,       *
  *          insert them if they are absent.                                   *
  *                                                                            *
- * Parameters:                                                                *
- *     key     - [OUT/IN] key in PEM container                                *
- *     key_len - [OUT/IN] key length                                          *
+ * Parameters: key     - [IN/OUT] key in PEM container                        *
+ *             key_len - [IN/OUT] key length                                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_normalize_pem(char **key, size_t *key_len)
@@ -99,12 +98,12 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
 #if defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Purpose: create RS256 signature for given data                             *
+ * Purpose: creates RS256 signature for given data                            *
  *                                                                            *
  * Parameters:                                                                *
- *     key         - [IN] private key in a PEM container (PKCS#1 or PKCS#8)   *
- *     data        - [IN] data to sign                                        *
- *     data_len    - [IN] length of data to sign                              *
+ *     key         - [IN]  private key in a PEM container (PKCS#1 or PKCS#8)  *
+ *     data        - [IN]  data to sign                                       *
+ *     data_len    - [IN]  length of data to sign                             *
  *     output      - [OUT] dynamically allocated memory with signature        *
  *     output_len  - [OUT] length of a signature (bytes)                      *
  *     error       - [OUT] dynamically allocated memory with error message    *

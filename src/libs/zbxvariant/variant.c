@@ -150,7 +150,7 @@ void	zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copy variant contents from source to value                        *
+ * Purpose: copies variant contents from source to value                      *
  *                                                                            *
  * Comments: String and binary data are cloned, which is different from       *
  *           setters where only the pointers are copied.                      *
@@ -436,11 +436,11 @@ static int	variant_compare_empty(const zbx_variant_t *value1, const zbx_variant_
 	return 1;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: compare two variant values when at least one contains binary data *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: compares two variant values when at least one contains binary data *
+ *                                                                             *
+ *******************************************************************************/
 static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t *value2)
 {
 	if (ZBX_VARIANT_BIN == value1->type)
@@ -461,7 +461,7 @@ static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values when at least one contains error       *
+ * Purpose: compares two variant values when at least one contains error      *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_error(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -479,7 +479,7 @@ static int	variant_compare_error(const zbx_variant_t *value1, const zbx_variant_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values when at least one contains error       *
+ * Purpose: compares two variant values when at least one contains error      *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_vector(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -511,7 +511,7 @@ static int	variant_compare_vector(const zbx_variant_t *value1, const zbx_variant
 }
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values when at least one is string            *
+ * Purpose: compares two variant values when at least one is string           *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -524,7 +524,7 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values when at least one is double and the    *
+ * Purpose: compares two variant values when at least one is double and the   *
  *          other is double, uint64 or a string representing a valid double   *
  *          value                                                             *
  *                                                                            *
@@ -582,7 +582,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values when both are uint64                   *
+ * Purpose: compares two variant values when both are uint64                  *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -594,14 +594,14 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compare two variant values                                        *
+ * Purpose: compares two variant values                                       *
  *                                                                            *
- * Parameters: value1 - [IN] the first value                                  *
- *             value2 - [IN] the second value                                 *
+ * Parameters: value1 - [IN] first value                                      *
+ *             value2 - [IN] second value                                     *
  *                                                                            *
- * Return value: <0 - the first value is less than the second                 *
- *               >0 - the first value is greater than the second              *
- *               0  - the values are equal                                    *
+ * Return value: <0 - first value is less than the second                     *
+ *               >0 - first value is greater than the second                  *
+ *               0  - values are equal                                        *
  *                                                                            *
  * Comments: The following comparison logic is applied:                       *
  *           1) value of 'none' type is always less than other types, two     *
@@ -650,7 +650,7 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 
 int	zbx_vector_var_get_type(zbx_vector_var_t *v)
 {
-	int 	i, type = ITEM_VALUE_TYPE_NONE;
+	int	i, type = ITEM_VALUE_TYPE_NONE;
 
 	for (i = 0; i < v->values_num; i++)
 	{
@@ -682,4 +682,3 @@ void	zbx_vector_var_clear_ext(zbx_vector_var_t *v)
 	for (i = 0; i < v->values_num; i++)
 		zbx_variant_clear(&v->values[i]);
 }
-

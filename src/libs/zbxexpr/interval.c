@@ -77,7 +77,7 @@ struct zbx_custom_interval
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if current time is within given period                      *
+ * Purpose: checks if current time is within given period                     *
  *                                                                            *
  * Parameters: period - [IN] preprocessed time period                         *
  *             tm     - [IN] broken-down time for comparison                  *
@@ -98,7 +98,7 @@ static int	check_time_period(const zbx_time_period_t period, struct tm *tm)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return delay value that is currently applicable                   *
+ * Purpose: returns delay value that is currently applicable                  *
  *                                                                            *
  * Parameters: default_delay  - [IN] default delay value, can be overridden   *
  *             flex_intervals - [IN] preprocessed flexible intervals          *
@@ -128,17 +128,19 @@ static int	get_current_delay(int default_delay, const zbx_flexible_interval_t *f
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return time when next delay settings take effect                  *
+ * Purpose: returns time when next delay settings take effect                 *
  *                                                                            *
- * Parameters: flex_intervals - [IN] preprocessed flexible intervals          *
- *             now            - [IN] current time                             *
+ * Parameters: flex_intervals - [IN]  preprocessed flexible intervals         *
+ *             now            - [IN]  current time                            *
  *             next_interval  - [OUT] start of next delay interval            *
  *                                                                            *
  * Return value: SUCCEED - there is a next interval                           *
- *               FAIL - otherwise (in this case, next_interval is unaffected) *
+ *               FAIL    - otherwise (in this case, next_interval is          *
+ *                         unaffected)                                        *
  *                                                                            *
  ******************************************************************************/
-static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals, time_t now, time_t *next_interval)
+static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals, time_t now,
+		time_t *next_interval)
 {
 	int		day, time, next = 0, candidate;
 	struct tm	*tm;
@@ -182,24 +184,24 @@ static int	get_next_delay_interval(const zbx_flexible_interval_t *flex_intervals
 	return SUCCEED;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parses time of day                                                *
- *                                                                            *
- * Parameters: time       - [OUT] number of seconds since the beginning of    *
- *                            the day corresponding to a given time of day    *
- *             text       - [IN] text to parse                                *
- *             len        - [IN] number of characters available for parsing   *
- *             parsed_len - [OUT] number of characters recognized as time     *
- *                                                                            *
- * Return value: SUCCEED - text was successfully parsed as time of day        *
- *               FAIL    - otherwise (time and parsed_len remain untouched)   *
- *                                                                            *
- * Comments: !!! Don't forget to sync code with PHP !!!                       *
- *           Supported formats are hh:mm, h:mm and 0h:mm; 0 <= hours <= 24;   *
- *           0 <= minutes <= 59; if hours == 24 then minutes must be 0.       *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: parses time of day                                                 *
+ *                                                                             *
+ * Parameters: time       - [OUT] number of seconds since the beginning of     *
+ *                                the day corresponding to a given time of day *
+ *             text       - [IN]  text to parse                                *
+ *             len        - [IN]  number of characters available for parsing   *
+ *             parsed_len - [OUT] number of characters recognized as time      *
+ *                                                                             *
+ * Return value: SUCCEED - text was successfully parsed as time of day         *
+ *               FAIL    - otherwise (time and parsed_len remain untouched)    *
+ *                                                                             *
+ * Comments: !!! Don't forget to sync code with PHP !!!                        *
+ *           Supported formats are hh:mm, h:mm and 0h:mm; 0 <= hours <= 24;    *
+ *           0 <= minutes <= 59; if hours == 24 then minutes must be 0.        *
+ *                                                                             *
+ *******************************************************************************/
 static int	time_parse(int *time, const char *text, int len, int *parsed_len)
 {
 	const int	old_len = len;
@@ -237,8 +239,8 @@ static int	time_parse(int *time, const char *text, int len, int *parsed_len)
  * Purpose: parses time period                                                *
  *                                                                            *
  * Parameters: period - [OUT] time period structure                           *
- *             text   - [IN] text to parse                                    *
- *             len    - [IN] number of characters available for parsing       *
+ *             text   - [IN]  text to parse                                   *
+ *             len    - [IN]  number of characters available for parsing      *
  *                                                                            *
  * Return value: SUCCEED - text was successfully parsed as time period        *
  *               FAIL    - otherwise                                          *
@@ -303,15 +305,15 @@ static int	time_period_parse(zbx_time_period_t *period, const char *text, int le
  *                                                                            *
  * Purpose: parses text string into scheduler filter                          *
  *                                                                            *
- * Parameters: filter  - [IN/OUT] the first filter                            *
- *             text    - [IN] the text to parse                               *
- *             len     - [IN/OUT] the number of characters left to parse      *
- *             min     - [IN] the minimal time unit value                     *
- *             max     - [IN] the maximal time unit value                     *
- *             var_len - [IN] the maximum number of characters for a filter   *
- *                       variable (<from>, <to>, <step>)                      *
+ * Parameters: filter  - [IN/OUT] first filter                                *
+ *             text    - [IN]     text to parse                               *
+ *             len     - [IN/OUT] number of characters left to parse          *
+ *             min     - [IN]     minimal time unit value                     *
+ *             max     - [IN]     maximal time unit value                     *
+ *             var_len - [IN]     maximum number of characters for a filter   *
+ *                                variable (<from>, <to>, <step>)             *
  *                                                                            *
- * Return value: SUCCEED - the filter was successfully parsed                 *
+ * Return value: SUCCEED - filter was successfully parsed                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function recursively calls itself for each filter fragment. *
@@ -425,15 +427,15 @@ static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char 
  *                                                                            *
  * Purpose: parses text string into scheduler filter                          *
  *                                                                            *
- * Parameters: filter  - [IN/OUT] the first filter                            *
- *             text    - [IN] the text to parse                               *
- *             len     - [IN/OUT] the number of characters left to parse      *
- *             min     - [IN] the minimal time unit value                     *
- *             max     - [IN] the maximal time unit value                     *
- *             var_len - [IN] the maximum number of characters for a filter   *
- *                       variable (<from>, <to>, <step>)                      *
+ * Parameters: filter  - [IN/OUT] first filter                                *
+ *             text    - [IN]     text to parse                               *
+ *             len     - [IN/OUT] number of characters left to parse          *
+ *             min     - [IN]     minimal time unit value                     *
+ *             max     - [IN]     maximal time unit value                     *
+ *             var_len - [IN]     maximum number of characters for a filter   *
+ *                                variable (<from>, <to>, <step>)             *
  *                                                                            *
- * Return value: SUCCEED - the filter was successfully parsed                 *
+ * Return value: SUCCEED - filter was successfully parsed                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: This function will fail if a filter already exists. This         *
@@ -455,11 +457,11 @@ static int	scheduler_parse_filter(zbx_scheduler_filter_t **filter, const char *t
  *                                                                            *
  * Purpose: parses scheduler interval                                         *
  *                                                                            *
- * Parameters: interval - [IN/OUT] the first interval                         *
- *             text     - [IN] the text to parse                              *
- *             len      - [IN] the text length                                *
+ * Parameters: interval - [IN/OUT] first interval                             *
+ *             text     - [IN]     text to parse                              *
+ *             len      - [IN]     text length                                *
  *                                                                            *
- * Return value: SUCCEED - the interval was successfully parsed               *
+ * Return value: SUCCEED - interval was successfully parsed                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -586,11 +588,11 @@ static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
  *                                                                            *
  * Purpose: parses flexible interval                                          *
  *                                                                            *
- * Parameters: interval - [IN/OUT] the first interval                         *
- *             text     - [IN] the text to parse                              *
- *             len      - [IN] the text length                                *
+ * Parameters: interval - [IN/OUT] first interval                             *
+ *             text     - [IN]     text to parse                              *
+ *             len      - [IN]     text length                                *
  *                                                                            *
- * Return value: SUCCEED - the interval was successfully parsed               *
+ * Return value: SUCCEED - interval was successfully parsed                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: !!! Don't forget to sync code with PHP !!!                       *
@@ -635,7 +637,7 @@ static void	flexible_interval_free(zbx_flexible_interval_t *interval)
  *                                                                            *
  * Purpose: parses item and low-level discovery rule update intervals         *
  *                                                                            *
- * Parameters: interval_str     - [IN] update interval string to parse        *
+ * Parameters: interval_str     - [IN]  update interval string to parse       *
  *             simple_interval  - [OUT] simple update interval                *
  *             custom_intervals - [OUT] flexible and scheduling intervals     *
  *             error            - [OUT] error message                         *
@@ -656,7 +658,8 @@ int	zbx_interval_preproc(const char *interval_str, int *simple_interval, zbx_cus
 	const char			*delim, *interval_type;
 
 	if (SUCCEED != zbx_is_time_suffix(interval_str, simple_interval,
-			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED : delim - interval_str)))
+			(int)(NULL == (delim = strchr(interval_str, ';')) ? ZBX_LENGTH_UNLIMITED :
+			delim - interval_str)))
 	{
 		interval_type = "update";
 		goto fail;
@@ -737,15 +740,15 @@ fail:
  *                                                                            *
  * Purpose: parses user macro and finds it's length                           *
  *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
+ * Parameters: str   - [IN]  string to check                                  *
  *             len   - [OUT] length simple interval string until separator    *
- *             sep   - [IN] separator to calculate length                     *
+ *             sep   - [IN]  separator to calculate length                    *
  *             value - [OUT] interval value                                   *
  *                                                                            *
  * Return Value:                                                              *
- *     SUCCEED - the macro was parsed successfully.                           *
- *     FAIL    - the macro parsing failed, the content of output variables    *
- *               is not defined.                                              *
+ *     SUCCEED - macro was parsed successfully                                *
+ *     FAIL    - macro parsing failed, the content of output variables        *
+ *               is not defined                                               *
  *                                                                            *
  ******************************************************************************/
 static int	parse_simple_interval(const char *str, int *len, char sep, int *value)
@@ -767,12 +770,12 @@ static int	parse_simple_interval(const char *str, int *len, char sep, int *value
  *                                                                            *
  * Purpose: parses user macro and finds it's length                           *
  *                                                                            *
- * Parameters: str  - [IN] string to check                                    *
+ * Parameters: str  - [IN]  string to check                                   *
  *             len  - [OUT] length of macro                                   *
  *                                                                            *
  * Return Value:                                                              *
- *     SUCCEED - the macro was parsed successfully.                           *
- *     FAIL    - the macro parsing failed, the content of output variables    *
+ *     SUCCEED - macro was parsed successfully.                               *
+ *     FAIL    - macro parsing failed, the content of output variables        *
  *               is not defined.                                              *
  *                                                                            *
  ******************************************************************************/
@@ -793,9 +796,9 @@ static int	parse_user_macro(const char *str, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate update interval, flexible and scheduling intervals       *
+ * Purpose: validates update interval, flexible and scheduling intervals      *
  *                                                                            *
- * Parameters: str   - [IN] string to check                                   *
+ * Parameters: str   - [IN]  string to check                                  *
  *             error - [OUT] validation error                                 *
  *                                                                            *
  * Return Value:                                                              *
@@ -912,9 +915,9 @@ int	zbx_validate_interval(const char *str, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if custom interval contains scheduling interval             *
+ * Purpose: checks if custom interval contains scheduling interval            *
  *                                                                            *
- * Parameters: custom_intervals - [IN] custom intervals                       *
+ * Parameters: custom_intervals - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED if custom interval contains scheduling interval      *
  *               FAIL otherwise                                               *
@@ -929,7 +932,7 @@ int	zbx_custom_interval_is_scheduling(const zbx_custom_interval_t *custom_interv
  *                                                                            *
  * Purpose: frees custom update intervals                                     *
  *                                                                            *
- * Parameters: custom_intervals - [IN] custom intervals                       *
+ * Parameters: custom_intervals - [IN]                                        *
  *                                                                            *
  ******************************************************************************/
 void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
@@ -943,7 +946,7 @@ void	zbx_custom_interval_free(zbx_custom_interval_t *custom_intervals)
  *                                                                            *
  * Purpose: increment struct tm value by one second                           *
  *                                                                            *
- * Parameters: tm - [IN/OUT] the tm structure to increment                    *
+ * Parameters: tm - [IN/OUT] tm structure to increment                        *
  *                                                                            *
  ******************************************************************************/
 static void	scheduler_tm_inc(struct tm *tm)
@@ -976,8 +979,8 @@ static void	scheduler_tm_inc(struct tm *tm)
  *                                                                            *
  * Purpose: finds daylight saving change time inside specified time period    *
  *                                                                            *
- * Parameters: time_start - [IN] the time period start                        *
- *             time_end   - [IN] the time period end                          *
+ * Parameters: time_start - [IN] time period start                            *
+ *             time_end   - [IN] time period end                              *
  *                                                                            *
  * Return Value: Time when the daylight saving changes should occur.          *
  *                                                                            *
@@ -1024,9 +1027,9 @@ static time_t	scheduler_find_dst_change(time_t time_start, time_t time_end)
  *                                                                            *
  * Purpose: calculates day of week                                            *
  *                                                                            *
- * Parameters: year - [IN] the year (>1752)                                   *
- *             mon  - [IN] the month (1-12)                                   *
- *             mday - [IN] the month day (1-31)                               *
+ * Parameters: year - [IN] year (>1752)                                       *
+ *             mon  - [IN] month (1-12)                                       *
+ *             mday - [IN] month day (1-31)                                   *
  *                                                                            *
  * Return value: The day of week: 1 - Monday, 2 - Tuesday, ...                *
  *                                                                            *
@@ -1045,10 +1048,10 @@ static int	calculate_dayofweek(int year, int mon, int mday)
  *                                                                            *
  * Purpose: checks if the specified date satisfies week day filter            *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN] the date & time to validate                    *
+ * Parameters: interval - [IN] scheduler interval                             *
+ *             tm       - [IN] date & time to validate                        *
  *                                                                            *
- * Return value: SUCCEED - the input date satisfies week day filter           *
+ * Return value: SUCCEED - input date satisfies week day filter               *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -1087,11 +1090,11 @@ static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interv
  *                                                                            *
  * Purpose: gets the next nearest value that satisfies the filter chain       *
  *                                                                            *
- * Parameters: filter - [IN] the filter chain                                 *
- *             value  - [IN] the current value                                *
- *                      [OUT] the next nearest value (>= than input value)    *
+ * Parameters: filter - [IN]  filter chain                                    *
+ *             value  - [IN]  current value                                   *
+ *                      [OUT] next nearest value (>= than input value)        *
  *                                                                            *
- * Return value: SUCCEED - the next nearest value was successfully found      *
+ * Return value: SUCCEED - next nearest value was successfully found          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -1138,11 +1141,11 @@ static int	scheduler_get_nearest_filter_value(const zbx_scheduler_filter_t *filt
  *                                                                            *
  * Purpose: calculates the next day that satisfies the week day filter        *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
- * Return value: SUCCEED - the next day was found                             *
- *               FAIL    - the next day satisfying week day filter was not    *
+ * Return value: SUCCEED - next day was found                                 *
+ *               FAIL    - next day satisfying week day filter was not        *
  *                         found in the current month                         *
  *                                                                            *
  ******************************************************************************/
@@ -1181,11 +1184,11 @@ static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval
  *                                                                            *
  * Purpose: calculates the next day that satisfies month and week day filters *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
- * Return value: SUCCEED - the next day was found                             *
- *               FAIL    - the next day satisfying day filters was not        *
+ * Return value: SUCCEED - next day was found                                 *
+ *               FAIL    - next day satisfying day filters was not            *
  *                         found in the current month                         *
  *                                                                            *
  ******************************************************************************/
@@ -1227,13 +1230,13 @@ static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval,
  *                                                                            *
  * Purpose: calculates the time/day that satisfies the specified filter       *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             level    - [IN] the filter level, see ZBX_SCHEDULER_FILTER_*   *
- *                        defines                                             *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             level    - [IN]     filter level, see ZBX_SCHEDULER_FILTER_*   *
+ *                                 defines                                    *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
- * Return value: SUCCEED - the next time/day was found                        *
- *               FAIL    - the next time/day was not found on the current     *
+ * Return value: SUCCEED - next time/day was found                            *
+ *               FAIL    - next time/day was not found on the current         *
  *                         filter level                                       *
  *                                                                            *
  ******************************************************************************/
@@ -1293,8 +1296,8 @@ static int	scheduler_get_filter_nextcheck(const zbx_scheduler_interval_t *interv
  * Purpose: applies day filter to the specified time/day calculating the next *
  *          scheduled check                                                   *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
  ******************************************************************************/
 static void	scheduler_apply_day_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
@@ -1326,8 +1329,8 @@ static void	scheduler_apply_day_filter(zbx_scheduler_interval_t *interval, struc
  * Purpose: applies hour filter to the specified time/day calculating the     *
  *          next scheduled check                                              *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
  ******************************************************************************/
 static void	scheduler_apply_hour_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
@@ -1356,8 +1359,8 @@ static void	scheduler_apply_hour_filter(zbx_scheduler_interval_t *interval, stru
  * Purpose: applies minute filter to the specified time/day calculating the   *
  *          next scheduled check                                              *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
  ******************************************************************************/
 static void	scheduler_apply_minute_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
@@ -1383,8 +1386,8 @@ static void	scheduler_apply_minute_filter(zbx_scheduler_interval_t *interval, st
  * Purpose: applies second filter to the specified time/day calculating the   *
  *          next scheduled check                                              *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             tm       - [IN/OUT] the input/output date & time               *
+ * Parameters: interval - [IN]     scheduler interval                         *
+ *             tm       - [IN/OUT] input/output date & time                   *
  *                                                                            *
  ******************************************************************************/
 static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
@@ -1403,8 +1406,8 @@ static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, st
  *                                                                            *
  * Purpose: finds the next timestamp satisfying one of intervals.             *
  *                                                                            *
- * Parameters: interval - [IN] the scheduler interval                         *
- *             now      - [IN] the current timestamp                          *
+ * Parameters: interval - [IN] scheduler interval                             *
+ *             now      - [IN] current timestamp                              *
  *                                                                            *
  * Return Value: Timestamp when the next check must be scheduled.             *
  *                                                                            *
@@ -1459,20 +1462,19 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate nextcheck timestamp for item                            *
+ * Purpose: calculates nextcheck timestamp for item                           *
  *                                                                            *
- * Parameters: seed             - [IN] the seed value applied to delay to     *
- *                                     spread item checks over the delay      *
- *                                     period                                 *
- *             item_type        - [IN] the item type                          *
+ * Parameters: seed             - [IN] seed value applied to delay to spread  *
+ *                                     item checks over the delay period      *
+ *             item_type        - [IN]                                        *
  *             simple_interval  - [IN] default delay value, can be overridden *
  *             custom_intervals - [IN] preprocessed custom intervals          *
  *             now              - [IN] current timestamp                      *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
- * Comments: if item check is forbidden with delay=0 (default and flexible),  *
- *           a timestamp very far in the future is returned                   *
+ * Comments: If item check is forbidden with delay=0 (default and flexible),  *
+ *           a timestamp very far in the future is returned.                  *
  *                                                                            *
  *           Old algorithm: now+delay                                         *
  *           New one: preserve period, if delay==5, nextcheck = 0,5,10,15,... *
@@ -1559,7 +1561,7 @@ int	zbx_calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int simple_in
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate nextcheck timestamp for item on unreachable host        *
+ * Purpose: calculates nextcheck timestamp for item on unreachable host       *
  *                                                                            *
  * Parameters: simple_interval  - [IN] default delay value, can be overridden *
  *             custom_intervals - [IN] preprocessed custom intervals          *
@@ -1610,13 +1612,14 @@ int	zbx_calculate_item_nextcheck_unreachable(int simple_interval, const zbx_cust
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate time period and check if specified time is within it     *
+ * Purpose: validates time period and check if specified time is within it    *
  *                                                                            *
- * Parameters: period - [IN] semicolon-separated list of time periods in one  *
- *                           of the following formats:                        *
- *                             d1-d2,h1:m1-h2:m2                              *
- *                             or d1,h1:m1-h2:m2                              *
- *             time   - [IN] time to check                                    *
+ * Parameters: period - [IN]  semicolon-separated list of time periods in one *
+ *                            of the following formats:                       *
+ *                              d1-d2,h1:m1-h2:m2                             *
+ *                              or d1,h1:m1-h2:m2                             *
+ *             time   - [IN]  time to check                                   *
+ *             tz     - [IN]                                                  *
  *             res    - [OUT] check result:                                   *
  *                              SUCCEED - if time is within period            *
  *                              FAIL    - otherwise                           *
@@ -1656,7 +1659,7 @@ int	zbx_check_time_period(const char *period, time_t time, const char *tz, int *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate item nextcheck for Zabbix agent type items              *
+ * Purpose: calculates item nextcheck for Zabbix agent type items             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now,
@@ -1684,15 +1687,15 @@ int	zbx_get_agent_item_nextcheck(zbx_uint64_t itemid, const char *delay, int now
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate report nextcheck                                        *
+ * Purpose: calculates report nextcheck                                       *
  *                                                                            *
- * Parameters: now        - [IN] the current timestamp                        *
- *             cycle      - [IN] the report cycle                             *
- *             weekdays   - [IN] the week days report should be prepared,     *
+ * Parameters: now        - [IN] current timestamp                            *
+ *             cycle      - [IN] report cycle                                 *
+ *             weekdays   - [IN] week days report should be prepared,         *
  *                               bitmask (0x01 - Monday, 0x02 - Tuesday...)   *
- *             start_time - [IN] the report start time in seconds after       *
+ *             start_time - [IN] report start time in seconds after           *
  *                               midnight                                     *
- *             tz         - [IN] the report starting timezone                 *
+ *             tz         - [IN] report starting timezone                     *
  *                                                                            *
  * Return value: The timestamp when the report must be prepared or -1 if an   *
  *               error occurred.                                              *

@@ -26,9 +26,9 @@
  * Purpose: checks if the specified character is allowed whitespace character *
  *          that can be used before or after iprange definition               *
  *                                                                            *
- * Parameters: value - [IN] the character to check                            *
+ * Parameters: value - [IN] character to check                                *
  *                                                                            *
- * Return value: SUCCEED - the value is whitespace character                  *
+ * Return value: SUCCEED - value is a whitespace character                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -72,8 +72,8 @@ static size_t	iprange_address_length(const char *address)
  *                                                                            *
  * Purpose: applies a bit mask to the parsed v4 or v6 IP range                *
  *                                                                            *
- * Parameters: iprange - [IN] the IP range                                    *
- *             bits    - [IN] the number of bits in IP mask                   *
+ * Parameters: iprange - [IN]                                                 *
+ *             bits    - [IN] number of bits in IP mask                       *
  *                                                                            *
  ******************************************************************************/
 static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
@@ -115,14 +115,14 @@ static void	iprange_apply_mask(zbx_iprange_t *iprange, int bits)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse IPv4 address into IP range structure                        *
+ * Purpose: parses IPv4 address into IP range structure                       *
  *                                                                            *
- * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN]  the IP address with optional ranges or         *
+ * Parameters: iprange - [OUT]                                                *
+ *             address - [IN]  IP address with optional ranges or             *
  *                             network mask (see documentation for network    *
  *                             discovery rule configuration)                  *
  *                                                                            *
- * Return value: SUCCEED - the IP range was successfully parsed               *
+ * Return value: SUCCEED - IP range was successfully parsed                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -207,14 +207,14 @@ static int	iprangev4_parse(zbx_iprange_t *iprange, const char *address)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse IPv6 address into IP range structure                        *
+ * Purpose: parses IPv6 address into IP range structure                       *
  *                                                                            *
- * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN]  the IP address with optional ranges or         *
+ * Parameters: iprange - [OUT]                                                *
+ *             address - [IN]  IP address with optional ranges or             *
  *                             network mask (see documentation for network    *
  *                             discovery rule configuration)                  *
  *                                                                            *
- * Return value: SUCCEED - the IP range was successfully parsed               *
+ * Return value: SUCCEED - IP range was successfully parsed                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -341,14 +341,14 @@ check_fill:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse IP address (v4 or v6) into IP range structure               *
+ * Purpose: parses IP address (v4 or v6) into IP range structure              *
  *                                                                            *
- * Parameters: iprange - [OUT] the IP range                                   *
- *             address - [IN]  the IP address with optional ranges or         *
+ * Parameters: iprange - [OUT]                                                *
+ *             address - [IN]  IP address with optional ranges or             *
  *                             network mask (see documentation for network    *
  *                             discovery rule configuration)                  *
  *                                                                            *
- * Return value: SUCCEED - the IP range was successfully parsed               *
+ * Return value: SUCCEED - IP range was successfully parsed                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -368,8 +368,8 @@ int	zbx_iprange_parse(zbx_iprange_t *iprange, const char *address)
  *                                                                            *
  * Purpose: gets the first IP address from the specified range                *
  *                                                                            *
- * Parameters: iprange - [IN] the IP range                                    *
- *             address - [OUT] the first address of the specified range       *
+ * Parameters: iprange - [IN]                                                 *
+ *             address - [OUT] first address of the specified range           *
  *                             (with at least 8 items to support IPv6)        *
  *                                                                            *
  * Comments: The IP address is returned as a number array.                    *
@@ -393,12 +393,12 @@ void	zbx_iprange_first(const zbx_iprange_t *iprange, int *address)
  *                                                                            *
  * Purpose: gets the next IP address from the specified range                 *
  *                                                                            *
- * Parameters: iprange - [IN] the IP range                                    *
- *             address - [IN/OUT] IN - the current address from IP range      *
- *                                OUT - the next address from IP range        *
+ * Parameters: iprange - [IN]                                                 *
+ *             address - [IN/OUT] IN  - current address from IP range         *
+ *                                OUT - next address from IP range            *
  *                                (with at least 8 items to support IPv6)     *
  *                                                                            *
- * Return value: SUCCEED - the next IP address was returned successfully      *
+ * Return value: SUCCEED - next IP address was returned successfully          *
  *               FAIL    - no more addresses in the specified range           *
  *                                                                            *
  * Comments: The IP address is returned as a number array.                    *
@@ -442,11 +442,11 @@ int	zbx_iprange_next(const zbx_iprange_t *iprange, int *address)
  *                                                                            *
  * Purpose: checks if the IP address is in specified range                    *
  *                                                                            *
- * Parameters: iprange - [IN] the IP range                                    *
- *             address - [IN] the IP address to check                         *
+ * Parameters: iprange - [IN]                                                 *
+ *             address - [IN] IP address to check                             *
  *                            (with at least 8 items to support IPv6)         *
  *                                                                            *
- * Return value: SUCCEED - the IP address was in the specified range          *
+ * Return value: SUCCEED - IP address was in the specified range              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -467,9 +467,9 @@ int	zbx_iprange_validate(const zbx_iprange_t *iprange, const int *address)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the number of addresses covered by the specified IP range     *
+ * Purpose: gets the number of addresses covered by the specified IP range    *
  *                                                                            *
- * Parameters: iprange - [IN] the IP range                                    *
+ * Parameters: iprange - [IN]                                                 *
  *                                                                            *
  * Return value: The number of addresses covered by the range or              *
  *               ZBX_MAX_UINT64 if this number exceeds 64 bit unsigned        *
