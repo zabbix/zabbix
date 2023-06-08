@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
@@ -35,7 +36,6 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	/**
 	 * Name of discovery rule for update scenario.
-	 *
 	 */
 	protected static $update_rule = 'Discovery rule for update';
 
@@ -53,7 +53,7 @@ class testFormNetworkDiscovery extends CWebTest {
 	 */
 	private static function getHash() {
 		return CDBHelper::getHash( 'SELECT * FROM drules').
-			CDBHelper::getHash('SELECT * FROM dchecks');
+				CDBHelper::getHash('SELECT * FROM dchecks');
 	}
 
 	public function testFormNetworkDiscovery_Layout() {
@@ -884,6 +884,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr($old_name)));
 			}
 
+			// Trim spaces inside the string, so that it is possible to click link on the list table.
 			if ($update && CTestArrayHelper::get($data, 'trim')) {
 				self::$update_rule = str_replace('     ', ' ', self::$update_rule);
 			}
