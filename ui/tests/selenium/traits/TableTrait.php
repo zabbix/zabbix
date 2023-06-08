@@ -203,6 +203,20 @@ trait TableTrait {
 	}
 
 	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column		Column name, where value should be checked
+	 */
+	private function getTableResult($column, $table_selector = 'class:list-table') {
+		$table = $this->query($table_selector)->asTable()->one();
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
+	}
+
+	/**
 	 * Assert text of selected rows amount.
 	 *
 	 * @param integer $count	selected rows count
