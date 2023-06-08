@@ -54,6 +54,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
 	int			ret;
+	char			*ret_str;
 
 	ZBX_UNUSED(fd);
 
@@ -68,7 +69,14 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 	if (ZBX_ASYNC_TASK_WRITE == ret)
 		event_add(task->tx_event, NULL);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	if (ZBX_ASYNC_TASK_STOP == ret)
+		ret_str = "ZBX_ASYNC_TASK_STOP";
+	else if (ZBX_ASYNC_TASK_READ == ret)
+		ret_str = "ZBX_ASYNC_TASK_READ";
+	else
+		ret_str = "ZBX_ASYNC_TASK_WRITE";
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, ret_str);
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,

@@ -66,9 +66,9 @@ static int	agent_task_process(short event, void *data)
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &event_tls, &error))
 				{
-					if (POLLOUT & event_tls)
-						return ZBX_ASYNC_TASK_READ;
 					if (POLLIN & event_tls)
+						return ZBX_ASYNC_TASK_READ;
+					if (POLLOUT & event_tls)
 						return ZBX_ASYNC_TASK_WRITE;
 
 					SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
