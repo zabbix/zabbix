@@ -1295,9 +1295,7 @@ zabbix_export:
                   value: '{#NODENAME}'
               trigger_prototypes:
                 - uuid: 0fa3a54b559349d58b616720ee33cdf5
-                  expression: 'last(/NetApp by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down" and last(/NetApp by HTTP/netapp.port.eth.enabled[{#NODENAME},{#ETHPORTNAME}])="false"'
-                  recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'last(/NetApp by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="up"'
+                  expression: 'last(/NetApp by HTTP/netapp.port.eth.state[{#NODENAME},{#ETHPORTNAME}])="down" and last(/NetApp by HTTP/netapp.port.eth.enabled[{#NODENAME},{#ETHPORTNAME}])="true"'
                   name: '{#ETHPORTNAME}: Ethernet port of the Node "{#NODENAME}" is down'
                   priority: AVERAGE
                   description: 'Something is wrong with the ethernet port.'
