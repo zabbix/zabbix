@@ -188,12 +188,12 @@ COMMON_WRAP_FUNCS = \
 	$(WRAP_EXIT) \
 	$(WRAP_COMM_FUNCS)
 
-tests_build:
+tests_build: modules_build
 	$(MAKE) $(AM_MAKEFLAGS) && \
 	cd tests && \
 	$(MAKE) $(AM_MAKEFLAGS) LDFLAGS="$(LDFLAGS) $(COMMON_WRAP_FUNCS)" LIBS="$(LIBS)"
 
-tests: tests_build modules_build
+tests: tests_build
 	export LD_LIBRARY_PATH=$$LD_LIBRARY_PATH:$(CMOCKA_LIBRARY_PATH):$(YAML_LIBRARY_PATH); \
 	tests/tests_run.pl
 
