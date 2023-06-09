@@ -758,6 +758,7 @@
 			.dynamicRows({
 				template: '#override-filters-row',
 				counter: this.override.filter_counter,
+				allow_empty: true,
 				dataCallback: function(data) {
 					data.formulaId = num2letter(data.rowNum);
 					that.override.filter_counter++;
@@ -1048,9 +1049,7 @@
 			}
 		});
 
-		$custom_intervals.dynamicRows({
-			template: '#lldoverride-custom-intervals-row'
-		});
+		$custom_intervals.dynamicRows({template: '#lldoverride-custom-intervals-row', allow_empty: true});
 
 		jQuery('#ophistory_history_mode', this.$form)
 			.change(function() {
@@ -1076,7 +1075,7 @@
 
 		jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 		jQuery('.tags-table', this.$form)
-			.dynamicRows({template: '#lldoverride-tag-row'})
+			.dynamicRows({template: '#lldoverride-tag-row', allow_empty: true})
 			.on('click', 'button.element-table-add', function() {
 				jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 			});

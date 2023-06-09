@@ -19,7 +19,7 @@
 
 #include "connector_manager.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxconnector.h"
 #include "zbxipcservice.h"

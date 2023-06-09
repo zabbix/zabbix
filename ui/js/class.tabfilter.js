@@ -69,7 +69,6 @@ class CTabFilter extends CBaseComponent {
 			}
 
 			if (options.selected == index) {
-				item.renderContentTemplate();
 				this.setSelectedItem(item);
 
 				if (options.expanded) {

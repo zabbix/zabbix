@@ -50,7 +50,7 @@ package zbxlib
 
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 

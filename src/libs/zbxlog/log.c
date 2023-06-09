@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 
 #include "zbxmutexs.h"
 #include "zbxthreads.h"
@@ -31,11 +31,11 @@
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 
-static char			log_filename[MAX_STRING_LEN];
-static int			log_type = LOG_TYPE_UNDEFINED;
-static zbx_mutex_t		log_access = ZBX_MUTEX_NULL;
+static char		log_filename[MAX_STRING_LEN];
+static int		log_type = ZBX_LOG_TYPE_UNDEFINED;
+static zbx_mutex_t	log_access = ZBX_MUTEX_NULL;
 
-static int			config_log_file_size = -1;	/* max log file size in MB */
+static int		config_log_file_size = -1;	/* max log file size in MB */
 
 static int	get_config_log_file_size(void)
 {
@@ -248,7 +248,7 @@ void	zbx_handle_log(void)
 #ifndef _WINDOWS
 	zabbix_report_log_level_change();
 #endif
-	if (LOG_TYPE_FILE != log_type)
+	if (ZBX_LOG_TYPE_FILE != log_type)
 		return;
 
 	LOCK_LOG;
@@ -267,7 +267,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 	zbx_set_log_level(level);
 	config_log_file_size = log_file_cfg->log_file_size;
 
-	if (LOG_TYPE_SYSTEM == type)
+	if (ZBX_LOG_TYPE_SYSTEM == type)
 	{
 #ifdef _WINDOWS
 		wchar_t	*wevent_source;
@@ -279,7 +279,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 		openlog(syslog_app_name, LOG_PID, LOG_DAEMON);
 #endif
 	}
-	else if (LOG_TYPE_FILE == type)
+	else if (ZBX_LOG_TYPE_FILE == type)
 	{
 		FILE	*log_file = NULL;
 
@@ -302,7 +302,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 		zbx_strscpy(log_filename, filename);
 		zbx_fclose(log_file);
 	}
-	else if (LOG_TYPE_CONSOLE == type || LOG_TYPE_UNDEFINED == type)
+	else if (ZBX_LOG_TYPE_CONSOLE == type || ZBX_LOG_TYPE_UNDEFINED == type)
 	{
 		if (SUCCEED != zbx_mutex_create(&log_access, ZBX_MUTEX_LOG, error))
 		{
@@ -325,7 +325,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 
 void	zabbix_close_log(void)
 {
-	if (LOG_TYPE_SYSTEM == log_type)
+	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		if (NULL != system_log_handle)
@@ -334,12 +334,13 @@ void	zabbix_close_log(void)
 		closelog();
 #endif
 	}
-	else if (LOG_TYPE_FILE == log_type || LOG_TYPE_CONSOLE == log_type || LOG_TYPE_UNDEFINED == log_type)
+	else if (ZBX_LOG_TYPE_FILE == log_type || ZBX_LOG_TYPE_CONSOLE == log_type ||
+			ZBX_LOG_TYPE_UNDEFINED == log_type)
 	{
 		zbx_mutex_destroy(&log_access);
 	}
 
-	log_type = LOG_TYPE_UNDEFINED;
+	log_type = ZBX_LOG_TYPE_UNDEFINED;
 }
 
 void	zbx_log_impl(int level, const char *fmt, va_list args)
@@ -357,7 +358,7 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		return;
 #endif
 
-	if (LOG_TYPE_FILE == log_type)
+	if (ZBX_LOG_TYPE_FILE == log_type)
 	{
 		FILE	*log_file;
 
@@ -406,7 +407,7 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		return;
 	}
 
-	if (LOG_TYPE_CONSOLE == log_type)
+	if (ZBX_LOG_TYPE_CONSOLE == log_type)
 	{
 		long		milliseconds;
 		struct tm	tm;
@@ -441,7 +442,7 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 
 	zbx_vsnprintf(message, sizeof(message), fmt, args);
 
-	if (LOG_TYPE_SYSTEM == log_type)
+	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
 #ifdef _WINDOWS
 		switch (level)
@@ -502,8 +503,8 @@ void	zbx_log_impl(int level, const char *fmt, va_list args)
 		}
 
 #endif	/* _WINDOWS */
-	}	/* LOG_TYPE_SYSLOG */
-	else	/* LOG_TYPE_UNDEFINED == log_type */
+	}	/* ZBX_LOG_TYPE_SYSTEM */
+	else	/* ZBX_LOG_TYPE_UNDEFINED == log_type */
 	{
 		LOCK_LOG;
 
@@ -544,19 +545,19 @@ int	zbx_get_log_type(const char *logtype)
 			return i + 1;
 	}
 
-	return LOG_TYPE_UNDEFINED;
+	return ZBX_LOG_TYPE_UNDEFINED;
 }
 
 int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_file_cfg)
 {
-	if (LOG_TYPE_UNDEFINED == log_file_cfg->log_type)
+	if (ZBX_LOG_TYPE_UNDEFINED == log_file_cfg->log_type)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"LogType\" configuration parameter: '%s'",
 				log_file_cfg->log_type_str);
 		return FAIL;
 	}
 
-	if (LOG_TYPE_CONSOLE == log_file_cfg->log_type && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
+	if (ZBX_LOG_TYPE_CONSOLE == log_file_cfg->log_type && 0 == (task->flags & ZBX_TASK_FLAG_FOREGROUND) &&
 			ZBX_TASK_START == task->task)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"console\" parameter can only be used with the"
@@ -564,7 +565,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 		return FAIL;
 	}
 
-	if (LOG_TYPE_FILE == log_file_cfg->log_type && (NULL == log_file_cfg->log_file_name || '\0' ==
+	if (ZBX_LOG_TYPE_FILE == log_file_cfg->log_type && (NULL == log_file_cfg->log_file_name || '\0' ==
 			*log_file_cfg->log_file_name))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"LogType\" \"file\" parameter requires \"LogFile\" parameter to be set");

@@ -287,6 +287,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 .table-paging {
 	text-align: center;
 	background-color: $ui-bg-color;

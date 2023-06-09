@@ -21,7 +21,7 @@
 #include "sysinfo.h"
 #include "alias/alias.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxthreads.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "zbxnix.h"
