@@ -486,6 +486,8 @@ $tabs
 	->addTab('options_tab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS)
 	->setSelected(0);
 
+$email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
+
 // Append tabs to form.
 $form
 	->addItem($tabs)
@@ -493,7 +495,9 @@ $form
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
 			'mediatype' => $data,
-			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
+			'smtp_server_default' => $email_defaults['smtp_server'],
+			'smtp_email_default' =>  $email_defaults['smtp_email']
 		]).');'))->setOnDocumentReady()
 	);
 

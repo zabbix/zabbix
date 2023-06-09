@@ -26,7 +26,7 @@
 
 window.mediatype_edit_popup = new class {
 
-	init({mediatype, message_templates}) {
+	init({mediatype, message_templates, smtp_server_default, smtp_email_default}) {
 		this.overlay = overlays_stack.getById('media-type-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -35,6 +35,8 @@ window.mediatype_edit_popup = new class {
 		this.row_num = 0;
 		this.message_template_list = {};
 		this.message_templates = Object.fromEntries(message_templates.map((obj, index) => [index, { ...obj }]));
+		this.smtp_server_default = smtp_server_default;
+		this.smtp_email_default = smtp_email_default;
 
 		this.#loadView(mediatype);
 		this.#initActions();
@@ -485,11 +487,25 @@ window.mediatype_edit_popup = new class {
 					this.#loadProviderFields(change, parseInt(provider.value));
 				};
 
+				const smtp_server = this.form.querySelector('#smtp_server');
+				const smtp_email = this.form.querySelector('#smtp_email');
+
+				smtp_server.value = this.mediatype.smtp_server === '' ? this.smtp_server_default : smtp_server.value;
+				smtp_email.value = this.mediatype.smtp_email === '' ? this.smtp_email_default : smtp_email.value;
+				this.mediatype.smtp_server = smtp_server.value;
+				this.mediatype.smtp_email = smtp_email.value;
+
 				provider.dispatchEvent(new CustomEvent('change', {detail: {change: false}}));
 				break;
 
 			case <?= MEDIA_TYPE_SMS ?>:
 				show_fields = ['#gsm_modem_label', '#gsm_modem_field'];
+
+				const gsm_modem = this.form.querySelector('#gsm_modem');
+
+				gsm_modem.value = this.mediatype.gsm_modem === '' ? '/dev/ttyS0' : gsm_modem.value;
+				this.mediatype.gsm_modem = gsm_modem.value;
+
 				break;
 
 			case <?= MEDIA_TYPE_EXEC ?>:
