@@ -505,7 +505,6 @@ window.mediatype_edit_popup = new class {
 
 				gsm_modem.value = this.mediatype.gsm_modem === '' ? '/dev/ttyS0' : gsm_modem.value;
 				this.mediatype.gsm_modem = gsm_modem.value;
-
 				break;
 
 			case <?= MEDIA_TYPE_EXEC ?>:
@@ -525,6 +524,7 @@ window.mediatype_edit_popup = new class {
 		}
 
 		if (typeof event.detail == 'undefined' || this.type == <?= MEDIA_TYPE_SMS ?>) {
+			this.max_session_checked = 'one';
 			this.#setMaxSessionsType(this.type);
 		}
 
