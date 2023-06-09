@@ -173,7 +173,7 @@ class ZBarGauge extends HTMLElement {
 
 				this._canvas.width = width + 2;
 
-				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(value), 1);
+				this._drawCell(ctx, 1, bar_size, this._getThresholdColorByValue(this._value), 1);
 			}
 			else {
 				const cell_count = Math.floor(width / BAR_GAUGE_BAR_ITEM_WIDTH);
