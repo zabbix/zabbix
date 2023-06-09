@@ -81,12 +81,10 @@ switch ($data['type']) {
 			$i++;
 		}
 
-		if (!$i) {
+		if ($i === 0) {
 			$form_grid->addItem([
 				new CLabel(_('Parameters')),
-				new CFormField(
-					(new CDiv(_('Webhook does not have parameters.')))->addClass(ZBX_STYLE_GREY)
-				)
+				new CFormField((new CSpan(_('Webhook does not have parameters.')))->addClass(ZBX_STYLE_GREY))
 			]);
 		}
 

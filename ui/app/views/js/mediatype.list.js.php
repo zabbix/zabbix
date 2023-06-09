@@ -183,7 +183,7 @@
 		/**
 		 * Opens action edit popup and adds event listener for dialogue.submit event.
 		 *
-		 * @param {Object} parameters  An object containing the action data.
+		 * @param {object} parameters  An object containing the action data.
 		 */
 		#actionEdit(parameters) {
 			const overlay = PopUp('popup.action.edit', parameters, {
