@@ -1318,10 +1318,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 				{
 					zbx_tm_task_t	*task;
 					const char	*error = "Remote commands are disabled on unsupported proxies.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT,
-							ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
+							ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 					task->data = zbx_tm_remote_command_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1365,10 +1367,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 					zbx_tm_task_t	*task;
 					const char	*error = "The requested task is disabled. Proxy major"
 							" version does not match server major version.";
+					double		t;
 
 					zabbix_log(LOG_LEVEL_WARNING, "%s", error);
+					t = zbx_time();
 					task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW,
-							(time_t)zbx_time(), 0, 0);
+							(time_t)t, 0, 0);
 					task->data = zbx_tm_data_result_create(taskid, FAIL, error);
 					zbx_tm_save_task(task);
 					zbx_tm_task_free(task);
@@ -1610,9 +1614,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 	static time_t		cleanup_time = 0;
-	double			sec1, sec2;
 	int			tasks_num, sleeptime;
-	time_t			nextcheck;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -1634,7 +1636,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
 		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
 
-	sec1 = zbx_time();
+	double sec1 = zbx_time();
 
 	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
 
@@ -1671,9 +1673,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			cleanup_time = (time_t)sec1;
 		}
 
-		sec2 = zbx_time();
+		double sec2 = zbx_time();
 
-		nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
+		time_t nextcheck = (time_t)sec1 - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD + ZBX_TM_PROCESS_PERIOD;
 
 		if (0 > (sleeptime = nextcheck - (time_t)sec2))
 			sleeptime = 0;

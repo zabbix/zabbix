@@ -69,6 +69,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	zbx_script_t	script;
 	char		*info = NULL, error[MAX_STRING_LEN];
 	zbx_dc_host_t	host;
+	double		t;
 
 	result = zbx_db_select("select command_type,execute_on,port,authtype,username,password,publickey,privatekey,"
 					"command,parent_taskid,hostid,alertid"
@@ -79,7 +80,8 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
+	t = zbx_time();
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_REMOTE_COMMAND_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 
 	ZBX_STR2UINT64(parent_taskid, row[9]);
 
@@ -196,7 +198,10 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
 	zbx_db_free_result(result);
 
 	if (0 != (processed_num = itemids.values_num))
-		zbx_dc_reschedule_items(&itemids, (int)zbx_time(), NULL);
+	{
+		double t = zbx_time();
+		zbx_dc_reschedule_items(&itemids, (time_t)t, NULL);
+	}
 
 	if (0 != taskids->values_num)
 	{
@@ -267,6 +272,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	int			ret = FAIL, data_type;
 	char			*info = NULL;
 	zbx_uint64_t		parent_taskid;
+	double			t;
 
 	result = zbx_db_select("select parent_taskid,data,type"
 				" from task_data"
@@ -276,7 +282,8 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 	if (NULL == (row = zbx_db_fetch(result)))
 		goto finish;
 
-	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (time_t)zbx_time(), 0, 0);
+	t = zbx_time();
+	task = zbx_tm_task_create(0, ZBX_TM_TASK_DATA_RESULT, ZBX_TM_STATUS_NEW, (time_t)t, 0, 0);
 	ZBX_STR2UINT64(parent_taskid, row[0]);
 
 	if (0 != ttl && clock + ttl < now)

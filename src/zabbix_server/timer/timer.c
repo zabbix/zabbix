@@ -561,7 +561,6 @@ static int	update_host_maintenances(void)
  ******************************************************************************/
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
-	double			sec;
 	time_t			maintenance_time = 0, update_time = 0;
 	int			idle = 1, events_num, hosts_num, update;
 	char			*info = NULL;
@@ -584,13 +583,14 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		sec = zbx_time();
+		double sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
 
 		if (1 == process_num)
 		{
 			/* start update process only when all timers have finished their updates */
-			if (sec - maintenance_time >= ZBX_TIMER_DELAY && FAIL == zbx_dc_maintenance_check_update_flags())
+			if (sec - (double)maintenance_time >= ZBX_TIMER_DELAY &&
+					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
@@ -646,7 +646,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			update_time -= update_time % 60;
 			maintenance_time = update_time;
 
-			if (0 > (idle = ZBX_TIMER_DELAY - ((time_t)zbx_time() - maintenance_time)))
+			if (0 > (idle = (int)(ZBX_TIMER_DELAY - (zbx_time() - (double)maintenance_time))))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

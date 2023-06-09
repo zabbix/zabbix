@@ -10646,7 +10646,7 @@ static void	dc_requeue_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, co
  *             nextcheck - [IN] the scheduled time                            *
  *                                                                            *
  ******************************************************************************/
-static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int nextcheck)
+static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, time_t nextcheck)
 {
 	unsigned char	old_poller_type;
 	int		old_nextcheck;
@@ -14080,7 +14080,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  *           all items can be safely rescheduled.                             *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, int nextcheck, zbx_uint64_t *proxy_hostids)
+void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxy_hostids)
 {
 	int		i;
 	ZBX_DC_ITEM	*dc_item;
