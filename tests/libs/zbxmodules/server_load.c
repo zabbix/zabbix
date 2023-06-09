@@ -59,4 +59,5 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_int_eq("modules loaded", SUCCEED, r);
 
 	zbx_unload_modules();
+	zbx_vector_str_destroy(&files);
 }
