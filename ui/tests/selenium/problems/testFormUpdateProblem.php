@@ -222,7 +222,8 @@ class testFormUpdateProblem extends CWebTest {
 					],
 					'message' => 'Acknowledged event',
 					'Unacknowledge' => true,
-					'history' => [' Admin (Zabbix Administrator) Acknowledged event'],
+					'history' => [" Admin (Zabbix Administrator)".
+							"\nAcknowledged event"],
 					'hintboxes' => [
 						'Suppress' => 'Manual problem suppression. Date-time input accepts relative and absolute time format.',
 						'Unsuppress' => 'Deactivates manual suppression.',
@@ -321,7 +322,7 @@ class testFormUpdateProblem extends CWebTest {
 		// Check Hintboxes.
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
-				$form->getLabel($field)->query('tag:button')->one()->click();
+				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
 				$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
@@ -932,7 +933,7 @@ class testFormUpdateProblem extends CWebTest {
 
 		// Check Actions hint in Problem row.
 		$row->invalidate();
-		$unsuppress_button = 'xpath:.//button[contains(@class, "zi-eye")]';
+		$unsuppress_button = 'xpath:.//button['.CXPathHelper::fromClass('zi-eye').']';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue"]')->asOverlayDialog()
 				->one()->waitUntilReady();

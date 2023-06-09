@@ -37,14 +37,14 @@ class testDashboardPages extends CWebTest {
 	 *
 	 * @var string
 	 */
-	const NEXT_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-previous-page")]';
+	const NEXT_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-next-page")]';
 
 	/**
 	 * Previous page button in dashboard.
 	 *
 	 * @var string
 	 */
-	const PREVIOUS_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-next-page")]';
+	const PREVIOUS_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-previous-page")]';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -645,7 +645,9 @@ class testDashboardPages extends CWebTest {
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
-	// Check default period change for page.
+	/**
+	 * Check default period change for page.
+	 */
 	public function testDashboardPages_DefaultPeriod() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])
 				->waitUntilReady();

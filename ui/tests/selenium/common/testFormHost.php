@@ -263,7 +263,7 @@ class testFormHost extends CWebTest {
 		foreach ($interfaces_form->getRows() as $i => $row) {
 			$enabled = ($i !== 0 && $i !== 2);
 			// "Remove" button is disabled (in the 7th column) for Agent (in 0th row) and JMX (in 2nd row) interfaces.
-			$this->assertTrue($row->getColumn(7)->query('tag:button')->one()->isEnabled($enabled));
+			$this->assertTrue($row->getColumn(7)->query('xpath:./button[@data-hintbox]')->one()->isEnabled($enabled));
 		}
 		// Interface fields maxlength attribute.
 		foreach (['IP address' => 64, 'DNS name' => 255, 'Port' => 64] as $field => $maxlength) {
@@ -273,7 +273,7 @@ class testFormHost extends CWebTest {
 		}
 
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
-		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
+		$interfaces_form->getRow(1)->getColumn(0)->query('xpath:./button[@data-hintbox]')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
 				->asForm(['normalized' => true])->one();
 		$data = [

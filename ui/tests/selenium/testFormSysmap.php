@@ -280,7 +280,7 @@ class testFormSysmap extends CLegacyWebTest {
 		}
 
 		if (isset($data['remove_owner'])) {
-			$this->zbxTestClickXpathWait("//div[@id='userid']//span[contains(@class, 'zi-remove-smaller')]");
+			$this->zbxTestClickXpathWait('//div[@id="userid"]//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 		}
 
 		if ($data['expected'] == TEST_GOOD) {

@@ -1197,14 +1197,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			 * Check that edit widget button on disabled module widget is hidden and that it doesn't exist
 			 * if the dashboard is opened in Monitoring => Hosts view (where All hosts link is present) or in kiosk mode.
 			 */
-			$edit_button = $inaccessible_widget->query('xpath:.//button[contains(@class, "js-widget-edit")]');
+			$edit_button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-edit').']');
 			$this->assertFalse(($mode === 'kiosk' || $this->query('link:All hosts')->one(false)->isValid())
 					? $edit_button->one(false)->isValid()
 					: $edit_button->one()->isDisplayed()
 			);
 
 			// It should not be possible only to Delete the widget and only when the dashboard is in edit mode.
-			$button = $inaccessible_widget->query('xpath:.//button[contains(@class, "js-widget-action")]')->one();
+			$button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-edit').']')->one();
 
 			if ($mode === 'edit') {
 				$popup_menu = $button->waitUntilPresent()->asPopupButton()->getMenu();

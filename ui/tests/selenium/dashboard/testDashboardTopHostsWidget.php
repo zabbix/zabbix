@@ -1756,7 +1756,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Check that no warning icon displayed before adding fields.
 		foreach ($label_warnings as $label) {
-			$this->assertFalse($column_form->getLabel($label)->query('tag:button')->one()->isVisible());
+			$this->assertFalse($column_form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->isVisible());
 		}
 
 		// Adding those fields new info icons appear.
@@ -1765,7 +1765,7 @@ class testDashboardTopHostsWidget extends CWebTest {
 
 		// Check warning and info icon message.
 		foreach ($label_warnings as $label) {
-			$column_form->getLabel($label)->query('tag:button')->one()->click();
+			$column_form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->click();
 
 			// Check hint-box.
 			$hint = $column_form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent();

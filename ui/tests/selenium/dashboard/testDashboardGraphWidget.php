@@ -141,7 +141,7 @@ class testDashboardGraphWidget extends CWebTest {
 			case 'Data set':
 				// Remove data set.
 				if (CTestArrayHelper::get($data, 'remove_data_set', false)) {
-					$form->query('xpath:.//button[contains(@class,"js-remove")]')->one()->click();
+					$form->query('xpath:.//button['.CXPathHelper::fromClass('js-remove').']')->one()->click();
 				}
 				break;
 
@@ -151,8 +151,8 @@ class testDashboardGraphWidget extends CWebTest {
 
 				// Remove all override options.
 				if (CTestArrayHelper::get($data, 'remove_override_options', false)) {
-					$form->query('xpath:.//ul[@class="overrides-options-list"]//button[contains(@class,"js-remove")]')
-							->all()->click();
+					$form->query("xpath:.//ul[@class='overrides-options-list']//button[".
+							CXPathHelper::fromClass('js-remove')."]")->all()->click();
 				}
 
 				break;
@@ -2467,7 +2467,7 @@ class testDashboardGraphWidget extends CWebTest {
 		$form = $this->openGraphWidgetConfiguration();
 
 		// Check hint next to the "Data set label" field.
-		$form->getLabel('Data set label')->query('tag:button')->one()->click();
+		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
