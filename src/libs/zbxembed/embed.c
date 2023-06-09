@@ -303,6 +303,7 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	es->env = zbx_malloc(NULL, sizeof(zbx_es_env_t));
 	memset(es->env, 0, sizeof(zbx_es_env_t));
+	es->env->max_total_alloc = 0;
 
 	if (0 != setjmp(es->env->loc))
 	{
