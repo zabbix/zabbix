@@ -89,7 +89,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	return SYSINFO_RET_FAIL;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 	return zbx_strerror(errno);
 }

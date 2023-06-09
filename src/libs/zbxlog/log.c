@@ -258,7 +258,7 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
 {
 	const char	*filename = log_file_cfg->log_file_name;
 	int		type = log_file_cfg->log_type;
@@ -323,7 +323,7 @@ int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **erro
 	return SUCCEED;
 }
 
-void	zabbix_close_log(void)
+void	zbx_close_log(void)
 {
 	if (ZBX_LOG_TYPE_SYSTEM == log_type)
 	{
@@ -575,7 +575,7 @@ int	zbx_validate_log_parameters(ZBX_TASK_EX *task, const zbx_config_log_t *log_f
 	return SUCCEED;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 #ifdef _WINDOWS
 	size_t		offset = 0;
@@ -608,7 +608,7 @@ char	*strerror_from_system(zbx_syserror_t error)
 }
 
 #ifdef _WINDOWS
-char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
+char	*zbx_strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 {
 	size_t		offset = 0;
 	wchar_t		wide_string[ZBX_MESSAGE_BUF_SIZE];
@@ -626,7 +626,7 @@ char	*strerror_from_module(zbx_syserror_t error, const wchar_t *module)
 			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), wide_string, sizeof(wide_string), NULL))
 	{
 		zbx_snprintf(utf8_string + offset, sizeof(utf8_string) - offset,
-				"unable to find message text: %s", strerror_from_system(GetLastError()));
+				"unable to find message text: %s", zbx_strerror_from_system(GetLastError()));
 
 		return utf8_string;
 	}
