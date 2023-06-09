@@ -134,7 +134,6 @@ class CDocHelper {
 	const POPUP_MEDIA_IMPORT =									'xml_export_import/media#importing';
 	const POPUP_SERVICE_EDIT =									'web_interface/frontend_sections/services/service#editing-services';
 	const POPUP_SLA_EDIT =										'it_services/sla#configuration';
-	const POPUP_STANDARD_ITEMS =								'config/items/itemtypes';
 	const POPUP_TEMPLATE_IMPORT =								'xml_export_import/templates#importing';
 	const POPUP_TOKEN_EDIT =									'web_interface/frontend_sections/users/api_tokens';
 	const POPUP_TEST_EDIT =										'config/items/item#testing';

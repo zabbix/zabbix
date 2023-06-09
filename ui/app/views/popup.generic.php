@@ -123,9 +123,6 @@ if ($data['popup_type'] === 'help_items') {
 		case ITEM_TYPE_JMX:
 			$popup_doc_url = CDocHelper::ITEM_TYPES_JMX_AGENT;
 			break;
-
-		default:
-			$popup_doc_url = CDocHelper::POPUP_STANDARD_ITEMS;
 	}
 
 	$output['doc_url'] = CDocHelper::getUrl($popup_doc_url);
@@ -478,16 +475,7 @@ switch ($data['popup_type']) {
 					popup_generic.closePopup(event);
 				');
 
-			if (is_array($item['documentation_link'])) {
-				$item_doc_link = CDocHelper::POPUP_STANDARD_ITEMS.$item['documentation_link'][$options['itemtype']];
-			}
-			else {
-				$item_doc_link = substr($item['documentation_link'], 0, 1) === '/'
-					? CDocHelper::POPUP_STANDARD_ITEMS.$item['documentation_link']
-					: $item['documentation_link'];
-			}
-
-			$documentation_link = (new CLink(null, CDocHelper::getUrl($item_doc_link)))
+			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
 				->setTitle(_('Help'))
 				->addClass(ZBX_STYLE_ICON_DOC_LINK)
 				->setTarget('_blank');
