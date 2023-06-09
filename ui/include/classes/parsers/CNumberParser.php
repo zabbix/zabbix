@@ -64,7 +64,7 @@ class CNumberParser extends CParser {
 	 *
 	 * @var array
 	 */
-	private static $suffix_multipliers;
+	private $suffix_multipliers;
 
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
@@ -76,14 +76,14 @@ class CNumberParser extends CParser {
 		if ($this->options['with_size_suffix']) {
 			$this->suffixes .= ZBX_SIZE_SUFFIXES;
 
-			self::$suffix_multipliers = $this->options['is_binary_size']
+			$this->suffix_multipliers = $this->options['is_binary_size']
 				? ZBX_SIZE_SUFFIX_MULTIPLIERS_BINARY
 				: ZBX_SIZE_SUFFIX_MULTIPLIERS;
 		}
 
 		if ($this->options['with_time_suffix']) {
 			$this->suffixes .= $this->options['with_year'] ? ZBX_TIME_SUFFIXES_WITH_YEAR : ZBX_TIME_SUFFIXES;
-			self::$suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
+			$this->suffix_multipliers += ZBX_TIME_SUFFIX_MULTIPLIERS;
 		}
 	}
 
@@ -138,7 +138,7 @@ class CNumberParser extends CParser {
 		$number = (float) $this->number;
 
 		if ($this->suffix !== null) {
-			$number *= self::$suffix_multipliers[$this->suffix];
+			$number *= $this->suffix_multipliers[$this->suffix];
 		}
 
 		return $number;
