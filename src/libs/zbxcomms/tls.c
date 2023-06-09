@@ -3043,20 +3043,20 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 {
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-	unsigned char	repeated;
+	unsigned char	initialized;
 
 	if (NULL == s->tls_ctx)
 	{
 		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));
 		s->tls_ctx->ctx = NULL;
-		repeated = 0;
+		initialized = 0;
 	}
 	else
-		repeated = 1;
+		initialized = 1;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
-		if (0 == repeated)
+		if (0 == initialized)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "In %s(): issuer:\"%s\" subject:\"%s\"", __func__,
 					ZBX_NULL2EMPTY_STR(tls_arg1), ZBX_NULL2EMPTY_STR(tls_arg2));
@@ -3081,7 +3081,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		zabbix_log(LOG_LEVEL_DEBUG, "In %s(): psk_identity:\"%s\"", __func__, ZBX_NULL2EMPTY_STR(tls_arg1));
 
 #if defined(HAVE_OPENSSL_WITH_PSK)
-		if (0 == repeated)
+		if (0 == initialized)
 		{
 			if (NULL == ctx_psk)
 			{
@@ -3116,7 +3116,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
 			/* passive checks, for a server when it connects to a passive proxy) */
 
-			if (0 == repeated)
+			if (0 == initialized)
 			{
 				if (0 >= (s->tls_ctx->psk_len = zbx_hex2bin((const unsigned char *)tls_arg2,
 						(unsigned char *)s->tls_ctx->psk_buf, sizeof(s->tls_ctx->psk_buf))))
@@ -3148,7 +3148,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		goto out1;
 	}
 
-	if (0 == repeated)
+	if (0 == initialized)
 	{
 		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && 1 != SSL_set_tlsext_host_name(
 				s->tls_ctx->ctx, server_name))

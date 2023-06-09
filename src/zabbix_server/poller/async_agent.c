@@ -79,16 +79,22 @@ static int	agent_task_process(short event, void *data)
 					ZBX_TCP_SEC_TLS_PSK == agent_context->host.tls_connect)
 			{
 				char	*error = NULL;
-				short	event_tls = 0;
 
 				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->host.tls_connect,
 						agent_context->tls_arg1, agent_context->tls_arg2,
-						agent_context->server_name, &event_tls, &error))
+						agent_context->server_name, &event_local, &error))
 				{
-					if (POLLIN & event_tls)
+					if (POLLIN & event_local)
+					{
+						zbx_free(error);
 						return ZBX_ASYNC_TASK_READ;
-					if (POLLOUT & event_tls)
+					}
+
+					if (POLLOUT & event_local)
+					{
+						zbx_free(error);
 						return ZBX_ASYNC_TASK_WRITE;
+					}
 
 					SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: TCP successful, cannot establish TLS to [[%s]:%hu]: %s",
