@@ -692,7 +692,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 3601,
 					'errors' => [
-						'Invalid parameter "timeout": value must be one of 1-3600.'
+						'Incorrect value for field "timeout": value must be one of 1-3600.'
 					]
 				]
 			],
@@ -704,7 +704,7 @@ class testFormWebStep extends CLegacyWebTest {
 					'url' => 'http://www.zabbix.com',
 					'timeout' => 0,
 					'errors' => [
-						'Invalid parameter "timeout": value must be one of 1-3600.'
+						'Incorrect value for field "timeout": value must be one of 1-3600.'
 					]
 				]
 			],
@@ -824,7 +824,7 @@ class testFormWebStep extends CLegacyWebTest {
 	 */
 	protected function addPairs($context, $items) {
 		$parent = $this->query('xpath', $context)->one();
-		$element = $parent->query('xpath:.//tr[@class="form_row"]')->all()->last();
+		$element = $parent->query('xpath:.//tr[contains(@class, "form_row")]')->all()->last();
 
 		foreach($items as $item) {
 			foreach ($item as $field => $value) {
@@ -841,7 +841,7 @@ class testFormWebStep extends CLegacyWebTest {
 			}
 
 			$parent->query('xpath:.//button[text()="Add"]')->one()->click();
-			$element = $parent->query('xpath:.//tr[@class="form_row"]')->all()->last();
+			$element = $parent->query('xpath:.//tr[contains(@class, "form_row")]')->all()->last();
 		}
 	}
 
@@ -853,7 +853,7 @@ class testFormWebStep extends CLegacyWebTest {
 	protected function getPairs($context) {
 		$pairs = [];
 		$parent = $this->query('xpath', $context)->one();
-		$rows = $parent->query('xpath:.//tr[@class="form_row"]')->all();
+		$rows = $parent->query('xpath:.//tr[contains(@class, "form_row")]')->all();
 
 		foreach ($rows as $row) {
 			$pair = [];
@@ -947,8 +947,8 @@ class testFormWebStep extends CLegacyWebTest {
 			$paths = [
 				'input[@id="post_type_0"',
 				'input[@id="post_type_1"',
-				'table[@data-type="post_fields"]//input[@data-type="name"',
-				'table[@data-type="post_fields"]//input[@data-type="value"'
+				'table[@id="step-post-fields"]//textarea[@placeholder="name"',
+				'table[@id="step-post-fields"]//textarea[@placeholder="value"'
 			];
 			if ($data['retrieve'] === 'Headers') {
 				foreach ($paths as $path) {
@@ -980,7 +980,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->page->removeFocus();
 
 			foreach (['Post fields', 'Headers', 'Query fields'] as $field) {
-				$form = $this->query('id:http_step')->asForm()->one();
+				$form = $this->query('id:webscenario-step-form')->asForm()->one();
 
 				if ($field === 'Query fields') {
 					COverlayDialogElement::find()->one()->scrollToTop();
