@@ -146,7 +146,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 		$sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
 			? $sla['timezone']
 			: CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System default')),
-		CSlaHelper::getScheduleTag($sla['schedule']),
+		CSlaHelper::getScheduleCaption($sla['schedule']),
 		$sla_report_tag,
 		$status_tag
 	];
