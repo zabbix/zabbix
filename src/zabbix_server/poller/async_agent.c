@@ -28,19 +28,18 @@
 #include "zbxip.h"
 #include "../../libs/zbxcomms/tls.h"
 
-const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
+static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {
 	switch (step)
 	{
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
-			return "CONNECT_WAIT";
+			return "connect";
 		case ZABBIX_AGENT_STEP_SEND:
-			return "AGENT_STEP_SEND";
+			return "send";
 		case ZABBIX_AGENT_STEP_RECV:
-			return "AGENT_STEP_RECV";
+			return "receive";
 	}
 }
-
 
 static int	agent_task_process(short event, void *data)
 {
@@ -68,7 +67,8 @@ static int	agent_task_process(short event, void *data)
 	if (0 != (event & EV_TIMEOUT))
 	{
 		agent_context->ret = TIMEOUT_ERROR;
-		SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed: timed out during %d", agent_context->step));
+		SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed during %s:"
+		" timed out", get_agent_step_string(agent_context->step)));
 		return ZBX_ASYNC_TASK_STOP;
 	}
 
@@ -105,20 +105,13 @@ static int	agent_task_process(short event, void *data)
 			}
 			ZBX_FALLTHROUGH;
 		case ZABBIX_AGENT_STEP_SEND:
-			if (0 == (event & EV_WRITE))
-			{
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
-						" unexpected read event during send"));
-				agent_context->ret = NETWORK_ERROR;
-				return ZBX_ASYNC_TASK_STOP;
-			}
-
 			zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", agent_context->key);
 
 			if (SUCCEED != zbx_tcp_send(&agent_context->s, agent_context->key))
 			{
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
-						" %s", zbx_socket_strerror()));
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
+					" during %s: %s", get_agent_step_string(agent_context->step),
+					zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 				return ZBX_ASYNC_TASK_STOP;
 			}
@@ -147,8 +140,9 @@ static int	agent_task_process(short event, void *data)
 				if (POLLOUT & event_local)
 					return ZBX_ASYNC_TASK_WRITE;
 
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed:"
-						" %s", zbx_socket_strerror()));
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
+				 		" during %s: %s", get_agent_step_string(agent_context->step),
+						zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 			}
 			break;

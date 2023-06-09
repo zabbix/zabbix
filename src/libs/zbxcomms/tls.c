@@ -2709,7 +2709,7 @@ void	zbx_tls_free(void)
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, char **error)
+		const char *server_name, short *event, char **error)
 {
 	int	ret = FAIL, res;
 
