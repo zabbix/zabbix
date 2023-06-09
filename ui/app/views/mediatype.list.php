@@ -132,24 +132,24 @@ foreach ($data['mediatypes'] as $media_type) {
 	}
 
 	// action list
-	$actionLinks = [];
+	$action_links = [];
 
 	if (count($media_type['list_of_actions']) > 0) {
 		foreach ($media_type['list_of_actions'] as $action) {
-			$actionLinks[] = (new CLink($action['name']))
+			$action_links[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
 				->setAttribute('data-actionid', $action['actionid'])
 				->setAttribute('data-eventsource', $action['eventsource']);
 
-			$actionLinks[] = ', ';
+			$action_links[] = ', ';
 		}
-		array_pop($actionLinks);
+		array_pop($action_links);
 	}
 	else {
-		$actionLinks = '';
+		$action_links = '';
 	}
 
-	$action_column = (new CCol($actionLinks))->addStyle('white-space: normal;');
+	$action_column = (new CCol($action_links))->addStyle('white-space: normal;');
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
