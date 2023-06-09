@@ -39,7 +39,7 @@ window.mediatype_edit_popup = new class {
 		this.#loadView(mediatype);
 		this.#initActions();
 
-		this.form.querySelector('#type').dispatchEvent(new Event('change'));
+		this.form.querySelector('#type').dispatchEvent(new CustomEvent('change', {detail: {init: true}}));
 	}
 
 	#initActions() {
@@ -448,6 +448,7 @@ window.mediatype_edit_popup = new class {
 		const concurrent_sessions = typeof event.target.value === 'undefined'
 			? this.max_session_checked
 			: event.target.value;
+
 		const maxsessions = this.form.querySelector('#maxsessions');
 
 		if (concurrent_sessions === 'one' || concurrent_sessions === 'unlimited') {
@@ -507,8 +508,11 @@ window.mediatype_edit_popup = new class {
 				break;
 		}
 
+		if (typeof event.detail == 'undefined' || this.type == <?= MEDIA_TYPE_SMS ?>) {
+			this.#setMaxSessionsType(this.type);
+		}
+
 		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
-		this.#setMaxSessionsType(this.type);
 		this.form.querySelector('#maxsessions_type').dispatchEvent(new Event('change'));
 	}
 
