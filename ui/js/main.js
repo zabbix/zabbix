@@ -870,6 +870,7 @@ function getConditionFormula(conditions, evalType) {
 			remove_next_sibling: false,
 			disable: '.element-table-disable',
 			counter: null,
+			allow_empty: false,
 			beforeRow: null,
 			rows: [],
 			dataCallback: function(data) {
@@ -892,8 +893,12 @@ function getConditionFormula(conditions, evalType) {
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
-					:  $(this).closest('tr');
+					: $(this).closest('tr');
 				addRow(table, beforeRow, options);
+
+				if (!options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
 
 				table.trigger('afteradd.dynamicRows', options);
 			});
@@ -902,6 +907,15 @@ function getConditionFormula(conditions, evalType) {
 			table.on('click', options.remove, function() {
 				// remove the parent row
 				removeRow(table, $(this).closest(options.row), options);
+
+				if (!options.allow_empty && $(options.row, table).length === 0) {
+					table.trigger('beforeadd.dynamicRows', options);
+
+					addRow(table, $(options.add, table).closest('tr'), options);
+					$(options.remove, table).attr('disabled', true);
+
+					table.trigger('afteradd.dynamicRows', options);
+				}
 			});
 
 			// disable buttons
@@ -910,11 +924,16 @@ function getConditionFormula(conditions, evalType) {
 				disableRow($(this).closest(options.row));
 			});
 
-			if (typeof options.rows === 'object') {
+			table.on('change', options, function() {
+				if (!options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
+			});
+
+			if (options.rows.length > 0) {
 				var before_row = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
-
 				initRows(table, before_row, options);
 			}
 		});
@@ -986,6 +1005,7 @@ function getConditionFormula(conditions, evalType) {
 		if (options.remove_next_sibling) {
 			row.next().remove();
 		}
+
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);

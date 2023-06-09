@@ -131,7 +131,8 @@ class HostMacrosManager {
 		$parent
 			.dynamicRows({
 				remove_next_sibling: show_inherited_macros,
-				template: show_inherited_macros ? '#macro-row-tmpl-inherited' : '#macro-row-tmpl'
+				template: show_inherited_macros ? '#macro-row-tmpl-inherited' : '#macro-row-tmpl',
+				allow_empty: true,
 			})
 			.on('click', 'button.element-table-add', () => {
 				this.initMacroFields($parent);
