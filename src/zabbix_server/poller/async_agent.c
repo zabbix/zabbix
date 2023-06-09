@@ -147,7 +147,7 @@ static int	agent_task_process(short event, void *data)
 					return ZBX_ASYNC_TASK_WRITE;
 
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
-				 		" during %s: %s", get_agent_step_string(agent_context->step),
+						" during %s: %s", get_agent_step_string(agent_context->step),
 						zbx_socket_strerror()));
 				agent_context->ret = NETWORK_ERROR;
 			}
