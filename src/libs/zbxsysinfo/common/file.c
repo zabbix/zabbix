@@ -376,7 +376,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		utf8 = convert_to_utf8(contents, contents_offset, encoding);
 		zbx_free(contents);
-		zbx_rtrim_utf8(utf8, "\r\n");
+		zbx_rtrim(utf8, "\r\n");
 
 		SET_TEXT_RESULT(result, utf8);
 	}
