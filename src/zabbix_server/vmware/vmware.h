@@ -578,8 +578,7 @@ void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src,
-		zbx_vector_vmware_entity_tags_t *dst);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 
