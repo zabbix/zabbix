@@ -658,8 +658,8 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated memory: "
 			ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),
-			ZBX_NULL2EMPTY_STR(*error), es->env->total_alloc, es->env->max_total_alloc,
-			ZBX_ES_MEMORY_LIMIT);
+			ZBX_NULL2EMPTY_STR(*error), (zbx_fs_size_t)es->env->total_alloc,
+			(zbx_fs_size_t)es->env->max_total_alloc, ZBX_ES_MEMORY_LIMIT);
 	es->env->max_total_alloc = 0;
 
 	return ret;
