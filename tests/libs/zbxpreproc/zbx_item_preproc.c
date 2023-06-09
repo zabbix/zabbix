@@ -26,7 +26,7 @@
 #include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxembed.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxpreproc.h"
 #include "libs/zbxpreproc/pp_execute.h"
 #include "libs/zbxpreproc/preproc_snmp.h"
@@ -313,7 +313,7 @@ void	zbx_mock_test_entry(void **state)
 			step_cache = cache;
 
 		if (FAIL == (returned_ret = pp_execute_step(&ctx, step_cache, NULL, 0, value_type, &value, ts, &step,
-				&history_value, &history_ts)))
+				&history_value, &history_ts, get_zbx_config_source_ip())))
 		{
 			pp_error_on_fail(&value, &step);
 

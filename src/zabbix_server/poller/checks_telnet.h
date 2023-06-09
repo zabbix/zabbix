@@ -23,6 +23,6 @@
 #include "module.h"
 #include "zbxcacheconfig.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, int timeout, AGENT_RESULT *result);
+int	get_value_telnet(zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result);
 
 #endif

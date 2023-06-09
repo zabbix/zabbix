@@ -53,7 +53,7 @@ package zbxlib
 
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
 
@@ -63,7 +63,6 @@ typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
 int CONFIG_MAX_LINES_PER_SECOND = 20;
 char ZBX_THREAD_LOCAL *CONFIG_HOSTNAME = NULL;
-char	*CONFIG_SOURCE_IP= NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 

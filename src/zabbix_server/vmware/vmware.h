@@ -558,6 +558,7 @@ zbx_vmware_stats_t;
 
 typedef struct
 {
+	const char	*config_source_ip;
 	int		config_vmware_frequency;
 	int		config_vmware_perf_frequency;
 	int		config_vmware_timeout;
@@ -579,15 +580,14 @@ void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	zbx_vmware_service_update(zbx_vmware_service_t *service, int config_vmware_timeout, int cache_update_period);
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, int config_vmware_timeout);
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, int config_vmware_timeout);
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout, int cache_update_period));
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src,
-		zbx_vector_vmware_entity_tags_t *dst);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
 
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password);
 

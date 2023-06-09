@@ -57,28 +57,35 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['api_endpoint', 'token'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+                    ['api_token', 'api_url', 'api_server_scheme', 'api_server_port', 'controller_scheme', 'controller_port',
+                        'scheduler_scheme', 'scheduler_port', 'control_plane_taint'].forEach(function (field) {
+                            if (typeof params !== 'object' || typeof params[field] === 'undefined'
+                                || params[field] === '') {
+                                throw 'Required param is not set: "' + field + '".';
+                            }
+                        });
             
                     Kube.params = params;
-                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
-                        Kube.params.api_endpoint += '/';
+                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+                        Kube.params.api_url += '/';
                     }
                 },
             
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_endpoint + query;
-            
+                apiRequest: function (query) {
+                    var request = new HttpRequest(),
+                        response,
+                        url = encodeURI(Kube.params.api_url + query);
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
                     request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    if (Kube.params.http_proxy) {
+                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+                    }
             
                     response = request.get(url);
             
@@ -88,73 +95,73 @@ zabbix_export:
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                    }
+                    return response;
+                },
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
                         }
-                        catch (error) {
-                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                        }
+            
+                        data = data[step];
                     }
             
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
+                    return data;
                 },
             
                 getNodes: function () {
-                    var result = Kube.request('v1/nodes');
+                    var result = Kube.apiRequest('api/v1/nodes?labelSelector=' + Kube.params.control_plane_taint);
             
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.items === 'undefined'
-                        || result.status != 200) {
-                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+                    if (typeof result !== 'object'
+                        || typeof result.items === 'undefined') {
+                        throw 'Cannot get control plane nodes from Kubernetes API. Check debug log for more information.';
                     };
             
-                    return result.response;
-                },
-            };
+                    var nodes = result.items,
+                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+                        controlPlaneNodes = [],
+                        hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/);
             
-            try {
-                Kube.setParams(JSON.parse(value));
-            
-                var nodes = Kube.getNodes(),
-                    controlPlaneNodes = [],
-                    api_url = '{$KUBE.API.URL}',
-                    hostname = api_url.match(/\/\/(.+):/);
-            
-                if (typeof hostname[1] === 'undefined') {
+                    if (typeof hostname[1] === 'undefined') {
                         Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
                         throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
                     };
             
-                for (idx in nodes.items) {
-                    for (label in nodes.items[idx].metadata.labels) {
-                        if (label === 'node-role.kubernetes.io/control-plane') {                          
-                            var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                                return addr.type === 'InternalIP';
-                            });
+                    controlPlaneNodes = nodes.map(function (node) {
+                        var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
+                            return addr.type === 'InternalIP';
+                        });
+                        var internalIP = internalIPs.length && internalIPs[0].address;
             
-                            var internalIP = internalIPs.length && internalIPs[0].address;
-                            controlPlaneNodes.push({
-                                '{#NAME}': nodes.items[idx].metadata.name,
-                                '{#IP}': internalIP,
-                                '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.api_server_port + '/metrics',
-                                '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.controller_port + '/metrics',
-                                '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']') + ':' + Kube.params.scheduler_port + '/metrics',
-                                '{#COMPONENT.API}' : 'API',
-                                '{#COMPONENT.CONTROLLER}' : 'Controller manager',
-                                '{#COMPONENT.SCHEDULER}' : 'Scheduler',
-                                '{#CLUSTER_HOSTNAME}': hostname[1]
-                            });
+                        return {
+                            '{#NAME}': Kube.getField(node, 'metadata.name'),
+                            '{#IP}': internalIP,
+                            '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.api_server_port + '/metrics',
+                            '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.controller_port + '/metrics',
+                            '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.scheduler_port + '/metrics',
+                            '{#COMPONENT.API}': 'API',
+                            '{#COMPONENT.CONTROLLER}': 'Controller manager',
+                            '{#COMPONENT.SCHEDULER}': 'Scheduler',
+                            '{#CLUSTER_HOSTNAME}': hostname[1]
+                        };
+                    });
             
-                            break;
-                        }
-                    }
+                    return JSON.stringify(controlPlaneNodes);
                 }
+            };
             
-                return JSON.stringify(controlPlaneNodes);
+            try {
+                Kube.setParams(JSON.parse(value));
+                return Kube.getNodes();
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
@@ -168,9 +175,9 @@ zabbix_export:
                 - 3h
           timeout: 10s
           parameters:
-            - name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
-            - name: token
+            - name: api_url
+              value: '{$KUBE.API.URL}'
+            - name: api_token
               value: '{$KUBE.API.TOKEN}'
             - name: api_server_scheme
               value: '{$KUBE.API_SERVER.SCHEME}'
@@ -184,6 +191,10 @@ zabbix_export:
               value: '{$KUBE.SCHEDULER.SCHEME}'
             - name: scheduler_port
               value: '{$KUBE.SCHEDULER.PORT}'
+            - name: control_plane_taint
+              value: '{$KUBE.CONTROL_PLANE.TAINT}'
+            - name: http_proxy
+              value: '{$KUBE.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -346,28 +357,42 @@ zabbix_export:
                 params: {},
             
                 setParams: function (params) {
-                    ['api_endpoint', 'token'].forEach(function (field) {
+                    ['api_url', 'api_token', 'kubelet_scheme', 'kubelet_port'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
+                    ['node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
+                        if (typeof params !== 'object' || typeof params[field] === 'undefined') {
+                            throw 'Parameter can be empty but not removed: "' + field + '".';
+                        }
+                    });
             
                     Kube.params = params;
-                    if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
-                        Kube.params.api_endpoint += '/';
+                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+                        Kube.params.api_url += '/';
                     }
+            
                 },
             
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_endpoint + query;
+                apiRequest: function (query) {
+                    var request = new HttpRequest(),
+                        response,
+                        url = encodeURI(Kube.params.api_url + query);
+            
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
             
                     request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    if (Kube.params.http_proxy) {
+                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+                    }
             
                     response = request.get(url);
             
@@ -375,65 +400,110 @@ zabbix_export:
             
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            
+                    }
+                    try {
+                        response = JSON.parse(response);
+                    }
+                    catch (error) {
+                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                    }
+                    return response;
+            
+                },
+            
+                parseFilters: function (filter) {
+                    var pairs = {};
+            
+                    filter.split(/\s*,\s*/).forEach(function (kv) {
+                        if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
+                            var pair = kv.split(/\s*:\s*/);
+                            pairs[pair[0]] = pair[1];
+                        }
+                    });
+                    return pairs;
+                },
+            
+                filter: function (name, data, filters) {
+                    var filtered = true;
+                    if (typeof data === 'object') {
+                        Object.keys(filters).some(function (filter) {
+                            var exclude = filter.match(/^!(.+)/);
+                            if (filter in data || (exclude && exclude[1] in data)) {
+                                if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+                                    || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+                                    Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+            
+                                    filtered = false;
+                                    return true;
+                                }
+                            };
+                        });
+                    }
+                    return filtered;
+                },
+            
+                getField: function (data, path) {
+                    var steps = path.split('.');
+                    for (var i = 0; i < steps.length; i++) {
+                        var step = steps[i];
+                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                            throw 'Required field was not found: ' + path;
+                        }
+            
+                        data = data[step];
                     }
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                        }
-                    }
-            
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
+                    return data;
                 },
             
                 getNodes: function () {
-                    var result = Kube.request('v1/nodes');
-            
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.items === 'undefined'
-                        || result.status != 200) {
+                    var result = Kube.apiRequest('api/v1/nodes');
+                    if (typeof result !== 'object'
+                        || typeof result.items === 'undefined') {
                         throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
                     };
+                    var nodes = result.items,
+                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+                        kubeNodes = [],
+                        hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/),
+                        filterNodeLabels = Kube.parseFilters(Kube.params.node_filter_labels),
+                        filterNodeAnnotations = Kube.parseFilters(Kube.params.node_filter_annotations);
             
-                    return result.response;
+                    if (typeof hostname[1] === 'undefined') {
+                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+                    };
+            
+                    kubeNodes = nodes.map(function (node) {
+                        if (Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.labels'), filterNodeLabels)
+                            && Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.annotations'), filterNodeAnnotations)) {
+                            Zabbix.log(4, '[ Kubernetes ] Filtered node "' + node.metadata.name + '"');
+            
+                            var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
+                                return addr.type === 'InternalIP';
+                            });
+            
+                            var internalIP = internalIPs.length && internalIPs[0].address;
+            
+                            return {
+                                '{#NAME}': node.metadata.name,
+                                '{#IP}': internalIP,
+                                '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.kubelet_port,
+                                '{#COMPONENT}': 'Kubelet',
+                                '{#CLUSTER_HOSTNAME}': hostname[1]
+                            };
+                        }
+                    });
+            
+                    return JSON.stringify(kubeNodes);
+            
                 },
             };
             
             try {
                 Kube.setParams(JSON.parse(value));
-            
-                var nodes = Kube.getNodes(),
-                    kubeNodes = [];
-                    api_url = '{$KUBE.API.URL}',
-                    hostname = api_url.match(/\/\/(.+):/);
-            
-                if (typeof hostname[1] === 'undefined') {
-                      Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
-                      throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                    };
-                for (idx in nodes.items) {
-                    var internalIPs = nodes.items[idx].status.addresses.filter(function (addr) {
-                        return addr.type === 'InternalIP';
-                    });
-            
-                    var internalIP = internalIPs.length && internalIPs[0].address;
-            
-                    kubeNodes.push({
-                        '{#NAME}': nodes.items[idx].metadata.name,
-                        '{#IP}': internalIP,
-                        '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + ((/(\d+.){3}\d+/.test(internalIP)) ? internalIP : '['+internalIP+']')  + ':' + Kube.params.kubelet_port,
-                        '{#COMPONENT}': 'Kubelet',
-                        '{#CLUSTER_HOSTNAME}': hostname[1]
-                    });
-                }
-            
-                return JSON.stringify(kubeNodes);
+                return Kube.getNodes();
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
@@ -447,14 +517,20 @@ zabbix_export:
                 - 3h
           timeout: 10s
           parameters:
-            - name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
-            - name: token
+            - name: api_url
+              value: '{$KUBE.API.URL}'
+            - name: api_token
               value: '{$KUBE.API.TOKEN}'
             - name: kubelet_scheme
               value: '{$KUBE.KUBELET.SCHEME}'
             - name: kubelet_port
               value: '{$KUBE.KUBELET.PORT}'
+            - name: node_filter_labels
+              value: '{$KUBE.KUBELET.FILTER.LABELS}'
+            - name: node_filter_annotations
+              value: '{$KUBE.KUBELET.FILTER.ANNOTATIONS}'
+            - name: http_proxy
+              value: '{$KUBE.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -520,31 +596,38 @@ zabbix_export:
           params: |
             var Kube = {
                 params: {},
-                metrics_endpoint: undefined,
             
                 setParams: function (params) {
-                    ['api_endpoint', 'token', 'state_endpoint_name'].forEach(function (field) {
+                    ['api_url', 'api_token', 'state_endpoint_name'].forEach(function (field) {
                         if (typeof params !== 'object' || typeof params[field] === 'undefined'
                             || params[field] === '') {
                             throw 'Required param is not set: "' + field + '".';
                         }
                     });
             
-                      Kube.params = params;
-                      if (typeof Kube.params.api_endpoint === 'string' && !Kube.params.api_endpoint.endsWith('/')) {
-                          Kube.params.api_endpoint += '/';
-                      }
+                    Kube.params = params;
+                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+                        Kube.params.api_url += '/';
+                    }
                 },
             
                 apiRequest: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Kube.params.api_endpoint + query;
+                    var request = new HttpRequest(),
+                        response,
+                        url = encodeURI(Kube.params.api_url + query);
+            
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
             
                     request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    if (Kube.params.http_proxy) {
+                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+                    }
             
                     response = request.get(url);
             
@@ -553,33 +636,25 @@ zabbix_export:
                     if (request.getStatus() < 200 || request.getStatus() >= 300) {
                         throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                     }
-            
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                        }
+                    try {
+                        response = JSON.parse(response);
                     }
-            
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
+                    catch (error) {
+                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+                    }
+                    return response;
                 },
             
                 getMetricsEndpoint: function () {
-                    var result = Kube.apiRequest('v1/endpoints'),
-                        endpoint = undefined;
+                    var result = Kube.apiRequest('api/v1/endpoints'),
+                        endpoint;
             
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.items === 'undefined'
-                        || result.status != 200) {
+                    if (typeof result !== 'object'
+                        || typeof result.items === 'undefined') {
                         throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
                     };
             
-                    result.response.items.forEach(function (ep) {
+                    result.items.forEach(function (ep) {
                         if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
                             if (typeof ep.subsets[0].addresses !== 'undefined') {
                                 var port, addr
@@ -609,14 +684,23 @@ zabbix_export:
                         throw 'Cannot get kube-state-metrics endpoints from Kubernetes API. Check debug log for more information.';
                     }
             
-                    var response,
-                        request = new HttpRequest(),
-                        url = 'http://' + Kube.metrics_endpoint.address + ':' + Kube.metrics_endpoint.port + '/metrics';
+                    var request = new HttpRequest(),
+                        response,
+                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+                        url = 'http://' + (IPv4.test(Kube.metrics_endpoint.address) ? Kube.metrics_endpoint.address : '[' + Kube.metrics_endpoint.address + ']') + ':' + Kube.metrics_endpoint.port + '/metrics';
+            
+                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+                        request.setProxy(Kube.params.http_proxy);
+                    }
             
                     request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.token);
+                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
                     Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            
+                    if (Kube.params.http_proxy) {
+                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+                    }
             
                     response = request.get(url);
             
@@ -651,17 +735,19 @@ zabbix_export:
           description: 'Collecting Kubernetes metrics from kube-state-metrics.'
           timeout: 10s
           parameters:
-            - name: api_endpoint
-              value: '{$KUBE.API.URL}/api'
+            - name: api_url
+              value: '{$KUBE.API.URL}'
             - name: state_endpoint_name
               value: '{$KUBE.STATE.ENDPOINT.NAME}'
-            - name: token
+            - name: api_token
               value: '{$KUBE.API.TOKEN}'
+            - name: http_proxy
+              value: '{$KUBE.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
         - uuid: 3940412bea334e139a72b223197582eb
-          name: 'Kubernetes: Statefulset count'
+          name: 'Kubernetes: StatefulSet count'
           type: DEPENDENT
           key: kube.statefulset.count
           delay: '0'
@@ -1226,7 +1312,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1250,7 +1336,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1276,7 +1362,49 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
+                  value: '{#NAME}'
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+            - uuid: b6d4d557e6104f6b9e1084863cf4024d
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of available replicas that mismatch the desired number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_deployment_(spec_replicas|status_replicas_available)$", namespace="{#NAMESPACE}", deployment="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas_desired,
+                          replicas_available;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === 'kube_deployment_spec_replicas') {
+                              replicas_desired = item.value;
+                          }
+                          if (item.name === 'kube_deployment_status_replicas_available') {
+                              replicas_available = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas_desired - replicas_available);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: deployment
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1300,7 +1428,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1326,7 +1454,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1352,7 +1480,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
@@ -1376,38 +1504,34 @@ zabbix_export:
               tags:
                 - tag: component
                   value: deployment
-                - tag: daemonset
+                - tag: deployment
                   value: '{#NAME}'
                 - tag: namespace
                   value: '{#NAMESPACE}'
           trigger_prototypes:
             - uuid: aa9f828467d84252aecc00dd342b5661
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0'
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}])>=0
               name: 'Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch'
+              opdata: 'Desired: {ITEM.LASTVALUE2}, available: {ITEM.LASTVALUE3}'
               priority: WARNING
+              description: 'Deployment has not matched the expected number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.deployment
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_deployment_spec_paused
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.deployment,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1672,10 +1796,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
+                value: '{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}'
                 formulaid: A
               - macro: '{#NAME}'
-                value: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
+                value: '{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           host_prototypes:
@@ -3122,7 +3246,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 6244f250f6cd411080221843ad1c59f2
-          name: 'Replicaset discovery'
+          name: 'ReplicaSet discovery'
           type: DEPENDENT
           key: kube.replicaset.discovery
           delay: '0'
@@ -3139,7 +3263,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 928536dae27c4e3497627b9f5642a7a8
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Fully labeled replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Fully labeled replicas'
               type: DEPENDENT
               key: 'kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3165,7 +3289,7 @@ zabbix_export:
                 - tag: status
                   value: fully-labeled
             - uuid: 4e911e4b71c342dba2227ed7ef360190
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Ready'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Ready'
               type: DEPENDENT
               key: 'kube.replicaset.ready[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3191,7 +3315,7 @@ zabbix_export:
                 - tag: status
                   value: ready
             - uuid: 545c8486dcc9409c93c6efee0f4b2ad6
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas'
               type: DEPENDENT
               key: 'kube.replicaset.replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3215,7 +3339,7 @@ zabbix_export:
                 - tag: replicaset
                   value: '{#NAME}'
             - uuid: 30aea656c8a5470ea4566333077628b3
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Desired replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Desired replicas'
               type: DEPENDENT
               key: 'kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3240,34 +3364,72 @@ zabbix_export:
                   value: '{#NAME}'
                 - tag: status
                   value: desired
+            - uuid: a249a4762874499eb83eb8864df5c357
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas that mismatch the desired number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_replicaset_(spec_replicas|status_ready_replicas)$", namespace="{#NAMESPACE}", replicaset="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas_desired,
+                          replicas_ready;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === 'kube_replicaset_spec_replicas') {
+                              replicas_desired = item.value;
+                          }
+                          if (item.name === 'kube_replicaset_status_ready_replicas') {
+                              replicas_ready = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas_desired - replicas_ready);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: replicaset
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+                - tag: replicaset
+                  value: '{#NAME}'
           trigger_prototypes:
             - uuid: 8046757dbd3b459c9cd9f7bd369dd416
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch'
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"replicaset:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}])>=0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicaSet mismatch'
+              opdata: 'Desired: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
               priority: WARNING
+              description: 'ReplicaSet has not matched the expected number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.replicaset
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_replicaset_status_replicas
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.replicaset,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3299,7 +3461,7 @@ zabbix_export:
           master_item:
             key: kube.control_plane.lld
         - uuid: 37812660877243e9bdbc0ffc7815578c
-          name: 'Statefulset discovery'
+          name: 'StatefulSet discovery'
           type: DEPENDENT
           key: kube.statefulset.discovery
           delay: '0'
@@ -3316,7 +3478,7 @@ zabbix_export:
           lifetime: '0'
           item_prototypes:
             - uuid: 9cc34425228f44868f3cd46450d557ca
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3340,7 +3502,7 @@ zabbix_export:
                 - tag: statefulset
                   value: '{#NAME}'
             - uuid: 33e5a534b35f40c6ad7fef53212ef970
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Current replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Current replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3364,7 +3526,7 @@ zabbix_export:
                 - tag: statefulset
                   value: '{#NAME}'
             - uuid: 3fee3afc8b924b13ae24ab4b5e793acf
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Desired replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Desired replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_desired[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3389,8 +3551,50 @@ zabbix_export:
                   value: '{#NAME}'
                 - tag: status
                   value: ready
+            - uuid: e2c3e03fe9bd42beab8a5d09c0a766bd
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas mismatched'
+              type: DEPENDENT
+              key: 'kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}]'
+              delay: '0'
+              history: 7d
+              value_type: FLOAT
+              description: 'The number of ready replicas that mismatch the number of replicas.'
+              preprocessing:
+                - type: PROMETHEUS_TO_JSON
+                  parameters:
+                    - '{__name__=~"^kube_statefulset_(status_replicas|status_replicas_ready)$", namespace="{#NAMESPACE}", statefulset="{#NAME}"}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      var data = JSON.parse(value),
+                          replicas,
+                          replicas_ready;
+                      
+                      if (data.length !== 2) {
+                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      }
+                      
+                      JSON.parse(value).forEach(function (item) {
+                          if (item.name === 'kube_statefulset_status_replicas') {
+                              replicas = item.value;
+                          }
+                          if (item.name === 'kube_statefulset_status_replicas_ready') {
+                              replicas_ready = item.value;
+                          }
+                      });
+                      
+                      return Math.abs(replicas - replicas_ready);
+              master_item:
+                key: kube.state.metrics
+              tags:
+                - tag: component
+                  value: statefulset
+                - tag: namespace
+                  value: '{#NAMESPACE}'
+                - tag: statefulset
+                  value: '{#NAME}'
             - uuid: b35c1cebd902484998f383585ce29b76
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Ready replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Ready replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3416,7 +3620,7 @@ zabbix_export:
                 - tag: status
                   value: ready
             - uuid: b00b1cfed30e4b90b9754d543e72d7aa
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Updated replicas'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Updated replicas'
               type: DEPENDENT
               key: 'kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]'
               delay: '0'
@@ -3442,40 +3646,36 @@ zabbix_export:
                 - tag: status
                   value: updated
           trigger_prototypes:
-            - uuid: 469d6933f5494ca48a212cdc364058e0
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch'
-              priority: WARNING
+            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
+              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down'
+              priority: HIGH
               tags:
                 - tag: scope
                   value: availability
-            - uuid: c29a27fe5a0345c8af9e0d4e99b22dcb
-              expression: '(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1'
-              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down'
-              priority: HIGH
+            - uuid: 469d6933f5494ca48a212cdc364058e0
+              expression: |
+                min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0
+                and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])>=0
+                and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}])>=0
+              name: 'Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet replicas mismatch'
+              opdata: 'Replicas: {ITEM.LASTVALUE2}, ready: {ITEM.LASTVALUE3}'
+              priority: WARNING
+              description: 'StatefulSet has not matched the number of replicas during the specified trigger evaluation period.'
               tags:
                 - tag: scope
                   value: availability
           master_item:
             key: kube.state.metrics
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.labels.statefulset
+            - lld_macro: '{#NAMESPACE}'
+              path: $.labels.namespace
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:
                 - kube_statefulset_status_replicas
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.forEach(function (metric) {
-                      output.push({
-                          '{#NAME}': metric.labels.statefulset,
-                          '{#NAMESPACE}': metric.labels.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -3499,7 +3699,7 @@ zabbix_export:
         - macro: '{$KUBE.API.TOKEN}'
           description: 'Service account bearer token.'
         - macro: '{$KUBE.API.URL}'
-          value: 'https://localhost:6443'
+          value: 'https://kubernetes.default.svc.cluster.local:443'
           description: 'Kubernetes API endpoint URL in the format <scheme>://<host>:<port>'
         - macro: '{$KUBE.API_SERVER.PORT}'
           value: '6443'
@@ -3513,12 +3713,27 @@ zabbix_export:
         - macro: '{$KUBE.CONTROLLER_MANAGER.SCHEME}'
           value: https
           description: 'Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.'
+        - macro: '{$KUBE.CONTROL_PLANE.TAINT}'
+          value: node-role.kubernetes.io/control-plane
+          description: 'Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.'
+        - macro: '{$KUBE.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.'
+        - macro: '{$KUBE.KUBELET.FILTER.ANNOTATIONS}'
+          description: 'Node annotations to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
+        - macro: '{$KUBE.KUBELET.FILTER.LABELS}'
+          description: 'Node labels to filter Kubelets (regex in values are supported). See the template''s README.md for details.'
         - macro: '{$KUBE.KUBELET.PORT}'
           value: '10250'
           description: 'Kubernetes Kubelet metrics endpoint port. Used in Kubelet LLD.'
         - macro: '{$KUBE.KUBELET.SCHEME}'
           value: https
           description: 'Kubernetes Kubelet metrics endpoint scheme. Used in Kubelet LLD.'
+        - macro: '{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable Kubelets by nodename.'
+        - macro: '{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered Kubelets by nodename.'
         - macro: '{$KUBE.LLD.FILTER.NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable metrics by namespace.'
@@ -3537,12 +3752,9 @@ zabbix_export:
         - macro: '{$KUBE.LLD.FILTER.PV.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered persistent volumes by name.'
-        - macro: '{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable worker nodes by nodename.'
-        - macro: '{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered worker nodes by nodename.'
+        - macro: '{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}'
+          value: '#5'
+          description: 'The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.'
         - macro: '{$KUBE.SCHEDULER.PORT}'
           value: '10259'
           description: 'Kubernetes Scheduler metrics endpoint port. Used in ControlPlane LLD.'

@@ -23,7 +23,6 @@ require __DIR__ . '/vendor/autoload.php';
 require_once __DIR__.'/include/func.inc.php';
 require_once __DIR__.'/include/classes/core/CHttpRequest.php';
 require_once __DIR__.'/include/classes/core/APP.php';
-require_once __DIR__.'/include/debug.inc.php';
 
 use SCIM\API as SCIM;
 use SCIM\clients\ScimApiClient;
@@ -49,12 +48,9 @@ try {
 }
 catch (Throwable $e) {
 	$response = new HttpResponse();
+	$exception = $e instanceof APIException ? $e : new APIException(ZBX_API_ERROR_INTERNAL, $e->getMessage());
 
-	if (!$e->getCode() || $e instanceof APIException) {
-		$e = new Exception($e->getMessage(), 500);
-	}
-
-	$response->setException($e);
+	$response->setException($exception);
 }
 
 $response->send();

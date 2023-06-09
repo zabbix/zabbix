@@ -26,17 +26,406 @@
 #include "../poller/checks_telnet.h"
 #include "zbxexec.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxtasks.h"
 #include "zbxembed.h"
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
+#include "zbxparam.h"
+#include "zbxmutexs.h"
+#include "zbxshmem.h"
+#include "zbx_availability_constants.h"
+
+#define REMOTE_COMMAND_NEW		0
+#define REMOTE_COMMAND_RESULT_OOM	1
+#define REMOTE_COMMAND_RESULT_WAIT	2
+#define REMOTE_COMMAND_COMPLETED	4
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
-static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
+static zbx_uint64_t	remote_command_cache_size = 256 * ZBX_KIBIBYTE;
+
+static zbx_mutex_t	remote_commands_lock = ZBX_MUTEX_NULL;
+static zbx_shmem_info_t	*remote_commands_mem = NULL;
+ZBX_SHMEM_FUNC_IMPL(__remote_commands, remote_commands_mem)
+typedef struct
+{
+	zbx_uint64_t		maxid;
+	int			commands_num;
+	zbx_hashset_t		commands;
+}
+zbx_remote_commands_t;
+
+zbx_remote_commands_t	*remote_commands = NULL;
+
+typedef struct
+{
+	zbx_uint64_t		id;
+	zbx_uint64_t		hostid;
+	char			*command;
+	volatile unsigned char	flag;
+	char			*value;
+	char			*error;
+}
+zbx_rc_command_t;
+
+static zbx_hash_t	remote_commands_commands_hash_func(const void *data)
+{
+	return ZBX_DEFAULT_UINT64_HASH_FUNC(&((const zbx_rc_command_t *)data)->id);
+}
+
+static int	remote_commands_commands_compare_func(const void *d1, const void *d2)
+{
+	const zbx_rc_command_t	*command1 = (const zbx_rc_command_t *)d1;
+	const zbx_rc_command_t	*command2 = (const zbx_rc_command_t *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(command1->id, command2->id);
+
+	return 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initializes active remote commands cache                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_init_remote_commands_cache(char **error)
+{
+#define	REMOTE_COMMANS_INITIAL_HASH_SIZE	100
+	int		ret = FAIL;
+	zbx_uint64_t	size_reserved;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_mutex_create(&remote_commands_lock, ZBX_MUTEX_REMOTE_COMMANDS, error))
+		goto out;
+
+	size_reserved = zbx_shmem_required_size(1, "commands cache size", "CommandsCacheSize");
+
+	remote_command_cache_size -= size_reserved;
+
+	if (SUCCEED != zbx_shmem_create(&remote_commands_mem, remote_command_cache_size, "commands cache size",
+			"CommandsCacheSize",1, error))
+	{
+		goto out;
+	}
+
+	remote_commands = (zbx_remote_commands_t *)__remote_commands_shmem_malloc_func(NULL,
+			sizeof(zbx_remote_commands_t));
+	memset(remote_commands, 0, sizeof(zbx_remote_commands_t));
+
+	remote_commands->maxid = 0;
+	remote_commands->commands_num = 0;
+
+	zbx_hashset_create_ext(&remote_commands->commands, REMOTE_COMMANS_INITIAL_HASH_SIZE,
+			remote_commands_commands_hash_func,remote_commands_commands_compare_func, NULL,
+			__remote_commands_shmem_malloc_func, __remote_commands_shmem_realloc_func,
+			__remote_commands_shmem_free_func);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+#undef	REMOTE_COMMANS_INITIAL_HASH_SIZE
+}
+
+static char	*remote_commands_shared_strdup(const char *str)
+{
+	char		*new_str;
+	zbx_uint64_t	len;
+
+	len = strlen(str) + 1;
+	new_str = (char *)__remote_commands_shmem_malloc_func(NULL, len);
+	memcpy(new_str, str, len);
+
+	return new_str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: de-initializes active remote commands cache                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_deinit_remote_commands_cache(void)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (NULL != remote_commands_mem)
+	{
+		zbx_hashset_destroy(&remote_commands->commands);
+
+		zbx_shmem_destroy(remote_commands_mem);
+		remote_commands_mem = NULL;
+		zbx_mutex_destroy(&remote_commands_lock);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: locks remote_commands cache                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	commands_lock(void)
+{
+	zbx_mutex_lock(remote_commands_lock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unlocks remote_commands cache                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	commands_unlock(void)
+{
+	zbx_mutex_unlock(remote_commands_lock);
+}
+
+static int	remote_commands_insert_result(zbx_uint64_t id, char *value, char *err_msg)
+{
+	int			ret = SUCCEED;
+	zbx_rc_command_t	*command, command_loc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	commands_lock();
+	command_loc.id = id;
+
+	if (NULL != (command = (zbx_rc_command_t *)zbx_hashset_search(&remote_commands->commands,
+			&command_loc)))
+	{
+		if (NULL != value && NULL == (command->value = remote_commands_shared_strdup(value)))
+		{
+			command->flag |= REMOTE_COMMAND_RESULT_OOM;
+			ret = FAIL;
+		}
+
+		if (NULL != err_msg && NULL == (command->error = remote_commands_shared_strdup(err_msg)))
+		{
+			command->flag |= REMOTE_COMMAND_RESULT_OOM;
+			ret = FAIL;
+		}
+
+		command->flag |= REMOTE_COMMAND_COMPLETED;
+	}
+
+	commands_unlock();
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), ret %d", __func__, ret);
+
+	return ret;
+}
+
+void	zbx_process_command_results(struct zbx_json_parse *jp)
+{
+	int			values_num = 0, parsed_num = 0, results_num = 0;
+	const char		*pnext = NULL;
+	struct zbx_json_parse	jp_commands, jp_command;
+	char 			*str = NULL, *value = NULL, *error = NULL;
+	size_t 			str_alloc = 0;
+	zbx_uint64_t		id;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_COMMANDS, &jp_commands))
+		goto out;
+
+	while (NULL != (pnext = zbx_json_next(&jp_commands, pnext)))
+	{
+		if (FAIL == zbx_json_brackets_open(pnext, &jp_command))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s", zbx_json_strerror());
+			goto out;
+		}
+
+		parsed_num++;
+		str_alloc = 0;
+		zbx_free(str);
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ID, &str, &str_alloc, NULL))
+			continue;
+
+		if (SUCCEED != zbx_is_uint64(str, &id))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Wrong command id '%s'", str);
+			goto out;
+		}
+
+		str_alloc = 0;
+		zbx_free(value);
+		zbx_free(error);
+
+		if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_VALUE, &value, &str_alloc, NULL))
+		{
+
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_command, ZBX_PROTO_TAG_ERROR, &error, &str_alloc,
+					NULL))
+			{
+				continue;
+			}
+		}
+
+		values_num++;
+		if (SUCCEED == remote_commands_insert_result(id, value, error))
+			results_num++;
+	}
+out:
+	zbx_free(str);
+	zbx_free(value);
+	zbx_free(error);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(), parsed %d values received %d results inserted %d", __func__,
+			parsed_num, values_num, results_num);
+}
+
+void	zbx_remote_commans_prepare_to_send(struct zbx_json *json, zbx_uint64_t hostid)
+{
+	zbx_hashset_iter_t	iter_comands;
+	zbx_rc_command_t	*command;
+	int			has_commands = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	commands_lock();
+	if (0 == remote_commands->commands_num)
+		goto out;
+
+	zbx_hashset_iter_reset(&remote_commands->commands, &iter_comands);
+
+	while (NULL != (command = (zbx_rc_command_t *)zbx_hashset_iter_next(&iter_comands)))
+	{
+		if (hostid == command->hostid)
+		{
+			int	wait = 0;
+
+			if (0 == has_commands)
+			{
+				zbx_json_addarray(json, ZBX_PROTO_TAG_COMMANDS);
+				has_commands = 1;
+			}
+
+			zbx_json_addobject(json, NULL);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_COMMAND, command->command, ZBX_JSON_TYPE_STRING);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, command->id);
+
+			if (0 != (command->flag & REMOTE_COMMAND_RESULT_WAIT))
+				wait = 1;
+
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_WAIT, (zbx_uint64_t)wait);
+			zbx_json_close(json);
+
+			remote_commands->commands_num--;
+		}
+	}
+
+	if (0 != has_commands)
+		zbx_json_close(json);
+out:
+	commands_unlock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+static int	active_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
 		int config_timeout, char *error, size_t max_error_len)
+{
+	int			ret = FAIL, completed = 0;
+	zbx_rc_command_t	cmd, *pcmd;
+	time_t			time_start;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (2 > CONFIG_FORKS[ZBX_PROCESS_TYPE_TRAPPER] && NULL != result)
+	{
+		zbx_snprintf(error, max_error_len, "cannot execute remote command on active agent, at least two"
+				" trappers are required");
+		goto out;
+	}
+
+	*error = '\0';
+	commands_lock();
+
+	cmd.id = remote_commands->maxid++;
+
+	if (NULL == (pcmd = zbx_hashset_insert(&remote_commands->commands, &cmd, sizeof(cmd))))
+	{
+		commands_unlock();
+		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command");
+		goto out;
+	}
+
+	pcmd->flag = REMOTE_COMMAND_NEW;
+	if (NULL != result)
+		pcmd->flag |= REMOTE_COMMAND_RESULT_WAIT;
+
+	pcmd->hostid = host->hostid;
+	pcmd->command = remote_commands_shared_strdup(command);
+	pcmd->value = NULL;
+	pcmd->error = NULL;
+
+	if (NULL == pcmd->command)
+	{
+		zbx_hashset_remove_direct(&remote_commands->commands, pcmd);
+		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command");
+		commands_unlock();
+		goto out;
+	}
+
+	remote_commands->commands_num++;
+	commands_unlock();
+
+	for (time_start = time(NULL); config_timeout > time(NULL) - time_start; sleep(1))
+	{
+		if  (0 != (REMOTE_COMMAND_COMPLETED & pcmd->flag))
+		{
+			commands_lock();
+
+			if (0 == (REMOTE_COMMAND_COMPLETED & pcmd->flag))
+			{
+				commands_unlock();
+				continue;
+			}
+
+			completed = 1;
+			break;
+		}
+	}
+
+	if (0 == completed)
+	{
+		zbx_snprintf(error, max_error_len, "timeout while retrieving result for remote command");
+		commands_lock();
+	}
+	else  if (0 != (REMOTE_COMMAND_RESULT_OOM & pcmd->flag))
+	{
+		zbx_snprintf(error, max_error_len, "cannot allocate memory for remote command result");
+	}
+	else if (NULL != pcmd->value)
+	{
+		if (NULL != result)
+			*result = zbx_strdup(*result, pcmd->value);
+
+		__remote_commands_shmem_free_func(pcmd->value);
+		ret = SUCCEED;
+	}
+	else if (NULL != pcmd->error)
+	{
+		zbx_strlcpy(error, pcmd->error, max_error_len);
+		__remote_commands_shmem_free_func(pcmd->error);
+	}
+
+	__remote_commands_shmem_free_func(pcmd->command);
+	zbx_hashset_remove_direct(&remote_commands->commands, pcmd);
+
+	commands_unlock();
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	passive_command_send_and_result_fetch(const zbx_dc_host_t *host, const char *command, char **result,
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret;
 	AGENT_RESULT	agent_result;
@@ -77,7 +466,7 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = get_value_agent(&item, config_timeout, &agent_result)))
+	if (SUCCEED != (ret = get_value_agent(&item, config_timeout, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -98,13 +487,32 @@ fail:
 	return ret;
 }
 
+static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *command, char **result,
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
+{
+	zbx_dc_interface_t	interface;
+
+	memset(&interface, 0, sizeof(interface));
+	zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT);
+
+	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
+			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
+	{
+		return active_command_send_and_result_fetch(host, command, result, config_timeout, error,
+				max_error_len);
+	}
+
+	return passive_command_send_and_result_fetch(host, command, result, config_timeout, config_source_ip, error,
+			max_error_len);
+}
+
 static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_script_t *script, char **result,
-		int config_timeout, char *error, size_t max_error_len)
+		int config_timeout, const char *config_source_ip, char *error, size_t max_error_len)
 {
 	int		ret = FAIL, i;
 	AGENT_RESULT	agent_result;
 	zbx_dc_item_t	item;
-	int             (*function)(zbx_dc_item_t *, int timeout, AGENT_RESULT *);
+	int             (*function)(zbx_dc_item_t *, int timeout, const char*, AGENT_RESULT *);
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 	assert(ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type);
@@ -165,7 +573,7 @@ static int	zbx_execute_script_on_terminal(const zbx_dc_host_t *host, const zbx_s
 
 	zbx_init_agent_result(&agent_result);
 
-	if (SUCCEED != (ret = function(&item, config_timeout, &agent_result)))
+	if (SUCCEED != (ret = function(&item, config_timeout, config_source_ip, &agent_result)))
 	{
 		if (ZBX_ISSET_MSG(&agent_result))
 			zbx_strlcpy(error, agent_result.msg, max_error_len);
@@ -416,26 +824,28 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: executing user scripts or remote commands                         *
- *                                                                            *
- * Parameters:  script         - [IN] the script to be executed               *
- *              host           - [IN] the host the script will be executed on *
- *              params         - [IN] parameters for the script               *
- *              config_timeout - [IN]                                         *
- *              result         - [OUT] the result of a script execution       *
- *              error          - [OUT] the error reported by the script       *
- *              max_error_len  - [IN] the maximum error length                *
- *              debug          - [OUT] the debug data (optional)              *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                TIMEOUT_ERROR - a timeout occurred                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params, int config_timeout,
-		char **result, char *error, size_t max_error_len, char **debug)
+/****************************************************************************
+ *                                                                          *
+ * Purpose: executing user scripts or remote commands                       *
+ *                                                                          *
+ * Parameters:  script           - [IN] script to be executed               *
+ *              host             - [IN] host the script will be executed on *
+ *              params           - [IN] parameters for the script           *
+ *              config_timeout   - [IN]                                     *
+ *              config_source_ip - [IN]                                     *
+ *              result           - [OUT] result of a script execution       *
+ *              error            - [OUT] error reported by the script       *
+ *              max_error_len    - [IN] maximum error length                *
+ *              debug            - [OUT] debug data (optional)              *
+ *                                                                          *
+ * Return value:  SUCCEED - processed successfully                          *
+ *                FAIL - an error occurred                                  *
+ *                TIMEOUT_ERROR - a timeout occurred                        *
+ *                                                                          *
+ ****************************************************************************/
+int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
+		int config_timeout, const char *config_source_ip, char **result, char *error, size_t max_error_len,
+		char **debug)
 {
 	int	ret = FAIL;
 
@@ -446,15 +856,15 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 	switch (script->type)
 	{
 		case ZBX_SCRIPT_TYPE_WEBHOOK:
-			ret = zbx_es_execute_command(script->command, params, script->timeout, result, error,
-					max_error_len, debug);
+			ret = zbx_es_execute_command(script->command, params, script->timeout, config_source_ip,
+					result, error, max_error_len, debug);
 			break;
 		case ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT:
 			switch (script->execute_on)
 			{
 				case ZBX_SCRIPT_EXECUTE_ON_AGENT:
 					ret = zbx_execute_script_on_agent(host, script->command, result, config_timeout,
-							error, max_error_len);
+							config_source_ip, error, max_error_len);
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
@@ -493,8 +903,8 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 			break;
 #endif
 		case ZBX_SCRIPT_TYPE_TELNET:
-			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, error,
-					max_error_len);
+			ret = zbx_execute_script_on_terminal(host, script, result, config_timeout, config_source_ip,
+					error, max_error_len);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Invalid command type \"%d\".", (int)script->type);

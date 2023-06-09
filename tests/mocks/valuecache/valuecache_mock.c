@@ -24,7 +24,7 @@
 
 #include "zbxcachevalue.h"
 #include "zbxnum.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxalgo.h"

@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxembed.h"
 #include "zbxmutexs.h"
@@ -82,8 +82,6 @@ static char	shortopts[] = "s:i:p:hVl:t:";
 
 /* end of COMMAND LINE OPTIONS */
 
-char	*CONFIG_SOURCE_IP 		= NULL;
-
 /* not related with tls from libzbxcomms.a */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
@@ -131,7 +129,7 @@ int	main(int argc, char **argv)
 	int			ret = FAIL, loglevel = LOG_LEVEL_WARNING, timeout = 0;
 	char			*script_file = NULL, *input_file = NULL, *param = NULL, ch, *script = NULL,
 				*error = NULL, *result = NULL, script_error[MAX_STRING_LEN];
-	zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 0};
+	zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 0};
 
 	/* see description of 'optarg' in 'man 3 getopt' */
 	char			*zbx_optarg = NULL;
@@ -139,7 +137,11 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int			zbx_optind = 0;
 
+	const char		*config_source_ip = NULL;
+
 	progname = get_program_name(argv[0]);
+
+	zbx_init_library_common(zbx_log_impl);
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL, &zbx_optarg,
@@ -239,7 +241,8 @@ int	main(int argc, char **argv)
 		}
 	}
 
-	if (FAIL == zbx_es_execute_command(script, param, timeout, &result, script_error, sizeof(script_error), NULL))
+	if (FAIL == zbx_es_execute_command(script, param, timeout, config_source_ip, &result, script_error,
+			sizeof(script_error), NULL))
 	{
 		zbx_error("error executing script:\n%s", script_error);
 		goto close;

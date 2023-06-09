@@ -19,7 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -30,7 +29,10 @@ extern unsigned char	program_type;
  *                                                                            *
  * Purpose: retrieve data from Zabbix agent                                   *
  *                                                                            *
- * Parameters: item - item we are interested in                               *
+ * Parameters: item             - [IN] item we are interested in              *
+ *             timeout          - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
+ *             result           - [OUT]                                       *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
@@ -42,7 +44,7 @@ extern unsigned char	program_type;
  * Comments: error will contain error message                                 *
  *                                                                            *
  ******************************************************************************/
-int	get_value_agent(const zbx_dc_item_t *item, int timeout, AGENT_RESULT *result)
+int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result)
 {
 	zbx_socket_t	s;
 	const char	*tls_arg1, *tls_arg2;
@@ -83,7 +85,7 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, AGENT_RESULT *result
 			goto out;
 	}
 
-	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, timeout,
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, item->interface.addr, item->interface.port, timeout,
 			item->host.tls_connect, tls_arg1, tls_arg2))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", item->key);
@@ -98,7 +100,10 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, AGENT_RESULT *result
 			ret = NETWORK_ERROR;
 	}
 	else
+	{
 		ret = NETWORK_ERROR;
+		goto out;
+	}
 
 	if (SUCCEED == ret)
 	{

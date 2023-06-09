@@ -375,16 +375,6 @@
 				data.to = this.global_timerange.to;
 			}
 
-			// Close all opened hint boxes, otherwise their contents will not be updated after autorefresh.
-			for (let i = overlays_stack.length - 1; i >= 0; i--) {
-				const hintbox = overlays_stack.getById(overlays_stack.stack[i]);
-
-				if (hintbox.type === 'hintbox') {
-					hintBox.hideHint(hintbox.element, true);
-					removeFromOverlaysStack(overlays_stack.stack[i]);
-				}
-			}
-
 			Object.entries(data).forEach(([key, value]) => {
 				if (['filter_show_counter', 'filter_custom_time', 'action'].indexOf(key) !== -1) {
 					return;
