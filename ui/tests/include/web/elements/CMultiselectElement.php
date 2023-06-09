@@ -178,7 +178,7 @@ class CMultiselectElement extends CElement {
 	 */
 	public function remove($label) {
 		$query = $this->query('xpath:.//span[@class="subfilter-enabled"][string()='.CXPathHelper::escapeQuotes($label).
-				']/span[contains(@class, "zi-remove-smaller")]'
+				']/span['.CXPathHelper::fromClass('zi-remove-smaller').']'
 		);
 
 		$query->one()->click();

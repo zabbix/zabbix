@@ -1026,7 +1026,7 @@ class testUsersPasswordComplexity extends CWebTest {
 		}
 		else {
 			// If password can be 1 symbol long and doesn't have any complexity rules hint is not shown at all.
-			$this->assertFalse($user_form->getLabel('Password')->query('tag:button')->exists());
+			$this->assertFalse($user_form->getLabel('Password')->query('xpath:./button[@data-hintbox]')->exists());
 		}
 
 		if ($own || $userid === 1) {

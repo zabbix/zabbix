@@ -79,6 +79,6 @@ class CFilterTabElement extends CElement {
 			$this->selectTab($name, $count);
 		}
 
-		$this->query('xpath:.//a[contains(@class, "tabfilter-edit")]')->one()->waitUntilReady()->click(true);
+		$this->query('xpath:.//a['.CXPathHelper::fromClass('tabfilter-edit').']')->one()->waitUntilReady()->click(true);
 	}
 }
