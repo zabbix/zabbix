@@ -822,7 +822,8 @@ header {
   header a.link-action {
     box-sizing: border-box;
     display: block;
-    height: 25px; }
+    height: 25px;
+    margin-bottom: 0; }
     header a.link-action h1 {
       padding-right: 1em; }
       header a.link-action h1::after {
@@ -836,8 +837,10 @@ header {
         border-right: 2px solid #ffffff;
         border-bottom: 2px solid #ffffff;
         transform: rotate(45deg); }
-    header a.link-action:hover h1::after, header a.link-action:focus h1::after {
-      border-color: #ffffff; }
+    header a.link-action:hover, header a.link-action:focus {
+      margin-bottom: 0; }
+      header a.link-action:hover h1::after, header a.link-action:focus h1::after {
+        border-color: #ffffff; }
   header form {
     display: flex;
     justify-content: flex-end; }

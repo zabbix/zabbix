@@ -97,6 +97,7 @@ header {
 		box-sizing: border-box;
 		display: block;
 		height: 25px;
+		margin-bottom: 0;
 
 		h1 {
 			padding-right: 1em;
@@ -121,6 +122,8 @@ header {
 
 		&:hover,
 		&:focus {
+			margin-bottom: 0;
+
 			h1::after {
 				border-color: $link-hover-color;
 			}

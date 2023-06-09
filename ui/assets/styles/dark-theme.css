@@ -840,7 +840,8 @@ header {
   header a.link-action {
     box-sizing: border-box;
     display: block;
-    height: 25px; }
+    height: 25px;
+    margin-bottom: 0; }
     header a.link-action h1 {
       padding-right: 1em; }
       header a.link-action h1::after {
@@ -855,8 +856,10 @@ header {
         border-bottom: 2px solid #f2f2f2;
         transform: rotate(45deg);
         transition: border-color 0.2s ease-out; }
-    header a.link-action:hover h1::after, header a.link-action:focus h1::after {
-      border-color: #4796c4; }
+    header a.link-action:hover, header a.link-action:focus {
+      margin-bottom: 0; }
+      header a.link-action:hover h1::after, header a.link-action:focus h1::after {
+        border-color: #4796c4; }
   header form {
     display: flex;
     justify-content: flex-end; }
