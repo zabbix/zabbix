@@ -23,7 +23,7 @@
 #include "../events/events.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "../actions.h"

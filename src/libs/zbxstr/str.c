@@ -995,7 +995,7 @@ int	zbx_strncasecmp(const char *s1, const char *s2, size_t n)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-#include "log.h"
+#include "zbxlog.h"
 /******************************************************************************
  *                                                                            *
  * Parameters: encoding - [IN] non-empty string, code page identifier         *

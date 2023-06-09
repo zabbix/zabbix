@@ -27,7 +27,7 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "zbxthreads.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
 #include "zbxtime.h"

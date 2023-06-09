@@ -21,7 +21,6 @@
 #define ZABBIX_ZBXALGO_H
 
 #include "zbxnum.h"
-#include "log.h"
 
 /* generic */
 

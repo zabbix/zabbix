@@ -20,7 +20,6 @@
 #include "trigger_dep_linking.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 
