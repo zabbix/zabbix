@@ -643,13 +643,13 @@ char	*zbx_strerror_from_module(zbx_syserror_t error, const wchar_t *module)
  *                                                                            *
  * Purpose: log the message optionally appending to a string buffer           *
  *                                                                            *
- * Parameters: level      - [IN] the log level                                *
- *             out        - [OUT] the output buffer (optional)                *
- *             out_alloc  - [OUT] the output buffer size                      *
- *             out_offset - [OUT] the output buffer offset                    *
- *             format     - [IN] the format string                            *
+ * Parameters: level      - [IN] log level                                    *
+ *             out        - [OUT] output buffer (optional)                    *
+ *             out_alloc  - [OUT] output buffer size                          *
+ *             out_offset - [OUT] output buffer offset                        *
+ *             format     - [IN] format string                                *
  *                                                                            *
- * Return value: SUCCEED - the socket was successfully opened                 *
+ * Return value: SUCCEED - socket was successfully opened                     *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -724,7 +724,7 @@ static void	update_resolver_conf(void)
  * Purpose: throttling of update "/etc/resolv.conf" and "stdio" to the new    *
  *          log file after rotation                                           *
  *                                                                            *
- * Parameters: time_now - [IN] the time for compare in seconds                *
+ * Parameters: time_now - [IN] time for compare in seconds                    *
  *                                                                            *
  ******************************************************************************/
 void	__zbx_update_env(double time_now)
