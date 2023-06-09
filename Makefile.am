@@ -137,13 +137,13 @@ css_icons:
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
 modules_build:
-	for i in src/modules/*/Makefile; do \
+	-@for i in src/modules/*/Makefile; do \
 		dir=$${i%/Makefile}; \
 		$(MAKE) -C $$dir; \
 	done
 
 modules_clean:
-	for i in src/modules/*/Makefile; do \
+	-@for i in src/modules/*/Makefile; do \
 		dir=$${i%/Makefile}; \
 		$(MAKE) -C $$dir clean; \
 	done
