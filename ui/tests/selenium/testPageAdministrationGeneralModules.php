@@ -1028,7 +1028,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Disable all modules.
 		$this->query('id:all_modules')->waitUntilPresent()->asCheckbox()->one()->set(true);
 		$this->query('button:Disable')->waitUntilCLickable()->one()->click();
-		$this->page->acceptAlert();
 
 		// Wait for the Success message to confirm that modules were disabled before heading to the dashboard.
 		$message = CMessageElement::find()->waitUntilVisible()->one();
