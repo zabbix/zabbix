@@ -40,7 +40,7 @@ $http_popup_form = (new CForm())
 	->addVar('action', 'popup.httpstep');
 
 // Enable form submitting on Enter.
-$http_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$http_popup_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(

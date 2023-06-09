@@ -38,7 +38,7 @@ $overrides_popup_form = (new CForm())
 	->addItem((new CVar('action', 'popup.lldoverride'))->removeId());
 
 // Enable form submitting on Enter.
-$overrides_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$overrides_popup_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $overrides_popup_form_list = (new CFormList())
 	->addRow(

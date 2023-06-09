@@ -32,7 +32,7 @@ $form = (new CForm())
 	->addVar('eventsource', $data['eventsource']);
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Action tab.
 $action_tab = (new CFormGrid())
