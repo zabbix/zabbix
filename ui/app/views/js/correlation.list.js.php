@@ -37,7 +37,7 @@
 		#initActions() {
 			document.getElementById('js-create').addEventListener('click', () => this.#edit());
 			document.getElementById('js-massdelete').addEventListener('click',
-				(e) => this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+				(e) => this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()))
 			);
 			document.getElementById('js-massenable').addEventListener('click',
 				(e) => this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
@@ -122,7 +122,7 @@
 		 *
 		 * @param {element} target          The target element that will be passed to post.
 		 * @param {array}   correlationids  Event correlation IDs to enable.
-		 * @param {bool}    massdisable     True if footer button is pressed for mass enable action which brings up
+		 * @param {bool}    massenable      True if footer button is pressed for mass enable action which brings up
 		 *                                  confirmation menu. False if only one element with single link is clicked.
 		 */
 		#enable(target, correlationids, massenable = false) {
