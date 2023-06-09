@@ -23,7 +23,5 @@
 #include "zbxproxydatacache.h"
 #include "proxydatacache.h"
 
-void	pdc_autoreg_write_host(zbx_pdc_t *pdc, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock);
 
 #endif

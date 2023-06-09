@@ -20,6 +20,8 @@
 #include "proxydatacache.h"
 #include "zbxproxydatacache.h"
 #include "pdc_discovery.h"
+#include "pdc_autoreg.h"
+#include "pdc_history.h"
 
 #include "zbxcommon.h"
 #include "zbxalgo.h"
@@ -31,12 +33,15 @@ ZBX_PTR_VECTOR_IMPL(pdc_history_ptr, zbx_pdc_history_t *)
 ZBX_PTR_VECTOR_IMPL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
 ZBX_PTR_VECTOR_IMPL(pdc_autoreg_ptr, zbx_pdc_autoreg_t *)
 
-static zbx_pdc_t	*pdc_cache = NULL;
+zbx_pdc_t	*pdc_cache = NULL;
 static zbx_shmem_info_t	*pdc_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__pdc, pdc_mem)
 
 static void	pdc_cache_set_init_state(zbx_pdc_t *pdc);
+
+/* remap states to incoming data destination - database or memory */
+zbx_pdc_state_t	pdc_dst[] = {PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY, PDC_DATABASE};
 
 /******************************************************************************
  *                                                                            *
@@ -52,8 +57,7 @@ static void	pdc_cache_set_init_state(zbx_pdc_t *pdc);
  ******************************************************************************/
 int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
 {
-	zbx_uint64_t	size_actual, size_entry;
-	int		ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -169,60 +173,3 @@ static void	pdc_cache_set_init_state(zbx_pdc_t *pdc)
 
 	zbx_db_close();
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: open discovery data cache                                         *
- *                                                                            *
- * Return value: The discovery data cache handle                              *
- *                                                                            *
- ******************************************************************************/
-zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
-{
-	return pdc_discovery_open();
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: flush the cached discovery data and free the handle               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
-{
-	pdc_discovery_close(pdc_cache, data);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write service data into discovery data cache                      *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
-		const char *ip, const char *dns, int port, int status, const char *value, int clock)
-{
-	pdc_discovery_write_service(data, druleid, dcheckid, ip, dns, port, status, value, clock);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write host data into discovery data cache                         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
-		const char *dns, int status, int clock)
-{
-	pdc_discovery_write_host(data, druleid, ip, dns, status, clock);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write host data into autoregistraion data cache                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, int flags, int clock)
-{
-	pdc_autoreg_write_host(pdc_cache, host, ip, dns, port, connection_type, host_metadata, flags, clock);
-}
-
-

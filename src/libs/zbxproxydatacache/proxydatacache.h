@@ -35,6 +35,8 @@ typedef enum
 }
 zbx_pdc_state_t;
 
+extern zbx_pdc_state_t	pdc_dst[];
+
 typedef struct
 {
 	zbx_uint64_t	id;
@@ -57,10 +59,10 @@ typedef struct
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;		/* clock + ns */
-	char		*source;
-	char		*value;
+	const char	*source;
+	const char	*value;
 	int		timestamp;
-	int		serverity;
+	int		severity;
 	int		logeventid;
 	int		state;
 	int		mtime;
@@ -99,6 +101,8 @@ typedef struct
 	zbx_mutex_t			mutex;
 }
 zbx_pdc_t;
+
+extern zbx_pdc_t	*pdc_cache;
 
 
 #endif

@@ -72,7 +72,7 @@ static void	pdc_discovery_flush_db(zbx_pdc_discovery_data_t *data)
  * Return value: The discovery data cache handle                              *
  *                                                                            *
  ******************************************************************************/
-zbx_pdc_discovery_data_t	*pdc_discovery_open(void)
+zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
 {
 	zbx_pdc_discovery_data_t	*data;
 
@@ -87,19 +87,18 @@ zbx_pdc_discovery_data_t	*pdc_discovery_open(void)
  * Purpose: flush the cached discovery data and free the handle               *
  *                                                                            *
  ******************************************************************************/
-void	pdc_discovery_close(zbx_pdc_t *pdc, zbx_pdc_discovery_data_t *data)
+void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 {
-	switch (pdc->state)
+	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 	{
-		case PDC_MEMORY:
-		case PDC_DATABASE_MEMORY:
-			zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
-			pdc->state = PDC_DATABASE_ONLY;
-			ZBX_FALLTHROUGH;
-		default:
-			/* TODO flush local cache */
-			pdc_discovery_flush_db(data);
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
+		pdc_cache->state = PDC_DATABASE_ONLY;
+
+		/* TODO: change to 'else' after memory cache implementation */
 	}
+
+	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
+			pdc_discovery_flush_db(data);
 
 	zbx_vector_pdc_discovery_ptr_clear_ext(&data->rows, pdc_discovery_free);
 	zbx_vector_pdc_discovery_ptr_destroy(&data->rows);
@@ -111,7 +110,7 @@ void	pdc_discovery_close(zbx_pdc_t *pdc, zbx_pdc_discovery_data_t *data)
  * Purpose: write service data into discovery data cache                      *
  *                                                                            *
  ******************************************************************************/
-void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		const char *ip, const char *dns, int port, int status, const char *value, int clock)
 {
 	zbx_pdc_discovery_t	*row;
@@ -133,7 +132,7 @@ void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t dr
  * Purpose: write host data into discovery data cache                         *
  *                                                                            *
  ******************************************************************************/
-void	pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip, const char *dns,
+void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip, const char *dns,
 		int status, int clock)
 {
 	zbx_pdc_discovery_t	*row;

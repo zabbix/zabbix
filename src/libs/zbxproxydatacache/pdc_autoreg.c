@@ -21,7 +21,6 @@
 #include "zbxproxydatacache.h"
 #include "zbxdbhigh.h"
 
-
 static void	pdc_autoreg_write_host_db(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
@@ -45,19 +44,17 @@ static void	pdc_autoreg_write_host_db(const char *host, const char *ip, const ch
  * Purpose: write host data into autoregistraion data cache                   *
  *                                                                            *
  ******************************************************************************/
-void	pdc_autoreg_write_host(zbx_pdc_t *pdc, const char *host, const char *ip, const char *dns,
+void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags,
 		int clock)
 {
-	switch (pdc->state)
+	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 	{
-		case PDC_MEMORY:
-		case PDC_DATABASE_MEMORY:
-			zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
-			pdc->state = PDC_DATABASE_ONLY;
-			ZBX_FALLTHROUGH;
-		default:
-			/* TODO flush local cache */
-			pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock);
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
+		pdc_cache->state = PDC_DATABASE_ONLY;
+		/* TODO: change to 'else' after memory cache implementation */
 	}
+
+	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
+		pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock);
 }

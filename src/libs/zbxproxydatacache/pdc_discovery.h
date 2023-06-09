@@ -24,14 +24,4 @@
 #include "proxydatacache.h"
 #include "zbxtypes.h"
 
-zbx_pdc_discovery_data_t	*pdc_discovery_open(void);
-
-void	pdc_discovery_close(zbx_pdc_t *pdc, zbx_pdc_discovery_data_t *data);
-
-void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
-		const char *ip, const char *dns, int port, int status, const char *value, int clock);
-
-void	pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip, const char *dns,
-		int status, int clock);
-
 #endif
