@@ -83,7 +83,7 @@ window.webscenario_step_edit_popup = new class {
 		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.#overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+			this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 		});
 	}
 
