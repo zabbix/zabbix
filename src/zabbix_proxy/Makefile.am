@@ -40,7 +40,6 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_proxy.a \
-	$(top_builddir)/src/libs/zbxproxydatacache/libzbxproxydatacache.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	taskmanager/libzbxtaskmanager.a \
 	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
@@ -57,6 +56,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_builddir)/src/libs/zbxproxydatacache/libzbxproxydatacache.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \

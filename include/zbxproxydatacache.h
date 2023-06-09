@@ -46,9 +46,9 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data);
 void	zbx_pdc_history_write_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
 		const zbx_timespec_t *ts, int flags);
 
-void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
-		const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime, int timestamp, int logeventid,
-		int severity, const char *source);
+void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state,
+		const char *value, const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime,
+		int timestamp, int logeventid, int severity, const char *source);
 
 
 

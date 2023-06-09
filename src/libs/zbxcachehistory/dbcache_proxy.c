@@ -31,6 +31,7 @@
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbx_item_constants.h"
+#include "zbxproxydatacache.h"
 
 static char		*sql = NULL;
 static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
@@ -74,67 +75,40 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
  *          ITEM_VALUE_TYPE_LOG not containing meta information in result     *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history(zbx_dc_history_t *history, int history_num)
+static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
 {
-	int		i, now, history_count = 0;
-	unsigned int	flags;
-	char		buffer[64], *pvalue;
-	zbx_db_insert_t	db_insert;
+	int	flags;
+	char	buffer[64], *pvalue;
 
-	now = (int)time(NULL);
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "flags", "write_clock",
-			NULL);
-
-	for (i = 0; i < history_num; i++)
+	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		const zbx_dc_history_t	*h = &history[i];
-
-		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
-			continue;
-
-		if (0 != (h->flags & ZBX_DC_FLAG_META))
-			continue;
-
-		if (ITEM_STATE_NOTSUPPORTED == h->state)
-			continue;
-
-		if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
+		switch (h->value_type)
 		{
-			switch (h->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
-					break;
-				case ITEM_VALUE_TYPE_STR:
-				case ITEM_VALUE_TYPE_TEXT:
-					pvalue = h->value.str;
-					break;
-				case ITEM_VALUE_TYPE_LOG:
-					continue;
-				case ITEM_VALUE_TYPE_BIN:
-				case ITEM_VALUE_TYPE_NONE:
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-			}
-			flags = 0;
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				pvalue = h->value.str;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return;
 		}
-		else
-		{
-			flags = ZBX_PROXY_HISTORY_FLAG_NOVALUE;
-			pvalue = (char *)"";
-		}
-
-		history_count++;
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, flags, now);
+		flags = 0;
+	}
+	else
+	{
+		flags = ZBX_PROXY_HISTORY_FLAG_NOVALUE;
+		pvalue = (char *)"";
 	}
 
-	zbx_change_proxy_history_count(history_count);
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	/* TODO: in the case of numeric values the stack value is passed and currently is stored by reference */
+	/* which will cause this to fail                                                                      */
+	zbx_pdc_history_write_value(handle, h->itemid, h->state, pvalue, &h->ts, flags);
 }
 
 /******************************************************************************
@@ -145,68 +119,41 @@ static void	dc_add_proxy_history(zbx_dc_history_t *history, int history_num)
  *          ITEM_VALUE_TYPE_LOG containing meta information in result         *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_meta(zbx_dc_history_t *history, int history_num)
+static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
 {
-	int		i, now, history_count = 0;
 	char		buffer[64], *pvalue;
 	zbx_db_insert_t	db_insert;
+	int		flags;
 
-	now = (int)time(NULL);
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "lastlogsize", "mtime",
-			"flags", "write_clock", NULL);
-
-	for (i = 0; i < history_num; i++)
+	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		unsigned int		flags = ZBX_PROXY_HISTORY_FLAG_META;
-		const zbx_dc_history_t	*h = &history[i];
-
-		if (ITEM_STATE_NOTSUPPORTED == h->state)
-			continue;
-
-		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
-			continue;
-
-		if (0 == (h->flags & ZBX_DC_FLAG_META))
-			continue;
-
-		if (ITEM_VALUE_TYPE_LOG == h->value_type)
-			continue;
-
-		if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
+		switch (h->value_type)
 		{
-			switch (h->value_type)
-			{
-				case ITEM_VALUE_TYPE_FLOAT:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
-					break;
-				case ITEM_VALUE_TYPE_UINT64:
-					zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
-					break;
-				case ITEM_VALUE_TYPE_STR:
-				case ITEM_VALUE_TYPE_TEXT:
-					pvalue = h->value.str;
-					break;
-				case ITEM_VALUE_TYPE_BIN:
-				case ITEM_VALUE_TYPE_NONE:
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					continue;
-			}
+			case ITEM_VALUE_TYPE_FLOAT:
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_DBL64, h->value.dbl);
+				break;
+			case ITEM_VALUE_TYPE_UINT64:
+				zbx_snprintf(pvalue = buffer, sizeof(buffer), ZBX_FS_UI64, h->value.ui64);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+				pvalue = h->value.str;
+				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				return;
 		}
-		else
-		{
-			flags |= ZBX_PROXY_HISTORY_FLAG_NOVALUE;
-			pvalue = (char *)"";
-		}
-
-		history_count++;
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, pvalue, h->lastlogsize, h->mtime,
-				flags, now);
+	}
+	else
+	{
+		flags |= ZBX_PROXY_HISTORY_FLAG_NOVALUE;
+		pvalue = (char *)"";
 	}
 
-	zbx_change_proxy_history_count(history_count);
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	/* TODO: in the case of numeric values the stack value is passed and currently is stored by reference */
+	/* which will cause this to fail                                                                      */
+	zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, h->lastlogsize,
+			h->mtime, 0, 0, 0, "");
 }
 
 /******************************************************************************
@@ -217,67 +164,40 @@ static void	dc_add_proxy_history_meta(zbx_dc_history_t *history, int history_num
  *          ITEM_VALUE_TYPE_LOG                                               *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_log(zbx_dc_history_t *history, int history_num)
+static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
 {
-	int		i, now, history_count = 0;
-	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	lastlogsize;
+	int		mtime, flags;
 
-	now = (int)time(NULL);
-
-	/* see hc_copy_history_data() for fields that might be uninitialized and need special handling here */
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
-			"value", "logeventid", "lastlogsize", "mtime", "flags", "write_clock", NULL);
-
-	for (i = 0; i < history_num; i++)
+	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		unsigned int		flags;
-		zbx_uint64_t		lastlogsize;
-		int			mtime;
-		const zbx_dc_history_t	*h = &history[i];
+		zbx_log_value_t *log = h->value.log;
 
-		if (ITEM_STATE_NOTSUPPORTED == h->state)
-			continue;
-
-		if (ITEM_VALUE_TYPE_LOG != h->value_type)
-			continue;
-
-		if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
+		if (0 != (h->flags & ZBX_DC_FLAG_META))
 		{
-			zbx_log_value_t *log = h->value.log;
-
-			if (0 != (h->flags & ZBX_DC_FLAG_META))
-			{
-				flags = ZBX_PROXY_HISTORY_FLAG_META;
-				lastlogsize = h->lastlogsize;
-				mtime = h->mtime;
-			}
-			else
-			{
-				flags = 0;
-				lastlogsize = 0;
-				mtime = 0;
-			}
-
-			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, log->timestamp,
-					ZBX_NULL2EMPTY_STR(log->source), log->severity, log->value, log->logeventid,
-					lastlogsize, mtime, flags, now);
+			flags = ZBX_PROXY_HISTORY_FLAG_META;
+			lastlogsize = h->lastlogsize;
+			mtime = h->mtime;
 		}
 		else
 		{
-			/* sent to server only if not 0, see proxy_get_history_data() */
-			const int	unset_if_novalue = 0;
-
-			flags = ZBX_PROXY_HISTORY_FLAG_META | ZBX_PROXY_HISTORY_FLAG_NOVALUE;
-
-			zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, unset_if_novalue, "",
-					unset_if_novalue, "", unset_if_novalue, h->lastlogsize, h->mtime, flags, now);
+			flags = 0;
+			lastlogsize = 0;
+			mtime = 0;
 		}
-		history_count++;
-	}
 
-	zbx_change_proxy_history_count(history_count);
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+		zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, log->value, &h->ts, flags, lastlogsize,
+				mtime, log->timestamp, log->logeventid, log->severity, ZBX_NULL2EMPTY_STR(log->source));
+	}
+	else
+	{
+		/* sent to server only if not 0, see proxy_get_history_data() */
+
+		flags = ZBX_PROXY_HISTORY_FLAG_META | ZBX_PROXY_HISTORY_FLAG_NOVALUE;
+
+		zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, "", &h->ts, flags, h->lastlogsize, h->mtime,
+				0, 0, 0, "");
+	}
 }
 
 /******************************************************************************
@@ -285,30 +205,9 @@ static void	dc_add_proxy_history_log(zbx_dc_history_t *history, int history_num)
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_notsupported(zbx_dc_history_t *history, int history_num)
+static void	dc_add_proxy_history_notsupported(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
 {
-	int		i, now, history_count = 0;
-	zbx_db_insert_t	db_insert;
-
-	now = (int)time(NULL);
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "state", "write_clock",
-			NULL);
-
-	for (i = 0; i < history_num; i++)
-	{
-		const zbx_dc_history_t	*h = &history[i];
-
-		if (ITEM_STATE_NOTSUPPORTED != h->state)
-			continue;
-
-		history_count++;
-		zbx_db_insert_add_values(&db_insert, h->itemid, h->ts.sec, h->ts.ns, ZBX_NULL2EMPTY_STR(h->value.err),
-				(int)h->state, now);
-	}
-
-	zbx_change_proxy_history_count(history_count);
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	zbx_pdc_history_write_value(handle, h->itemid, h->state, ZBX_NULL2EMPTY_STR(h->value.err), &h->ts, 0);
 }
 
 /******************************************************************************
@@ -321,9 +220,12 @@ static void	dc_add_proxy_history_notsupported(zbx_dc_history_t *history, int his
  ******************************************************************************/
 static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 {
-	int	i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0;
+	int			i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0, history_count = 0;
+	zbx_pdc_history_data_t	*handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	handle = zbx_pdc_history_open();
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -331,44 +233,41 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
-			notsupported_num++;
+			dc_add_proxy_history_notsupported(handle, h);
+			history_count++;
 			continue;
 		}
+
+		if (0 != (h->flags & ZBX_DC_FLAG_UNDEF))
+			continue;
 
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
-				hlog_num++;
+				dc_add_proxy_history_log(handle, h);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 				if (0 != (h->flags & ZBX_DC_FLAG_META))
-					h_meta_num++;
+					dc_add_proxy_history_meta(handle, h);
 				else
-					h_num++;
+					dc_add_proxy_history(handle, h);
 				break;
 			case ITEM_VALUE_TYPE_NONE:
-				h_num++;
+				dc_add_proxy_history(handle, h);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
+
+		history_count++;
 	}
 
-	if (0 != h_num)
-		dc_add_proxy_history(history, history_num);
-
-	if (0 != h_meta_num)
-		dc_add_proxy_history_meta(history, history_num);
-
-	if (0 != hlog_num)
-		dc_add_proxy_history_log(history, history_num);
-
-	if (0 != notsupported_num)
-		dc_add_proxy_history_notsupported(history, history_num);
+	zbx_pdc_history_close(handle);
+	zbx_change_proxy_history_count(history_count);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
