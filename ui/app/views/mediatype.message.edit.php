@@ -42,7 +42,7 @@ if ($data['params']['old_message_type'] != -1) {
 
 $message_type_select = (new CSelect('message_type'))
 	->setId('message_type')
-	->setFocusableElementId( 'message-type')
+	->setFocusableElementId('message-type')
 	->setValue($data['params']['old_message_type'])
 	->addOption((new CSelectOption(CMediatypeHelper::MSG_TYPE_PROBLEM, _('Problem')))
 		->setDisabled(in_array(CMediatypeHelper::MSG_TYPE_PROBLEM, $data['params']['message_types']))

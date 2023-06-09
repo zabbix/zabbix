@@ -275,7 +275,7 @@ window.mediatype_edit_popup = new class {
 				parameters.message_type = row.dataset.messageType;
 				parameters.old_message_type = parameters.message_type;
 
-				[...row.querySelectorAll('input[type="hidden"]')].map((input) => {
+				[...row.querySelectorAll('input[type="hidden"]')].forEach((input) => {
 					const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
 
 					if (name) {
@@ -291,11 +291,11 @@ window.mediatype_edit_popup = new class {
 			});
 
 			overlay.$dialogue[0].addEventListener('message.submit', (e) => {
-				if (row !== null) {
-					this.#addMessageTemplateRow(e.detail, row);
+				if (row === null) {
+					this.#addMessageTemplateRow(e.detail);
 				}
 				else {
-					this.#addMessageTemplateRow(e.detail);
+					this.#addMessageTemplateRow(e.detail, row);
 				}
 			});
 		}
@@ -379,7 +379,7 @@ window.mediatype_edit_popup = new class {
 	 */
 	#toggleAddButton() {
 		const limit_reached = (
-			Object.keys(this.message_template_list).length === Object.keys(this.message_templates).length
+			Object.keys(this.message_template_list).length == Object.keys(this.message_templates).length
 		);
 		const add_button = this.form.querySelector('#message-templates-footer .btn-link');
 
@@ -523,7 +523,7 @@ window.mediatype_edit_popup = new class {
 				break;
 		}
 
-		if (typeof event.detail == 'undefined' || this.type == <?= MEDIA_TYPE_SMS ?>) {
+		if (typeof event.detail === 'undefined' || this.type == <?= MEDIA_TYPE_SMS ?>) {
 			this.max_session_checked = 'one';
 			this.#setMaxSessionsType(this.type);
 		}
@@ -690,8 +690,7 @@ window.mediatype_edit_popup = new class {
 							break;
 
 						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
-							const show_fields = ['#passwd_label', '#passwd_field'
-							];
+							const show_fields = ['#passwd_label', '#passwd_field'];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 							break;

@@ -446,7 +446,7 @@ switch ($data['maxsessions']) {
 		$data['maxsessions_type'] = 'custom';
 }
 
-$mediaOptionsForm = (new CFormGrid())
+$media_options_form_grid = (new CFormGrid())
 	->setId('options')
 	->addItem([
 		new CLabel(_('Concurrent sessions'), 'maxsessions_type'),
@@ -483,7 +483,7 @@ $mediaOptionsForm = (new CFormGrid())
 $tabs
 	->addTab('media_tab', _('Media type'), $mediatype_form_grid)
 	->addTab('msg_templates_tab', _('Message templates'), $message_templates_form_grid, TAB_INDICATOR_MESSAGE_TEMPLATE)
-	->addTab('options_tab', _('Options'), $mediaOptionsForm, TAB_INDICATOR_MEDIATYPE_OPTIONS)
+	->addTab('options_tab', _('Options'), $media_options_form_grid, TAB_INDICATOR_MEDIATYPE_OPTIONS)
 	->setSelected(0);
 
 $email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_PROVIDER_SMTP);
