@@ -123,6 +123,7 @@ class CControllerCorrelationEdit extends CController {
 		}
 		unset($condition);
 
+		$data['conditions'] = array_values($data['conditions']);
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
