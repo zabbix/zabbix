@@ -768,7 +768,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.appendTo($msg_box);
 
 		if (!show_details) {
-			$list.hide();
+			$msg_details.hide();
 		}
 	}
 

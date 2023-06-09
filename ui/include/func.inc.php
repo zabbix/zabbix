@@ -1789,9 +1789,6 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		}
 
 		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
-		if ($title !== null && !$show_details) {
-			$list->setAttribute('style', 'display: none;');
-		}
 
 		foreach ($messages as $message) {
 			$list->addItem($message['message']);
@@ -1800,6 +1797,10 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		$msg_details = (new CDiv())
 			->addClass(ZBX_STYLE_MSG_DETAILS)
 			->addItem($list);
+
+		if ($title !== null && !$show_details) {
+			$msg_details->addStyle('display: none;');
+		}
 	}
 
 	$aria_labels = [
