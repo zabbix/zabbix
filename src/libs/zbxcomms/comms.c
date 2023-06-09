@@ -20,6 +20,7 @@
 #include "zbxcomms.h"
 #include "comms.h"
 #include "zbxtypes.h"
+#include <stddef.h>
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
@@ -714,124 +715,158 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
 #define ZBX_TCP_HEADER_LEN	ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA)
 
+int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
+		zbx_tcp_send_context_t *context)
+{
+	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
+
+	context->compressed_data = NULL;
+	context->written = 0;
+	context->written_header = 0;
+	context->header_len = 0;
+
+	context->data = data;
+	context->send_len = len;
+
+	if (0 == (flags & ZBX_TCP_PROTOCOL))
+		return SUCCEED;
+	
+	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
+	{
+		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
+				" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+		return FAIL;
+	}
+
+	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
+	{
+		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
+				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
+				ZBX_MAX_RECV_LARGE_DATA_SIZE);
+		return FAIL;
+	}
+
+	if (0 != (flags & ZBX_TCP_COMPRESS))
+	{
+		/* compress if not compressed yet */
+		if (0 == reserved)
+		{
+			if (SUCCEED != zbx_compress(data, len, &context->compressed_data, &context->send_len))
+			{
+				zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
+
+				return FAIL;
+			}
+
+			context->data = context->compressed_data;
+			reserved = len;
+		}
+	}
+
+	memcpy(context->header_buf, ZBX_TCP_HEADER_DATA, ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA));
+	context->header_len = ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA);
+
+	if (max_uint32 <= len || max_uint32 <= reserved)
+		flags |= ZBX_TCP_LARGE;
+
+	context->header_buf[context->header_len++] = flags;
+
+	if (0 != (flags & ZBX_TCP_LARGE))
+	{
+		zbx_uint64_t	len64_le;
+
+		len64_le = zbx_htole_uint64((zbx_uint64_t)context->send_len);
+		memcpy(context->header_buf + context->header_len, &len64_le, sizeof(len64_le));
+		context->header_len += sizeof(len64_le);
+
+		len64_le = zbx_htole_uint64((zbx_uint64_t)reserved);
+		memcpy(context->header_buf + context->header_len, &len64_le, sizeof(len64_le));
+		context->header_len += sizeof(len64_le);
+	}
+	else
+	{
+		zbx_uint32_t	len32_le;
+
+		len32_le = zbx_htole_uint32((zbx_uint32_t)context->send_len);
+		memcpy(context->header_buf + context->header_len, &len32_le, sizeof(len32_le));
+		context->header_len += sizeof(len32_le);
+
+		len32_le = zbx_htole_uint32((zbx_uint32_t)reserved);
+		memcpy(context->header_buf + context->header_len, &len32_le, sizeof(len32_le));
+		context->header_len += sizeof(len32_le);
+	}
+
+	return SUCCEED;
+}
+
+int	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
+{
+	zbx_free(state->compressed_data);
+}
+
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context)
+{
+#define ZBX_TLS_MAX_REC_LEN	16384
+	ssize_t	bytes_sent;
+	size_t	send_bytes;
+
+	if (context->header_len > (size_t)context->written_header)
+	{
+		size_t	data_len;
+		char	buf[ZBX_TLS_MAX_REC_LEN];	/* Buffer is allocated on stack with a hope that it   */
+							/* will be short-lived in CPU cache. Static buffer is */
+							/* not used on purpose.                               */
+		size_t	remaining_header_len = context->header_len - context->written_header;
+
+		memcpy(buf, context->header_buf + context->written_header, remaining_header_len);
+
+		data_len = MIN(context->send_len, ZBX_TLS_MAX_REC_LEN - remaining_header_len);
+		memcpy(buf + remaining_header_len, context->data, data_len);
+
+		send_bytes = remaining_header_len + data_len;
+
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, buf, send_bytes)))
+			return FAIL;
+
+		if ((size_t)bytes_sent > remaining_header_len)
+		{
+			context->written += bytes_sent - remaining_header_len;
+			context->written_header += remaining_header_len;
+		}
+		else
+			 context->written_header += bytes_sent;
+	}
+
+	while (context->written < (ssize_t) context->send_len)
+	{
+		if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
+			send_bytes = context->send_len - (size_t)context->written;
+		else
+			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, context->send_len - (size_t)context->written);
+
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, context->data + context->written, send_bytes)))
+			return FAIL;
+
+		context->written += bytes_sent;
+	}
+
+	return SUCCEED;
+}
+
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
 		int timeout)
 {
-#define ZBX_TLS_MAX_REC_LEN	16384
-
-	ssize_t			bytes_sent, written = 0;
-	size_t			send_bytes, offset, send_len = len;
-	int			ret = SUCCEED;
-	char			*compressed_data = NULL;
-	const zbx_uint64_t	max_uint32 = ~(zbx_uint32_t)0;
+	int			ret;
+	zbx_tcp_send_context_t	context;
 
 	if (0 != timeout)
 		zbx_socket_set_deadline(s, timeout);
 
-	if (0 != (flags & ZBX_TCP_PROTOCOL))
+	if (SUCCEED == (ret = zbx_tcp_send_context_init(data, len, reserved, flags, &context)))
 	{
-		size_t	take_bytes;
-		char	header_buf[ZBX_TLS_MAX_REC_LEN];	/* Buffer is allocated on stack with a hope that it   */
-								/* will be short-lived in CPU cache. Static buffer is */
-								/* not used on purpose.				      */
-
-		if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
-		{
-			zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
-					" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
-			ret = FAIL;
-			goto cleanup;
-		}
-
-		if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
-		{
-			zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
-					" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
-					ZBX_MAX_RECV_LARGE_DATA_SIZE);
-			ret = FAIL;
-			goto cleanup;
-		}
-
-		if (0 != (flags & ZBX_TCP_COMPRESS))
-		{
-			/* compress if not compressed yet */
-			if (0 == reserved)
-			{
-				if (SUCCEED != zbx_compress(data, len, &compressed_data, &send_len))
-				{
-					zbx_set_socket_strerror("cannot compress data: %s", zbx_compress_strerror());
-					ret = FAIL;
-					goto cleanup;
-				}
-
-				data = compressed_data;
-				reserved = len;
-			}
-		}
-
-		memcpy(header_buf, ZBX_TCP_HEADER_DATA, ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA));
-		offset = ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA);
-
-		if (max_uint32 <= len || max_uint32 <= reserved)
-			flags |= ZBX_TCP_LARGE;
-
-		header_buf[offset++] = flags;
-
-		if (0 != (flags & ZBX_TCP_LARGE))
-		{
-			zbx_uint64_t	len64_le;
-
-			len64_le = zbx_htole_uint64((zbx_uint64_t)send_len);
-			memcpy(header_buf + offset, &len64_le, sizeof(len64_le));
-			offset += sizeof(len64_le);
-
-			len64_le = zbx_htole_uint64((zbx_uint64_t)reserved);
-			memcpy(header_buf + offset, &len64_le, sizeof(len64_le));
-			offset += sizeof(len64_le);
-		}
-		else
-		{
-			zbx_uint32_t	len32_le;
-
-			len32_le = zbx_htole_uint32((zbx_uint32_t)send_len);
-			memcpy(header_buf + offset, &len32_le, sizeof(len32_le));
-			offset += sizeof(len32_le);
-
-			len32_le = zbx_htole_uint32((zbx_uint32_t)reserved);
-			memcpy(header_buf + offset, &len32_le, sizeof(len32_le));
-			offset += sizeof(len32_le);
-		}
-
-		take_bytes = MIN(send_len, ZBX_TLS_MAX_REC_LEN - offset);
-		memcpy(header_buf + offset, data, take_bytes);
-
-		send_bytes = offset + take_bytes;
-
-		if (ZBX_PROTO_ERROR == (written = zbx_tcp_write(s, header_buf, send_bytes)))
-		{
-			ret = FAIL;
-			goto cleanup;
-		}
-
-		written -= (ssize_t)offset;
+		ret = zbx_tcp_send_context(s, &context);
+		zbx_tcp_send_context_clear(&context);
 	}
-
-	while (written < (ssize_t)send_len)
-	{
-		if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
-			send_bytes = send_len - (size_t)written;
-		else
-			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, send_len - (size_t)written);
-
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, data + written, send_bytes)))
-		{
-			ret = FAIL;
-			goto cleanup;
-		}
-		written += bytes_sent;
-	}
-cleanup:
-	zbx_free(compressed_data);
 
 	if (0 != timeout)
 		zbx_socket_set_deadline(s, 0);

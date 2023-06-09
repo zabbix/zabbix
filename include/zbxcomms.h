@@ -207,7 +207,6 @@ zbx_socket_t;
 
 typedef struct
 {
-	ssize_t		nbytes;
 	size_t		buf_dyn_bytes;
 	size_t		buf_stat_bytes;
 	size_t		offset;
@@ -218,6 +217,21 @@ typedef struct
 	int		protocol_version;
 }
 zbx_tcp_recv_state_t;
+
+#define ZBX_MAX_HEADER_LEN 21
+typedef struct
+{
+	unsigned char	header_buf[ZBX_MAX_HEADER_LEN];
+	size_t		header_len;
+	char		*compressed_data;
+	const char	*data;
+	size_t		send_len;
+	ssize_t		written;
+	ssize_t		written_header;
+}
+zbx_tcp_send_context_t;
+
+#undef ZBX_MAX_HEADER_LEN
 
 const char	*zbx_socket_strerror(void);
 
