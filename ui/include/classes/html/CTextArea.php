@@ -31,7 +31,7 @@ class CTextArea extends CTag {
 	 *        int      $options['maxlength']
 	 *        boolean  $options['readonly']
 	 */
-	public function __construct(string $name = 'textarea', string $value = '', array $options = []) {
+	public function __construct(string $name = 'textarea', $value = '', array $options = []) {
 		parent::__construct('textarea', true);
 
 		$this
@@ -60,7 +60,7 @@ class CTextArea extends CTag {
 		return $this;
 	}
 
-	public function setValue(string $value = ''): self {
+	public function setValue($value = ''): self {
 		$this->addItem($value);
 
 		return $this;

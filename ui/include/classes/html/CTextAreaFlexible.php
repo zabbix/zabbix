@@ -67,7 +67,7 @@ class CTextAreaFlexible extends CTextArea {
 	 *
 	 * @return $this
 	 */
-	public function setMaxlength($maxlength) {
+	public function setMaxlength(int $maxlength): self {
 		$this->setAttribute('maxlength', $maxlength);
 
 		return $this;
