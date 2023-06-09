@@ -267,6 +267,10 @@ const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
 		int timeout);
+int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
+		zbx_tcp_send_context_t *context);
+int	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -288,7 +292,7 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
 ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events);
-ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len);
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);

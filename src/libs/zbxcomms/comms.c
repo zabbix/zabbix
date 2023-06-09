@@ -611,7 +611,7 @@ int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsi
 	return zbx_socket_create(s, SOCK_STREAM, source_ip, ip, port, timeout, tls_connect, tls_arg1, tls_arg2);
 }
 
-ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event)
 {
 	zbx_pollfd_t	pd;
 	ssize_t		n, offset = 0;
@@ -621,7 +621,7 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 	{
 		char	*error = NULL;
 
-		if (ZBX_PROTO_ERROR == (n = zbx_tls_write(s, buf, len, &error)))
+		if (ZBX_PROTO_ERROR == (n = zbx_tls_write(s, buf, len, event, &error)))
 		{
 			zbx_set_socket_strerror("%s", error);
 			zbx_free(error);
@@ -633,6 +633,12 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len)
 
 	if (0 < (n = ZBX_TCP_WRITE(s->socket, buf, len)) && (size_t)n == len)
 		return n;
+
+	if (NULL != event)
+	{
+		*event = POLLOUT;
+		return ZBX_PROTO_ERROR;
+	}
 
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
@@ -804,7 +810,7 @@ int	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
 	zbx_free(state->compressed_data);
 }
 
-int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context)
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event)
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
 	ssize_t	bytes_sent;
@@ -825,7 +831,7 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context)
 
 		send_bytes = remaining_header_len + data_len;
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, buf, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, buf, send_bytes, event)))
 			return FAIL;
 
 		if ((size_t)bytes_sent > remaining_header_len)
@@ -844,7 +850,8 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context)
 		else
 			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, context->send_len - (size_t)context->written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, context->data + context->written, send_bytes)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, context->data + context->written, send_bytes,
+				event)))
 			return FAIL;
 
 		context->written += bytes_sent;
@@ -864,7 +871,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 
 	if (SUCCEED == (ret = zbx_tcp_send_context_init(data, len, reserved, flags, &context)))
 	{
-		ret = zbx_tcp_send_context(s, &context);
+		ret = zbx_tcp_send_context(s, &context, NULL);
 		zbx_tcp_send_context_clear(&context);
 	}
 

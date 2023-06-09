@@ -401,7 +401,8 @@ static int	tls_socket_wait(ZBX_SOCKET s, SSL *ctx, ssize_t ssl_err)
 
 	pd.fd = s;
 
-	tls_socket_event(ctx, ssl_err, &pd.events);
+	if (FAIL == tls_socket_event(ctx, ssl_err, &pd.events))
+		return FAIL;
 
 	event = pd.events;
 
@@ -3820,7 +3821,7 @@ out1:
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 #endif
 
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error)
+ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error)
 {
 	ssize_t		offset = 0, n;
 
@@ -3839,6 +3840,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, char **error
 			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
 			if (SUCCEED != tls_is_nonblocking_error(err))
 				break;
+
+			if (NULL != event)
+			{
+				if (SUCCEED == tls_socket_event(s->tls_ctx->ctx, err, event))
+					return ZBX_PROTO_ERROR;
+			}
 
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
@@ -3914,8 +3921,8 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 
 		if (NULL != events)
 		{
-			tls_socket_event(s->tls_ctx->ctx, err, events);
-			return ZBX_PROTO_ERROR;
+			if (SUCCEED == tls_socket_event(s->tls_ctx->ctx, err, events))
+				return ZBX_PROTO_ERROR;
 		}
 
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
