@@ -411,7 +411,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
-					'form' => 'name:httpForm',
+					'form' => 'name:webscenario_form',
 					'tabs' => [
 						[
 							'name' => 'Steps',

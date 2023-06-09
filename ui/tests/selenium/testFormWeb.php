@@ -279,14 +279,14 @@ class testFormWeb extends CLegacyWebTest {
 		$this->zbxTestAssertAttribute("//input[@id='http_proxy']", 'placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]');
 
 		$this->zbxTestTextPresent('Variables');
-		$this->zbxTestAssertVisibleXpath("//div[@id='scenarioTab']//table[contains(@data-type, 'variables')]");
-		$this->zbxTestAssertAttribute("//table[@data-type='variables']//tr[@data-index='1']//input[@data-type='name']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleXpath("//table[@data-type='variables']//tr[@data-index='1']//input[@data-type='value']");
+		$this->zbxTestAssertVisibleXpath("//div[@id='scenario-tab']//table[@id='variables']");
+		$this->zbxTestAssertAttribute("//table[@id='variables']//textarea[@placeholder='name']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//table[@id='variables']//textarea[@placeholder='value']", 'maxlength', 2000);
 
 		$this->zbxTestTextPresent('Headers');
-		$this->zbxTestAssertVisibleXpath("//div[@id='scenarioTab']//table[contains(@data-type, 'headers')]");
-		$this->zbxTestAssertAttribute("//table[@data-type='headers']//tr[@data-index='1']//input[@data-type='name']", 'maxlength', 255);
-		$this->zbxTestAssertVisibleXpath("//table[@data-type='headers']//tr[@data-index='1']//input[@data-type='value']");
+		$this->zbxTestAssertVisibleXpath("//div[@id='scenario-tab']//table[@id='headers']");
+		$this->zbxTestAssertAttribute("//table[@id='headers']//textarea[@placeholder='name']", 'maxlength', 255);
+		$this->zbxTestAssertAttribute("//table[@id='headers']//textarea[@placeholder='value']", 'maxlength', 2000);
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
@@ -319,7 +319,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertElementNotPresentId('update');
 		}
 
-		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
+		$this->zbxTestTabSwitchById('tab_authentication-tab', 'Authentication');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('authentication'));
 
 		$this->zbxTestTextPresent('Authentication');
@@ -343,30 +343,30 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 255);
 		}
 		else {
-			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());
+			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authentication-tab')->one());
 			$this->zbxTestAssertNotVisibleId('http_user');
 			$this->zbxTestAssertNotVisibleId('http_password');
 		}
 
-		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
+		$this->zbxTestTabSwitchById('tab_steps-tab' ,'Steps');
 		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes', 'Action']);
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->zbxTestAssertVisibleXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementText("//td[@colspan='8']/button[contains(@class, 'element-table-add')]", 'Add');
+			$this->zbxTestAssertVisibleXpath('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+			$this->zbxTestAssertElementText('//td[@colspan="8"]/button[@class="btn-link js-add-step"]', 'Add');
 
-			$this->zbxTestAssertVisibleXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
-			$this->zbxTestAssertElementText("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]", 'Remove');
+			$this->zbxTestAssertVisibleXpath('//table[@id="steps"]//button[@class="btn-link js-remove-step"]');
+			$this->zbxTestAssertElementText('//table[@id="steps"]//button[@class="btn-link js-remove-step"]', 'Remove');
 		}
 		elseif (!isset($data['form'])) {
-			$this->zbxTestAssertVisibleXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementText("//td[@colspan='8']/button[contains(@class, 'element-table-add')]", 'Add');
+			$this->zbxTestAssertVisibleXpath('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+			$this->zbxTestAssertElementText('//td[@colspan="8"]/button[@class="btn-link js-add-step"]', 'Add');
 
 			$this->zbxTestAssertElementNotPresentXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
 		}
 		else {
-			$this->zbxTestAssertElementNotPresentXpath("//td[@colspan='8']/button[contains(@class, 'element-table-add')]");
-			$this->zbxTestAssertElementNotPresentXpath("//table[contains(@class,'httpconf-steps-dynamic-row')]//button[contains(@class,'element-table-remove')]");
+			$this->zbxTestAssertElementNotPresentXpath('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+			$this->zbxTestAssertElementNotPresentXpath('//table[@id="steps"]//button[@class="btn-link js-remove-step"]');
 		}
 	}
 
@@ -1404,12 +1404,12 @@ class testFormWeb extends CLegacyWebTest {
 			$i = 1;
 			foreach($data['variables'] as $variable) {
 				if (isset($variable['name'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="variables"]//tr[@data-index="'.$i.'"]//input[@data-type="name"]', $variable['name']);
+					$this->zbxTestInputTypeByXpath('(//table[@id="variables"]//textarea[@placeholder="name"])['.$i.']', $variable['name']);
 				}
 				if (isset($variable['value'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="variables"]//tr[@data-index="'.$i.'"]//input[@data-type="value"]', $variable['value']);
+					$this->zbxTestInputTypeByXpath('(//table[@id="variables"]//textarea[@placeholder="value"])['.$i.']', $variable['value']);
 				}
-				$this->zbxTestClickXpath('//table[@data-type="variables"]//button[contains(@class, "element-table-add")]');
+				$this->zbxTestClickXpath('//table[@id="variables"]//button[contains(@class, "element-table-add")]');
 				$i++;
 			}
 		}
@@ -1418,12 +1418,12 @@ class testFormWeb extends CLegacyWebTest {
 			$i = 1;
 			foreach($data['headers'] as $header) {
 				if (isset($header['name'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="headers"]//tr[@data-index="'.$i.'"]//input[@data-type="name"]', $header['name']);
+					$this->zbxTestInputTypeByXpath('(//table[@id="headers"]//textarea[@placeholder="name"])['.$i.']', $header['name']);
 				}
 				if (isset($header['value'])) {
-					$this->zbxTestInputTypeByXpath('//table[@data-type="headers"]//tr[@data-index="'.$i.'"]//input[@data-type="value"]', $header['value']);
+					$this->zbxTestInputTypeByXpath('(//table[@id="headers"]//textarea[@placeholder="value"])['.$i.']', $header['value']);
 				}
-				$this->zbxTestClickXpath('//table[@data-type="headers"]//button[contains(@class, "element-table-add")]');
+				$this->zbxTestClickXpath('//table[@id="headers"]//button[contains(@class, "element-table-add")]');
 				$i++;
 			}
 		}
@@ -1431,10 +1431,10 @@ class testFormWeb extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of web headers.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('xpath://table[@data-type="headers"]')->waitUntilPresent()->one(), 'Web Headers fields');
+			$this->assertScreenshot($this->query('xpath://table[@id="headers"]')->waitUntilPresent()->one(), 'Web Headers fields');
 		}
 
-		$this->zbxTestTabSwitchById('tab_authenticationTab', 'Authentication');
+		$this->zbxTestTabSwitchById('tab_authentication-tab', 'Authentication');
 		if (isset($data['authentication'])) {
 			$this->zbxTestDropdownSelectWait('authentication', $data['authentication']);
 		}
@@ -1450,12 +1450,12 @@ class testFormWeb extends CLegacyWebTest {
 
 		$check = false;
 		if (isset($data['add_step'])) {
-			$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
+			$this->zbxTestTabSwitchById('tab_steps-tab' ,'Steps');
 			foreach($data['add_step'] as $item) {
-				$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
-				$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+				$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+				$this->zbxTestLaunchOverlayDialog('New step of web scenario');
 				$step = $item['step'].' step';
-				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step, false);
+				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step, false);
 				$url = $step.' url';
 				$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $url);
 				$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
@@ -1463,7 +1463,7 @@ class testFormWeb extends CLegacyWebTest {
 				COverlayDialogElement::ensureNotPresent();
 
 				if (isset($item['remove'])) {
-					$this->zbxTestClickXpathWait('//table[contains(@class, "httpconf-steps-dynamic-row")]//button[contains(@class,"element-table-remove")]');
+					$this->zbxTestClickXpathWait('//table[@id="steps"]//button[@class="btn-link js-remove-step"]');
 				}
 			}
 		}
@@ -1519,7 +1519,7 @@ class testFormWeb extends CLegacyWebTest {
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestDropdownAssertSelected('agent', $data['agent']);
 			if (isset($data['add_step'])) {
-				$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
+				$this->zbxTestTabSwitchById('tab_steps-tab' ,'Steps');
 				foreach($data['add_step'] as $item) {
 					$step = $item['step']." step";
 					$this->zbxTestTextPresent($step);

@@ -67,13 +67,11 @@ class testFormWebStep extends CLegacyWebTest {
 					'name' => 'Empty query name',
 					'step_name' => 'Step with empty query name',
 					'url' => 'http://www.zabbix.com',
-					'error_webform' => true,
 					'query' => [
 						['value' => 'test']
 					],
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/query_fields/1/name": cannot be empty.'
+						'Incorrect value for field "query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -188,13 +186,11 @@ class testFormWebStep extends CLegacyWebTest {
 					'name' => 'Empty post name',
 					'step_name' => 'Step with empty post name',
 					'url' => 'http://www.zabbix.com',
-					'error_webform' => true,
 					'post' => [
 						['value' => 'test']
 					],
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/posts/1/name": cannot be empty.'
+						'Incorrect value for field "post_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -445,10 +441,8 @@ class testFormWebStep extends CLegacyWebTest {
 					'variables' => [
 						['name' => 'test']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
+						'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -461,10 +455,8 @@ class testFormWebStep extends CLegacyWebTest {
 					'variables' => [
 						['name' => '{test']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
+						'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -477,10 +469,8 @@ class testFormWebStep extends CLegacyWebTest {
 					'variables' => [
 						['name' => 'test}']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/variables/1/name": is not enclosed in {} or is malformed.'
+						'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 					]
 				]
 			],
@@ -525,10 +515,8 @@ class testFormWebStep extends CLegacyWebTest {
 					'variables' => [
 						['value' => 'test']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/variables/1/name": cannot be empty.'
+						'Incorrect value for field "variables/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -613,10 +601,8 @@ class testFormWebStep extends CLegacyWebTest {
 					'headers' => [
 						['value' => 'test']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/headers/1/name": cannot be empty.'
+						'Incorrect value for field "headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -742,8 +728,6 @@ class testFormWebStep extends CLegacyWebTest {
 					'step_name' => 'Step required status codes - symbols',
 					'url' => 'http://www.zabbix.com',
 					'code' => 'abcd',
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
 						'Invalid response code "abcd".'
 					]
@@ -840,12 +824,12 @@ class testFormWebStep extends CLegacyWebTest {
 	 */
 	protected function addPairs($context, $items) {
 		$parent = $this->query('xpath', $context)->one();
-		$element = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all()->last();
+		$element = $parent->query('xpath:.//tr[@class="form_row"]')->all()->last();
 
 		foreach($items as $item) {
 			foreach ($item as $field => $value) {
-				$this->query('xpath', $context.'//input[@data-type="'.$field.'"]')->one()->waitUntilPresent();
-				$input = $element->query('xpath:.//input[@data-type="'.$field.'"]')->one();
+				$this->query('xpath', $context.'//textarea[@placeholder="'.$field.'"]')->one()->waitUntilPresent();
+				$input = $element->query('xpath:.//textarea[@placeholder="'.$field.'"]')->one();
 				$input->sendKeys($value);
 
 				// Fire onchange event.
@@ -857,7 +841,7 @@ class testFormWebStep extends CLegacyWebTest {
 			}
 
 			$parent->query('xpath:.//button[text()="Add"]')->one()->click();
-			$element = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all()->last();
+			$element = $parent->query('xpath:.//tr[@class="form_row"]')->all()->last();
 		}
 	}
 
@@ -869,13 +853,13 @@ class testFormWebStep extends CLegacyWebTest {
 	protected function getPairs($context) {
 		$pairs = [];
 		$parent = $this->query('xpath', $context)->one();
-		$rows = $parent->query('xpath:.//tr[contains(@class, "sortable")]')->all();
+		$rows = $parent->query('xpath:.//tr[@class="form_row"]')->all();
 
 		foreach ($rows as $row) {
 			$pair = [];
-			$inputs = $row->query('xpath:.//input[@data-type]')->all();
+			$inputs = $row->query('xpath:.//textarea')->all();
 			foreach ($inputs as $input) {
-				$pair[$input->getAttribute('data-type')] = $input->getAttribute('value');
+				$pair[$input->getAttribute('placeholder')] = $input->getValue();
 			}
 
 			$pairs[] = $pair;
@@ -914,12 +898,12 @@ class testFormWebStep extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Web monitoring');
 
 		$this->zbxTestInputTypeWait('name', $data['name']);
-		$this->zbxTestTabSwitchById('tab_stepTab' ,'Steps');
-		$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
-		$this->zbxTestLaunchOverlayDialog('Step of web scenario');
+		$this->zbxTestTabSwitchById('tab_steps-tab' ,'Steps');
+		$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+		$this->zbxTestLaunchOverlayDialog('New step of web scenario');
 
 		if (array_key_exists('step_name', $data)) {
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $data['step_name']);
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $data['step_name']);
 		}
 
 		if (array_key_exists('url', $data)) {
@@ -927,10 +911,10 @@ class testFormWebStep extends CLegacyWebTest {
 		}
 
 		$fields = [
-			'query'		=> 'query_fields',
-			'post'		=> 'post_fields',
-			'variables'	=> 'variables',
-			'headers'	=> 'headers'
+			'query'		=> 'step-query-fields',
+			'post'		=> 'step-post-fields',
+			'variables'	=> 'step-variables',
+			'headers'	=> 'step-headers'
 		];
 		foreach ($fields as $field => $data_type) {
 			if (array_key_exists($field, $data)) {
@@ -938,12 +922,12 @@ class testFormWebStep extends CLegacyWebTest {
 					// Synthetic wait
 					sleep(2);
 				}
-				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]', $data[$field]);
+				$this->addPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$data_type.'"]', $data[$field]);
 			}
 		}
 
 		if (array_key_exists('parse', $data)) {
-			$this->zbxTestClick('parse');
+			$this->query('button:Parse')->one()->click();
 		}
 
 		if (array_key_exists('raw', $data)) {
@@ -1018,7 +1002,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
 		}
 
-		foreach (['parse_query' => 'query_fields', 'check_post' => 'post_fields'] as $key => $data_type) {
+		foreach (['parse_query' => 'step-query-fields', 'check_post' => 'step-post-fields'] as $key => $data_type) {
 			if (!array_key_exists($key, $data)) {
 				continue;
 			}
@@ -1026,7 +1010,7 @@ class testFormWebStep extends CLegacyWebTest {
 			$this->zbxTestClickLinkTextWait($data['step_name']);
 			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
 
-			$pairs = $this->getPairs('//div[@class="overlay-dialogue-body"]//table[@data-type="'.$data_type.'"]');
+			$pairs = $this->getPairs('//div[@class="overlay-dialogue-body"]//table[@id="'.$data_type.'"]');
 			$this->assertEquals($this->serializePairs($data[$key]), $this->serializePairs($pairs));
 
 			if (array_key_exists('check_url', $data)) {
