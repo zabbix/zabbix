@@ -855,6 +855,10 @@ form {
 			.btn-icon,
 			.icon {
 				@extend %button-size-medium;
+
+				&:not(:first-child) {
+					margin-left: 5px;
+				}
 			}
 		}
 
