@@ -852,7 +852,7 @@ form {
 		}
 
 		table {
-			.btn-icon,
+			.btn-icon:not(.btn-small),
 			.icon {
 				@extend %button-size-medium;
 			}

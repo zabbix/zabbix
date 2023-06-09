@@ -1194,7 +1194,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
-.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon,
+.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
