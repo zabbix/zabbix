@@ -98,6 +98,10 @@ $filter_tags_table->addRow(
 	))->setColSpan(4)
 );
 
+if(!$data['tags']) {
+	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
+
 $i = 0;
 foreach ($data['tags'] as $tag) {
 	$filter_tags_table->addRow([
@@ -321,7 +325,9 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// tags table
-		if (data.tags.length == 0) {
+		$('#tags_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.tags.length === 0) {
 			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 
