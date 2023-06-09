@@ -156,7 +156,7 @@ $parameters_exec_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('100%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(
@@ -172,7 +172,7 @@ $parameters_exec_template = (new CTemplateTag('exec_params_template'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('parameters_exec[#{row_num}][value]', '', false, DB::getFieldLength('script_param', 'name')))
-				->setAttribute('style', 'width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->setAttribute('maxlength', DB::getFieldLength('media_type_param', 'name'))
 				->setAttribute('value', '#{value}')
 				->setId('parameters_exec_#{rowNum}_value')
@@ -195,7 +195,7 @@ $mediatype_form_grid
 		(new CFormField(
 			(new CFormField($parameters_exec_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 
 		))->setId('row_exec_params_field')
 	])
@@ -219,7 +219,7 @@ if ($data['change_passwd']) {
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
-			->setAttribute('disabled', 'disabled')
+			->setEnabled(false)
 	];
 }
 else {
@@ -234,7 +234,7 @@ $parameters_table = (new CTable())
 		(new CColHeader(_('Value')))->setWidth('50%'),
 		_('Action')
 	])
-	->setAttribute('style', 'width: 100%;')
+	->addStyle('width: 100%;')
 	->addItem(
 		(new CTag('tfoot', true))
 			->addItem(
@@ -250,11 +250,11 @@ $webhook_params_template = (new CTemplateTag('webhook_params_template'))
 	->addItem(
 		(new CRow([
 			(new CTextBox('parameters_webhook[name][]', '', false, DB::getFieldLength('media_type_param', 'name')))
-				->setAttribute('style', 'width: 100%;')
+				->addStyle('width: 100%;')
 				->setAttribute('value', '#{name}')
 				->removeId(),
 			(new CTextBox('parameters_webhook[value][]', '', false, DB::getFieldLength('media_type_param', 'value')))
-				->setAttribute('style', 'width: 100%;')
+				->addStyle('width: 100%;')
 				->setAttribute('value', '#{value}')
 				->removeId(),
 			(new CSimpleButton(_('Remove')))
@@ -286,7 +286,7 @@ $mediatype_form_grid
 		(new CFormField(
 			(new CDiv($parameters_table))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('webhook_parameters_field')
 	])
 	->addItem([
@@ -393,8 +393,7 @@ $message_template = (new CTemplateTag('message-templates-row-tmpl'))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->addClass('js-remove-msg-template')
 			]))->addClass(ZBX_STYLE_NOWRAP)
-		]))
-			->setAttribute('data-message-type', '#{message_type}')
+		]))->setAttribute('data-message-type', '#{message_type}')
 	);
 
 // Message templates tab.
@@ -430,7 +429,8 @@ $message_templates_form_grid = (new CFormGrid())
 	->addItem($message_template);
 
 // Media options tab.
-$max_sessions = ($data['maxsessions'] > 1) ? $data['maxsessions'] : 0;
+$max_sessions = $data['maxsessions'] > 1 ? $data['maxsessions'] : 0;
+
 if ($data['type'] == MEDIA_TYPE_SMS) {
 	$max_sessions = 1;
 }
@@ -492,9 +492,9 @@ $form
 	->addItem($parameters_exec_template)
 	->addItem(
 		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
-				'mediatype' => $data,
-				'message_templates' => CMediatypeHelper::getAllMessageTemplates()
-			]).');'))->setOnDocumentReady()
+			'mediatype' => $data,
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
+		]).');'))->setOnDocumentReady()
 	);
 
 if ($data['mediatypeid']) {

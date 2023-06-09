@@ -46,8 +46,7 @@ $html_page = (new CHtmlPage())
 					)
 					->removeId()
 			)
-		))
-			->setAttribute('aria-label', _('Content controls'))
+		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
 		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'mediatype.list'))
@@ -81,7 +80,7 @@ $html_page = (new CHtmlPage())
 	);
 
 // create form
-$media_type_form = (new CForm())->setName('mediaTypesForm');
+$media_type_form = (new CForm())->setName('media-types-form');
 
 // create table
 $url = (new CUrl('zabbix.php'))
@@ -130,12 +129,12 @@ foreach ($data['mediatypes'] as $media_type) {
 
 		default:
 			$details = '';
-			break;
 	}
 
 	// action list
 	$actionLinks = [];
-	if (!empty($media_type['list_of_actions'])) {
+
+	if (count($media_type['list_of_actions']) > 0) {
 		foreach ($media_type['list_of_actions'] as $action) {
 			$actionLinks[] = (new CLink($action['name']))
 				->addClass('js-action-edit')
@@ -149,15 +148,8 @@ foreach ($data['mediatypes'] as $media_type) {
 	else {
 		$actionLinks = '';
 	}
-	$actionColumn = new CCol($actionLinks);
-	$actionColumn->setAttribute('style', 'white-space: normal;');
 
-	$statusLink = 'zabbix.php'.
-		'?action='.($media_type['status'] == MEDIA_TYPE_STATUS_DISABLED
-			? 'mediatype.enable'
-			: 'mediatype.disable'
-		).
-		'&mediatypeids[]='.$media_type['mediatypeid'];
+	$action_column = (new CCol($actionLinks))->addStyle('white-space: normal;');
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 		? (new CLink(_('Enabled')))
@@ -186,7 +178,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		CMediatypeHelper::getMediaTypes($media_type['typeid']),
 		$status,
-		$actionColumn,
+		$action_column,
 		$details,
 		$test_link
 	]);

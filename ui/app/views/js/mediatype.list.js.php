@@ -30,17 +30,17 @@
 		init() {
 			document.getElementById('js-create').addEventListener('click', () => this.#edit());
 
-			document.getElementById('js-massenable').addEventListener('click', (e) => {
-				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
-			});
+			document.getElementById('js-massenable').addEventListener('click', (e) =>
+				this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			);
 
-			document.getElementById('js-massdisable').addEventListener('click', (e) => {
-				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
-			});
+			document.getElementById('js-massdisable').addEventListener('click', (e) =>
+				this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), true)
+			);
 
-			document.getElementById('js-massdelete').addEventListener('click', (e) => {
-				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
-			});
+			document.getElementById('js-massdelete').addEventListener('click', (e) =>
+				this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()))
+			);
 
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit')) {
@@ -66,6 +66,12 @@
 			})
 		}
 
+		/**
+		 * Opens media type edit popup and and listens to submit and delete actions from edit form. If gets a
+		 * successful response, reloads the page.
+		 *
+		 * @param {object} parameters  Parameters to pass to the edit form.
+		 */
 		#edit(parameters = {}) {
 			const overlay = PopUp('mediatype.edit', parameters, {
 				dialogueid: 'media-type-form',
@@ -97,6 +103,15 @@
 			});
 		}
 
+		/**
+		 * Shows confirmation window if multiple media type elements are selected for enabling and sends a POST request
+		 * to enable action.
+		 *
+		 * @param {element} target        The target element that will be passed to post.
+		 * @param {array}   mediatypeids  Media type IDs to enable.
+		 * @param {bool}    massenable    True if footer button is pressed for mass enable action which brings up
+		 *                                confirmation menu. False if only one element with single link is clicked.
+		 */
 		#enable(target, mediatypeids, massenable = false) {
 			if (massenable) {
 				const confirmation = mediatypeids.length > 1
@@ -115,6 +130,15 @@
 			this.#post(target, mediatypeids, curl);
 		}
 
+		/**
+		 * Shows confirmation window if multiple media type elements are selected for enabling and sends a POST request
+		 * to disable action.
+		 *
+		 * @param {element} target        The target element that will be passed to post.
+		 * @param {array}   mediatypeids  Media type IDs to disable.
+		 * @param {bool}    massdisable   True if footer button is pressed for mass enable action which brings up
+		 *                                confirmation menu. False if only one element with single link is clicked.
+		 */
 		#disable(target, mediatypeids, massdisable = false) {
 			if (massdisable) {
 				const confirmation = mediatypeids.length > 1
@@ -133,6 +157,13 @@
 			this.#post(target, mediatypeids, curl);
 		}
 
+		/**
+		 * Shows confirmation window if multiple media type elements are selected for deletion and sends a POST request
+		 * to delete action.
+		 *
+		 * @param {element} target        The target element that will be passed to post.
+		 * @param {array}   mediatypeids  Media type IDs to delete.
+		 */
 		#delete(target, mediatypeids) {
 			const confirmation = mediatypeids.length > 1
 				? <?= json_encode(_('Delete selected media types?')) ?>
@@ -185,9 +216,9 @@
 		/**
 		 * Sends a POST request to the specified URL with the provided data and handles the response.
 		 *
-		 * @param {string}   target        The target element that will display a loading state during the request.
-		 * @param {object}   mediatypeids  Mediatype IDs to send with the POST request.
-		 * @param {callback} url           The URL to send the POST request to.
+		 * @param {element} target        The target element that will display a loading state during the request.
+		 * @param {array}   mediatypeids  Mediatype IDs to send with the POST request.
+		 * @param {object}  url           The URL to send the POST request to.
 		 */
 		#post(target, mediatypeids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
@@ -230,9 +261,7 @@
 
 					addMessage(message_box);
 				})
-				.finally(() => {
-					target.classList.remove('is-loading');
-				});
+				.finally(() => target.classList.remove('is-loading'));
 		}
 	};
 </script>

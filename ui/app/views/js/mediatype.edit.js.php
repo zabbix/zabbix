@@ -34,9 +34,7 @@ window.mediatype_edit_popup = new class {
 		this.mediatype = mediatype;
 		this.row_num = 0;
 		this.message_template_list = {};
-		this.message_templates = Object.fromEntries(
-			message_templates.map((obj, index) => [index, { ...obj }])
-		);
+		this.message_templates = Object.fromEntries(message_templates.map((obj, index) => [index, { ...obj }]));
 
 		this.#loadView(mediatype);
 		this.#initActions();
@@ -141,18 +139,19 @@ window.mediatype_edit_popup = new class {
 
 		// Trim all string values within the 'parameters_exec' object.
 		if (typeof fields.parameters_exec !== 'undefined') {
-			Object.keys(fields.parameters_exec).forEach((key) => {
+			Object.keys(fields.parameters_exec).forEach((key) =>
 				Object.values(key).forEach((parameter) =>
 					fields.parameters_exec[parameter].value = fields.parameters_exec[parameter].value.trim()
-				);
-			});
+				)
+			)
 		}
 
 		// Set maxsessions value.
-		const maxsessions_type = this.form.querySelector(`input[name='maxsessions_type']:checked`).value;
+		const maxsessions_type = this.form.querySelector('input[name="maxsessions_type"]:checked').value;
 
 		switch (maxsessions_type) {
 			case 'one':
+			default:
 				fields.maxsessions = 1;
 				break;
 
@@ -162,10 +161,6 @@ window.mediatype_edit_popup = new class {
 
 			case 'custom':
 				fields.maxsessions = this.form.querySelector('#maxsessions').value;
-				break;
-
-			default:
-				fields.maxsessions = maxsessions_type;
 				break;
 		}
 
@@ -229,7 +224,7 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Adds a new row to the Parameters table with the given webhook parameter data (name, value).
 	 *
-	 * @param {Object} parameter  An object containing the webhook parameter data.
+	 * @param {object} parameter  An object containing the webhook parameter data.
 	 */
 	#addWebhookParam(parameter = {}) {
 		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
@@ -242,10 +237,11 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Adds a new row to the Script parameters table with the given script parameter data (value).
 	 *
-	 * @param {Object} parameter  An object containing the script parameter data.
+	 * @param {object} parameter  An object containing the script parameter data.
 	 */
 	#addExecParam(parameter = {}) {
 		parameter.row_num = this.row_num;
+
 		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
 
 		this.form
@@ -265,7 +261,7 @@ window.mediatype_edit_popup = new class {
 			const btn = event.target;
 			const parameters = {
 				type: this.form.querySelector('#type').value,
-				content_type: this.form.querySelector(`input[name='content_type']:checked`).value,
+				content_type: this.form.querySelector('input[name="content_type"]:checked').value,
 				message_types: [...this.form.querySelectorAll('tr[data-message-type]')].map((tr) =>
 					tr.dataset.messageType
 				)
@@ -277,7 +273,7 @@ window.mediatype_edit_popup = new class {
 				parameters.message_type = row.dataset.messageType;
 				parameters.old_message_type = parameters.message_type;
 
-				[...row.querySelectorAll(`input[type='hidden']`)].map((input) => {
+				[...row.querySelectorAll('input[type="hidden"]')].map((input) => {
 					const name = input.getAttribute('name').match(/\[([^\]]+)]$/);
 
 					if (name) {
@@ -306,8 +302,8 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Adds a new row to the Message templates table with the given message template data.
 	 *
-	 * @param {Object} input     An object containing the input data.
-	 * @param {Object|null} row  Optional. The row element to insert the new row after.
+	 * @param {object} input     An object containing the input data.
+	 * @param {object|null} row  Optional. The row element to insert the new row after.
 	 *                           If not provided, the new row is appended at the end of the table.
 	 */
 	#addMessageTemplateRow(input, row = null) {
@@ -383,7 +379,6 @@ window.mediatype_edit_popup = new class {
 		const limit_reached = (
 			Object.keys(this.message_template_list).length === Object.keys(this.message_templates).length
 		);
-
 		const add_button = this.form.querySelector('#message-templates-footer .btn-link');
 
 		add_button.disabled = limit_reached;
@@ -425,7 +420,7 @@ window.mediatype_edit_popup = new class {
 
 		const max_sessions = this.form.querySelector('#maxsessions_type');
 
-		this.max_session_checked = this.form.querySelector(`input[name='maxsessions_type']:checked`).value;
+		this.max_session_checked = this.form.querySelector('input[name="maxsessions_type"]:checked').value;
 
 		max_sessions.onchange = (e) => this.#toggleMaxSessionField(e);
 	}
@@ -468,7 +463,7 @@ window.mediatype_edit_popup = new class {
 	 * Compiles necessary fields for popup based on type.
 	 *
 	 * @param {object} event  The event object.
-	 **/
+	 */
 	#loadTypeFields(event) {
 		if (event.target.value) {
 			this.type = parseInt(event.target.value);
@@ -498,7 +493,8 @@ window.mediatype_edit_popup = new class {
 
 			case <?= MEDIA_TYPE_EXEC ?>:
 				show_fields = ['#exec-path-label', '#exec-path-field', '#row_exec_params_label',
-					'#row_exec_params_field'];
+					'#row_exec_params_field'
+				];
 				break;
 
 			case <?= MEDIA_TYPE_WEBHOOK ?>:
@@ -506,7 +502,8 @@ window.mediatype_edit_popup = new class {
 					'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
 					'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
 					'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
-					'#webhook_event_menu_url_field'];
+					'#webhook_event_menu_url_field'
+				];
 				break;
 		}
 
@@ -518,9 +515,9 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Compiles necessary fields for popup based on provider value.
 	 *
-	 * @param {string} change     Indicates whether the provider field value has changed.
-	 * @param {integer} provider  Media type provider.
-	 **/
+	 * @param {string} change    Indicates whether the provider field value has changed.
+	 * @param {number} provider  Media type provider.
+	 */
 	#loadProviderFields(change, provider) {
 		let show_fields = [];
 
@@ -556,24 +553,27 @@ window.mediatype_edit_popup = new class {
 					'#smtp-server-field', '#smtp-port-label', '#smtp-port-field', '#smtp-email-label',
 					'#smtp-email-field', '#smtp-helo-label', '#smtp-helo-field', '#smtp-security-label',
 					'#smtp-security-field', '#smtp-authentication-label', '#smtp-authentication-field',
-					'#content_type_label', '#content_type_field'];
+					'#content_type_label', '#content_type_field'
+				];
 
 				const smtp_security = this.form.querySelector('#smtp_security');
 
 				smtp_security.onchange = () => this.#loadSmtpSecurityFields();
-				this.#loadSmtpSecurityFields()
+				this.#loadSmtpSecurityFields();
 				break;
 
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 				show_fields = ['#smtp-email-label', '#smtp-email-field', '#passwd_label', '#passwd_field',
-					'#content_type_label', '#content_type_field'];
+					'#content_type_label', '#content_type_field'
+				];
 				break;
 
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 			case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
 				show_fields = ['#smtp-email-label', '#smtp-email-field', '#smtp-authentication-label',
-					'#smtp-authentication-field', '#content_type_label', '#content_type_field'];
+					'#smtp-authentication-field', '#content_type_label', '#content_type_field'
+				];
 				break;
 		}
 
@@ -582,9 +582,9 @@ window.mediatype_edit_popup = new class {
 
 	/**
 	 * Compiles necessary fields for popup based on smtp_security value.
-	 **/
+	 */
 	#loadSmtpSecurityFields() {
-		const smtp_security = this.form.querySelector(`input[name='smtp_security']:checked`).value;
+		const smtp_security = this.form.querySelector('input[name="smtp_security"]:checked').value;
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
 			switch (parseInt(smtp_security)) {
@@ -593,7 +593,8 @@ window.mediatype_edit_popup = new class {
 					this.form.querySelector('#smtp_verify_host').checked = false;
 
 					const hide_fields = ['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
-						'#verify-host-field'];
+						'#verify-host-field'
+					];
 
 					hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 					break;
@@ -601,7 +602,8 @@ window.mediatype_edit_popup = new class {
 				case <?= SMTP_CONNECTION_SECURITY_STARTTLS ?>:
 				case <?= SMTP_CONNECTION_SECURITY_SSL_TLS ?>:
 					const show_fields = ['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
-						'#verify-host-field'];
+						'#verify-host-field'
+					];
 
 					show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 					break;
@@ -612,13 +614,13 @@ window.mediatype_edit_popup = new class {
 	/**
 	 * Compiles necessary fields for popup based on smtp_authentication value.
 	 *
-	 * @param {integer} provider  Media type provider.
-	 **/
+	 * @param {number} provider  Media type provider.
+	 */
 	#loadAuthenticationFields(provider) {
-		const authentication = this.form.querySelector(`input[name='smtp_authentication']:checked`).value;
+		const authentication = this.form.querySelector('input[name="smtp_authentication"]:checked').value;
 		const passwd_label = this.form.querySelector('#passwd_label');
 		const passwd = this.form.querySelector('#passwd');
-		const smtp_auth_1 = this.form.querySelector(`label[for= 'smtp_authentication_1']`);
+		const smtp_auth_1 = this.form.querySelector('label[for="smtp_authentication_1"]');
 
 		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		passwd.setAttribute('aria-required', 'true');
@@ -636,14 +638,16 @@ window.mediatype_edit_popup = new class {
 							this.form.querySelector('#smtp_username').value = '';
 
 							const hide_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'];
+								'#passwd_field'
+							];
 
 							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 							break;
 
 						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
 							const show_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'];
+								'#passwd_field'
+							];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 							break;
@@ -659,13 +663,15 @@ window.mediatype_edit_popup = new class {
 							this.form.querySelector('#passwd').value = '';
 
 							const hide_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'];
+								'#passwd_field'
+							];
 
 							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
 							break;
 
 						case <?= SMTP_AUTHENTICATION_NORMAL ?>:
-							const show_fields = ['#passwd_label', '#passwd_field'];
+							const show_fields = ['#passwd_label', '#passwd_field'
+							];
 
 							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
 							break;
@@ -687,7 +693,8 @@ window.mediatype_edit_popup = new class {
 				'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field', '#smtp-helo-label',
 				'#smtp-helo-field', '#smtp-security-label', '#smtp-security-field', '#verify-peer-label',
 				'#verify-peer-field', '#verify-host-label', '#verify-host-field', '#passwd_label', '#passwd_field',
-				'#smtp-authentication-label', '#smtp-authentication-field'];
+				'#smtp-authentication-label', '#smtp-authentication-field'
+			];
 		}
 		else if (type === 'all') {
 			fields = ['#email-provider-label', '#email-provider-field', '#smtp-server-label', '#smtp-server-field',
@@ -701,7 +708,8 @@ window.mediatype_edit_popup = new class {
 				'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
 				'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
 				'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
-				'#webhook_event_menu_url_field'];
+				'#webhook_event_menu_url_field'
+			];
 		}
 
 		fields.forEach((field) => this.form.querySelector(field).style.display = 'none');

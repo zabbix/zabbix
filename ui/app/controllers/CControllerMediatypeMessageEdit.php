@@ -76,7 +76,12 @@ class CControllerMediatypeMessageEdit extends CController {
 			'message' => $this->getInput('message', '')
 		];
 
-		if (!$this->hasInput('message_type')) {
+		if ($this->hasInput('message_type')) {
+			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
+			$data['eventsource'] = $from['eventsource'];
+			$data['recovery'] = $from['recovery'];
+		}
+		else {
 			$diff = array_diff($this->message_types, $data['message_types']);
 			$diff = reset($diff);
 			$data['message_type'] = $diff ?: CMediatypeHelper::MSG_TYPE_PROBLEM;
@@ -85,11 +90,6 @@ class CControllerMediatypeMessageEdit extends CController {
 			);
 			$data['subject'] = $message_template['subject'];
 			$data['message'] = $message_template['message'];
-		}
-		else {
-			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
-			$data['eventsource'] = $from['eventsource'];
-			$data['recovery'] = $from['recovery'];
 		}
 
 		$output = [

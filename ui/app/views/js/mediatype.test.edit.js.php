@@ -47,11 +47,11 @@ window.mediatype_test_edit_popup = new class {
 			<?= json_encode(CCsrfTokenHelper::get('mediatype'), JSON_THROW_ON_ERROR) ?>
 		);
 
-		document.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
+		this.form.querySelector('#mediatypetest_log')?.classList.add('<?= ZBX_STYLE_DISABLED ?>');
 
 		// Trim fields.
 		for (let key in fields) {
-			if(['sendto', 'subject', 'message'].includes(key)) {
+			if (['sendto', 'subject', 'message'].includes(key)) {
 				fields[key] = fields[key].trim();
 			}
 		}
@@ -123,19 +123,21 @@ window.mediatype_test_edit_popup = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				if ('debug' in response) {
-					$('#mediatypetest_log').removeClass('disabled');
+					this.form.querySelector('#mediatypetest_log').classList.remove('disabled');
 					sessionStorage.setItem('mediatypetest', JSON.stringify(response.debug));
 				}
 
 				if ('response' in response) {
 					// Set 'webhook_response_value' input field value
-					const response_value_element = document.querySelector('#webhook_response_value');
+					const response_value_element = this.form.querySelector('#webhook_response_value');
+
 					if (response_value_element) {
 						response_value_element.value = response.response.value;
 					}
 
 					// Set 'webhook_response_type' text element value
-					const response_type_element = document.querySelector('#webhook_response_type');
+					const response_type_element = this.form.querySelector('#webhook_response_type');
+
 					if (response_type_element) {
 						response_type_element.textContent = response.response.type;
 					}

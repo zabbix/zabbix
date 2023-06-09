@@ -102,7 +102,7 @@ class CControllerMediatypeEnable extends CController {
 
 			if ($incomplete_configurations) {
 				$output['error']['messages'][] = _s(
-					'%1$s: %2$s', _('Incomplete configuration'), implode(',', $incomplete_configurations)
+					'%1$s: %2$s', _('Incomplete configuration'), implode(', ', $incomplete_configurations)
 				);
 			}
 		}

@@ -84,12 +84,11 @@ class CControllerMediatypeList extends CController {
 				'gsm_modem', 'username', 'status', 'provider'
 			],
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
+				'name' => $filter['name'] === '' ? null : $filter['name']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status']
+				'status' => $filter['status'] == -1 ? null : $filter['status']
 			],
-			'editable' => true,
 			'limit' => $limit,
 			'preservekeys' => true
 		]);

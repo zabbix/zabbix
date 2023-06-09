@@ -105,8 +105,8 @@ $form
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	->addItem(
 		(new CScriptTag('mediatype_message_popup.init('.json_encode([
-				'message_templates' => CMediatypeHelper::getAllMessageTemplates()
-			]).');'))->setOnDocumentReady()
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
+		]).');'))->setOnDocumentReady()
 	);
 
 $output = [
@@ -114,7 +114,7 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => [
 		[
-			'title' => ($data['params']['old_message_type'] == -1) ? _('Add') : _('Update'),
+			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
 			'class' => 'dialogue-widget-save',
 			'keepOpen' => true,
 			'isSubmit' => true,

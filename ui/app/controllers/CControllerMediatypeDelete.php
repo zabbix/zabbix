@@ -73,7 +73,6 @@ class CControllerMediatypeDelete extends CController {
 			$mediatypes = API::MediaType()->get([
 				'output' => [],
 				'mediatypeids' => $mediatypeids,
-				'editable' => true,
 				'preservekeys' => true
 			]);
 
