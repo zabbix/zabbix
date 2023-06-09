@@ -68,8 +68,8 @@ class testPageSearch extends CWebTest {
 				['name' => 'Latest data', 'href' => 'zabbix.php?action=latest.view&filter_groupids%5B%5D={id}&filter_set=1'],
 				['name' => 'Problems', 'href' => 'zabbix.php?action=problem.view&filter_groupids%5B%5D={id}&filter_set=1'],
 				['name' => 'Web', 'href' => 'zabbix.php?action=web.view&filter_groupids%5B%5D={id}&filter_set=1'],
-				['name' => 'Hosts', 'href' => 'hosts.php?filter_set=1&filter_groups%5B0%5D={id}', 'entity_count' => 1],
-				['name' => 'Templates', 'href' => 'templates.php?filter_set=1&filter_groups%5B0%5D={id}', 'entity_count' => 1]
+				['name' => 'Hosts', 'text' => 'Hosts 1', 'href' => 'hosts.php?filter_set=1&filter_groups%5B0%5D={id}'],
+				['name' => 'Templates', 'text' => 'Templates 1', 'href' => 'templates.php?filter_set=1&filter_groups%5B0%5D={id}']
 			]
 		],
 		'templates' => [
@@ -214,22 +214,17 @@ class testPageSearch extends CWebTest {
 			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
 
 			foreach ($widget_params['columns'] as $i => $column) {
-				// If no text specified, the column text should match its name.
-				$expected_text = CTestArrayHelper::get($column, 'text', $column['name']);
 				// The same column name is sometimes used twice so need to access column by index.
 				$column_element = $table_first_row->getColumn($i);
 
+				// If no text specified, the column text should match its name.
+				$this->assertEquals(CTestArrayHelper::get($column, 'text', $column['name']), $column_element->getText());
+
 				if (isset($column['href'])) {
-					// Sometimes there might be an entity counter next to the link.
-					if(isset($column['entity_count'])){
-						$expected_text .= ' '.$column['entity_count'];
-					}
 					// Check that the link href matches.
 					$expected_href = str_replace('{id}', $widget_params['link_id'], $column['href']);
 					$this->assertEquals($expected_href, $column_element->query('tag:a')->one()->getAttribute('href'));
 				}
-
-				$this->assertEquals($expected_text, $column_element->getText());
 			}
 
 			// Check expanding functionality.
@@ -351,9 +346,9 @@ class testPageSearch extends CWebTest {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
 			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
-				'WHERE h.status in (0,1) AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\''.
-				' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\' OR i.dns LIKE \'%'.$data['search_string'].
-				'%\' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
+				'WHERE h.status in (0,1) AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' '.
+				'OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\' OR i.dns LIKE \'%'.$data['search_string'].'%\' '.
+				'OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
 			$db_count = [];
 			foreach (['hosts' => $host_sql, 'host_groups' => $hostgroup_sql, 'templates' => $template_sql] as $type => $sql) {
@@ -440,6 +435,12 @@ class testPageSearch extends CWebTest {
 				[
 					'search_string' => STRING_128,
 					'expected_suggestions' => [STRING_128]
+				]
+			],
+			[
+				[
+					'search_string' => 'st obj',
+					'expected_suggestions' => ['Test object Host']
 				]
 			]
 		];
