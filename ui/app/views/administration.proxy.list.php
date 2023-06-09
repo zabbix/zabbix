@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('proxy.list.js.php');
+$this->includeJsFile('administration.proxy.list.js.php');
 
 $filter = (new CFilter())
 	->addVar('action', 'proxy.list')
@@ -184,7 +184,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			(new CLink($proxy['host']))
 				->addClass('js-edit-proxy')
 				->setAttribute('data-proxyid', $proxyid)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$info_icons ? [$version, NBSP(), makeInformationList($info_icons)] : $version,
