@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-03-22 08:35+0000\n"
-"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
+"PO-Revision-Date: 2023-06-07 10:47+0000\n"
+"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -9459,12 +9459,12 @@ msgstr "Прототип узла сети с именем узла сети \"%
 #: include/classes/api/services/CHostPrototype.php:1127
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of host \"%3$s\"."
-msgstr ""
+msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\" узла сети \"%3$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:1124
 #, c-format
 msgid "Host prototype with visible name \"%1$s\" already exists in discovery rule \"%2$s\" of template \"%3$s\"."
-msgstr ""
+msgstr "Прототип узла сети с видимым именем \"%1$s\" уже существует в правиле обнаружения \"%2$s\" шаблона \"%3$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:1026
 #, c-format
@@ -12054,7 +12054,7 @@ msgstr "LLD макросы"
 
 #: include/classes/api/services/CItemGeneralOld.php:700
 msgid "LLD rule with the same UUID already exists"
-msgstr ""
+msgstr "Правило низкоуровневого обнаружения с таким UUID уже существует"
 
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:59
@@ -24192,11 +24192,11 @@ msgstr "глобальные настройки очистки истории"
 
 #: include/classes/api/services/CGraphGeneral.php:874
 msgid "graph prototype with the same UUID already exists"
-msgstr ""
+msgstr "прототип графика с таким UUID уже существует"
 
 #: include/classes/api/services/CGraphGeneral.php:868
 msgid "graph with the same UUID already exists"
-msgstr ""
+msgstr "график с таким UUID уже существует"
 
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
@@ -24225,7 +24225,7 @@ msgstr "группа узла сети"
 
 #: include/classes/api/services/CHostGroup.php:795
 msgid "host group with the same UUID already exists"
-msgstr ""
+msgstr "группа узлов сети с таким UUID уже существует"
 
 #: include/classes/widgets/CWidgetHelper.php:799
 #: include/classes/widgets/CWidgetHelper.php:1158
@@ -24235,7 +24235,7 @@ msgstr "шаблон узла сети"
 
 #: include/classes/api/services/CHostPrototype.php:1190
 msgid "host prototype with the same UUID already exists"
-msgstr ""
+msgstr "прототип узла сети с таким UUID уже существует"
 
 #: include/classes/api/services/CMap.php:844
 #: include/classes/api/services/CMap.php:1311
@@ -24470,11 +24470,11 @@ msgstr "шаблон элемента данных"
 
 #: include/classes/api/services/CItemGeneral.php:486
 msgid "item prototype with the same UUID already exists"
-msgstr ""
+msgstr "прототип элемента данных с таким UUID уже существует"
 
 #: include/classes/api/services/CItemGeneral.php:480
 msgid "item with the same UUID already exists"
-msgstr ""
+msgstr "элемент данных с таким UUID уже существует"
 
 #: include/classes/parsers/CItemKey.php:54
 msgid "key is empty"
@@ -24639,7 +24639,7 @@ msgstr "достигнуто максимальное количество за�
 #: include/classes/validators/CApiInputValidator.php:1726
 #, c-format
 msgid "maximum number of array elements is %1$s"
-msgstr ""
+msgstr "максимальное количество элементов массива равно %1$s"
 
 #: include/classes/api/services/CItemGeneral.php:2396
 #: include/classes/import/CConfigurationImport.php:2761
@@ -24794,7 +24794,7 @@ msgstr "нет данных"
 #: include/classes/api/services/CHostPrototype.php:1360
 #, c-format
 msgid "no default interface for \"%1$s\" type"
-msgstr ""
+msgstr "для типа \"%1$s\" нет интерфейса по умолчанию"
 
 #: include/classes/api/services/CHostPrototype.php:1205
 #, c-format
@@ -25256,11 +25256,11 @@ msgstr ""
 
 #: include/classes/api/services/CTemplateGroup.php:594
 msgid "template group with the same UUID already exists"
-msgstr ""
+msgstr "группа шаблонов с таким UUID уже существует"
 
 #: include/classes/api/services/CTemplate.php:458
 msgid "template with the same UUID already exists"
-msgstr ""
+msgstr "шаблон с таким UUID уже существует"
 
 #: include/classes/api/services/CItemGeneral.php:1577
 #: include/classes/api/services/CItemGeneral.php:1594
@@ -25395,7 +25395,7 @@ msgstr "прототип триггера нельзя переместить в
 
 #: include/classes/api/services/CTriggerGeneral.php:686
 msgid "trigger prototype with the same UUID already exists"
-msgstr ""
+msgstr "прототип триггера с таким UUID уже существует"
 
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
@@ -25403,7 +25403,7 @@ msgstr "триггер со связями нельзя переместить �
 
 #: include/classes/api/services/CTriggerGeneral.php:680
 msgid "trigger with the same UUID already exists"
-msgstr ""
+msgstr "триггер с таким UUID уже существует"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
 msgid "trim() - Remove specified characters from the beginning and the end of a string"

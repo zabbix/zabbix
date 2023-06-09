@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-08 14:49+0000\n"
+"PO-Revision-Date: 2023-06-03 13:02+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -3351,7 +3351,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\" en raison de 
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" à l'hôte \"%2$s\", car il serait lié deux fois via le modèle \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
@@ -3377,7 +3377,7 @@ msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\" en 
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au prototype d'hôte \"%2$s\", car il serait lié deux fois via le modèle \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3413,37 +3413,37 @@ msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\" car une liais
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car il serait lié deux fois à l'hôte \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car il serait lié deux fois au prototype hôte \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car il serait lié deux fois au modèle \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car il serait lié deux fois via le modèle \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car son modèle parent \"%3$s\" serait lié deux fois à l'hôte \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car son modèle parent \"%3$s\" serait lié deux fois au prototype hôte \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "Impossible de lier le modèle \"%1$s\" au modèle \"%2$s\", car son modèle parent \"%3$s\" serait lié deux fois au modèle \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
