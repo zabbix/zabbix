@@ -24,41 +24,14 @@
 
 struct zbx_pdc_history_data
 {
+	zbx_pdc_state_t			state;
 	zbx_vector_pdc_history_ptr_t	rows;
+	zbx_db_insert_t			db_insert;
 };
 
 static void	pdc_history_free(zbx_pdc_history_t *row)
 {
 	zbx_free(row);
-}
-
-static void	pdc_history_flush_db(zbx_pdc_history_data_t *data)
-{
-	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	id;
-	int		now;
-
-	if (0 == data->rows.values_num)
-		return;
-
-	now = (int)time(NULL);
-
-	id = zbx_db_get_maxid_num("proxy_history", data->rows.values_num);
-
-	zbx_db_insert_prepare(&db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source", "serverity",
-			"value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags", "write_clock", NULL);
-
-	for (int i = 0; i < data->rows.values_num; i++)
-	{
-		zbx_pdc_history_t	*row = data->rows.values[i];
-
-		zbx_db_insert_add_values(&db_insert, id++, row->itemid, row->ts.sec, row->timestamp, row->source,
-				row->severity, row->value, row->logeventid, row->ts.ns, row->state, row->lastlogsize,
-				row->mtime, row->flags, now);
-	}
-
-	(void)zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 }
 
 /******************************************************************************
@@ -74,6 +47,22 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
 
 	data = (zbx_pdc_history_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_data_t));
 	zbx_vector_pdc_history_ptr_create(&data->rows);
+	data->state = pdc_dst[pdc_cache->state];
+
+	if (PDC_MEMORY == data->state)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
+		data->state = PDC_DATABASE_ONLY;
+
+		/* zbx_vector_pdc_history_ptr_create(&data->rows); */
+	}
+
+	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
+	{
+		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
+				"serverity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
+				"write_clock", NULL);
+	}
 
 	return data;
 }
@@ -85,19 +74,18 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
  ******************************************************************************/
 void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 {
-	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+	if (PDC_MEMORY == data->state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
-		pdc_cache->state = PDC_DATABASE_ONLY;
-
-		/* TODO: change to 'else' after memory cache implementation */
+		zbx_vector_pdc_history_ptr_clear_ext(&data->rows, pdc_history_free);
+		zbx_vector_pdc_history_ptr_destroy(&data->rows);
+	}
+	else
+	{
+		zbx_db_insert_autoincrement(&data->db_insert, "id");
+		(void)zbx_db_insert_execute(&data->db_insert);
+		zbx_db_insert_clean(&data->db_insert);
 	}
 
-	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
-			pdc_history_flush_db(data);
-
-	zbx_vector_pdc_history_ptr_clear_ext(&data->rows, pdc_history_free);
-	zbx_vector_pdc_history_ptr_destroy(&data->rows);
 	zbx_free(data);
 }
 
@@ -105,23 +93,32 @@ static void	pdc_history_add_value(zbx_pdc_history_data_t *data, zbx_uint64_t ite
 		const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime, int timestamp, int logeventid,
 		int severity, const char *source)
 {
-	zbx_pdc_history_t	*row;
+	if (PDC_MEMORY == data->state)
+	{
+		zbx_pdc_history_t	*row;
 
-	row = (zbx_pdc_history_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_t));
+		row = (zbx_pdc_history_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_t));
 
-	row->itemid = itemid;
-	row->state = state;
-	row->value = value;
-	row->ts = *ts;
-	row->flags = flags;
-	row->lastlogsize = lastlogsize;
-	row->mtime = mtime;
-	row->timestamp = timestamp;
-	row->logeventid = logeventid;
-	row->severity = severity;
-	row->source = source;
+		row->itemid = itemid;
+		row->state = state;
+		row->value = value;
+		row->ts = *ts;
+		row->flags = flags;
+		row->lastlogsize = lastlogsize;
+		row->mtime = mtime;
+		row->timestamp = timestamp;
+		row->logeventid = logeventid;
+		row->severity = severity;
+		row->source = source;
 
-	zbx_vector_pdc_history_ptr_append(&data->rows, row);
+		zbx_vector_pdc_history_ptr_append(&data->rows, row);
+	}
+	else
+	{
+		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), itemid, ts->sec, timestamp, source, severity,
+				value, logeventid, ts->ns, state, lastlogsize, mtime, flags, time(NULL));
+
+	}
 }
 
 /******************************************************************************

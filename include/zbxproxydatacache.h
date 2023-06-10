@@ -23,6 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxtime.h"
 
+int	zbx_pdc_init(zbx_uint64_t size, int age, char **error);
+
 typedef struct zbx_pdc_discovery_data zbx_pdc_discovery_data_t;
 typedef struct zbx_pdc_history_data zbx_pdc_history_data_t;
 

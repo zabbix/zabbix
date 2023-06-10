@@ -24,7 +24,9 @@
 
 struct zbx_pdc_discovery_data
 {
+	zbx_pdc_state_t			state;
 	zbx_vector_pdc_discovery_ptr_t	rows;
+	zbx_db_insert_t			db_insert;
 };
 
 static void	pdc_discovery_free(zbx_pdc_discovery_t *row)
@@ -33,36 +35,6 @@ static void	pdc_discovery_free(zbx_pdc_discovery_t *row)
 	zbx_free(row->dns);
 	zbx_free(row->value);
 	zbx_free(row);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: flush locally cached discovery data to database                   *
- *                                                                            *
- ******************************************************************************/
-static void	pdc_discovery_flush_db(zbx_pdc_discovery_data_t *data)
-{
-	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	id;
-
-	if (0 == data->rows.values_num)
-		return;
-
-	id = zbx_db_get_maxid_num("proxy_dhistory", data->rows.values_num);
-
-	zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-			"dcheckid", "dns", NULL);
-
-	for (int i = 0; i < data->rows.values_num; i++)
-	{
-		zbx_pdc_discovery_t	*row = data->rows.values[i];
-
-		zbx_db_insert_add_values(&db_insert, id++, row->clock, row->druleid, row->ip, row->port, row->value,
-				row->status, row->dcheckid, row->dns);
-	}
-
-	(void)zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 }
 
 /******************************************************************************
@@ -77,7 +49,21 @@ zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
 	zbx_pdc_discovery_data_t	*data;
 
 	data = (zbx_pdc_discovery_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_data_t));
-	zbx_vector_pdc_discovery_ptr_create(&data->rows);
+	data->state = pdc_dst[pdc_cache->state];
+
+	if (PDC_MEMORY == data->state)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
+		data->state = PDC_DATABASE_ONLY;
+
+		/* zbx_vector_pdc_discovery_ptr_create(&data->rows); */
+	}
+
+	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
+	{
+		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
+				"value", "status", "dcheckid", "dns", NULL);
+	}
 
 	return data;
 }
@@ -89,20 +75,44 @@ zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
  ******************************************************************************/
 void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 {
-	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+	if (PDC_MEMORY == data->state)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
-		pdc_cache->state = PDC_DATABASE_ONLY;
-
-		/* TODO: change to 'else' after memory cache implementation */
+		zbx_vector_pdc_discovery_ptr_clear_ext(&data->rows, pdc_discovery_free);
+		zbx_vector_pdc_discovery_ptr_destroy(&data->rows);
+	}
+	else
+	{
+		zbx_db_insert_autoincrement(&data->db_insert, "id");
+		(void)zbx_db_insert_execute(&data->db_insert);
+		zbx_db_insert_clean(&data->db_insert);
 	}
 
-	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
-			pdc_discovery_flush_db(data);
-
-	zbx_vector_pdc_discovery_ptr_clear_ext(&data->rows, pdc_discovery_free);
-	zbx_vector_pdc_discovery_ptr_destroy(&data->rows);
 	zbx_free(data);
+}
+
+static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+		const char *ip, const char *dns, int port, int status, const char *value, int clock)
+{
+	if (PDC_MEMORY == data->state)
+	{
+		zbx_pdc_discovery_t	*row;
+
+		row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
+		row->druleid = druleid;
+		row->dcheckid = dcheckid;
+		row->ip = zbx_strdup(NULL, ip);
+		row->dns = zbx_strdup(NULL, dns);
+		row->port = port;
+		row->status = status;
+		row->value = zbx_strdup(NULL, value);
+		row->clock = clock;
+		zbx_vector_pdc_discovery_ptr_append(&data->rows, row);
+	}
+	else
+	{
+		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
+				dcheckid, dns);
+	}
 }
 
 /******************************************************************************
@@ -113,18 +123,7 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		const char *ip, const char *dns, int port, int status, const char *value, int clock)
 {
-	zbx_pdc_discovery_t	*row;
-
-	row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
-	row->druleid = druleid;
-	row->dcheckid = dcheckid;
-	row->ip = zbx_strdup(NULL, ip);
-	row->dns = zbx_strdup(NULL, dns);
-	row->port = port;
-	row->status = status;
-	row->value = zbx_strdup(NULL, value);
-	row->clock = clock;
-	zbx_vector_pdc_discovery_ptr_append(&data->rows, row);
+	pdc_discovery_write_service(data, druleid, dcheckid, ip, dns, port, status, value, clock);
 }
 
 /******************************************************************************
@@ -132,19 +131,8 @@ void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_
  * Purpose: write host data into discovery data cache                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip, const char *dns,
-		int status, int clock)
+void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
+		const char *dns, int status, int clock)
 {
-	zbx_pdc_discovery_t	*row;
-
-	row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
-	row->druleid = druleid;
-	row->dcheckid = 0;
-	row->ip = zbx_strdup(NULL, ip);
-	row->dns = zbx_strdup(NULL, dns);
-	row->port = 0;
-	row->status = status;
-	row->value = zbx_strdup(NULL, "");
-	row->clock = clock;
-	zbx_vector_pdc_discovery_ptr_append(&data->rows, row);
+	pdc_discovery_write_service(data, druleid, 0, ip, dns, 0, status, "", clock);
 }
