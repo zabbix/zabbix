@@ -1013,7 +1013,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Cancel editing dashboard not to interfere with following cases from data provider.
 		$this->query('link:Cancel')->one()->click();
-		$this->page->acceptAlert();
 	}
 
 	/**
@@ -1204,7 +1203,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			);
 
 			// It should not be possible only to Delete the widget and only when the dashboard is in edit mode.
-			$button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-edit').']')->one();
+			$button = $inaccessible_widget->query('xpath:.//button['.CXPathHelper::fromClass('js-widget-action').']')->one();
 
 			if ($mode === 'edit') {
 				$popup_menu = $button->waitUntilPresent()->asPopupButton()->getMenu();

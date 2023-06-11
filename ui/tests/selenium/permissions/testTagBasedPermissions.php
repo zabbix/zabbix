@@ -198,7 +198,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 			// Select trigger
 			$this->zbxTestClickButtonMultiselect('triggerids_0');
 			$this->zbxTestLaunchOverlayDialog('Triggers');
-			COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext($this->trigger_host);
+			COverlayDialogElement::find()->waitUntilReady()->one()->setDataContext($this->trigger_host);
 			$this->zbxTestClickLinkTextWait($name);
 			COverlayDialogElement::ensureNotPresent();
 			// Apply filter
