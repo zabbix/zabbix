@@ -3874,8 +3874,8 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 			if (NULL != event)
 			{
-				 tls_socket_event(s->tls_ctx->ctx, err, event);
-				 return offset;
+				tls_socket_event(s->tls_ctx->ctx, err, event);
+				return offset;
 			}
 
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
