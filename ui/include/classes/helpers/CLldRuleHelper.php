@@ -111,10 +111,10 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			}
 		}
 
-		CItemPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
-		CTriggerPrototypeHelper::copy($src_options, $dst_options);
-
-		return true;
+		return CItemPrototypeHelper::copy($src_options, $dst_options, $dst_itemids)
+			&& CTriggerPrototypeHelper::copy($src_options, $dst_options)
+			&& CGraphPrototypeHelper::copy($src_options, $dst_options)
+			&& CHostPrototypeHelper::copy($src_options, $dst_options, $dst_itemids);
 	}
 
 	/**
@@ -122,7 +122,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 *
 	 * @return array
 	 */
-	private static function getSourceLldRules($src_options): array {
+	private static function getSourceLldRules(array $src_options): array {
 		return API::DiscoveryRule()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status',
 

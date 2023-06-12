@@ -202,44 +202,12 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 	 */
 	private function copyFromCloneSourceHost(string $src_hostid, string $hostid): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_hostid, $hostid)) {
+		if (!copyHttpTests($src_hostid, $hostid)
+				|| !CItemHelper::cloneHostItems($src_hostid, $hostid)
+				|| !CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)
+				|| !CGraphHelper::cloneHostGraphs($src_hostid, $hostid)
+				|| !CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
 			return false;
-		}
-
-		if (!CItemHelper::cloneHostItems($src_hostid, $hostid)) {
-			return false;
-		}
-
-		if (!CTriggerHelper::cloneHostTriggers($src_hostid, $hostid)) {
-			return false;
-		}
-
-		if (!CLldRuleHelper::cloneHostItems($src_hostid, $hostid)) {
-			throw new Exception();
-		}
-
-		// Copy graphs.
-		$db_graphs = API::Graph()->get([
-			'output' => ['graphid'],
-			'selectHosts' => ['hostid'],
-			'selectItems' => ['type'],
-			'hostids' => $src_hostid,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
-			'inherited' => false
-		]);
-
-		foreach ($db_graphs as $db_graph) {
-			if (count($db_graph['hosts']) > 1) {
-				continue;
-			}
-
-			if (httpItemExists($db_graph['items'])) {
-				continue;
-			}
-
-			if (!copyGraphToHost($db_graph['graphid'], $hostid)) {
-				return false;
-			}
 		}
 
 		return true;

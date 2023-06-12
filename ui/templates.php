@@ -341,36 +341,15 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		// clone
 		if ($cloneTemplateId != 0 && getRequest('form') === 'clone') {
-
 			/*
 			 * First copy web scenarios with web items, so that later regular items can use web item as their master
 			 * item.
 			 */
-			if (!copyHttpTests($cloneTemplateId, $input_templateid)) {
-				throw new Exception();
-			}
-
-			if (!CItemHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
-				throw new Exception();
-			}
-
-			if (!CTriggerHelper::cloneTemplateTriggers($cloneTemplateId, $input_templateid)) {
-				throw new Exception();
-			}
-
-			// copy graphs
-			$dbGraphs = API::Graph()->get([
-				'output' => ['graphid'],
-				'hostids' => $cloneTemplateId,
-				'inherited' => false
-			]);
-
-			foreach ($dbGraphs as $dbGraph) {
-				copyGraphToHost($dbGraph['graphid'], $input_templateid);
-			}
-
-			// copy discovery rules
-			if (!CLldRuleHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
+			if (!copyHttpTests($cloneTemplateId, $input_templateid)
+					|| !CItemHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)
+					|| !CTriggerHelper::cloneTemplateTriggers($cloneTemplateId, $input_templateid)
+					|| !CGraphHelper::cloneTemplateGraphs($cloneTemplateId, $input_templateid)
+					|| !CLldRuleHelper::cloneTemplateItems($cloneTemplateId, $input_templateid)) {
 				throw new Exception();
 			}
 

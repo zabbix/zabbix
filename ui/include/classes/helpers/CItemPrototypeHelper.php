@@ -57,12 +57,7 @@ class CItemPrototypeHelper extends CItemGeneralHelper {
 			}
 		}
 
-		try {
-			$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
-		}
-		catch (Exception $e) {
-			return false;
-		}
+		$dst_master_itemids = self::getDestinationMasterItems($src_items, $dst_options);
 
 		do {
 			$dst_items = [];

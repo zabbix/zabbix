@@ -399,55 +399,6 @@ function interfaceIdsByType(array $interfaces) {
 }
 
 /**
- * Description:
- * Replace items for specified host
- *
- * Comments:
- * $error= true : rise Error if item doesn't exist (error generated), false: special processing (NO error generated)
- */
-function get_same_item_for_host($item, $dest_hostids) {
-	$return_array = is_array($dest_hostids);
-	zbx_value2array($dest_hostids);
-
-	if (!is_array($item)) {
-		$itemid = $item;
-	}
-	elseif (isset($item['itemid'])) {
-		$itemid = $item['itemid'];
-	}
-
-	$same_item = null;
-	$same_items = [];
-
-	if (isset($itemid)) {
-		$db_items = DBselect(
-			'SELECT src.*'.
-			' FROM items src,items dest'.
-			' WHERE dest.itemid='.zbx_dbstr($itemid).
-				' AND src.key_=dest.key_'.
-				' AND '.dbConditionInt('src.hostid', $dest_hostids)
-		);
-		while ($db_item = DBfetch($db_items)) {
-			if (is_array($item)) {
-				$same_item = $db_item;
-				$same_items[$db_item['itemid']] = $db_item;
-			}
-			else {
-				$same_item = $db_item['itemid'];
-				$same_items[$db_item['itemid']] = $db_item['itemid'];
-			}
-		}
-		if ($return_array) {
-			return $same_items;
-		}
-		else {
-			return $same_item;
-		}
-	}
-	return false;
-}
-
-/**
  * Get parent templates for each given item.
  *
  * @param array  $items                  An array of items.

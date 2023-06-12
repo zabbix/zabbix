@@ -65,12 +65,7 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 				'preservekeys' => true
 			] + $dst_options);
 
-		try {
-			$dst_master_triggerids = self::getDestinationMasterTriggers($src_hosts, $dst_hosts);
-		}
-		catch (Exception $e) {
-			return false;
-		}
+		$dst_master_triggerids = self::getDestinationMasterTriggers($src_hosts, $dst_hosts);
 
 		do {
 			$dst_triggers = [];

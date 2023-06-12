@@ -71,9 +71,11 @@ class CTriggerHelper extends CTriggerGeneralHelper {
 		elseif (!array_key_exists('hostids', $src_options)) {
 			foreach ($src_triggers as $src_trigger) {
 				if (count($src_trigger['hosts']) > 1) {
-					error(_s('Cannot copy trigger "%1$s", because it has multiple hosts in the expression.',
-						$src_trigger['description']
-					));
+					$error = reset($src_trigger['hosts'])['status'] == HOST_STATUS_TEMPLATE
+						? _('Cannot copy trigger "%1$s", because it has multiple templates in the expression.')
+						: _('Cannot copy trigger "%1$s", because it has multiple hosts in the expression.');
+
+					error(sprintf($error, $src_trigger['description']));
 
 					return false;
 				}
@@ -217,7 +219,7 @@ class CTriggerHelper extends CTriggerGeneralHelper {
 			],
 			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
-			'selectHosts' => ['hostid', 'host'],
+			'selectHosts' => ['hostid', 'host', 'status'],
 			'preservekeys' => true
 		] + $src_options);
 
