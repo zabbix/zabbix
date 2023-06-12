@@ -166,6 +166,7 @@ typedef struct
 	gnutls_session_t		ctx;
 	gnutls_psk_client_credentials_t	psk_client_creds;
 	gnutls_psk_server_credentials_t	psk_server_creds;
+	unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
 #if defined(HAVE_OPENSSL_WITH_PSK)
