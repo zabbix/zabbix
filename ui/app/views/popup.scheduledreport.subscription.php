@@ -30,12 +30,10 @@ $form = (new CForm())
 	->addVar('recipient_type', $data['recipient_type'])
 	->addVar('recipient_name', $data['recipient_name'])
 	->addVar('recipient_inaccessible', $data['recipient_inaccessible'])
-	->addVar('update', 1)
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->addVar('update', 1);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['old_recipientid']) {
 	$form->addVar('old_recipientid', $data['old_recipientid']);

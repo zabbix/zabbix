@@ -109,26 +109,29 @@ $form = (new CForm())
 	->addVar('add', '1')
 	->addVar('media', $options['media'])
 	->addVar('dstfrm', $options['dstfrm'])
-	->setId('media_form')
-	->addItem([
-		$media_form,
-		(new CInput('submit', 'submit'))->addStyle('display: none;'),
-		(new CTag('script'))
-			->addItem((new CRow([
-				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
-					->setAriaRequired()
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				)),
-				(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
-				))
-			]))
-				->addClass('form_row')
-				->addClass('dynamic-row'))
-				->setAttribute('type', 'text/x-jquery-tmpl')
-				->setAttribute('id', 'email_send_to_table_row')
-	]);
+	->setId('media_form');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form->addItem([
+	$media_form,
+	(new CTag('script'))
+		->addItem((new CRow([
+			(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
+				->setAriaRequired()
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)),
+			(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+			))
+		]))
+			->addClass('form_row')
+			->addClass('dynamic-row'))
+			->setAttribute('type', 'text/x-jquery-tmpl')
+			->setAttribute('id', 'email_send_to_table_row')
+]);
 
 $output = [
 	'header' => $data['title'],

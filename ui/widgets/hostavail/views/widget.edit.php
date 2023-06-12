@@ -28,7 +28,7 @@
 
 (new CWidgetFormView($data))
 	->addField(array_key_exists('groupids', $data['fields'])
-		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['ms']['groups']['groupids'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
 		: null
 	)
 	->addField(

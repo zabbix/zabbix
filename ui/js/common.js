@@ -340,7 +340,9 @@ function PopUp(action, parameters, {
 	trigger_element = document.activeElement,
 	prevent_navigation = false
 } = {}) {
-	var overlay = overlays_stack.getById(dialogueid);
+	hintBox.deleteAll();
+
+	let overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
@@ -914,6 +916,17 @@ function showHideVisible(obj) {
 }
 
 /**
+ * Check if element is visible.
+ *
+ * @param {object} element
+ *
+ * @return {boolean}
+ */
+function isVisible(element) {
+	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
+}
+
+/**
  * Switch element classes and return final class.
  *
  * @param object|string obj			object or object id
@@ -1081,7 +1094,6 @@ function visibilityStatusChanges(value, objectid, replace_to) {
 		}
 		else if (!value) {
 			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
 			new_obj.setAttribute('id', obj.id);
 			new_obj.innerHTML = replace_to;
 			new_obj.originalObject = obj;

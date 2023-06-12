@@ -142,7 +142,6 @@
 						postMessageDetails('success', response.success.messages);
 					}
 
-					this.disableNavigationWarning();
 					this.cancelEditing();
 				})
 				.catch((exception) => {
@@ -176,6 +175,8 @@
 		},
 
 		cancelEditing() {
+			this.disableNavigationWarning();
+
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'template.dashboard.list');

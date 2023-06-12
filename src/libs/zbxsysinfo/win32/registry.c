@@ -25,6 +25,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxlog.h"
 
 #include <locale.h>
 #include <winreg.h>
