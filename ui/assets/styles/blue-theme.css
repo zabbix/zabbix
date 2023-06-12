@@ -2791,9 +2791,8 @@ output {
     top: 8px;
     left: -42px;
     font-size: 28px;
-    color: #fff;
-    text-shadow: 0 0 5px rgba(0, 0, 0, 0.9);
-    opacity: 0.9; }
+    color: rgba(255, 255, 255, 0.9);
+    text-shadow: 0 0 5px rgba(0, 0, 0, 0.9); }
   output > span {
     font-size: 1.167em; }
   output .link-action {
@@ -6293,6 +6292,8 @@ svg {
       left: -8px;
       width: 10px;
       height: 24px; }
+    .preprocessing-list .preprocessing-step div {
+      height: 34px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
     .preprocessing-list .step-parameters z-select {
