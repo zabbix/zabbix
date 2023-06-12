@@ -331,7 +331,7 @@ class testPageSearch extends CWebTest {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
 			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h LEFT JOIN interface i on i.hostid=h.hostid '.
-				'WHERE h.status in (0,1) AND h.flags=0 AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' '.
+				'WHERE h.status in (0,1) AND h.flags in (0,4) AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' '.
 				'OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\' OR i.dns LIKE \'%'.$data['search_string'].'%\' '.
 				'OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
