@@ -38,11 +38,12 @@ class CHistFunctionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false    Enable user macros usage in function parameters.
-	 *   'lldmacros' => false     Enable low-level discovery macros usage in function parameters.
-	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *   'usermacros' => false             Enable user macros usage in function parameters.
+	 *   'lldmacros' => false              Enable low-level discovery macros usage in function parameters.
+	 *   'host_macro' => false             Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false           Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false             Allow empty hostname in the query string.
+	 *   'no_backslash_escaping' => false  Enable backslash escaping in history functions.
 	 *
 	 * @var array
 	 */

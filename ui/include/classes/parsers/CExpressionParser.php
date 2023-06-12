@@ -48,14 +48,15 @@ class CExpressionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false            Enable user macros usage in expression.
-	 *   'lldmacros' => false             Enable low-level discovery macros usage in expression.
-	 *   'collapsed_expression' => false  Short trigger expression.
-	 *                                       For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
-	 *   'calculated' => false            Parse calculated item formula instead of trigger expression.
-	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false          Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false            Allow empty hostname in the query string.
+	 *   'usermacros' => false             Enable user macros usage in expression.
+	 *   'lldmacros' => false              Enable low-level discovery macros usage in expression.
+	 *   'collapsed_expression' => false   Short trigger expression.
+	 *                                        For example: {439} > {$MAX_THRESHOLD} or {439} < {$MIN_THRESHOLD}
+	 *   'calculated' => false             Parse calculated item formula instead of trigger expression.
+	 *   'host_macro' => false             Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false           Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false             Allow empty hostname in the query string.
+	 *   'no_backslash_escaping' => false  Enable backslash escaping in history functions.
 	 *
 	 * @var array
 	 */
