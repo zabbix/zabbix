@@ -74,10 +74,19 @@ class CSvgGraphHelper {
 
 		// Get problems to display in graph.
 		if ($options['problems']['show_problems'] == SVG_GRAPH_PROBLEMS_SHOW) {
-			$options['problems']['itemids'] =
-				($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS)
-					? array_unique(zbx_objectValues($metrics, 'itemid'))
-					: null;
+			if ($options['problems']['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS) {
+				$options['problems']['itemids'] = [];
+
+				foreach ($metrics as $metric) {
+					$options['problems']['itemids'] += $metric['options']['aggregate_function'] != AGGREGATE_NONE
+						? array_column($metric['items'], 'itemid', 'itemid')
+						: [$metric['itemid'] => $metric['itemid']];
+				}
+				$options['problems']['itemids'] = array_values($options['problems']['itemids']);
+			}
+			else {
+				$options['problems']['itemids'] = null;
+			}
 
 			$problems = self::getProblems($options['problems'], $options['time_period']);
 			$graph->addProblems($problems);

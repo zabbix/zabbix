@@ -138,7 +138,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_WEEKLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_TO)
 				]);
 				break;
@@ -150,7 +150,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_QUARTERLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_TO)
 				]);
 				break;

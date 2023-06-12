@@ -187,7 +187,7 @@ class CControllerHostEdit extends CController {
 			'is_psk_edit' => $this->hasInput('tls_psk_identity') && $this->hasInput('tls_psk'),
 			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
-			'warning' => null,
+			'warnings' => [],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
@@ -229,14 +229,21 @@ class CControllerHostEdit extends CController {
 			];
 		}
 
-		foreach ($data['host']['macros'] as &$macro) {
-			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
-				$macro['allow_revert'] = true;
+		// Reset Secret text macros and set warning for cloned host.
+		if ($this->hasInput('clone') || $this->hasInput('full_clone')) {
+			foreach ($data['host']['macros'] as &$macro) {
+				if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+					$macro['deny_revert'] = true;
+
+					unset($macro['allow_revert']);
+				}
 			}
+			unset($macro);
 		}
 
-		// Reset Secret text macros and set warning for cloned host.
 		if ($data['host']['hostid'] === null) {
+			$secret_macro_reset = false;
+
 			foreach ($data['host']['macros'] as &$macro) {
 				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
 					$macro = [
@@ -244,11 +251,25 @@ class CControllerHostEdit extends CController {
 						'value' => ''
 					] + $macro;
 
-					$data['warning'] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+					unset($macro['allow_revert']);
+
+					$secret_macro_reset = true;
 				}
 			}
 			unset($macro);
+
+			if ($secret_macro_reset) {
+				$data['warnings'][] = _('The cloned host contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+			}
 		}
+
+		foreach ($data['host']['macros'] as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+					&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
+				$macro['allow_revert'] = true;
+			}
+		}
+		unset($macro);
 
 		order_result($data['host']['valuemaps'], 'name');
 		$data['host']['valuemaps'] = array_values($data['host']['valuemaps']);
@@ -258,8 +279,12 @@ class CControllerHostEdit extends CController {
 		}
 
 		// Extend data for view.
-		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups']);
+		$data['groups_ms'] = $this->hostGroupsForMultiselect($data['host']['groups'], $clone_hostid !== null);
 		unset($data['groups']);
+
+		if ($clone_hostid !== null && count($data['host']['groups']) != count($data['groups_ms'])) {
+			$data['warnings'][] = _("The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host.");
+		}
 
 		$this->extendLinkedTemplates($data['editable_templates']);
 		$this->extendProxies($data['proxies']);
@@ -281,10 +306,11 @@ class CControllerHostEdit extends CController {
 	 * Function to prepare data for host group multiselect.
 	 *
 	 * @param array $groups
+	 * @param bool  $skip_non_editable  Whether to include non-editable host groups into response.
 	 *
 	 * @return array
 	 */
-	protected function hostGroupsForMultiselect(array $groups): array {
+	protected function hostGroupsForMultiselect(array $groups, $skip_non_editable = false): array {
 		$groupids = [];
 		foreach ($groups as $group) {
 			if (array_key_exists('new', $group)) {
@@ -323,12 +349,16 @@ class CControllerHostEdit extends CController {
 				];
 			}
 			elseif (array_key_exists($group['groupid'], $groups_all)) {
+				$is_editable = array_key_exists($group['groupid'], $groups_rw);
+
+				if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN && $skip_non_editable && !$is_editable) {
+					continue;
+				}
+
 				$groups_ms[] = [
 					'id' => $group['groupid'],
 					'name' => $groups_all[$group['groupid']]['name'],
-					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
-						&& !array_key_exists($group['groupid'], $groups_rw
-					)
+					'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !$is_editable
 				];
 			}
 		}

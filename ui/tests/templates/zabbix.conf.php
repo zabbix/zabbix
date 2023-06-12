@@ -19,6 +19,11 @@ $DB['CA_FILE']			= '';
 $DB['VERIFY_HOST']		= false;
 $DB['CIPHER_LIST']		= '';
 
+// Use IEEE754 compatible value range for 64-bit Numeric (float) history values.
+// This option is enabled by default for new Zabbix installations.
+// For upgraded installations, please read database upgrade notes before enabling this option.
+$DB['DOUBLE_IEEE754']	= true;
+
 $ZBX_SERVER				= 'localhost';
 $ZBX_SERVER_PORT		= '{SERVER_PORT}';
 $ZBX_SERVER_NAME		= 'TEST_SERVER_NAME';

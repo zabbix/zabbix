@@ -37,8 +37,10 @@ $host_form = (new CForm())
 	)
 	->addVar('hostid', $data['hostid'])
 	->addVar('clone_hostid', $data['clone_hostid'])
-	->addVar('full_clone', $data['full_clone'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('full_clone', $data['full_clone']);
+
+// Enable form submitting on Enter.
+$host_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Host tab.
 $discovered_by = null;
@@ -415,7 +417,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 				->getUrl()
 		))->setTitle(_s('This field is automatically populated by item "%1$s".', $item_name));
 
-		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
+		$inventory_item = (new CSpan([' ', LARR(), ' ', $link]))->addClass('populating_item');
 		$input_field->addClass('linked_to_item');
 
 		if ($data['host']['inventory_mode'] == HOST_INVENTORY_AUTOMATIC) {
