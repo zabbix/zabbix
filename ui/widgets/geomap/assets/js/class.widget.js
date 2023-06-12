@@ -251,14 +251,6 @@ class CWidgetGeoMap extends CWidget {
 		this._map.on('zoomstart movestart resize', () => {
 			this.removeHintBoxes();
 		});
-
-		// Disable severity filter in dashboard edit mode.
-		if (this._dashboard.templateid === null) {
-			document.getElementById('dashboard-edit').addEventListener('click', () => {
-				this._map.severityFilterControl.close();
-				this._map.severityFilterControl.disable();
-			});
-		}
 	}
 
 	/**

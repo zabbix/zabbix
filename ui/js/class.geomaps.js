@@ -111,10 +111,6 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 		return this.div;
 	},
 
-	disable: function() {
-		this.div.classList.add('disabled');
-	},
-
 	close: function() {
 		this.bar.classList.remove('collapsed');
 	}
