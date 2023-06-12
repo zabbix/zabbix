@@ -7243,6 +7243,8 @@ td.inactive-bg {
   .problem-icon-link .problem-icon-list-item::before,
   .problem-icon-list .problem-icon-list-item::before {
     margin-right: 4px;
+    color: #ffffff;
+    -webkit-text-stroke: 0.4px rgba(0, 0, 0, 0.2);
     border-radius: 3px; }
 .problem-icon-link .status-na-bg::before,
 .problem-icon-list .status-na-bg::before {

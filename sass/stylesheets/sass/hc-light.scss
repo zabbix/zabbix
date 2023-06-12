@@ -912,6 +912,8 @@ td.inactive-bg {
 			@extend %icons-font;
 
 			margin-right: 4px;
+			color: $ui-bg-color;
+			-webkit-text-stroke: 0.4px rgba(0, 0, 0, .2);
 			border-radius: 3px;
 		}
 	}
