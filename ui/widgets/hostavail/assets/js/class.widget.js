@@ -20,8 +20,8 @@
 
 class CWidgetHostAvail extends CWidget {
 
-	_hasPadding() {
-		return this._view_mode == ZBX_WIDGET_VIEW_MODE_NORMAL
+	hasPadding() {
+		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
 			&& (this._fields.interface_type === undefined || this._fields.interface_type.length !== 1);
 	}
 }

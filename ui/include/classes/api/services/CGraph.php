@@ -28,6 +28,8 @@ class CGraph extends CGraphGeneral {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['graphid', 'name', 'graphtype'];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	public function __construct() {
 		parent::__construct();
 
@@ -415,117 +417,5 @@ class CGraph extends CGraphGeneral {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Validate create.
-	 *
-	 * @param array $graphs
-	 */
-	protected function validateCreate(array &$graphs) {
-		$itemIds = $this->validateItemsCreate($graphs);
-		$this->validateItems($itemIds, $graphs);
-
-		parent::validateCreate($graphs);
-	}
-
-	/**
-	 * Validate update.
-	 *
-	 * @param array $graphs
-	 * @param array $dbGraphs
-	 */
-	protected function validateUpdate(array $graphs, array $dbGraphs) {
-		// check for "itemid" when updating graph with only "gitemid" passed
-		foreach ($graphs as &$graph) {
-			if (isset($graph['gitems'])) {
-				foreach ($graph['gitems'] as &$gitem) {
-					if (isset($gitem['gitemid']) && !isset($gitem['itemid'])) {
-						$dbGitems = zbx_toHash($dbGraphs[$graph['graphid']]['gitems'], 'gitemid');
-						$gitem['itemid'] = $dbGitems[$gitem['gitemid']]['itemid'];
-					}
-				}
-				unset($gitem);
-			}
-		}
-		unset($graph);
-
-		$itemIds = $this->validateItemsUpdate($graphs, $dbGraphs);
-		$this->validateItems($itemIds, $graphs);
-
-		parent::validateUpdate($graphs, $dbGraphs);
-	}
-
-	/**
-	 * Validates items.
-	 *
-	 * @param array $itemIds
-	 * @param array $graphs
-	 */
-	protected function validateItems(array $itemIds, array $graphs) {
-		$dbItems = API::Item()->get([
-			'output' => ['name', 'value_type'],
-			'itemids' => $itemIds,
-			'webitems' => true,
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// check if items exist and user has permission to access those items
-		foreach ($itemIds as $itemId) {
-			if (!isset($dbItems[$itemId])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
-			}
-		}
-
-		$allowedValueTypes = [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64];
-
-		// get value type and name for these items
-		foreach ($graphs as $graph) {
-			// graph items
-			foreach ($graph['gitems'] as $graphItem) {
-				$item = $dbItems[$graphItem['itemid']];
-
-				if (!in_array($item['value_type'], $allowedValueTypes)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-						$item['name'],
-						$graph['name']
-					));
-				}
-			}
-
-			// Y axis min
-			if (array_key_exists('ymin_type', $graph) && $graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
-					&& array_key_exists('ymin_itemid', $graph) && $graph['ymin_itemid'] != 0) {
-				if (array_key_exists($graph['ymin_itemid'], $dbItems)) {
-					$item = $dbItems[$graph['ymin_itemid']];
-
-					if (!in_array($item['value_type'], $allowedValueTypes)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-							$item['name'],
-							$graph['name']
-						));
-					}
-				}
-			}
-
-			// Y axis max
-			if (array_key_exists('ymax_type', $graph) && $graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE
-					&& array_key_exists('ymax_itemid', $graph) && $graph['ymax_itemid'] != 0) {
-				if (array_key_exists($graph['ymax_itemid'], $dbItems)) {
-					$item = $dbItems[$graph['ymax_itemid']];
-
-					if (!in_array($item['value_type'], $allowedValueTypes)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Cannot add a non-numeric item "%1$s" to graph "%2$s".',
-							$item['name'],
-							$graph['name']
-						));
-					}
-				}
-			}
-		}
 	}
 }

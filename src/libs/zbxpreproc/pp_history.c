@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pp_history.h"
+#include "zbxpreprocbase.h"
 
 ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
 
@@ -25,7 +25,7 @@ ZBX_VECTOR_IMPL(pp_step_history, zbx_pp_step_history_t)
  *                                                                            *
  * Purpose: create preprocessing history                                      *
  *                                                                            *
- * Parameters: history_num - [IN] the number of steps using history           *
+ * Parameters: history_num - [IN] number of steps using history               *
  *                                                                            *
  * Return value: The created preprocessing history.                           *
  *                                                                            *
@@ -46,10 +46,8 @@ zbx_pp_history_t	*zbx_pp_history_create(int history_num)
  *                                                                            *
  * Purpose: free preprocessing history                                        *
  *                                                                            *
- * Parameters: history - [IN] the preprocessing history                       *
- *                                                                            *
  ******************************************************************************/
-void	pp_history_free(zbx_pp_history_t *history)
+void	zbx_pp_history_free(zbx_pp_history_t *history)
 {
 	for (int i = 0; i < history->step_history.values_num; i++)
 		zbx_variant_clear(&history->step_history.values[i].value);
@@ -62,9 +60,6 @@ void	pp_history_free(zbx_pp_history_t *history)
  *                                                                            *
  * Purpose: reserve preprocessing history                                     *
  *                                                                            *
- * Parameters: history     - [IN] the preprocessing history                   *
- *             history_num - [IN] the preprocessing history size              *
- *                                                                            *
  ******************************************************************************/
 void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num)
 {
@@ -75,11 +70,11 @@ void	zbx_pp_history_reserve(zbx_pp_history_t *history, int history_num)
  *                                                                            *
  * Purpose: add value to preprocessing history                                *
  *                                                                            *
- * Parameters: history - [IN] the preprocessing history                       *
- *             index   - [IN] the preprocessing step index                    *
- *             value   - [IN/OUT] the value to add, its resources are copied  *
+ * Parameters: history - [IN] preprocessing history                           *
+ *             index   - [IN] preprocessing step index                        *
+ *             value   - [IN/OUT] value to add, its resources are copied      *
  *                         over to history and the value itself is reseted    *
- *             ts      - [IN] the value timestamp                             *
+ *             ts      - [IN] value timestamp                                 *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t ts)
@@ -99,23 +94,21 @@ void	zbx_pp_history_add(zbx_pp_history_t *history, int index, zbx_variant_t *val
  *                                                                            *
  * Purpose: remove value from preprocessing history and return it             *
  *                                                                            *
- * Parameters: history - [IN] the preprocessing history                       *
- *             index   - [IN] the preprocessing step index                    *
- *             value   - [OUT] the value. If there is no history for the      *
+ * Parameters: history - [IN] preprocessing history                           *
+ *             index   - [IN] preprocessing step index                        *
+ *             value   - [OUT] value. If there is no history for the          *
  *                             requested step then empty variant              *
  *                             (ZBX_VBARIANT_NONE) is returned                *
- *             ts      - [OUT] the value timestamp. If there is no history    *
+ *             ts      - [OUT] value timestamp. If there is no history        *
  *                             for the requested step then 0 timestamp is     *
  *                             returned                                       *
  *                                                                            *
  ******************************************************************************/
-void	pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
+void	zbx_pp_history_pop(zbx_pp_history_t *history, int index, zbx_variant_t *value, zbx_timespec_t *ts)
 {
 	if (NULL != history)
 	{
-		int	i;
-
-		for (i = 0; i < history->step_history.values_num; i++)
+		for (int i = 0; i < history->step_history.values_num; i++)
 		{
 			if (history->step_history.values[i].index == index)
 			{

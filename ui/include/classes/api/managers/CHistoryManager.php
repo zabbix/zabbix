@@ -94,11 +94,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -257,7 +256,7 @@ class CHistoryManager {
 				$history_table = self::getTableName($value_type);
 
 				$max_clock_per_item = DBselect(
-					'SELECT h.itemid, MAX(h.clock) AS clock'.
+					'SELECT h.itemid,MAX(h.clock) AS clock'.
 					' FROM '.$history_table.' h'.
 					' WHERE '.dbConditionId('h.itemid', array_column($items, 'itemid')).
 						($period !== null ? ' AND h.clock>'.$period : '').
@@ -289,7 +288,7 @@ class CHistoryManager {
 						' FROM '.$history_table.' h'.
 						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 							($period !== null ? ' AND h.clock>'.$period : '').
-						' ORDER BY h.clock DESC, h.ns DESC',
+						' ORDER BY h.clock DESC,h.ns DESC',
 						$limit
 					);
 
@@ -555,7 +554,7 @@ class CHistoryManager {
 			' WHERE itemid='.zbx_dbstr($item['itemid']).
 				' AND clock<'.zbx_dbstr($clock).
 				' AND clock>='.zbx_dbstr($time_from).
-			' ORDER BY clock DESC, ns DESC';
+			' ORDER BY clock DESC,ns DESC';
 
 		if (($row = DBfetch(DBselect($sql, 1))) !== false) {
 			return $row;
@@ -898,7 +897,7 @@ class CHistoryManager {
 					' GROUP BY '.implode(', ', $sql_group_by);
 
 				if ($function == AGGREGATE_FIRST || $function == AGGREGATE_LAST) {
-					$sql = 'SELECT DISTINCT h.itemid, h.'.($source === 'history' ? 'value' : 'value_avg').' AS value, h.clock, hi.tick'.
+					$sql = 'SELECT DISTINCT h.itemid,h.'.($source === 'history' ? 'value' : 'value_avg').' AS value,h.clock,hi.tick'.
 						' FROM '.$sql_from.' h'.
 						' JOIN('.$sql.') hi ON h.itemid = hi.itemid AND h.clock = hi.clock';
 				}
@@ -1014,8 +1013,7 @@ class CHistoryManager {
 		];
 
 		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$period = $time_to - $time_from;
 
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
@@ -1025,15 +1023,14 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*((doc[\'clock\'].value.getMillis()/1000+params.delta)%params.size))'.
-					'/params.size)';
+			$formula = "Math.round(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
 
 			$script = [
 				'inline' => $formula,
 				'params' => [
 					'width' => (int)$width,
-					'delta' => $delta,
-					'size' => $size
+					'time_from' => $time_from,
+					'period' => $period
 				]
 			];
 			$aggs = [
@@ -1122,12 +1119,10 @@ class CHistoryManager {
 		$sql_select_extra = '';
 
 		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$period = $time_to - $time_from;
 
 			// Required for 'group by' support of Oracle.
-			$calc_field = 'round('.$width.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$delta, $size)
-					.'/('.$size.'),0)';
+			$calc_field = 'round('.$width.'*('.zbx_dbcast_2bigint('clock').'-'.$time_from.')/'.$period.',0)';
 
 			$sql_select_extra = ','.$calc_field.' AS i';
 			$group_by .= ','.$calc_field;
@@ -1374,7 +1369,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_STR => 'str',
 			ITEM_VALUE_TYPE_LOG => 'log',
 			ITEM_VALUE_TYPE_UINT64 => 'uint',
-			ITEM_VALUE_TYPE_TEXT => 'text'
+			ITEM_VALUE_TYPE_TEXT => 'text',
+			ITEM_VALUE_TYPE_BINARY => 'binary'
 		];
 
 		if (array_key_exists($value_type, $mapping)) {
@@ -1398,7 +1394,8 @@ class CHistoryManager {
 			'str' => ITEM_VALUE_TYPE_STR,
 			'log' => ITEM_VALUE_TYPE_LOG,
 			'uint' => ITEM_VALUE_TYPE_UINT64,
-			'text' => ITEM_VALUE_TYPE_TEXT
+			'text' => ITEM_VALUE_TYPE_TEXT,
+			'binary' => ITEM_VALUE_TYPE_BINARY
 		];
 
 		if (array_key_exists($type_name, $mapping)) {
@@ -1519,7 +1516,8 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
 			ITEM_VALUE_TYPE_STR => 'history_str',
 			ITEM_VALUE_TYPE_FLOAT => 'history',
-			ITEM_VALUE_TYPE_UINT64 => 'history_uint'
+			ITEM_VALUE_TYPE_UINT64 => 'history_uint',
+			ITEM_VALUE_TYPE_BINARY => 'history_bin'
 		];
 
 		return ($value_type === null) ? $tables : $tables[$value_type];

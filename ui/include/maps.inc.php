@@ -1313,6 +1313,7 @@ function getMapHighligts(array $map, array $map_info) {
  * Get trigger data for all linktriggers.
  *
  * @param array $sysmap
+ * @param array $sysmap['links']            Map element link options.
  * @param array $sysmap['show_suppressed']  Whether to show suppressed problems.
  * @param array $sysmap['show_unack']       Property specified in sysmap's 'Problem display' field. Used to determine
  *                                          whether to show unacknowledged problems only.

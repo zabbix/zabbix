@@ -23,6 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "module.h"
 
-int	get_value_external(const DC_ITEM *item, int config_timeout, AGENT_RESULT *result);
+int	get_value_external(const zbx_dc_item_t *item, int config_timeout, AGENT_RESULT *result);
 
 #endif

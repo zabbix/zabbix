@@ -419,7 +419,9 @@ void	zbx_report_test(const struct zbx_json_parse *jp, zbx_uint64_t userid, struc
 			size_t		value_alloc = 0;
 			zbx_ptr_pair_t	pair;
 
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, NULL))
+				continue;
+
 			pair.first = zbx_strdup(NULL, key);
 			pair.second = value;
 			zbx_vector_ptr_pair_append(&params, pair);

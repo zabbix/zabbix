@@ -22,6 +22,21 @@
 
 #include "zbxcommon.h"
 
+#define ZBX_HTTPFIELD_HEADER		0
+#define ZBX_HTTPFIELD_VARIABLE		1
+#define ZBX_HTTPFIELD_POST_FIELD	2
+#define ZBX_HTTPFIELD_QUERY_FIELD	3
+
+#define ZBX_POSTTYPE_RAW		0
+#define ZBX_POSTTYPE_FORM		1
+#define ZBX_POSTTYPE_JSON		2
+#define ZBX_POSTTYPE_XML		3
+#define ZBX_POSTTYPE_NDJSON		4
+
+#define ZBX_RETRIEVE_MODE_CONTENT	0
+#define ZBX_RETRIEVE_MODE_HEADERS	1
+#define ZBX_RETRIEVE_MODE_BOTH		2
+
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
@@ -44,13 +59,14 @@ typedef size_t	(*zbx_curl_cb_t)(void *ptr, size_t size, size_t nmemb, void *user
 int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
 		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error);
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
-		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host, char **error);
+		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
+		const char *config_source_ip, char **error);
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		const char *token, char **error);
 char	*zbx_http_parse_header(char **headers);
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
-		const char *ssl_key_file, char **out, long *response_code, char **error);
+		const char *ssl_key_file, const char *config_source_ip, char **out, long *response_code, char **error);
 
 #define HTTP_REQUEST_GET	0
 #define HTTP_REQUEST_POST	1
@@ -65,7 +81,8 @@ int	zbx_http_request(unsigned char request_method, const char *url, const char *
 		const char *timeout, int max_attempts, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
-		unsigned char post_type, char *status_codes, unsigned char output_format, char **out, char **error);
+		unsigned char post_type, char *status_codes, unsigned char output_format, const char *config_source_ip,
+		char **out, char **error);
 #endif
 
 #endif

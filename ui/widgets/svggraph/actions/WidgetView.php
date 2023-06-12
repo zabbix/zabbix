@@ -42,18 +42,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
-			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
-			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
+			'contents_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
+			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
-			'to' => 'string'
+			'to' => 'string',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
 	protected function doAction(): void {
 		$edit_mode = $this->getInput('edit_mode', 0);
-		$width = (int) $this->getInput('content_width', self::GRAPH_WIDTH_MIN);
-		$height = (int) $this->getInput('content_height', self::GRAPH_HEIGHT_MIN);
+		$width = (int) $this->getInput('contents_width', self::GRAPH_WIDTH_MIN);
+		$height = (int) $this->getInput('contents_height', self::GRAPH_HEIGHT_MIN);
 		$preview = (bool) $this->getInput('preview', 0); // Configuration preview.
 
 		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
@@ -141,13 +142,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => $this->fields_values['problemhosts'],
+				'problemhosts' => $this->isTemplateDashboard() ? '' : $this->fields_values['problemhosts'],
 				'severities' => $this->fields_values['severities'],
 				'problem_name' => $this->fields_values['problem_name'],
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags']
 			],
-			'overrides' => array_values($this->fields_values['or'])
+			'overrides' => array_values($this->fields_values['or']),
+			'templateid' => $this->getInput('templateid', ''),
+			'dynamic_hostid' => $this->getInput('dynamic_hostid', '')
 		];
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);

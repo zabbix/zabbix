@@ -64,10 +64,8 @@ if (!empty($this->data['templates'])) {
 // Name
 $name_text_box = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setAriaRequired();
-if (!$this->data['templated']) {
-	$name_text_box->setAttribute('autofocus', 'autofocus');
-}
+	->setAriaRequired()
+	->setAttribute('autofocus', 'autofocus');
 
 $http_form_list
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(), $name_text_box)
@@ -109,7 +107,7 @@ $http_form_list
 	->addRow(_('HTTP proxy'),
 		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+			->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 			->disableAutocomplete()
 	);
 
@@ -167,12 +165,14 @@ $http_authentication_form_list->addRow(new CLabel(_('HTTP authentication'), 'lab
 
 $http_authentication_form_list
 	->addRow(new CLabel(_('User'), 'http_user'),
-		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+		(new CTextBox('http_user', $this->data['http_user'], false, DB::getFieldLength('httptest', 'http_user')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)
 	->addRow(new CLabel(_('Password'), 'http_password'),
-		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+		(new CTextBox('http_password', $this->data['http_password'], false,
+			DB::getFieldLength('httptest', 'http_password')
+		))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 	)

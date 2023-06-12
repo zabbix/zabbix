@@ -23,9 +23,8 @@
 #include "zbxalgo.h"
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
-#include "preproc.h"
 #include "zbxconnector.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
@@ -555,13 +554,13 @@ void	zbx_diag_add_locks_info(struct zbx_json *json)
 				"ZBX_MUTEX_CACHE_IDS", "ZBX_MUTEX_SELFMON", "ZBX_MUTEX_CPUSTATS", "ZBX_MUTEX_DISKSTATS",
 				"ZBX_MUTEX_VALUECACHE", "ZBX_MUTEX_VMWARE", "ZBX_MUTEX_SQLITE3",
 				"ZBX_MUTEX_PROCSTAT", "ZBX_MUTEX_PROXY_HISTORY", "ZBX_MUTEX_KSTAT", "ZBX_MUTEX_MODBUS",
-				"ZBX_MUTEX_TREND_FUNC"};
+				"ZBX_MUTEX_TREND_FUNC", "ZBX_MUTEX_REMOTE_COMMANDS"};
 #else
 	const char	*names[ZBX_MUTEX_COUNT] = {"ZBX_MUTEX_LOG", "ZBX_MUTEX_CACHE", "ZBX_MUTEX_TRENDS",
 				"ZBX_MUTEX_CACHE_IDS", "ZBX_MUTEX_SELFMON", "ZBX_MUTEX_CPUSTATS", "ZBX_MUTEX_DISKSTATS",
 				"ZBX_MUTEX_VALUECACHE", "ZBX_MUTEX_VMWARE", "ZBX_MUTEX_SQLITE3",
 				"ZBX_MUTEX_PROCSTAT", "ZBX_MUTEX_PROXY_HISTORY", "ZBX_MUTEX_MODBUS",
-				"ZBX_MUTEX_TREND_FUNC"};
+				"ZBX_MUTEX_TREND_FUNC", "ZBX_MUTEX_REMOTE_COMMANDS"};
 #endif
 	zbx_json_addarray(json, ZBX_DIAG_LOCKS);
 
@@ -710,7 +709,8 @@ static void	diag_get_simple_values(const struct zbx_json_parse *jp, char **msg)
 	{
 		if (FAIL == zbx_json_brackets_open(pnext, &jp_value))
 		{
-			zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type);
+			if (NULL == zbx_json_decodevalue_dyn(pnext, &value, &value_alloc, &type))
+				type = ZBX_JSON_TYPE_NULL;
 
 			if (0 != msg_offset)
 				zbx_chrcpy_alloc(msg, &msg_alloc, &msg_offset, ' ');

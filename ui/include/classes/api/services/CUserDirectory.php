@@ -937,8 +937,14 @@ class CUserDirectory extends CApiService {
 			'output' => ['ldap_userdirectoryid', 'authentication_type', 'ldap_auth_enabled']
 		]);
 
+		// Default LDAP server cannot be removed if there are remaining LDAP servers.
 		if (in_array($auth['ldap_userdirectoryid'], $userdirectoryids)
 				&& ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED || $ldap_userdirectories_left > 0)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
+		}
+
+		// Cannot remove the last remaining LDAP server if LDAP authentication is on.
+		if ($auth['ldap_auth_enabled'] == ZBX_AUTH_LDAP_ENABLED && $ldap_userdirectories_left == 0) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default user directory.'));
 		}
 
@@ -1091,7 +1097,7 @@ class CUserDirectory extends CApiService {
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
 											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
@@ -1403,7 +1409,7 @@ class CUserDirectory extends CApiService {
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
 											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
@@ -1411,7 +1417,7 @@ class CUserDirectory extends CApiService {
 			'provision_groups' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 											'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_idpgroup', 'name')],
-											'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+											'roleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
 											'user_groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['usrgrpid']], 'fields' => [
 												'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 											]]

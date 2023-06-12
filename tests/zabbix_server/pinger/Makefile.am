@@ -26,7 +26,6 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxprof/libzbxprof.a \
-	$(top_srcdir)/src/zabbix_server/preprocessor/libpreprocessor.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/zabbix_server/scripts/libzbxscripts.a \
@@ -60,6 +59,7 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -73,9 +73,11 @@ PINGER_LIBS = \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 zbx_pinger_test_SOURCES = \
 	zbx_pinger_test.c \
@@ -87,8 +89,8 @@ zbx_pinger_test_SOURCES = \
 
 zbx_pinger_test_LDADD = $(PINGER_LIBS)
 zbx_pinger_test_LDADD += @SERVER_LIBS@
-zbx_pinger_test_LDFLAGS = @SERVER_LDFLAGS@
+zbx_pinger_test_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 zbx_pinger_test_CFLAGS = \
-	-I@top_srcdir@/tests @LIBXML2_CFLAGS@
+	-I@top_srcdir@/tests @LIBXML2_CFLAGS@ $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)
 endif

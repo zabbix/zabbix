@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 if DBSCHEMA
-dbschema.c: $(top_srcdir)/create/src/schema.tmpl
+dbschema.c: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_schema.pl
 	$(top_srcdir)/create/bin/gen_schema.pl c > dbschema.c
 
 clean:

@@ -19,7 +19,6 @@
 
 #include "zbxcachevalue.h"
 
-#include "log.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
@@ -68,9 +67,6 @@ zbx_rwlock_t	vc_lock = ZBX_RWLOCK_NULL;
 
 /* value cache state, after initialization value cache is always disabled */
 static int	vc_state = ZBX_VC_DISABLED;
-
-/* the value cache size */
-extern zbx_uint64_t	CONFIG_VALUE_CACHE_SIZE;
 
 ZBX_SHMEM_FUNC_IMPL(__vc, vc_mem)
 
@@ -274,9 +270,9 @@ static void	vc_cache_item_update(zbx_uint64_t itemid, zbx_vc_item_update_type_t 
 /* the value cache */
 static zbx_vc_cache_t	*vc_cache = NULL;
 
-#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock);
-#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock);
-#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock);
+#define	RDLOCK_CACHE	zbx_rwlock_rdlock(vc_lock)
+#define	WRLOCK_CACHE	zbx_rwlock_wrlock(vc_lock)
+#define	UNLOCK_CACHE	zbx_rwlock_unlock(vc_lock)
 
 /* function prototypes */
 static void	vc_history_record_copy(zbx_history_record_t *dst, const zbx_history_record_t *src, int value_type);
@@ -626,6 +622,15 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 		case ITEM_VALUE_TYPE_LOG:
 			for (i = 0; i < vector->values_num; i++)
 				vc_history_logfree(vector->values[i].value.log);
+			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_history_record_clear(vector);
@@ -1133,6 +1138,14 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 			for (i = first; i <= last; i++)
 				freed += vc_item_logfree(values[i].value.log);
 			break;
+		case ITEM_VALUE_TYPE_UINT64:
+		case ITEM_VALUE_TYPE_FLOAT:
+			break;
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_NONE:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	item->values_total -= (last - first + 1);
@@ -2364,12 +2377,12 @@ static size_t	vch_item_free_cache(zbx_vc_item_t *item)
  * Purpose: initializes value cache                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vc_init(char **error)
+int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 {
 	zbx_uint64_t	size_reserved;
 	int		ret = FAIL;
 
-	if (0 == CONFIG_VALUE_CACHE_SIZE)
+	if (0 == value_cache_size)
 		return SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -2379,13 +2392,13 @@ int	zbx_vc_init(char **error)
 
 	size_reserved = zbx_shmem_required_size(1, "value cache size", "ValueCacheSize");
 
-	if (SUCCEED != zbx_shmem_create(&vc_mem, CONFIG_VALUE_CACHE_SIZE, "value cache size", "ValueCacheSize", 1,
+	if (SUCCEED != zbx_shmem_create(&vc_mem, value_cache_size, "value cache size", "ValueCacheSize", 1,
 			error))
 	{
 		goto out;
 	}
 
-	CONFIG_VALUE_CACHE_SIZE -= size_reserved;
+	value_cache_size -= size_reserved;
 
 	vc_cache = (zbx_vc_cache_t *)__vc_shmem_malloc_func(vc_cache, sizeof(zbx_vc_cache_t));
 
@@ -2417,7 +2430,7 @@ int	zbx_vc_init(char **error)
 	}
 
 	/* the free space request should be 5% of cache size, but no more than 128KB */
-	vc_cache->min_free_request = (CONFIG_VALUE_CACHE_SIZE / 100) * 5;
+	vc_cache->min_free_request = (value_cache_size / 100) * 5;
 	if (vc_cache->min_free_request > 128 * ZBX_KIBIBYTE)
 		vc_cache->min_free_request = 128 * ZBX_KIBIBYTE;
 
@@ -2513,7 +2526,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 {
 	zbx_vc_item_t		*item;
 	int			i;
-	ZBX_DC_HISTORY		*h;
+	zbx_dc_history_t	*h;
 
 	if (SUCCEED != zbx_history_add_values(history, ret_flush))
 		return FAIL;
@@ -2525,7 +2538,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 
 	for (i = 0; i < history->values_num; i++)
 	{
-		h = (ZBX_DC_HISTORY *)history->values[i];
+		h = (zbx_dc_history_t *)history->values[i];
 
 		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
 		{

@@ -41,16 +41,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
 			'dynamic_hostid' => 'db hosts.hostid',
-			'content_width' => 'int32',
-			'content_height' => 'int32'
+			'contents_width' => 'int32',
+			'contents_height' => 'int32'
 		]);
 	}
 
 	protected function doAction(): void {
 		$edit_mode = (int) $this->getInput('edit_mode', 0);
 
-		$width = (int) $this->getInput('content_width', 100);
-		$height = (int) $this->getInput('content_height', 100);
+		$width = (int) $this->getInput('contents_width', 100);
+		$height = (int) $this->getInput('contents_height', 100);
 
 		$dynamic_hostid = $this->getInput('dynamic_hostid', 0);
 		$resourceid = null;
@@ -99,8 +99,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'profileIdx2' => $profileIdx2
 		];
 
-		$is_template_dashboard = $this->hasInput('templateid');
-		$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+		$is_dynamic_item = $this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM;
 
 		// Replace graph item by particular host item if dynamic items are used.
 		if ($is_dynamic_item && $dynamic_hostid != 0 && $resourceid) {
@@ -263,14 +262,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					->setArgument('from')
 					->setArgument('to');
 
-				$header_name = $is_template_dashboard
+				$header_name = $this->isTemplateDashboard()
 					? $item['name']
 					: $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
 				$graph_src = '';
 
-				$prepend_host_name = $is_template_dashboard
+				$prepend_host_name = $this->isTemplateDashboard()
 					? false
 					: count($graph['hosts']) == 1 || ($is_dynamic_item && $dynamic_hostid != 0);
 
@@ -347,7 +346,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$graph_src->setArgument('widget_view', '1');
 			$time_control_data['src'] = $graph_src->getUrl();
 
-			if ($edit_mode || ($is_template_dashboard && !$this->hasInput('dynamic_hostid'))) {
+			if ($edit_mode || ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid'))) {
 				$graph_url = null;
 			}
 			else {

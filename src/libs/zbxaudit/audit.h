@@ -23,19 +23,11 @@
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
-/* audit logging mode */
-#define ZBX_AUDITLOG_DISABLED	0
-#define ZBX_AUDITLOG_ENABLED	1
-
 #define AUDIT_ACTION_ADD		0
 #define AUDIT_ACTION_UPDATE		1
 #define AUDIT_ACTION_DELETE		2
 #define AUDIT_ACTION_EXECUTE		7
 #define AUDIT_ACTION_CONFIG_REFRESH	11
-
-#define AUDIT_DETAILS_ACTION_ADD	"add"
-#define AUDIT_DETAILS_ACTION_UPDATE	"update"
-#define AUDIT_DETAILS_ACTION_DELETE	"delete"
 
 #define	AUDIT_DETAILS_KEY_LEN		100
 
@@ -56,21 +48,7 @@
 #define AUDIT_RESOURCE_SETTINGS			40
 #define AUDIT_RESOURCE_HA_NODE			47
 
-#define AUDIT_HOST_ID		1
-#define AUDIT_HOSTGRP_ID	2
-#define AUDIT_ITEM_ID		3
-#define AUDIT_TRIGGER_ID	4
-#define AUDIT_GRAPH_ID		5
-#define AUDIT_HTTPTEST_ID	6
-#define AUDIT_HA_NODE_ID	7
-#define AUDIT_CONFIG_ID		8
-
-int		zbx_get_audit_mode(void);
 zbx_hashset_t	*zbx_get_audit_hashset(void);
-
-#define RETURN_IF_AUDIT_OFF()					\
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())	\
-		return						\
 
 typedef struct zbx_audit_entry
 {
@@ -90,12 +68,6 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table,const char *name,
 		int audit_action, int resource_type);
 
-void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_table, const char *audit_op,
-		const char *key, const char *value, const char *table, const char *field);
-void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int id_table, const char *audit_op,
-		const char *key, const char *value, const char *table, const char *field);
-void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_table, const char *audit_op,
-		const char *key, uint64_t value, const char *table, const char *field);
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
 		const char *key);
 void	zbx_audit_update_json_append_int(const zbx_uint64_t id, const int id_table, const char *audit_op,

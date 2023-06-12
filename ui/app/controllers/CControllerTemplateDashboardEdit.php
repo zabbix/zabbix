@@ -92,8 +92,8 @@ class CControllerTemplateDashboardEdit extends CController {
 
 		$data = [
 			'dashboard' => $dashboard,
-			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(true),
-			'widget_last_type' => CDashboardHelper::getWidgetLastType(true),
+			'widget_defaults' => APP::ModuleManager()->getWidgetsDefaults(),
+			'widget_last_type' => CDashboardHelper::getWidgetLastType(),
 			'time_period' => getTimeSelectorPeriod([]),
 			'page' => CPagerHelper::loadPage('template.dashboard.list', null)
 		];

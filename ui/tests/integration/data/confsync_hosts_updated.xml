@@ -574,7 +574,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>Zabbix internall</name>
+                    <name>Zabbix internal updated</name>
                     <type>INTERNAL</type>
                     <key>zabbix[boottime]</key>
                 </item>
@@ -633,7 +633,7 @@
                     </master_item>
                 </item>
                 <item>
-                    <name>External checkk</name>
+                    <name>External check updated</name>
                     <type>EXTERNAL</type>
                     <key>extcheck</key>
                     <interface_ref>if1</interface_ref>
@@ -665,7 +665,7 @@
                     <allow_traps>YES</allow_traps>
                 </item>
                 <item>
-                    <name>Simple checkk</name>
+                    <name>Simple check updated</name>
                     <type>SIMPLE</type>
                     <key>icmpping[127.1.0.1]</key>
                     <interface_ref>if1</interface_ref>

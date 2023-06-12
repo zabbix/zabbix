@@ -74,7 +74,7 @@ foreach ($data['macros'] as $macro_name => $macro_value) {
 				->removeAttribute('name')
 				->removeId()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
-		(new CCol('&rArr;'))->addStyle('vertical-align: top;'),
+		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol(
 			(new CTextAreaFlexible('macros['.$macro_name.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -379,9 +379,10 @@ if ($data['show_final_result']) {
 	]);
 }
 
-$form
-	->addItem($form_grid)
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+$form->addItem($form_grid);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $templates = [
 	(new CTag('script', true))

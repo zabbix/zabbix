@@ -32,9 +32,7 @@ class CWidgetMap extends CWidget {
 		return ['filter_widget_reference'];
 	}
 
-	_init() {
-		super._init();
-
+	onInitialize() {
 		this._map_svg = null;
 
 		this._source_type = this._fields.source_type || CWidgetMap.SOURCETYPE_MAP;
@@ -46,27 +44,23 @@ class CWidgetMap extends CWidget {
 		this._initial_load = true;
 
 		this._has_contents = false;
+
+		this._registerContentsEvents();
 	}
 
-	_doActivate() {
-		super._doActivate();
-
+	onActivate() {
 		if (this._has_contents) {
 			this._activateContentsEvents();
 		}
 	}
 
-	_doDeactivate() {
-		super._doDeactivate();
-
+	onDeactivate() {
 		if (this._has_contents) {
 			this._deactivateContentsEvents();
 		}
 	}
 
-	_doDestroy() {
-		super._doDestroy();
-
+	onDestroy() {
 		if (this._filter_widget) {
 			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_MARK, this._events.mark);
 			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
@@ -93,12 +87,12 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
-	_promiseUpdate() {
+	promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
 			if (this._sysmapid !== null
 					|| this._source_type == CWidgetMap.SOURCETYPE_MAP
 					|| this._filter_widget === null) {
-				return super._promiseUpdate();
+				return super.promiseUpdate();
 			}
 
 			return Promise.resolve();
@@ -128,9 +122,9 @@ class CWidgetMap extends CWidget {
 		}
 	}
 
-	_getUpdateRequestData() {
+	getUpdateRequestData() {
 		return {
-			...super._getUpdateRequestData(),
+			...super.getUpdateRequestData(),
 			current_sysmapid: this._sysmapid ?? undefined,
 			previous_maps: this._previous_maps.map((i) => i.sysmapid),
 			unique_id: this._unique_id,
@@ -138,14 +132,14 @@ class CWidgetMap extends CWidget {
 		};
 	}
 
-	_processUpdateResponse(response) {
+	processUpdateResponse(response) {
 		if (this._has_contents) {
 			this._deactivateContentsEvents();
 
 			this._has_contents = false;
 		}
 
-		super._processUpdateResponse(response);
+		super.processUpdateResponse(response);
 
 		if (response.sysmap_data !== undefined) {
 			this._has_contents = true;
@@ -157,21 +151,16 @@ class CWidgetMap extends CWidget {
 
 			if (map_options !== null) {
 				this._makeSvgMap(map_options);
-
-				if (this._state === WIDGET_STATE_ACTIVE) {
-					this._activateContentsEvents();
-				}
+				this._activateContentsEvents();
 			}
 
 			if (response.sysmap_data.error_msg !== undefined) {
-				this._content_body.innerHTML = response.sysmap_data.error_msg;
+				this._body.innerHTML = response.sysmap_data.error_msg;
 			}
 		}
 	}
 
-	_registerEvents() {
-		super._registerEvents();
-
+	_registerContentsEvents() {
 		this._events = {
 			...this._events,
 
@@ -254,7 +243,7 @@ class CWidgetMap extends CWidget {
 		this._startUpdating();
 	}
 
-	_hasPadding() {
+	hasPadding() {
 		return true;
 	}
 }

@@ -26,6 +26,7 @@ class CControllerPopupImportCompare extends CController {
 	public const CHANGE_REMOVED = 2;
 
 	private $toc = [];
+	private $id_counter = 0;
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -326,27 +327,7 @@ class CControllerPopupImportCompare extends CController {
 		return $yaml_key;
 	}
 
-	private function objectToRows(array $before, array $after, int $depth, string $id): array {
-		if ($before && $after) {
-			$outer_change_type = self::CHANGE_NONE;
-		}
-		else if ($before) {
-			$outer_change_type = self::CHANGE_REMOVED;
-		}
-		else if ($after) {
-			$outer_change_type = self::CHANGE_ADDED;
-		}
-		else {
-			$outer_change_type = self::CHANGE_NONE;
-		}
-
-		$rows = [[
-			'value' => '-',
-			'depth' => $depth,
-			'change_type' => $outer_change_type,
-			'id' => $id
-		]];
-
+	private function objectToRows(array $before, array $after, int $depth, int $id): array {
 		$all_keys = [];
 
 		foreach (array_keys($before) as $key) {
@@ -373,6 +354,8 @@ class CControllerPopupImportCompare extends CController {
 		}
 
 		unset($all_keys['uuid']);
+
+		$rows = [];
 
 		foreach ($all_keys as $key => $change_type) {
 			switch ($change_type) {
@@ -424,6 +407,10 @@ class CControllerPopupImportCompare extends CController {
 			}
 		}
 
+		if ($rows) {
+			$rows[0] += ['id' => $id];
+		}
+
 		return $rows;
 	}
 
@@ -446,10 +433,11 @@ class CControllerPopupImportCompare extends CController {
 				foreach ($entities as $entity) {
 					$before = array_key_exists('before', $entity) ? $entity['before'] : [];
 					$after = array_key_exists('after', $entity) ? $entity['after'] : [];
-					$object = $before ? $before : $after;
+					$object = $before ?: $after;
 					unset($entity['before'], $entity['after']);
 
-					$id = $object['uuid'];
+					$id = $this->id_counter++;
+
 					$this->toc[$change_type][$entity_type][] = [
 						'name' => $this->nameForToc($entity_type, $object),
 						'id' => $id
@@ -464,6 +452,7 @@ class CControllerPopupImportCompare extends CController {
 				}
 			}
 		}
+
 		return $rows;
 	}
 

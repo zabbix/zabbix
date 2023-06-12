@@ -91,7 +91,7 @@ foreach ($data['triggers'] as $trigger) {
 	);
 
 	$description[] = new CLink(
-		CHtml::encode($trigger['description']),
+		$trigger['description'],
 		(new CUrl('trigger_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
@@ -106,9 +106,8 @@ foreach ($data['triggers'] as $trigger) {
 		foreach ($trigger['dependencies'] as $dependency) {
 			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
 
-			$depTriggerDescription = CHtml::encode(
-				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description']
-			);
+			$depTriggerDescription =
+				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description'];
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 				$triggerDependencies[] = (new CLink(
@@ -202,11 +201,17 @@ $triggersForm->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'triggerprototype.massenable' => ['name' => _('Create enabled'),
-				'confirm' => _('Create triggers from selected prototypes as enabled?'), 'csrf_token' => $csrf_token
+			'triggerprototype.massenable' => [
+				'name' => _('Create enabled'),
+				'confirm_singular' => _('Create triggers from selected prototype as enabled?'),
+				'confirm_plural' => _('Create triggers from selected prototypes as enabled?'),
+				'csrf_token' => $csrf_token
 			],
-			'triggerprototype.massdisable' => ['name' => _('Create disabled'),
-				'confirm' => _('Create triggers from selected prototypes as disabled?'), 'csrf_token' => $csrf_token
+			'triggerprototype.massdisable' => [
+				'name' => _('Create disabled'),
+				'confirm_singular' => _('Create triggers from selected prototype as disabled?'),
+				'confirm_plural' => _('Create triggers from selected prototypes as disabled?'),
+				'csrf_token' => $csrf_token
 			],
 			'popup.massupdate.triggerprototype' => [
 				'content' => (new CButton('', _('Mass update')))
@@ -221,8 +226,11 @@ $triggersForm->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeAttribute('id')
 			],
-			'triggerprototype.massdelete' => ['name' => _('Delete'),
-				'confirm' => _('Delete selected trigger prototypes?'), 'csrf_token' => $csrf_token
+			'triggerprototype.massdelete' => [
+				'name' => _('Delete'),
+				'confirm_singular' => _('Delete selected trigger prototype?'),
+				'confirm_plural' => _('Delete selected trigger prototypes?'),
+				'csrf_token' => $csrf_token
 			]
 		],
 		$this->data['parent_discoveryid']

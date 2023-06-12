@@ -44,7 +44,8 @@ class CControllerProblemView extends CControllerProblem {
 			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
 			'show_symptoms' =>			'in 0,1',
 			'show_suppressed' =>		'in 0,1',
-			'unacknowledged' =>			'in 0,1',
+			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
+			'acknowledged_by_me' =>		'in 0,1',
 			'compact_view' =>			'in 0,1',
 			'show_timeline' =>			'in '.ZBX_TIMELINE_OFF.','.ZBX_TIMELINE_ON,
 			'details' =>				'in 0,1',
@@ -62,6 +63,7 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_custom_time' =>		'in 1,0',
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
+			'filter_set' =>				'in 1',
 			'filter_reset' =>			'in 1',
 			'counter_index' =>			'ge 0'
 		];
@@ -86,6 +88,10 @@ class CControllerProblemView extends CControllerProblem {
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
+		}
+		elseif ($this->hasInput('filter_set')) {
+			$profile->setTabFilter(0, ['filter_name' => ''] + $this->cleanInput($this->getInputAll()));
+			$profile->update();
 		}
 		else {
 			$profile->setInput($this->cleanInput($this->getInputAll()));

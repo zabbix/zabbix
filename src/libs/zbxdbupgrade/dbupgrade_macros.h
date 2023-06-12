@@ -64,8 +64,8 @@ zbx_field_len_t;
 
 ZBX_VECTOR_DECL(strloc, zbx_strloc_t)
 
-int	db_rename_macro(DB_RESULT result, const char *table, const char *pkey, zbx_field_len_t *fields, int fields_num,
-		const char *oldmacro, const char *newmacro);
+int	db_rename_macro(zbx_db_result_t result, const char *table, const char *pkey, zbx_field_len_t *fields,
+		int fields_num, const char *oldmacro, const char *newmacro);
 void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple_macro_t *data, int more,
 		char **function);
 int	dbpatch_is_time_function(const char *name, size_t len);

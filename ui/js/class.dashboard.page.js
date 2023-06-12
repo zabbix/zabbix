@@ -35,7 +35,7 @@ const DASHBOARD_PAGE_EVENT_WIDGET_PASTE = 'dashboard-page-widget-paste';
 const DASHBOARD_PAGE_EVENT_ANNOUNCE_WIDGETS = 'dashboard-page-announce-widgets';
 const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header-lines';
 
-class CDashboardPage extends CBaseComponent {
+class CDashboardPage {
 
 	constructor(target, {
 		data,
@@ -55,7 +55,7 @@ class CDashboardPage extends CBaseComponent {
 		csrf_token = null,
 		unique_id
 	}) {
-		super(document.createElement('div'));
+		this._target = document.createElement('div');
 
 		this._dashboard_grid = target;
 
@@ -86,18 +86,12 @@ class CDashboardPage extends CBaseComponent {
 		this._unique_id = unique_id;
 
 		this._init();
-		this._registerEvents();
 	}
 
 	_init() {
 		this._state = DASHBOARD_PAGE_STATE_INITIAL;
 
 		this._widgets = new Map();
-
-		this._original_properties = {
-			name: this._data.name,
-			display_period: this._data.display_period
-		};
 
 		this._grid_min_rows = 0;
 		this._grid_pad_rows = 2;
@@ -120,6 +114,8 @@ class CDashboardPage extends CBaseComponent {
 
 	start() {
 		this._state = DASHBOARD_PAGE_STATE_INACTIVE;
+
+		this._registerEvents();
 
 		for (const widget of this._widgets.keys()) {
 			widget.start();
@@ -272,17 +268,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	isUnsaved() {
-		if (this._is_unsaved) {
-			return true;
-		}
-
-		for (const [name, value] of Object.entries(this._original_properties)) {
-			if (value != this._data[name]) {
-				return true;
-			}
-		}
-
-		return false;
+		return this._is_unsaved;
 	}
 
 	// Data interface methods.
@@ -343,7 +329,7 @@ class CDashboardPage extends CBaseComponent {
 			});
 		}
 		else {
-			widget = this._createInaccessibleWidget({name, widgetid, pos, unique_id});
+			widget = this._createInaccessibleWidget({widgetid, pos, unique_id});
 		}
 
 		this._doAddWidget(widget);
@@ -408,8 +394,6 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	replaceWidget(widget, widget_data) {
-		this._is_unsaved = true;
-
 		this.deleteWidget(widget, {is_batch_mode: true});
 
 		return this.addWidget(widget_data);
@@ -446,10 +430,9 @@ class CDashboardPage extends CBaseComponent {
 		});
 	}
 
-	_createInaccessibleWidget({name, widgetid, pos, unique_id}) {
+	_createInaccessibleWidget({widgetid, pos, unique_id}) {
 		return this._createWidget(CWidgetInaccessible, {
 			type: 'inaccessible',
-			name,
 			view_mode: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER,
 			fields: {},
 			defaults: {
@@ -725,7 +708,7 @@ class CDashboardPage extends CBaseComponent {
 	}
 
 	_resizeGrid(min_rows = null) {
-		if (min_rows == 0) {
+		if (min_rows === 0) {
 			this._grid_min_rows = 0;
 		}
 		else if (min_rows !== null) {
@@ -733,6 +716,12 @@ class CDashboardPage extends CBaseComponent {
 		}
 
 		let num_rows = Math.max(this._grid_min_rows, this._getNumOccupiedRows());
+
+		if (!this._is_edit_mode && num_rows === 0) {
+			this._dashboard_grid.style.height = '';
+
+			return;
+		}
 
 		let height = this._cell_height * num_rows;
 
@@ -748,7 +737,7 @@ class CDashboardPage extends CBaseComponent {
 			}
 			while (!element.classList.contains('wrapper'));
 
-			height = Math.max(height, min_height);
+			height = Math.min(Math.max(height, min_height), this._cell_height * this._max_rows);
 		}
 
 		this._dashboard_grid.style.height = `${height}px`;
@@ -1287,7 +1276,7 @@ class CDashboardPage extends CBaseComponent {
 				for (const widget of this._widgets.keys()) {
 					const widget_view = widget.getView();
 
-					if (widget_view.querySelector(`.${widget.getCssClass('head')}`).contains(e.target)
+					if (widget_view.querySelector(`.${widget.getCssClass('header')}`).contains(e.target)
 							&& !widget_view.querySelector(`.${widget.getCssClass('actions')}`).contains(e.target)) {
 						drag_widget = widget;
 						break;
@@ -1325,7 +1314,7 @@ class CDashboardPage extends CBaseComponent {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -1863,7 +1852,7 @@ class CDashboardPage extends CBaseComponent {
 				this.fire(DASHBOARD_PAGE_EVENT_WIDGET_POSITION);
 			},
 
-			mouseUp: (e) => {
+			mouseUp: () => {
 				if (move_animation_frame !== null) {
 					cancelAnimationFrame(move_animation_frame);
 				}
@@ -2066,5 +2055,48 @@ class CDashboardPage extends CBaseComponent {
 		if (this._events_data.dashboard_grid_resize_timeout_id != null) {
 			clearTimeout(this._events_data.dashboard_grid_resize_timeout_id);
 		}
+	}
+
+	/**
+	 * Attach event listener to dashboard page events.
+	 *
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
+	 *
+	 * @returns {CDashboardPage}
+	 */
+	on(type, listener, options = false) {
+		this._target.addEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Detach event listener from dashboard page events.
+	 *
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
+	 *
+	 * @returns {CDashboardPage}
+	 */
+	off(type, listener, options = false) {
+		this._target.removeEventListener(type, listener, options);
+
+		return this;
+	}
+
+	/**
+	 * Dispatch dashboard page event.
+	 *
+	 * @param {string} type
+	 * @param {Object} detail
+	 * @param {Object} options
+	 *
+	 * @returns {boolean}
+	 */
+	fire(type, detail = {}, options = {}) {
+		return this._target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }

@@ -68,14 +68,6 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					continue;
 				}
 
-				if ($this->hasInput('templateid') && !$widget->hasTemplateSupport()) {
-					error(_('Widget type is not supported in this context.'));
-
-					$ret = false;
-
-					break;
-				}
-
 				$this->widgets_data[] = [
 					'type' => $widget_input['type'],
 					'form' => $widget->getForm($widget_input['fields'],

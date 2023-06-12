@@ -41,10 +41,10 @@ zbx_mutex_t	modbus_lock = ZBX_MUTEX_NULL;
 #define LOCK_MODBUS	zbx_mutex_lock(modbus_lock)
 #define UNLOCK_MODBUS	zbx_mutex_unlock(modbus_lock)
 
-#define ZBX_MODBUS_DATATYPE_STRLEN_MAX	6
-
 #define ZBX_MODBUS_BAUDRATE_DEFAULT	115200
 #define ZBX_MODBUS_ADDRESS_MAX		65535
+
+#define ZBX_MODBUS_DATATYPE_STRLEN_MAX	6
 
 static struct modbus_datatype_ref
 {
@@ -64,6 +64,8 @@ modbus_datatype_map[] =
 	{ ZBX_MODBUS_DATATYPE_UINT64,	"uint64" },
 	{ ZBX_MODBUS_DATATYPE_DOUBLE,	"double" }
 };
+
+#undef ZBX_MODBUS_DATATYPE_STRLEN_MAX
 
 static uint64_t	read_reg_64(uint16_t *reg16, modbus_endianness_t endianness)
 {

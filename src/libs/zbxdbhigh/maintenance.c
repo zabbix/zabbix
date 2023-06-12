@@ -47,8 +47,8 @@ int	zbx_db_lock_maintenanceids(zbx_vector_uint64_t *maintenanceids)
 	size_t		sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t	maintenanceid;
 	int		i;
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_vector_uint64_sort(maintenanceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 

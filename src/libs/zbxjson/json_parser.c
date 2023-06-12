@@ -82,7 +82,7 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 		if ('\\' == *ptr)
 		{
 			const char	*escape_start = ptr;
-			int		i;
+			unsigned char	uc[4];	/* decoded Unicode character takes 1-4 bytes in UTF-8 */
 
 			/* unexpected end of string data, failing */
 			if ('\0' == *(++ptr))
@@ -101,16 +101,13 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 					break;
 				case 'u':
 					/* check if the \u is followed with 4 hex digits */
-					for (i = 0; i < 4; i++)
+					if (0 == zbx_json_decode_character(&ptr, uc))
 					{
-						if (0 == isxdigit((unsigned char)*(++ptr)))
-						{
-							return json_error("invalid escape sequence in string",
-									escape_start, error);
-						}
+						return json_error("invalid escape sequence in string",
+								escape_start, error);
 					}
 
-					break;
+					continue;
 				default:
 					return json_error("invalid escape sequence in string data",
 							escape_start, error);
@@ -127,7 +124,12 @@ static zbx_int64_t	json_parse_string(const char *start, char **str, char **error
 	if (NULL != str)
 	{
 		*str = (char *)zbx_malloc(NULL, (size_t)(ptr - start));
-		json_copy_string(start, *str, (size_t)(ptr - start));
+
+		if (NULL == json_copy_string(start, *str, (size_t)(ptr - start)))
+		{
+			zbx_free(*str);
+			return json_error("invalid string data", start, error);
+		}
 	}
 
 	return ptr - start + 1;
@@ -456,7 +458,20 @@ zbx_int64_t	json_parse_object(const char *start, zbx_jsonobj_t *obj, char **erro
 			}
 
 			if (NULL != obj)
-				zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+			{
+				zbx_jsonobj_el_t	*pel;
+
+				pel = (zbx_jsonobj_el_t *)zbx_hashset_insert(&obj->data.object, &el, sizeof(el));
+
+				/* check if they element was inserted, if not solve the conflict */
+				/* by overwriting old data                                       */
+				if (pel->name != el.name)
+				{
+					zbx_free(pel->name);
+					zbx_jsonobj_clear(&pel->value);
+					*pel = el;
+				}
+			}
 
 			ptr += len;
 

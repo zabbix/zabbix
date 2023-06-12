@@ -150,6 +150,16 @@ class CMessageHelper {
 	}
 
 	/**
+	 * Set title for warning messages.
+	 *
+	 * @param string $title
+	 */
+	public static function setWarningTitle(string $title): void {
+		self::$type = self::MESSAGE_TYPE_WARNING;
+		self::$title = $title;
+	}
+
+	/**
 	 * Get messages type.
 	 *
 	 * @return string

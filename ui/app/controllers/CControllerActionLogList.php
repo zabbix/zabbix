@@ -130,12 +130,7 @@ class CControllerActionLogList extends CController {
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
-		$search_strings = [];
-
-		if ($data['messages']) {
-			$search_strings = explode(' ', $data['messages']);
-		}
-
+		$search = $data['messages'] === '' ? null : $data['messages'];
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		foreach (eventSourceObjects() as $event_source) {
@@ -149,8 +144,8 @@ class CControllerActionLogList extends CController {
 				'actionids' => $actionids ?: null,
 				'mediatypeids' => $mediatypeids ?: null,
 				'search' => [
-					'subject' => $search_strings,
-					'message' => $search_strings
+					'subject' => $search,
+					'message' => $search
 				],
 				'searchByAny' => true,
 				'time_from' => $data['timeline']['from_ts'] - 1,
@@ -219,7 +214,7 @@ class CControllerActionLogList extends CController {
 		CProfile::updateArray('web.actionlog.filter.mediatypeids', $this->getInput('filter_mediatypeids', []),
 			PROFILE_TYPE_ID);
 		CProfile::updateArray('web.actionlog.filter.statuses', $this->getInput('filter_statuses', []), PROFILE_TYPE_ID);
-		CProfile::update('web.actionlog.filter.messages', $this->getInput('filter_messages', ''),PROFILE_TYPE_STR);
+		CProfile::update('web.actionlog.filter.messages', $this->getInput('filter_messages', ''), PROFILE_TYPE_STR);
 	}
 
 	private function deleteProfiles(): void {

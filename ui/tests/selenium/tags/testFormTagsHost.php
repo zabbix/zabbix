@@ -54,14 +54,7 @@ class testFormTagsHost extends testFormTags {
 	 * Test cloning of Host with tags.
 	 */
 	public function testFormTagsHost_Clone() {
-		$this->executeCloning('host', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Host with tags.
-	 */
-	public function testFormTagsHost_FullClone() {
-		$this->executeCloning('host', 'Full clone');
+		$this->executeCloning('host');
 	}
 
 	/**

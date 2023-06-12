@@ -18,6 +18,7 @@ OBJS = \
 	$(OUTPUTDIR)\num.o \
 	$(OUTPUTDIR)\str.o \
 	$(OUTPUTDIR)\common_str.o \
+	$(OUTPUTDIR)\common_log.o \
 	$(OUTPUTDIR)\components_strings_representations.o \
 	$(OUTPUTDIR)\libc_wrappers.o \
 	$(OUTPUTDIR)\param.o \
@@ -49,10 +50,12 @@ OBJS = \
 	$(OUTPUTDIR)\variant.o \
 	$(OUTPUTDIR)\sysinfo_system.o \
 	$(OUTPUTDIR)\sysinfo_dns.o \
-	$(OUTPUTDIR)\sysinfo_file.o \
+	$(OUTPUTDIR)\sysinfo_vfs_file.o \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
+	$(OUTPUTDIR)\symbols.o \
+	$(OUTPUTDIR)\win32_file.o \
 	$(TARGETDIR)\resource.syso
 
 CFLAGS := $(CFLAGS) -O2 -g -DHAVE_STDINT_H=1 -DZBX_BUILD_AGENT2=1  -DHAVE_THREAD_LOCAL=1 \
@@ -128,7 +131,16 @@ $(OUTPUTDIR)\str.o: $(TOPDIR)\src\libs\zbxstr\str.c
 $(OUTPUTDIR)\common_str.o: $(TOPDIR)\src\libs\zbxcommon\common_str.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxcommon\file.c
+$(OUTPUTDIR)\common_log.o: $(TOPDIR)\src\libs\zbxcommon\common_log.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\file.o: $(TOPDIR)\src\libs\zbxfile\file.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\symbols.o: $(TOPDIR)\src\libs\zbxwin32\symbols.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\win32_file.o: $(TOPDIR)\src\libs\zbxfile\win32\win32_file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\time.o: $(TOPDIR)\src\libs\zbxtime\time.c
@@ -206,7 +218,7 @@ $(OUTPUTDIR)\sysinfo_system.o: $(TOPDIR)\src\libs\zbxsysinfo\common\system.c
 $(OUTPUTDIR)\sysinfo_dns.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dns.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
-$(OUTPUTDIR)\sysinfo_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\file.c
+$(OUTPUTDIR)\sysinfo_vfs_file.o: $(TOPDIR)\src\libs\zbxsysinfo\common\vfs_file.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\sysinfo_dir.o: $(TOPDIR)\src\libs\zbxsysinfo\common\dir.c
@@ -228,6 +240,9 @@ $(OUTPUTDIR)\algodefs.o: $(TOPDIR)\src\libs\zbxalgo\algodefs.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c

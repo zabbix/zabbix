@@ -19,7 +19,7 @@
 
 #include "housekeeper.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserver.h"
@@ -99,6 +99,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history_log",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
@@ -108,7 +109,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 };
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	ITEM_VALUE_TYPE_MAX
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
 #define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 #define HK_UPDATE_CACHE_TREND_COUNT		2
 
@@ -178,6 +179,9 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "history_text",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
 			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
 			.type = ITEM_VALUE_TYPE_TEXT},
+	{.table = "history_bin",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
+			.type = ITEM_VALUE_TYPE_BIN},
 	{.table = "trends",		.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
 			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
 			.type = ITEM_VALUE_TYPE_FLOAT},
@@ -264,8 +268,8 @@ static void	hk_history_delete_queue_append(zbx_hk_history_rule_t *rule, int now,
  ******************************************************************************/
 static void	hk_history_prepare(zbx_hk_history_rule_t *rule)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 
 	zbx_hashset_create(&rule->item_cache, 1024, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -366,8 +370,8 @@ static void	hk_history_item_update(zbx_hk_history_rule_t *rules, zbx_hk_history_
  ******************************************************************************/
 static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	char			*tmp = NULL;
 	zbx_dc_um_handle_t	*um_handle;
 
@@ -392,7 +396,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(hostid, row[4]);
 
-		if (value_type < ITEM_VALUE_TYPE_MAX &&
+		if (value_type <= ITEM_VALUE_TYPE_BIN &&
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			tmp = zbx_strdup(tmp, row[2]);
@@ -415,7 +419,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				history = *rule->poption;
 
-			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_MAX, now, itemid, history);
+			hk_history_item_update(rules, rule, ITEM_VALUE_TYPE_BIN + 1, now, itemid, history);
 		}
 
 		if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
@@ -523,7 +527,7 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 {
 #if defined(HAVE_POSTGRESQL)
 	int		history_seconds;
-	DB_RESULT	result;
+	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
@@ -720,8 +724,8 @@ skip:
  ******************************************************************************/
 static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
 	int		keep_from, id_field_str_type, deleted = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
@@ -973,8 +977,8 @@ static int	hk_table_cleanup(const char *table, const char *field, zbx_uint64_t i
  ******************************************************************************/
 static int	housekeeping_cleanup(void)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			deleted = 0;
 	zbx_vector_uint64_t	housekeeperids;
 	char			*sql = NULL, *table_name_esc;
@@ -1171,8 +1175,8 @@ static int	housekeeping_events(int now)
 static int	housekeeping_problems(int now)
 {
 	int			deleted = 0, rc;
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	zbx_vector_uint64_t	ids_uint64;
 	size_t			sql_alloc = 0, sql_offset;
 	char			*sql = NULL;
@@ -1184,8 +1188,8 @@ static int	housekeeping_problems(int now)
 
 	zbx_snprintf(buffer, sizeof(buffer),
 		"select p1.eventid from problem p1"
-		" where p1.r_clock<>0 and p1.r_clock<%d and p1.eventid not in ("
-			" select cause_eventid"
+		" where p1.r_clock<>0 and p1.r_clock<%d and not exists ("
+			"select NULL"
 			" from problem p2"
 			" where p1.eventid=p2.cause_eventid"
 		")", now - SEC_PER_DAY);
@@ -1273,6 +1277,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	zbx_uint32_t		rtc_msgs[] = {ZBX_RTC_HOUSEKEEPER_EXECUTE, ZBX_RTC_TRIGGER_HOUSEKEEPER_EXECUTE};
 
 	db_version_info = housekeeper_args_in->db_version_info;
 
@@ -1297,7 +1302,8 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 	hk_history_compression_init();
 
-	zbx_rtc_subscribe(process_type, process_num, housekeeper_args_in->config_timeout, &rtc);
+	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), housekeeper_args_in->config_timeout,
+			&rtc);
 
 #if defined(HAVE_POSTGRESQL)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);

@@ -21,7 +21,6 @@
 #define ZABBIX_ZBXALGO_H
 
 #include "zbxnum.h"
-#include "log.h"
 
 /* generic */
 
@@ -90,15 +89,18 @@ typedef void (*zbx_clean_func_t)(void *data);
 	if ((a) > (b))			\
 		return +1
 
-#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)	\
-						\
-	if (FAIL == zbx_double_compare(a, b))	\
-	{					\
-		if ((a) < (b))			\
-			return -1;		\
-		else				\
-			return +1;		\
-	}
+#define ZBX_RETURN_IF_DBL_NOT_EQUAL(a, b)		\
+	do						\
+	{						\
+		if (FAIL == zbx_double_compare(a, b))	\
+		{					\
+			if ((a) < (b))			\
+				return -1;		\
+			else				\
+				return +1;		\
+		}					\
+	}						\
+	while(0)
 
 /* pair */
 
@@ -164,7 +166,7 @@ void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
 void	*zbx_hashset_search(const zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
-void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);
+void	zbx_hashset_remove_direct(zbx_hashset_t *hs, void *data);
 
 void	zbx_hashset_clear(zbx_hashset_t *hs);
 
@@ -240,8 +242,8 @@ void	zbx_hashmap_clear(zbx_hashmap_t *hm);
 
 typedef struct
 {
-	zbx_uint64_t		key;
-	const void		*data;
+	zbx_uint64_t	key;
+	void		*data;
 }
 zbx_binary_heap_elem_t;
 
@@ -272,8 +274,8 @@ void			zbx_binary_heap_create_ext(zbx_binary_heap_t *heap, zbx_compare_func_t co
 							zbx_mem_free_func_t mem_free_func);
 void			zbx_binary_heap_destroy(zbx_binary_heap_t *heap);
 
-int			zbx_binary_heap_empty(zbx_binary_heap_t *heap);
-zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(zbx_binary_heap_t *heap);
+int			zbx_binary_heap_empty(const zbx_binary_heap_t *heap);
+zbx_binary_heap_elem_t	*zbx_binary_heap_find_min(const zbx_binary_heap_t *heap);
 void			zbx_binary_heap_insert(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem);
 void			zbx_binary_heap_update_direct(zbx_binary_heap_t *heap, zbx_binary_heap_elem_t *elem);
 void			zbx_binary_heap_remove_min(zbx_binary_heap_t *heap);
@@ -283,9 +285,9 @@ void			zbx_binary_heap_clear(zbx_binary_heap_t *heap);
 
 /* vector implementation start */
 
-#define ZBX_VECTOR_DECL(__id, __type)										\
+#define ZBX_VECTOR_STRUCT_DECL(__id, __type)									\
 														\
-typedef struct													\
+typedef struct zbx_vector_ ## __id ## _s									\
 {														\
 	__type			*values;									\
 	int			values_num;									\
@@ -294,7 +296,9 @@ typedef struct													\
 	zbx_mem_realloc_func_t	mem_realloc_func;								\
 	zbx_mem_free_func_t	mem_free_func;									\
 }														\
-zbx_vector_ ## __id ## _t;											\
+zbx_vector_ ## __id ## _t;
+
+#define ZBX_VECTOR_FUNC_DECL(__id, __type)									\
 														\
 void	zbx_vector_ ## __id ## _create(zbx_vector_ ## __id ## _t *vector);					\
 void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
@@ -327,15 +331,22 @@ void	zbx_vector_ ## __id ## _setdiff(zbx_vector_ ## __id ## _t *left, const zbx_
 void	zbx_vector_ ## __id ## _reserve(zbx_vector_ ## __id ## _t *vector, size_t size);			\
 void	zbx_vector_ ## __id ## _clear(zbx_vector_ ## __id ## _t *vector);
 
-#define ZBX_PTR_VECTOR_DECL(__id, __type)									\
+#define ZBX_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)					\
+					ZBX_VECTOR_FUNC_DECL(__id, __type)
+
+#define ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)									\
 														\
-ZBX_VECTOR_DECL(__id, __type)											\
+ZBX_VECTOR_FUNC_DECL(__id, __type)										\
 														\
 typedef void (*zbx_ ## __id ## _free_func_t)(__type data);							\
 														\
 void	zbx_vector_ ## __id ## _clear_ext(zbx_vector_ ## __id ## _t *vector, zbx_ ## __id ## _free_func_t free_func);
 
+#define ZBX_PTR_VECTOR_DECL(__id, __type)	ZBX_VECTOR_STRUCT_DECL(__id, __type)				\
+						ZBX_PTR_VECTOR_FUNC_DECL(__id, __type)
+
 ZBX_VECTOR_DECL(uint64, zbx_uint64_t)
+ZBX_VECTOR_DECL(uint32, zbx_uint32_t)
 ZBX_PTR_VECTOR_DECL(str, char *)
 ZBX_PTR_VECTOR_DECL(ptr, void *)
 ZBX_VECTOR_DECL(ptr_pair, zbx_ptr_pair_t)

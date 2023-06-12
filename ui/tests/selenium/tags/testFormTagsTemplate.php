@@ -54,14 +54,7 @@ class testFormTagsTemplate extends testFormTags {
 	 * Test cloning of Template with tags.
 	 */
 	public function testFormTagsTemplate_Clone() {
-		$this->executeCloning('template', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Template with tags.
-	 */
-	public function testFormTagsTemplate_FullClone() {
-		$this->executeCloning('template', 'Full clone');
+		$this->executeCloning('template');
 	}
 
 	/**

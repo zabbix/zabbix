@@ -20,7 +20,6 @@
 #include "dbconfig.h"
 
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 static void	DCdump_config(void)
@@ -1307,7 +1306,7 @@ static int	strpool_compare(const void *v1, const void *v2)
 	return strcmp(s1, s2);
 }
 
-static void	DCdump_strpool()
+static void	DCdump_strpool(void)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vector_ptr_t	records;
@@ -1346,8 +1345,9 @@ static void	DCdump_drules(void)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "druleid:" ZBX_FS_UI64 " proxy_hostid:" ZBX_FS_UI64 " revision:" ZBX_FS_UI64,
 				drule->druleid, drule->proxy_hostid, drule->revision);
-		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld",
-				drule->status, drule->delay, drule->location, (long int)drule->nextcheck);
+		zabbix_log(LOG_LEVEL_TRACE, "  status:%u delay:%d location:%d nextcheck:%ld concurrency_max:%d",
+				drule->status, drule->delay, drule->location, (long int)drule->nextcheck,
+				drule->concurrency_max);
 	}
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);

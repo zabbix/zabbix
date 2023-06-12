@@ -185,7 +185,7 @@ class CProvisioning {
 			'name' => $this->userdirectory['user_username'],
 			'surname' => $this->userdirectory['user_lastname']
 		], 'strlen');
-		$user = array_fill_keys(array_keys($user_idp_fields), '');
+		$user = [];
 		$idp_user_lowercased = [];
 
 		if (!$case_sensitive) {

@@ -38,10 +38,12 @@ $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
 $this->addJsFile('class.geomaps.js');
+$this->addJsFile('class.widget-base.js');
 $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.coverride.js');
@@ -105,7 +107,7 @@ $html_page = (new CHtmlPage())
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
-						(new CButton('', '&nbsp;'))
+						(new CButton(null, NBSP()))
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
@@ -132,7 +134,7 @@ $html_page = (new CHtmlPage())
 							))->addClass(ZBX_STYLE_BTN_ALT)
 						)
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add', ZWSPACE()))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),

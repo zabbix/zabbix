@@ -62,7 +62,7 @@ class NavTreeItemEdit extends CController {
 	protected function doAction(): void {
 		$sysmapid = $this->getInput('sysmapid');
 
-		$sysmap = ['sysmapid' => $sysmapid, 'name' => ''];
+		$sysmap = [];
 
 		if ($sysmapid != 0) {
 			$sysmaps = API::Map()->get([
@@ -72,9 +72,17 @@ class NavTreeItemEdit extends CController {
 
 			if ($sysmaps) {
 				$sysmap = $sysmaps[0];
+				$sysmap = [
+					'id' => $sysmap['sysmapid'],
+					'name' => $sysmap['name']
+				];
 			}
 			else {
-				$sysmap['name'] = _('Inaccessible map');
+				$sysmap = [
+					'id' => $sysmapid,
+					'name' => _('Inaccessible map'),
+					'inaccessible' => true
+				];
 			}
 		}
 

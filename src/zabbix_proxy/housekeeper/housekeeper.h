@@ -22,13 +22,12 @@
 
 #include "zbxthreads.h"
 
-extern int	CONFIG_HOUSEKEEPING_FREQUENCY;
-extern int	CONFIG_PROXY_LOCAL_BUFFER;
-extern int	CONFIG_PROXY_OFFLINE_BUFFER;
-
 typedef struct
 {
-	int			config_timeout;
+	int	config_timeout;
+	int	config_housekeeping_frequency;
+	int	config_proxy_local_buffer;
+	int	config_proxy_offline_buffer;
 }
 zbx_thread_proxy_housekeeper_args;
 

@@ -34,17 +34,9 @@ zbx_jsonobj_ref_t;
 
 ZBX_VECTOR_DECL(jsonobj_ref, zbx_jsonobj_ref_t)
 
-typedef struct
-{
-	char				*value;		/* the value found at indexed path */
-	zbx_vector_jsonobj_ref_t	objects;	/* the objects matching value at indexed path */
-}
-zbx_jsonobj_index_el_t;
-
 void	jsonobj_init(zbx_jsonobj_t *obj, zbx_json_type_t type);
 
 void	jsonobj_el_init(zbx_jsonobj_el_t *el);
-void	jsonobj_init_index(zbx_jsonobj_t *obj, const char *path);
 void	jsonobj_el_clear(zbx_jsonobj_el_t *el);
 
 void	jsonobj_set_string(zbx_jsonobj_t *obj, char *str);
@@ -52,5 +44,7 @@ void	jsonobj_set_number(zbx_jsonobj_t *obj, double number);
 void	jsonobj_set_true(zbx_jsonobj_t *obj);
 void	jsonobj_set_false(zbx_jsonobj_t *obj);
 void	jsonobj_set_null(zbx_jsonobj_t *obj);
+
+void	jsonobj_clear_ref_vector(zbx_vector_jsonobj_ref_t *refs);
 
 #endif

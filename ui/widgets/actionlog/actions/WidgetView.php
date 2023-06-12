@@ -98,12 +98,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$data['mediatypeids'] = $this->prepareDataForMultiselect($data['media_types'], 'media_types');
 		}
 
-		$search_strings = [];
-
-		if ($data['message']) {
-			$search_strings = explode(' ', $data['message']);
-		}
-
+		$search = $data['message'] === '' ? null : $data['message'];
 		$range_time_parser = new CRangeTimeParser();
 
 		$range_time_parser->parse($this->getInput('from'));
@@ -127,8 +122,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'mediatypeids' => $mediatypeids ?: null,
 				'filter' => ['status' => $data['statuses']],
 				'search' => [
-					'subject' => $search_strings,
-					'message' => $search_strings
+					'subject' => $search,
+					'message' => $search
 				],
 				'searchByAny' => true,
 				'time_from' => $time_from - 1,

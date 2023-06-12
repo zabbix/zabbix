@@ -28,9 +28,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	// Is selecting multiple objects or a single one?
 	private bool $is_multiple = true;
 
-	// Additional filter parameters used for data selection.
-	protected array $filter_parameters = [];
-
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
@@ -70,22 +67,6 @@ abstract class CWidgetFieldMultiSelect extends CWidgetField {
 	 */
 	public function setMultiple(bool $is_multiple = true): self {
 		$this->is_multiple = $is_multiple;
-
-		return $this;
-	}
-
-	/**
-	 * Get additional filter parameters.
-	 */
-	public function getFilterParameters(): array {
-		return $this->filter_parameters;
-	}
-
-	/**
-	 * Set an additional filter parameter for data selection.
-	 */
-	public function setFilterParameter(string $name, $value): self {
-		$this->filter_parameters[$name] = $value;
 
 		return $this;
 	}

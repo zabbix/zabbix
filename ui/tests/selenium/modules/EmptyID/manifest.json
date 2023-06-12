@@ -1,0 +1,9 @@
+{
+	"manifest_version": 2.0,
+	"id": " ",
+	"type": "widget",
+	"name": "EmptyID",
+	"namespace": "EmptyID",
+	"version": "1.0",
+	"author": "Zabbix SIA"
+}

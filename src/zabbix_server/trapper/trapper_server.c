@@ -19,7 +19,6 @@
 
 #include "trapper_request.h"
 
-#include "log.h"
 #include "cfg.h"
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
@@ -77,10 +76,10 @@ out:
  *              jp    - [IN] the request data                                 *
  *                                                                            *
  ******************************************************************************/
-static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
-	DB_RESULT		result;
-	DB_ROW			row;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
 	int			ret = FAIL, errcode;
 	char			tmp[ZBX_MAX_UINT64_LEN + 1], *sendto = NULL, *subject = NULL,
 				*message = NULL, *error = NULL, *params = NULL, *value = NULL, *debug = NULL;
@@ -200,7 +199,7 @@ fail:
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_free(params);
 	zbx_free(message);
@@ -218,10 +217,13 @@ fail:
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		zbx_get_program_type_f get_program_type_cb, int config_timeout)
+		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *config_source_ip,
+		const char *server)
 {
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(get_program_type_cb);
+	ZBX_UNUSED(server);
+	ZBX_UNUSED(config_source_ip);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
@@ -230,12 +232,12 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
-		trapper_process_alert_send(sock, jp);
+		trapper_process_alert_send(sock, jp, config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
-		zbx_send_proxyconfig(sock, jp, config_vault, config_timeout);
+		zbx_send_proxyconfig(sock, jp, config_vault, config_timeout, config_source_ip);
 		return SUCCEED;
 	}
 

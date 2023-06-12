@@ -249,7 +249,7 @@ class CFormElement extends CElement {
 	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $key => $label) {
+		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 
 			if ($element->isValid()) {

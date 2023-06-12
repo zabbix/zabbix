@@ -36,6 +36,7 @@ $available_js = [
 	'class.dashboard.js' => '',
 	'class.dashboard.page.js' => '',
 	'class.dashboard.widget.placeholder.js' => '',
+	'class.widget-base.js' => '',
 	'class.widget.js' => '',
 	'class.widget.inaccessible.js' => '',
 	'class.widget.iterator.js' => '',
@@ -66,7 +67,6 @@ $available_js = [
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
-	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
@@ -88,6 +88,7 @@ $available_js = [
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
 	'class.curl.js' => '',
+	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
@@ -116,9 +117,6 @@ $available_js = [
 $translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
-	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
 	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
@@ -152,7 +150,7 @@ $translate_strings = [
 	'class.geomaps.js' => [
 		'Severity filter' => _('Severity filter')
 	],
-	'class.widget.js' => [
+	'class.widget-base.js' => [
 		'10 seconds' => _n('%1$s second', '%1$s seconds', 10),
 		'30 seconds' => _n('%1$s second', '%1$s seconds', 30),
 		'1 minute' => _n('%1$s minute', '%1$s minutes', 1),
@@ -419,7 +417,6 @@ if (empty($_GET['files'])) {
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',
-		'class.bbcode.js',
 		'class.csuggest.js',
 		'class.scrollable.js',
 		'class.sidebar.js',

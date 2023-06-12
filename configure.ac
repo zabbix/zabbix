@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[6.4.0rc3])
+AC_INIT([Zabbix],[7.0.0alpha2])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE([subdir-objects tar-pax])
 
@@ -65,7 +65,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   stdarg.h winsock2.h pdh.h psapi.h sys/sem.h sys/ipc.h sys/shm.h Winldap.h \
   Winber.h lber.h ws2tcpip.h inttypes.h sys/file.h grp.h \
   execinfo.h sys/systemcfg.h sys/mnttab.h mntent.h sys/times.h \
-  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h)
+  dlfcn.h sys/utsname.h sys/un.h sys/protosw.h stddef.h limits.h float.h poll.h)
 AC_CHECK_HEADERS(resolv.h, [], [], [
 #ifdef HAVE_SYS_TYPES_H
 #  include <sys/types.h>
@@ -166,7 +166,6 @@ dnl *****************************************************************
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
-AC_SEARCH_LIBS(gethostbyname, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_SEARCH_LIBS(dlopen, dl)
 
@@ -1244,7 +1243,7 @@ AM_CONDITIONAL(IPV6, test "x$ipv6" = "xyes")
 
 AM_CONDITIONAL([DBSCHEMA], [test -d create])
 
-AM_CONDITIONAL([ZBXCMOCKA], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
+AM_CONDITIONAL([USE_TESTS], [(test -f m4/conf_tests.m4) && (test "x$server" = "xyes" || test "x$proxy" = "xyes" || test "x$agent" = "xyes")])
 
 have_db="no"
 have_unixodbc="no"
@@ -1574,6 +1573,16 @@ if test "x$have_ipcservice" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $LIBEVENT_LIBS"
 fi
 
+dnl Check multhithread SSL libs requirements [by default - skip]
+mt_required="no"
+if test "x$server" = "xyes"; then
+	mt_required="yes"
+fi
+
+if test "x$proxy" = "xyes"; then
+	mt_required="yes"
+fi
+
 dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
@@ -1591,10 +1600,13 @@ if test "x$want_gnutls" = "xyes"; then
 	TLS_CFLAGS="$GNUTLS_CFLAGS"
 	TLS_LDFLAGS="$GNUTLS_LDFLAGS"
 	TLS_LIBS="$GNUTLS_LIBS"
+	AC_SUBST(TLS_CFLAGS)
+	AC_SUBST(TLS_LDFLAGS)
+	AC_SUBST(TLS_LIBS)
 fi
 
 dnl Check for OpenSSL libssl and libcrypto [by default - skip]
-LIBOPENSSL_CHECK_CONFIG([no])
+LIBOPENSSL_CHECK_CONFIG([no], [$mt_required])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-gnutls or --with-openssl).])
@@ -1602,6 +1614,8 @@ if test "x$want_openssl" = "xyes"; then
 
 	if test "x$found_openssl" != "xOpenSSL" -a "x$found_openssl" != "xOpenSSL (PSK not supported)"; then
 		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
+	elif test "x$accept_openssl_version" != "xyes" -a "$mt_required" = "yes"; then
+		AC_MSG_ERROR([OpenSSL library version requirement for server or proxy not met (>= 1.1.0)])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
@@ -1795,6 +1809,19 @@ fi
 LDFLAGS="$LDFLAGS $ICONV_LDFLAGS"
 LIBS="$LIBS $ICONV_LIBS"
 
+TIMES_CHECK_NULL_ARG([no])
+
+have_stacksize="no"
+
+AC_ARG_WITH(stacksize,[
+Override default thread stack size:
+AS_HELP_STRING([--with-stacksize=STACKSIZE], [Set default thread stack size in kilobytes.])],
+[case "${withval}" in
+  [[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]]|[[0-9]][[0-9]][[0-9]][[0-9]][[0-9]])
+    AC_DEFINE_UNQUOTED(HAVE_STACKSIZE, ${withval}, [Override default thread stack size.]) ;;
+  *) AC_MSG_ERROR([bad value ${withval} for --with-stacksize]) ;;
+esac])
+
 RANLIB="ranlib"
 AC_SUBST(RANLIB)
 
@@ -1849,6 +1876,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
 		\${abs_top_builddir}/src/libs/zbxstr/libzbxstr.a \
+		\${abs_top_builddir}/src/libs/zbxfile/libzbxfile.a \
 		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
@@ -1863,6 +1891,7 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/libs/zbxxml/libzbxxml.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
+		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -1926,6 +1955,9 @@ case "x$ARCH" in
 		;;
 esac
 
+found_cmocka="no"
+found_yaml="no"
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *
@@ -1933,6 +1965,7 @@ dnl *                                                               *
 dnl *****************************************************************
 
 m4_ifdef([CONF_TESTS],[CONF_TESTS])
+AM_CONDITIONAL([TESTS],[test "x$found_cmocka" = "xyes"])
 
 AC_CONFIG_FILES([
 	Makefile
@@ -1957,6 +1990,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxconf/Makefile
 	src/libs/zbxcrypto/Makefile
 	src/libs/zbxdb/Makefile
+	src/libs/zbxdbsyncer/Makefile
 	src/libs/zbxcacheconfig/Makefile
 	src/libs/zbxcachehistory/Makefile
 	src/libs/zbxcachevalue/Makefile
@@ -1971,8 +2005,8 @@ AC_CONFIG_FILES([
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile
+	src/libs/zbxfile/Makefile
 	src/libs/zbxgetopt/Makefile
-	src/libs/zbxha/Makefile
 	src/libs/zbxhash/Makefile
 	src/libs/zbxhistory/Makefile
 	src/libs/zbxhttp/Makefile
@@ -1988,6 +2022,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile
 	src/libs/zbxnum/Makefile
+	src/libs/zbxodbc/Makefile
 	src/libs/zbxparam/Makefile
 	src/libs/zbxpreproc/Makefile
 	src/libs/zbxprometheus/Makefile
@@ -2027,6 +2062,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxxml/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
+	src/zabbix_agent/active_checks/Makefile
 	src/zabbix_get/Makefile
 	src/zabbix_java/Makefile
 	src/zabbix_js/Makefile
@@ -2036,28 +2072,27 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
+	src/zabbix_proxy/preproc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
 	src/zabbix_server/alerter/Makefile
-	src/zabbix_server/availability/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfig/Makefile
-	src/zabbix_server/dbsyncer/Makefile
 	src/zabbix_server/diag/Makefile
 	src/zabbix_server/discoverer/Makefile
 	src/zabbix_server/escalator/Makefile
+	src/zabbix_server/events/Makefile
 	src/zabbix_server/ha/Makefile
 	src/zabbix_server/housekeeper/Makefile
 	src/zabbix_server/httppoller/Makefile
 	src/zabbix_server/ipmi/Makefile
 	src/zabbix_server/lld/Makefile
-	src/zabbix_server/odbc/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
-	src/zabbix_server/preprocessor/Makefile
+	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile
 	src/zabbix_server/proxypoller/Makefile
 	src/zabbix_server/reporter/Makefile
@@ -2275,7 +2310,31 @@ fi
 
 echo "
   LDAP support:          ${found_ldap}
-  IPv6 support:          ${have_ipv6}"
+  IPv6 support:          ${have_ipv6}
+  cmocka support:        ${found_cmocka}"
+
+if test "x$found_cmocka" != "xno"; then
+
+echo "  cmocka library details:
+    Compiler flags:      ${CMOCKA_CFLAGS}
+    Linker flags:        ${CMOCKA_LDFLAGS}
+    Libraries:           ${CMOCKA_LIBS}
+    Library location:    ${CMOCKA_LIBRARY_PATH}"
+
+fi
+
+echo "
+  yaml support:          ${found_yaml}"
+
+if test "x$found_yaml" != "xno"; then
+
+echo "  yaml library details:
+    Compiler flags:      ${YAML_CFLAGS}
+    Linker flags:        ${YAML_LDFLAGS}
+    Libraries:           ${YAML_LIBS}
+    Library location:    ${YAML_LIBRARY_PATH}"
+
+fi
 
 echo
 echo "***********************************************************"

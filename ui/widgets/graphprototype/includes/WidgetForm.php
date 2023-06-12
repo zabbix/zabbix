@@ -43,46 +43,30 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_ROWS_COUNT = 1;
 
 	public function addFields(): self {
-		$this->addField(
-			(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
-				ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
-				ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype')
-			]))
-				->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
-				->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
-		);
-
-		if (array_key_exists('source_type', $this->values)
-				&& $this->values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
-
-			$field_item_prototype = (new CWidgetFieldMultiSelectItemPrototype('itemid', _('Item prototype'),
-				$this->templateid
-			))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false)
-				->setFilterParameter('numeric', true);
-
-			if ($this->templateid === null) {
-				$field_item_prototype->setFilterParameter('with_simple_graph_item_prototypes', true);
-			}
-
-			$this->addField($field_item_prototype);
-		}
-		else {
-			$this->addField(
-				(new CWidgetFieldMultiSelectGraphPrototype('graphid', _('Graph prototype'), $this->templateid))
+		return $this
+			->addField(
+				(new CWidgetFieldRadioButtonList('source_type', _('Source'), [
+					ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE => _('Graph prototype'),
+					ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE => _('Simple graph prototype')
+				]))
+					->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE)
+					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
+			)
+			->addField(array_key_exists('source_type', $this->values)
+					&& $this->values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
+				? (new CWidgetFieldMultiSelectItemPrototype('itemid', _('Item prototype')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-			);
-		}
-
-		$this
+				: (new CWidgetFieldMultiSelectGraphPrototype('graphid', _('Graph prototype')))
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->setMultiple(false)
+			)
 			->addField(
 				(new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1)
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('columns', _('Columns'), 1, DASHBOARD_MAX_COLUMNS))
@@ -96,7 +80,5 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(self::DEFAULT_ROWS_COUNT)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			);
-
-		return $this;
 	}
 }
