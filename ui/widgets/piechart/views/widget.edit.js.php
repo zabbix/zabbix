@@ -183,9 +183,8 @@ window.widget_piechart_form = new class {
 			}
 
 			for (let i = 0; i < list.values.length; i++) {
-				this._addSingleItem(list.values[i].itemid, list.values[i].name);
+				this._addSingleItem(list.values[i].itemid, list.values[i].name, list.values[i].type);
 			}
-
 
 			this._updateSingleItemsLinks();
 			this._initSingleItemSortable(this._getOpenedDataset());
@@ -363,7 +362,8 @@ window.widget_piechart_form = new class {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 				this._addSingleItem(
 					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
-					row.querySelector('.table-col-name a').textContent
+					row.querySelector('.table-col-name a').textContent,
+					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][type]`).value
 				);
 			}
 
@@ -472,7 +472,7 @@ window.widget_piechart_form = new class {
 		}
 	}
 
-	_addSingleItem(itemid, name) {
+	_addSingleItem(itemid, name, type) {
 		const dataset = this._getOpenedDataset();
 		const items_table = dataset.querySelector('.single-item-table');
 
@@ -488,7 +488,8 @@ window.widget_piechart_form = new class {
 			dsNum: dataset_index,
 			rowNum: item_next_index,
 			name: name,
-			itemid: itemid
+			itemid: itemid,
+			type: type
 		}));
 
 		const used_colors = [];

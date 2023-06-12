@@ -193,7 +193,9 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 					? $value['item_names'][$itemid]
 					: '';
 
-				$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_name, $value['color'][$i]);
+				$item_rows[] = $this->getItemRowTemplate($row_num, ($i + 1), $itemid, $item_name, $value['color'][$i],
+															$value['type'][$i]
+				);
 			}
 
 			$empty_msg_block = (new CDiv(_('No item selected.')))->addClass('no-items-message');
@@ -317,7 +319,7 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-											$name = '#{name}', $color = '#{color}'): CRow {
+											$name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
 		return (new CRow([
 			(new CCol(
 				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
@@ -336,9 +338,9 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 					->addClass('js-click-expend')
 			))->addClass('table-col-name'),
 			(new CCol([
-				(new CSelect($this->field->getName().'['.$ds_num.'][itemtype][]'))
-					->setId('items_'.$ds_num.'_'.$row_num.'_itemtype')
-					->setValue(PIE_CHART_ITEM_NORMAL)
+				(new CSelect($this->field->getName().'['.$ds_num.'][type][]'))
+					->setId('items_'.$ds_num.'_'.$row_num.'_type')
+					->setValue($type)
 					->addOptions(CSelect::createOptionsFromArray([
 						PIE_CHART_ITEM_NORMAL =>_('Normal'),
 						PIE_CHART_ITEM_TOTAL =>_('Total')

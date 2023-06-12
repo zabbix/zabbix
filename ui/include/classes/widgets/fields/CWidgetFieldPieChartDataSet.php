@@ -59,7 +59,7 @@ class CWidgetFieldPieChartDataSet extends CWidgetField {
 				'color'					=> ['type' => API_COLOR, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'dataset_aggregation'   => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM])],
-				'itemtype'              => ['type' => API_INTS32, 'flags' => null],
+				'type'                  => ['type' => API_INTS32, 'flags' => null, 'in' => implode(',', [PIE_CHART_ITEM_NORMAL, PIE_CHART_ITEM_TOTAL])],
 				'data_set_label'		=> ['type' => API_STRING_UTF8, 'length' => 255]
 			]]);
 	}
@@ -111,7 +111,7 @@ class CWidgetFieldPieChartDataSet extends CWidgetField {
 			'color' => self::DEFAULT_COLOR,
 			'aggregate_function' => AGGREGATE_LAST,
 			'dataset_aggregation' => AGGREGATE_NONE,
-			'itemtype' => PIE_CHART_ITEM_NORMAL,
+			'type' => [],
 			'data_set_label' => ''
 		];
 	}
@@ -171,7 +171,7 @@ class CWidgetFieldPieChartDataSet extends CWidgetField {
 				if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
 					$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
 					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
-					$validation_rules_by_type['fields']['itemtype']['flags'] |= API_REQUIRED;
+					$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
 
 					unset($data['hosts'], $data['items']);
 				}
@@ -179,7 +179,7 @@ class CWidgetFieldPieChartDataSet extends CWidgetField {
 					$validation_rules_by_type['fields']['hosts']['flags'] |= API_REQUIRED;
 					$validation_rules_by_type['fields']['items']['flags'] |= API_REQUIRED;
 
-					unset($data['itemids'], $data['itemtype']);
+					unset($data['itemids'], $data['type']);
 				}
 
 				if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($i+1), $error)) {
@@ -231,11 +231,11 @@ class CWidgetFieldPieChartDataSet extends CWidgetField {
 					'value' => $itemid
 				];
 			}
-			foreach ($val['itemtype'] as $num => $itemtype) {
+			foreach ($val['type'] as $num => $type) {
 				$widget_fields[] = [
 					'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 					'name' => $this->name.'.type.'.$index.'.'.$num,
-					'value' => $itemtype
+					'value' => $type
 				];
 			}
 			// Field "color" stored as array for dataset type DATASET_TYPE_SINGLE_ITEM (0)
