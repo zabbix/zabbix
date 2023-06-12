@@ -866,6 +866,12 @@ class CDashboard extends CBaseComponent {
 	}
 
 	getDashboardPageIndex(dashboard_page) {
+		if (this._is_kiosk_mode) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+
+			return dashboard_pages.indexOf(dashboard_page);
+		}
+
 		const tabs = [...this._tabs.getList().children];
 		const data = this._dashboard_pages.get(dashboard_page);
 
