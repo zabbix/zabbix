@@ -19,14 +19,14 @@
 **/
 
 
-namespace Zabbix\Widgets\Fields;
+namespace Widgets\SvgGraph\Includes;
 
 use Zabbix\Widgets\CWidgetField;
 
 /**
  * Class for override widget field used in Graph widget configuration overrides tab.
  */
-class CWidgetFieldGraphOverride extends CWidgetField {
+class CWidgetFieldOverride extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 

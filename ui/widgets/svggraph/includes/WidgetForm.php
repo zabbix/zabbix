@@ -34,8 +34,6 @@ use Zabbix\Widgets\{
 use Zabbix\Widgets\Fields\{
 	CWidgetFieldCheckBox,
 	CWidgetFieldDatePicker,
-	CWidgetFieldGraphDataSet,
-	CWidgetFieldGraphOverride,
 	CWidgetFieldHostPatternSelect,
 	CWidgetFieldNumericBox,
 	CWidgetFieldRadioButtonList,
@@ -250,7 +248,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 
@@ -430,7 +428,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initOverridesFields(): self {
 		return $this->addField(
-			(new CWidgetFieldGraphOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldOverride('or', _('Overrides')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 

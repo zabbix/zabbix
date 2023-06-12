@@ -26,7 +26,11 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldGraphDataSet;
+use Widgets\SvgGraph\Includes\{
+	CWidgetFieldDataSet,
+	CWidgetFieldDataSetView,
+	CWidgetFieldOverrideView
+};
 
 $form = (new CWidgetFormView($data));
 
@@ -65,13 +69,13 @@ $form
 	->includeJsFile('widget.edit.js.php')
 	->addJavaScript('widget_svggraph_form.init('.json_encode([
 		'form_tabs_id' => $form_tabs->getId(),
-		'color_palette' => CWidgetFieldGraphDataSet::DEFAULT_COLOR_PALETTE,
+		'color_palette' => CWidgetFieldDataSet::DEFAULT_COLOR_PALETTE,
 		'templateid' => $data['templateid']
 	], JSON_THROW_ON_ERROR).');')
 	->show();
 
 function getDatasetTab(CWidgetFormView $form, array $fields): array {
-	$dataset = $form->registerField(new CWidgetFieldGraphDataSetView($fields['ds']));
+	$dataset = $form->registerField(new CWidgetFieldDataSetView($fields['ds']));
 
 	return [
 		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
@@ -327,7 +331,7 @@ function getProblemsTab(CWidgetFormView $form, array $fields): CFormGrid {
 }
 
 function getOverridesTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$overrides = $form->registerField(new CWidgetFieldGraphOverrideView($fields['or']));
+	$overrides = $form->registerField(new CWidgetFieldOverrideView($fields['or']));
 
 	return (new CFormGrid())->addItem([
 		$overrides->getLabel(),
