@@ -25,6 +25,15 @@
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 
+#define ZBX_MAX_HRECORDS	1000
+#define ZBX_MAX_HRECORDS_TOTAL	10000
+
+/* the space reserved in json buffer to hold at least one record plus service data */
+#define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
+
+#define ZBX_DATA_JSON_RECORD_LIMIT	(ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED)
+#define ZBX_DATA_JSON_BATCH_LIMIT	((ZBX_MAX_RECV_DATA_SIZE - ZBX_DATA_JSON_RESERVED) / 2)
+
 typedef enum
 {
 	PDC_DATABASE_ONLY,
@@ -36,6 +45,7 @@ typedef enum
 zbx_pdc_state_t;
 
 extern zbx_pdc_state_t	pdc_dst[];
+extern zbx_pdc_state_t	pdc_src[];
 
 typedef struct
 {
@@ -53,14 +63,21 @@ zbx_pdc_discovery_t;
 
 ZBX_PTR_VECTOR_DECL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
 
+typedef union
+{
+	const char	*str;
+	size_t		offset;
+}
+zbx_pdc_str_t;
+
 typedef struct
 {
 	zbx_uint64_t	id;
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;		/* clock + ns */
-	const char	*source;
-	const char	*value;
+	zbx_pdc_str_t	source;
+	zbx_pdc_str_t	value;
 	int		timestamp;
 	int		severity;
 	int		logeventid;
@@ -104,5 +121,6 @@ zbx_pdc_t;
 
 extern zbx_pdc_t	*pdc_cache;
 
+zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield);
 
 #endif

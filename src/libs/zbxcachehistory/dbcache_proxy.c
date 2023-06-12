@@ -122,7 +122,6 @@ static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_hi
 static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
 {
 	char		buffer[64], *pvalue;
-	zbx_db_insert_t	db_insert;
 	int		flags;
 
 	if (0 == (h->flags & ZBX_DC_FLAG_NOVALUE))
@@ -220,7 +219,7 @@ static void	dc_add_proxy_history_notsupported(zbx_pdc_history_data_t *handle, co
  ******************************************************************************/
 static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 {
-	int			i, h_num = 0, h_meta_num = 0, hlog_num = 0, notsupported_num = 0, history_count = 0;
+	int			i, history_count = 0;
 	zbx_pdc_history_data_t	*handle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);

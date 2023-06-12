@@ -31,6 +31,7 @@
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager.h"
 #include "zbxjson.h"
+#include "zbxproxydatacache.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -109,7 +110,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
+		history_records = zbx_pdc_get_history(&j, &history_lastid, &more_history);
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
