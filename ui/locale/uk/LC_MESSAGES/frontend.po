@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-05-12 20:06+0000\n"
+"PO-Revision-Date: 2023-06-07 18:44+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -2908,6 +2908,11 @@ msgstr "Неможливо зв’язати шаблон \"%1$s\" із хост
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Неможливо зв’язати шаблон \"%1$s\" із хостом \"%2$s\" через вираз тригера \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -2928,6 +2933,11 @@ msgstr "Неможливо зв’язати шаблон \"%1$s\" із прот
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Неможливо зв’язати шаблон \"%1$s\" із прототипом хосту \"%2$s\" через вираз тригера \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -2959,6 +2969,41 @@ msgstr "Неможливо зв’язати шаблон «%1$s» із шабл
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Неможливо пов’язати шаблон «%1$s» із шаблоном «%2$s», оскільки виникне циклічний зв’язок (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr "Неможливо зв’язати шаблон \"%1$s\" із шаблоном \"%2$s\", оскільки його батьківський шаблон \"%3$s\" буде пов’язано двічі з прототипом вузла \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3814,11 +3859,11 @@ msgstr "Клонувати"
 #: app/views/configuration.host.edit.php:63
 #: app/views/js/popup.host.edit.js.php:47 host_prototypes.php:177
 msgid "Cloned host parameter values have been modified."
-msgstr ""
+msgstr "Параметри клонованого вузла було змінено."
 
 #: templates.php:194
 msgid "Cloned template parameter values have been modified."
-msgstr ""
+msgstr "Параметри клонованого шаблону було змінено."
 
 #: app/views/administration.token.view.php:64
 #: app/views/administration.user.token.view.php:63
@@ -4404,12 +4449,11 @@ msgid "Correlation added"
 msgstr "Кореляцію додано"
 
 #: app/controllers/CControllerCorrelationDelete.php:65
-#, fuzzy
 msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] "Кореляцію видалено"
-msgstr[1] "Кореляцію видалено"
-msgstr[2] "Кореляцію видалено"
+msgstr[1] "Кореляції видалено"
+msgstr[2] "Кореляції видалено"
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
@@ -5918,7 +5962,7 @@ msgstr "Об'єкт виявлення"
 
 #: include/classes/data/CItemData.php:1242
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Виявлення кластерів VMware, \"url\" - URL-адреса служби VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:1229
 msgid "Discovery of VMware clusters, <url> - VMware service URL. Returns JSON"
@@ -5926,7 +5970,7 @@ msgstr "Виявлення кластерів VMware, <url> - URL-адреса �
 
 #: include/classes/data/CItemData.php:1250
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Виявлення сховищ даних VMware, \"url\" - URL-адреса служби VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:1237
 msgid "Discovery of VMware datastores, <url> - VMware service URL. Returns JSON"
@@ -5934,7 +5978,7 @@ msgstr "Виявлення сховищ даних VMware, <url> - URL-адре�
 
 #: include/classes/data/CItemData.php:1302
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "Виявлення сховищ даних гіпервізора VMware, \"url\" - URL-адреса служби VMware, \"uuid\" - глобальний унікальний ідентифікатор гіпервізора VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:1289
 msgid "Discovery of VMware hypervisor datastores, <url> - VMware service URL, <uuid> - VMware hypervisor host name. Returns JSON"
@@ -5942,7 +5986,7 @@ msgstr "Виявлення сховищ даних гіпервізора VMware
 
 #: include/classes/data/CItemData.php:1326
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "Виявлення гіпервізорів VMware, \"url\" – URL-адреса служби VMware. Повертає JSON"
 
 #: include/classes/data/CItemData.php:1313
 msgid "Discovery of VMware hypervisors, <url> - VMware service URL. Returns JSON"
@@ -13209,7 +13253,7 @@ msgstr "Кількість елементів даних в історії пр�
 
 #: include/classes/data/CItemData.php:1668
 msgid "Number of items in the queue which are delayed by from to seconds, inclusive."
-msgstr ""
+msgstr "Кількість елементів даних в черзі, які затримуються від та до секунд, включно."
 
 #: include/classes/data/CItemData.php:1685
 msgid "Number of items in the queue which are delayed by from to to seconds, inclusive."
@@ -13266,7 +13310,7 @@ msgstr "Кількість рядків"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:126
 msgid "Number of seasons"
-msgstr ""
+msgstr "Кількість сезонів"
 
 #: include/views/reports.toptriggers.php:86
 msgid "Number of status changes"
@@ -13279,7 +13323,7 @@ msgstr "Кількість кроків"
 
 #: app/partials/administration.system.info.php:50
 msgid "Number of templates"
-msgstr ""
+msgstr "Кількість шаблонів"
 
 #: app/partials/administration.system.info.php:67
 msgid "Number of triggers (enabled/disabled [problem/ok])"
@@ -13798,7 +13842,7 @@ msgstr "Перевизначити період зберігання тренд�
 #: app/controllers/CControllerPopupLldOverride.php:91
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
-msgstr ""
+msgstr "Заміна з іменем \"%1$s\" вже існує."
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:408
 #: include/classes/widgets/views/widget.svggraph.form.view.php:310
@@ -13831,11 +13875,11 @@ msgstr "PHP LDAP модуль відсутній."
 
 #: include/classes/setup/CFrontendSetup.php:547
 msgid "PHP OpenSSL"
-msgstr ""
+msgstr "PHP OpenSSL"
 
 #: include/classes/setup/CFrontendSetup.php:551
 msgid "PHP OpenSSL extension missing."
-msgstr ""
+msgstr "Розширення PHP OpenSSL відсутнє."
 
 #: include/classes/setup/CFrontendSetup.php:290
 msgid "PHP bcmath"
@@ -14086,7 +14130,7 @@ msgstr "Параметри"
 #: app/controllers/CControllerActionOperationValidate.php:76
 #: include/classes/api/services/CAction.php:2817
 msgid "Parameters \"esc_step_from\" and \"esc_step_to\" must be set together."
-msgstr ""
+msgstr "Параметри \"esc_step_from\" та \"esc_step_to\" повинні встановлюватись одночасно."
 
 #: include/views/configuration.host.discovery.edit.php:53
 #: include/views/configuration.host.prototype.edit.php:63
@@ -14099,7 +14143,7 @@ msgstr "Батьківські графіки"
 
 #: app/partials/hostmacros.inherited.list.html.php:52
 msgid "Parent host value"
-msgstr ""
+msgstr "Значення батьківського вузла мережі"
 
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.prototype.edit.php:53
@@ -14109,7 +14153,7 @@ msgstr "Батьківські елементи даних"
 #: app/partials/service.info.php:111 app/partials/service.list.edit.php:41
 #: app/partials/service.list.php:35 app/views/popup.service.edit.php:55
 msgid "Parent services"
-msgstr ""
+msgstr "Батьківські послуги"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Parent templates"
@@ -14184,17 +14228,17 @@ msgstr "Пароль не обов'язковий для не внутрішнь
 
 #: app/views/administration.authentication.edit.php:44
 msgid "Password must contain"
-msgstr ""
+msgstr "Пароль має містити"
 
 #: app/views/administration.authentication.edit.php:38
 msgid "Password policy"
-msgstr ""
+msgstr "Політика паролів"
 
 #: app/views/administration.authentication.edit.php:46
 #: app/views/administration.authentication.edit.php:95
 #: app/views/administration.user.edit.php:151
 msgid "Password requirements:"
-msgstr ""
+msgstr "Вимоги до паролю:"
 
 #: jsLoader.php:168 jsLoader.php:282
 msgid "Paste"
@@ -14203,12 +14247,12 @@ msgstr "Вставити"
 #: app/views/js/configuration.dashboard.edit.js.php:217
 #: app/views/js/monitoring.dashboard.view.js.php:305
 msgid "Paste page"
-msgstr ""
+msgstr "Вставити сторінку"
 
 #: app/views/js/configuration.dashboard.edit.js.php:210
 #: app/views/js/monitoring.dashboard.view.js.php:298 jsLoader.php:143
 msgid "Paste widget"
-msgstr ""
+msgstr "Вставити віджет"
 
 #: jsLoader.php:283
 msgid "Paste without external links"
@@ -14216,7 +14260,7 @@ msgstr "Вставити без зовнішніх зв'язків"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:909
 msgid "Pattern"
-msgstr ""
+msgstr "Шаблон"
 
 #: actionconf.php:82 include/views/configuration.action.edit.php:475
 msgid "Pause operations for suppressed problems"
@@ -14283,7 +14327,7 @@ msgstr "Період"
 #: app/controllers/CControllerPopupTriggerExpr.php:109
 #: app/controllers/CControllerPopupTriggerExpr.php:1096
 msgid "Period shift"
-msgstr ""
+msgstr "Зсув періоду"
 
 #: app/views/popup.maintenance.period.php:69
 #: include/views/configuration.maintenance.edit.php:45
@@ -14346,11 +14390,11 @@ msgstr "Будь-ласка, перевірте параметри конфіг�
 
 #: app/views/js/popup.massupdate.js.php:414
 msgid "Please confirm that you want to remove all macros."
-msgstr ""
+msgstr "Будь ласка, підтвердить намір видалити всі макроси."
 
 #: app/views/js/popup.massupdate.js.php:417
 msgid "Please confirm that you want to remove all value mappings."
-msgstr ""
+msgstr "Будь ласка, підтвердить намір видалити всі відображення значень."
 
 #: include/classes/setup/CSetupWizard.php:603
 #, c-format
@@ -14359,7 +14403,7 @@ msgstr "Будь-ласка, вручну створіть базу даних �
 
 #: include/classes/setup/CSetupWizard.php:189
 msgid "Please enable \"allow_url_fopen\" directive."
-msgstr ""
+msgstr "Будь ласка, увімкніть директиву \"allow_url_fopen\"."
 
 #: jsLoader.php:271
 msgid "Please select two elements"
@@ -14424,7 +14468,7 @@ msgstr "Португальська (pt_PT)"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:249
 msgid "Position"
-msgstr ""
+msgstr "Розташування"
 
 #: include/classes/widgets/views/widget.item.form.view.php:142
 msgid "Position is ignored for s, uptime and unixtime units."
@@ -14461,7 +14505,7 @@ msgstr "Узагальнення інсталяції"
 
 #: app/views/popup.triggerexpr.php:115
 msgid "Prediction functions"
-msgstr ""
+msgstr "Функції прогнозування"
 
 #: app/views/popup.massupdate.item.php:493
 #: include/views/configuration.host.discovery.edit.php:966
@@ -14497,7 +14541,7 @@ msgstr "Попередній перегляд"
 #: app/partials/scheduledreport.formgrid.html.php:86
 #: app/partials/scheduledreport.table.html.php:56
 msgid "Previous day"
-msgstr ""
+msgstr "Попередній день"
 
 #: app/partials/scheduledreport.formgrid.html.php:88
 #: app/partials/scheduledreport.table.html.php:58 include/func.inc.php:2470
@@ -14507,7 +14551,7 @@ msgstr "Попередній місяць"
 #: app/views/monitoring.dashboard.view.php:162
 #: app/views/monitoring.host.dashboard.view.php:95 jsLoader.php:194
 msgid "Previous page"
-msgstr ""
+msgstr "Попередня сторінка"
 
 #: app/views/popup.itemtestedit.view.php:282
 msgid "Previous value"
@@ -14641,7 +14685,7 @@ msgstr "Проблема на"
 #: app/views/popup.mediatype.message.php:52
 #: include/classes/helpers/CMediatypeHelper.php:64
 msgid "Problem recovery"
-msgstr ""
+msgstr "Відновлення проблеми"
 
 #: include/actions.inc.php:2062
 msgid "Problem resolved"
@@ -14655,7 +14699,7 @@ msgstr ""
 #: app/views/popup.mediatype.message.php:55
 #: include/classes/helpers/CMediatypeHelper.php:79
 msgid "Problem update"
-msgstr ""
+msgstr "Оновлення проблеми"
 
 #: app/controllers/CControllerProblemView.php:151
 #: app/partials/monitoring.host.view.html.php:40
@@ -14679,7 +14723,7 @@ msgstr "Проблеми за важливістю"
 
 #: include/classes/data/CItemData.php:1001
 msgid "Process CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "Відсоток використання ЦП процесом. Повертає дріб"
 
 #: app/views/administration.mediatype.edit.php:234
 msgid "Process tags"
@@ -14687,7 +14731,7 @@ msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:395
 msgid "Profile"
-msgstr ""
+msgstr "Профіль"
 
 #: include/items.inc.php:1900 include/items.inc.php:1904
 msgid "Prometheus"
@@ -14807,11 +14851,11 @@ msgstr "Файл публічного ключа"
 
 #: include/classes/helpers/CSlaHelper.php:61
 msgid "Quarter"
-msgstr ""
+msgstr "Квартал"
 
 #: app/views/popup.sla.edit.php:77 include/classes/helpers/CSlaHelper.php:42
 msgid "Quarterly"
-msgstr ""
+msgstr "Щокварталу"
 
 #: app/views/popup.httpstep.php:64
 #: include/views/configuration.host.discovery.edit.php:181
@@ -14834,7 +14878,7 @@ msgstr "Черга"
 #: app/views/administration.queue.overview.proxy.php:39
 #: include/classes/helpers/CMenuHelper.php:323
 msgid "Queue details"
-msgstr ""
+msgstr "Деталі черги"
 
 #: app/views/administration.queue.details.php:33
 #: app/views/administration.queue.overview.php:27
@@ -14842,7 +14886,7 @@ msgstr ""
 #: app/views/administration.queue.overview.proxy.php:33
 #: include/classes/helpers/CMenuHelper.php:319
 msgid "Queue overview"
-msgstr ""
+msgstr "Огляд черги"
 
 #: app/views/administration.queue.details.php:36
 #: app/views/administration.queue.overview.php:36
@@ -14850,7 +14894,7 @@ msgstr ""
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:321
 msgid "Queue overview by proxy"
-msgstr ""
+msgstr "Огляд черги по проксі"
 
 #: app/views/hintbox.eventlist.php:100
 #: app/views/monitoring.widget.problems.view.php:93
@@ -14898,12 +14942,12 @@ msgstr "Тільки читання"
 #: app/views/administration.user.edit.php:546
 #: app/views/administration.userrole.edit.php:179
 msgid "Read-only access to services"
-msgstr ""
+msgstr "Доступ до послуг лише для читання"
 
 #: app/views/administration.user.edit.php:555
 #: app/views/administration.userrole.edit.php:203
 msgid "Read-only access to services with tag"
-msgstr ""
+msgstr "Доступ до послуг з тегом лише для читання"
 
 #: app/partials/administration.usergroup.grouprights.html.php:69
 #: app/views/administration.usergroup.edit.php:131
@@ -14919,16 +14963,16 @@ msgstr "Читання-запис"
 #: app/views/administration.user.edit.php:501
 #: app/views/administration.userrole.edit.php:138
 msgid "Read-write access to services"
-msgstr ""
+msgstr "Доступ до послуг читання-запису"
 
 #: app/views/administration.user.edit.php:510
 #: app/views/administration.userrole.edit.php:162
 msgid "Read-write access to services with tag"
-msgstr ""
+msgstr "Доступ до послуг із тегом на читання-запис"
 
 #: include/classes/data/CItemData.php:909
 msgid "Reads modbus data. Returns various types"
-msgstr ""
+msgstr "Читання даних mobus. Повертає різні типи"
 
 #: include/actions.inc.php:60
 msgid "Received value"
@@ -14956,11 +15000,11 @@ msgstr "Отримувач"
 
 #: app/controllers/CControllerPopupScheduledReportSubscriptionEdit.php:89
 msgid "Recipient already exists."
-msgstr ""
+msgstr "Отримувач вже існує."
 
 #: include/views/administration.auditacts.list.php:30
 msgid "Recipients"
-msgstr ""
+msgstr "Одержувачі"
 
 #: app/views/reports.auditlog.list.php:73
 #: app/views/reports.auditlog.list.php:95
@@ -15066,7 +15110,7 @@ msgstr "Регулярні вирази"
 
 #: app/controllers/CControllerPopupScheduledReportList.php:52
 msgid "Related reports"
-msgstr ""
+msgstr "Пов'язані звіти"
 
 #: jsLoader.php:151
 msgid "Release to create a widget."
@@ -15222,7 +15266,7 @@ msgstr "Видалити"
 #: app/partials/massupdate.macros.tab.php:127
 #: app/partials/massupdate.valuemaps.tab.php:98
 msgid "Remove all"
-msgstr ""
+msgstr "Видалити все"
 
 #: app/views/administration.authentication.edit.php:125
 msgid "Remove domain name"
@@ -15253,7 +15297,7 @@ msgstr "Видалити, %1$s"
 
 #: app/controllers/CControllerPopupImportCompare.php:159
 msgid "Removed"
-msgstr ""
+msgstr "Видалено"
 
 #: jsLoader.php:341
 #, c-format
@@ -15263,14 +15307,14 @@ msgstr "Видалено, %1$s"
 
 #: app/partials/massupdate.valuemaps.tab.php:96
 msgid "Rename"
-msgstr ""
+msgstr "Перейменувати"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:70
 #: app/controllers/CControllerScheduledReportCreate.php:82
 #: app/controllers/CControllerScheduledReportUpdate.php:86
 #: app/partials/scheduledreport.formgrid.html.php:135
 msgid "Repeat on"
-msgstr ""
+msgstr "Повторити в"
 
 #: app/partials/scheduledreport.table.html.php:41
 msgid "Repeats"
@@ -15299,24 +15343,24 @@ msgstr "Замінити залежності"
 #: app/controllers/CControllerPopupTriggerExpr.php:678
 #: app/controllers/CControllerPopupTriggerExpr.php:914
 msgid "Replacement"
-msgstr ""
+msgstr "Заміна"
 
 #: include/classes/api/services/CReport.php:256
 #, c-format
 msgid "Report \"%1$s\" already exists."
-msgstr ""
+msgstr "Звіт \"%1$s\" вже існує."
 
 #: app/views/js/reports.scheduledreport.edit.js.php:75
 msgid "Report generated by other users will be changed to the current user."
-msgstr ""
+msgstr "Звіт створений іншими користувачами буде змінено на поточного користувача."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:97
 msgid "Report generating test failed."
-msgstr ""
+msgstr "Збій створення тестового звіту."
 
 #: app/controllers/CControllerPopupScheduledReportTest.php:94
 msgid "Report generating test successful."
-msgstr ""
+msgstr "Тестовий звіт створено успішно."
 
 #: app/views/popup.scheduledreport.subscription.php:107
 #, c-format
@@ -15636,7 +15680,7 @@ msgstr "Обрізати справа"
 #: app/views/administration.user.edit.php:402
 #: app/views/administration.user.edit.php:412
 msgid "Role"
-msgstr ""
+msgstr "Роль"
 
 #: include/locales.inc.php:58
 msgid "Romanian (ro_RO)"
@@ -15644,7 +15688,7 @@ msgstr "Румунська (ro_RO)"
 
 #: app/partials/service.list.edit.php:56 app/partials/service.list.php:53
 msgid "Root cause"
-msgstr ""
+msgstr "Першопричина"
 
 #: include/classes/widgets/forms/CWidgetForm.php:81
 msgid "Rows"
@@ -15661,22 +15705,22 @@ msgstr "Правила"
 #: include/actions.inc.php:635 include/actions.inc.php:813
 #, c-format
 msgid "Run script \"%1$s\" on Zabbix server"
-msgstr ""
+msgstr "Виконання скрипту \"%1$s\" на сервері Zabbix"
 
 #: include/actions.inc.php:648 include/actions.inc.php:826
 #, c-format
 msgid "Run script \"%1$s\" on current host"
-msgstr ""
+msgstr "Виконання скрипту \"%1$s\" на поточному вузлі"
 
 #: include/actions.inc.php:679 include/actions.inc.php:857
 #, c-format
 msgid "Run script \"%1$s\" on host groups"
-msgstr ""
+msgstr "Виконання скрипту \"%1$s\" на поточній групі вузлів"
 
 #: include/actions.inc.php:661 include/actions.inc.php:839
 #, c-format
 msgid "Run script \"%1$s\" on hosts"
-msgstr ""
+msgstr "Виконання скрипту \"%1$s\" на вузлах"
 
 #: include/classes/data/CItemData.php:1089
 msgid "Run specified command on the host. Returns text result of the command; 1 - with mode as nowait (regardless of command result)"
@@ -15698,7 +15742,7 @@ msgstr "Нд"
 
 #: app/views/administration.authentication.edit.php:336
 msgid "SAML settings"
-msgstr ""
+msgstr "Налаштування SAML"
 
 #: app/controllers/CControllerAuditLogList.php:239
 #: app/controllers/CControllerPopupGeneric.php:382
@@ -15723,43 +15767,43 @@ msgstr ""
 
 #: app/controllers/CControllerSlaReportList.php:229
 msgid "SLA Report"
-msgstr ""
+msgstr "Звіт SLA"
 
 #: app/controllers/CControllerSlaCreate.php:123
 msgid "SLA created"
-msgstr ""
+msgstr "SLA створено"
 
 #: app/controllers/CControllerSlaDelete.php:64
 msgid "SLA deleted"
 msgid_plural "SLAs deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "SLA видалено"
+msgstr[1] "SLAs видалені"
+msgstr[2] "SLAs видалені"
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "SLA вимкнено"
+msgstr[1] "SLAs вимкнені"
+msgstr[2] "SLAs вимкнені"
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "SLA увімкнена"
+msgstr[1] "SLAs увімкнені"
+msgstr[2] "SLAs увімкнені"
 
 #: app/views/monitoring.widget.slareport.view.php:33
 msgid "SLA is disabled."
-msgstr ""
+msgstr "SLA вимкнено."
 
 #: app/views/sla.list.php:93 app/views/sla.list.php:121
 #: app/views/slareport.list.php:92 include/classes/helpers/CMenuHelper.php:94
 #: include/classes/helpers/CRoleHelper.php:359
 #: include/classes/widgets/CWidgetConfig.php:69
 msgid "SLA report"
-msgstr ""
+msgstr "Звіт SLA"
 
 #: app/controllers/CControllerSlaUpdate.php:134
 msgid "SLA updated"
@@ -15774,7 +15818,7 @@ msgstr ""
 #: app/views/monitoring.widget.slareport.view.php:98
 #: app/views/slareport.list.php:163
 msgid "SLI"
-msgstr ""
+msgstr "SLI"
 
 #: app/partials/service.info.php:61
 #: app/views/monitoring.widget.slareport.view.php:38
@@ -15782,7 +15826,7 @@ msgstr ""
 #: app/views/popup.sla.edit.php:61 app/views/sla.list.php:88
 #: app/views/slareport.list.php:115 app/views/slareport.list.php:162
 msgid "SLO"
-msgstr ""
+msgstr "SLO"
 
 #: app/views/administration.authentication.edit.php:236
 msgid "SLO service URL"
@@ -15834,7 +15878,7 @@ msgstr "SNMP OID"
 
 #: include/items.inc.php:89
 msgid "SNMP agent"
-msgstr ""
+msgstr "SNMP агент"
 
 #: app/controllers/CControllerPopupItemTest.php:1295
 #: app/partials/configuration.host.interface.row.php:91
@@ -15858,17 +15902,17 @@ msgstr "Ключ SNMP trap помилковий."
 #: app/partials/configuration.host.interface.row.php:76
 #: app/views/popup.itemtestedit.view.php:125
 msgid "SNMP version"
-msgstr ""
+msgstr "Версія SNMP"
 
 #: include/items.inc.php:1300
 #, c-format
 msgid "SNMPv%1$d"
-msgstr ""
+msgstr "SNMPv%1$d"
 
 #: app/partials/configuration.host.interface.row.php:81
 #: app/views/popup.itemtestedit.view.php:133
 msgid "SNMPv1"
-msgstr ""
+msgstr "SNMPv1"
 
 #: include/discovery.inc.php:57
 msgid "SNMPv1 agent"
@@ -15877,7 +15921,7 @@ msgstr "SNMPv1 агент"
 #: app/partials/configuration.host.interface.row.php:82
 #: app/views/popup.itemtestedit.view.php:134
 msgid "SNMPv2"
-msgstr ""
+msgstr "SNMPv2"
 
 #: include/discovery.inc.php:58
 msgid "SNMPv2 agent"
@@ -15886,7 +15930,7 @@ msgstr "SNMPv2 агент"
 #: app/partials/configuration.host.interface.row.php:83
 #: app/views/popup.itemtestedit.view.php:135
 msgid "SNMPv3"
-msgstr ""
+msgstr "SNMPv3"
 
 #: include/discovery.inc.php:59
 msgid "SNMPv3 agent"
@@ -15998,11 +16042,11 @@ msgstr "Субота"
 
 #: app/views/popup.tabfilter.edit.php:80
 msgid "Save"
-msgstr ""
+msgstr "Зберегти"
 
 #: include/classes/html/CTabFilter.php:100
 msgid "Save as"
-msgstr ""
+msgstr "Зберегти як"
 
 #: app/views/configuration.dashboard.edit.php:67
 #: app/views/monitoring.dashboard.view.php:147
@@ -16016,7 +16060,7 @@ msgstr "Зберегти як \"%1$s\""
 
 #: app/views/administration.module.list.php:34
 msgid "Scan directory"
-msgstr ""
+msgstr "Сканувати директорію"
 
 #: include/views/configuration.httpconf.edit.php:235
 msgid "Scenario"
@@ -16038,40 +16082,40 @@ msgstr "Запланована перевірка"
 #: app/controllers/CControllerAuditLogList.php:236
 #: app/views/reports.scheduledreport.edit.php:57
 msgid "Scheduled report"
-msgstr ""
+msgstr "Запланований звіт"
 
 #: app/controllers/CControllerScheduledReportCreate.php:145
 msgid "Scheduled report added"
-msgstr ""
+msgstr "Запланований звіт додано"
 
 #: app/controllers/CControllerPopupScheduledReportCreate.php:129
 msgid "Scheduled report created"
-msgstr ""
+msgstr "Запланований звіт створено"
 
 #: app/controllers/CControllerScheduledReportDelete.php:67
 msgid "Scheduled report deleted"
 msgid_plural "Scheduled reports deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Запланований звіт видалено"
+msgstr[1] "Заплановані звіти видалено"
+msgstr[2] "Заплановані звіти видалено"
 
 #: app/controllers/CControllerScheduledReportDisable.php:74
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Запланований звіт вимкнено"
+msgstr[1] "Заплановані звіти вимкнено"
+msgstr[2] "Заплановані звіти вимкнено"
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Запланований звіт увімкнено"
+msgstr[1] "Заплановані звіти ввімкнені"
+msgstr[2] "Заплановані звіти ввімкнені"
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
-msgstr ""
+msgstr "Запланований звіт оновлено"
 
 #: app/controllers/CControllerScheduledReportEdit.php:309
 #: app/controllers/CControllerScheduledReportList.php:148
@@ -16080,7 +16124,7 @@ msgstr ""
 #: include/classes/helpers/CMenuHelper.php:135
 #: include/classes/helpers/CRoleHelper.php:390
 msgid "Scheduled reports"
-msgstr ""
+msgstr "Заплановані звіти"
 
 #: app/views/js/popup.massupdate.tmpl.js.php:84
 #: app/views/popup.lldoperation.php:125 app/views/popup.massupdate.item.php:234
@@ -16097,7 +16141,7 @@ msgstr "По розкладу"
 #: app/views/administration.script.list.php:48
 #: app/views/administration.script.list.php:75
 msgid "Scope"
-msgstr ""
+msgstr "Область"
 
 #: app/views/popup.acknowledge.edit.php:53
 msgctxt "selected problems"
@@ -16135,11 +16179,11 @@ msgstr[2] "Скрипти видалено"
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
-msgstr ""
+msgstr "Журнал виконання скрипту"
 
 #: app/controllers/CControllerPopupScriptExec.php:116
 msgid "Script execution successful."
-msgstr ""
+msgstr "Успішне виконання скрипту."
 
 #: app/views/administration.mediatype.edit.php:95
 #: app/views/administration.mediatype.list.php:100
@@ -16182,7 +16226,7 @@ msgstr "Шаблон пошуку пустий"
 #: app/controllers/CControllerPopupTriggerExpr.php:114
 #: app/controllers/CControllerPopupTriggerExpr.php:1106
 msgid "Season"
-msgstr ""
+msgstr "Сезон"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1121
 msgid "Season deviation window"
@@ -16218,11 +16262,11 @@ msgstr "Другорядне нік-ім'я для контакту"
 
 #: include/classes/html/CMacroValue.php:157
 msgid "Secret text"
-msgstr ""
+msgstr "Прихований текст"
 
 #: app/views/administration.miscconfig.edit.php:98
 msgid "Security"
-msgstr ""
+msgstr "Безпека"
 
 #: app/partials/configuration.host.interface.row.php:127
 #: app/views/popup.discovery.check.php:92
@@ -16252,7 +16296,7 @@ msgstr "Вибрати"
 
 #: app/views/slareport.list.php:103
 msgid "Select SLA to display SLA report."
-msgstr ""
+msgstr "Виберіть SLA, щоб відобразити звіт по SLA."
 
 #: app/views/popup.massupdate.item.php:438 app/views/popup.triggerexpr.php:83
 #: include/views/configuration.graph.edit.php:217
@@ -16329,11 +16373,11 @@ msgstr "Перемістити на самий зад"
 
 #: app/partials/popup.operations.php:82
 msgid "Send to user groups"
-msgstr ""
+msgstr "Надіслати групі користувачів"
 
 #: app/partials/popup.operations.php:102
 msgid "Send to users"
-msgstr ""
+msgstr "Надіслати користувачам"
 
 #: include/actions.inc.php:2128
 #: include/views/administration.auditacts.list.php:77
@@ -16354,7 +16398,7 @@ msgstr "Непідтверджені окремо"
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:141
 #: include/classes/widgets/forms/CWidgetFormProblems.php:161
 msgid "Separately"
-msgstr ""
+msgstr "Окремо"
 
 #: include/func.inc.php:108 include/func.inc.php:261 jsLoader.php:241
 msgid "September"
@@ -16411,7 +16455,7 @@ msgstr ""
 #: include/classes/helpers/CRoleHelper.php:352
 #: include/views/configuration.action.list.php:28
 msgid "Service actions"
-msgstr ""
+msgstr "Дії послуг"
 
 #: app/controllers/CControllerServiceCreate.php:171
 msgid "Service created"
@@ -16419,24 +16463,23 @@ msgstr "Послугу створено"
 
 #: app/views/administration.housekeeping.edit.php:58
 msgid "Service data storage period"
-msgstr ""
+msgstr "Період зберігання даних послуг"
 
 #: app/controllers/CControllerServiceDelete.php:63
-#, fuzzy
 msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] "Послугу видалено"
-msgstr[1] "Послугу видалено"
-msgstr[2] "Послугу видалено"
+msgstr[1] "Послуги видалені"
+msgstr[2] "Послуги видалені"
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
 msgid "Service list"
-msgstr ""
+msgstr "Список послуг"
 
 #: include/actions.inc.php:68
 msgid "Service name"
-msgstr ""
+msgstr "Ім'я послуги"
 
 #: include/actions.inc.php:57
 msgid "Service port"
@@ -16445,19 +16488,19 @@ msgstr "Порт сервісу"
 #: app/views/popup.mediatype.message.php:61
 #: include/classes/helpers/CMediatypeHelper.php:121
 msgid "Service recovery"
-msgstr ""
+msgstr "Відновлення послуги"
 
 #: app/views/popup.condition.common.php:153
 msgid "Service tag name"
-msgstr ""
+msgstr "Ім'я тегу послуги"
 
 #: app/views/popup.condition.common.php:156
 msgid "Service tag value"
-msgstr ""
+msgstr "Значення тегу послуги"
 
 #: app/views/popup.sla.edit.php:122 app/views/sla.list.php:60
 msgid "Service tags"
-msgstr ""
+msgstr "Тегі послуги"
 
 #: app/views/popup.condition.common.php:564 include/actions.inc.php:56
 msgid "Service type"
@@ -16466,7 +16509,7 @@ msgstr "Тип сервісу"
 #: app/views/popup.mediatype.message.php:64
 #: include/classes/helpers/CMediatypeHelper.php:144
 msgid "Service update"
-msgstr ""
+msgstr "Оновлення послуги"
 
 #: app/controllers/CControllerServiceUpdate.php:187
 msgid "Service updated"
@@ -16575,7 +16618,7 @@ msgstr "Не вдалося встановити партнерів LDAP в \"Of
 #: include/classes/setup/CSetupWizard.php:66
 #: include/classes/setup/CSetupWizard.php:638
 msgid "Settings"
-msgstr ""
+msgstr "Налаштування"
 
 #: app/controllers/CControllerPopupGeneric.php:178
 #: app/controllers/CControllerPopupGeneric.php:192
@@ -16623,7 +16666,7 @@ msgstr "Важливість зменшено"
 
 #: jsLoader.php:154
 msgid "Severity filter"
-msgstr ""
+msgstr "Фільтр важливості"
 
 #: include/actions.inc.php:1780
 msgctxt "screen reader"
@@ -16638,7 +16681,7 @@ msgstr "Фігура"
 
 #: app/views/monitoring.dashboard.list.php:99
 msgid "Shared"
-msgstr ""
+msgstr "Спільний доступ"
 
 #: include/views/monitoring.sysmap.edit.php:414 jsLoader.php:366
 msgid "Sharing"
@@ -16680,7 +16723,7 @@ msgstr "Відображувати деталі"
 
 #: include/classes/widgets/CWidgetHelper.php:76
 msgid "Show header"
-msgstr ""
+msgstr "Відобразити заголовок"
 
 #: app/partials/monitoring.host.filter.php:134
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:62
@@ -16703,17 +16746,17 @@ msgstr "Відображувати лінії"
 
 #: app/views/popup.tabfilter.edit.php:34
 msgid "Show number of records"
-msgstr ""
+msgstr "Відображення кількості записів"
 
 #: app/partials/monitoring.problem.filter.php:240
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:139
 #: include/classes/widgets/forms/CWidgetFormProblems.php:159
 msgid "Show operational data"
-msgstr ""
+msgstr "Показати оперативні дані"
 
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:49
 msgid "Show periods"
-msgstr ""
+msgstr "Показати періоди"
 
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:305
 msgid "Show problems"
@@ -16728,7 +16771,7 @@ msgstr "Відобразити тільки відібрані"
 #: include/classes/html/widget/CWidget.php:153
 #: include/classes/html/widget/CWidget.php:156
 msgid "Show sidebar"
-msgstr ""
+msgstr "Відобразити бічну панель"
 
 #: app/partials/monitoring.host.filter.php:140
 #: app/partials/monitoring.problem.filter.php:249
@@ -16750,7 +16793,7 @@ msgstr "Відображати теги"
 
 #: app/views/administration.gui.edit.php:119
 msgid "Show technical errors"
-msgstr ""
+msgstr "Показувати технічні помилки"
 
 #: include/classes/widgets/forms/CWidgetFormPlainText.php:68
 msgid "Show text as HTML"
@@ -16789,11 +16832,11 @@ msgstr "Показана"
 
 #: include/classes/html/widget/CWidget.php:160
 msgid "Sidebar control"
-msgstr ""
+msgstr "Курування бічною панеллю"
 
 #: app/views/administration.authentication.edit.php:265
 msgid "Sign"
-msgstr ""
+msgstr "Увійти"
 
 #: include/views/general.login.php:65 include/views/general.login.php:80
 msgid "Sign in"
@@ -17006,16 +17049,16 @@ msgstr "Стандартні елементи даних"
 
 #: app/partials/administration.ha.nodes.php:45
 msgid "Standby"
-msgstr ""
+msgstr "Резервний"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:668
 #: app/controllers/CControllerPopupTriggerExpr.php:787
 msgid "Start"
-msgstr ""
+msgstr "Початок"
 
 #: app/partials/scheduledreport.formgrid.html.php:151
 msgid "Start date"
-msgstr ""
+msgstr "Початкова дата"
 
 #: include/views/configuration.action.edit.php:172
 msgid "Start in"
@@ -17026,22 +17069,22 @@ msgstr "Початок в"
 #: app/views/monitoring.host.dashboard.view.php:102
 #: app/views/monitoring.host.dashboard.view.php:166 jsLoader.php:145
 msgid "Start slideshow"
-msgstr ""
+msgstr "Почати слайд-шоу"
 
 #: app/views/dashboard.properties.edit.php:81
 msgid "Start slideshow automatically"
-msgstr ""
+msgstr "Починати слайд-шоу автоматично"
 
 #: app/partials/scheduledreport.formgrid.html.php:107
 #: app/views/popup.sla.edit.php:185
 #: app/views/popup.sla.excludeddowntime.edit.php:49
 msgid "Start time"
-msgstr ""
+msgstr "Початковий час"
 
 #: include/classes/api/services/CSla.php:578
 #, c-format
 msgid "Start time must be less than end time for SLA \"%1$s\"."
-msgstr ""
+msgstr "Початковий час повинен бути меншим за кінцевий для SLA \"%1$s\"."
 
 #: include/classes/api/services/CSla.php:605
 #, c-format
@@ -17232,7 +17275,7 @@ msgstr ""
 #: app/views/monitoring.host.dashboard.view.php:101
 #: app/views/monitoring.host.dashboard.view.php:167 jsLoader.php:146
 msgid "Stop slideshow"
-msgstr ""
+msgstr "Зупинити слайд-шоу"
 
 #: app/partials/administration.ha.nodes.php:40
 msgid "Stopped"
@@ -17949,7 +17992,7 @@ msgstr ""
 
 #: include/classes/core/CJsonRpc.php:177
 msgid "The received JSON is not a valid JSON-RPC request."
-msgstr ""
+msgstr "Отриманий JSON не є правильним запитом JSON-RPC."
 
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
@@ -18040,7 +18083,7 @@ msgstr "Межа"
 
 #: app/views/popup.tophosts.column.edit.php:232
 msgid "Thresholds"
-msgstr ""
+msgstr "Межі"
 
 #: include/items.inc.php:1892 include/items.inc.php:1896
 msgid "Throttling"
@@ -18056,15 +18099,15 @@ msgstr "Четвер"
 
 #: app/views/administration.geomaps.edit.php:77
 msgid "Tile URL"
-msgstr ""
+msgstr "URL плитки"
 
 #: app/views/administration.geomaps.edit.php:65
 msgid "Tile provider"
-msgstr ""
+msgstr "Постачальник плитки"
 
 #: app/views/administration.geomaps.edit.php:58
 msgid "Tile provider attribution data displayed in a small text box on the map."
-msgstr ""
+msgstr "Дані атрибуції постачальника плитки відображаються у невеликому текстовому полі на карті."
 
 #: report4.php:191
 msgid "Till"
@@ -18135,7 +18178,7 @@ msgstr "Тип часу"
 
 #: app/views/administration.user.edit.php:250 app/views/popup.sla.edit.php:83
 msgid "Time zone"
-msgstr ""
+msgstr "Часовий пояс"
 
 #: app/views/administration.mediatype.edit.php:230
 #: app/views/administration.script.edit.php:197
@@ -18158,7 +18201,7 @@ msgstr "Час виникнення (штамп)"
 
 #: app/views/sla.list.php:91
 msgid "Timezone"
-msgstr ""
+msgstr "Часовий пояс"
 
 #: app/controllers/CControllerSlaReportList.php:162
 #: app/controllers/CControllerSlaReportList.php:170
@@ -18240,11 +18283,11 @@ msgstr "Всього затрачено часу: %1$s"
 
 #: include/classes/widgets/forms/CWidgetFormProblemsBySv.php:104
 msgid "Totals"
-msgstr ""
+msgstr "Разом"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 msgid "Trace"
-msgstr ""
+msgstr "Трасування"
 
 #: include/page_footer.php:40
 msgid "Transaction has not been closed. Aborting..."
@@ -19108,7 +19151,7 @@ msgstr "Непідтримуваний параметр \"%2$s\" для філь
 #: app/controllers/CControllerPopupTabFilterEdit.php:98
 #: include/classes/services/CTabFilterProfile.php:95
 msgid "Untitled"
-msgstr ""
+msgstr "Без назви"
 
 #: app/views/monitoring.widget.discovery.view.php:33
 msgctxt "discovery results in dashboard"
@@ -19185,7 +19228,7 @@ msgstr "Оновити"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "Update column"
-msgstr ""
+msgstr "Оновлення стовпця"
 
 #: app/partials/massupdate.macros.tab.php:86
 #: app/partials/massupdate.valuemaps.tab.php:33 app/views/popup.import.php:129
@@ -19219,7 +19262,7 @@ msgstr "Оновити проблему"
 #: app/controllers/CControllerAuditLogList.php:364
 #: app/controllers/CControllerPopupImportCompare.php:160
 msgid "Updated"
-msgstr ""
+msgstr "Оновлено"
 
 #: include/classes/api/services/CHost.php:1256
 #, c-format
@@ -19255,11 +19298,11 @@ msgstr "Використовувати масові запити"
 
 #: app/views/administration.trigdisplay.edit.php:35
 msgid "Use custom event status colors"
-msgstr ""
+msgstr "Використовувати користувацькі кольори подій"
 
 #: jsLoader.php:402
 msgid "Use default"
-msgstr ""
+msgstr "Використовувати за замовчуванням"
 
 #: app/partials/configuration.host.edit.html.php:216
 msgid "Use host prototype configuration form to remove automatically linked templates on upcoming discovery."
@@ -19363,8 +19406,8 @@ msgstr ""
 msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] "Користувача видалено"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "Користувачі видалені"
+msgstr[2] "Користувачі видалені"
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -20506,7 +20549,7 @@ msgstr "Середа"
 #: app/controllers/CControllerPopupTriggerExpr.php:120
 #: include/classes/helpers/CSlaHelper.php:59
 msgid "Week"
-msgstr ""
+msgstr "Тиждень"
 
 #: app/partials/scheduledreport.formgrid.html.php:99
 #: app/partials/scheduledreport.table.html.php:50
@@ -20570,7 +20613,7 @@ msgstr "Ширина"
 
 #: app/controllers/CControllerLatest.php:530
 msgid "With data"
-msgstr ""
+msgstr "З даними"
 
 #: include/views/configuration.maintenance.edit.php:104
 #: include/views/configuration.maintenance.list.php:111
@@ -20605,7 +20648,7 @@ msgstr "З тригерами"
 
 #: app/controllers/CControllerLatest.php:535
 msgid "Without data"
-msgstr ""
+msgstr "Без даних"
 
 #: app/views/monitoring.widget.problemhosts.view.php:32
 msgid "Without problems"
@@ -20668,7 +20711,7 @@ msgstr "X2"
 
 #: include/classes/html/CButtonExport.php:67
 msgid "XML"
-msgstr ""
+msgstr "XML"
 
 #: include/items.inc.php:1821
 msgid "XML XPath"
@@ -20687,11 +20730,11 @@ msgstr "XML пустий"
 
 #: include/classes/api/services/CItemGeneral.php:2648
 msgid "XML is expected"
-msgstr ""
+msgstr "Очікується XML"
 
 #: include/items.inc.php:1833
 msgid "XML to JSON"
-msgstr ""
+msgstr "XML в JSON"
 
 #: include/forms.inc.php:1329 include/views/js/item.preprocessing.js.php:164
 msgid "XPath"
@@ -20757,13 +20800,13 @@ msgstr "Y2"
 
 #: include/classes/html/CButtonExport.php:59
 msgid "YAML"
-msgstr ""
+msgstr "YAML"
 
 #: app/partials/scheduledreport.formgrid.html.php:155
 #: app/partials/scheduledreport.formgrid.html.php:164
 #: include/translateDefines.inc.php:37
 msgid "YYYY-MM-DD"
-msgstr ""
+msgstr "РРРР-ММ-ДД"
 
 #: app/views/popup.maintenance.period.php:150
 #: include/translateDefines.inc.php:34
@@ -20774,7 +20817,7 @@ msgstr "YYYY-MM-DD hh:mm"
 
 #: include/translateDefines.inc.php:32
 msgid "YYYY-MM-DD hh:mm:ss"
-msgstr ""
+msgstr "РРРР-ММ-ДД гг:хх:сс"
 
 #: include/classes/import/validators/C20XmlValidator.php:801
 #: include/classes/import/validators/C30XmlValidator.php:864
@@ -21296,7 +21339,7 @@ msgstr ""
 
 #: include/events.inc.php:36
 msgid "autoregistration"
-msgstr ""
+msgstr "автореєстрація"
 
 #: app/views/popup.tophosts.column.edit.php:128
 #: include/classes/graphdraw/CLineGraphDraw.php:1369
@@ -21315,11 +21358,11 @@ msgstr "avg() - Середнє значення за період Т"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1053
 msgid "baselinedev() - Returns the number of deviations between data periods in seasons and the last data period"
-msgstr ""
+msgstr "baselinedev() - Повертає кількість відхилень між періодами часу в сезонах та останнім періодом даних"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1060
 msgid "baselinewma() - Calculates baseline by averaging data periods in seasons"
-msgstr ""
+msgstr "baselinewma() - Обчислення базису шляхом усереднення даних періодів у сезонах"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
@@ -21674,7 +21717,7 @@ msgstr "за спаданням"
 #: include/views/js/common.template.edit.js.php:66
 #: include/views/js/common.template.edit.js.php:88
 msgid "description"
-msgstr ""
+msgstr "опис"
 
 #: include/classes/validators/CApiInputValidator.php:1707
 msgid "directory cannot be empty"
@@ -21745,7 +21788,7 @@ msgstr "повідомлення помилки"
 #: include/views/js/configuration.host.discovery.edit.js.php:50
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:82
 msgid "exists"
-msgstr ""
+msgstr "існує"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"
@@ -22594,7 +22637,7 @@ msgstr ""
 
 #: include/forms.inc.php:1442 include/views/js/item.preprocessing.js.php:247
 msgid "replacement"
-msgstr ""
+msgstr "заміна"
 
 #: app/views/administration.geomaps.edit.php:48
 msgid "represent tile coordinates;"
@@ -22711,7 +22754,7 @@ msgstr "показати призначення іконок"
 
 #: include/views/general.login.php:41
 msgid "sign in as guest"
-msgstr ""
+msgstr "увійти як гість"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:963
 msgid "signum() - Returns -1 if a value is negative, 0 if a value is zero, 1 if a value is positive"
@@ -22747,7 +22790,7 @@ msgstr ""
 
 #: app/views/popup.tophosts.column.edit.php:130 include/graphs.inc.php:84
 msgid "sum"
-msgstr ""
+msgstr "сума"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1012
 msgid "sum() - Sum of values of a period T"
@@ -23260,7 +23303,7 @@ msgstr "через"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
-msgstr ""
+msgstr "т"
 
 #: include/classes/api/services/CHttpTest.php:438
 msgid "web scenario with the same UUID already exists"
