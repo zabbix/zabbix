@@ -101,13 +101,16 @@ unlock:
  *                                                                            *
  * Purpose: execute task of job                                               *
  *                                                                            *
- * Parameters: job              - [IN] job object                             *
- *             config_source_ip - [IN]                                        *
+ * Parameters: job                     - [IN] job object                      *
+ *             config_source_ip        - [IN]                                 *
+ *             config_vmware_timeout   - [IN]                                 *
+ *             config_vmware_frequency - [IN]                                 *
  *                                                                            *
  * Return value: count of successfully executed jobs                          *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, int config_vmware_timeout, int config_vmware_frequency)
+static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, int config_vmware_timeout,
+		int config_vmware_frequency)
 {
 	int	ret = FAIL;
 
@@ -119,7 +122,8 @@ static int	vmware_job_exec(zbx_vmware_job_t *job, const char *config_source_ip, 
 	switch (job->type)
 	{
 		case ZBX_VMWARE_UPDATE_CONF:
-			ret = zbx_vmware_service_update(job->service, config_source_ip, config_vmware_timeout, config_vmware_frequency);
+			ret = zbx_vmware_service_update(job->service, config_source_ip, config_vmware_timeout,
+					config_vmware_frequency);
 			break;
 		case ZBX_VMWARE_UPDATE_PERFCOUNTERS:
 			ret = zbx_vmware_service_update_perf(job->service, config_source_ip, config_vmware_timeout);
@@ -141,9 +145,11 @@ out:
  *                                                                            *
  * Purpose: set time of next job execution and return job to the queue        *
  *                                                                            *
- * Parameters: vmw      - [IN] the vmware object                              *
- *             job      - [IN] the job object                                 *
- *             time_now - [IN] the current time                               *
+ * Parameters: vmw                 - [IN] the vmware object                   *
+ *             job                 - [IN] the job object                      *
+ *             time_now            - [IN] the current time                    *
+ *             cache_update_period - [IN]                                     *
+ *             perf_update_period  - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_job_schedule(zbx_vmware_t *vmw, zbx_vmware_job_t *job, time_t time_now,
@@ -233,10 +239,10 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 				continue;
 			}
 
-			services_updated += vmware_job_exec(job, vmware_args_in->config_source_ip, args_in->config_vmware_timeout,
-					args_in->config_vmware_frequency);
-			vmware_job_schedule(vmware, job, (time_t)time_now, args_in->config_vmware_frequency,
-					args_in->config_vmware_perf_frequency);
+			services_updated += vmware_job_exec(job, vmware_args_in->config_source_ip,
+					vmware_args_in->config_vmware_timeout, vmware_args_in->config_vmware_frequency);
+			vmware_job_schedule(vmware, job, (time_t)time_now, vmware_args_in->config_vmware_frequency,
+					vmware_args_in->config_vmware_perf_frequency);
 		}
 
 		if (zbx_time() - time_now <= JOB_TIMEOUT)

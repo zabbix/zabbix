@@ -580,7 +580,8 @@ void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout, int cache_update_period));
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout, int cache_update_period);
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
 int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);

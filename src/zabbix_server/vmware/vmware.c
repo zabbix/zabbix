@@ -2730,11 +2730,13 @@ static void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *                                                                             *
  * Purpose: authenticates vmware service                                       *
  *                                                                             *
- * Parameters: service          - [IN] vmware service                          *
- *             easyhandle       - [IN] CURL handle                             *
- *             page             - [IN] CURL output buffer                      *
- *             config_source_ip - [IN]                                         *
- *             error            - [OUT] error message in the case of failure   *
+ * Parameters: service               - [IN] vmware service                     *
+ *             easyhandle            - [IN] CURL handle                        *
+ *             page                  - [IN] CURL output buffer                 *
+ *             config_source_ip      - [IN]                                    *
+ *             config_vmware_timeout - [IN]                                    *
+ *             error                 - [OUT] error message in the case of      *
+ *                                          failure                            *
  *                                                                             *
  * Return value: SUCCEED - authentication was completed successfully           *
  *               FAIL    - authentication process has failed                   *
@@ -8184,10 +8186,12 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
  *                                                                            *
  * Purpose: collect custom requests of the selected type                      *
  *                                                                            *
- * Parameters: cust_queries - [IN] the hashset with all type custom queries   *
- *             type         - [IN] - the type of custom query                 *
- *             cq_values    - [OUT] the vector with custom query entries and  *
- *                              responses                                     *
+ * Parameters: cust_queries        - [IN] hashset with all type custom        *
+ *                                        queries                             *
+ *             type                - [IN] type of custom query                *
+ *             cq_values           - [OUT] the vector with custom query       *
+ *                                         entries and responses              *
+ *             cache_update_period - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zbx_vmware_custom_query_type_t type,
@@ -8531,11 +8535,14 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
  *                                                                            *
  * Purpose: updates object with a new data from vmware service                *
  *                                                                            *
- * Parameters: service          - [IN] vmware service                         *
- *             config_source_ip - [IN]                                        *
+ * Parameters: service               - [IN] vmware service                    *
+ *             config_source_ip      - [IN]                                   *
+ *             config_vmware_timeout - [IN]                                   *
+ *             cache_update_period   - [IN]                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout, int cache_update_period)
+int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout, int cache_update_period)
 {
 	CURL			*easyhandle = NULL;
 	struct curl_slist	*headers = NULL;
@@ -8596,8 +8603,11 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout, &data->error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout,
+			&data->error))
+	{
 		goto clean;
+	}
 
 	if (SUCCEED != vmware_service_initialize(service, easyhandle, &data->error))
 		goto clean;
@@ -9435,11 +9445,13 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
  *                                                                            *
  * Purpose: updates vmware statistics data                                    *
  *                                                                            *
- * Parameters: service          - [IN] vmware service                         *
- *             config_source_ip - [IN]                                        *
+ * Parameters: service               - [IN] vmware service                    *
+ *             config_source_ip      - [IN]                                   *
+ *             config_vmware_timeout - [IN]                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout)
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout)
 {
 #	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 

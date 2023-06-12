@@ -778,7 +778,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			720},
 		{"HeartbeatFrequency",		&config_heartbeat_frequency,		TYPE_INT,
 			PARM_OPT,	0,			ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX},
-		{"ConfigFrequency",		&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+		{"ConfigFrequency",		&config_confsyncer_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},
 		{"ProxyConfigFrequency",	&config_proxyconfig_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_WEEK},

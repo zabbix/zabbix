@@ -236,19 +236,20 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
- * Parameters: url              - [IN] vmware service url                     *
- *             is_new_api       - [IN] flag to use new api version syntax     *
- *             config_source_ip - [IN]                                        *
- *             easyhandle       - [OUT] cURL handle                           *
- *             page             - [OUT] response buffer for cURL              *
- *             headers          - [OUT] request headers for cURL              *
- *             error            - [OUT] error message in the case of failure  *
+ * Parameters: url               - [IN] vmware service url                    *
+ *             is_new_api        - [IN] flag to use new api version syntax    *
+ *             config_source_ip  - [IN]                                       *
+ *             config_vm_timeout - [IN]                                       *
+ *             easyhandle        - [OUT] cURL handle                          *
+ *             page              - [OUT] response buffer for cURL             *
+ *             headers           - [OUT] request headers for cURL             *
+ *             error             - [OUT] error message in the case of failure *
  *                                                                            *
  * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, const char *config_source_ip,
-		CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers, int config_vmwware_timeout, char **error)
+		int config_vm_timeout, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers, char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
 #	define ZBX_XML_HEADER1		"Accept: application/json, text/plain, */*"
@@ -304,7 +305,7 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 			(NULL != config_source_ip && CURLE_OK != (err = curl_easy_setopt(*easyhandle,
 			opt = CURLOPT_INTERFACE, config_source_ip))) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
-			(long)config_vmwware_timeout)) ||
+			(long)config_vm_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
@@ -877,11 +878,13 @@ out:
  *                                                                            *
  * Purpose: updates vmware tags data                                          *
  *                                                                            *
- * Parameters: service          - [IN] vmware service                         *
- *             config_source_ip - [IN]                                        *
+ * Parameters: service               - [IN] vmware service                   *
+ *             config_source_ip      - [IN]                                   *
+ *             config_vmware_timeout - [IN]                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout)
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout)
 {
 	int				i, version, found_tags = 0, ret = FAIL;
 	char				*error = NULL;
@@ -917,8 +920,8 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 	is_new_api = (702 <= version) ? 1 : 0;
 
 	if (0 != entity_tags.values_num && (
-			SUCCEED != vmware_curl_init(service->url, is_new_api, config_source_ip, &easyhandle, &page,
-					&headers, config_vmware_timeout, &error) ||
+			SUCCEED != vmware_curl_init(service->url, is_new_api, config_source_ip, config_vmware_timeout,
+					&easyhandle, &page, &headers, &error) ||
 			SUCCEED != vmware_service_rest_authenticate(service, is_new_api, easyhandle, &headers, &page,
 			&error)))
 	{
