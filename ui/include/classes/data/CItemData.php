@@ -1099,8 +1099,8 @@ final class CItemData {
 				'description' => _('Network interface list (includes interface type, status, IPv4 address, description). Returns text'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.if.list',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.if.list'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent/win_keys?hl=net.if.list#net.if.list',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys?hl=net.if.list#net.if.list'
 				]
 			],
 			'net.if.out[if,<mode>]' => [
@@ -1263,8 +1263,8 @@ final class CItemData {
 				'description' => _('Various information about specific process(es). Returns float'),
 				'value_type' => ITEM_VALUE_TYPE_FLOAT,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#proc.info',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#proc.info'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent/win_keys#proc.info',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#proc.info'
 				]
 			],
 			'registry.data[key,<value name>]' => [
@@ -1709,8 +1709,8 @@ final class CItemData {
 				'description' => _('Virtual space size in bytes or in percentage from total. Returns integer for bytes; float for percentage'),
 				'value_type' => null,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.fs.size',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.fs.size'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent/win_keys#vm.vmemory.size',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#vm.vmemory.size'
 				]
 			],
 			'vmware.alarms.get[url]' => [
