@@ -114,11 +114,11 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_pdc_get_discovery(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		areg_records = zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
+		areg_records = zbx_pdc_get_autoreg(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
@@ -250,14 +250,14 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_db_free_result(result);
 
 					zbx_reset_proxy_history_count(history_maxid - history_lastid);
-					zbx_proxy_set_hist_lastid(history_lastid);
+					zbx_pdc_set_history_lastid(history_lastid);
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					zbx_proxy_set_dhis_lastid(discovery_lastid);
+					zbx_pdc_set_discovery_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
-					zbx_proxy_set_areg_lastid(areg_lastid);
+					zbx_pdc_set_autoreg_lastid(areg_lastid);
 
 				zbx_db_commit();
 			}

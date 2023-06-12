@@ -22,6 +22,21 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
+static zbx_history_table_t	dht = {
+	"proxy_dhistory", "dhistory_lastid",
+		{
+		{"clock",		ZBX_PROTO_TAG_CLOCK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"druleid",		ZBX_PROTO_TAG_DRULE,		ZBX_JSON_TYPE_INT,	NULL},
+		{"dcheckid",		ZBX_PROTO_TAG_DCHECK,		ZBX_JSON_TYPE_INT,	NULL},
+		{"ip",			ZBX_PROTO_TAG_IP,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"dns",			ZBX_PROTO_TAG_DNS,		ZBX_JSON_TYPE_STRING,	NULL},
+		{"port",		ZBX_PROTO_TAG_PORT,		ZBX_JSON_TYPE_INT,	"0"},
+		{"value",		ZBX_PROTO_TAG_VALUE,		ZBX_JSON_TYPE_STRING,	""},
+		{"status",		ZBX_PROTO_TAG_STATUS,		ZBX_JSON_TYPE_INT,	"0"},
+		{NULL}
+		}
+};
+
 struct zbx_pdc_discovery_data
 {
 	zbx_pdc_state_t			state;
@@ -135,4 +150,50 @@ void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t d
 		const char *dns, int status, int clock)
 {
 	pdc_discovery_write_service(data, druleid, 0, ip, dns, 0, status, "", clock);
+}
+
+static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int		records_num = 0;
+	zbx_uint64_t	id;
+
+	id = pdc_get_lastid(dht.table, dht.lastidfield);
+
+	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
+	/*   1) there are no more data to read                                  */
+	/*   2) we have retrieved more than the total maximum number of records */
+	/*   3) we have gathered more than half of the maximum packet size      */
+	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
+	{
+		pdc_get_rows(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
+
+		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
+			break;
+	}
+
+	if (0 != records_num)
+		zbx_json_close(j);
+
+	return records_num;
+}
+
+int	zbx_pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	if (PDC_MEMORY == pdc_src[pdc_cache->state])
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
+		pdc_cache->state = PDC_DATABASE_ONLY;
+	}
+
+	if (PDC_DATABASE == pdc_src[pdc_cache->state])
+	{
+		return pdc_get_discovery(j, lastid, more);
+	}
+	else
+		return 0;
+}
+
+void	zbx_pdc_set_discovery_lastid(const zbx_uint64_t lastid)
+{
+	pdc_set_lastid(dht.table, dht.lastidfield, lastid);
 }

@@ -53,12 +53,6 @@ int	zbx_proxy_check_permissions(const zbx_dc_proxy_t *proxy, const zbx_socket_t 
 
 int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts);
 
-int	zbx_proxy_get_hist_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_dhis_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-int	zbx_proxy_get_areg_data(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
-void	zbx_proxy_set_hist_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_dhis_lastid(const zbx_uint64_t lastid);
-void	zbx_proxy_set_areg_lastid(const zbx_uint64_t lastid);
 int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
 int	zbx_proxy_get_history_count(void);

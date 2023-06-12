@@ -307,7 +307,7 @@ try_again:
  * Return value: The total number of records added.                           *
  *                                                                            *
  ******************************************************************************/
-static int	proxy_export_history(struct zbx_json *j, int records_num, const zbx_dc_item_t *dc_items,
+static int	pdc_export_history(struct zbx_json *j, int records_num, const zbx_dc_item_t *dc_items,
 		const int *errcodes, const zbx_vector_pdc_history_ptr_t *records, const char *string_buffer,
 		zbx_uint64_t *lastid)
 {
@@ -448,7 +448,7 @@ static int	pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 		zbx_dc_config_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
 
-		records_num = proxy_export_history(j, records_num, dc_items, errcodes, &records, string_buffer, lastid);
+		records_num = pdc_export_history(j, records_num, dc_items, errcodes, &records, string_buffer, lastid);
 		zbx_dc_config_clean_items(dc_items, errcodes, itemids.values_num);
 
 		/* got less data than requested - either no more data to read or the history is full of */
@@ -494,4 +494,9 @@ int	zbx_pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	}
 	else
 		return 0;
+}
+
+void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
+{
+	pdc_set_lastid("proxy_history", "history_lastid", lastid);
 }

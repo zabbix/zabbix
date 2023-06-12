@@ -24,6 +24,7 @@
 #include "proxydatacache.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
+#include "zbxdbschema.h"
 
 #define ZBX_MAX_HRECORDS	1000
 #define ZBX_MAX_HRECORDS_TOTAL	10000
@@ -122,5 +123,26 @@ zbx_pdc_t;
 extern zbx_pdc_t	*pdc_cache;
 
 zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield);
+
+typedef struct
+{
+	const char		*field;
+	const char		*tag;
+	zbx_json_type_t		jt;
+	const char		*default_value;
+}
+zbx_history_field_t;
+
+typedef struct
+{
+	const char		*table, *lastidfield;
+	zbx_history_field_t	fields[ZBX_MAX_FIELDS];
+}
+zbx_history_table_t;
+
+void	pdc_get_rows(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);
+
+void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
 
 #endif

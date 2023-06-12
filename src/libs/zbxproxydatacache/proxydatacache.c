@@ -198,3 +198,117 @@ zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield)
 
 	return lastid;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Get discovery/auto registration data from the database.           *
+ *                                                                            *
+ ******************************************************************************/
+void	pdc_get_rows(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more)
+{
+	size_t		offset = 0;
+	int		f, records_num_last = *records_num, retries = 1;
+	char		sql[MAX_STRING_LEN];
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	struct timespec	t_sleep = { 0, 100000000L }, t_rem;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s'", __func__, ht->table);
+
+	*more = ZBX_PROXY_DATA_DONE;
+
+	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, "select id");
+
+	for (f = 0; NULL != ht->fields[f].field; f++)
+		offset += zbx_snprintf(sql + offset, sizeof(sql) - offset, ",%s", ht->fields[f].field);
+try_again:
+	zbx_snprintf(sql + offset, sizeof(sql) - offset, " from %s where id>" ZBX_FS_UI64 " order by id",
+			ht->table, *id);
+
+	result = zbx_db_select_n(sql, ZBX_MAX_HRECORDS);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(*lastid, row[0]);
+
+		if (1 < *lastid - *id)
+		{
+			/* At least one record is missing. It can happen if some DB syncer process has */
+			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
+			if (0 < retries--)
+			{
+				zbx_db_free_result(result);
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
+						" Waiting " ZBX_FS_DBL " sec, retrying.",
+						__func__, *lastid - *id - 1,
+						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+				nanosleep(&t_sleep, &t_rem);
+				goto try_again;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing. No more retries.",
+						__func__, *lastid - *id - 1);
+			}
+		}
+
+		if (0 == *records_num)
+			zbx_json_addarray(j, proto_tag);
+
+		zbx_json_addobject(j, NULL);
+
+		for (f = 0; NULL != ht->fields[f].field; f++)
+		{
+			if (NULL != ht->fields[f].default_value && 0 == strcmp(row[f + 1], ht->fields[f].default_value))
+				continue;
+
+			zbx_json_addstring(j, ht->fields[f].tag, row[f + 1], ht->fields[f].jt);
+		}
+
+		(*records_num)++;
+
+		zbx_json_close(j);
+
+		/* stop gathering data to avoid exceeding the maximum packet size */
+		if (ZBX_DATA_JSON_RECORD_LIMIT < j->buffer_offset)
+		{
+			*more = ZBX_PROXY_DATA_MORE;
+			break;
+		}
+
+		*id = *lastid;
+	}
+	zbx_db_free_result(result);
+
+	if (ZBX_MAX_HRECORDS == *records_num - records_num_last)
+		*more = ZBX_PROXY_DATA_MORE;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d lastid:" ZBX_FS_UI64 " more:%d size:" ZBX_FS_SIZE_T,
+			__func__, *records_num - records_num_last, *lastid, *more,
+			(zbx_fs_size_t)j->buffer_offset);
+}
+
+void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
+{
+	zbx_db_result_t	result;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]", __func__, table_name, lastidfield, lastid);
+
+	result = zbx_db_select("select 1 from ids where table_name='%s' and field_name='%s'",
+			table_name, lastidfield);
+
+	if (NULL == zbx_db_fetch(result))
+	{
+		zbx_db_execute("insert into ids (table_name,field_name,nextid) values ('%s','%s'," ZBX_FS_UI64 ")",
+				table_name, lastidfield, lastid);
+	}
+	else
+	{
+		zbx_db_execute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
+				lastid, table_name, lastidfield);
+	}
+	zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}

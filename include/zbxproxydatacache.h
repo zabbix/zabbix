@@ -40,10 +40,19 @@ void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_
 void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
 		const char *dns, int status, int clock);
 
+int	zbx_pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+
+void	zbx_pdc_set_discovery_lastid(const zbx_uint64_t lastid);
+
 /* auto registration */
 
 void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock);
+
+int	zbx_pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+
+void	zbx_pdc_set_autoreg_lastid(const zbx_uint64_t lastid);
+
 
 /* history */
 
@@ -61,5 +70,7 @@ void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t
 		int timestamp, int logeventid, int severity, const char *source);
 
 int	zbx_pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+
+void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid);
 
 #endif
