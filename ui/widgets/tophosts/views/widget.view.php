@@ -62,7 +62,7 @@ else {
 
 			if ($column === null) {
 				if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-					&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+						&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 					$row[] = (new CCol(''))->setColSpan(2);
 				}
 				else {
@@ -75,8 +75,8 @@ else {
 			$color = $column_config['base_color'];
 
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-				&& array_key_exists('thresholds', $column_config)) {
+					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
+					&& array_key_exists('thresholds', $column_config)) {
 				foreach ($column_config['thresholds'] as $threshold) {
 					$threshold_value = $column['is_binary_units']
 						? $threshold['threshold_binary']
