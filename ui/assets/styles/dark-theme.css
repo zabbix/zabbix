@@ -3994,6 +3994,8 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list {
     padding-left: 10px;
     margin-right: 5px; }
+    div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list .problem-icon-list-item {
+      border-radius: 2px; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {
     padding-left: 10px;
     margin-right: 5px;
