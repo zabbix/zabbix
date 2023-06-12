@@ -176,6 +176,8 @@ button {
 	@extend %button;
 	@extend %button-colors;
 	@extend %button-disabled;
+
+	margin: 0;
 }
 
 .btn {

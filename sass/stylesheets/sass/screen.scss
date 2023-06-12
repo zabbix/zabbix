@@ -3587,7 +3587,7 @@ svg {
 			@extend %icons-font;
 			content: $zi-chevron-down;
 			margin-top: 7px;
-			font-size: 10px;
+			font-size: $icon-smaller-size;
 		}
 
 		&:not(:empty) {
@@ -3633,11 +3633,6 @@ svg {
 		&:only-child button {
 			border-radius: 2px;
 		}
-	}
-
-	button {
-		margin-right: 0;
-		margin-bottom: 0;
 	}
 }
 

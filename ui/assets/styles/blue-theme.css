@@ -1274,6 +1274,9 @@ button[disabled], [disabled].btn, [disabled].btn-alt, [disabled].btn-grey {
   border-color: #ccd5d9;
   box-shadow: none; }
 
+button {
+  margin: 0; }
+
 .btn {
   display: inline-block; }
   .btn:link, .btn:visited {
@@ -3556,9 +3559,9 @@ z-select,
     border-radius: 0; }
     z-select button.focusable::after,
     .z-select button.focusable::after {
-      position: relative;
+      position: absolute;
       top: 50%;
-      float: right;
+      right: 4px;
       font-size: 10px;
       content: "";
       transform: translateY(-50%); }
@@ -6510,9 +6513,6 @@ svg {
           border-color: #02659f; }
     .btn-split li:only-child button {
       border-radius: 2px; }
-  .btn-split button {
-    margin-right: 0;
-    margin-bottom: 0; }
 
 .checkbox-block {
   margin: 10px 0; }

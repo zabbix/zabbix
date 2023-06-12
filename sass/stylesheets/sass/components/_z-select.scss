@@ -31,10 +31,10 @@ z-select,
 
 		&::after {
 			@extend %icons-font;
-			position: relative;
+			position: absolute;
 			top: 50%;
-			float: right;
-			font-size: 10px;
+			right: 4px;
+			font-size: $icon-smaller-size;
 			content: $zi-chevron-down;
 			transform: translateY(-50%);
 		}
