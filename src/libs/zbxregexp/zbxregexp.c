@@ -307,8 +307,7 @@ static unsigned long int	compute_recursion_limit(void)
 #else
 #	define REGEXP_RECURSION_DEFAULT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
-		if (0 == rxp_stacklimit)
-			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
+		rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 	}
 
 	return rxp_stacklimit / REGEXP_RECURSION_STEP;
