@@ -7068,7 +7068,7 @@ z-select button.focusable:focus,
     font-size: 26px;
     color: #ffffff;
     text-align: center;
-    -webkit-text-stroke: 0.1px black; }
+    -webkit-text-stroke: 0.4px rgba(0, 0, 0, 0.2); }
 
 .na-bg::before {
   content: ""; }
