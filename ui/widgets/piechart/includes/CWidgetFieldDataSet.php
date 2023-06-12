@@ -19,7 +19,7 @@
 **/
 
 
-namespace Zabbix\Widgets\Fields;
+namespace Widgets\PieChart\Includes;
 
 use API,
 	CApiInputValidator;
@@ -29,7 +29,7 @@ use Zabbix\Widgets\CWidgetField;
 /**
  * Class for data set widget field used in Pie chart widget configuration Data set tab.
  */
-class CWidgetFieldPieChartDataSet extends CWidgetField {
+class CWidgetFieldDataSet extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 

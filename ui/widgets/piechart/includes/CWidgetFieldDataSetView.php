@@ -1,4 +1,4 @@
-<?php declare(strict_types = 0);
+<?php declare(strict_types=0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,11 +19,34 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldPieChartDataSet;
+namespace Widgets\PieChart\Includes;
 
-class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
+use CButton,
+	CCol,
+	CColor,
+	CDiv,
+	CFormField,
+	CFormGrid,
+	CLabel,
+	CLink,
+	CList,
+	CListItem,
+	CPatternSelect,
+	CRow,
+	CSelect,
+	CSimpleButton,
+	CSpan,
+	CTable,
+	CTableColumn,
+	CTag,
+	CTemplateTag,
+	CTextBox,
+	CVar,
+	CWidgetFieldView;
 
-	public function __construct(CWidgetFieldPieChartDataSet $field) {
+class CWidgetFieldDataSetView extends CWidgetFieldView {
+
+	public function __construct(CWidgetFieldDataSet $field) {
 		$this->field = $field;
 	}
 
@@ -35,17 +58,17 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 		$values = $this->field->getValue();
 
 		if (!$values) {
-			$values[] = CWidgetFieldPieChartDataSet::getDefaults();
+			$values[] = CWidgetFieldDataSet::getDefaults();
 		}
 
 		$itemids = array_merge(...array_column($values, 'itemids'));
 		$item_names = [];
 		if ($itemids) {
-			$item_names = CWidgetFieldPieChartDataSet::getItemNames($itemids);
+			$item_names = CWidgetFieldDataSet::getItemNames($itemids);
 		}
 
 		foreach ($values as $i => $value) {
-			if ($value['dataset_type'] == CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM) {
+			if ($value['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
 				$value['item_names'] = $item_names;
 			}
 
@@ -75,14 +98,14 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 	}
 
 	public function getTemplates(): array {
-		$value = ['color' => '#{color}'] + CWidgetFieldPieChartDataSet::getDefaults();
+		$value = ['color' => '#{color}'] + CWidgetFieldDataSet::getDefaults();
 
 		return [
 			new CTemplateTag('dataset-pattern-item-tmpl',
-				$this->getDataSetLayout($value, CWidgetFieldPieChartDataSet::DATASET_TYPE_PATTERN_ITEM, true)
+				$this->getDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM, true)
 			),
 			new CTemplateTag('dataset-single-item-tmpl',
-				$this->getDataSetLayout($value, CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM, true)
+				$this->getDataSetLayout($value, CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM, true)
 			),
 			new CTemplateTag('dataset-item-row-tmpl', $this->getItemRowTemplate())
 		];
@@ -97,7 +120,7 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
-		if ($dataset_type == CWidgetFieldPieChartDataSet::DATASET_TYPE_PATTERN_ITEM) {
+		if ($dataset_type == CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM) {
 			if ($this->field->isTemplateDashboard()) {
 				$host_pattern_field = null;
 
@@ -259,7 +282,7 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 						new CLabel([
 							_('Aggregation function'),
 							makeHelpIcon(_('Aggregates each item in the data set.'))
-						],'label-'.$field_name.'_'.$row_num.'_aggregate_function'),
+						], 'label-'.$field_name.'_'.$row_num.'_aggregate_function'),
 						new CFormField(
 							(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
 								->setId($field_name.'_'.$row_num.'_aggregate_function')
@@ -342,8 +365,8 @@ class CWidgetFieldPieChartDataSetView extends CWidgetFieldView {
 					->setId('items_'.$ds_num.'_'.$row_num.'_type')
 					->setValue($type)
 					->addOptions(CSelect::createOptionsFromArray([
-						PIE_CHART_ITEM_NORMAL =>_('Normal'),
-						PIE_CHART_ITEM_TOTAL =>_('Total')
+						PIE_CHART_ITEM_NORMAL => _('Normal'),
+						PIE_CHART_ITEM_TOTAL => _('Total')
 					]))
 			]))->addClass('table-col-type'),
 			(new CCol([

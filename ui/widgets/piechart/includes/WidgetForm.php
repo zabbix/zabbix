@@ -29,14 +29,15 @@ use Zabbix\Widgets\{
 	CWidgetForm
 };
 
-use Zabbix\Widgets\Fields\{CWidgetFieldCheckBox,
+use Zabbix\Widgets\Fields\{
+	CWidgetFieldCheckBox,
 	CWidgetFieldColor,
 	CWidgetFieldDatePicker,
-	CWidgetFieldPieChartDataSet,
 	CWidgetFieldIntegerBox,
 	CWidgetFieldRadioButtonList,
 	CWidgetFieldRangeControl,
-	CWidgetFieldTextBox};
+	CWidgetFieldTextBox
+};
 
 /**
  * Pie chart widget form view.
@@ -87,7 +88,7 @@ class WidgetForm extends CWidgetForm {
 
 	private function initDataSetFields(): self {
 		return $this->addField(
-			(new CWidgetFieldPieChartDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+			(new CWidgetFieldDataSet('ds', _('Data set')))->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 		);
 	}
 

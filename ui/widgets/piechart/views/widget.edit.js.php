@@ -19,7 +19,7 @@
 **/
 
 
-use Zabbix\Widgets\Fields\CWidgetFieldPieChartDataSet;
+use Widgets\PieChart\Includes\CWidgetFieldDataSet;
 
 ?>
 
@@ -113,7 +113,7 @@ window.widget_piechart_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -125,7 +125,7 @@ window.widget_piechart_form = new class {
 				jQuery(window).trigger('resize');
 				const dataset = data.section[0];
 
-				if (dataset.dataset.type == '<?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
+				if (dataset.dataset.type == '<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>') {
 					const message_block = dataset.querySelector('.no-items-message');
 
 					if (dataset.querySelectorAll('.single-item-table-row').length == 0) {
@@ -170,7 +170,7 @@ window.widget_piechart_form = new class {
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
-				this._addDataset(<?= CWidgetFieldPieChartDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+				this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 			});
 
 		document
@@ -277,13 +277,13 @@ window.widget_piechart_form = new class {
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldPieChartDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
 						}
 					}
 				]
@@ -314,7 +314,7 @@ window.widget_piechart_form = new class {
 	_addDataset(type) {
 		jQuery(this._dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
-		const template = type == <?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>
+		const template = type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 			? new Template(jQuery('#dataset-single-item-tmpl').html())
 			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
 
@@ -328,7 +328,7 @@ window.widget_piechart_form = new class {
 
 		this._dataset_wrapper.insertAdjacentHTML('beforeend', template.evaluate({
 			rowNum: this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length,
-			color: type == <?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>
+			color: type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
 				? ''
 				: colorPalette.getNextColor(used_colors)
 		}));
@@ -358,7 +358,7 @@ window.widget_piechart_form = new class {
 
 		const cloned_dataset = this._getOpenedDataset();
 
-		if (dataset.dataset.type == <?= CWidgetFieldPieChartDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
+		if (dataset.dataset.type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
 				this._addSingleItem(
 					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
