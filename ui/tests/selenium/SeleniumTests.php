@@ -219,6 +219,9 @@ require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
+// Web scenarios.
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
+
 require_once dirname(__FILE__).'/testExecuteNow.php';
 require_once dirname(__FILE__).'/testPageWeb.php';
 
@@ -489,6 +492,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUsers');
+
+		// Web scenarios.
+		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
