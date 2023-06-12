@@ -135,7 +135,7 @@ static int	agent_task_process(short event, void *data)
 			else
 			{
 				agent_context->step = ZABBIX_AGENT_STEP_RECV;
-				zbx_tcp_recv_state_init(&agent_context->s, &agent_context->tcp_recv_state,
+				zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context,
 						agent_context->flags);
 
 				zbx_tcp_send_context_clear(&agent_context->tcp_send_context);
@@ -143,8 +143,8 @@ static int	agent_task_process(short event, void *data)
 			}
 			break;
 		case ZABBIX_AGENT_STEP_RECV:
-			if (FAIL != (received_len = zbx_tcp_recv_state(&agent_context->s,
-					&agent_context->tcp_recv_state, agent_context->flags, &want_event)))
+			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
+					&agent_context->tcp_recv_context, agent_context->flags, &want_event)))
 			{
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->ret,
 						agent_context->interface.addr, &agent_context->result);

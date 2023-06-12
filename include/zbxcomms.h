@@ -216,7 +216,7 @@ typedef struct
 	unsigned char	expect;
 	int		protocol_version;
 }
-zbx_tcp_recv_state_t;
+zbx_tcp_recv_context_t;
 
 #define ZBX_MAX_HEADER_LEN 21
 typedef struct
@@ -269,7 +269,7 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reser
 		int timeout);
 int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
 		zbx_tcp_send_context_t *context);
-int	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
+void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
 int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event);
 
 void	zbx_tcp_close(zbx_socket_t *s);
@@ -297,8 +297,8 @@ ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
 
-void	zbx_tcp_recv_state_init(zbx_socket_t *s, zbx_tcp_recv_state_t *tcp_recv_state, unsigned char flags);
-ssize_t	zbx_tcp_recv_state(zbx_socket_t *s, zbx_tcp_recv_state_t *state, unsigned char flags, short *events);
+void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
+ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
 
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);
