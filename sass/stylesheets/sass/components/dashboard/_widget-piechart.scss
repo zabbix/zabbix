@@ -1,7 +1,7 @@
 // Widget configuration.
 
 form.dashboard-widget-piechart {
-	width: 1090px;
+	width: 1110px;
 
 	.pie-chart-widget-config-tabs {
 		grid-column: 1 / -1;
@@ -156,7 +156,6 @@ form.dashboard-widget-piechart {
 		.table-col-handle { width: 26px; }
 		.table-col-no { width: 20px; }
 		.table-col-color { width: 24px; }
-		.table-col-type { width: 55px; }
 		.table-col-action { width: 55px; }
 
 		th {

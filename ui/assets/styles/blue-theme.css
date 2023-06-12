@@ -2014,7 +2014,7 @@ div.dashboard-widget-tophosts z-bar-gauge {
   height: 20px; }
 
 form.dashboard-widget-piechart {
-  width: 1090px; }
+  width: 1110px; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -2105,8 +2105,6 @@ form.dashboard-widget-piechart {
     width: 20px; }
   form.dashboard-widget-piechart .single-item-table .table-col-color {
     width: 24px; }
-  form.dashboard-widget-piechart .single-item-table .table-col-type {
-    width: 55px; }
   form.dashboard-widget-piechart .single-item-table .table-col-action {
     width: 55px; }
   form.dashboard-widget-piechart .single-item-table th {
