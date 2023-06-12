@@ -68,20 +68,20 @@ function getDatasetTab(CWidgetFormView $form, array $fields): array {
 
 function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$source = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
-	$draw = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw']));
+	$draw_type = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw_type']));
 	$width = $form->registerField(new CWidgetFieldRangeControlView($fields['width']));
 	$stroke = $form->registerField(new CWidgetFieldRangeControlView($fields['stroke']));
-	$sector_space = $form->registerField(new CWidgetFieldRangeControlView($fields['sector_space']));
-	$merge_sectors = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge_sectors']));
-	$merge_percentage = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percentage']));
+	$space = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
+	$merge = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
+	$merge_percent = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
 	$merge_color = $form->registerField(new CWidgetFieldColorView($fields['merge_color']));
-	$show_total = $form->registerField(new CWidgetFieldCheckBoxView($fields['show_total']));
+	$total_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['total_show']));
 	$value_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
 	$decimal_places = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_places']));
 	$value_bold = $form->registerField(new CWidgetFieldCheckBoxView($fields['value_bold']));
 	$value_color = $form->registerField(new CWidgetFieldColorView($fields['value_color']));
 	$units_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
-	$units_value = $form->registerField(new CWidgetFieldTextBoxView($fields['units_value']));
+	$units = $form->registerField(new CWidgetFieldTextBoxView($fields['units']));
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
@@ -93,8 +93,8 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 					new CFormField($source->getView())
 				])
 				->addItem([
-					$draw->getLabel(),
-					new CFormField($draw->getView())
+					$draw_type->getLabel(),
+					new CFormField($draw_type->getView())
 				])
 				->addItem([
 					$width->getLabel()->setId('width_label'),
@@ -105,13 +105,16 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 					new CFormField($stroke->getView())
 				])
 				->addItem([
-					$sector_space->getLabel(),
-					new CFormField($sector_space->getView())
+					$space->getLabel(),
+					new CFormField($space->getView())
 				])
 				->addItem([
-					$merge_sectors->getLabel(),
+					$merge->getLabel(),
 					(new CFormField([
-						$merge_sectors->getView(), ($merge_percentage->getView())->setWidth(55), ' % ', $merge_color->getView()
+						$merge->getView(),
+						($merge_percent->getView())->setWidth(ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH),
+						' % ',
+						$merge_color->getView()
 					]))
 				])
 
@@ -119,8 +122,8 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 		->addItem(
 			(new CFormGrid())
 				->addItem([
-					$show_total->getLabel(),
-					new CFormField($show_total->getView())
+					$total_show->getLabel(),
+					new CFormField($total_show->getView())
 				])
 				->addItem([
 					$value_size->getLabel(),
@@ -132,7 +135,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 				])
 				->addItem([
 					$units_show->getView(),
-					(new CFormField(($units_value->getView())->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)))
+					(new CFormField(($units->getView())->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)))
 				])
 				->addItem([
 					$value_bold->getLabel(),
@@ -146,7 +149,7 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$chart_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['chart_time']));
+	$graph_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
 	$time_from = $form->registerField(
 		(new CWidgetFieldDatePickerView($fields['time_from']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
@@ -160,8 +163,8 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 
 	return (new CFormGrid())
 		->addItem([
-			$chart_time->getLabel(),
-			new CFormField($chart_time->getView())
+			$graph_time->getLabel(),
+			new CFormField($graph_time->getView())
 		])
 		->addItem([
 			$time_from->getLabel(),

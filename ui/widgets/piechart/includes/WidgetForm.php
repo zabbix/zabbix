@@ -43,14 +43,14 @@ use Zabbix\Widgets\Fields\{CWidgetFieldCheckBox,
  */
 class WidgetForm extends CWidgetForm {
 
-	private bool $chart_time_on = false;
+	private bool $graph_time_on = false;
 	private bool $legend_on = true;
 
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
-		// Test chart custom time period.
-		if ($this->getFieldValue('chart_time') == PIE_CHART_CUSTOM_TIME_ON) {
+		// Test custom time period.
+		if ($this->getFieldValue('graph_time') == PIE_CHART_CUSTOM_TIME_ON) {
 			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
 				$this->getFieldValue('time_to')
 			));
@@ -62,11 +62,11 @@ class WidgetForm extends CWidgetForm {
 	protected function normalizeValues(array $values): array {
 		$values = parent::normalizeValues($values);
 
-		if (array_key_exists('chart_time', $values)) {
-			$this->chart_time_on = $values['chart_time'] == PIE_CHART_CUSTOM_TIME_ON;
+		if (array_key_exists('graph_time', $values)) {
+			$this->graph_time_on = $values['graph_time'] == PIE_CHART_CUSTOM_TIME_ON;
 		}
 
-		if (!$this->chart_time_on) {
+		if (!$this->graph_time_on) {
 			unset($values['time_from'], $values['time_to']);
 		}
 
@@ -101,7 +101,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(PIE_CHART_DATA_SOURCE_AUTO)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('draw', _('Draw'), [
+				(new CWidgetFieldRadioButtonList('draw_type', _('Draw'), [
 					PIE_CHART_DRAW_PIE => _('Pie'),
 					PIE_CHART_DRAW_DOUGHNUT => _('Doughnut')
 				]))->setDefault(PIE_CHART_DRAW_PIE)
@@ -119,30 +119,36 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(PIE_CHART_STROKE_DEFAULT)
 			)
 			->addField(
-				(new CWidgetFieldRangeControl('sector_space', _('Space between sectors'),
+				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
 					PIE_CHART_SECTORS_SPACE_MIN, PIE_CHART_SECTORS_SPACE_MAX
 				))
 					->setDefault(PIE_CHART_SECTORS_SPACE_DEFAULT)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('merge_sectors', null, _('Merge sectors smaller than '))
+				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than '))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('merge_percentage', null, 1, 100))
+				(new CWidgetFieldIntegerBox('merge_percent', null,
+					PIE_CHART_MERGE_PERCENT_MIN, PIE_CHART_MERGE_PERCENT_MAX
+				))
 					->setDefault(PIE_CHART_MERGE_PERCENT_DEFAULT)
 			)
 			->addField(
 				(new CWidgetFieldColor('merge_color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('show_total', _('Show total value')))
+				(new CWidgetFieldCheckBox('total_show', _('Show total value')))
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('value_size', _('Size'), 1, 100))
+				(new CWidgetFieldIntegerBox('value_size', _('Size'),
+					PIE_CHART_VALUE_SIZE_MIN, PIE_CHART_VALUE_SIZE_MAX
+				))
 					->setDefault(PIE_CHART_VALUE_SIZE_DEFAULT)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'), 1, 6))
+				(new CWidgetFieldIntegerBox('decimal_places', _('Decimal places'),
+					PIE_CHART_VALUE_DECIMALS_MIN, PIE_CHART_VALUE_DECIMALS_MAX
+				))
 					->setDefault(PIE_CHART_VALUE_DECIMALS_DEFAULT)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
@@ -150,7 +156,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('units_show', null, _('Units')))
 			)
 			->addField(
-				(new CWidgetFieldTextBox('units_value'))
+				(new CWidgetFieldTextBox('units'))
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('value_bold', _('Bold')))
@@ -163,12 +169,12 @@ class WidgetForm extends CWidgetForm {
 	private function initTimePeriodFields(): self {
 		return $this
 			->addField(
-				new CWidgetFieldCheckBox('chart_time', _('Set custom time period'))
+				new CWidgetFieldCheckBox('graph_time', _('Set custom time period'))
 			)
 			->addField(
 				(new CWidgetFieldDatePicker('time_from', _('From')))
 					->setDefault('now-1h')
-					->setFlags($this->chart_time_on
+					->setFlags($this->graph_time_on
 						? CWidgetField::FLAG_NOT_EMPTY
 						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
 					)
@@ -176,7 +182,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldDatePicker('time_to', _('To')))
 					->setDefault('now')
-					->setFlags($this->chart_time_on
+					->setFlags($this->graph_time_on
 						? CWidgetField::FLAG_NOT_EMPTY
 						: CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_DISABLED
 					)
@@ -209,8 +215,8 @@ class WidgetForm extends CWidgetForm {
 	 * Check if widget configuration is set to use custom time.
 	 */
 	public static function hasOverrideTime(array $fields_values): bool {
-		return array_key_exists('chart_time', $fields_values)
-			&& $fields_values['chart_time'] == PIE_CHART_CUSTOM_TIME_ON;
+		return array_key_exists('graph_time', $fields_values)
+			&& $fields_values['graph_time'] == PIE_CHART_CUSTOM_TIME_ON;
 	}
 
 	private static function validateTimeSelectorPeriod(string $from, string $to): array {

@@ -204,12 +204,12 @@ window.widget_piechart_form = new class {
 	}
 
 	_toggleDisplayingOptionsFields() {
-		const draw_type = this._form.querySelector('[name="draw"]:checked').value;
+		const draw_type = this._form.querySelector('[name="draw_type"]:checked').value;
 		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
 		const is_doughnut = draw_type == <?= PIE_CHART_DRAW_DOUGHNUT ?>;
-		const merge_sectors = document.getElementById('merge_sectors');
+		const merge = document.getElementById('merge');
 		const total_value_fields = this._form.querySelectorAll(
-			'#value_size, #decimal_places, #units_show, #units_value, #value_bold, #value_color'
+			'#value_size, #decimal_places, #units_show, #units, #value_bold, #value_color'
 		);
 
 		for (const element of doughnut_config_fields) {
@@ -223,18 +223,18 @@ window.widget_piechart_form = new class {
 			is_doughnut ? 'enable' : 'disable'
 		);
 
-		document.getElementById('merge_percentage').disabled = !merge_sectors.checked;
-		document.getElementById('merge_color').disabled = !merge_sectors.checked;
+		document.getElementById('merge_percent').disabled = !merge.checked;
+		document.getElementById('merge_color').disabled = !merge.checked;
 
 		for (const element of total_value_fields) {
-			element.disabled = !document.getElementById('show_total').checked;
+			element.disabled = !document.getElementById('total_show').checked;
 		}
 
-		document.getElementById('units_value').disabled = !document.getElementById('units_show').checked;
+		document.getElementById('units').disabled = !document.getElementById('units_show').checked;
 	}
 
 	_timePeriodTabInit() {
-		document.getElementById('chart_time')
+		document.getElementById('graph_time')
 			.addEventListener('click', (e) => {
 				document.getElementById('time_from').disabled = !e.target.checked;
 				document.getElementById('time_to').disabled = !e.target.checked;
