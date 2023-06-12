@@ -178,9 +178,7 @@ ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
 ZBX_PROPERTY_DECL_CONST(char *, zbx_config_pid_file, NULL)
 ZBX_PROPERTY_DECL_CONST(char *, zbx_config_tmpdir, NULL)
 ZBX_PROPERTY_DECL_CONST(char *, zbx_config_fping_location, NULL)
-#ifdef HAVE_IPV6
 ZBX_PROPERTY_DECL_CONST(char *, zbx_config_fping6_location, NULL)
-#endif
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
@@ -790,10 +788,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"FpingLocation",		&zbx_config_fping_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#ifdef HAVE_IPV6
 		{"Fping6Location",		&zbx_config_fping6_location,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -1041,9 +1037,7 @@ int	main(int argc, char **argv)
 	static zbx_config_icmpping_t	config_icmpping = {
 		get_zbx_config_source_ip,
 		get_zbx_config_fping_location,
-#ifdef HAVE_IPV6
 		get_zbx_config_fping6_location,
-#endif
 		get_zbx_config_tmpdir};
 
 	ZBX_TASK_EX			t = {ZBX_TASK_START};
