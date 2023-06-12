@@ -2815,7 +2815,7 @@ final class CItemData {
 				'description' => _('Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused).'),
 				'value_type' => null,
 				'documentation_link' => [
-					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/itemtypes/internal#wcache'
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#wcache'
 				]
 			]
 		];
