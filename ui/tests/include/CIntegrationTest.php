@@ -34,6 +34,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
 	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
 	const HOUSEKEEPER_EXEC_DELAY	= 5; // Housekeeper execution delay.
 	const DATA_PROCESSING_DELAY		= 5; // Data processing delay.
@@ -369,7 +370,7 @@ class CIntegrationTest extends CAPITest {
 				return;
 			}
 
-			sleep(self::WAIT_ITERATION_DELAY);
+			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to stop.');

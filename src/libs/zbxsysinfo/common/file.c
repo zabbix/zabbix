@@ -346,7 +346,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	flen = 0;
 
-	while (0 < (nbytes = zbx_read(f, read_buf, sizeof(read_buf), encoding)))
+	while (0 < (nbytes = read(f, read_buf, sizeof(read_buf))))
 	{
 		if (CONFIG_TIMEOUT < zbx_time() - ts)
 		{
@@ -362,9 +362,7 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		utf8 = convert_to_utf8(read_buf, nbytes, encoding);
-		zbx_strcpy_alloc(&contents, &contents_alloc, &contents_offset, utf8);
-		zbx_free(utf8);
+		zbx_str_memcpy_alloc(&contents, &contents_alloc, &contents_offset, read_buf, nbytes);
 	}
 
 	if (-1 == nbytes)	/* error occurred */
@@ -374,16 +372,16 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	if (0 != contents_offset)
-		contents_offset -= zbx_rtrim(contents, "\r\n");
-
-	if (0 == contents_offset) /* empty file */
+	if (NULL != contents)
 	{
+		utf8 = convert_to_utf8(contents, contents_offset, encoding);
 		zbx_free(contents);
-		contents = zbx_strdup(contents, "");
-	}
+		zbx_rtrim(utf8, "\r\n");
 
-	SET_TEXT_RESULT(result, contents);
+		SET_TEXT_RESULT(result, utf8);
+	}
+	else
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 
 	ret = SYSINFO_RET_OK;
 err:
