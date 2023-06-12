@@ -634,12 +634,6 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 	if (0 < (n = ZBX_TCP_WRITE(s->socket, buf, len)) && (size_t)n == len)
 		return n;
 
-	if (NULL != event)
-	{
-		*event = POLLOUT;
-		return ZBX_PROTO_ERROR;
-	}
-
 	pd.fd = s->socket;
 	pd.events = POLLOUT;
 
@@ -653,6 +647,12 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 			{
 				zbx_set_socket_strerror("cannot write data: %s",
 						strerror_from_system(zbx_socket_last_error()));
+				return ZBX_PROTO_ERROR;
+			}
+
+			if (NULL != event)
+			{
+				*event = POLLOUT;
 				return ZBX_PROTO_ERROR;
 			}
 
@@ -685,6 +685,12 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 			if (offset == (ssize_t)len)
 				break;
+
+			if (NULL != event)
+			{
+				*event = POLLOUT;
+				return offset;
+			}
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
@@ -841,6 +847,9 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 		}
 		else
 			context->written_header += bytes_sent;
+
+		if (NULL != event && 0 != *event)
+			return FAIL;
 	}
 
 	while (context->written < (ssize_t) context->send_len)
@@ -855,6 +864,9 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 			return FAIL;
 
 		context->written += bytes_sent;
+
+		if (NULL != event && 0 != *event)
+			return FAIL;
 	}
 
 	return SUCCEED;

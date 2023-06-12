@@ -3844,7 +3844,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 			if (NULL != event)
 			{
 				if (SUCCEED == tls_socket_event(s->tls_ctx->ctx, err, event))
-					return ZBX_PROTO_ERROR;
+					return offset;
 			}
 
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
@@ -3860,6 +3860,12 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 			if (offset == (ssize_t)len)
 				break;
+
+			if (NULL != event)
+			{
+				*event = POLLOUT;
+				return offset;
+			}
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
