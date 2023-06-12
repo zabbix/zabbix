@@ -78,7 +78,11 @@ else {
 				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 				&& array_key_exists('thresholds', $column_config)) {
 				foreach ($column_config['thresholds'] as $threshold) {
-					if ($column['value'] < $threshold['threshold']) {
+					$threshold_value = $column['is_binary_units']
+						? $threshold['threshold_binary']
+						: $threshold['threshold'];
+
+					if ($column['value'] < $threshold_value) {
 						break;
 					}
 
