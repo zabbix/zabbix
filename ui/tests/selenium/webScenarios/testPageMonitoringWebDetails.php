@@ -71,7 +71,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 					'name' => ' 	Test whitespace 	',
 					'step_names' => [
 						'	Tabs	',
-						' Spaces '
+						' Spaces ',
+						"\nNewline\n"
 					]
 				]
 			]
@@ -83,15 +84,15 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 *
 	 * @dataProvider getWebScenarioData
 	 */
-	public function testPageMonitoringWebDetails_Layout($data) {
+	public function testPageMonitoringWebDetails_DataDisplay($data) {
+		// Used for step creation with API.
 		$steps = [];
 
-		// Fill in repetitive step data.
+		// Fill in step data that's not displayed in this page.
 		foreach ($data['step_names'] as $i => $step_name){
 			$step = [];
 			$step['name'] = $step_name;
 			$step['url'] = 'http://example.com';
-			$step['status_codes'] = '200';
 			$step['no'] = $i;
 			$steps[] = $step;
 		}
@@ -117,9 +118,11 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// The table contains an additional TOTAL row.
 		$expected_step_names[] = ['TOTAL'];
 		$this->assertTableData($expected_step_names);
-
 	}
 
+	/**
+	 * Generates an array of strings like 'Step-1' with a length of $count.
+	 */
 	protected  function getGeneratedStepNames($count) {
 		$result = [];
 		for ($i = 1; $i <= $count; $i++) {
