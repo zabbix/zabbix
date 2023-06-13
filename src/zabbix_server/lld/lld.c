@@ -375,7 +375,7 @@ out:
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **err_msg)
 {
-	int			i, ret = FAIL, res, error_num = 0;
+	int			i, ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],
 				*errmsg = NULL;
 	double			result;
