@@ -15,6 +15,7 @@ require (
 	github.com/go-ole/go-ole v1.2.4
 	github.com/go-sql-driver/mysql v1.5.0
 	github.com/goburrow/modbus v0.1.0
+	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.20.1
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/mediocregopher/radix/v3 v3.5.0
@@ -32,7 +33,6 @@ require (
 	github.com/gobwas/httphead v0.1.0 // indirect
 	github.com/gobwas/pool v0.2.1 // indirect
 	github.com/gobwas/ws v1.1.0 // indirect
-	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
