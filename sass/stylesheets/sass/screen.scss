@@ -395,6 +395,12 @@ form {
 			background-color: darken($ui-bg-selected-color, 4%);
 			position: relative;
 		}
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			line-height: 18px;
+		}
 	}
 }
 

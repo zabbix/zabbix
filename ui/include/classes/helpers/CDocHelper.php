@@ -98,6 +98,13 @@ class CDocHelper {
 	const DATA_COLLECTION_TRIGGERS_EDIT =						'config/triggers/trigger#configuration';
 	const INVENTORY_HOST_LIST =									'web_interface/frontend_sections/inventory/hosts';
 	const INVENTORY_HOST_OVERVIEW =								'web_interface/frontend_sections/inventory/overview';
+	const ITEM_TYPES_DB_MONITOR =								'config/items/itemtypes/odbc_checks';
+	const ITEM_TYPES_IPMI_AGENT =								'config/items/itemtypes/ipmi';
+	const ITEM_TYPES_JMX_AGENT =								'config/items/itemtypes/jmx_monitoring';
+	const ITEM_TYPES_SIMPLE_CHECK =								'config/items/itemtypes/simple_checks';
+	const ITEM_TYPES_SNMP_TRAP =								'config/items/itemtypes/snmptrap';
+	const ITEM_TYPES_ZABBIX_AGENT =								'config/items/itemtypes/zabbix_agent';
+	const ITEM_TYPES_ZABBIX_INTERNAL =							'config/items/itemtypes/internal';
 	const MONITORING_CHARTS_VIEW =								'web_interface/frontend_sections/monitoring/hosts/graphs';
 	const MONITORING_DISCOVERY_VIEW =							'web_interface/frontend_sections/monitoring/discovery';
 	const MONITORING_HOST_DASHBOARD_VIEW =						'config/visualization/host_screens';
