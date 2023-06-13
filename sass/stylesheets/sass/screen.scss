@@ -299,6 +299,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -373,6 +380,12 @@ form {
 
 		.btn-widget-collapse {
 			background-position-y: -657px;
+		}
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			line-height: 18px;
 		}
 	}
 
@@ -1752,7 +1765,9 @@ input {
 textarea {
 	margin: 0;
 	padding: 4px 5px;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;

@@ -156,9 +156,14 @@ $left_column
 			)
 	);
 
-$filter_inventory_table = new CTable();
-$filter_inventory_table->setId('filter-inventory_#{uniqid}');
+$filter_inventory_table = (new CTable())->setId('filter-inventory_#{uniqid}');
+
 $inventories = array_column(getHostInventories(), 'title', 'db_field');
+
+if(!$data['inventory']) {
+	$data['inventory'] = [['field' => '', 'value' => '']];
+}
+
 $i = 0;
 foreach ($data['inventory'] as $field) {
 	$filter_inventory_table->addRow([
@@ -196,6 +201,10 @@ $filter_tags_table->addRow(
 			->setId('evaltype_#{uniqid}')
 	))->setColSpan(4)
 );
+
+if(!$data['tags']) {
+	$data['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+}
 
 $i = 0;
 foreach ($data['tags'] as $tag) {
@@ -322,7 +331,7 @@ $template = (new CForm('get'))
 	->setName('zbx_filter')
 	->addItem([
 		$template,
-		(new CSubmitButton(null))->addClass(ZBX_STYLE_DISPLAY_NONE),
+		(new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),
@@ -490,9 +499,12 @@ if (array_key_exists('render_html', $data)) {
 		}
 
 		// Inventory table.
-		if (data.inventory.length == 0) {
+		$('#filter-inventory_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.inventory.length === 0) {
 			data.inventory.push({'field': '', 'value': ''});
 		}
+
 		$('#filter-inventory_' + data.uniqid, container).dynamicRows({
 			template: '#filter-inventory-row',
 			rows: data.inventory,
@@ -500,8 +512,10 @@ if (array_key_exists('render_html', $data)) {
 		});
 
 		// Tags table.
-		if (data.tags.length == 0) {
-			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>});
+		$('#filter-tags_' + data.uniqid, container).find('.form_row').remove();
+
+		if (data.tags.length === 0) {
+			data.tags.push({'tag': '', 'value': '', 'operator': <?= TAG_OPERATOR_LIKE ?>, uniqid: data.uniqid});
 		}
 
 		$('#filter-tags_' + data.uniqid, container)

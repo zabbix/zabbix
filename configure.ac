@@ -166,6 +166,7 @@ dnl *****************************************************************
 
 AC_SEARCH_LIBS(socket, socket)
 AC_SEARCH_LIBS(kstat_open, kstat)
+AC_SEARCH_LIBS(inet_ntoa, nsl)
 AC_SEARCH_LIBS(clock_gettime, rt)
 AC_SEARCH_LIBS(dlopen, dl)
 

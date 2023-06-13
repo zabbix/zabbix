@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 static void	retrieve_hostname(char *buffer, int len, char **error)

@@ -22,7 +22,7 @@
 
 #include "zbxregexp.h"
 #include "zbxstr.h"
-#include "log.h"
+#include "zbxlog.h"
 
 static int	check_procstate(struct procentry64 *procentry, int zbx_proc_stat)
 {

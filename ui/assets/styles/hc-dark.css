@@ -3414,6 +3414,12 @@ pre, pre a, pre td, pre span {
 form.is-loading {
   position: relative; }
 
+.form-submit-hidden {
+  position: absolute;
+  visibility: hidden;
+  min-height: 0;
+  max-height: 0; }
+
 .list-table {
   width: 100%;
   background-color: #000000;
@@ -3458,6 +3464,10 @@ form.is-loading {
     background-position-y: -693px; }
   .list-table td .btn-widget-collapse, .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
     background-position-y: -657px; }
+  .list-table td .icon-doc-link {
+    width: 18px;
+    height: 18px;
+    line-height: 18px; }
   .list-table .second-col {
     padding-left: 0;
     padding-right: 0; }
@@ -4234,7 +4244,9 @@ input {
 textarea {
   margin: 0;
   padding: 4px 5px;
+  min-height: 24px;
   overflow: auto;
+  resize: vertical;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
   line-height: normal;
