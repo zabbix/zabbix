@@ -3234,7 +3234,8 @@ svg {
 			height: 24px;
 		}
 
-		> div {
+		.step-on-fail,
+		.step-action {
 			height: 34px;
 		}
 	}

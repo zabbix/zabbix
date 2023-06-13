@@ -6290,7 +6290,8 @@ svg {
       left: -8px;
       width: 10px;
       height: 24px; }
-    .preprocessing-list .preprocessing-step > div {
+    .preprocessing-list .preprocessing-step .step-on-fail,
+    .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
