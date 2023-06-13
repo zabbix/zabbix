@@ -766,7 +766,8 @@ void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *func
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets functionids from parsed expression in order they are written *
+ * Purpose: gets function identifiers from parsed expression in order they    *
+ *          are written                                                       *
  *                                                                            *
  * Parameters: ctx         - [IN] evaluation context                          *
  *             functionids - [OUT] extracted functionids                      *

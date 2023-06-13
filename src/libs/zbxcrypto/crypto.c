@@ -146,7 +146,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
  *                                                                            *
  * Purpose: calculates UUID version 4 as string of 32 symbols                 *
  *                                                                            *
- * Parameters: seed    - [IN] string for seed calculation                     *
+ * Parameters: seed - [IN] string for seed calculation                        *
  *                                                                            *
  * Return value: uuid string                                                  *
  *                                                                            *

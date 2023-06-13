@@ -133,9 +133,9 @@ static int	eval_parse_functionid(zbx_eval_context_t *ctx, size_t pos, zbx_eval_t
  *                                                                            *
  * Purpose: parses macro                                                      *
  *                                                                            *
- * Parameters: ctx   - [IN] evaluation context                                *
- *             pos   - [IN] starting position                                 *
- *             tok   - [OUT] parsed token                                     *
+ * Parameters: ctx - [IN] evaluation context                                  *
+ *             pos - [IN] starting position                                   *
+ *             tok - [OUT] parsed token                                       *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *

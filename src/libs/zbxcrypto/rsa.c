@@ -101,16 +101,16 @@ void	zbx_normalize_pem(char **key, size_t *key_len)
  * Purpose: creates RS256 signature for given data                            *
  *                                                                            *
  * Parameters:                                                                *
- *     key         - [IN] private key in a PEM container (PKCS#1 or PKCS#8)   *
+ *     key         - [IN] private key in PEM container (PKCS#1 or PKCS#8)     *
  *     data        - [IN] data to sign                                        *
  *     data_len    - [IN] length of data to sign                              *
  *     output      - [OUT] dynamically allocated memory with signature        *
- *     output_len  - [OUT] length of a signature (bytes)                      *
+ *     output_len  - [OUT] length of signature (bytes)                        *
  *     error       - [OUT] dynamically allocated memory with error message    *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - signature was generated successfully                         *
- *     FAIL    - an error occurred                                            *
+ *     FAIL    - error occurred                                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_rs256_sign(char *key, size_t key_len, char *data, size_t data_len, unsigned char **output,

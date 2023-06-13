@@ -158,11 +158,11 @@ static char	char_base64_encode(unsigned char uc)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: decodes a base64 character into a byte                            *
+ * Purpose: decodes base64 character into byte                                *
  *                                                                            *
  * Parameters: c - [IN] character to decode                                   *
  *                                                                            *
- * Return value: base64 character decoded into a byte                         *
+ * Return value: base64 character decoded into byte                           *
  *                                                                            *
  ******************************************************************************/
 static unsigned char	char_base64_decode(char c)
@@ -192,7 +192,7 @@ static unsigned char	char_base64_decode(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encodes a string into a base64 string                             *
+ * Purpose: encodes string into base64 string                                 *
  *                                                                            *
  * Parameters: p_str    - [IN] string to encode                               *
  *             p_b64str - [OUT] encoded str to return                         *
@@ -305,7 +305,7 @@ void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
  * Parameters: p_b64str   - [IN] base64 string to decode                      *
  *             p_str      - [OUT] decoded str to return                       *
  *             maxsize    - [IN] size of p_str buffer                         *
- *             p_out_size - [OUT] size (length) of the str decoded            *
+ *             p_out_size - [OUT] size (length) of str decoded                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_base64_decode(const char *p_b64str, char *p_str, size_t maxsize, size_t *p_out_size)
