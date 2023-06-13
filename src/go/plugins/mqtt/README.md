@@ -34,6 +34,9 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 **Plugins.MQTT.Sessions.<session_name>.Password** — Password to be used for MQTT authentication.
 *Default value:*
 
+**Plugins.MQTT.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for MQTT
+*Default value:* 
+
 **Plugins.MQTT.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the MQTT certificate or certificate chain.
 *Default value:* 
 
