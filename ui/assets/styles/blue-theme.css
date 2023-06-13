@@ -4451,10 +4451,6 @@ form.is-loading {
     .table-paging a.paging-selected:active, .paging-selected.radio-switch:active {
       background-color: #6b8390;
       position: relative; }
-    .table-paging a.paging-selected .icon-doc-link, .paging-selected.radio-switch .icon-doc-link {
-      width: 18px;
-      height: 18px;
-      line-height: 18px; }
 
 .table {
   display: table; }

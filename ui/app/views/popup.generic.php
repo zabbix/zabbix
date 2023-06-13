@@ -433,8 +433,9 @@ switch ($data['popup_type']) {
 				');
 
 			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_HELP)
 				->setTitle(_('Help'))
-				->addClass(ZBX_STYLE_ICON_DOC_LINK)
 				->setTarget('_blank');
 
 			$table->addRow([$name, $item['description'], $documentation_link]);
