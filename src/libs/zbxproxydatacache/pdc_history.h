@@ -23,4 +23,6 @@
 #include "zbxproxydatacache.h"
 #include "proxydatacache.h"
 
+void	pdc_history_flush(zbx_pdc_t *pdc);
+
 #endif

@@ -96,27 +96,30 @@ typedef struct
 	zbx_uint64_t	id;
 	char		*host;
 	char		*listen_ip;
-	char		*listen_port;
 	char		*listen_dns;
 	char		*host_metadata;
-	int		clock;
-	int		flags;
+	int		listen_port;
 	int		tls_accepted;
+	int		flags;
+	int		clock;
+	time_t		write_clock;
 }
 zbx_pdc_autoreg_t;
 
-ZBX_PTR_VECTOR_DECL(pdc_autoreg_ptr, zbx_pdc_autoreg_t *)
-
 typedef struct
 {
-	zbx_vector_pdc_history_ptr_t	history;
-	zbx_vector_pdc_discovery_ptr_t	discovery;
-	zbx_vector_pdc_autoreg_ptr_t	autoreg;
+	zbx_list_t		history;
+	zbx_list_t		discovery;
+	zbx_list_t		autoreg;
 
-	zbx_pdc_state_t			state;
-	int				max_age;
+	zbx_uint64_t		history_lastid;
+	zbx_uint64_t		discovery_lastid;
+	zbx_uint64_t		autoreg_lastid;
 
-	zbx_mutex_t			mutex;
+	zbx_pdc_state_t		state;
+	int			db_handles_num;		/* number of pending database inserts */
+	int			max_age;
+	zbx_mutex_t		mutex;
 }
 zbx_pdc_t;
 
@@ -140,9 +143,18 @@ typedef struct
 }
 zbx_history_table_t;
 
-void	pdc_get_rows(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+void	pdc_lock();
+void	pdc_unlock();
+void	*pdc_malloc(size_t size);
+void	*pdc_realloc(void *ptr, size_t size);
+void	pdc_free(void *ptr);
+char	*pdc_strdup(const char *str);
+
+void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);
 
 void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
+void	pdc_switch_to_database_only(zbx_pdc_t *pdc);
+
 
 #endif

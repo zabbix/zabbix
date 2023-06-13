@@ -24,4 +24,6 @@
 #include "proxydatacache.h"
 #include "zbxtypes.h"
 
+void	pdc_discovery_flush(zbx_pdc_t *pdc);
+
 #endif

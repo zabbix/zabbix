@@ -31,9 +31,8 @@
 
 ZBX_PTR_VECTOR_IMPL(pdc_history_ptr, zbx_pdc_history_t *)
 ZBX_PTR_VECTOR_IMPL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
-ZBX_PTR_VECTOR_IMPL(pdc_autoreg_ptr, zbx_pdc_autoreg_t *)
 
-zbx_pdc_t	*pdc_cache = NULL;
+zbx_pdc_t		*pdc_cache = NULL;
 static zbx_shmem_info_t	*pdc_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__pdc, pdc_mem)
@@ -46,75 +45,46 @@ zbx_pdc_state_t	pdc_dst[] = {PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY,
 /* remap states to outgoing data source - database or memory */
 zbx_pdc_state_t	pdc_src[] = {PDC_DATABASE, PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY};
 
-/******************************************************************************
- *                                                                            *
- * Purpose: initialize proxy data cache                                       *
- *                                                                            *
- * Return value: size  - [IN] the cache size in bytes                         *
- *               age   - [IN] the maximum allowed data age                    *
- *               error - [OUT] error message                                  *
- *                                                                            *
- * Return value: SUCCEED - cache was initialized successfully                 *
- *               FAIL    - otherwise                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
+void	pdc_lock()
 {
-	int	ret = FAIL;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (0 == size)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): proxy data cache disabled", __func__);
-
-		pdc_cache = (zbx_pdc_t *)zbx_malloc(NULL, sizeof(zbx_pdc_t));
-		memset(pdc_cache, 0, sizeof(zbx_pdc_t));
-
-		pdc_cache->state = PDC_DATABASE_ONLY;
-		pdc_cache->mutex = ZBX_MUTEX_NULL;
-
-		ret = SUCCEED;
-
-		goto out;
-	}
-
-	if (SUCCEED != zbx_shmem_create(&pdc_mem, size, "proxy data cache size", "ProxyDataCacheSize", 1, error))
-		goto out;
-
-	pdc_cache = (zbx_pdc_t *)__pdc_shmem_realloc_func(NULL, sizeof(zbx_pdc_t));
-
-	zbx_vector_pdc_history_ptr_create_ext(&pdc_cache->history, __pdc_shmem_malloc_func, __pdc_shmem_realloc_func,
-			__pdc_shmem_free_func);
-	zbx_vector_pdc_discovery_ptr_create_ext(&pdc_cache->discovery, __pdc_shmem_malloc_func, __pdc_shmem_realloc_func,
-			__pdc_shmem_free_func);
-	zbx_vector_pdc_autoreg_ptr_create_ext(&pdc_cache->autoreg, __pdc_shmem_malloc_func, __pdc_shmem_realloc_func,
-			__pdc_shmem_free_func);
-
-	pdc_cache->max_age = age;
-
-	if (SUCCEED != zbx_mutex_create(&pdc_cache->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
-		goto out;
-
-	pdc_cache_set_init_state(pdc_cache);
-
-	ret = SUCCEED;
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __func__, ZBX_NULL2EMPTY_STR(*error));
-
-	return ret;
+	if (NULL != pdc_cache->mutex)
+		zbx_mutex_lock(pdc_cache->mutex);
 }
 
-static void	pdc_lock(zbx_pdc_t *pdc)
+void	pdc_unlock()
 {
-	if (NULL != pdc->mutex)
-		zbx_mutex_lock(pdc->mutex);
+	if (NULL != pdc_cache->mutex)
+		zbx_mutex_unlock(pdc_cache->mutex);
 }
 
-static void	pdc_unlock(zbx_pdc_t *pdc)
+void	*pdc_malloc(size_t size)
 {
-	if (NULL != pdc->mutex)
-		zbx_mutex_unlock(pdc->mutex);
+	return __pdc_shmem_malloc_func(NULL, size);
+}
+
+void	*pdc_realloc(void *ptr, size_t size)
+{
+	return __pdc_shmem_realloc_func(ptr, size);
+}
+
+void	pdc_free(void *ptr)
+{
+	__pdc_shmem_free_func(ptr);
+}
+
+char	*pdc_strdup(const char *str)
+{
+	size_t	len;
+	char	*cpy;
+
+	len = strlen(str) + 1;
+
+	if (NULL == (cpy = (char *)__pdc_shmem_malloc_func(NULL, len)))
+		return NULL;
+
+	memcpy(cpy, str, len);
+
+	return cpy;
 }
 
 /******************************************************************************
@@ -204,7 +174,7 @@ zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield)
  * Purpose: Get discovery/auto registration data from the database.           *
  *                                                                            *
  ******************************************************************************/
-void	pdc_get_rows(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more)
 {
 	size_t		offset = 0;
@@ -311,4 +281,113 @@ void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_u
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+void	pdc_flush(zbx_pdc_t *pdc)
+{
+	pdc_autoreg_flush(pdc);
+
+	/* TODO: handle discovery and history */
+}
+
+void	pdc_switch_to_database_only(zbx_pdc_t *pdc)
+{
+	pdc_flush(pdc);
+	pdc->state = PDC_DATABASE_ONLY;
+}
+
+static void	pdc_update_state(zbx_pdc_t *pdc, int more)
+{
+	switch (pdc->state)
+	{
+		case PDC_MEMORY:
+			/* TODO: check for age */
+			break;
+		case PDC_MEMORY_DATABASE:
+			if (ZBX_PROXY_DATA_DONE == more)
+			{
+				/* cache is empty, but flush also updates in database */
+				pdc_flush(pdc);
+				pdc->state = PDC_DATABASE;
+			}
+			break;
+		case PDC_DATABASE:
+			if (0 != more)
+				break;
+			pdc->state = PDC_DATABASE_MEMORY;
+			ZBX_FALLTHROUGH;
+		case PDC_DATABASE_MEMORY:
+			if (ZBX_PROXY_DATA_DONE == more && 0 == pdc_cache->db_handles_num)
+			{
+				pdc->state = PDC_MEMORY;
+			}
+			break;
+		case PDC_DATABASE_ONLY:
+			break;
+	}
+}
+
+/* public api */
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initialize proxy data cache                                       *
+ *                                                                            *
+ * Return value: size  - [IN] the cache size in bytes                         *
+ *               age   - [IN] the maximum allowed data age                    *
+ *               error - [OUT] error message                                  *
+ *                                                                            *
+ * Return value: SUCCEED - cache was initialized successfully                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == size)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): proxy data cache disabled", __func__);
+
+		pdc_cache = (zbx_pdc_t *)zbx_malloc(NULL, sizeof(zbx_pdc_t));
+		memset(pdc_cache, 0, sizeof(zbx_pdc_t));
+
+		pdc_cache->state = PDC_DATABASE_ONLY;
+		pdc_cache->mutex = ZBX_MUTEX_NULL;
+
+		ret = SUCCEED;
+
+		goto out;
+	}
+
+	if (SUCCEED != zbx_shmem_create(&pdc_mem, size, "proxy data cache size", "ProxyDataCacheSize", 1, error))
+		goto out;
+
+	pdc_cache = (zbx_pdc_t *)__pdc_shmem_realloc_func(NULL, sizeof(zbx_pdc_t));
+
+	zbx_list_create_ext(&pdc_cache->history, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
+	zbx_list_create_ext(&pdc_cache->discovery, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
+	zbx_list_create_ext(&pdc_cache->autoreg, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
+
+	pdc_cache->max_age = age;
+
+	if (SUCCEED != zbx_mutex_create(&pdc_cache->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
+		goto out;
+
+	pdc_cache_set_init_state(pdc_cache);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pdc_cache->state);
+
+	return ret;
+}
+
+void	zbx_pdc_update_state(int more)
+{
+	pdc_lock();
+	pdc_update_state(pdc_cache, more);
+	pdc_unlock();
 }

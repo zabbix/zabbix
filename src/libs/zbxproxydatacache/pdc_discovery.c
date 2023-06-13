@@ -165,7 +165,7 @@ static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		pdc_get_rows(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
+		pdc_get_rows_db(j, ZBX_PROTO_TAG_DISCOVERY_DATA, &dht, lastid, &id, &records_num, more);
 
 		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
@@ -196,4 +196,11 @@ int	zbx_pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 void	zbx_pdc_set_discovery_lastid(const zbx_uint64_t lastid)
 {
 	pdc_set_lastid(dht.table, dht.lastidfield, lastid);
+}
+
+void	pdc_discovery_flush(zbx_pdc_t *pdc)
+{
+	if (0 != pdc->discovery_lastid)
+		pdc_set_lastid("proxy_dhistory", "discovery_lastid", pdc->discovery_lastid);
+
 }

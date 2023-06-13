@@ -18,8 +18,10 @@
 **/
 
 #include "pdc_autoreg.h"
+#include "proxydatacache.h"
 #include "zbxproxydatacache.h"
 #include "zbxdbhigh.h"
+#include "zbxcachehistory.h"
 
 static zbx_history_table_t	areg = {
 	"proxy_autoreg_host", "autoreg_host_lastid",
@@ -56,30 +58,10 @@ static void	pdc_autoreg_write_host_db(const char *host, const char *ip, const ch
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write host data into autoregistration data cache                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags,
-		int clock)
-{
-	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, switching to database");
-		pdc_cache->state = PDC_DATABASE_ONLY;
-		/* TODO: change to 'else' after memory cache implementation */
-	}
-
-	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
-		pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: write host data into autoregistraion data cache                   *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pdc_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
 	zbx_uint64_t	id;
@@ -92,7 +74,7 @@ static int	pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		pdc_get_rows(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num, more);
+		pdc_get_rows_db(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num, more);
 
 		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
@@ -104,23 +86,258 @@ static int	pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 	return records_num;
 }
 
-int	zbx_pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: free autoregistration record                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_list_free_autoreg(zbx_list_t *list, zbx_pdc_autoreg_t *ar)
 {
-	if (PDC_MEMORY == pdc_src[pdc_cache->state])
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
-		pdc_cache->state = PDC_DATABASE_ONLY;
-	}
+	if (NULL != ar->host)
+		list->mem_free_func(ar->host);
 
-	if (PDC_DATABASE == pdc_src[pdc_cache->state])
-	{
-		return pdc_get_autoreg(j, lastid, more);
-	}
-	else
-		return 0;
+	if (NULL != ar->listen_ip)
+		list->mem_free_func(ar->listen_ip);
+
+	if (NULL != ar->listen_dns)
+		list->mem_free_func(ar->listen_dns);
+
+	if (NULL != ar->host_metadata)
+		list->mem_free_func(ar->host_metadata);
+
+	list->mem_free_func(ar);
 }
 
-void	zbx_pdc_set_autoreg_lastid(const zbx_uint64_t lastid)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write autoregistration record into memory cache                   *
+ *                                                                            *
+ ******************************************************************************/
+static int	pdc_autoreg_write_host_mem(zbx_pdc_t *pdc, const char *host, const char *ip, const char *dns,
+		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
-	pdc_set_lastid(areg.table, areg.lastidfield, lastid);
+	zbx_pdc_autoreg_t	*row;
+	int			ret = FAIL;
+
+	if (NULL == (row = (zbx_pdc_autoreg_t *)pdc_malloc(sizeof(zbx_pdc_autoreg_t))))
+			goto out;
+
+	memset(row, 0, sizeof(zbx_pdc_autoreg_t));
+
+	if (NULL == (row->host = pdc_strdup(host)))
+		goto out;
+
+	if (NULL == (row->listen_ip = pdc_strdup(ip)))
+		goto out;
+
+	if (NULL == (row->listen_dns = pdc_strdup(dns)))
+		goto out;
+
+	if (NULL == (row->host_metadata = pdc_strdup(host_metadata)))
+		goto out;
+
+	row->listen_port = (int)port;
+	row->tls_accepted = (int)connection_type;
+	row->flags = flags;
+	row->clock = clock;
+	row->write_clock = time(NULL);
+
+	ret = zbx_list_append(&pdc->autoreg, row, NULL);
+out:
+	if (SUCCEED == ret)
+		row->id = zbx_dc_get_nextid("proxy_autoreg_host", 1);
+	else if (NULL != row)
+		pdc_list_free_autoreg(&pdc_cache->autoreg, row);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get autoregistration records from memory cache                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int			records_num = 0;
+	zbx_list_iterator_t	li;
+	zbx_pdc_autoreg_t	*row;
+
+	if (SUCCEED == zbx_list_peek(&pdc->autoreg, NULL))
+	{
+		zbx_json_addarray(j, ZBX_PROTO_TAG_AUTOREGISTRATION);
+		zbx_list_iterator_init(&pdc->autoreg, &li);
+
+		while (SUCCEED == zbx_list_iterator_next(&li))
+		{
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset)
+			{
+				*more = 1;
+				break;
+			}
+
+			zbx_list_iterator_peek(&li, (void **)&row);
+
+			zbx_json_addobject(j, NULL);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST, row->host, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_IP, row->listen_ip, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_DNS, row->listen_dns, ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->listen_port);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_HOST_METADATA, row->host_metadata, ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_FLAGS, row->flags);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_TLS_ACCEPTED, row->tls_accepted);
+			zbx_json_close(j);
+
+			records_num++;
+			*lastid = row->id;
+		}
+
+		zbx_json_close(j);
+	}
+
+	pdc->autoreg_lastid = *lastid;
+
+	return records_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear sent autoregistration records                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_autoreg_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
+{
+	zbx_pdc_autoreg_t	*row;
+
+	while (SUCCEED == zbx_list_peek(&pdc->autoreg, (void **)&row))
+	{
+		if (row->id > lastid)
+			break;
+
+		zbx_list_pop(&pdc->autoreg, NULL);
+		pdc_list_free_autoreg(&pdc->autoreg, row);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush cached autoregistration data to database                    *
+ *                                                                            *
+ ******************************************************************************/
+void	pdc_autoreg_flush(zbx_pdc_t *pdc)
+{
+	zbx_pdc_autoreg_t	*row;
+	zbx_db_insert_t		db_insert;
+
+	if (SUCCEED == zbx_list_peek(&pdc->autoreg, NULL))
+	{
+		zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns",
+				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", NULL);
+
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+		while (SUCCEED == zbx_list_pop(&pdc->autoreg, (void **)&row))
+		{
+			zbx_db_insert_add_values(&db_insert, row->id, row->host, row->listen_ip, row->listen_dns,
+					row->listen_port, row->tls_accepted, row->host_metadata, row->flags, row->clock);
+
+			pdc_list_free_autoreg(&pdc->autoreg, row);
+		}
+
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
+	}
+
+	if (0 != pdc->autoreg_lastid)
+		pdc_set_lastid("proxy_autoreg_host", "autoreg_host_lastid", pdc->autoreg_lastid);
+}
+
+/* public api */
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write host data into autoregistration data cache                  *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
+		unsigned int connection_type, const char *host_metadata, int flags, int clock)
+{
+	pdc_lock();
+
+	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+	{
+		if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type, host_metadata,
+				flags, clock))
+		{
+			return;
+		}
+
+		if (PDC_DATABASE_MEMORY == pdc_cache->state)
+		{
+			/* transition to memory cache failed, disable memory cache until restart */
+			pdc_switch_to_database_only(pdc_cache);
+		}
+		else
+		{
+			/* initiate transition to database cache */
+			pdc_cache->state = PDC_MEMORY_DATABASE;
+		}
+
+		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache is full, switching to database cache");
+	}
+
+	pdc_cache->db_handles_num++;
+	pdc_unlock();
+
+	pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock);
+
+	pdc_lock();
+	pdc_cache->db_handles_num--;
+	pdc_unlock();
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get autoregistration rows for sending to server                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int	ret, state;
+
+	pdc_lock();
+
+	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
+		ret = pdc_autoreg_get_mem(pdc_cache, j, lastid, more);
+
+	pdc_unlock();
+
+	if (PDC_DATABASE == state)
+		ret = pdc_autoreg_get_db(j, lastid, more);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update last sent autoregistration record id                       *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
+{
+	int	state;
+
+	pdc_lock();
+
+	pdc_cache->autoreg_lastid = lastid;
+
+	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
+		pdc_autoreg_clear(pdc_cache, lastid);
+
+	pdc_unlock();
+
+	if (PDC_DATABASE == state)
+		pdc_set_lastid(areg.table, areg.lastidfield, lastid);
 }

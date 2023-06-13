@@ -77,8 +77,26 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
  ******************************************************************************/
 void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 {
-	if (PDC_MEMORY == data->state)
+	int	state;
+
+	pdc_lock();
+
+	if (PDC_MEMORY == (state = data->state))
 	{
+		if (PDC_MEMORY == (state = pdc_dst[pdc_cache->state]))
+		{
+			/* TODO: flush into cache */
+		}
+		else
+			pdc_cache->db_handles_num++;
+
+		pdc_unlock();
+
+		if (PDC_DATABASE == state)
+		{
+			/* TODO: flush into database */
+		}
+
 		zbx_vector_pdc_history_ptr_clear_ext(&data->rows, pdc_history_free);
 		zbx_vector_pdc_history_ptr_destroy(&data->rows);
 	}
@@ -87,6 +105,13 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
 		(void)zbx_db_insert_execute(&data->db_insert);
 		zbx_db_insert_clean(&data->db_insert);
+	}
+
+	if (PDC_DATABASE == state)
+	{
+		pdc_lock();
+		pdc_cache->db_handles_num--;
+		pdc_unlock();
 	}
 
 	zbx_free(data);
@@ -499,4 +524,10 @@ int	zbx_pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
 {
 	pdc_set_lastid("proxy_history", "history_lastid", lastid);
+}
+
+void	pdc_history_flush(zbx_pdc_t *pdc)
+{
+	if (0 != pdc->history_lastid)
+		pdc_set_lastid("proxy_history", "history_lastid", pdc->history_lastid);
 }

@@ -26,6 +26,8 @@
 
 int	zbx_pdc_init(zbx_uint64_t size, int age, char **error);
 
+void	zbx_pdc_update_state(int more);
+
 /* discovery */
 
 typedef struct zbx_pdc_discovery_data zbx_pdc_discovery_data_t;
@@ -49,9 +51,9 @@ void	zbx_pdc_set_discovery_lastid(const zbx_uint64_t lastid);
 void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock);
 
-int	zbx_pdc_get_autoreg(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 
-void	zbx_pdc_set_autoreg_lastid(const zbx_uint64_t lastid);
+void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid);
 
 
 /* history */

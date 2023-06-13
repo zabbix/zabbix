@@ -109,7 +109,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char			*error = NULL, *buffer = NULL;
-	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay;
+	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay, more;
 	zbx_vector_tm_task_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 	size_t			buffer_size, reserved;
@@ -132,7 +132,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	zbx_get_interface_availability_data(&j, &availability_ts);
 	zbx_pdc_get_history(&j, &history_lastid, &more_history);
 	zbx_pdc_get_discovery(&j, &discovery_lastid, &more_discovery);
-	zbx_pdc_get_autoreg(&j, &areg_lastid, &more_areg);
+	zbx_pdc_autoreg_get_rows(&j, &areg_lastid, &more_areg);
 	zbx_proxy_get_host_active_availability(&j);
 
 	zbx_vector_tm_task_create(&tasks);
@@ -145,7 +145,10 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 			ZBX_PROXY_DATA_MORE == more_areg)
 	{
 		zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
+		more = ZBX_PROXY_DATA_MORE;
 	}
+	else
+		more = ZBX_PROXY_DATA_DONE;
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
@@ -193,7 +196,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 			zbx_pdc_set_discovery_lastid(discovery_lastid);
 
 		if (0 != areg_lastid)
-			zbx_pdc_set_autoreg_lastid(areg_lastid);
+			zbx_pdc_autoreg_set_lastid(areg_lastid);
 
 		if (0 != tasks.values_num)
 		{
@@ -211,6 +214,8 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		}
 
 		zbx_db_commit();
+
+		zbx_pdc_update_state(more);
 	}
 	else
 	{
