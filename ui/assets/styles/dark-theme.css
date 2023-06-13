@@ -6321,6 +6321,8 @@ svg {
       padding-left: 30px; }
     .preprocessing-list .on-fail-options input[type=text] {
       flex: 1; }
+      .preprocessing-list .on-fail-options input[type=text]:not(:first-child) {
+        margin-left: 5px; }
   .preprocessing-list .preprocessing-list-head {
     color: #737373;
     line-height: 14px; }

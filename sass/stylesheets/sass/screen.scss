@@ -3278,6 +3278,10 @@ svg {
 
 		input[type=text] {
 			flex: 1;
+
+			&:not(:first-child) {
+				margin-left: 5px;
+			}
 		}
 	}
 
