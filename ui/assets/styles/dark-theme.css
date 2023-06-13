@@ -3560,7 +3560,7 @@ z-select,
     position: relative;
     width: 100%;
     height: 24px;
-    padding: 3px 4px;
+    padding: 3px 16px 3px 4px;
     overflow: hidden;
     font-size: 1em;
     line-height: initial;
