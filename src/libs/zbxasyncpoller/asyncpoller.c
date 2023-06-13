@@ -40,7 +40,6 @@ zbx_async_task_t;
 
 static void	async_task_remove(zbx_async_task_t *task)
 {
-	printf("remove async task\n");
 	task->free_cb(task->data);
 
 	event_free(task->rx_event);

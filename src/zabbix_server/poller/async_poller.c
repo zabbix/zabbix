@@ -364,7 +364,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	double			sec, total_sec = 0.0;
+	double			sec;
 	time_t			last_stat_time;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -401,12 +401,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		struct timeval	tv_pending;
 
-		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
-
-		if (0 == evtimer_pending(poller_config.async_check_items_timer, &tv_pending))
+		if (0 == evtimer_pending(poller_config.async_check_items_timer, NULL))
 			evtimer_add(poller_config.async_check_items_timer, &tv);
 
 		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
@@ -419,17 +415,17 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 		poller_requeue_items(&poller_config);
 
-		total_sec += zbx_time() - sec;
-
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
+			sec = zbx_time();
+			zbx_update_env(get_process_type_string(process_type), sec);
+
 			zbx_setproctitle("%s #%d [got %d values, queued %d in " ZBX_FS_DBL " sec]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
-				poller_config.queued, total_sec);
+				poller_config.queued, zbx_time() - sec);
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
-			total_sec = 0.0;
 			last_stat_time = time(NULL);
 		}
 
