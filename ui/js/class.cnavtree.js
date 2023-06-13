@@ -270,6 +270,7 @@ if (typeof addPopupValues === 'undefined') {
 						else {
 							$('>.tree-list', drop_to).append(uiObj.placeholder);
 						}
+
 						uiObj.refreshPositions();
 					}, o.parent_change_delay);
 				}
@@ -356,8 +357,8 @@ if (typeof addPopupValues === 'undefined') {
 				$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
 
 				if (this.options.revert) {
-					const self = this,
-						cur = self.placeholder.offset();
+					const self = this;
+					const cur = self.placeholder.offset();
 
 					self.reverting = true;
 
