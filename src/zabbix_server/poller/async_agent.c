@@ -153,9 +153,10 @@ static int	agent_task_process(short event, void *data)
 			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
 					&agent_context->tcp_recv_context, agent_context->flags, &want_event)))
 			{
+				agent_context->ret = SUCCEED;
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->ret,
 						agent_context->interface.addr, &agent_context->result);
-				agent_context->ret = SUCCEED;
+
 				return ZBX_ASYNC_TASK_STOP;
 			}
 			else
