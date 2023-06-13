@@ -86,6 +86,7 @@ class CAudit {
 	public const RESOURCE_USERDIRECTORY = 49;
 	public const RESOURCE_TEMPLATE_GROUP = 50;
 	public const RESOURCE_CONNECTOR = 51;
+	public const RESOURCE_LLD_RULE = 52;
 
 	/**
 	 * Audit details actions.
@@ -117,7 +118,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
-		self::RESOURCE_DISCOVERY_RULE => 'items',
+		self::RESOURCE_LLD_RULE => 'items',
 		self::RESOURCE_HOST => 'hosts',
 		self::RESOURCE_HOST_GROUP => 'hstgrp',
 		self::RESOURCE_HOST_PROTOTYPE => 'hosts',
@@ -171,7 +172,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
-		self::RESOURCE_DISCOVERY_RULE => 'name',
+		self::RESOURCE_LLD_RULE => 'name',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'name',
 		self::RESOURCE_HOST_PROTOTYPE => 'host',
@@ -214,7 +215,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
-		self::RESOURCE_DISCOVERY_RULE => 'discoveryrule',
+		self::RESOURCE_LLD_RULE => 'discoveryrule',
 		self::RESOURCE_HOST => 'host',
 		self::RESOURCE_HOST_GROUP => 'hostgroup',
 		self::RESOURCE_HOST_PROTOTYPE => 'hostprototype',
@@ -267,7 +268,7 @@ class CAudit {
 			],
 			['paths' => ['connector.ssl_key_password']]
 		],
-		self::RESOURCE_DISCOVERY_RULE => [
+		self::RESOURCE_LLD_RULE => [
 			[
 				'paths' => ['discoveryrule.password'],
 				'conditions' => [

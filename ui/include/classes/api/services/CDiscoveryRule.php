@@ -1018,7 +1018,7 @@ class CDiscoveryRule extends CItemGeneral {
 		self::updateItemFilters($items);
 		self::updateOverrides($items);
 
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $items);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_LLD_RULE, $items);
 
 		foreach ($items as &$item) {
 			$item['host_status'] = array_shift($host_statuses);
@@ -1773,7 +1773,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = array_intersect_key($items, $upd_itemids);
 		$db_items = array_intersect_key($db_items, array_flip($upd_itemids));
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $items, $db_items);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_LLD_RULE, $items, $db_items);
 	}
 
 	/**
@@ -3042,7 +3042,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		DB::insertBatch('housekeeper', $ins_housekeeper);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DISCOVERY_RULE, $db_items);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE, $db_items);
 	}
 
 	/**
