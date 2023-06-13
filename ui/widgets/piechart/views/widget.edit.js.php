@@ -37,24 +37,27 @@ window.widget_piechart_form = new class {
 			this._$overlay_body.off('scroll');
 		});
 
+		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+			$(colorpicker).colorpicker({
+				appendTo: '.overlay-dialogue-body',
+				use_default: true
+			});
+		}
+
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', (e) => this.onChartConfigChange(e));
+			.on('change', 'input, z-select, .multiselect', (e) => this._onChartConfigChange(e));
 
 		this._datasetTabInit();
-		this._displayingOptionsTabInit();
 		this._toggleDisplayingOptionsFields();
-		this._timePeriodTabInit();
-		this._legendTabInit();
-
-		this.onChartConfigChange();
+		this._onChartConfigChange();
 	}
 
-	onChartConfigChange() {
+	_onChartConfigChange() {
 		this._updateForm();
 	}
 
-	updateVariableOrder(obj, row_selector, var_prefix) {
+	_updateVariableOrder(obj, row_selector, var_prefix) {
 		for (const k of [10000, 0]) {
 			jQuery(row_selector, obj).each(function(i) {
 				if (var_prefix === 'ds') {
@@ -196,12 +199,6 @@ window.widget_piechart_form = new class {
 		this._initSingleItemSortable(this._getOpenedDataset());
 	}
 
-	_displayingOptionsTabInit() {
-		this._form.querySelector('#displaying_options').onchange = () => {
-			this._toggleDisplayingOptionsFields();
-		};
-	}
-
 	_toggleDisplayingOptionsFields() {
 		const draw_type = this._form.querySelector('[name="draw_type"]:checked').value;
 		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
@@ -230,28 +227,6 @@ window.widget_piechart_form = new class {
 		}
 
 		document.getElementById('units').disabled = !document.getElementById('units_show').checked;
-	}
-
-	_timePeriodTabInit() {
-		document.getElementById('graph_time')
-			.addEventListener('click', (e) => {
-				document.getElementById('time_from').disabled = !e.target.checked;
-				document.getElementById('time_to').disabled = !e.target.checked;
-				document.getElementById('time_from_calendar').disabled = !e.target.checked;
-				document.getElementById('time_to_calendar').disabled = !e.target.checked;
-			});
-	}
-
-	_legendTabInit() {
-		document.getElementById('legend')
-			.addEventListener('click', (e) => {
-				jQuery('#legend_lines').rangeControl(
-					e.target.checked ? 'enable' : 'disable'
-				);
-				jQuery('#legend_columns').rangeControl(
-					e.target.checked ? 'enable' : 'disable'
-				);
-			});
 	}
 
 	_updateDatasetsLabel() {
@@ -403,7 +378,7 @@ window.widget_piechart_form = new class {
 			.closest('.list-accordion-item')
 			.remove();
 
-		this.updateVariableOrder(jQuery(this._dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+		this._updateVariableOrder(jQuery(this._dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 		this._updateDatasetsLabel();
 
 		const dataset = this._getOpenedDataset();
@@ -415,7 +390,7 @@ window.widget_piechart_form = new class {
 
 		this._initDataSetSortable();
 		this._updateSingleItemsLinks();
-		this.onChartConfigChange();
+		this._onChartConfigChange();
 	}
 
 	_getOpenedDataset() {
@@ -436,7 +411,7 @@ window.widget_piechart_form = new class {
 			);
 
 			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
-				this.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+				this._updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this._updateDatasetsLabel();
 			});
 		}
@@ -638,6 +613,31 @@ window.widget_piechart_form = new class {
 		if (dataset !== null) {
 			this._updateDatasetLabel(dataset);
 		}
+
+		// Displaying options tab.
+		this._form.querySelector('#displaying_options').onchange = () => {
+			this._toggleDisplayingOptionsFields();
+		};
+
+		// Time period tab changes.
+		document.getElementById('graph_time')
+			.addEventListener('click', (e) => {
+				document.getElementById('time_from').disabled = !e.target.checked;
+				document.getElementById('time_to').disabled = !e.target.checked;
+				document.getElementById('time_from_calendar').disabled = !e.target.checked;
+				document.getElementById('time_to_calendar').disabled = !e.target.checked;
+			});
+
+		// Legend tab changes.
+		document.getElementById('legend')
+			.addEventListener('click', (e) => {
+				jQuery('#legend_lines').rangeControl(
+					e.target.checked ? 'enable' : 'disable'
+				);
+				jQuery('#legend_columns').rangeControl(
+					e.target.checked ? 'enable' : 'disable'
+				);
+			});
 
 		// Trigger event to update tab indicators.
 		document.getElementById('tabs').dispatchEvent(new Event(TAB_INDICATOR_UPDATE_EVENT));
