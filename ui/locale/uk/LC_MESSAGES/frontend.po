@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-05-12 19:32+0000\n"
+"PO-Revision-Date: 2023-05-12 20:06+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -13516,7 +13516,7 @@ msgstr "Тільки одна перевірка може бути унікал�
 
 #: include/classes/api/services/CItemGeneral.php:1648
 msgid "Only one not supported value check is allowed."
-msgstr ""
+msgstr "Дозволяється лише одна перевірка непідтримуваного значення."
 
 #: include/classes/api/services/CItemGeneral.php:1421
 #: include/classes/api/services/CItemGeneral.php:1470
@@ -13532,11 +13532,11 @@ msgstr[2] "Тільки вибрані проблеми"
 
 #: app/views/service.list.edit.php:86
 msgid "Only services without children"
-msgstr ""
+msgstr "Лише послуги без дочірніх"
 
 #: app/views/service.list.edit.php:94
 msgid "Only services without problem tags"
-msgstr ""
+msgstr "Лише послуги без проблемних тегів"
 
 #: include/classes/api/services/CDashboard.php:414
 msgid "Only super admins can set dashboard owner."
@@ -13544,7 +13544,7 @@ msgstr "Тільки супер адмін може встановлювати �
 
 #: include/classes/api/services/CReport.php:334
 msgid "Only super admins can set report owner."
-msgstr ""
+msgstr "Лише супер адміністратор може встановлювати власника звіту."
 
 #: app/partials/administration.system.info.php:68
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
@@ -13552,7 +13552,7 @@ msgstr "Підраховуються тригери тільки у вузлів
 
 #: app/views/popup.mediatypetest.edit.php:52 app/views/popup.scriptexec.php:40
 msgid "Open log"
-msgstr ""
+msgstr "Відкрити протокол"
 
 #: include/httptest.inc.php:421
 msgid "Opera"
@@ -13565,17 +13565,17 @@ msgstr "Інформація про операційну систему. Пов�
 #: app/partials/popup.operations.php:41 app/views/popup.service.edit.php:66
 #: app/views/popup.sla.edit.php:129
 msgid "Operation"
-msgstr ""
+msgstr "Операція"
 
 #: include/classes/api/services/CAction.php:2805
 #, c-format
 msgid "Operation \"%1$s\" already exists for action \"%2$s\"."
-msgstr ""
+msgstr "Операція \"%1$s\" вже існує у дії \"%2$s\"."
 
 #: actionconf.php:400
 #, c-format
 msgid "Operation \"%1$s\" already exists."
-msgstr ""
+msgstr "Операція \"%1$s\" вже існує."
 
 #: include/classes/mvc/CController.php:209 include/validate.inc.php:308
 msgid "Operation cannot be performed due to unauthorized request."
@@ -13601,7 +13601,7 @@ msgstr "Операція не має шаблону для функціонув�
 #: include/views/configuration.triggers.edit.php:107
 #: include/views/configuration.triggers.list.php:193
 msgid "Operational data"
-msgstr ""
+msgstr "Оперативні дані"
 
 #: app/views/configuration.correlation.edit.php:143
 #: app/views/configuration.correlation.list.php:77
@@ -13644,7 +13644,7 @@ msgstr "Оператор"
 
 #: app/views/popup.triggerexpr.php:114
 msgid "Operator functions"
-msgstr ""
+msgstr "Функції оператора"
 
 #: app/views/administration.mediatype.edit.php:345
 msgid "Options"
@@ -13680,11 +13680,11 @@ msgstr "Або"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:131
 msgid "Order"
-msgstr ""
+msgstr "Сортування"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:145
 msgid "Order column"
-msgstr ""
+msgstr "Сортування стовпця"
 
 #: app/partials/massupdate.macros.tab.php:119
 #: app/partials/massupdate.valuemaps.tab.php:89
@@ -13770,7 +13770,7 @@ msgstr "Статистика вихідного трафіку на мереже
 
 #: app/views/popup.scriptexec.php:47
 msgid "Output"
-msgstr ""
+msgstr "Вивід"
 
 #: include/classes/api/services/CDashboardGeneral.php:336
 #, c-format
@@ -13785,7 +13785,7 @@ msgstr "Перевизначено в"
 
 #: app/controllers/CControllerPopupLldOverride.php:130
 msgid "Override"
-msgstr ""
+msgstr "Заміщення"
 
 #: app/views/administration.housekeeping.edit.php:127
 msgid "Override item history period"
@@ -14035,11 +14035,11 @@ msgstr "Ідентифікатор PSK"
 #: jsLoader.php:142
 #, c-format
 msgid "Page %1$d"
-msgstr ""
+msgstr "Сторінка %1$d"
 
 #: app/views/dashboard.page.properties.edit.php:55
 msgid "Page display period"
-msgstr ""
+msgstr "Період відображення сторінки"
 
 #: app/controllers/CControllerWidgetIteratorGraphPrototypeView.php:46
 #: include/validate.inc.php:435
@@ -14049,7 +14049,7 @@ msgstr "Сторінка отримала некоректні дані"
 #: include/classes/helpers/CPagerHelper.php:159
 msgctxt "page navigation"
 msgid "Pager"
-msgstr ""
+msgstr "Навігація по сторінках"
 
 #: app/partials/administration.system.info.php:30
 #: app/views/administration.mediatype.edit.php:103
