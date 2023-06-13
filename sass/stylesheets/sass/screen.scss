@@ -3184,7 +3184,8 @@ svg {
 }
 
 .preprocessing-list {
-	$name-width: 295px;
+	$drag-icon: 10px;
+	$name-width: 285px;
 	$on-fail-width: 100px;
 	$action-width: 120px;
 
@@ -3213,8 +3214,8 @@ svg {
 	}
 
 	.btn-link {
-		&:not(:last-of-type) {
-			margin-right: 10px;
+		&:not(:first-child) {
+			margin-left: 10px;
 		}
 	}
 
@@ -3251,7 +3252,7 @@ svg {
 		.drag-icon {
 			top: 5px;
 			left: -8px;
-			width: 10px;
+			width: $drag-icon;
 			height: 24px;
 		}
 
@@ -3306,6 +3307,8 @@ svg {
 		line-height: 14px;
 
 		.step-name {
+			flex: 0 0 $name-width + $drag-icon;
+			max-width: $name-width + $drag-icon;
 			padding-left: 30px;
 		}
 	}

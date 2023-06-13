@@ -6229,8 +6229,8 @@ svg {
   .preprocessing-list select {
     width: 100%;
     min-width: 0; }
-  .preprocessing-list .btn-link:not(:last-of-type) {
-    margin-right: 10px; }
+  .preprocessing-list .btn-link:not(:first-child) {
+    margin-left: 10px; }
   .preprocessing-list .preprocessing-list-head,
   .preprocessing-list .preprocessing-list-foot,
   .preprocessing-list .preprocessing-step,
@@ -6250,8 +6250,8 @@ svg {
   .preprocessing-list .on-fail-options > .radio-segmented {
     padding: 5px 5px 5px 0; }
   .preprocessing-list .step-name {
-    flex: 0 0 295px;
-    max-width: 295px; }
+    flex: 0 0 285px;
+    max-width: 285px; }
   .preprocessing-list .preprocessing-step {
     align-items: start; }
     .preprocessing-list .preprocessing-step .drag-icon {
@@ -6288,6 +6288,8 @@ svg {
     color: #333333;
     line-height: 14px; }
     .preprocessing-list .preprocessing-list-head .step-name {
+      flex: 0 0 295px;
+      max-width: 295px;
       padding-left: 30px; }
   .preprocessing-list .preprocessing-list-foot {
     justify-content: space-between; }
