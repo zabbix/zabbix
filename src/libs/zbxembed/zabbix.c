@@ -78,25 +78,32 @@ static duk_ret_t	es_zabbix_log(duk_context *ctx)
 	duk_get_memory_functions(ctx, &out_funcs);
 	env = (zbx_es_env_t *)out_funcs.udata;
 
-	if (ZBX_ES_LOG_MEMORY_LIMIT < env->log_size)
+	if (ZBX_ES_LOG_MSG_LIMIT <= env->logged_msgs)
+	{
+		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR,
+				"maximum count of logged messages was reached");
+		goto out;
+	}
+
+	zabbix_log(level, "%s", message);
+
+	if (NULL == env->json)
+		goto out;
+
+	if (ZBX_ES_LOG_MEMORY_LIMIT < env->json->buffer_size)	/* approximate limit */
 	{
 		err_index = duk_push_error_object(ctx, DUK_RET_EVAL_ERROR, "log exceeds the maximum size of "
 				ZBX_FS_UI64 " bytes.", ZBX_ES_LOG_MEMORY_LIMIT);
 		goto out;
 	}
 
-	zabbix_log(level, "%s", message);
-
-	if (NULL != env->json)
-	{
-		zbx_json_addobject(env->json, NULL);
-		zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
-		zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
-		zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(env->json);
-	}
+	zbx_json_addobject(env->json, NULL);
+	zbx_json_adduint64(env->json, "level", (zbx_uint64_t)level);
+	zbx_json_adduint64(env->json, "ms", zbx_get_duration_ms(&env->start_time));
+	zbx_json_addstring(env->json, "message", message, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(env->json);
 out:
-	env->log_size += strlen(message);
+	env->logged_msgs++;
 	zbx_free(message);
 
 	if (-1 != err_index)

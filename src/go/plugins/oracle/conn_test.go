@@ -30,7 +30,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/uri"
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
-	"zabbix.com/pkg/uri"
 )
 
 func TestConnManager_closeUnused(t *testing.T) {

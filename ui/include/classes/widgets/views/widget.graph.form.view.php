@@ -42,7 +42,7 @@ $form_list->addRow(
 
 // Graph.
 if (array_key_exists('graphid', $fields)) {
-	$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['ms']['graphs']['graphid'],
+	$field_graphid = CWidgetHelper::getGraph($fields['graphid'], $data['captions']['graphs']['graphid'],
 		$form->getName()
 	);
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['graphid']), $field_graphid);
@@ -51,9 +51,7 @@ if (array_key_exists('graphid', $fields)) {
 
 // Item.
 if (array_key_exists('itemid', $fields)) {
-	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-		$form->getName()
-	);
+	$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
 	$form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 	$scripts[] = $field_itemid->getPostJS();
 }

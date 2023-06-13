@@ -184,19 +184,7 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!$this->getInput('actionid', '0')) {
-				return true;
-			}
-
-			return (bool) API::Action()->get([
-				'output' => [],
-				'actionids' => $this->getInput('actionid'),
-				'editable' => true
-			]);
-		}
-
-		return false;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
 	}
 
 	protected function doAction() {

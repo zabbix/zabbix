@@ -1,0 +1,1 @@
+...G...... [ZBX-22762] fixed race condition in Zabbix agent 2 when reading filesystem (arimdjonoks)

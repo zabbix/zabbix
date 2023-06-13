@@ -148,7 +148,7 @@ $http_tests = $data['http_tests'];
 foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
 	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
-	$name[] = new CLink(CHtml::encode($httpTest['name']),
+	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
 			->setArgument('hostid', $httpTest['hostid'])

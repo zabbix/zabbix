@@ -45,6 +45,8 @@ char	*es_get_buffer_dyn(duk_context *ctx, int index, duk_size_t *len)
 	const char	*ptr;
 	char		*buf = NULL;
 
+	*len = 0;
+
 	type = duk_get_type(ctx, index);
 
 	switch (type)
