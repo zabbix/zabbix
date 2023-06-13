@@ -926,11 +926,6 @@ form {
 	@extend %found-bg;
 }
 
-.margin-top {
-	display: block;
-	margin: 4px 0 0;
-}
-
 .form-new-group {
 	border: 5px solid $lighter-green;
 	border-radius: 2px;
@@ -1292,23 +1287,6 @@ select {
 
 	&:focus {
 		border-color: $form-focus-border-color;
-	}
-}
-
-.btn-tag {
-	@extend .tag;
-
-	height: auto;
-	outline: none;
-	border: none;
-
-	&:hover {
-		text-decoration: underline;
-		background-color: $ui-bg-selected-color;
-	}
-
-	&:focus {
-		background-color: $ui-bg-selected-color;
 	}
 }
 

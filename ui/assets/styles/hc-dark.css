@@ -1287,6 +1287,16 @@ button {
     background-color: transparent;
     border-style: dotted; }
 
+.btn-tag {
+  height: auto;
+  outline: none;
+  border: none; }
+  .btn-tag:hover {
+    text-decoration: underline;
+    background-color: #dddddd; }
+  .btn-tag:focus {
+    background-color: #dddddd; }
+
 .btn-overlay-close {
   position: absolute;
   top: 1px;
@@ -4753,10 +4763,6 @@ form.is-loading {
 .border-left {
   border-left: 1px solid #333333; }
 
-.margin-top {
-  display: block;
-  margin: 4px 0 0; }
-
 .form-new-group {
   border: 5px solid #44e763;
   border-radius: 2px;
@@ -4943,16 +4949,6 @@ z-select button.focusable,
   .z-select button.focusable:focus, z-select .list:focus,
   .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #bbbbbb; }
-
-.btn-tag {
-  height: auto;
-  outline: none;
-  border: none; }
-  .btn-tag:hover {
-    text-decoration: underline;
-    background-color: #dddddd; }
-  .btn-tag:focus {
-    background-color: #dddddd; }
 
 .filter-space {
   box-sizing: border-box; }
