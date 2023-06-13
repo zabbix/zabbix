@@ -22,8 +22,17 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Default value:* equals the global 'Timeout' (configuration parameter set in zabbix_agent2.conf).  
 *Limits:* 1-30
 
-**Plugins.MQTT.Sessions.<session_name>.TLSCAFile** — Full pathname of a file containing the top-level CA(s) certificates for MQTT
+**Plugins.MQTT.Sessions.<session_name>.Url** — Broker connection string used for MQTT.
 *Default value:* 
+
+**Plugins.MQTT.Sessions.<session_name>.Topic** — Topic used for MQTT subscription.
+*Default value:*
+
+**Plugins.MQTT.Sessions.<session_name>.User** — Username to be used for MQTT authentication.
+*Default value:* 
+
+**Plugins.MQTT.Sessions.<session_name>.Password** — Password to be used for MQTT authentication.
+*Default value:*
 
 **Plugins.MQTT.Sessions.<session_name>.TLSCertFile** — Full pathname of a file containing the MQTT certificate or certificate chain.
 *Default value:* 
