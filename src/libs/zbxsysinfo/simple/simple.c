@@ -500,7 +500,7 @@ int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
 }
 
-static zbx_metric	parameters_simple[] =
+static zbx_metric_t	parameters_simple[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
@@ -510,7 +510,7 @@ static zbx_metric	parameters_simple[] =
 	{NULL}
 };
 
-zbx_metric	*get_parameters_simple(void)
+zbx_metric_t	*get_parameters_simple(void)
 {
 	return &parameters_simple[0];
 }

@@ -24,6 +24,6 @@
 
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result);
-zbx_metric	*get_parameters_simple(void);
+zbx_metric_t	*get_parameters_simple(void);
 
 #endif /* ZABBIX_SYSINFO_SIMPLE_H */

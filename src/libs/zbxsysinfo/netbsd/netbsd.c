@@ -20,7 +20,7 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-static zbx_metric	parameters_specific[] =
+static zbx_metric_t	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"kernel.maxfiles",	0,		kernel_maxfiles,	NULL},
@@ -59,7 +59,7 @@ static zbx_metric	parameters_specific[] =
 	{NULL}
 };
 
-zbx_metric	*get_parameters_specific(void)
+zbx_metric_t	*get_parameters_specific(void)
 {
 	return parameters_specific;
 }

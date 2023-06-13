@@ -22,6 +22,6 @@
 #ifndef ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H
 #define ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H
 
-zbx_metric	*get_parameters_common_http(void);
+zbx_metric_t	*get_parameters_common_http(void);
 
 #endif /* ZABBIX_SYSINFO_COMMON_HTTP_METRICS_H */

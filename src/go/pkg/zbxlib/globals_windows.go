@@ -88,14 +88,14 @@ const char	title_message[] = "agent";
 const char	*usage_message[] = {};
 const char	*help_message[] = {};
 
-zbx_metric	parameters_common[] = {NULL};
-zbx_metric	*get_parameters_common(void)
+zbx_metric_t	parameters_common[] = {NULL};
+zbx_metric_t	*get_parameters_common(void)
 {
 	return &parameters_common[0];
 }
 
-zbx_metric	parameters_common_local[] = {NULL};
-zbx_metric	*get_parameters_common_local(void)
+zbx_metric_t	parameters_common_local[] = {NULL};
+zbx_metric_t	*get_parameters_common_local(void)
 {
 	return &parameters_common_local[0];
 }

@@ -64,7 +64,7 @@ typedef struct
 zbx_key_access_rule_t;
 
 #ifdef WITH_HOSTNAME_METRIC
-static zbx_metric	parameter_hostname =
+static zbx_metric_t	parameter_hostname =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 #ifdef ZBX_UNKNOWN_ARCH
 	{"system.hostname",     0,              system_hostname,        NULL};
@@ -73,8 +73,8 @@ static zbx_metric	parameter_hostname =
 #endif
 #endif
 
-static zbx_metric		*commands = NULL;
-static zbx_metric		*commands_local = NULL;
+static zbx_metric_t		*commands = NULL;
+static zbx_metric_t		*commands_local = NULL;
 zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
@@ -129,7 +129,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
-static int	add_to_metrics(zbx_metric **metrics, zbx_metric *metric, char *error, size_t max_error_len)
+static int	add_to_metrics(zbx_metric_t **metrics, zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	int		i = 0;
 
@@ -148,8 +148,8 @@ static int	add_to_metrics(zbx_metric **metrics, zbx_metric *metric, char *error,
 	(*metrics)[i].function = metric->function;
 	(*metrics)[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
-	*metrics = (zbx_metric *)zbx_realloc(*metrics, (i + 2) * sizeof(zbx_metric));
-	memset(&(*metrics)[i + 1], 0, sizeof(zbx_metric));
+	*metrics = (zbx_metric_t *)zbx_realloc(*metrics, (i + 2) * sizeof(zbx_metric_t));
+	memset(&(*metrics)[i + 1], 0, sizeof(zbx_metric_t));
 
 	return SUCCEED;
 }
@@ -171,7 +171,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
  * Purpose: registers a new item key into the system                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_add_metric(zbx_metric *metric, char *error, size_t max_error_len)
+int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
@@ -182,7 +182,7 @@ int	zbx_add_metric(zbx_metric *metric, char *error, size_t max_error_len)
  * Purpose: registers a new item key as local into the system                 *
  *                                                                            *
  ******************************************************************************/
-static int	add_metric_local(zbx_metric *metric, char *error, size_t max_error_len)
+static int	add_metric_local(zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
@@ -193,7 +193,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 {
 	int		ret;
 	unsigned	flags = CF_USERPARAMETER;
-	zbx_metric	metric;
+	zbx_metric_t	metric;
 	AGENT_REQUEST	request;
 
 	zbx_init_agent_request(&request);
@@ -244,8 +244,8 @@ void	zbx_remove_user_parameters(void)
 
 	if (0 < usr)
 	{
-		commands = (zbx_metric *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(zbx_metric));
-		memset(&commands[usr], 0, sizeof(zbx_metric));
+		commands = (zbx_metric_t *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(zbx_metric_t));
+		memset(&commands[usr], 0, sizeof(zbx_metric_t));
 	}
 	else if (0 == usr)
 	{
@@ -253,7 +253,7 @@ void	zbx_remove_user_parameters(void)
 	}
 }
 
-void	zbx_get_metrics_copy(zbx_metric **metrics)
+void	zbx_get_metrics_copy(zbx_metric_t **metrics)
 {
 	unsigned int	i;
 
@@ -266,7 +266,7 @@ void	zbx_get_metrics_copy(zbx_metric **metrics)
 	for (i = 0; NULL != commands[i].key; i++)
 		;
 
-	*metrics = (zbx_metric *)zbx_malloc(*metrics, sizeof(zbx_metric) * (i + 1));
+	*metrics = (zbx_metric_t *)zbx_malloc(*metrics, sizeof(zbx_metric_t) * (i + 1));
 
 	for (i = 0; NULL != commands[i].key; i++)
 	{
@@ -277,10 +277,10 @@ void	zbx_get_metrics_copy(zbx_metric **metrics)
 				NULL : zbx_strdup(NULL, commands[i].test_param));
 	}
 
-	memset(&(*metrics)[i], 0, sizeof(zbx_metric));
+	memset(&(*metrics)[i], 0, sizeof(zbx_metric_t));
 }
 
-void	zbx_set_metrics(zbx_metric *metrics)
+void	zbx_set_metrics(zbx_metric_t *metrics)
 {
 	zbx_free_metrics_ext(&commands);
 	commands = metrics;
@@ -319,13 +319,13 @@ void	zbx_init_metrics(void)
 
 	zbx_init_key_access_rules();
 
-	commands = (zbx_metric *)zbx_malloc(commands, sizeof(zbx_metric));
+	commands = (zbx_metric_t *)zbx_malloc(commands, sizeof(zbx_metric_t));
 	commands[0].key = NULL;
-	commands_local = (zbx_metric *)zbx_malloc(commands_local, sizeof(zbx_metric));
+	commands_local = (zbx_metric_t *)zbx_malloc(commands_local, sizeof(zbx_metric_t));
 	commands_local[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
-	zbx_metric	*parameters_agent = get_parameters_agent();
+	zbx_metric_t	*parameters_agent = get_parameters_agent();
 
 	for (i = 0; NULL != parameters_agent[i].key; i++)
 	{
@@ -338,7 +338,7 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_COMMON_METRICS
-	zbx_metric	*parameters_common = get_parameters_common();
+	zbx_metric_t	*parameters_common = get_parameters_common();
 
 	for (i = 0; NULL != parameters_common[i].key; i++)
 	{
@@ -349,7 +349,7 @@ void	zbx_init_metrics(void)
 		}
 	}
 
-	zbx_metric	*parameters_common_local = get_parameters_common_local();
+	zbx_metric_t	*parameters_common_local = get_parameters_common_local();
 
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
@@ -362,7 +362,7 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_HTTP_METRICS
-	zbx_metric	*parameters_common_http = get_parameters_common_http();
+	zbx_metric_t	*parameters_common_http = get_parameters_common_http();
 
 	for (i = 0; NULL != parameters_common_http[i].key; i++)
 	{
@@ -375,7 +375,7 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SPECIFIC_METRICS
-	zbx_metric	*parameters_specific = get_parameters_specific();
+	zbx_metric_t	*parameters_specific = get_parameters_specific();
 
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 	{
@@ -388,7 +388,7 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SIMPLE_METRICS
-	zbx_metric	*parameters_simple = get_parameters_simple();
+	zbx_metric_t	*parameters_simple = get_parameters_simple();
 
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 	{
@@ -409,7 +409,7 @@ void	zbx_init_metrics(void)
 #endif
 }
 
-void	zbx_free_metrics_ext(zbx_metric **metrics)
+void	zbx_free_metrics_ext(zbx_metric_t **metrics)
 {
 	if (NULL != *metrics)
 	{
@@ -1162,7 +1162,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
-	zbx_metric	*command = NULL;
+	zbx_metric_t	*command = NULL;
 	AGENT_REQUEST	request;
 
 	zbx_init_agent_request(&request);

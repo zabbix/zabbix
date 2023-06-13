@@ -44,19 +44,19 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-static zbx_metric	parameters_common_local[] =
+static zbx_metric_t	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
 	{NULL}
 };
 
-zbx_metric	*get_parameters_common_local(void)
+zbx_metric_t	*get_parameters_common_local(void)
 {
 	return &parameters_common_local[0];
 }
 
-static zbx_metric	parameters_common[] =
+static zbx_metric_t	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.localtime",	CF_HAVEPARAMS,	system_localtime,	"utc"},
@@ -97,7 +97,7 @@ static zbx_metric	parameters_common[] =
 	{NULL}
 };
 
-zbx_metric	*get_parameters_common(void)
+zbx_metric_t	*get_parameters_common(void)
 {
 	return &parameters_common[0];
 }

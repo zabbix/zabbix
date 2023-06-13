@@ -33,7 +33,7 @@ static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_variant(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-static zbx_metric	parameters_agent[] =
+static zbx_metric_t	parameters_agent[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"agent.hostname",	0,		agent_hostname,		NULL},
@@ -45,7 +45,7 @@ static zbx_metric	parameters_agent[] =
 	{NULL}
 };
 
-zbx_metric	*get_parameters_agent(void)
+zbx_metric_t	*get_parameters_agent(void)
 {
 	return &parameters_agent[0];
 }

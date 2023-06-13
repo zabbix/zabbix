@@ -22,8 +22,8 @@
 
 #include "module.h"
 
-zbx_metric	*get_parameters_common(void);
-zbx_metric	*get_parameters_common_local(void);
+zbx_metric_t	*get_parameters_common(void);
+zbx_metric_t	*get_parameters_common_local(void);
 
 int	execute_user_parameter(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	execute_str(const char *command, AGENT_RESULT *result);
