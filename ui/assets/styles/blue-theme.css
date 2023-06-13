@@ -6294,7 +6294,7 @@ svg {
       left: -8px;
       width: 10px;
       height: 24px; }
-    .preprocessing-list .preprocessing-step div {
+    .preprocessing-list .preprocessing-step > div {
       height: 34px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
@@ -6634,7 +6634,9 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .input-section-header {
   padding-top: 10px; }
 
-.modal-popup-preprocessing .preprocessing-list .step-name {
+.modal-popup-preprocessing .preprocessing-list-head .step-name {
+  flex: 0 0 190px; }
+.modal-popup-preprocessing .preprocessing-list-item .step-name {
   flex: 0 0 180px; }
 .modal-popup-preprocessing .preprocessing-list {
   min-width: unset;

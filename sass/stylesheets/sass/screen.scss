@@ -3256,7 +3256,7 @@ svg {
 			height: 24px;
 		}
 
-		div {
+		> div {
 			height: 34px;
 		}
 	}
@@ -3836,8 +3836,16 @@ z-select,
 }
 
 .modal-popup-preprocessing {
-	.preprocessing-list .step-name {
-		flex: 0 0 180px;
+	.preprocessing-list-head{
+		.step-name {
+			flex: 0 0 190px;
+		}
+	}
+
+	.preprocessing-list-item {
+		.step-name {
+			flex: 0 0 180px;
+		}
 	}
 
 	.preprocessing-list {
