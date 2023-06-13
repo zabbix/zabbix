@@ -3492,6 +3492,10 @@ form.is-loading {
     background-position-y: -693px; }
   .list-table td .btn-widget-collapse, .list-table td .list-vertical-accordion .list-accordion-item-opened .list-accordion-item-toggle, .list-vertical-accordion .list-accordion-item-opened .list-table td .list-accordion-item-toggle {
     background-position-y: -657px; }
+  .list-table td .icon-doc-link {
+    width: 18px;
+    height: 18px;
+    line-height: 18px; }
   .list-table .second-col {
     padding-left: 0;
     padding-right: 0; }
