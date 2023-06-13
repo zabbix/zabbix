@@ -28,6 +28,7 @@
 #include "zbxpreproc.h"
 #include "zbxip.h"
 #include "../../libs/zbxcomms/tls.h"
+#include "zbxself.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {
@@ -58,6 +59,12 @@ static int	agent_task_process(short event, void *data)
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
 	short			want_event = 0;
+
+	if (ZBX_PROCESS_STATE_IDLE == agent_context->poller_config->state)
+	{
+		zbx_update_selfmon_counter(agent_context->poller_config->info, ZBX_PROCESS_STATE_BUSY);
+		agent_context->poller_config->state = ZBX_PROCESS_STATE_BUSY;
+	}
 
 	if (0 == event)
 	{

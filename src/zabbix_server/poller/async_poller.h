@@ -21,7 +21,7 @@
 #define ZABBIX_ASYNC_POLLER_H
 
 #include "zbxalgo.h"
-
+#include "zbxthreads.h"
 ZBX_VECTOR_DECL(int32, int)
 
 typedef struct
@@ -34,6 +34,7 @@ typedef struct
 	int			config_unreachable_delay;
 	int			config_unreachable_period;
 	int			config_timeout;
+	int			state;
 	const char		*config_source_ip;
 	struct event		*async_check_items_timer;
 	zbx_vector_uint64_t	itemids;
@@ -42,6 +43,7 @@ typedef struct
 	CURLM			*curl_handle;
 	struct event_base	*base;
 	zbx_hashset_t		interfaces;
+	const zbx_thread_info_t	*info;
 }
 zbx_poller_config_t;
 

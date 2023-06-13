@@ -349,6 +349,17 @@ static void	http_agent_poller_destroy(zbx_poller_config_t *poller_config)
 	zbx_hashset_destroy(&poller_config->interfaces);
 }
 
+/*static void	poller_update_selfmon_counter(void *arg)
+{
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
+
+	if (1 == poller_config->idle)
+	{
+		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
+		poller_config->idle = 0;
+	}
+}*/
+
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
@@ -382,6 +393,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	http_agent_poller_init(&poller_config, poller_args_in, async_check_items);
 	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result);
+	poller_config.state = ZBX_PROCESS_STATE_BUSY;
+	poller_config.info = info;
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -395,9 +408,16 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		if (0 == evtimer_pending(poller_config.async_check_items_timer, &tv_pending))
 			evtimer_add(poller_config.async_check_items_timer, &tv);
 
+		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
+		{
+			zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
+			poller_config.state = ZBX_PROCESS_STATE_IDLE;
+		}
+
 		event_base_loop(poller_config.base, EVLOOP_ONCE);
 
 		poller_requeue_items(&poller_config);
+		
 
 		total_sec += zbx_time() - sec;
 
