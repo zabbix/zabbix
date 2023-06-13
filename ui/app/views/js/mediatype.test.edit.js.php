@@ -124,6 +124,12 @@ window.mediatype_test_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				for (const element of this.form.parentNode.children) {
+					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+						element.parentNode.removeChild(element);
+					}
+				}
+
 				if ('debug' in response) {
 					this.form.querySelector('#mediatypetest_log').classList.remove('disabled');
 					sessionStorage.setItem('mediatypetest', JSON.stringify(response.debug));
