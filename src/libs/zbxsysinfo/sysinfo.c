@@ -936,6 +936,9 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
  * Parameters: itemkey - [IN] complete item key                               *
  *             request - [OUT] structure filled with data from item key       *
  *                                                                            *
+ * Return value: SUCCEED - key was parsed successfully                        *
+ *               FAIL - otherwise                                             *
+ *                                                                            *
  * Comments: thread-safe                                                      *
  *                                                                            *
  ******************************************************************************/
