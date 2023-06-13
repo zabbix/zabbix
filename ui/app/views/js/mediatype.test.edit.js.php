@@ -85,9 +85,11 @@ window.mediatype_test_edit_popup = new class {
 				var preElement = document.createElement('pre');
 				preElement.textContent = entry.ms + ' ' + entry.level + ' ' + entry.message;
 				logitems.appendChild(preElement);
+				logitems.classList.add('logitems');
 			});
 
 			footer.textContent = <?= json_encode(_('Time elapsed:')) ?> + " " + debug.ms + 'ms';
+			footer.classList.add('logtotalms');
 			content.appendChild(logitems);
 		}
 
