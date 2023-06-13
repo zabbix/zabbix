@@ -883,32 +883,32 @@ final class CItemData {
 				'description' => _('Agent host name. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.hostname',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.hostname'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#agent.hostname',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#agent.hostname'
 				]
 			],
 			'agent.ping' => [
 				'description' => _('Agent availability check. Returns nothing - unavailable; 1 - available'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.ping',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.ping'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#agent.ping',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#agent.ping'
 				]
 			],
 			'agent.variant' => [
 				'description' => _('Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.variant',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.variant'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#agent.variant',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#agent.variant'
 				]
 			],
 			'agent.version' => [
 				'description' => _('Version of Zabbix agent. Returns string'),
 				'value_type' => ITEM_VALUE_TYPE_STR,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.version',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent?hl=agent.hostname#agent.version'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#agent.version',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#agent.version'
 				]
 			],
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]' => [
@@ -1052,7 +1052,7 @@ final class CItemData {
 				'description' => _('Value of MQTT topic. Format of returned data depends on the topic content. If wildcards are used, returns topic values in JSON'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/zabbix_agent2?hl=mqtt.get#mqtt.get'
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/zabbix_agent2#mqtt.get'
 				]
 			],
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
@@ -1099,8 +1099,8 @@ final class CItemData {
 				'description' => _('Network interface list (includes interface type, status, IPv4 address, description). Returns text'),
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'documentation_link' => [
-					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent/win_keys?hl=net.if.list#net.if.list',
-					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys?hl=net.if.list#net.if.list'
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent/win_keys#net.if.list',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent/win_keys#net.if.list'
 				]
 			],
 			'net.if.out[if,<mode>]' => [
