@@ -198,6 +198,4 @@ int	registry_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 #ifdef _AIX
 int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
-
-zbx_metric *get_parameters_specific(void);
 #endif /* ZABBIX_SYSINFO_H */

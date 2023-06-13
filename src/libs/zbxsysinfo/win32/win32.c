@@ -19,6 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+#include "../specsysinfo.h"
 
 #include "zbxwinservice.h"
 

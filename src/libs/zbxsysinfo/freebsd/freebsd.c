@@ -19,6 +19,7 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+#include "../specsysinfo.h"
 
 static zbx_metric	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
