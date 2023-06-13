@@ -325,9 +325,11 @@ void	zbx_init_metrics(void)
 	commands_local[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
-	for (i = 0; NULL != (get_parameters_agent())[i].key; i++)
+	zbx_metric	*parameters_agent = get_parameters_agent();
+
+	for (i = 0; NULL != parameters_agent[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric(&(get_parameters_agent())[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_agent[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -336,18 +338,22 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_COMMON_METRICS
-	for (i = 0; NULL != (get_parameters_common())[i].key; i++)
+	zbx_metric	*parameters_common = get_parameters_common();
+
+	for (i = 0; NULL != parameters_common[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric(&(get_parameters_common())[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_common[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
 		}
 	}
 
-	for (i = 0; NULL != (get_parameters_common_local())[i].key; i++)
+	zbx_metric	*parameters_common_local = get_parameters_common_local();
+
+	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
-		if (SUCCEED != add_metric_local(&(get_parameters_common_local())[i], error, sizeof(error)))
+		if (SUCCEED != add_metric_local(&parameters_common_local[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -356,9 +362,11 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_HTTP_METRICS
-	for (i = 0; NULL != (get_parameters_common_http())[i].key; i++)
+	zbx_metric	*parameters_common_http = get_parameters_common_http();
+
+	for (i = 0; NULL != parameters_common_http[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric(&(get_parameters_common_http())[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_common_http[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -367,9 +375,11 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SPECIFIC_METRICS
-	for (i = 0; NULL != (get_parameters_specific())[i].key; i++)
+	zbx_metric	*parameters_specific = get_parameters_specific();
+
+	for (i = 0; NULL != parameters_specific[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric(&(get_parameters_specific())[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_specific[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
@@ -378,9 +388,11 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SIMPLE_METRICS
-	for (i = 0; NULL != (get_parameters_simple())[i].key; i++)
+	zbx_metric	*parameters_simple = get_parameters_simple();
+
+	for (i = 0; NULL != parameters_simple[i].key; i++)
 	{
-		if (SUCCEED != zbx_add_metric(&(get_parameters_simple())[i], error, sizeof(error)))
+		if (SUCCEED != zbx_add_metric(&parameters_simple[i], error, sizeof(error)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot add item key: %s", error);
 			exit(EXIT_FAILURE);
