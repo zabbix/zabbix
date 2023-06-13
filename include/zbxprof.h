@@ -20,6 +20,7 @@
 #ifndef ZABBIX_PROF_H
 #define ZABBIX_PROF_H
 
+#define ZBX_PROF_UNKNOWN	0x00
 #define ZBX_PROF_PROCESSING	0x01
 #define ZBX_PROF_RWLOCK		0x02
 #define ZBX_PROF_MUTEX		0x04

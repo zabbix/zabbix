@@ -21,7 +21,6 @@
 
 #include "checks_simple_vmware.h"
 #include "simple.h"
-#include "log.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 

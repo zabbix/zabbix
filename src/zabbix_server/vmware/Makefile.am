@@ -9,4 +9,6 @@ libzbxvmware_a_SOURCES = \
 	vmware_manager.c \
 	vmware.h
 
-libzbxvmware_a_CFLAGS = $(LIBXML2_CFLAGS)
+libzbxvmware_a_CFLAGS = \
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)

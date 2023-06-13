@@ -299,6 +299,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -373,6 +380,12 @@ form {
 
 		.btn-widget-collapse {
 			background-position-y: -657px;
+		}
+
+		.icon-doc-link {
+			width: 18px;
+			height: 18px;
+			line-height: 18px;
 		}
 	}
 
@@ -1752,7 +1765,9 @@ input {
 textarea {
 	margin: 0;
 	padding: 4px 5px;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	font: {
 		family: $font-stack;
 		size: $font-form-size;
@@ -2688,6 +2703,21 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
+}
+
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -3364,7 +3394,7 @@ $form-icon-btn: (
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(100px, max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
 
 		&.form-grid-1-1 {
 			grid-template-columns: repeat(2, minmax(100px, max-content) auto);

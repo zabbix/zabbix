@@ -336,11 +336,11 @@ class testFormWeb extends CLegacyWebTest {
 		if ($authentication!='None') {
 			$this->zbxTestTextPresent('User');
 			$this->zbxTestAssertVisibleId('http_user');
-			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='http_user']", 'maxlength', 255);
 
 			$this->zbxTestTextPresent('Password');
 			$this->zbxTestAssertVisibleId('http_password');
-			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='http_password']", 'maxlength', 255);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User', 'Password'], $this->query('id:authenticationTab')->one());

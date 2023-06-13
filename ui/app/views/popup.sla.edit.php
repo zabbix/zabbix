@@ -31,7 +31,7 @@ $form = (new CForm('post'))
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit'))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // SLA tab.
 
@@ -44,7 +44,7 @@ for ($weekday = 0; $weekday < 7; $weekday++) {
 			->setChecked($data['form']['schedule_periods'][$weekday] !== ''),
 		(new CTextBox('schedule_periods['.$weekday.']', $data['form']['schedule_periods'][$weekday]))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAttribute('placeholder', '8:00-17:00, &hellip;')
+			->setAttribute('placeholder', '8:00-17:00, ...')
 	]));
 }
 

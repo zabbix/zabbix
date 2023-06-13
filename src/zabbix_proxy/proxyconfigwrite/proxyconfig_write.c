@@ -1026,8 +1026,7 @@ static int	proxyconfig_insert_rows(zbx_table_data_t *td, char **error)
 				zbx_vector_db_value_ptr_append(&values, value);
 			}
 
-			zbx_db_insert_add_values_dyn(&db_insert, (const zbx_db_value_t **)values.values,
-					values.values_num);
+			zbx_db_insert_add_values_dyn(&db_insert, values.values, values.values_num);
 clean:
 			for (j = 0; j < values.values_num; j++)
 			{
@@ -2061,7 +2060,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls,
-		const zbx_config_vault_t *config_vault, int config_timeout, const char *server)
+		const zbx_config_vault_t *config_vault, int config_timeout,
+		const char *config_source_ip, const char *server)
 {
 	struct zbx_json_parse	jp_config, jp_kvs_paths = {0};
 	int			ret;
@@ -2117,7 +2117,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		if (SUCCEED == zbx_rtc_reload_config_cache(&error))
 		{
 			if (SUCCEED == zbx_json_brackets_by_name(&jp_config, ZBX_PROTO_TAG_MACRO_SECRETS, &jp_kvs_paths))
-				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault);
+				zbx_dc_sync_kvs_paths(&jp_kvs_paths, config_vault, config_source_ip);
 		}
 		else
 		{

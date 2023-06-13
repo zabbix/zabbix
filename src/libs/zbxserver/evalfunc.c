@@ -21,7 +21,6 @@
 #include "evalfunc_common.h"
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxcachevalue.h"
 #include "zbxtrends.h"
@@ -458,7 +457,7 @@ static int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuema
 
 					while (NULL != (ptr = strchr(ptr, '-')))
 					{
-						if (ptr > range_str && 'e' != ptr[-1] && 'E' != ptr[-1])
+						if (ptr > range_str && 'e' != *(ptr - 1) && 'E' != *(ptr - 1))
 							break;
 						ptr++;
 					}
@@ -1074,7 +1073,8 @@ static void	zbx_vector_history_record_log_uniq(zbx_vector_history_record_t *vect
 #define OP_LIKE		6
 #define OP_REGEXP	7
 #define OP_IREGEXP	8
-#define OP_BITAND		9
+#define OP_BITAND	9
+#define OP_ANY		10
 
 static void	count_one_ui64(int *count, int op, zbx_uint64_t value, zbx_uint64_t pattern, zbx_uint64_t mask)
 {
@@ -1140,44 +1140,340 @@ static void	count_one_dbl(int *count, int op, double value, double pattern)
 	}
 }
 
-static void	count_one_str(int *count, int op, const char *value, const char *pattern,
-		zbx_vector_expression_t *regexps)
+static int	count_one_str(int *count, int op, const char *value, const char *pattern,
+		const zbx_vector_expression_t *regexps, char **error)
 {
 	int	res;
 
 	switch (op)
 	{
 		case OP_EQ:
-			if (0 == strcmp(value, pattern))
+			if (0 == strcmp(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_NE:
-			if (0 != strcmp(value, pattern))
+			if (0 != strcmp(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_LIKE:
-			if (NULL != strstr(value, pattern))
+			if (NULL != strstr(value, ZBX_NULL2EMPTY_STR(pattern)))
 				(*count)++;
 			break;
 		case OP_REGEXP:
-			if (ZBX_REGEXP_MATCH ==
-					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+			if (FAIL == (res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE)))
+			{
+				*error = zbx_strdup(*error, "invalid regular expression");
+				return FAIL;
+			}
+
+			if (ZBX_REGEXP_MATCH == res)
 				(*count)++;
-			else if (FAIL == res)
-				*count = FAIL;
+
 			break;
 		case OP_IREGEXP:
-			if (ZBX_REGEXP_MATCH ==
-					(res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+			if (FAIL == (res = zbx_regexp_match_ex(regexps, value, pattern, ZBX_IGNORE_CASE)))
+			{
+				*error = zbx_strdup(*error, "invalid regular expression");
+				return FAIL;
+			}
+
+			if (ZBX_REGEXP_MATCH == res)
 				(*count)++;
-			else if (FAIL == res)
-				*count = FAIL;
+
+			break;
 	}
+	return SUCCEED;
 }
 
 /* flags for evaluate_COUNT() */
 #define COUNT_ALL	0
 #define COUNT_UNIQUE	1
+
+static int	validate_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error)
+{
+	pdata->numeric_search = (ITEM_VALUE_TYPE_UINT64 == value_type || ITEM_VALUE_TYPE_FLOAT == value_type);
+
+	if (NULL == operator || '\0' == *operator)
+	{
+		if (NULL == pattern || '\0' == *pattern)
+		{
+			pdata->op = OP_ANY;
+			return SUCCEED;
+		}
+
+		pdata->op = (0 != pdata->numeric_search ? OP_EQ : OP_LIKE);
+	}
+	else if (0 == strcmp(operator, "eq"))
+		pdata->op = OP_EQ;
+	else if (0 == strcmp(operator, "ne"))
+		pdata->op = OP_NE;
+	else if (0 == strcmp(operator, "gt"))
+		pdata->op = OP_GT;
+	else if (0 == strcmp(operator, "ge"))
+		pdata->op = OP_GE;
+	else if (0 == strcmp(operator, "lt"))
+		pdata->op = OP_LT;
+	else if (0 == strcmp(operator, "le"))
+		pdata->op = OP_LE;
+	else if (0 == strcmp(operator, "like"))
+		pdata->op = OP_LIKE;
+	else if (0 == strcmp(operator, "regexp"))
+		pdata->op = OP_REGEXP;
+	else if (0 == strcmp(operator, "iregexp"))
+		pdata->op = OP_IREGEXP;
+	else if (0 == strcmp(operator, "bitand"))
+		pdata->op = OP_BITAND;
+	else
+		pdata->op = OP_UNKNOWN;
+
+	if (OP_UNKNOWN == pdata->op)
+	{
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for function COUNT", operator);
+		return FAIL;
+	}
+
+	if (NULL == pattern || '\0' == *pattern)
+	{
+		/* also match any value if "" is searched in text values */
+		if (OP_LIKE == pdata->op || OP_REGEXP == pdata->op || OP_IREGEXP == pdata->op)
+		{
+			pdata->op = OP_ANY;
+			return SUCCEED;
+		}
+	}
+
+	pdata->numeric_search = (0 != pdata->numeric_search && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op);
+
+	if (0 != pdata->numeric_search)
+	{
+		if (NULL != operator && '\0' != *operator && (NULL == pattern || '\0' == *pattern))
+		{
+			*error = zbx_strdup(*error, "pattern must be provided along with operator for numeric values");
+			return FAIL;
+		}
+
+		if (OP_LIKE == pdata->op)
+		{
+			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting numeric values",
+					operator);
+			return FAIL;
+		}
+
+		if (OP_BITAND == pdata->op && ITEM_VALUE_TYPE_FLOAT == value_type)
+		{
+			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
+					operator);
+			return FAIL;
+		}
+
+		if (OP_BITAND == pdata->op && NULL != (pdata->pattern2 = strchr(pattern, '/')))
+		{
+			*pdata->pattern2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
+			pdata->pattern2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+		}
+
+		if (NULL != pattern && '\0' != *pattern)
+		{
+			if (ITEM_VALUE_TYPE_UINT64 == value_type)
+			{
+				if (OP_BITAND != pdata->op)
+				{
+					if (SUCCEED != zbx_str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pdata->pattern_ui64))
+					{
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", pattern);
+						return FAIL;
+					}
+					pdata->pattern2_ui64 = 0;
+				}
+				else
+				{
+					if (SUCCEED != zbx_is_uint64(pattern, &pdata->pattern_ui64))
+					{
+						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
+								" value", pattern);
+						return FAIL;
+					}
+
+					if (NULL != pdata->pattern2)
+					{
+						if (SUCCEED != zbx_is_uint64(pdata->pattern2, &pdata->pattern2_ui64))
+						{
+							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
+									" unsigned value", pdata->pattern2);
+							return FAIL;
+						}
+					}
+					else
+						pdata->pattern2_ui64 = pdata->pattern_ui64;
+				}
+			}
+			else
+			{
+				if (SUCCEED != zbx_is_double_suffix(pattern, ZBX_FLAG_DOUBLE_SUFFIX))
+				{
+					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
+							pattern);
+					return FAIL;
+				}
+
+				pdata->pattern_dbl = zbx_str2double(pattern);
+			}
+		}
+	}
+	else if (OP_LIKE != pdata->op && OP_REGEXP != pdata->op && OP_IREGEXP != pdata->op && OP_EQ != pdata->op &&
+			OP_NE != pdata->op && ITEM_VALUE_TYPE_NONE != value_type)
+	{
+		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
+		return FAIL;
+	}
+
+	if ((OP_REGEXP == pdata->op || OP_IREGEXP == pdata->op) && NULL != pattern && '@' == *pattern)
+	{
+		zbx_dc_get_expressions_by_name(&pdata->regexps, pattern + 1);
+
+		if (0 == pdata->regexps.values_num)
+		{
+			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", pattern + 1);
+			return FAIL;
+		}
+	}
+
+	return SUCCEED;
+}
+
+int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error)
+{
+	int	ret;
+
+	memset(pdata, 0, sizeof(zbx_eval_count_pattern_data_t));
+	zbx_vector_expression_create(&pdata->regexps);
+
+	if (FAIL == (ret = validate_count_pattern(operator, pattern, value_type, pdata, error)))
+		zbx_clear_count_pattern(pdata);
+
+	return ret;
+}
+
+void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata)
+{
+	if (NULL != pdata->regexps.values)
+	{
+		zbx_regexp_clean_expressions(&pdata->regexps);
+		zbx_vector_expression_destroy(&pdata->regexps);
+	}
+}
+
+int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int limit, int *count, char **error)
+{
+	int	i;
+	char	buf[ZBX_MAX_UINT64_LEN];
+
+	if (OP_ANY == pdata->op)
+	{
+		if ((*count = values->values_num) > limit)
+			*count = values->values_num;
+
+		return SUCCEED;
+	}
+
+	for (i = 0; i < values->values_num && *count < limit; i++)
+	{
+		zbx_variant_t	value;
+
+		value = values->values[i];
+
+		switch (value.type)
+		{
+			case ZBX_VARIANT_UI64:
+				if (0 != pdata->numeric_search)
+				{
+					count_one_ui64(count, pdata->op, value.data.ui64, pdata->pattern_ui64,
+							pdata->pattern2_ui64);
+				}
+				else
+				{
+					zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64, value.data.ui64);
+					if (FAIL == count_one_str(count, pdata->op, buf, pattern, &pdata->regexps,
+							error))
+					{
+						return FAIL;
+					}
+				}
+				break;
+			case ZBX_VARIANT_DBL:
+				if (0 != pdata->numeric_search)
+				{
+					count_one_dbl(count, pdata->op, value.data.dbl, pdata->pattern_dbl);
+				}
+				else
+				{
+					zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4), value.data.dbl);
+					if (FAIL == count_one_str(count, pdata->op, buf, pattern, &pdata->regexps,
+							error))
+					{
+						return FAIL;
+					}
+				}
+				break;
+			case ZBX_VARIANT_STR:
+				if (FAIL == count_one_str(count, pdata->op, value.data.str, pattern, &pdata->regexps,
+						error))
+				{
+					return FAIL;
+				}
+				break;
+		}
+	}
+
+	return SUCCEED;
+}
+
+int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata,
+		zbx_vector_history_record_t *records, int limit, int *count, char **error)
+{
+	int			i, ret;
+	zbx_vector_var_t	values;
+
+	zbx_vector_var_create(&values);
+	zbx_vector_var_reserve(&values, records->values_num);
+	values.values_num = records->values_num;
+
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_UINT64:
+			for (i = 0; i < records->values_num; i++)
+				zbx_variant_set_ui64(&values.values[i], records->values[i].value.ui64);
+
+			break;
+
+		case ITEM_VALUE_TYPE_FLOAT:
+			for (i = 0; i < records->values_num; i++)
+				zbx_variant_set_dbl(&values.values[i], records->values[i].value.dbl);
+
+			break;
+
+		case ITEM_VALUE_TYPE_LOG:
+			for (i = 0; i < records->values_num; i++)
+				zbx_variant_set_str(&values.values[i], records->values[i].value.log->value);
+
+			break;
+		default:
+			for (i = 0; i < records->values_num; i++)
+				zbx_variant_set_str(&values.values[i], records->values[i].value.str);
+
+			break;
+	}
+
+	ret = zbx_count_var_vector_with_pattern(pdata, pattern, &values, limit, count, error);
+
+	zbx_vector_var_destroy(&values);
+
+	return ret;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1209,22 +1505,16 @@ static void	count_one_str(int *count, int op, const char *value, const char *pat
 static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
 		const zbx_timespec_t *ts, int limit, int unique, char **error)
 {
-	int				arg1, op = OP_UNKNOWN, numeric_search, nparams, count = 0, i, ret = FAIL;
-	int				seconds = 0, nvalues = 0, time_shift;
-	char				*operator = NULL, *pattern2 = NULL, *pattern = NULL, buf[ZBX_MAX_UINT64_LEN];
-	double				arg3_dbl;
-	zbx_uint64_t			pattern_ui64, pattern2_ui64;
+	int				arg1, nparams, count = 0, ret = FAIL, seconds = 0, nvalues = 0, time_shift;
+	char				*operator = NULL, *pattern = NULL;
 	zbx_value_type_t		arg1_type;
-	zbx_vector_expression_t		regexps;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			ts_end = *ts;
+	zbx_eval_count_pattern_data_t	pdata;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() params:%s", __func__, ZBX_NULL2EMPTY_STR(parameters));
 
-	zbx_vector_expression_create(&regexps);
 	zbx_history_record_vector_create(&values);
-
-	numeric_search = (ITEM_VALUE_TYPE_UINT64 == item->value_type || ITEM_VALUE_TYPE_FLOAT == item->value_type);
 
 	if (3 < (nparams = zbx_num_param(parameters)))
 	{
@@ -1252,134 +1542,12 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 			goto out;
 		}
 	}
-	else
-		pattern = zbx_strdup(NULL, "");
 
 	ts_end.sec -= time_shift;
 
-	if (NULL == operator || '\0' == *operator)
-		op = (0 != numeric_search ? OP_EQ : OP_LIKE);
-	else if (0 == strcmp(operator, "eq"))
-		op = OP_EQ;
-	else if (0 == strcmp(operator, "ne"))
-		op = OP_NE;
-	else if (0 == strcmp(operator, "gt"))
-		op = OP_GT;
-	else if (0 == strcmp(operator, "ge"))
-		op = OP_GE;
-	else if (0 == strcmp(operator, "lt"))
-		op = OP_LT;
-	else if (0 == strcmp(operator, "le"))
-		op = OP_LE;
-	else if (0 == strcmp(operator, "like"))
-		op = OP_LIKE;
-	else if (0 == strcmp(operator, "regexp"))
-		op = OP_REGEXP;
-	else if (0 == strcmp(operator, "iregexp"))
-		op = OP_IREGEXP;
-	else if (0 == strcmp(operator, "bitand"))
-		op = OP_BITAND;
-
-	if (OP_UNKNOWN == op)
+	if (FAIL == zbx_init_count_pattern(operator, pattern, item->value_type, &pdata, error))
 	{
-		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for function COUNT", operator);
 		goto out;
-	}
-
-	numeric_search = (0 != numeric_search && OP_REGEXP != op && OP_IREGEXP != op);
-
-	if (0 != numeric_search)
-	{
-		if (NULL != operator && '\0' != *operator && '\0' == *pattern)
-		{
-			*error = zbx_strdup(*error, "pattern must be provided along with operator for numeric values");
-			goto out;
-		}
-
-		if (OP_LIKE == op)
-		{
-			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting numeric values",
-					operator);
-			goto out;
-		}
-
-		if (OP_BITAND == op && ITEM_VALUE_TYPE_FLOAT == item->value_type)
-		{
-			*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting float values",
-					operator);
-			goto out;
-		}
-
-		if (OP_BITAND == op && NULL != (pattern2 = strchr(pattern, '/')))
-		{
-			*pattern2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
-			pattern2++;	/* start of the 2nd part of the 2nd parameter (mask) */
-		}
-
-		if (NULL != pattern && '\0' != *pattern)
-		{
-			if (ITEM_VALUE_TYPE_UINT64 == item->value_type)
-			{
-				if (OP_BITAND != op)
-				{
-					if (SUCCEED != zbx_str2uint64(pattern, ZBX_UNIT_SYMBOLS, &pattern_ui64))
-					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", pattern);
-						goto out;
-					}
-					pattern2_ui64 = 0;
-				}
-				else
-				{
-					if (SUCCEED != zbx_is_uint64(pattern, &pattern_ui64))
-					{
-						*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric unsigned"
-								" value", pattern);
-						goto out;
-					}
-
-					if (NULL != pattern2)
-					{
-						if (SUCCEED != zbx_is_uint64(pattern2, &pattern2_ui64))
-						{
-							*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric"
-									" unsigned value", pattern2);
-							goto out;
-						}
-					}
-					else
-						pattern2_ui64 = pattern_ui64;
-				}
-			}
-			else
-			{
-				if (SUCCEED != zbx_is_double_suffix(pattern, ZBX_FLAG_DOUBLE_SUFFIX))
-				{
-					*error = zbx_dsprintf(*error, "\"%s\" is not a valid numeric float value",
-							pattern);
-					goto out;
-				}
-
-				arg3_dbl = zbx_str2double(pattern);
-			}
-		}
-	}
-	else if (OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op && OP_EQ != op && OP_NE != op)
-	{
-		*error = zbx_dsprintf(*error, "operator \"%s\" is not supported for counting textual values", operator);
-		goto out;
-	}
-
-	if ((OP_REGEXP == op || OP_IREGEXP == op) && NULL != pattern && '@' == *pattern)
-	{
-		zbx_dc_get_expressions_by_name(&regexps, pattern + 1);
-
-		if (0 == regexps.values_num)
-		{
-			*error = zbx_dsprintf(*error, "global regular expression \"%s\" does not exist", pattern + 1);
-			goto out;
-		}
 	}
 
 	switch (arg1_type)
@@ -1400,7 +1568,7 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	if (FAIL == zbx_vc_get_values(item->itemid, item->value_type, &values, seconds, nvalues, &ts_end))
 	{
 		*error = zbx_strdup(*error, "cannot get values from value cache");
-		goto out;
+		goto clean;
 	}
 
 	if (COUNT_UNIQUE == unique)
@@ -1433,60 +1601,13 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 		}
 	}
 
-	/* skip counting values one by one if both pattern and operator are empty or "" is searched in text values */
-	if ((NULL != pattern && '\0' != *pattern) || (NULL != operator && '\0' != *operator &&
-			OP_LIKE != op && OP_REGEXP != op && OP_IREGEXP != op))
+	/* skip counting values one by one if filter matches any value */
+	if (OP_ANY != pdata.op)
 	{
-		switch (item->value_type)
+		if (FAIL == zbx_execute_count_with_pattern(pattern, item->value_type, &pdata, &values, limit, &count,
+				error))
 		{
-			case ITEM_VALUE_TYPE_UINT64:
-				if (0 != numeric_search)
-				{
-					for (i = 0; i < values.values_num && count < limit; i++)
-					{
-						count_one_ui64(&count, op, values.values[i].value.ui64, pattern_ui64,
-								pattern2_ui64);
-					}
-				}
-				else
-				{
-					for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					{
-						zbx_snprintf(buf, sizeof(buf), ZBX_FS_UI64,
-								values.values[i].value.ui64);
-						count_one_str(&count, op, buf, pattern, &regexps);
-					}
-				}
-				break;
-			case ITEM_VALUE_TYPE_FLOAT:
-				if (0 != numeric_search)
-				{
-					for (i = 0; i < values.values_num && count < limit; i++)
-						count_one_dbl(&count, op, values.values[i].value.dbl, arg3_dbl);
-				}
-				else
-				{
-					for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					{
-						zbx_snprintf(buf, sizeof(buf), ZBX_FS_DBL_EXT(4),
-								values.values[i].value.dbl);
-						count_one_str(&count, op, buf, pattern, &regexps);
-					}
-				}
-				break;
-			case ITEM_VALUE_TYPE_LOG:
-				for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					count_one_str(&count, op, values.values[i].value.log->value, pattern, &regexps);
-				break;
-			default:
-				for (i = 0; i < values.values_num && FAIL != count && count < limit; i++)
-					count_one_str(&count, op, values.values[i].value.str, pattern, &regexps);
-		}
-
-		if (FAIL == count)
-		{
-			*error = zbx_strdup(*error, "invalid regular expression");
-			goto out;
+			goto clean;
 		}
 	}
 	else
@@ -1498,12 +1619,11 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 	zbx_variant_set_dbl(value, count);
 
 	ret = SUCCEED;
+clean:
+	zbx_clear_count_pattern(&pdata);
 out:
 	zbx_free(operator);
 	zbx_free(pattern);
-
-	zbx_regexp_clean_expressions(&regexps);
-	zbx_vector_expression_destroy(&regexps);
 
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
@@ -2707,7 +2827,8 @@ out:
 static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *func,
 		const char *parameters, const zbx_timespec_t *ts, char **error)
 {
-	int		start, end, ret = FAIL;
+	time_t		start, end;
+	int		ret = FAIL;
 	char		*period = NULL;
 	const char	*table;
 	double		value_dbl;
@@ -2821,7 +2942,7 @@ static int	evaluate_TREND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 
 		if (SUCCEED != get_function_parameter_str(parameters, 5, &dev_alg) || '\0' == *dev_alg)
 		{
-			dev_alg = zbx_strdup(NULL, "mad");
+			dev_alg = zbx_strdup(dev_alg, "mad");
 		}
 		else if ((0 != strcmp("mad", dev_alg) && (0 != strcmp("stddevpop", dev_alg)) &&
 				(0 != strcmp("stddevsamp", dev_alg))))

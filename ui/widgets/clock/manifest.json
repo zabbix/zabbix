@@ -9,7 +9,6 @@
 	"description": "Displays local, server, or specified host time.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/clock",
 	"widget": {
-		"template_support": true,
 		"size": {
 			"width": 4,
 			"height": 3

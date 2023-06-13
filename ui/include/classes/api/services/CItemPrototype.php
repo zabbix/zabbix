@@ -85,7 +85,8 @@ class CItemPrototype extends CItemGeneral {
 		ITEM_VALUE_TYPE_STR => ['valuemapid'],
 		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
 		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid'],
-		ITEM_VALUE_TYPE_TEXT => []
+		ITEM_VALUE_TYPE_TEXT => [],
+		ITEM_VALUE_TYPE_BINARY => []
 	];
 
 	/**
@@ -398,14 +399,17 @@ class CItemPrototype extends CItemGeneral {
 			'flags' =>			['type' => API_ANY],
 			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid')]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>			['type' => API_ANY],
 			'ruleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -436,7 +440,9 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items);
 
-		self::checkAndAddUuid($items);
+		self::addUuid($items);
+
+		self::checkUuidDuplicates($items);
 		self::checkDuplicates($items);
 		self::checkDiscoveryRules($items);
 		self::checkValueMaps($items);
@@ -512,7 +518,6 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	protected function validateUpdate(array &$items, ?array &$db_items): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['itemid']], 'fields' => [
-			'uuid' => 	['type' => API_UUID],
 			'itemid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
 		]];
 
@@ -535,8 +540,8 @@ class CItemPrototype extends CItemGeneral {
 		 * fields as they stored in database.
 		 */
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_column($items, 'itemid'),
 			'preservekeys' => true
@@ -546,6 +551,7 @@ class CItemPrototype extends CItemGeneral {
 
 		foreach ($items as $i => &$item) {
 			$db_item = $db_items[$item['itemid']];
+			$item['host_status'] = $db_item['host_status'];
 
 			if ($db_item['templateid'] != 0) {
 				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
@@ -561,7 +567,7 @@ class CItemPrototype extends CItemGeneral {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 			else {
-				$item += array_intersect_key($db_item, array_flip(['value_type']));
+				$item += array_intersect_key($db_item, array_flip(['type', 'value_type']));
 
 				$api_input_rules = self::getValidationRules();
 			}
@@ -576,12 +582,13 @@ class CItemPrototype extends CItemGeneral {
 
 		self::validateByType(array_keys($api_input_rules['fields']), $items, $db_items);
 
-		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'host_status', 'flags', 'ruleid']);
+		$items = $this->extendObjectsByKey($items, $db_items, 'itemid', ['hostid', 'flags', 'ruleid']);
 
 		self::validateUniqueness($items);
 
 		self::addAffectedObjects($items, $db_items);
 
+		self::checkUuidDuplicates($items, $db_items);
 		self::checkDuplicates($items, $db_items);
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
@@ -601,12 +608,19 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
+			]],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('items', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('items', 'key_')],
-			'value_type' =>		['type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'units')]
@@ -637,7 +651,8 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'uuid' => 			['type' => API_UUID],
+			'host_status' =>	['type' => API_ANY],
+			'uuid' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'itemid' =>			['type' => API_ANY],
 			'name' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
 			'type' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
@@ -1052,17 +1067,14 @@ class CItemPrototype extends CItemGeneral {
 	 */
 	private static function getUpdChildObjectsUsingTemplateid(array $items, array $db_items,
 			array $upd_db_items): array {
+		$parent_indexes = array_flip(array_column($items, 'itemid'));
 
 		foreach ($items as &$item) {
-			if (!array_key_exists($item['itemid'], $db_items)) {
-				continue;
-			}
-
+			unset($item['uuid']);
 			$item = self::unsetNestedObjectIds($item);
 		}
 		unset($item);
 
-		$parent_indexes = array_flip(array_column($items, 'itemid'));
 		$upd_items = [];
 
 		foreach ($upd_db_items as $upd_db_item) {
@@ -1142,8 +1154,8 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history', 'trends',
-				'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
+			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'value_type', 'units', 'history',
+				'trends', 'valuemapid', 'logtimefmt', 'description', 'status', 'discover'
 			], array_diff(CItemType::FIELD_NAMES, ['parameters'])),
 			'itemids' => array_keys($upd_db_items)
 		];
@@ -1528,7 +1540,7 @@ class CItemPrototype extends CItemGeneral {
 		DBselect(
 			'SELECT NULL'.
 			' FROM items i'.
-			' WHERE '.dbConditionInt('i.itemid', $del_itemids).
+			' WHERE '.dbConditionId('i.itemid', $del_itemids).
 			' FOR UPDATE'
 		);
 

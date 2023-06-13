@@ -138,16 +138,12 @@
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
 
-		$('#clone, #full_clone').click(function() {
+		$('#clone').click(function() {
 			var form = $(this).attr('id');
 
 			$('#form').val(form);
 
-			if (form === 'clone') {
-				$('#sysmapid').remove();
-			}
-
-			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
+			$('#delete, #clone, #inaccessible_user').remove();
 
 			$('#update')
 				.text(<?= json_encode(_('Add')) ?>)

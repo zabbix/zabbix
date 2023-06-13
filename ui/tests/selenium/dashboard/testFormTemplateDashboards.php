@@ -598,9 +598,6 @@ class testFormTemplateDashboards extends CWebTest {
 		$form->submit();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
-
-		// Close the opened alert so that the next running scenario would not fail.
-		$this->page->acceptAlert();
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
@@ -1035,6 +1032,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
 
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
+		COverlayDialogElement::find()->waitUntilReady();
 		$form->fill($data['fields']);
 		$this->page->removeFocus();
 		COverlayDialogElement::find()->waitUntilReady();
@@ -1110,9 +1108,12 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->assertEquals($display_periods, $form->getField('Default page display period')->getOptions()->asText());
 		}
 		else {
-			$this->assertEquals(['Clock', 'Graph (classic)', 'Graph prototype', 'Item value', 'Plain text', 'URL'],
-					$form->getField('Type')->getOptions()->asText()
-			);
+			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Geomap', 'Graph',
+					'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
+					'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
+					'Top hosts', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+			];
+			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
 		$dialog->close();
 	}
@@ -1181,7 +1182,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$data['fields']['Name'] = trim($data['fields']['Name']);
 				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
-				CDashboardElement::find()->asDashboard()->one()->getWidget($name)->waitUntilVisible();
+				CDashboardElement::find()->asDashboard()->one()->waitUntilReady()->getWidget($name)->waitUntilVisible();
 			}
 			$this->query('button:Save changes')->one()->click();
 

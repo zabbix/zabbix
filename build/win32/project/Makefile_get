@@ -34,6 +34,7 @@ OBJS = \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\common_log.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
@@ -69,7 +70,7 @@ OBJS = \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib $(LIBS)
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib user32.lib shlwapi.lib $(LIBS)
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_tls.inc

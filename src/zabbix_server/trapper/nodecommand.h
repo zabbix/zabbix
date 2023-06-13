@@ -24,9 +24,8 @@
 #include "zbxjson.h"
 
 extern int	CONFIG_TRAPPER_TIMEOUT;
-extern char	*CONFIG_SOURCE_IP;
 
 int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_json_parse *jp,
-		int config_timeout);
+		int config_timeout, const char *config_source_ip);
 
 #endif

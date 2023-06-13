@@ -84,6 +84,7 @@ class CControllerPopupMassupdateTrigger extends CController {
 		if ($this->hasInput('update')) {
 			$output = [];
 			$triggerids = $this->getInput('ids', []);
+			$triggers_count = count($triggerids);
 			$visible = $this->getInput('visible', []);
 			$tags = array_filter($this->getInput('tags', []),
 				function (array $tag): bool {
@@ -206,15 +207,17 @@ class CControllerPopupMassupdateTrigger extends CController {
 
 			if (!$result) {
 				CMessageHelper::setErrorTitle(
-					$this->hasInput('prototype') ? _('Cannot update trigger prototypes') : _('Cannot update trigger')
+					$this->hasInput('prototype')
+						? _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $triggers_count)
+						: _n('Cannot update trigger', 'Cannot update triggers', $triggers_count)
 				);
 			}
 
 			if ($result) {
 				$messages = CMessageHelper::getMessages();
 				$output = ['title' => $this->hasInput('prototype')
-					? _('Trigger prototypes updated')
-					: _('Trigger updated')
+					? _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count)
+					: _n('Trigger updated', 'Triggers updated', $triggers_count)
 				];
 				if (count($messages)) {
 					$output['messages'] = array_column($messages, 'message');

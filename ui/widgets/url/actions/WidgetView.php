@@ -42,14 +42,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 	protected function doAction(): void {
 		$error = null;
 
-		$is_template_dashboard = $this->hasInput('templateid');
-
 		// Editing template dashboard?
-		if ($is_template_dashboard && !$this->hasInput('dynamic_hostid')) {
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
 			$error = _('No data.');
 		}
 		else {
-			$is_dynamic_item = ($is_template_dashboard || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM);
+			$is_dynamic_item = $this->isTemplateDashboard() || $this->fields_values['dynamic'] == CWidget::DYNAMIC_ITEM;
 
 			$dynamic_hostid = $this->getInput('dynamic_hostid', '0');
 

@@ -965,6 +965,7 @@ function getMenuPopupTrigger(options, trigger_element) {
  * @param bool   options['trends']                      Are trends available.
  * @param bool   options['allowed_ui_conf_hosts']       Whether user has access to configuration hosts pages.
  * @param bool   options['isWriteable']                 Whether user has read and write access to host and its items.
+ * @param string options['context']                     Determines whether the menu is made for host or template item.
  *
  * @return array
  */
@@ -974,60 +975,62 @@ function getMenuPopupItem(options) {
 	const items = [];
 	let url;
 
-	// latest data link
-	if (options.allowed_ui_latest_data) {
-		url = new Curl('zabbix.php');
-		url.setArgument('action', 'latest.view');
-		url.setArgument('hostids[]', options.hostid);
-		url.setArgument('name', options.name);
-		url.setArgument('filter_set', '1');
+	if (options.context !== 'template') {
+		// latest data link
+		if (options.allowed_ui_latest_data) {
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'latest.view');
+			url.setArgument('hostids[]', options.hostid);
+			url.setArgument('name', options.name);
+			url.setArgument('filter_set', '1');
+
+			items.push({
+				label: t('Latest data'),
+				url: url.getUrl()
+			});
+		}
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showgraph');
+		url.setArgument('itemids[]', options.itemid);
 
 		items.push({
-			label: t('Latest data'),
-			url: url.getUrl()
+			label: t('Graph'),
+			url: url.getUrl(),
+			disabled: !options.showGraph
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showvalues');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('Values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		url = new Curl('history.php');
+		url.setArgument('action', 'showlatest');
+		url.setArgument('itemids[]', options.itemid);
+
+		items.push({
+			label: t('500 latest values'),
+			url: url.getUrl(),
+			disabled: !options.history && !options.trends
+		});
+
+		sections.push({
+			label: t('View'),
+			items: items
 		});
 	}
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showgraph');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Graph'),
-		url: url.getUrl(),
-		disabled: !options.showGraph
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showvalues');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('Values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	url = new Curl('history.php');
-	url.setArgument('action', 'showlatest');
-	url.setArgument('itemids[]', options.itemid);
-
-	items.push({
-		label: t('500 latest values'),
-		url: url.getUrl(),
-		disabled: !options.history && !options.trends
-	});
-
-	sections.push({
-		label: t('View'),
-		items: items
-	});
 
 	if (options.allowed_ui_conf_hosts) {
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.triggers.length === 0
+			disabled: options.binary_value_type || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1044,7 +1047,7 @@ function getMenuPopupItem(options) {
 			});
 		}
 
-		if (options.triggers.length) {
+		if (!config_triggers.disabled) {
 			const trigger_items = [];
 
 			for (const value of options.triggers) {
@@ -1075,7 +1078,8 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			url: url.getUrl()
+			url: url.getUrl(),
+			disabled: options.binary_value_type
 		});
 
 		url = new Curl('items.php');
@@ -1112,25 +1116,27 @@ function getMenuPopupItem(options) {
 		});
 	}
 
-	const execute = {
-		label: t('Execute now'),
-		disabled: !options.isExecutable
-	};
-
-	if (options.isExecutable) {
-		execute.clickCallback = function () {
-			jQuery(this).closest('.menu-popup').menuPopup('close', null);
-
-			view.checkNow(options.itemid);
+	if (options.context !== 'template') {
+		const execute = {
+			label: t('Execute now'),
+			disabled: !options.isExecutable
 		};
+
+		if (options.isExecutable) {
+			execute.clickCallback = function() {
+				jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+				view.checkNow(options.itemid);
+			};
+		}
+
+		actions.push(execute);
+
+		sections.push({
+			label: t('Actions'),
+			items: actions
+		});
 	}
-
-	actions.push(execute);
-
-	sections.push({
-		label: t('Actions'),
-		items: actions
-	});
 
 	return sections;
 }
@@ -1264,14 +1270,14 @@ function getMenuPopupDropdown(options, trigger_elem) {
 		else if (options.submit_form) {
 			row.url = 'javascript:void(0);';
 			row.clickCallback = () => {
-				var $_form = trigger_elem.closest('form');
+				const form = trigger_elem.closest('form').get(0);
 
-				if (!$_form.data("action")) {
-					$_form.data("action", $_form.attr("action"));
+				if (!form.dataset.action) {
+					form.dataset.action = form.getAttribute('action');
 				}
 
-				$_form.attr("action", item.url);
-				$_form.submit();
+				form.setAttribute('action', item.url);
+				form.submit();
 			}
 		}
 

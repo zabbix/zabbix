@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 typedef struct

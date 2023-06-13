@@ -39,10 +39,25 @@ zbx_pp_cache_t	*pp_cache_create(const zbx_pp_item_preproc_t *preproc, const zbx_
 {
 	zbx_pp_cache_t	*cache = (zbx_pp_cache_t *)zbx_malloc(NULL, sizeof(zbx_pp_cache_t));
 
-	cache->type = (0 != preproc->steps_num ? preproc->steps[0].type : ZBX_PREPROC_NONE);
+	if (0 != preproc->steps_num)
+	{
+		switch (preproc->steps[0].type)
+		{
+			/* 'prometheus pattern' cache is reused for 'prometheus to json' */
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
+				cache->type = ZBX_PREPROC_PROMETHEUS_PATTERN;
+				break;
+			default:
+				cache->type = preproc->steps[0].type;
+		}
+	}
+	else
+		cache->type = ZBX_PREPROC_NONE;
+
 	zbx_variant_copy(&cache->value, value);
 	cache->data = NULL;
 	cache->refcount = 1;
+	cache->error = NULL;
 
 	return cache;
 }
@@ -61,7 +76,8 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 		switch (cache->type)
 		{
 			case ZBX_PREPROC_JSONPATH:
-				zbx_jsonobj_clear((zbx_jsonobj_t *)cache->data);
+				zbx_jsonobj_clear(&((zbx_pp_cache_jsonpath_t *)cache->data)->obj);
+				zbx_jsonpath_index_free(((zbx_pp_cache_jsonpath_t *)cache->data)->index);
 				break;
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
 				zbx_prometheus_clear((zbx_prometheus_t *)cache->data);
@@ -74,6 +90,7 @@ static void	pp_cache_free(zbx_pp_cache_t *cache)
 		zbx_free(cache->data);
 	}
 
+	zbx_free(cache->error);
 	zbx_free(cache);
 }
 
@@ -120,13 +137,10 @@ zbx_pp_cache_t	*pp_cache_copy(zbx_pp_cache_t *cache)
  *           cached. Otherwise the cache will be used to execute the step.    *
  *                                                                            *
  ******************************************************************************/
-void	pp_cache_copy_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
+void	pp_cache_prepare_output_value(zbx_pp_cache_t *cache, int step_type, zbx_variant_t *value)
 {
-	if (NULL != cache && (NULL == cache->data || step_type != cache->type))
-	{
-		zbx_variant_clear(value);
+	if (NULL == cache->data || step_type != cache->type)
 		zbx_variant_copy(value, &cache->value);
-	}
 }
 
 /******************************************************************************
@@ -148,6 +162,7 @@ int	pp_cache_is_supported(zbx_pp_item_preproc_t *preproc)
 		{
 			case ZBX_PREPROC_JSONPATH:
 			case ZBX_PREPROC_PROMETHEUS_PATTERN:
+			case ZBX_PREPROC_PROMETHEUS_TO_JSON:
 			case ZBX_PREPROC_SNMP_WALK_TO_VALUE:
 				return SUCCEED;
 		}

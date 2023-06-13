@@ -23,16 +23,9 @@ namespace Zabbix\Widgets\Fields;
 
 class CWidgetFieldMultiSelectGraphPrototype extends CWidgetFieldMultiSelect {
 
-	public function __construct(string $name, string $label = null, $hostid = null) {
+	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
 		$this->setSaveType(ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE);
-
-		if ($hostid === null) {
-			$this->setFilterParameter('real_hosts', true);
-		}
-		else {
-			$this->setFilterParameter('hostid', $hostid);
-		}
 	}
 }

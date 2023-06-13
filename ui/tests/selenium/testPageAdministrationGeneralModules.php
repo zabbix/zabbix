@@ -1013,7 +1013,6 @@ class testPageAdministrationGeneralModules extends CWebTest {
 
 		// Cancel editing dashboard not to interfere with following cases from data provider.
 		$this->query('link:Cancel')->one()->click();
-		$this->page->acceptAlert();
 	}
 
 	/**

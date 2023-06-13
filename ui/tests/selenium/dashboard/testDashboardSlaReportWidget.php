@@ -69,6 +69,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			[
 				'name' => 'Dashboard for SLA report widget tests',
 				'private' => 0,
+				'auto_start' => 1,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',
@@ -123,7 +124,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('SLA report')]);
 		$dialog->waitUntilReady();
 
-		$this->assertEquals(["Type", "Name", "Refresh interval", "SLA", "Service", "Show periods", "From", "To"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'SLA', 'Service', 'Show periods', 'From', 'To'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['Show header' => true, 'Refresh interval' => 'Default (No refresh)']);
@@ -147,11 +148,11 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				'value' => 20
 			],
 			'id:date_from' => [
-				'maxlength' => 2048,
+				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			],
 			'id:date_to' => [
-				'maxlength' => 2048,
+				'maxlength' => 255,
 				'placeholder' => 'YYYY-MM-DD'
 			]
 		];

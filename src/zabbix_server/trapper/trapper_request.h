@@ -26,5 +26,6 @@
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *server);
+		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *config_source_ip,
+		const char *server);
 #endif

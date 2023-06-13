@@ -21,7 +21,7 @@
 
 #ifdef _AIX
 
-#include "log.h"
+#include "zbxlog.h"
 
 #ifndef XINTFRAC	/* defined in IBM AIX 7.1 libperfstat.h, not defined in AIX 6.1 */
 #include <sys/systemcfg.h>
@@ -94,10 +94,11 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 	perfstat_disk_total_t		diskstats;
 #ifdef _AIXVERSION_530
 	zbx_uint64_t			dpcpu_us, dpcpu_sy, dpcpu_id, dpcpu_wa, pcputime, dtimebase;
-	zbx_uint64_t			delta_purr, entitled_purr, unused_purr, r1, r2;
+	zbx_uint64_t			delta_purr, entitled_purr, unused_purr;
 	perfstat_partition_total_t	lparstats;
 #ifdef HAVE_AIXOSLEVEL_530006
-	zbx_uint64_t			didle_donated_purr, dbusy_donated_purr, didle_stolen_purr, dbusy_stolen_purr;
+	zbx_uint64_t			didle_donated_purr, dbusy_donated_purr, didle_stolen_purr, dbusy_stolen_purr,
+					r1, r2;
 #endif	/* HAVE_AIXOSLEVEL_530006 */
 #endif	/* _AIXVERSION_530 */
 

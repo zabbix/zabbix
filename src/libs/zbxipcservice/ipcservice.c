@@ -9,7 +9,6 @@
 
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
-#include "log.h"
 #include "zbxstr.h"
 
 #define ZBX_IPC_PATH_MAX	sizeof(((struct sockaddr_un *)0)->sun_path)
@@ -1326,6 +1325,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 	(*data)[data_offset] = '\0';
 }
 
+#ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
  * Purpose: copies ipc message                                                *
@@ -1341,6 +1341,7 @@ void	zbx_ipc_message_copy(zbx_ipc_message_t *dst, const zbx_ipc_message_t *src)
 	dst->data = (unsigned char *)zbx_malloc(NULL, src->size);
 	memcpy(dst->data, src->data, src->size);
 }
+#endif /* HAVE_OPENIPMI */
 
 static void	ipc_service_user_cb(evutil_socket_t fd, short what, void *arg)
 {

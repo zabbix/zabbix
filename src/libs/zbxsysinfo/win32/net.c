@@ -22,7 +22,7 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 
 /* __stdcall calling convention is used for GetIfEntry2(). In order to declare a */

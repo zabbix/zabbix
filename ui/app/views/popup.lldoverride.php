@@ -35,11 +35,10 @@ $overrides_popup_form = (new CForm())
 	->addItem((new CVar('templated', $options['templated']))->removeId())
 	->addVar('old_name', $options['old_name'])
 	->addVar('overrides_names', $options['overrides_names'])
-	->addItem((new CVar('action', 'popup.lldoverride'))->removeId())
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addItem((new CVar('action', 'popup.lldoverride'))->removeId());
+
+// Enable form submitting on Enter.
+$overrides_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
@@ -88,7 +87,7 @@ $override_evaltype = (new CDiv([
 				DB::getFieldLength('lld_override', 'formula')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('overrides_formula')
-			->setAttribute('placeholder', 'A or (B and C) &hellip;')
+			->setAttribute('placeholder', 'A or (B and C) ...')
 	]))
 		->addClass(ZBX_STYLE_CELL)
 		->addClass(ZBX_STYLE_CELL_EXPRESSION)

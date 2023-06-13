@@ -46,7 +46,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
 			'from' => 'string',
-			'to' => 'string'
+			'to' => 'string',
+			'dynamic_hostid' => 'db hosts.hostid'
 		]);
 	}
 
@@ -141,13 +142,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
 				'graph_item_problems' => $this->fields_values['graph_item_problems'] == SVG_GRAPH_SELECTED_ITEM_PROBLEMS,
-				'problemhosts' => $this->fields_values['problemhosts'],
+				'problemhosts' => $this->isTemplateDashboard() ? '' : $this->fields_values['problemhosts'],
 				'severities' => $this->fields_values['severities'],
 				'problem_name' => $this->fields_values['problem_name'],
 				'evaltype' => $this->fields_values['evaltype'],
 				'tags' => $this->fields_values['tags']
 			],
-			'overrides' => array_values($this->fields_values['or'])
+			'overrides' => array_values($this->fields_values['or']),
+			'templateid' => $this->getInput('templateid', ''),
+			'dynamic_hostid' => $this->getInput('dynamic_hostid', '')
 		];
 
 		$svg_options = CSvgGraphHelper::get($graph_data, $width, $height);
