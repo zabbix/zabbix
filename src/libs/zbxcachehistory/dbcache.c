@@ -4986,7 +4986,7 @@ static void	zbx_hc_proxyqueue_enqueue(zbx_uint64_t proxyid)
 		zbx_uint64_t *ptr;
 
 		ptr = zbx_hashset_insert(&cache->proxyqueue.index, &proxyid, sizeof(proxyid));
-		zbx_list_append(&cache->proxyqueue.list, ptr, NULL);
+		(void)zbx_list_append(&cache->proxyqueue.list, ptr, NULL);
 	}
 }
 

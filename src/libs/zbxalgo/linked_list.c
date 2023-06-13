@@ -68,9 +68,11 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
 {
 	zbx_list_item_t *item;
 
-	item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t));
-	item->next = NULL;
-	item->data = value;
+	if (NULL != (item = (zbx_list_item_t *)list->mem_malloc_func(NULL, sizeof(zbx_list_item_t))))
+	{
+		item->next = NULL;
+		item->data = value;
+	}
 
 	*created = item;
 }
@@ -86,12 +88,18 @@ static void	list_create_item(zbx_list_t *list, void *value, zbx_list_item_t **cr
  *                             goes to list item.                             *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
+ * Return value: SUCCEED - the item was prepended successfully                *
+ *               FAIL    - memory allocation error                            *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted)
+int	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value, zbx_list_item_t **inserted)
 {
 	zbx_list_item_t *item;
 
 	list_create_item(list, value, &item);
+
+	if (NULL == item)
+		return FAIL;
 
 	if (NULL == after)
 		after = list->tail;
@@ -111,6 +119,8 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
 
 	if (NULL != inserted)
 		*inserted = item;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -122,10 +132,13 @@ void	zbx_list_insert_after(zbx_list_t *list, zbx_list_item_t *after, void *value
  *                             list item.                                     *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
+ * Return value: SUCCEED - the item was prepended successfully                *
+ *               FAIL    - memory allocation error                            *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
+int	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 {
-	zbx_list_insert_after(list, NULL, value, inserted);
+	return zbx_list_insert_after(list, NULL, value, inserted);
 }
 
 /******************************************************************************
@@ -137,12 +150,19 @@ void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
  *                             list item.                                     *
  *             inserted - [OUT] pointer to the inserted list item             *
  *                                                                            *
+ * Return value: SUCCEED - the item was prepended successfully                *
+ *               FAIL    - memory allocation error                            *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
+int	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 {
 	zbx_list_item_t *item;
 
 	list_create_item(list, value, &item);
+
+	if (NULL == item)
+		return FAIL;
+
 	item->next = list->head;
 	list->head = item;
 
@@ -151,6 +171,8 @@ void	zbx_list_prepend(zbx_list_t *list, void *value, zbx_list_item_t **inserted)
 
 	if (NULL != inserted)
 		*inserted = item;
+
+	return SUCCEED;
 }
 
 /******************************************************************************

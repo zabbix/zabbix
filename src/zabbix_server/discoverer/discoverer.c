@@ -1020,7 +1020,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 			{
 				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
 				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
-				zbx_list_append(&job->tasks, task_out, NULL);
+				(void)zbx_list_append(&job->tasks, task_out, NULL);
 			}
 
 			zbx_hashset_destroy(&tasks);
