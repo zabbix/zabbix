@@ -24,10 +24,10 @@
 
 /******************************************************************************
  *                                                                            *
- * Return value:  SUCCEED - char is allowed in the item key                   *
+ * Return value:  SUCCEED - char is allowed in item key                       *
  *                FAIL    - otherwise                                         *
  *                                                                            *
- * Comments: in key allowed characters: '0-9a-zA-Z._-'                        *
+ * Comments: allowed characters in key are: '0-9a-zA-Z._-'                    *
  *           !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -44,16 +44,16 @@ int	zbx_is_key_char(unsigned char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: advances pointer to first invalid character in string             *
- *          ensuring that everything before it is a valid key                 *
+ * Purpose: Advances pointer to first invalid character in string             *
+ *          ensuring that everything before it is a valid key.                *
  *                                                                            *
  *  e.g., system.run[cat /etc/passwd | awk -F: '{ print $1 }']                *
  *                                                                            *
- * Parameters: exp - [IN/OUT] pointer to the first char of key                *
+ * Parameters: exp - [IN/OUT] pointer to first char of key                    *
  *                                                                            *
  *  e.g., {host:system.run[cat /etc/passwd | awk -F: '{ print $1 }'].last(0)} *
  *              ^                                                             *
- * Return value: returns FAIL only if no key is present (length 0),           *
+ * Return value: Returns FAIL only if no key is present (length 0),           *
  *               or the whole string is invalid. SUCCEED otherwise.           *
  *                                                                            *
  * Comments: The pointer is advanced to the first invalid character even if   *
@@ -162,13 +162,13 @@ succeed:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the string is double                                    *
+ * Purpose: checks if string is double                                        *
  *                                                                            *
  * Parameters: str   - [IN] string to check                                   *
  *             flags - [IN] extra options including:                          *
  *                          ZBX_FLAG_DOUBLE_SUFFIX - allow suffixes           *
  *                                                                            *
- * Return value:  SUCCEED - the string is double                              *
+ * Return value:  SUCCEED - string is double                                  *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  * Comments: function automatically processes suffixes K, M, G, T and         *
@@ -216,7 +216,7 @@ double	zbx_str2double(const char *str)
  *                                                                            *
  * Purpose: parses a suffixed number like "12.345K"                           *
  *                                                                            *
- * Parameters: number - [IN]  start of number                                 *
+ * Parameters: number - [IN] start of number                                  *
  *             len    - [OUT] length of parsed number                         *
  *                                                                            *
  * Return value: SUCCEED - number was parsed successfully                     *
@@ -240,7 +240,7 @@ int	zbx_suffixed_number_parse(const char *number, int *len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if pattern matches the specified value                     *
+ * Purpose: checks if pattern matches specified value                         *
  *                                                                            *
  * Parameters: value    - [IN] value to match                                 *
  *             pattern  - [IN] pattern to match                               *

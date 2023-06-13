@@ -153,10 +153,9 @@ void	zbx_variant_set_vector(zbx_variant_t *value, zbx_vector_var_t *vector)
  * Purpose: copies variant contents from source to value                      *
  *                                                                            *
  * Comments: String and binary data are cloned, which is different from       *
- *           setters where only the pointers are copied.                      *
- *           The contents of the destination value are not freed. If copied   *
- *           over already initialized variant it's safer to clear it          *
- *           beforehand.                                                      *
+ *           setters where only the pointers are copied. The contents of the  *
+ *           destination value are not freed. If copied over already          *
+ *           initialized variant it's safer to clear it beforehand.           *
  *                                                                            *
  ******************************************************************************/
 void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
@@ -524,9 +523,9 @@ static int	variant_compare_str(const zbx_variant_t *value1, const zbx_variant_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares two variant values when at least one is double and the   *
+ * Purpose: Compares two variant values when at least one is double and the   *
  *          other is double, uint64 or a string representing a valid double   *
- *          value                                                             *
+ *          value.                                                            *
  *                                                                            *
  ******************************************************************************/
 static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -599,8 +598,8 @@ static int	variant_compare_ui64(const zbx_variant_t *value1, const zbx_variant_t
  * Parameters: value1 - [IN] first value                                      *
  *             value2 - [IN] second value                                     *
  *                                                                            *
- * Return value: <0 - first value is less than the second                     *
- *               >0 - first value is greater than the second                  *
+ * Return value: <0 - first value is less than second                         *
+ *               >0 - first value is greater than second                      *
  *               0  - values are equal                                        *
  *                                                                            *
  * Comments: The following comparison logic is applied:                       *

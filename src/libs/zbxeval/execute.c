@@ -56,7 +56,7 @@ zbx_function_trim_optype_t;
  *          floating point variant value                                      *
  *                                                                            *
  * Parameters: value     - [OUT]                                              *
- *             value_num - [IN]  value to convert                             *
+ *             value_num - [IN] value to convert                              *
  *                                                                            *
  * Return value: SUCCEED - value was converted successfully                   *
  *               FAIL    - otherwise                                          *
@@ -87,10 +87,10 @@ static int	variant_convert_suffixed_num(zbx_variant_t *value, const zbx_variant_
  *                                                                            *
  * Purpose: evaluates unary operator                                          *
  *                                                                            *
- * Parameters: ctx      - [IN]     evaluation context                         *
- *             token    - [IN]     operator token                             *
+ * Parameters: ctx      - [IN] evaluation context                             *
+ *             token    - [IN] operator token                                 *
  *             output   - [IN/OUT] output value stack                         *
- *             error    - [OUT]    error message in the case of failure       *
+ *             error    - [OUT] error message in the case of failure          *
  *                                                                            *
  * Return value: SUCCEED - operator was evaluated successfully                *
  *               FAIL    - otherwise                                          *
@@ -153,8 +153,8 @@ static int	eval_execute_op_unary(const zbx_eval_context_t *ctx, const zbx_eval_t
  *                                                                            *
  * Purpose: evaluates logical or/and operator with one operand being error    *
  *                                                                            *
- * Parameters: token  - [IN]  operator token                                  *
- *             value  - [IN]  other operand                                   *
+ * Parameters: token  - [IN] operator token                                   *
+ *             value  - [IN] other operand                                    *
  *             result - [OUT]                                                 *
  *                                                                            *
  * Return value: SUCCEED - operator was evaluated successfully                *
@@ -231,10 +231,10 @@ static int	eval_variant_compare(const zbx_variant_t *left, const zbx_variant_t *
  *                                                                            *
  * Purpose: evaluates binary operator                                         *
  *                                                                            *
- * Parameters: ctx      - [IN]     evaluation context                         *
- *             token    - [IN]     operator token                             *
+ * Parameters: ctx      - [IN] evaluation context                             *
+ *             token    - [IN] operator token                                 *
  *             output   - [IN/OUT] output value stack                         *
- *             error    - [OUT]    error message in the case of failure       *
+ *             error    - [OUT] error message in the case of failure          *
  *                                                                            *
  * Return value: SUCCEED - operator was evaluated successfully                *
  *               FAIL    - otherwise                                          *
@@ -402,10 +402,9 @@ finish:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the value is suffixed number and returns the suffix if  *
- *          exists                                                            *
+ * Purpose: checks if value is suffixed number and returns suffix if exists   *
  *                                                                            *
- * Parameters: value  - [IN]  value to check                                  *
+ * Parameters: value  - [IN] value to check                                   *
  *             suffix - [OUT] suffix or 0 if number does not have suffix      *
  *                            (optional)                                      *
  *                                                                            *
@@ -435,10 +434,10 @@ int	 eval_suffixed_number_parse(const char *value, char *suffix)
  *                                                                            *
  * Purpose: pushes value in output stack                                      *
  *                                                                            *
- * Parameters: ctx      - [IN]     evaluation context                         *
- *             token    - [IN]     value token                                *
+ * Parameters: ctx      - [IN] evaluation context                             *
+ *             token    - [IN] value token                                    *
  *             output   - [IN/OUT] output value stack                         *
- *             error    - [OUT]    error message in the case of failure       *
+ *             error    - [OUT] error message in the case of failure          *
  *                                                                            *
  * Return value: SUCCEED - value was pushed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -532,14 +531,14 @@ static void	eval_execute_push_null(zbx_vector_var_t *output)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if expression fragment matches the specified text          *
+ * Purpose: checks if expression fragment matches specified text              *
  *                                                                            *
  * Parameters: ctx  - [IN] evaluation context                                 *
  *             loc  - [IN] expression fragment location                       *
  *             text - [IN] text to compare with                               *
  *             len  - [IN] text length                                        *
  *                                                                            *
- * Return value: SUCCEED - the expression fragment matches the text           *
+ * Return value: SUCCEED - expression fragment matches text                   *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -559,8 +558,8 @@ int	eval_compare_token(const zbx_eval_context_t *ctx, const zbx_strloc_t *loc, c
  *                                                                            *
  * Purpose: handles function return                                           *
  *                                                                            *
- * Parameters: args_num - [IN]     number of function arguments               *
- *             value    - [IN]     return value                               *
+ * Parameters: args_num - [IN] number of function arguments                   *
+ *             value    - [IN] return value                                   *
  *             output   - [IN/OUT] output value stack                         *
  *                                                                            *
  * Comments: The function arguments on output stack are replaced with the     *
@@ -583,18 +582,18 @@ static void	eval_function_return(zbx_uint32_t args_num, zbx_variant_t *value, zb
  *                                                                            *
  * Purpose: validates function arguments                                      *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in the case of failure            *
  *                                                                            *
- * Return value: SUCCEED - function arguments contain error values - the      *
+ * Return value: SUCCEED - Function arguments contain error values - the      *
  *                         first error is returned as function value without  *
- *                         evaluating the function                            *
- *               FAIL    - argument validation failed                         *
- *               UNKNOWN - argument validation succeeded, function result is  *
+ *                         evaluating the function.                           *
+ *               FAIL    - Argument validation failed.                        *
+ *               UNKNOWN - Argument validation succeeded, function result is  *
  *                         unknown at the moment, function must be evaluated  *
- *                         with the prepared arguments                        *
+ *                         with the prepared arguments.                       *
  *                                                                            *
  ******************************************************************************/
 static int	eval_validate_function_args(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
@@ -643,13 +642,13 @@ static const char	*eval_type_desc(unsigned char type)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts function argument to the specified type                  *
+ * Purpose: converts function argument to specified type                      *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
- *             type   - [IN]     required type                                *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             type   - [IN] required type                                    *
  *             arg    - [IN/OUT] argument to convert                          *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - argument was converted successfully                *
  *               FAIL    - otherwise                                          *
@@ -681,18 +680,18 @@ static int	eval_convert_function_arg(const zbx_eval_context_t *ctx, const zbx_ev
  * Purpose: validates and prepares (converts to floating values) math         *
  *          function arguments                                                *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
- * Return value: SUCCEED - function arguments contain error values - the      *
+ * Return value: SUCCEED - Function arguments contain error values - the      *
  *                         first error is returned as function value without  *
- *                         evaluating the function                            *
- *               FAIL    - argument validation/conversion failed              *
- *               UNKNOWN - argument conversion succeeded, function result is  *
+ *                         evaluating the function.                           *
+ *               FAIL    - Argument validation/conversion failed.             *
+ *               UNKNOWN - Argument conversion succeeded, function result is  *
  *                         unknown at the moment, function must be evaluated  *
- *                         with the prepared arguments                        *
+ *                         with the prepared arguments.                       *
  *                                                                            *
  * Comments: Math function accepts either 1+ arguments that can be converted  *
  *           to floating values or a single argument of non-zero length       *
@@ -823,10 +822,10 @@ int	zbx_eval_var_vector_to_dbl(zbx_vector_var_t *input_vector, zbx_vector_dbl_t 
  *                                                                            *
  * Purpose: evaluates min() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -864,10 +863,10 @@ static int	eval_execute_function_min(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates max() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -905,10 +904,10 @@ static int	eval_execute_function_max(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates sum() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -941,10 +940,10 @@ static int	eval_execute_function_sum(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates avg() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -979,10 +978,10 @@ static int	eval_execute_function_avg(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates abs() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in the case of failure            *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1025,10 +1024,10 @@ static int	eval_execute_function_abs(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates length() function                                       *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1065,10 +1064,10 @@ static int	eval_execute_function_length(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates date() function                                         *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1106,10 +1105,10 @@ static int	eval_execute_function_date(const zbx_eval_context_t *ctx, const zbx_e
  *                                                                            *
  * Purpose: evaluates time() function                                         *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1145,10 +1144,10 @@ static int	eval_execute_function_time(const zbx_eval_context_t *ctx, const zbx_e
  *                                                                            *
  * Purpose: evaluates now() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1175,10 +1174,10 @@ static int	eval_execute_function_now(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates dayofweek() function                                    *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1215,10 +1214,10 @@ static int	eval_execute_function_dayofweek(const zbx_eval_context_t *ctx, const 
  *                                                                            *
  * Purpose: evaluates dayofmonth() function                                   *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1256,11 +1255,11 @@ static int	eval_execute_function_dayofmonth(const zbx_eval_context_t *ctx, const
  * Purpose: evaluates bitand(), bitor(), bitxor(), bitlshift(),               *
  *          bitrshift() functions                                             *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
- *             type   - [IN]     function type                                *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             type   - [IN] function type                                    *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1318,10 +1317,10 @@ static int	eval_execute_function_bitwise(const zbx_eval_context_t *ctx, const zb
  *                                                                            *
  * Purpose: evaluates bitnot() function                                       *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1358,10 +1357,10 @@ static int	eval_execute_function_bitnot(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates left() function                                         *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1456,11 +1455,11 @@ static int	eval_validate_statistical_function_args(const zbx_eval_context_t *ctx
  *                                                                             *
  * Purpose: common operations for aggregate function calculation               *
  *                                                                             *
- * Parameters: ctx       - [IN]     evaluation context                         *
- *             token     - [IN]     function token                             *
- *             stat_func - [IN]     pointer to aggregate function to be called *
+ * Parameters: ctx       - [IN] evaluation context                             *
+ *             token     - [IN] function token                                 *
+ *             stat_func - [IN] pointer to aggregate function to be called     *
  *             output    - [IN/OUT] output value stack                         *
- *             error     - [OUT]    error message in the case of failure       *
+ *             error     - [OUT] error message in case of failure              *
  *                                                                             *
  * Return value: SUCCEED - function evaluation succeeded                       *
  *               FAIL    - otherwise                                           *
@@ -1494,10 +1493,10 @@ out:
  *                                                                            *
  * Purpose: evaluates right() function                                        *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1552,10 +1551,10 @@ static int	eval_execute_function_right(const zbx_eval_context_t *ctx, const zbx_
  *                                                                            *
  * Purpose: evaluates mid() function                                          *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1620,11 +1619,11 @@ static int	eval_execute_function_mid(const zbx_eval_context_t *ctx, const zbx_ev
  *                                                                            *
  * Purpose: evaluates trim(), rtrim(), ltrim() functions                      *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
- *             type   - [IN]     function type                                *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             type   - [IN] function type                                    *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1691,10 +1690,10 @@ static int	eval_execute_function_trim(const zbx_eval_context_t *ctx, const zbx_e
  *                                                                            *
  * Purpose: evaluates concat() function                                       *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1742,10 +1741,10 @@ static int	eval_execute_function_concat(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates insert() function                                       *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1816,10 +1815,10 @@ static int	eval_execute_function_insert(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates replace() function                                      *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1869,10 +1868,10 @@ static int	eval_execute_function_replace(const zbx_eval_context_t *ctx, const zb
  *                                                                            *
  * Purpose: evaluates repeat() function                                       *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1932,10 +1931,10 @@ static int	eval_execute_function_repeat(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates bytelength() function                                   *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -1991,10 +1990,10 @@ static int	eval_execute_function_bytelength(const zbx_eval_context_t *ctx, const
  *                                                                            *
  * Purpose: evaluates bitlength() function                                    *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2049,10 +2048,10 @@ static int	eval_execute_function_bitlength(const zbx_eval_context_t *ctx, const 
  *                                                                            *
  * Purpose: evaluates char() function                                         *
  *                                                                            *
- * Parameters: ctx    - [IN]      evaluation context                          *
- *             token  - [IN]      function token                              *
- *             output - [IN/OUT]  output value stack                          *
- *             error  - [OUT]     error message in the case of failure        *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
+ *             output - [IN/OUT] output value stack                           *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2096,10 +2095,10 @@ static int	eval_execute_function_char(const zbx_eval_context_t *ctx, const zbx_e
  *                                                                            *
  * Purpose: evaluates ascii() function                                        *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2139,10 +2138,10 @@ static int	eval_execute_function_ascii(const zbx_eval_context_t *ctx, const zbx_
  *                                                                            *
  * Purpose: evaluates between() function                                      *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2183,10 +2182,10 @@ static int	eval_execute_function_between(const zbx_eval_context_t *ctx, const zb
  *                                                                            *
  * Purpose: evaluates in() function                                           *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2273,10 +2272,10 @@ out:
  *                                                                            *
  * Purpose: evaluates histogram_quantile() function                           *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2412,13 +2411,13 @@ out:
  *                                                                            *
  * Purpose: evaluates function by calling custom callback (if configured)     *
  *                                                                            *
- * Parameters: ctx         - [IN]     evaluation context                      *
- *             token       - [IN]     function token                          *
- *             function_cb - [IN]     callback function                       *
+ * Parameters: ctx         - [IN] evaluation context                          *
+ *             token       - [IN] function token                              *
+ *             function_cb - [IN] callback function                           *
  *             output      - [IN/OUT] output value stack                      *
- *             error       - [OUT]    error message in the case of failure    *
+ *             error       - [OUT] error message in case of failure           *
  *                                                                            *
- * Return value: SUCCEED - the function was executed successfully             *
+ * Return value: SUCCEED - function was executed successfully                 *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -2483,11 +2482,11 @@ static double	eval_math_func_signum(double x)
  * Purpose: evaluates mathematical function by calling passed function        *
  *          with 1 double argument                                            *
  *                                                                            *
- * Parameters: ctx        - [IN]     evaluation context                       *
- *             token      - [IN]     function token                           *
+ * Parameters: ctx        - [IN] evaluation context                           *
+ *             token      - [IN] function token                               *
  *             output     - [IN/OUT] output value stack                       *
- *             error      - [OUT]    error message in the case of failure     *
- *             func       - [IN]     pointer to math function                 *
+ *             error      - [OUT] error message in case of failure            *
+ *             func       - [IN] pointer to math function                     *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2566,11 +2565,11 @@ static double	eval_math_func_truncate(double n, double decimal_points)
  * Purpose: evaluates mathematical function by calling passed function        *
  *          with 2 double arguments                                           *
  *                                                                            *
- * Parameters: ctx        - [IN]     evaluation context                       *
- *             token      - [IN]     function token                           *
+ * Parameters: ctx        - [IN] evaluation context                           *
+ *             token      - [IN] function token                               *
  *             output     - [IN/OUT] output value stack                       *
- *             error      - [OUT]    error message in the case of failure     *
- *             func       - [IN]     pointer to math function                 *
+ *             error      - [OUT] error message in case of failure            *
+ *             func       - [IN] pointer to math function                     *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *               FAIL    - otherwise                                          *
@@ -2636,11 +2635,11 @@ static int	eval_execute_math_function_double_param(const zbx_eval_context_t *ctx
  *                                                                            *
  * Purpose: evaluates mathematical function that returns constant value       *
  *                                                                            *
- * Parameters: ctx        - [IN]     evaluation context                       *
- *             token      - [IN]     function token                           *
+ * Parameters: ctx        - [IN] evaluation context                           *
+ *             token      - [IN] function token                               *
  *             output     - [IN/OUT] output value stack                       *
- *             error      - [OUT]    error message in the case of failure     *
- *             value      - [IN]     value to be returned                     *
+ *             error      - [OUT] error message in case of failure            *
+ *             value      - [IN] value to be returned                         *
  *                                                                            *
  * Return value: SUCCEED - function evaluation succeeded                      *
  *                                                                            *
@@ -2773,10 +2772,10 @@ static int	eval_execute_function_count(const zbx_eval_context_t *ctx, const zbx_
  *                                                                            *
  * Purpose: evaluates common function                                         *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function was executed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -2949,10 +2948,10 @@ static int	eval_execute_common_function(const zbx_eval_context_t *ctx, const zbx
  *                                                                            *
  * Purpose: evaluates history function                                        *
  *                                                                            *
- * Parameters: ctx    - [IN]     evaluation context                           *
- *             token  - [IN]     function token                               *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             token  - [IN] function token                                   *
  *             output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  * Return value: SUCCEED - function was executed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -2977,10 +2976,10 @@ static int	eval_execute_history_function(const zbx_eval_context_t *ctx, const zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: throws exception by returning the specified error                 *
+ * Purpose: throws exception by returning specified error                     *
  *                                                                            *
  * Parameters: output - [IN/OUT] output value stack                           *
- *             error  - [OUT]    error message in the case of failure         *
+ *             error  - [OUT] error message in case of failure                *
  *                                                                            *
  ******************************************************************************/
 static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
@@ -3003,9 +3002,9 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
  *                                                                            *
  * Purpose: evaluates pre-parsed expression                                   *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
+ * Parameters: ctx   - [IN] evaluation context                                *
  *             value - [OUT] resulting value                                  *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - expression was evaluated successfully              *
  *               FAIL    - otherwise                                          *
@@ -3124,7 +3123,7 @@ out:
  * Purpose: initializes execution context                                     *
  *                                                                            *
  * Parameters: ctx             - [IN] evaluation context                      *
- *             ts              - [IN] timestamp of the execution time         *
+ *             ts              - [IN] timestamp of execution time             *
  *             common_func_cb  - [IN] common function callback (optional)     *
  *             history_func_cb - [IN] history function callback (optional)    *
  *             data_cb         - [IN] caller data to be passed to callback    *
@@ -3148,10 +3147,10 @@ static void	eval_init_execute_context(zbx_eval_context_t *ctx, const zbx_timespe
  *                                                                            *
  * Purpose: evaluates parsed expression                                       *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             ts    - [IN]  timestamp of the execution time                  *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             ts    - [IN] timestamp of execution time                       *
  *             value - [OUT] resulting value                                  *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - expression was evaluated successfully              *
  *               FAIL    - otherwise                                          *
@@ -3169,15 +3168,15 @@ int	zbx_eval_execute(zbx_eval_context_t *ctx, const zbx_timespec_t *ts, zbx_vari
  * Purpose: evaluates parsed expression with callback for custom function     *
  *          processing                                                        *
  *                                                                            *
- * Parameters: ctx             - [IN]  evaluation context                     *
- *             ts              - [IN]  timestamp of the execution time        *
- *             common_func_cb  - [IN]  common function callback (optional)    *
- *             history_func_cb - [IN]  history function callback (optional)   *
+ * Parameters: ctx             - [IN] evaluation context                      *
+ *             ts              - [IN] timestamp of execution time             *
+ *             common_func_cb  - [IN] common function callback (optional)     *
+ *             history_func_cb - [IN] history function callback (optional)    *
  *             data            - [IN]                                         *
  *             value           - [OUT] resulting value                        *
  *             error           - [OUT] error message                          *
  *                                                                            *
- * Return value: SUCCEED - the expression was evaluated successfully          *
+ * Return value: SUCCEED - expression was evaluated successfully              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: The callback will be called for unsupported math and all history *

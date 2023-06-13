@@ -28,7 +28,7 @@
  *          type                                                              *
  *                                                                            *
  * Parameters: value         - [IN/OUT] value to convert                      *
- *             value_type    - [IN]     target value type                     *
+ *             value_type    - [IN] target value type                         *
  *             errmsg        - [OUT]                                          *
  *                                                                            *
  * Return value: SUCCEED - value conversion was successful                    *

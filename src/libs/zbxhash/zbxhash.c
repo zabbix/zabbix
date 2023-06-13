@@ -21,7 +21,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets a textual representation of md5 sum                          *
+ * Purpose: gets textual representation of md5 sum                            *
  *                                                                            *
  * Parameters:                                                                *
  *          md5 - [IN]  buffer with md5 sum                                   *

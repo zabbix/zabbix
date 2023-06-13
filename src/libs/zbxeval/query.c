@@ -130,7 +130,7 @@ void	zbx_eval_prepare_filter(zbx_eval_context_t *ctx)
  *                                                                            *
  * Purpose: applies binary operation to stack                                 *
  *                                                                            *
- * Parameters: token - [IN]     operation token                               *
+ * Parameters: token - [IN] operation token                                   *
  *             stack - [IN/OUT] target stack                                  *
  *             index - [IN/OUT] stack index                                   *
  *                                                                            *
@@ -177,7 +177,7 @@ static void	eval_filter_apply_op2(zbx_eval_token_t *token, zbx_vector_eval_token
  *                                                                            *
  * Purpose: applies unary operation to stack                                  *
  *                                                                            *
- * Parameters: token - [IN]     operation token                               *
+ * Parameters: token - [IN] operation token                                   *
  *             stack - [IN/OUT] target stack                                  *
  *             index - [IN/OUT] stack index                                   *
  *                                                                            *
@@ -199,8 +199,8 @@ static void	eval_filter_apply_op1(zbx_eval_token_t *token, zbx_vector_eval_token
  *                                                                            *
  * Purpose: applies function to stack                                         *
  *                                                                            *
- * Parameters: ctx   - [IN]     evaluation context                            *
- *             token - [IN]     function token                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             token - [IN] function token                                    *
  *             stack - [IN/OUT] target stack                                  *
  *             index - [IN/OUT] stack index                                   *
  *                                                                            *
@@ -265,7 +265,7 @@ static const char	*eval_op_str(zbx_token_type_t op)
  *                                                                            *
  * Return value: unquoted string                                              *
  *                                                                            *
- * Comments: string is unquoted in the same buffer                            *
+ * Comments: string is unquoted in same buffer                                *
  *                                                                            *
  ******************************************************************************/
 static char	*eval_unquote_str(char *str)
@@ -299,8 +299,8 @@ static char	*eval_unquote_str(char *str)
  *                                                                            *
  * Purpose: generates filter expression from the specified stack              *
  *                                                                            *
- * Parameters: ctx    - [IN]  evaluation context                              *
- *             stack  - [IN]  expression stack                                *
+ * Parameters: ctx    - [IN] evaluation context                               *
+ *             stack  - [IN] expression stack                                 *
  *             groups - [OUT] group values to match                           *
  *             filter - [OUT] generated filter                                *
  *             error  - [OUT] error message                                   *
@@ -400,7 +400,7 @@ out:
  *                                                                            *
  * Purpose: generates group SQL filter expression from item filter            *
  *                                                                            *
- * Parameters: ctx    - [IN]  filter expression evaluation context            *
+ * Parameters: ctx    - [IN] filter expression evaluation context             *
  *             groups - [OUT] group values to match                           *
  *             filter - [OUT] generated filter                                *
  *             error  - [OUT] error message                                   *

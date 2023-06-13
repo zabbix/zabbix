@@ -21,7 +21,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Return value:  SUCCEED - char is allowed in the macro name                 *
+ * Return value:  SUCCEED - char is allowed in macro name                     *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  * Comments: allowed characters in macro names: '0-9A-Z._'                    *
@@ -44,9 +44,9 @@ int	zbx_is_macro_char(unsigned char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the name is a valid discovery macro                     *
+ * Purpose: checks if name is valid discovery macro                           *
  *                                                                            *
- * Return value:  SUCCEED - name is a valid discovery macro                   *
+ * Return value:  SUCCEED - name is valid discovery macro                     *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  ******************************************************************************/
@@ -74,22 +74,22 @@ int	zbx_is_discovery_macro(const char *name)
  *                                                                                 *
  * Purpose: parses user macro and finds its end position and context location      *
  *                                                                                 *
- * Parameters: macro      - [IN]  macro to parse                                   *
+ * Parameters: macro      - [IN] macro to parse                                    *
  *             macro_r    - [OUT] position of ending '}' character                 *
- *             context_l  - [OUT] position of context start character (first non   *
- *                                space character after context separator ':')     *
+ *             context_l  - [OUT] Position of the context start character (first   *
+ *                                non space character after context separator ':') *
  *                                0 if macro does not have context specified.      *
- *             context_r  - [OUT] position of context end character (either the    *
- *                                ending '"' for quoted context values or the last *
- *                                character before the ending '}' character)       *
+ *             context_r  - [OUT] Position of the context end character (either    *
+ *                                the ending '"' for quoted context values or the  *
+ *                                last character before the ending '}' character)  *
  *                                0 if macro does not have context specified.      *
  *             context_op - [OUT] context matching operator (optional):            *
  *                                ZBX_CONDITION_OPERATOR_EQUAL                     *
  *                                ZBX_CONDITION_OPERATOR_REGEXP                    *
  *                                                                                 *
  * Return value:                                                                   *
- *     SUCCEED - macro was parsed successfully.                                    *
- *     FAIL    - macro parsing failed, the content of output variables             *
+ *     SUCCEED - Macro was parsed successfully.                                    *
+ *     FAIL    - Macro parsing failed, the content of output variables             *
  *               is not defined.                                                   *
  *                                                                                 *
  ***********************************************************************************/
@@ -185,7 +185,7 @@ int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *c
  * Purpose: parses user macro {$MACRO:<context>} into {$MACRO} and <context>  *
  *          strings                                                           *
  *                                                                            *
- * Parameters: macro      - [IN]  macro to parse                              *
+ * Parameters: macro      - [IN] macro to parse                               *
  *             name       - [OUT] macro name without context                  *
  *             context    - [OUT] unquoted macro context, NULL for macros     *
  *                                without context                             *
@@ -247,9 +247,9 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extracts the macro context unquoting if necessary                 *
+ * Purpose: extracts macro context unquoting if necessary                     *
  *                                                                            *
- * Parameters: context - [IN] macro context inside a user macro               *
+ * Parameters: context - [IN] macro context inside user macro                 *
  *             len     - [IN] macro context length (including quotes for      *
  *                            quoted contexts)                                *
  *                                                                            *
@@ -296,8 +296,8 @@ char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
  *                                                                              *
  * Purpose: quotes user macro context if necessary                              *
  *                                                                              *
- * Parameters: context     - [IN]  macro context                                *
- *             force_quote - [IN]  if non zero then context quoting is enforced *
+ * Parameters: context     - [IN] macro context                                 *
+ *             force_quote - [IN] if non zero then context quoting is enforced  *
  *             error       - [OUT] error message                                *
  *                                                                              *
  * Return value:                                                                *

@@ -23,13 +23,13 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts ASCII hex digit string to a binary representation (byte  *
+ * Purpose: converts ASCII hex digit string to binary representation (byte    *
  *          string)                                                           *
  *                                                                            *
  * Parameters:                                                                *
- *     p_hex   - [IN]  null-terminated input string                           *
+ *     p_hex   - [IN] null-terminated input string                            *
  *     buf     - [OUT] output buffer                                          *
- *     buf_len - [IN]  output buffer size                                     *
+ *     buf_len - [IN] output buffer size                                      *
  *                                                                            *
  * Return value:                                                              *
  *     Number of bytes written into 'buf' on successful conversion.           *
@@ -73,10 +73,10 @@ int	zbx_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
  *                                                                            *
  * Purpose: converts binary data to hex string                                *
  *                                                                            *
- * Parameters: bin     - [IN]  data to convert                                *
- *             bin_len - [IN]  number of bytes to convert                     *
+ * Parameters: bin     - [IN] data to convert                                 *
+ *             bin_len - [IN] number of bytes to convert                      *
  *             out     - [OUT] output buffer                                  *
- *             out_len - [IN]  size of output buffer (should be at least      *
+ *             out_len - [IN] size of output buffer (should be at least       *
  *                             2 * bin_len + 1)                               *
  *                                                                            *
  * Return value: The number of bytes written (excluding terminating zero).    *
@@ -103,7 +103,7 @@ int    zbx_bin2hex(const unsigned char *bin, size_t bin_len, char *out, size_t o
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates semi-unique token based on the seed and current timestamp *
+ * Purpose: creates semi-unique token based on seed and current timestamp     *
  *                                                                            *
  * Parameters:  seed - [IN]                                                   *
  *                                                                            *

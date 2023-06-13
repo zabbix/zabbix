@@ -21,20 +21,20 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the string is unsigned integer within the specified     *
- *          range and optionally stores it into value parameter               *
+ * Purpose: Checks if the string is an unsigned integer within the specified  *
+ *          range and optionally stores it into the value parameter.          *
  *                                                                            *
- * Parameters: str   - [IN]  string to check                                  *
- *             n     - [IN]  string length or ZBX_MAX_UINT64_LEN              *
- *             value - [OUT] pointer to output buffer where the converted     *
- *                           value is to be written (optional, can be NULL)   *
- *             size  - [IN]  size of the output buffer (optional)             *
- *             min   - [IN]  minimum acceptable value                         *
- *             max   - [IN]  maximum acceptable value                         *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length or ZBX_MAX_UINT64_LEN               *
+ *             value - [OUT] pointer to output buffer where converted value   *
+ *                           is to be written (optional, can be NULL)         *
+ *             size  - [IN] size of output buffer (optional)                  *
+ *             min   - [IN] minimum acceptable value                          *
+ *             max   - [IN] maximum acceptable value                          *
  *                                                                            *
  * Return value:  SUCCEED - string is unsigned integer                        *
- *                FAIL    - string is not a number or its value is outside    *
- *                          the specified range                               *
+ *                FAIL    - string is not number or its value is outside      *
+ *                          specified range                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
@@ -79,20 +79,21 @@ int	zbx_is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the string is unsigned hexadecimal integer within the   *
- *          specified range and optionally stores it into value parameter     *
+ * Purpose: Checks if the string is an unsigned hexadecimal integer within    *
+ *          the specified range and optionally stores it into the value       *
+ *          parameter.                                                        *
  *                                                                            *
- * Parameters: str   - [IN]  string to check                                  *
- *             n     - [IN]  string length                                    *
- *             value - [OUT] pointer to output buffer where the converted     *
- *                           value is to be written (optional, can be NULL)   *
- *             size  - [IN]  size of the output buffer (optional)             *
- *             min   - [IN]  minimum acceptable value                         *
- *             max   - [IN]  maximum acceptable value                         *
+ * Parameters: str   - [IN] string to check                                   *
+ *             n     - [IN] string length                                     *
+ *             value - [OUT] pointer to output buffer where converted value   *
+ *                           is to be written (optional, can be NULL)         *
+ *             size  - [IN] size of output buffer (optional)                  *
+ *             min   - [IN] minimum acceptable value                          *
+ *             max   - [IN] maximum acceptable value                          *
  *                                                                            *
  * Return value:  SUCCEED - string is unsigned integer                        *
- *                FAIL    - string is not a hexadecimal number or its value   *
- *                          is outside the specified range                    *
+ *                FAIL    - string is not hexadecimal number or its value is  *
+ *                          outside specified range                           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max)
@@ -177,12 +178,12 @@ int	zbx_validate_value_dbl(double value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if integer matches a list of integers                      *
+ * Purpose: checks if integer matches list of integers                        *
  *                                                                            *
  * Parameters: list  - [IN] integers [i1-i2,i3,i4,i5-i6] (10-25,45,67-699)    *
  *             value - [IN] integer to check                                  *
  *                                                                            *
- * Return value: FAIL - out of period, SUCCEED - within the period            *
+ * Return value: FAIL - out of period, SUCCEED - within period                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_int_in_list(char *list, int value)
@@ -252,17 +253,17 @@ static int	is_double_valid_syntax(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validates and optionally converts a string to a number of type    *
+ * Purpose: validates and optionally converts string to number of type        *
  *          'double'                                                          *
  *                                                                            *
- * Parameters: str   - [IN]  string to check                                  *
- *             value - [OUT] output buffer where to write the converted value *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write converted value     *
  *                           (optional, can be NULL)                          *
  *                                                                            *
  * Return value:  SUCCEED - string can be converted to 'double' and           *
  *                          was converted if 'value' is not NULL              *
- *                FAIL    - string does not represent a valid 'double' or     *
- *                          its value is outside of valid range               *
+ *                FAIL    - string does not represent valid 'double' or its   *
+ *                          value is outside of valid range                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_is_double(const char *str, double *value)
@@ -316,8 +317,8 @@ int	zbx_wis_uint(const wchar_t *wide_string)
  *          precision                                                         *
  *                                                                            *
  * Parameters: buffer - [OUT]                                                 *
- *             size   - [IN]  output buffer size                              *
- *             val    - [IN]  double value to be converted                    *
+ *             size   - [IN] output buffer size                               *
+ *             val    - [IN] double value to be converted                     *
  *                                                                            *
  * Return value: output buffer with printed value                             *
  *                                                                            *
@@ -334,9 +335,9 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses a number like "12.345"                                     *
+ * Purpose: parses number like "12.345"                                       *
  *                                                                            *
- * Parameters: number - [IN]  start of number                                 *
+ * Parameters: number - [IN] start of number                                  *
  *             len    - [OUT] length of parsed number                         *
  *                                                                            *
  * Return value: SUCCEED - number was parsed successfully                     *
@@ -396,7 +397,7 @@ int	zbx_number_parse(const char *number, int *len)
  *                                                                            *
  * Purpose: converts string to 64bit unsigned integer                         *
  *                                                                            *
- * Parameters: str      - [IN]  string to convert                             *
+ * Parameters: str      - [IN] string to convert                              *
  *             suffixes - [IN]                                                *
  *             value    - [OUT] pointer to converted value                    *
  *                                                                            *
@@ -442,7 +443,7 @@ int	zbx_str2uint64(const char *str, const char *suffixes, zbx_uint64_t *value)
  *          before checking if value is numeric.                              *
  *                                                                            *
  * Parameters: str             - [IN/OUT] string for processing               *
- *             strip_plus_sign - [IN]     non-zero if "+" should be stripped  *
+ *             strip_plus_sign - [IN] non-zero if "+" should be stripped      *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_trim_number(char *str, int strip_plus_sign)
@@ -574,16 +575,15 @@ int	zbx_is_hex_string(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validates and optionally converts a string to a number of type    *
- *          'int'                                                             *
+ * Purpose: validates and optionally converts string to number of type 'int'  *
  *                                                                            *
- * Parameters: str   - [IN]  string to check                                  *
- *             value - [OUT] output buffer where to write the converted value *
+ * Parameters: str   - [IN] string to check                                   *
+ *             value - [OUT] output buffer where to write converted value     *
  *                           (optional, can be NULL)                          *
  *                                                                            *
  * Return value:  SUCCEED - string can be converted to 'int' and              *
  *                          was converted if 'value' is not NULL              *
- *                FAIL    - string does not represent a valid 'int' or        *
+ *                FAIL    - string does not represent valid 'int' or          *
  *                          its value is outside of valid range               *
  *                                                                            *
  ******************************************************************************/

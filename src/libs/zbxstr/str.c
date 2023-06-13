@@ -79,10 +79,10 @@ int	zbx_is_ascii_string(const char *str)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: strips characters from the end of a string                        *
+ * Purpose: strips characters from end of string                              *
  *                                                                            *
  * Parameters: str      - [IN/OUT] string for processing                      *
- *             charlist - [IN]     null terminated list of characters         *
+ *             charlist - [IN] null terminated list of characters             *
  *                                                                            *
  * Return value: number of trimmed characters                                 *
  *                                                                            *
@@ -106,7 +106,7 @@ int	zbx_rtrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: strips characters from the beginning of a string                  *
+ * Purpose: strips characters from beginning of string                        *
  *                                                                            *
  * Parameters: str      - [IN/OUT] string for processing                      *
  *             charlist - [IN]     null terminated list of characters         *
@@ -133,11 +133,11 @@ void	zbx_ltrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes leading and trailing characters from the specified        *
- *          character string                                                  *
+ * Purpose: removes leading and trailing characters from specified character  *
+ *          string                                                            *
  *                                                                            *
  * Parameters: str      - [IN/OUT] string for processing                      *
- *             charlist - [IN]     null terminated list of characters         *
+ *             charlist - [IN] null terminated list of characters             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_lrtrim(char *str, const char *charlist)
@@ -148,10 +148,10 @@ void	zbx_lrtrim(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes characters 'charlist' from the whole string               *
+ * Purpose: removes characters 'charlist' from whole string                   *
  *                                                                            *
  * Parameters: str      - [IN/OUT] string for processing                      *
- *             charlist - [IN]     null terminated list of characters         *
+ *             charlist - [IN] null terminated list of characters             *
  *                                                                            *
  ******************************************************************************/
 void	zbx_remove_chars(char *str, const char *charlist)
@@ -231,7 +231,7 @@ char	*zbx_str_printable_dyn(const char *text)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: deletes all right '0' and '.' for the string                      *
+ * Purpose: deletes all right '0' and '.' for string                          *
  *                                                                            *
  * Parameters: s - [IN/OUT] string to trim '0'                                *
  *                                                                            *
@@ -294,12 +294,12 @@ void	zbx_del_zeros(char *s)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates the required size for the escaped string               *
+ * Purpose: calculates required size for escaped string                       *
  *                                                                            *
  * Parameters: src      - [IN] null terminated source string                  *
  *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
- * Return value: size of the escaped string                                   *
+ * Return value: size of escaped string                                       *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
@@ -317,12 +317,12 @@ size_t	zbx_get_escape_string_len(const char *src, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: escapes characters in the source string                           *
+ * Purpose: escapes characters in source string                               *
  *                                                                            *
  * Parameters: src      - [IN] null terminated source string                  *
  *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
- * Return value: the escaped string                                           *
+ * Return value: escaped string                                               *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_dyn_escape_string(const char *src, const char *charlist)
@@ -349,12 +349,12 @@ char	*zbx_dyn_escape_string(const char *src, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: escapes characters in the source string to fixed output buffer    *
+ * Purpose: escapes characters in source string to fixed output buffer        *
  *                                                                            *
  * Parameters: dst      - [OUT] output buffer                                 *
- *             len      - [IN]  output buffer size                            *
- *             src      - [IN]  null terminated source string                 *
- *             charlist - [IN]  null terminated to-be-escaped character list  *
+ *             len      - [IN] output buffer size                             *
+ *             src      - [IN] null terminated source string                  *
+ *             charlist - [IN] null terminated to-be-escaped character list   *
  *                                                                            *
  * Return value: SUCCEED - string was escaped successfully                    *
  *               FAIL    - output buffer is too small                         *
@@ -386,13 +386,13 @@ int	zbx_escape_string(char *dst, size_t len, const char *src, const char *charli
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if string is contained in a list of delimited strings      *
+ * Purpose: checks if string is contained in list of delimited strings        *
  *                                                                            *
  * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
  *             value     - [IN]                                               *
  *             delimiter - [IN]                                               *
  *                                                                            *
- * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ * Return value: SUCCEED - string is in list, FAIL - otherwise                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_str_in_list(const char *list, const char *value, char delimiter)
@@ -402,14 +402,14 @@ int	zbx_str_in_list(const char *list, const char *value, char delimiter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if string is contained in a list of delimited strings      *
+ * Purpose: checks if string is contained in list of delimited strings        *
  *                                                                            *
  * Parameters: list      - [IN] strings a,b,ccc,ddd                           *
  *             value     - [IN]                                               *
  *             len       - [IN] value length                                  *
  *             delimiter - [IN]                                               *
  *                                                                            *
- * Return value: SUCCEED - string is in the list, FAIL - otherwise            *
+ * Return value: SUCCEED - string is in list, FAIL - otherwise                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_str_n_in_list(const char *list, const char *value, size_t len, char delimiter)
@@ -447,7 +447,7 @@ int	zbx_str_n_in_list(const char *list, const char *value, size_t len, char deli
  * Purpose: wraps long string at specified position with linefeeds            *
  *                                                                            *
  * Parameters: src     - [IN] input string                                    *
- *             maxline - [IN] maximum length of a line                        *
+ *             maxline - [IN] maximum length of line                          *
  *             delim   - [IN] delimiter to use as linefeed                    *
  *                            (default "\n" if NULL)                          *
  *                                                                            *
@@ -526,10 +526,10 @@ void	zbx_strarr_init(char ***arr)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds a string to dynamic string array                             *
+ * Purpose: adds string to dynamic string array                               *
  *                                                                            *
  * Parameters: arr   - [IN/OUT] pointer to array of strings                   *
- *             entry - [IN]     string to add                                 *
+ *             entry - [IN] string to add                                     *
  *                                                                            *
  * Comments: allocates memory, calls assert() if that fails                   *
  *                                                                            *
@@ -649,11 +649,11 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 
 /******************************************************************************
  *                                                                            *
- * Parameters: src       - [IN]     source string                             *
+ * Parameters: src       - [IN] source string                                 *
  *             delimiter - [IN]                                               *
- *             last      - [IN]     split after last delimiter                *
- *             left      - [IN/OUT] first part of the string                  *
- *             right     - [IN/OUT] second part of the string or NULL, if     *
+ *             last      - [IN] split after last delimiter                    *
+ *             left      - [IN/OUT] first part of string                      *
+ *             right     - [IN/OUT] second part of string or NULL, if         *
  *                                  delimiter was not found                   *
  *                                                                            *
  ******************************************************************************/
@@ -762,7 +762,7 @@ size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size)
  *                                                                            *
  * Return value: new pointer to string                                        *
  *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
+ * Comments: returns pointer to allocated memory                              *
  *           zbx_strdcat(NULL, "") will return "", not NULL!                  *
  *                                                                            *
  ******************************************************************************/
@@ -792,7 +792,7 @@ char	*zbx_strdcat(char *dest, const char *src)
  *                                                                            *
  * Return value: new pointer to string                                        *
  *                                                                            *
- * Comments: returns a pointer to allocated memory                            *
+ * Comments: returns pointer to allocated memory                              *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_strdcatf(char *dest, const char *f, ...)
@@ -817,10 +817,10 @@ char	*zbx_strdcatf(char *dest, const char *f, ...)
  *          max allowable characters length, truncates the item key, while    *
  *          maintaining the right square bracket.                             *
  *                                                                            *
- * Parameters: key      - [IN]     item key for processing                    *
- *             char_max - [IN]     item key max characters length             *
+ * Parameters: key      - [IN] item key for processing                        *
+ *             char_max - [IN] item key max characters length                 *
  *             buf      - [IN/OUT] buffer for short version of item key       *
- *             buf_len  - [IN]     buffer size for short version of item key  *
+ *             buf_len  - [IN] buffer size for short version of item key      *
  *                                                                            *
  * Return value: item key that does not exceed passed length                  *
  *                                                                            *
@@ -910,10 +910,10 @@ const char	*zbx_truncate_itemkey(const char *key, const size_t char_max, char *b
  * Purpose: Checks the value characters length and, if the length exceeds     *
  *          max allowable characters length, truncates the value.             *
  *                                                                            *
- * Parameters: val      - [IN]     value for processing                       *
- *             char_max - [IN]     value max characters length                *
+ * Parameters: val      - [IN] value for processing                           *
+ *             char_max - [IN] value max characters length                    *
  *             buf      - [IN/OUT] buffer for short version of value          *
- *             buf_len  - [IN]     buffer size for short version of value     *
+ *             buf_len  - [IN] buffer size for short version of value         *
  *                                                                            *
  * Return value: value that does not exceed passed length                     *
  *                                                                            *
@@ -1313,7 +1313,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding)
  * Purpose: Returns the size (in bytes) of a UTF-8 encoded character or 0     *
  *          if the character is not a valid UTF-8.                            *
  *                                                                            *
- * Parameters: text - [IN] pointer to the 1st byte of UTF-8 character         *
+ * Parameters: text - [IN] pointer to 1st byte of UTF-8 character             *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_utf8_char_len(const char *text)
@@ -1410,7 +1410,7 @@ size_t	zbx_charcount_utf8_nbytes(const char *text, size_t maxlen)
  *                                                                            *
  * Purpose: checks UTF-8 sequences                                            *
  *                                                                            *
- * Parameters: text - [IN] pointer to the string                              *
+ * Parameters: text - [IN] pointer to string                                  *
  *                                                                            *
  * Return value: SUCCEED if string is valid or FAIL otherwise                 *
  *                                                                            *
@@ -1503,7 +1503,7 @@ int	zbx_is_utf8(const char *text)
  *                                                                            *
  * Purpose: replaces invalid UTF-8 sequences of bytes with '?' character      *
  *                                                                            *
- * Parameters: text - [IN/OUT] pointer to the first char                      *
+ * Parameters: text - [IN/OUT] pointer to first char                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_invalid_utf8(char *text)
@@ -1627,10 +1627,10 @@ void	zbx_dos2unix(char *str)
  * Parameters: data       - [IN/OUT] allocated memory                         *
  *             data_alloc - [IN/OUT] allocated memory size                    *
  *             data_len   - [IN/OUT] used memory size                         *
- *             offset     - [IN]     offset of memory block to be replaced    *
- *             sz_to      - [IN]     size of block that need to be replaced   *
- *             from       - [IN]     what to replace with                     *
- *             sz_from    - [IN]     size of new block                        *
+ *             offset     - [IN] offset of memory block to be replaced        *
+ *             sz_to      - [IN] size of block that need to be replaced       *
+ *             from       - [IN] what to replace with                         *
+ *             sz_from    - [IN] size of new block                            *
  *                                                                            *
  * Return value: once data is replaced offset can become smaller, bigger or   *
  *               remain unchanged                                             *
@@ -1665,11 +1665,11 @@ int	zbx_replace_mem_dyn(char **data, size_t *data_alloc, size_t *data_len, size_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: removes whitespace surrounding a string list item delimiters      *
+ * Purpose: removes whitespace surrounding string list item delimiters        *
  *                                                                            *
- * Parameters: list      - [IN/OUT] list (a string containing items separated *
+ * Parameters: list      - [IN/OUT] list (string containing items separated   *
  *                                  by delimiter)                             *
- *             delimiter - [IN]     list delimiter                            *
+ *             delimiter - [IN] list delimiter                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_trim_str_list(char *list, char delimiter)
@@ -1705,7 +1705,7 @@ void	zbx_trim_str_list(char *list, char delimiter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compares two strings where any of them can be a NULL pointer      *
+ * Purpose: compares two strings where any of them can be NULL pointer        *
  *                                                                            *
  * Parameters: same as strcmp() except NULL values are allowed                *
  *                                                                            *
@@ -1813,7 +1813,7 @@ int	zbx_strcmp_natural(const char *s1, const char *s2)
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: extracts value from a string, unquoting if necessary                    *
+ * Purpose: extracts value from string, unquoting if necessary                      *
  *                                                                                  *
  * Parameters: text  - [IN] text containing value to extract                        *
  *             len   - [IN] Length (in bytes) of the value to extract. It can be 0. *
@@ -1880,7 +1880,7 @@ fail:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extracts substring at the specified location                      *
+ * Purpose: extracts substring at specified location                          *
  *                                                                            *
  * Parameters: src   - [IN] source string                                     *
  *             left  - [IN] left substring position (start)                   *
@@ -1902,7 +1902,7 @@ char	*zbx_substr(const char *src, size_t left, size_t right)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: unquotes valid substring at the specified location                *
+ * Purpose: unquotes valid substring at specified location                    *
  *                                                                            *
  * Parameters: src   - [IN] source string                                     *
  *             left  - [IN] left substring position (start)                   *
@@ -1957,11 +1957,11 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns pointer to the next utf-8 character                       *
+ * Purpose: returns pointer to next utf-8 character                           *
  *                                                                            *
  * Parameters: str - [IN]                                                     *
  *                                                                            *
- * Return value: pointer to the next utf-8 character                          *
+ * Return value: pointer to next utf-8 character                              *
  *                                                                            *
  ******************************************************************************/
 static const char	*utf8_chr_next(const char *str)
@@ -1981,7 +1981,7 @@ static const char	*utf8_chr_next(const char *str)
  * Parameters: seq  - [IN]                                                    *
  *             c    - [IN] utf-8 character to look for                        *
  *                                                                            *
- * Return value: SUCCEED - string contains the specified character            *
+ * Return value: SUCCEED - string contains specified character                *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -2014,8 +2014,7 @@ static int	strchr_utf8(const char *seq, const char *c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: trims the specified utf-8 characters from the left side of input  *
- *          string                                                            *
+ * Purpose: trims specified utf-8 characters from left side of input string   *
  *                                                                            *
  * Parameters: str      - [IN] input string                                   *
  *             charlist - [IN] characters to trim                             *
@@ -2044,12 +2043,12 @@ void	zbx_ltrim_utf8(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns pointer to the previous utf-8 character                   *
+ * Purpose: returns pointer to previous utf-8 character                       *
  *                                                                            *
  * Parameters: str   - [IN]                                                   *
- *             start - [IN] start of the initial string                       *
+ *             start - [IN] start of initial string                           *
  *                                                                            *
- * Return value: pointer to the previous utf-8 character                      *
+ * Return value: pointer to previous utf-8 character                          *
  *                                                                            *
  ******************************************************************************/
 static char	*utf8_chr_prev(char *str, const char *start)
@@ -2066,8 +2065,7 @@ static char	*utf8_chr_prev(char *str, const char *start)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: trims the specified utf-8 characters from the right side of input *
- *          string                                                            *
+ * Purpose: trims specified utf-8 characters from right side of input string  *
  *                                                                            *
  * Parameters: str      - [IN]                                                *
  *             charlist - [IN] characters to trim                             *
@@ -2091,17 +2089,16 @@ void	zbx_rtrim_utf8(char *str, const char *charlist)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: If there is no '\0' byte among the first n bytes of src,          *
- *          then all n bytes will be placed into the dest buffer.             *
- *          In other case only strlen() bytes will be placed there.           *
- *          Add zero character at the end of string.                          *
- *          Reallocs memory if not enough.                                    *
+ * Purpose: If there is no '\0' byte among the first n bytes of src, then all *
+ *          n bytes will be placed into the dest buffer. In other case, only  *
+ *          strlen() bytes will be placed there. Adds zero character at the   *
+ *          end of string. Reallocs memory if not enough.                     *
  *                                                                            *
  * Parameters: str       - [IN/OUT] destination buffer pointer                *
  *             alloc_len - [IN/OUT] already allocated memory                  *
  *             offset    - [IN/OUT] offset for writing                        *
- *             src       - [IN]     copied string                             *
- *             n         - [IN]     maximum number of bytes to copy           *
+ *             src       - [IN] copied string                                 *
+ *             n         - [IN] maximum number of bytes to copy               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n)
@@ -2138,10 +2135,10 @@ void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char
  *                                                                            *
  * Purpose: replaces data block with 'value'                                  *
  *                                                                            *
- * Parameters: data  - [IN/OUT] pointer to the string                         *
- *             l     - [IN]     left position of the block                    *
- *             r     - [IN/OUT] right position of the block                   *
- *             value - [IN]     string to replace the block with              *
+ * Parameters: data  - [IN/OUT] pointer to string                             *
+ *             l     - [IN] left position of block                            *
+ *             r     - [IN/OUT] right position of block                       *
+ *             value - [IN] string to replace block with                      *
  *                                                                            *
  ******************************************************************************/
 void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)

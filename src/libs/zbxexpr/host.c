@@ -21,7 +21,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Return value:  SUCCEED - char is allowed in the host name                  *
+ * Return value:  SUCCEED - char is allowed in host name                      *
  *                FAIL    - otherwise                                         *
  *                                                                            *
  * Comments: in host name allowed characters: '0-9a-zA-Z. _-'                 *
@@ -44,7 +44,7 @@ int	zbx_is_hostname_char(unsigned char c)
  * Purpose: returns hostname and key                                          *
  *          <hostname:>key                                                    *
  *                                                                            *
- * Parameters: exp  - [IN] pointer to the first char of hostname              *
+ * Parameters: exp  - [IN] pointer to first char of hostname                  *
  *                         host:key[key params]                               *
  *                         ^                                                  *
  *             host - [OUT]                                                   *
@@ -85,11 +85,11 @@ int	zbx_parse_host_key(char *exp, char **host, char **key)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replaces all not-allowed hostname characters in the string        *
+ * Purpose: replaces all not-allowed hostname characters in string            *
  *                                                                            *
  * Parameters: host - [IN] target C-style string                              *
  *                                                                            *
- * Comments: string must be null-terminated, otherwise not secure!            *
+ * Comments: String must be null-terminated, otherwise not secure!            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_make_hostname(char *host)
@@ -107,14 +107,14 @@ void	zbx_make_hostname(char *host)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks a byte stream for a valid hostname                         *
+ * Purpose: checks byte stream for valid hostname                             *
  *                                                                            *
- * Parameters: hostname - [IN]  pointer to the first char of hostname         *
- *             error    - [OUT] pointer to the error message (can be NULL)    *
+ * Parameters: hostname - [IN]  pointer to first char of hostname             *
+ *             error    - [OUT] pointer to error message (can be NULL)        *
  *                                                                            *
- * Return value: return SUCCEED if hostname is valid                          *
- *               or FAIL if hostname contains invalid chars, is empty         *
- *               or is longer than ZBX_MAX_HOSTNAME_LEN                       *
+ * Return value: SUCCEED - if hostname is valid                               *
+ *               FAIL - If hostname contains invalid chars, is empty or is    *
+ *                      longer than ZBX_MAX_HOSTNAME_LEN.                     *
  *                                                                            *
  ******************************************************************************/
 int	zbx_check_hostname(const char *hostname, char **error)

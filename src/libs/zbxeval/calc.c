@@ -63,7 +63,7 @@ static double	calc_arithmetic_mean(const zbx_vector_dbl_t *v)
  *                                                                            *
  * Purpose: evaluates function 'kurtosis'                                     *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -120,7 +120,7 @@ err:
  *                                                                            *
  * Purpose: finds median (helper function)                                    *
  *                                                                            *
- * Parameters: v - [IN/OUT] non-empty vector with input data.                 *
+ * Parameters: v - [IN/OUT] non-empty vector with input data                  *
  *                          NOTE: it will be modified (sorted in place).      *
  *                                                                            *
  * Return value: median                                                       *
@@ -140,7 +140,7 @@ static double	find_median(zbx_vector_dbl_t *v)
  *                                                                            *
  * Purpose: calculates 'median absolute deviation'                            *
  *                                                                            *
- * Parameters: values - [IN] non-empty vector with input data.                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *                            NOTE: its elements will be modified and should  *
  *                            not be used in the caller!                      *
  *             result - [OUT] calculated value                                *
@@ -185,7 +185,7 @@ err:
  *                                                                            *
  * Purpose: evaluates 'skewness' function                                     *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -236,7 +236,7 @@ err:
  *                                                                            *
  * Purpose: evaluates function 'stdevpop' (population standard deviation)     *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -286,7 +286,7 @@ err:
  *                                                                            *
  * Purpose: evaluates function 'stddevsamp' (sample standard deviation)       *
  *                                                                            *
- * Parameters: values - [IN]  vector with input data with at least 2 elements *
+ * Parameters: values - [IN] vector with input data with at least 2 elements  *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -342,7 +342,7 @@ err:
  *                                                                            *
  * Purpose: calculates sum of squares                                         *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -373,7 +373,7 @@ int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **
  *                                                                            *
  * Purpose: evaluates function 'varpop' (population variance)                 *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -422,7 +422,7 @@ err:
  *                                                                            *
  * Purpose: evaluates function 'varsamp' (sample variance)                    *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -519,9 +519,9 @@ static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
  * Purpose: calculates histogram quantile base on vector, where odd position  *
  *          is bucket upper bound ('le') and even position is 'rate' value    *
  *                                                                            *
- * Parameters: q      - [IN]  quantile value from 0 till 1                    *
- *             values - [IN]  non-empty vector with input data                *
- *             err_fn - [IN]  function name for error info                    *
+ * Parameters: q      - [IN] quantile value from 0 till 1                     *
+ *             values - [IN] non-empty vector with input data                 *
+ *             err_fn - [IN] function name for error info                     *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -639,7 +639,7 @@ err:
  *                                                                            *
  * Purpose: evaluates function avg                                            *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -664,7 +664,7 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
  *                                                                            *
  * Purpose: evaluates function min                                            *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -700,7 +700,7 @@ int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
  *                                                                            *
  * Purpose: evaluates function max                                            *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
@@ -736,7 +736,7 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
  *                                                                            *
  * Purpose: evaluates function sum                                            *
  *                                                                            *
- * Parameters: values - [IN]  non-empty vector with input data                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *

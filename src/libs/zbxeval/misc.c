@@ -29,13 +29,13 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reserves number of bytes in the specified buffer, reallocating if *
- *          necessary                                                         *
+ * Purpose: Reserves number of bytes in the specified buffer, reallocating if *
+ *          necessary.                                                        *
  *                                                                            *
  * Parameters: buffer      - [IN/OUT]                                         *
  *             buffer_size - [IN/OUT]                                         *
- *             reserve     - [IN]     number of bytes to reserve              *
- *             ptr         - [IN/OUT] pointer to an offset in buffer          *
+ *             reserve     - [IN] number of bytes to reserve                  *
+ *             ptr         - [IN/OUT] pointer to offset in buffer             *
  *                                                                            *
  * Comments: Initially static buffer is used, allocating dynamic buffer when  *
  *           static buffer is too small.                                      *
@@ -143,17 +143,16 @@ static zbx_uint32_t	deserialize_variant(const unsigned char *ptr,  zbx_variant_t
  *                                                                            *
  * Purpose: serializes evaluation context into buffer                         *
  *                                                                            *
- * Parameters: ctx         - [IN]  evaluation context                         *
- *             malloc_func - [IN]  buffer memory allocation function,         *
- *                                 optional (by default the buffer is         *
- *                                 allocated in heap)                         *
+ * Parameters: ctx         - [IN] evaluation context                          *
+ *             malloc_func - [IN] buffer memory allocation function,          *
+ *                                optional (by default the buffer is          *
+ *                                allocated in heap)                          *
  *             data        - [OUT] buffer with serialized evaluation context  *
  *                                                                            *
  * Comments: Location of the replaced tokens (with token.value set) are not   *
  *           serialized, making it impossible to reconstruct the expression   *
- *           text with replaced tokens.                                       *
- *           Context serialization/deserialization must be used for           *
- *           context caching.                                                 *
+ *           text with replaced tokens. Context serialization/deserialization *
+ *           must be used for context caching.                                *
  *                                                                            *
  * Return value: size of serialized data                                      *
  *                                                                            *
@@ -206,10 +205,10 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t m
  * Purpose: deserializes evaluation context from buffer                       *
  *                                                                            *
  * Parameters: ctx        - [OUT] evaluation context                          *
- *             expression - [IN]  expression the evaluation context was       *
- *                                created from                                *
- *             rules      - [IN]  composition and evaluation rules            *
- *             data       - [IN]  buffer with serialized context              *
+ *             expression - [IN] expression, evaluation context was created   *
+ *                               from                                         *
+ *             rules      - [IN] composition and evaluation rules             *
+ *             data       - [IN] buffer with serialized context               *
  *                                                                            *
  ******************************************************************************/
 void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules,
@@ -256,11 +255,11 @@ static int	compare_tokens_by_loc(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: prints token into string quoting/escaping if necessary            *
  *                                                                            *
- * Parameters: ctx        - [IN]     evaluation context                       *
+ * Parameters: ctx        - [IN] evaluation context                           *
  *             str        - [IN/OUT] output buffer                            *
  *             str_alloc  - [IN/OUT] output buffer size                       *
  *             str_offset - [IN/OUT] output buffer offset                     *
- *             token      - [IN]     token to print                           *
+ *             token      - [IN] token to print                               *
  *                                                                            *
  ******************************************************************************/
 static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, size_t *str_alloc, size_t *str_offset,
@@ -340,9 +339,9 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 /******************************************************************************
  *                                                                            *
  * Purpose: composes expression by replacing processed tokens (with values)   *
- *          in the original expression                                        *
+ *          in original expression                                            *
  *                                                                            *
- * Parameters: ctx        - [IN]  evaluation context                          *
+ * Parameters: ctx        - [IN] evaluation context                           *
  *             expression - [OUT] composed expression                         *
  *                                                                            *
  ******************************************************************************/
@@ -399,7 +398,7 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
  * Parameters: str - [IN] string to check                                     *
  *             len - [IN] string length                                       *
  *                                                                            *
- * Return value: SUCCEED - string might contain a user macro                  *
+ * Return value: SUCCEED - string might contain user macro                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -429,13 +428,13 @@ static int	eval_has_usermacro(const char *str, size_t len)
  * Purpose: expands user macros in item query                                 *
  *                                                                            *
  * Parameters: itemquery    - [IN]                                            *
- *             len          - [IN]  item query length                         *
- *             hostids      - [IN]  linked hostids                            *
- *             hostids_num  - [IN]  number of linked hostids                  *
- *             um_expand_cb - [IN]  resolver callback                         *
- *             um_data      - [IN]  resolver callback data                    *
+ *             len          - [IN] item query length                          *
+ *             hostids      - [IN] linked hostids                             *
+ *             hostids_num  - [IN] number of linked hostids                   *
+ *             um_expand_cb - [IN] resolver callback                          *
+ *             um_data      - [IN] resolver callback data                     *
  *             out          - [OUT] item query with expanded macros           *
- *             error        - [OUT] Error message, optional. If specified     *
+ *             error        - [OUT] Error message, optional. If specified,    *
  *                                  the function will return failure at the   *
  *                                  first failed macro expansion.             *
  *                                                                            *
@@ -527,11 +526,11 @@ out:
  *                                                                            *
  * Purpose: expands user macros in parsed expression                          *
  *                                                                            *
- * Parameters: ctx          - [IN]  evaluation context                        *
- *             hostids      - [IN]  linked hostids                            *
- *             hostids_num  - [IN]  number of linked hostids                  *
- *             um_expand_cb - [IN]  resolver callback                         *
- *             data         - [IN]  resolver callback data                    *
+ * Parameters: ctx          - [IN] evaluation context                         *
+ *             hostids      - [IN] linked hostids                             *
+ *             hostids_num  - [IN] number of linked hostids                   *
+ *             um_expand_cb - [IN] resolver callback                          *
+ *             data         - [IN] resolver callback data                     *
  *             error        - [OUT] Error message, optional. If specified     *
  *                                  the function will return failure at the   *
  *                                  first failed macro expansion.             *
@@ -620,8 +619,7 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
  * Purpose: sets eval context to exception that will be returned when executed *
  *                                                                             *
  * Parameters: ctx     - [IN] evaluation context                               *
- *             message - [IN] exception message (the memory is owned by        *
- *                            context)                                         *
+ *             message - [IN] exception message (memory is owned by context)   *
  *                                                                             *
  *******************************************************************************/
 void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
@@ -644,7 +642,7 @@ void	zbx_eval_set_exception(zbx_eval_context_t *ctx, char *message)
  *                                                                            *
  * Purpose: extracts functionid from token                                    *
  *                                                                            *
- * Parameters: expression - [IN]  original expression                         *
+ * Parameters: expression - [IN] original expression                          *
  *             token      - [IN]                                              *
  *             functionid - [OUT] extracted functionid                        *
  *                                                                            *
@@ -682,7 +680,7 @@ static int	expression_extract_functionid(const char *expression, zbx_eval_token_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: deserializes expression and extract specified tokens into values  *
+ * Purpose: deserializes expression and extracts specified tokens into values *
  *                                                                            *
  * Parameters: data       - [IN] serialized expression                        *
  *             expression - [IN] original expression                          *
@@ -748,7 +746,7 @@ zbx_eval_context_t	*zbx_eval_deserialize_dyn(const unsigned char *data, const ch
  *                                                                            *
  * Purpose: gets functionids from parsed expression                           *
  *                                                                            *
- * Parameters: ctx         - [IN]  evaluation context                         *
+ * Parameters: ctx         - [IN] evaluation context                          *
  *             functionids - [OUT] extracted functionids                      *
  *                                                                            *
  ******************************************************************************/
@@ -768,10 +766,9 @@ void	zbx_eval_get_functionids(zbx_eval_context_t *ctx, zbx_vector_uint64_t *func
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets functionids from parsed expression in the order they are     *
- *          written                                                           *
+ * Purpose: gets functionids from parsed expression in order they are written *
  *                                                                            *
- * Parameters: ctx         - [IN]  evaluation context                         *
+ * Parameters: ctx         - [IN] evaluation context                          *
  *             functionids - [OUT] extracted functionids                      *
  *                                                                            *
  ******************************************************************************/
@@ -843,8 +840,8 @@ int	zbx_eval_check_timer_functions(const zbx_eval_context_t *ctx)
  *                                                                            *
  * Purpose: extracts functionids from serialized expression                   *
  *                                                                            *
- * Parameters: expression  - [IN]  original expression                        *
- *             data        - [IN]  serialized expression                      *
+ * Parameters: expression  - [IN] original expression                         *
+ *             data        - [IN] serialized expression                       *
  *             functionids - [OUT] extracted functionids                      *
  *                                                                            *
  ******************************************************************************/
@@ -903,8 +900,8 @@ void	zbx_get_serialized_expression_functionids(const char *expression, const uns
  *                                                                            *
  * Purpose: gets Nth constant in expression                                   *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             index - [IN]  constant index                                   *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             index - [IN] constant index                                    *
  *             value - [OUT] constant value                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1021,8 +1018,8 @@ int	zbx_eval_validate_replaced_functionids(zbx_eval_context_t *ctx, char **error
  * Purpose: copies parsed expression                                          *
  *                                                                            *
  * Parameters: dst        - [OUT] destination evaluation context              *
- *             src        - [IN]  source evaluation context                   *
- *             expression - [IN]  copied destination expression               *
+ *             src        - [IN] source evaluation context                    *
+ *             expression - [IN] copied destination expression                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_eval_copy(zbx_eval_context_t *dst, const zbx_eval_context_t *src, const char *expression)
@@ -1081,7 +1078,7 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
  *                                                                             *
  * Purpose: copies history query into vector and replaces it with vector index *
  *                                                                             *
- * Parameters: ctx  - [IN]  evaluation context                                 *
+ * Parameters: ctx  - [IN] evaluation context                                  *
  *             refs - [OUT] item references                                    *
  *                                                                             *
  *******************************************************************************/

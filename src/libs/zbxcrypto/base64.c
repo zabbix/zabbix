@@ -194,9 +194,9 @@ static unsigned char	char_base64_decode(char c)
  *                                                                            *
  * Purpose: encodes a string into a base64 string                             *
  *                                                                            *
- * Parameters: p_str    - [IN]  string to encode                              *
+ * Parameters: p_str    - [IN] string to encode                               *
  *             p_b64str - [OUT] encoded str to return                         *
- *             in_size  - [IN]  size (length) of input str                    *
+ *             in_size  - [IN] size (length) of input str                     *
  *                                                                            *
  ******************************************************************************/
 void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size)
@@ -256,12 +256,11 @@ void	zbx_base64_encode(const char *p_str, char *p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: encodes a string into a base64 string                             *
- *          with dynamic memory allocation                                    *
+ * Purpose: encodes string into base64 string with dynamic memory allocation  *
  *                                                                            *
- * Parameters: p_str    - [IN]  string to encode                              *
+ * Parameters: p_str    - [IN] string to encode                               *
  *             p_b64str - [OUT] pointer to encoded str to return              *
- *             in_size  - [IN]  size (length) of input str                    *
+ *             in_size  - [IN] size (length) of input str                     *
  *                                                                            *
  * Comments: allocates memory                                                 *
  *                                                                            *
@@ -301,11 +300,11 @@ void	zbx_base64_encode_dyn(const char *p_str, char **p_b64str, int in_size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: decodes a base64 string into a string                             *
+ * Purpose: decodes base64 string into string                                 *
  *                                                                            *
- * Parameters: p_b64str   - [IN]  base64 string to decode                     *
+ * Parameters: p_b64str   - [IN] base64 string to decode                      *
  *             p_str      - [OUT] decoded str to return                       *
- *             maxsize    - [IN]  size of p_str buffer                        *
+ *             maxsize    - [IN] size of p_str buffer                         *
  *             p_out_size - [OUT] size (length) of the str decoded            *
  *                                                                            *
  ******************************************************************************/

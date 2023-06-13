@@ -31,7 +31,7 @@ static int	is_whitespace(char c)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds the number of following whitespace characters               *
+ * Purpose: finds number of following whitespace characters                   *
  *                                                                            *
  * Parameters: ctx - [IN] evaluation context                                  *
  *             pos - [IN] starting position                                   *
@@ -51,7 +51,7 @@ static size_t	eval_get_whitespace_len(zbx_eval_context_t *ctx, size_t pos)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates constant variable index in the trigger expression         *
+ * Purpose: updates constant variable index in trigger expression             *
  *                                                                            *
  * Parameters: ctx   - [IN] evaluation context                                *
  *             token - [IN] variable token                                    *
@@ -80,8 +80,8 @@ static void	eval_update_const_variable(zbx_eval_context_t *ctx, zbx_eval_token_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the character can be a part of a compound number        *
- *          following a macro                                                 *
+ * Purpose: Checks if the character can be a part of a compound number        *
+ *          following a macro.                                                *
  *                                                                            *
  ******************************************************************************/
 static int	eval_is_compound_number_char(char c, int pos)
@@ -106,8 +106,8 @@ static int	eval_is_compound_number_char(char c, int pos)
  *                                                                            *
  * Purpose: parses functionid token ({<functionid>})                          *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -133,8 +133,8 @@ static int	eval_parse_functionid(zbx_eval_context_t *ctx, size_t pos, zbx_eval_t
  *                                                                            *
  * Purpose: parses macro                                                      *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             tok   - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -171,8 +171,8 @@ static int	eval_parse_macro(zbx_eval_context_t *ctx, int pos, zbx_token_t *tok)
  *                                                                            *
  * Purpose: parses numeric value                                              *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             pos_r - [OUT]                                                  *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -206,8 +206,8 @@ static int	eval_parse_number(zbx_eval_context_t *ctx, size_t pos, size_t *pos_r)
  *                                                                            *
  * Purpose: parses constant value                                             *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *             error - [OUT] error message                                    *
  *                                                                            *
@@ -311,8 +311,8 @@ out:
  *                                                                            *
  * Purpose: parses single character token                                     *
  *                                                                            *
- * Parameters: pos   - [IN]  starting position                                *
- *             type  - [IN]  token type                                       *
+ * Parameters: pos   - [IN] starting position                                 *
+ *             type  - [IN] token type                                        *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  ******************************************************************************/
@@ -327,8 +327,8 @@ static void	eval_parse_character_token(size_t pos, zbx_token_type_t type, zbx_ev
  *                                                                            *
  * Purpose: parses token starting with  '<'                                   *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -367,8 +367,8 @@ static int	eval_parse_less_character_token(zbx_eval_context_t *ctx, size_t pos, 
  *                                                                            *
  * Purpose: parses token starting with  '>'                                   *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Comments: Tokens starting with '>' are '>' and '>='.                       *
@@ -390,10 +390,10 @@ static void	eval_parse_greater_character_token(zbx_eval_context_t *ctx, size_t p
  *                                                                            *
  * Purpose: parses string variable token                                      *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -436,8 +436,8 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  *                                                                            *
  * Purpose: parses numeric variable token                                     *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -477,8 +477,8 @@ static int	eval_parse_number_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  *                                                                            *
  * Purpose: parses logical operation token                                    *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -521,8 +521,8 @@ static int	eval_parse_logic_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
  *                                                                            *
  * Purpose: parses function token                                             *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -555,7 +555,7 @@ static int	eval_parse_function_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
  * Purpose: parses item query filter (?[group="xyz"])                         *
  *                                                                            *
  * Parameters: ptr - [IN]  filter to parse                                    *
- *                   [OUT] reference to the next character after filter       *
+ *                   [OUT] reference to next character after filter           *
  *                                                                            *
  * Return value: SUCCEED - filter was parsed successfully                     *
  *               FAIL    - otherwise                                          *
@@ -599,10 +599,10 @@ static int	eval_parse_query_filter(const char **ptr)
  * Purpose: parses item query /host/key?[filter] into host, key and filter    *
  *          components                                                        *
  *                                                                            *
- * Parameters: str     - [IN]  item query                                     *
+ * Parameters: str     - [IN] item query                                      *
  *             phost   - [OUT] reference to host or NULL (optional)           *
  *             pkey    - [OUT] reference to key                               *
- *             pfilter - [OUT] reference to the filter or NULL                *
+ *             pfilter - [OUT] reference to filter or NULL                    *
  *                                                                            *
  * Return value: The number of parsed characters, 0 if there was an error.    *
  *                                                                            *
@@ -705,10 +705,10 @@ size_t	eval_parse_query(const char *str, const char **phost, const char **pkey, 
  *                                                                            *
  * Purpose: parses history query token                                        *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -738,16 +738,16 @@ static int	eval_parse_query_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_
  *                                                                            *
  * Purpose: parses time period token                                          *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  * Comments: Time period token is the second argument of history functions    *
- *           to specify the history range in format <period>[:<timeshift>]    *
+ *           to specify the history range in format <period>[:<timeshift>].   *
  *                                                                            *
  ******************************************************************************/
 static int	eval_parse_period_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_t *token, char **error)
@@ -785,8 +785,8 @@ static int	eval_parse_period_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
  *                                                                            *
  * Purpose: parses property token                                             *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
@@ -818,12 +818,10 @@ static int	eval_parse_property_token(zbx_eval_context_t *ctx, size_t pos, zbx_ev
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses token                                                      *
- *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             pos   - [IN]  starting position                                *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             pos   - [IN] starting position                                 *
  *             token - [OUT] parsed token                                     *
- *             error - [OUT] error message in the case of failure             *
+ *             error - [OUT] error message in case of failure                 *
  *                                                                            *
  * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - otherwise                                          *
@@ -1019,8 +1017,8 @@ static int	eval_parse_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval_token_
  *                                                                            *
  * Purpose: adds operator/function token to evaluation stack                  *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             token - [IN]  token to add                                     *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             token - [IN] token to add                                      *
  *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -1106,8 +1104,8 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
  *                                                                            *
  * Purpose: adds operand token to evaluation stack                            *
  *                                                                            *
- * Parameters: ctx   - [IN]  evaluation context                               *
- *             token - [IN]  token to add                                     *
+ * Parameters: ctx   - [IN] evaluation context                                *
+ *             token - [IN] token to add                                      *
  *             error - [OUT]                                                  *
  *                                                                            *
  ******************************************************************************/
@@ -1200,9 +1198,9 @@ static void	eval_clear(zbx_eval_context_t *ctx)
  * Purpose: parses expression into tokens in postfix notation order           *
  *                                                                            *
  * Parameters: ctx        - [OUT] evaluation context                          *
- *             expression - [IN]  expression to parse                         *
- *             rules      - [IN]  parsing rules                               *
- *             error      - [OUT] error message in the case of failure        *
+ *             expression - [IN] expression to parse                          *
+ *             rules      - [IN] parsing rules                                *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - expression was parsed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -1463,9 +1461,9 @@ out:
  * Purpose: parses expression into tokens in postfix notation order           *
  *                                                                            *
  * Parameters: ctx        - [OUT] evaluation context                          *
- *             expression - [IN]  expression to parse                         *
- *             rules      - [IN]  parsing rules                               *
- *             error      - [OUT] error message in the case of failure        *
+ *             expression - [IN] expression to parse                          *
+ *             rules      - [IN] parsing rules                                *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - expression was parsed successfully                 *
  *               FAIL    - otherwise                                          *
@@ -1507,8 +1505,8 @@ void	zbx_eval_clear(zbx_eval_context_t *ctx)
  * Parameters: ctx   - [IN] evaluation context                                *
  *                                                                            *
  * Return value: SUCCEED - contains parsed expression                         *
- *               FAIL    - empty, either parsing failed or was initialized    *
- *                         without parsing                                    *
+ *               FAIL    - Empty, either parsing failed or was initialized    *
+ *                         without parsing.                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_status(const zbx_eval_context_t *ctx)
