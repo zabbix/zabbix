@@ -121,9 +121,9 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
-					PIE_CHART_SECTORS_SPACE_MIN, PIE_CHART_SECTORS_SPACE_MAX
+					PIE_CHART_SPACE_MIN, PIE_CHART_SPACE_MAX
 				))
-					->setDefault(PIE_CHART_SECTORS_SPACE_DEFAULT)
+					->setDefault(PIE_CHART_SPACE_DEFAULT)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('merge', null, _('Merge sectors smaller than '))
