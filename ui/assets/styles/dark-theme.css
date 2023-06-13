@@ -786,7 +786,8 @@ footer {
 .btn-remove[disabled],
 .btn-remove[disabled]:hover {
   background-color: transparent;
-  opacity: .25; }
+  opacity: .25;
+  cursor: default; }
 
 .overlay-close-btn {
   position: absolute;

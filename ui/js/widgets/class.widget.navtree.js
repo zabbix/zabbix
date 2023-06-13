@@ -34,9 +34,7 @@ class CWidgetNavTree extends CWidget {
 		this._maps_accessible = null;
 		this._show_unavailable = false;
 		this._problems = null;
-
-		// this._max_depth must be synced with WIDGET_NAVIGATION_TREE_MAX_DEPTH in defines.inc.php.
-		this._max_depth = 10;
+		this._max_depth = null;
 		this._last_id = null;
 
 		this._has_contents = false;
@@ -143,9 +141,7 @@ class CWidgetNavTree extends CWidget {
 				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const parent = button.getAttribute('data-id');
 
-				if (depth < this._max_depth) {
-					this._itemEditDialog(0, parent, depth + 1, button);
-				}
+				this._itemEditDialog(0, parent, depth + 1, button);
 			},
 
 			addMaps: (e) => {
@@ -158,46 +154,44 @@ class CWidgetNavTree extends CWidget {
 					window.old_addPopupValues = window.addPopupValues;
 				}
 
-				if (depth < this._max_depth) {
-					window.addPopupValues = (data) => {
-						this._deactivateContentsEvents();
+				window.addPopupValues = (data) => {
+					this._deactivateContentsEvents();
 
-						const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
+					const root = this._target.querySelector(`.tree-item[data-id="${id}"] > ul.tree-list`);
 
-						if (root != null) {
-							for (const item of data.values) {
-								root.appendChild(this._makeTreeItem({
-									id: this._getNextId(),
-									name: item.name,
-									sysmapid: item.sysmapid,
-									parent: id
-								}, depth + 1));
-							}
-
-							const tree_item = root.closest('.tree-item');
-
-							tree_item.classList.remove('closed');
-							tree_item.classList.add('opened');
+					if (root !== null) {
+						for (const item of data.values) {
+							root.appendChild(this._makeTreeItem({
+								id: this._getNextId(),
+								name: item.name,
+								sysmapid: item.sysmapid,
+								parent: id
+							}, depth + 1));
 						}
 
-						this._setTreeHandlers();
-						this._updateWidgetFields();
+						const tree_item = root.closest('.tree-item');
 
-						if (typeof old_addPopupValues === 'function') {
-							window.addPopupValues = old_addPopupValues;
-							delete window.old_addPopupValues;
-						}
+						tree_item.classList.remove('closed');
+						tree_item.classList.add('opened');
+					}
 
-						this._activateContentsEvents();
-					};
+					this._setTreeHandlers();
+					this._updateWidgetFields();
 
-					return PopUp('popup.generic', {
-						srctbl: 'sysmaps',
-						srcfld1: 'sysmapid',
-						srcfld2: 'name',
-						multiselect: '1'
-					}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
-				}
+					if (typeof old_addPopupValues === 'function') {
+						window.addPopupValues = old_addPopupValues;
+						delete window.old_addPopupValues;
+					}
+
+					this._activateContentsEvents();
+				};
+
+				return PopUp('popup.generic', {
+					srctbl: 'sysmaps',
+					srcfld1: 'sysmapid',
+					srcfld2: 'name',
+					multiselect: '1'
+				}, {dialogue_class: 'modal-popup-generic', trigger_element: e.target});
 			},
 
 			editItem: (e) => {
@@ -207,9 +201,7 @@ class CWidgetNavTree extends CWidget {
 				const parent = this._target.querySelector(`input[name="navtree.parent.${id}"]`).value;
 				const depth = parseInt(button.closest('[data-depth]').getAttribute('data-depth'));
 
-				if (depth <= this._max_depth) {
-					this._itemEditDialog(id, parent, depth, button);
-				}
+				this._itemEditDialog(id, parent, depth, button);
 			},
 
 			removeItem: (e) => {
@@ -550,7 +542,7 @@ class CWidgetNavTree extends CWidget {
 			button_add_child.title = t('Add child element');
 			button_add_child.classList.add('btn-add', 'js-button-add-child');
 			button_add_child.setAttribute('data-id', item.id);
-			button_add_child.disabled = depth === this._max_depth;
+			button_add_child.disabled = depth >= this._max_depth;
 			tools.appendChild(button_add_child);
 
 			const button_add_maps = document.createElement('input');
@@ -558,7 +550,7 @@ class CWidgetNavTree extends CWidget {
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
 			button_add_maps.classList.add('btn-import', 'js-button-add-maps');
-			button_add_maps.disabled = depth === this._max_depth;
+			button_add_maps.disabled = depth >= this._max_depth;
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -870,17 +862,11 @@ class CWidgetNavTree extends CWidget {
 									method: 'POST',
 									data: {
 										name: form_inputs.name.value.trim(),
-										sysmapid: typeof form_inputs.sysmapid !== 'undefined'
+										sysmapid: form_inputs.sysmapid !== undefined
 											? form_inputs.sysmapid.value
 											: null,
-										add_submaps: () => {
-											if (typeof form_inputs.add_submaps !== 'undefined') {
-												return form_inputs.add_submaps.checked ? 1 : 0
-											}
-											else {
-												return 0;
-											}
-										},
+										add_submaps: form_inputs.add_submaps !== undefined
+											&& form_inputs.add_submaps.checked ? 1 : 0,
 										depth: depth
 									},
 									dataType: 'json',
@@ -918,7 +904,7 @@ class CWidgetNavTree extends CWidget {
 
 												id = this._getNextId();
 
-												if (root != null) {
+												if (root !== null) {
 													root.append(this._makeTreeItem({
 														id: id,
 														name: resp['name'],
@@ -932,26 +918,26 @@ class CWidgetNavTree extends CWidget {
 											}
 
 											const add_child_level = (sysmapid, itemid, depth) => {
-												if (typeof resp.hierarchy[sysmapid] !== 'undefined'
-													&& depth <= this._max_depth) {
+												if (resp.hierarchy[sysmapid] !== undefined
+														&& depth <= this._max_depth) {
 													const root = this._target
-														.querySelector(
-															`.tree-item[data-id="${itemid}"]>ul.tree-list`
-														);
+														.querySelector(`.tree-item[data-id="${itemid}"]>ul.tree-list`);
 
 													$.each(resp.hierarchy[sysmapid], (i, submapid) => {
-														if (typeof resp.submaps[submapid] !== 'undefined') {
-															const submap_item = resp.submaps[submapid];
-															const submap_itemid = this._getNextId();
-
-															root.append(this._makeTreeItem({
-																id: submap_itemid,
-																name: submap_item['name'],
-																sysmapid: submap_item['sysmapid'],
-																parent: itemid
-															}));
-															add_child_level(submapid, submap_itemid, depth + 1);
+														if (resp.submaps[submapid] === undefined) {
+															return;
 														}
+
+														const submap_item = resp.submaps[submapid];
+														const submap_itemid = this._getNextId();
+
+														root.append(this._makeTreeItem({
+															id: submap_itemid,
+															name: submap_item['name'],
+															sysmapid: submap_item['sysmapid'],
+															parent: itemid
+														}));
+														add_child_level(submapid, submap_itemid, depth + 1);
 													});
 
 													root.closest('.tree-item').classList.remove('closed');

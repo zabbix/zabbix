@@ -59,7 +59,6 @@ if (typeof addPopupValues === 'undefined') {
 
 		_mouseDrag: function(event) {
 			const o = this.options;
-			let prev_offset_top;
 
 			// Compute the helpers position.
 			this.position = this._generatePosition(event);
@@ -110,7 +109,7 @@ if (typeof addPopupValues === 'undefined') {
 			// Regenerate the absolute position used for position checks.
 			this.positionAbs = this._convertPositionTo('absolute');
 
-			prev_offset_top = this.placeholder.offset().top;
+			let prev_offset_top = this.placeholder.offset().top;
 
 			// Set the helper position.
 			if (!this.options.axis || this.options.axis !== 'y') {
@@ -133,7 +132,9 @@ if (typeof addPopupValues === 'undefined') {
 			for (let i = this.items.length - 1; i >= 0; i--) {
 
 				// Cache variables and intersection, continue if no intersection.
-				const item = this.items[i], itemElement = item.item[0], intersection = this._intersectsWithPointer(item);
+				const item = this.items[i];
+				const itemElement = item.item[0];
+				const intersection = this._intersectsWithPointer(item);
 
 				if (!intersection) {
 					continue;
@@ -184,13 +185,14 @@ if (typeof addPopupValues === 'undefined') {
 				}
 			}
 
-			const parent_item = $(this.placeholder.parent()).closest('.tree-item'),
-				level = +$(this.placeholder.parent()).attr('data-depth'),
-				child_levels = this._levelsUnder(this.currentItem[0])+1;
-			let prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null,
-				next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null,
-				direction_moved = null,
-				levels_moved = 0;
+			const parent_item = $(this.placeholder.parent()).closest('.tree-item');
+			const level = +$(this.placeholder.parent()).attr('data-depth');
+			const child_levels = this._levelsUnder(this.currentItem[0]) + 1;
+
+			let prev_item = this.placeholder[0].previousSibling ? $(this.placeholder[0].previousSibling) : null;
+			let next_item = this.placeholder[0].nextSibling ? $(this.placeholder[0].nextSibling) : null;
+			let direction_moved = null;
+			let levels_moved = 0;
 
 			if (prev_item !== null) {
 				while (prev_item[0] === this.currentItem[0] || prev_item[0] === this.helper[0]
@@ -235,7 +237,7 @@ if (typeof addPopupValues === 'undefined') {
 			 */
 			if (parent_item !== null && next_item === null
 					&& (this.positionAbs.left <= parent_item.offset().left
-						|| this.positionAbs.left <= o.indent_size*-0.6)) {
+						|| this.positionAbs.left <= o.indent_size * -0.6)) {
 				direction_moved = 'left';
 			}
 			// If item is moved to the right and there is sibling element before, put it as a child of it.
@@ -250,13 +252,13 @@ if (typeof addPopupValues === 'undefined') {
 			$('.highlighted-parent').removeClass('highlighted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
-				const drop_to = prev_item,
-					uiObj = this,
-					hovered_branch_depth = drop_to[0].getElementsByClassName('tree-list')[0].dataset.depth;
+				const drop_to = prev_item;
+				const uiObj = this;
+				const hovered_branch_depth = drop_to[0].getElementsByClassName('tree-list')[0].dataset.depth;
 
 				this._isAllowed(prev_item, level, level + child_levels);
 
-				if (hovered_branch_depth < this.options.max_depth+1) {
+				if (hovered_branch_depth < this.options.max_depth + 1) {
 					this.changing_parent = setTimeout(function() {
 						$(drop_to)
 							.addClass('highlighted-parent opened')
@@ -274,9 +276,10 @@ if (typeof addPopupValues === 'undefined') {
 			}
 
 			else if (direction_moved === 'left' && levels_moved) {
-				let drop_to = $(this.currentItem[0]).closest('.tree-item'),
-					one_before = null;
 				const uiObj = this;
+
+				let drop_to = $(this.currentItem[0]).closest('.tree-item');
+				let one_before = null;
 
 				while (levels_moved > 0) {
 					if ($(drop_to).parent().closest('.tree-item').length) {
@@ -376,8 +379,8 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_isAllowed: function(parentItem, level, levels) {
-			if (this.options.max_depth+1 != 0 && (this.options.max_depth+1 < levels
-					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth+1)
+			if (this.options.max_depth + 1 != 0 && (this.options.max_depth + 1 < levels
+					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth + 1)
 			) {
 				this.placeholder.addClass('sortable-error');
 				this.beyondMaxLevels = levels - (this.options.max_depth+1);
