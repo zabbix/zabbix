@@ -477,7 +477,7 @@ class testPageSearch extends CWebTest {
 	 * Test if the global search form is not being submitted with empty search string.
 	 */
 	public function testPageSearch_FindEmptyString() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 
 		foreach (['', '   '] as $search_string) {
