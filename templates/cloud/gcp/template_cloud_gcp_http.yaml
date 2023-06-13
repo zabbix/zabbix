@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-26T12:16:59Z'
+  date: '2023-06-13T12:06:09Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -49,7 +49,7 @@ zabbix_export:
               priority: AVERAGE
               description: |
                 GCP: Authorization has failed. 
-                Check the authorization parameters and GCP API availability from network segment, where Zabbix-server/proxy is located.
+                Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.
                 
               tags:
                 - tag: scope
@@ -173,7 +173,7 @@ zabbix_export:
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
             The necessary scopes are pre-defined.
-            Returns a signed authorization token with 1 hour lifetime; required only once and used for all the dependent script items.
+            Returns a signed authorization token with 1 hour lifetime; is required only once, and is used for all the dependent script items.
             Check the template documentation for the details.
             
           timeout: '{$GCP.DATA.TIMEOUT}'
@@ -195,7 +195,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'GCP Cloud SQL: Instances Get.'
+          description: 'GCP Cloud SQL: Instances get.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -212,6 +212,20 @@ zabbix_export:
                           data = data[step];
                       }
                       return data;
+                  }
+                  
+                  function getFieldBool(data, path) {
+                      var steps = path.split('.');
+                  
+                      for (var i = 0; i < steps.length; i++) {
+                          var step = steps[i];
+                  
+                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                              return false;
+                          }
+                          data = data[step];
+                      }
+                      return true;
                   }
                   
                   function getHttpData(url, token) {
@@ -284,13 +298,21 @@ zabbix_export:
                       }
                   
                       if (Array.isArray(sql_inst.ipAddresses)) {
-                          var addresses = sql_inst.ipAddresses.filter(function (addr) {
+                          var int_addresses = sql_inst.ipAddresses.filter(function (addr) {
+                              return addr.type === 'PRIVATE';
+                          });
+                  
+                          var ext_addresses = sql_inst.ipAddresses.filter(function (addr) {
                               return addr.type === 'PRIMARY';
                           });
                   
-                          obj.ip = addresses[0].ipAddress;
+                          obj.ip = getFieldBool(int_addresses,'0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
+                          obj.ext_ip = getFieldBool(ext_addresses, '0.ipAddress') ? ext_addresses[0].ipAddress : '0.0.0.0';
                       }
-                      else obj.ip = '0.0.0.0';
+                      else {
+                          obj.ip = '0.0.0.0';
+                          obj.ext_ip = '0.0.0.0';
+                      }
                   
                       return obj;
                   }));
@@ -444,19 +466,8 @@ zabbix_export:
                                   integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
                               };
                   
-                              if (getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP')) {
-                                  obj.ext_ip = inst.networkInterfaces[0].accessConfigs[0].natIP;
-                              }
-                              else {
-                                  obj.ext_ip = '0.0.0.0';
-                              }
-                  
-                              if (getFieldBool(inst, 'labels.container-vm')) {
-                                  obj.i_type = 'container-optimized';
-                              }
-                              else {
-                                  obj.i_type = 'regular';
-                              }
+                              obj.ext_ip = getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP') ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
+                              obj.i_type = getFieldBool(inst, 'labels.container-vm') ? 'container-optimized' : 'regular';
                               return obj;
                           });
                           arr = arr.concat(vm_prop);
@@ -697,13 +708,13 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition. Required for metrics filtration.'
+                  description: 'GCP Cloud SQL instance high availability definition. Required for metrics filtration.'
                 - macro: '{$CLOUD_SQL.MSSQL.AUDITED}'
                   value: '{#MSSQL.AUDITED}'
-                  description: 'GCP Cloud SQL MSSQL Audit Enabled Definition. Required for metrics filtration.'
+                  description: 'GCP Cloud SQL MSSQL audit enabled definition. Required for metrics filtration.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP Project Id.'
@@ -730,13 +741,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -826,10 +842,10 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition.'
+                  description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP Project Id.'
@@ -854,13 +870,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -948,13 +969,13 @@ zabbix_export:
               macros:
                 - macro: '{$CLOUD_SQL.HIGH.AVAILABILITY}'
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
-                  description: 'GCP Cloud SQL Instance High Availability definition.'
+                  description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
-                  description: 'GCP Project Id.'
+                  description: 'GCP project id.'
               tags:
                 - tag: db-version
                   value: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
@@ -976,13 +997,18 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.ZONE}'
               custom_interfaces: 'YES'
               interfaces:
+                - default: 'NO'
+                  ip: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+                  dns: external.ip
                 - ip: '{#CLOUD_SQL.INSTANCE.IP}'
-                  dns: primary.ip
+                  dns: internal.ip
           master_item:
             key: gcp.cloudsql.instances.get
           lld_macro_paths:
             - lld_macro: '{#CLOUD_SQL.INSTANCE.DB.TYPE}'
               path: $.db_type
+            - lld_macro: '{#CLOUD_SQL.INSTANCE.EXT.IP}'
+              path: $.ext_ip
             - lld_macro: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
               path: $.high_availability
             - lld_macro: '{#CLOUD_SQL.INSTANCE.IP}'
@@ -1069,7 +1095,7 @@ zabbix_export:
                   description: 'Instance machine type.'
                 - macro: '{$GCP.AUTH.TOKEN}'
                   type: SECRET_TEXT
-                  description: 'Google Cloud Platform Authorization Token.'
+                  description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
                   description: 'GCP project id.'
@@ -1297,7 +1323,7 @@ zabbix_export:
         - macro: '{$GCP.AUTH.FREQUENCY}'
           value: 45m
           description: |
-            The update interval for the GCP Authorization item, which also equals to the access token regeneration requests frequency.
+            The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency. 
             Check the template documentation notes carefully for more details.
             
         - macro: '{$GCP.CLIENT.EMAIL}'
@@ -1635,6 +1661,7 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.base_audits_size
+              error_handler: DISCARD_VALUE
           master_item:
             key: gcp.cloudsql.mssql.metrics.get
           tags:
@@ -1945,7 +1972,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -2130,6 +2157,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -2160,7 +2190,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -2179,7 +2209,7 @@ zabbix_export:
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
@@ -3110,7 +3140,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'Total number of log bytes flushed  for the [{#DB.NAME}] database.'
+              description: 'Total number of log bytes flushed for the [{#DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3856,7 +3886,7 @@ zabbix_export:
             }
             
             return JSON.stringify(obj);
-          description: 'MSSQL Replica metrics data in raw format.'
+          description: 'MSSQL replica metrics data in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -4087,7 +4117,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -4405,6 +4435,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -4435,7 +4468,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -4454,7 +4487,7 @@ zabbix_export:
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
@@ -4717,7 +4750,7 @@ zabbix_export:
             obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
             
             return JSON.stringify(obj);
-          description: 'MySQL Metrics in raw format.'
+          description: 'MySQL metrics in raw format.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -5644,7 +5677,7 @@ zabbix_export:
               error_handler: DISCARD_VALUE
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/up | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -5829,6 +5862,9 @@ zabbix_export:
                       'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
           posts: '{"query":"cloudsql.googleapis.com/database/state | within 5m | filter database_id = ''{$GCP.PROJECT.ID}:{HOST.NAME}''"}'
@@ -5859,7 +5895,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
               priority: AVERAGE
               description: |
-                The instance creation failed or an operation left the instance in an own bad state.
+                The instance creation failed, or an operation left the instance in an own bad state.
                 
               tags:
                 - tag: scope
@@ -5878,7 +5914,7 @@ zabbix_export:
               priority: WARNING
               description: |
                 The instance is in Suspended state. 
-                It is not available, for example due to problems with billing. 
+                It is not available, for example, due to problems with billing. 
                 
               tags:
                 - tag: scope
@@ -6636,13 +6672,13 @@ zabbix_export:
                 - tag: database
                   value: '{#PGSQL.DB.NAME}'
             - uuid: 4751ef5e498e4ce184bd07aadc831d2b
-              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled back transactions'
+              name: 'GCP Cloud SQL PostgreSQL: Database [{#PGSQL.DB.NAME}]: Rolled-back transactions'
               type: DEPENDENT
               key: 'gcp.cloudsql.pgsql.transaction_count_rollback[{#PGSQL.DB.NAME}]'
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Delta count of number of rolled back transactions in the [{#PGSQL.DB.NAME}] database.'
+              description: 'Delta count of number of rolled-back transactions in the [{#PGSQL.DB.NAME}] database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -6831,7 +6867,7 @@ zabbix_export:
                 - $.items
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 12h
+                - 3h
       tags:
         - tag: class
           value: cloud
@@ -7780,7 +7816,7 @@ zabbix_export:
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1h
+                - 10m
           timeout: '{$GCP.DATA.TIMEOUT}'
           url: 'https://compute.googleapis.com/compute/v1/projects/{$GCP.PROJECT.ID}/zones/{$GCE.INSTANCE.ZONE}/instances/{HOST.NAME}'
           status_codes: ''
