@@ -23,7 +23,7 @@ Open the Zabbix Agent configuration file (zabbix_agent2.conf) and set the requir
 *Limits:* 1-30
 
 **Plugins.MQTT.Sessions.<session_name>.Url** — Broker connection string used for MQTT.
-*Default value:* 
+*Default value:* tcp://localhost:1883
 
 **Plugins.MQTT.Sessions.<session_name>.Topic** — Topic used for MQTT subscription.
 *Default value:*
