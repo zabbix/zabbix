@@ -379,11 +379,10 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_isAllowed: function(parentItem, level, levels) {
-			if (this.options.max_depth + 1 != 0 && (this.options.max_depth + 1 < levels
-					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth + 1)
-			) {
+			if (this.options.max_depth + 1 > 0 && (this.options.max_depth + 1 < levels
+					|| +this.placeholder.closest('[data-depth]').attr('data-depth') > this.options.max_depth + 1)) {
 				this.placeholder.addClass('sortable-error');
-				this.beyondMaxLevels = levels - (this.options.max_depth+1);
+				this.beyondMaxLevels = levels - this.options.max_depth + 1;
 			}
 			else {
 				this.placeholder.removeClass('sortable-error');
