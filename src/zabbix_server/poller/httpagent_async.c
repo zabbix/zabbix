@@ -22,6 +22,8 @@ static ZBX_THREAD_LOCAL struct event		*curl_timeout;
 static ZBX_THREAD_LOCAL CURLM			*curl_handle;
 
 static process_httpagent_result_callback_fn	process_httpagent_result;
+static httpagent_action_callback_fn		http_agent_action;
+static void					*http_agent_action_arg;
 
 typedef struct
 {
@@ -81,6 +83,7 @@ static void	on_timeout(evutil_socket_t fd, short events, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	http_agent_action(http_agent_action_arg);
 	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
 	check_multi_info();
 
@@ -100,6 +103,7 @@ static void	curl_perform(int fd, short event, void *arg)
 	if(event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
 
+	http_agent_action(http_agent_action_arg);
 	context = (zbx_curl_context_t *)arg;
 	curl_multi_socket_action(curl_handle, context->sockfd, flags, &running_handles);
 
@@ -175,13 +179,17 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-CURLM	*zbx_async_httpagent_init(struct event_base *ev, process_httpagent_result_callback_fn process_httpagent_result_callback)
+CURLM	*zbx_async_httpagent_init(struct event_base *ev,
+		process_httpagent_result_callback_fn process_httpagent_result_callback,
+		httpagent_action_callback_fn httpagent_action_callback, void *arg)
 {
 	CURLMcode	merr;
 	CURLcode	err;
 
 	base = ev;
 	process_httpagent_result = process_httpagent_result_callback;
+	http_agent_action = httpagent_action_callback;
+	http_agent_action_arg = arg;
 
 	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
 	{
