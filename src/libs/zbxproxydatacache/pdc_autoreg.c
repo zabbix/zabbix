@@ -276,12 +276,12 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 		if (PDC_DATABASE_MEMORY == pdc_cache->state)
 		{
 			/* transition to memory cache failed, disable memory cache until restart */
-			pdc_switch_to_database_only(pdc_cache);
+			pdc_fallback_to_database(pdc_cache);
 		}
 		else
 		{
 			/* initiate transition to database cache */
-			pdc_cache->state = PDC_MEMORY_DATABASE;
+			pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
 		}
 
 		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache is full, switching to database cache");

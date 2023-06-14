@@ -150,11 +150,13 @@ void	*pdc_realloc(void *ptr, size_t size);
 void	pdc_free(void *ptr);
 char	*pdc_strdup(const char *str);
 
+void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *message);
+
 void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);
 
 void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
-void	pdc_switch_to_database_only(zbx_pdc_t *pdc);
+void	pdc_fallback_to_database(zbx_pdc_t *pdc);
 
 
 #endif
