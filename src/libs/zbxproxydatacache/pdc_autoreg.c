@@ -162,8 +162,9 @@ static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 	int			records_num = 0;
 	zbx_list_iterator_t	li;
 	zbx_pdc_autoreg_t	*row;
+	void			*ptr;
 
-	if (SUCCEED == zbx_list_peek(&pdc->autoreg, NULL))
+	if (SUCCEED == zbx_list_peek(&pdc->autoreg, &ptr))
 	{
 		zbx_json_addarray(j, ZBX_PROTO_TAG_AUTOREGISTRATION);
 		zbx_list_iterator_init(&pdc->autoreg, &li);
@@ -229,8 +230,11 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 {
 	zbx_pdc_autoreg_t	*row;
 	zbx_db_insert_t		db_insert;
+	void			*ptr;
 
-	if (SUCCEED == zbx_list_peek(&pdc->autoreg, NULL))
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == zbx_list_peek(&pdc->autoreg, &ptr))
 	{
 		zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns",
 				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", NULL);
@@ -251,6 +255,8 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 
 	if (0 != pdc->autoreg_lastid)
 		pdc_set_lastid("proxy_autoreg_host", "autoreg_host_lastid", pdc->autoreg_lastid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /* public api */
@@ -263,6 +269,8 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	pdc_lock();
 
 	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
@@ -270,7 +278,8 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 		if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type, host_metadata,
 				flags, clock))
 		{
-			return;
+			pdc_unlock();
+			goto out;
 		}
 
 		if (PDC_DATABASE_MEMORY == pdc_cache->state)
@@ -295,7 +304,8 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 	pdc_lock();
 	pdc_cache->db_handles_num--;
 	pdc_unlock();
-
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -307,6 +317,8 @@ int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 {
 	int	ret, state;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
+
 	pdc_lock();
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
@@ -316,6 +328,8 @@ int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 
 	if (PDC_DATABASE == state)
 		ret = pdc_autoreg_get_db(j, lastid, more);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);
 
 	return ret;
 }
@@ -329,6 +343,9 @@ void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
 {
 	int	state;
 
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
+
 	pdc_lock();
 
 	pdc_cache->autoreg_lastid = lastid;
@@ -340,4 +357,6 @@ void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
 
 	if (PDC_DATABASE == state)
 		pdc_set_lastid(areg.table, areg.lastidfield, lastid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

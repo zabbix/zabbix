@@ -68,8 +68,10 @@ zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
 
 	if (PDC_MEMORY == data->state)
 	{
+		/*
 		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
 		data->state = PDC_DATABASE_ONLY;
+		*/
 
 		/* zbx_vector_pdc_discovery_ptr_create(&data->rows); */
 	}
@@ -181,8 +183,10 @@ int	zbx_pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	if (PDC_MEMORY == pdc_src[pdc_cache->state])
 	{
+		/*
 		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
 		pdc_cache->state = PDC_DATABASE_ONLY;
+		*/
 	}
 
 	if (PDC_DATABASE == pdc_src[pdc_cache->state])

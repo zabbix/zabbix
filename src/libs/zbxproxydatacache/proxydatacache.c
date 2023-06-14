@@ -101,6 +101,7 @@ static int	pdc_has_history(const char *table_name)
 	zbx_db_row_t	row;
 	zbx_uint64_t	lastid;
 	int		ret;
+	char		sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:%s", __func__, table_name);
 
@@ -113,7 +114,9 @@ static int	pdc_has_history(const char *table_name)
 
 	zbx_db_free_result(result);
 
-	result = zbx_db_select_n("select null from %s where id>" ZBX_FS_UI64, 1);
+	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table_name);
+
+	result = zbx_db_select_n(sql, 1);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 		ret = SUCCEED;
@@ -129,6 +132,8 @@ static int	pdc_has_history(const char *table_name)
 
 void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *message)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d -> %d", __func__, pdc->state, state);
+
 	switch (state)
 	{
 		case PDC_DATABASE_ONLY:
@@ -157,6 +162,8 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
 	}
 
 	pdc->state = state;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -417,7 +424,11 @@ out:
 
 void	zbx_pdc_update_state(int more)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() more:%d", more);
+
 	pdc_lock();
 	pdc_update_state(pdc_cache, more);
 	pdc_unlock();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 }

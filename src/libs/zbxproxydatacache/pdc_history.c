@@ -54,8 +54,10 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
 
 	if (PDC_MEMORY == data->state)
 	{
+		/*
 		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
 		data->state = PDC_DATABASE_ONLY;
+		*/
 
 		/* zbx_vector_pdc_history_ptr_create(&data->rows); */
 	}
@@ -102,6 +104,8 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 	}
 	else
 	{
+		pdc_unlock();
+
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
 		(void)zbx_db_insert_execute(&data->db_insert);
 		zbx_db_insert_clean(&data->db_insert);
@@ -509,8 +513,10 @@ int	zbx_pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	if (PDC_MEMORY == pdc_src[pdc_cache->state])
 	{
+		/*
 		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
 		pdc_cache->state = PDC_DATABASE_ONLY;
+		*/
 	}
 
 	if (PDC_DATABASE == pdc_src[pdc_cache->state])
