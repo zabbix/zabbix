@@ -394,8 +394,11 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	poller_config.state = ZBX_PROCESS_STATE_BUSY;
 	poller_config.info = info;
 
-	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
-			poller_update_selfmon_counter, &poller_config);
+	if (ZBX_POLLER_TYPE_HTTPAGENT == process_type)
+	{
+		poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
+				poller_update_selfmon_counter, &poller_config);
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
