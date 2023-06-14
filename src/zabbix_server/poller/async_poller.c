@@ -150,6 +150,68 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
+{
+	zbx_hashset_iter_t	iter;
+	zbx_interface_status	*interface_status;
+	unsigned char		*data = NULL;
+	size_t			data_alloc = 0, data_offset = 0;
+	zbx_timespec_t		timespec;
+
+	if (0 == poller_config->interfaces.num_data)
+		return;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "updating:%d interfaces", poller_config->interfaces.num_data);
+
+	zbx_timespec(&timespec);
+
+	zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
+
+	while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
+	{
+		switch (interface_status->errcode)
+		{
+			case SUCCEED:
+			case NOTSUPPORTED:
+			case AGENT_ERROR:
+				zbx_activate_item_interface(&timespec, &interface_status->interface,
+						interface_status->itemid, ITEM_TYPE_ZABBIX,
+						interface_status->host, &data, &data_alloc, &data_offset);
+				break;
+			case NETWORK_ERROR:
+			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
+				zbx_deactivate_item_interface(&timespec, &interface_status->interface,
+						interface_status->itemid,
+						ITEM_TYPE_ZABBIX, interface_status->host,
+						interface_status->key_orig, &data, &data_alloc, &data_offset,
+						poller_config->config_unavailable_delay,
+						poller_config->config_unreachable_period,
+						poller_config->config_unreachable_delay,
+						interface_status->error);
+				break;
+			case CONFIG_ERROR:
+				/* nothing to do */
+				break;
+			case SIG_ERROR:
+				/* nothing to do, execution was forcibly interrupted by signal */
+				break;
+			default:
+				zbx_error("unknown response code returned: %d", interface_status->errcode);
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+	}
+
+	zbx_hashset_clear(&poller_config->interfaces);
+
+	if (NULL != data)
+	{
+		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
+		zbx_free(data);
+	}
+}
+
 static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		item, *items;
@@ -205,63 +267,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 exit:
 	zbx_preprocessor_flush();
 
-	if (0 != poller_config->interfaces.num_data)
-	{
-		zbx_hashset_iter_t	iter;
-		zbx_interface_status	*interface_status;
-		unsigned char		*data = NULL;
-		size_t			data_alloc = 0, data_offset = 0;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "updating:%d interfaces", poller_config->interfaces.num_data);
-
-		zbx_timespec(&timespec);
-
-		zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
-
-		while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
-		{
-			switch (interface_status->errcode)
-			{
-				case SUCCEED:
-				case NOTSUPPORTED:
-				case AGENT_ERROR:
-					zbx_activate_item_interface(&timespec, &interface_status->interface,
-							interface_status->itemid, ITEM_TYPE_ZABBIX,
-							interface_status->host, &data, &data_alloc, &data_offset);
-					break;
-				case NETWORK_ERROR:
-				case GATEWAY_ERROR:
-				case TIMEOUT_ERROR:
-					zbx_deactivate_item_interface(&timespec, &interface_status->interface,
-							interface_status->itemid,
-							ITEM_TYPE_ZABBIX, interface_status->host,
-							interface_status->key_orig, &data, &data_alloc, &data_offset,
-							poller_config->config_unavailable_delay,
-							poller_config->config_unreachable_period,
-							poller_config->config_unreachable_delay,
-							interface_status->error);
-					break;
-				case CONFIG_ERROR:
-					/* nothing to do */
-					break;
-				case SIG_ERROR:
-					/* nothing to do, execution was forcibly interrupted by signal */
-					break;
-				default:
-					zbx_error("unknown response code returned: %d", interface_status->errcode);
-					THIS_SHOULD_NEVER_HAPPEN;
-			}
-
-		}
-
-		zbx_hashset_clear(&poller_config->interfaces);
-
-		if (NULL != data)
-		{
-			zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
-			zbx_free(data);
-		}
-	}
+	poller_update_interfaces(poller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
