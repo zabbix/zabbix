@@ -231,7 +231,7 @@ int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 static int		last_clock = 0;
 /* --- kthr --- */
 static zbx_uint64_t	last_runque = 0;		/* length of the run queue (processes ready) */
-static zbx_uint64_t	last_swpque = 0;		/* length of the swap queue (processes waiting to be paged in) */
+static zbx_uint64_t	last_swpque = 0;		/* length of swap queue (processes waiting to be paged in) */
 /* --- page --- */
 static zbx_uint64_t	last_pgins = 0;			/* number of pages paged in */
 static zbx_uint64_t	last_pgouts = 0;		/* number of pages paged out */
@@ -376,7 +376,8 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 		lcputime = dlcpu_us + dlcpu_sy + dlcpu_id + dlcpu_wa;
 #ifdef _AIXVERSION_530
-		/* Distribute the donated and stolen purr to the existing purr buckets in case if donation is enabled. */
+		/* Distribute the donated and stolen purr to the existing purr buckets in case if donation */
+		/* is enabled. */
 #ifdef HAVE_AIXOSLEVEL_530006
 		if (lparstats.type.b.donate_enabled)
 		{
@@ -471,13 +472,14 @@ static void	update_vmstat(ZBX_VMSTAT_DATA *vmstat)
 
 #endif	/* _AIXVERSION_530 */
 		/* --- disk --- */
-		vmstat->disk_bps = 512 * ((diskstats.wblks - last_wblks) + (diskstats.rblks - last_rblks)) / (now - last_clock);
+		vmstat->disk_bps = 512 * ((diskstats.wblks - last_wblks) + (diskstats.rblks - last_rblks)) /
+				(now - last_clock);
 		vmstat->disk_tps = (double)(diskstats.xfers - last_xfers) / (now - last_clock);
 
 		/* -- memory -- */
 #ifdef HAVE_AIXOSLEVEL_520004
-		vmstat->mem_avm = (zbx_uint64_t)memstats.virt_active;	/* Active virtual pages. Virtual pages are considered
-									   active if they have been accessed */
+		/* Active virtual pages. Virtual pages are considered active if they have been accessed. */
+		vmstat->mem_avm = (zbx_uint64_t)memstats.virt_active;
 #endif
 		vmstat->mem_fre = (zbx_uint64_t)memstats.real_free;	/* free real memory (in 4KB pages) */
 
