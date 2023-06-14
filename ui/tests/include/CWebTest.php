@@ -104,13 +104,13 @@ class CWebTest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function tearDown(): void {
+	protected function assertPostConditions(): void {
 		// Check for JS errors.
 		$errors = [];
 		if (self::$shared_page !== null) {
-				foreach (self::$shared_page->getBrowserLog() as $log) {
-					$errors[] = $log['message'];
-				}
+			foreach (self::$shared_page->getBrowserLog() as $log) {
+				$errors[] = $log['message'];
+			}
 		}
 
 		if ($errors) {
