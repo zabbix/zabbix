@@ -19,8 +19,6 @@
 
 #include "zbxcomms.h"
 #include "comms.h"
-#include "zbxtypes.h"
-#include <stddef.h>
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #include "tls.h"
@@ -1815,8 +1813,11 @@ ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events)
 
 		if (ZBX_PROTO_ERROR == (res = zbx_tls_read(s, buf, len, events, &error)))
 		{
-			zbx_set_socket_strerror("%s", error);
-			zbx_free(error);
+			if (NULL == events || 0 == *events)
+			{
+				zbx_set_socket_strerror("%s", error);
+				zbx_free(error);
+			}
 		}
 
 		return res;
@@ -1882,7 +1883,7 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 
 ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events)
 {
-	ssize_t		nbytes;
+	ssize_t	nbytes;
 
 	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + context->buf_stat_bytes,
 			sizeof(s->buf_stat) - context->buf_stat_bytes, events)))
