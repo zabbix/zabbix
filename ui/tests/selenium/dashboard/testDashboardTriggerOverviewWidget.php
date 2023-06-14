@@ -52,7 +52,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	private static $icon_host = 'Host for triggers filtering';
 
 	private static $background_classes = [
-		'1_trigger_Average' => 'normal-bg cursor-pointer blink',
+		'1_trigger_Average' => 'normal-bg cursor-pointer js-blink',
 		'1_trigger_Disaster' => 'disaster-bg',
 		'1_trigger_High' => 'high-bg',
 		'1_trigger_Not_classified' => 'na-bg',
@@ -69,12 +69,12 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 	];
 
 	private static $trigger_icons = [
-		'2_trigger_Information' => 'icon-ackn',
-		'3_trigger_Average' => 'icon-ackn',
-		'4_trigger_Average' => 'icon-ackn',
+		'2_trigger_Information' => 'zi-check',
+		'3_trigger_Average' => 'zi-check',
+		'4_trigger_Average' => 'zi-check',
 		'Dependent trigger ONE' => 'icon-depend-down',
-		'Inheritance trigger with tags' => 'icon-depend-down',
-		'Trigger disabled with tags' => 'icon-depend-up'
+		'Inheritance trigger with tags' => 'zi-bullet-alt-down',
+		'Trigger disabled with tags' => 'zi-bullet-alt-up'
 	];
 
 	/**
@@ -890,7 +890,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 
 		// Check trigger icon if such should exist.
 		if (in_array($trigger, self::$trigger_icons)) {
-			$element = (self::$trigger_icons[$trigger] === 'icon-ackn') ? 'span' : 'a';
+			$element = (self::$trigger_icons[$trigger] === 'zi-check') ? 'span' : 'a';
 			$icon = $cell->query('xpath:.//'.$element)->one();
 			$this->assertTrue($icon->isValid());
 			$this->assertStringStartsWith(self::$trigger_icons[$trigger], $cell->getAttribute('class'));

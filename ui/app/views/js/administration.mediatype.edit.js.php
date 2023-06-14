@@ -47,12 +47,8 @@
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-action', 'edit'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("removeMessageTemplate('#{message_type}');")
+				(new CButtonLink(_('Edit')))->setAttribute('data-action', 'edit'),
+				(new CButtonLink(_('Remove')))->onClick("removeMessageTemplate('#{message_type}');")
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setAttribute('data-message-type', '#{message_type}')
@@ -292,7 +288,7 @@
 			$('#event_menu_url, #event_menu_name').prop('disabled', !$(this).is(':checked'));
 		});
 
-		$('#parameters_table').dynamicRows({ template: '#parameters_row' });
+		$('#parameters_table').dynamicRows({template: '#parameters_row', allow_empty: true});
 
 		/**
 		 * Show or hide "SSL verify peer" and "SSL verify host" fields.
@@ -413,7 +409,7 @@
 			$('input[name=content_type][value=' + providers[provider]['content_type'] + ']').prop("checked", true);
 		}
 
-		$('#exec_params_table').dynamicRows({ template: '#exec_params_row' });
+		$('#exec_params_table').dynamicRows({template: '#exec_params_row', allow_empty: true});
 
 		$('#chPass_btn').on('click', function() {
 			$(this).hide();

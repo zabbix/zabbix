@@ -21,13 +21,11 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses user macro token                                           *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of the token                       *
+ *             token      - [OUT] token data                                  *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             token      - [OUT] the token data                              *
- *                                                                            *
- * Return value: SUCCEED - the user macro was parsed successfully             *
+ * Return value: SUCCEED - user macro was parsed successfully                 *
  *               FAIL    - macro does not point at valid user macro           *
  *                                                                            *
  * Comments: If the macro points at valid user macro in the expression then   *
@@ -80,13 +78,11 @@ static int	token_parse_user_macro(const char *expression, const char *macro, zbx
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses lld macro token                                            *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of token                           *
+ *             token      - [OUT]                                             *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             token      - [OUT] the token data                              *
- *                                                                            *
- * Return value: SUCCEED - the lld macro was parsed successfully              *
+ * Return value: SUCCEED - lld macro was parsed successfully                  *
  *               FAIL    - macro does not point at valid lld macro            *
  *                                                                            *
  * Comments: If the macro points at valid lld macro in the expression then    *
@@ -131,22 +127,20 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses expression macro token                                     *
+ * Parameters: expression    - [IN]                                           *
+ *             macro         - [IN] beginning of the token                    *
+ *             token_search  - [IN] specify if references will be searched    *
+ *             token         - [OUT]                                          *
  *                                                                            *
- * Parameters: expression    - [IN] the expression                            *
- *             macro         - [IN] the beginning of the token                *
- *             token_search - [IN] specify if references will be searched     *
- *             token         - [OUT] the token data                           *
- *                                                                            *
- * Return value: SUCCEED - the expression macro was parsed successfully       *
+ * Return value: SUCCEED - expression macro was parsed successfully           *
  *               FAIL    - macro does not point at valid expression macro     *
  *                                                                            *
  * Comments: If the macro points at valid expression macro in the expression  *
  *           then the generic token fields are set and the                    *
  *           token->data.expression_macro structure is filled with expression *
- *           macro specific data.                                             *
- *           Contents of macro are not validated because expression macro may *
- *           contain user macro contexts and item keys with string arguments. *
+ *           macro specific data. Contents of macro are not validated because *
+ *           the expression macro may contain user macro contexts and item    *
+ *           keys with string arguments.                                      *
  *                                                                            *
  ******************************************************************************/
 static int	token_parse_expression_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
@@ -226,13 +220,11 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses object id token                                            *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of token                           *
+ *             token      - [OUT]                                             *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             token      - [OUT] the token data                              *
- *                                                                            *
- * Return value: SUCCEED - the object id was parsed successfully              *
+ * Return value: SUCCEED - object id was parsed successfully                  *
  *               FAIL    - macro does not point at valid object id            *
  *                                                                            *
  * Comments: If the macro points at valid object id in the expression then    *
@@ -279,17 +271,16 @@ static int	token_parse_objectid(const char *expression, const char *macro, zbx_t
  *                                                                            *
  * Purpose: parses macro name segment                                         *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             segment    - [IN] the segment start                            *
+ * Parameters: expression - [IN]                                              *
+ *             segment    - [IN] segment start                                *
  *             strict     - [OUT] 1 - macro contains only standard characters *
  *                                    (upper case alphanumeric characters,    *
  *                                     dots and underscores)                  *
- *                                0 - the last segment contains lowercase or  *
+ *                                0 - last segment contains lowercase or      *
  *                                    quoted characters                       *
- *             next       - [OUT] offset of the next character after the      *
- *                                segment                                     *
+ *             next       - [OUT] offset of next character after the segment  *
  *                                                                            *
- * Return value: SUCCEED - the segment was parsed successfully                *
+ * Return value: SUCCEED - segment was parsed successfully                    *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
@@ -350,13 +341,11 @@ static int	token_parse_macro_segment(const char *expression, const char *segment
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses macro name                                                 *
+ * Parameters: expression - [IN]                                              *
+ *             ptr        - [IN] beginning of macro name                      *
+ *             loc        - [OUT] macro name location                         *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             ptr        - [IN] the beginning of macro name                  *
- *             loc        - [OUT] the macro name location                     *
- *                                                                            *
- * Return value: SUCCEED - the simple macro was parsed successfully           *
+ * Return value: SUCCEED - simple macro was parsed successfully               *
  *               FAIL    - macro does not point at valid macro                *
  *                                                                            *
  * Comments: Note that the character following macro name must be inspected   *
@@ -391,11 +380,11 @@ static int	token_parse_macro_name(const char *expression, const char *ptr, zbx_s
  *                                                                            *
  * Purpose: parses normal macro token                                         *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             token      - [OUT] the token data                              *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of the token                       *
+ *             token      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - the simple macro was parsed successfully           *
+ * Return value: SUCCEED - simple macro was parsed successfully               *
  *               FAIL    - macro does not point at valid macro                *
  *                                                                            *
  * Comments: If the macro points at valid macro in the expression then        *
@@ -430,12 +419,13 @@ static int	token_parse_macro(const char *expression, const char *macro, zbx_toke
  *                                                                            *
  * Purpose: parses function inside token                                      *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             func       - [IN] the beginning of the function                *
- *             func_loc   - [OUT] the function location relative to the       *
+ * Parameters: expression - [IN]                                              *
+ *             func       - [IN] beginning of the function                    *
+ *             func_loc   - [OUT] function location relative to the           *
  *                                expression (including parameters)           *
+ *             func_param - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - the function was parsed successfully               *
+ * Return value: SUCCEED - function was parsed successfully                   *
  *               FAIL    - func does not point at valid function              *
  *                                                                            *
  ******************************************************************************/
@@ -458,17 +448,14 @@ static int	token_parse_function(const char *expression, const char *func,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses function macro token                                       *
- *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             func       - [IN] the beginning of the macro function in the   *
- *                               token                                        *
- *             token      - [OUT] the token data                              *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of the token                       *
+ *             func       - [IN] beginning of the macro function in token     *
+ *             token      - [OUT]                                             *
  *             token_type - [IN] type flag ZBX_TOKEN_FUNC_MACRO or            *
  *                               ZBX_TOKEN_LLD_FUNC_MACRO                     *
  *                                                                            *
- * Return value: SUCCEED - the function macro was parsed successfully         *
+ * Return value: SUCCEED - function macro was parsed successfully             *
  *               FAIL    - macro does not point at valid function macro       *
  *                                                                            *
  * Comments: If the macro points at valid function macro in the expression    *
@@ -524,12 +511,12 @@ static int	token_parse_func_macro(const char *expression, const char *macro, con
  *                                                                            *
  * Purpose: parses simple macro token with given key                          *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             key        - [IN] the beginning of host key inside the token   *
- *             token      - [OUT] the token data                              *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of token                           *
+ *             key        - [IN] beginning of host key inside token           *
+ *             token      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - the function macro was parsed successfully         *
+ * Return value: SUCCEED - function macro was parsed successfully             *
  *               FAIL    - macro does not point at valid simple macro         *
  *                                                                            *
  * Comments: Simple macros have format {<host>:<key>.<func>(<params>)}        *
@@ -609,13 +596,11 @@ static int	token_parse_simple_macro_key(const char *expression, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parses simple macro token                                         *
+ * Parameters: expression - [IN]                                              *
+ *             macro      - [IN] beginning of the token                       *
+ *             token      - [OUT]                                             *
  *                                                                            *
- * Parameters: expression - [IN] the expression                               *
- *             macro      - [IN] the beginning of the token                   *
- *             token      - [OUT] the token data                              *
- *                                                                            *
- * Return value: SUCCEED - the simple macro was parsed successfully           *
+ * Return value: SUCCEED - simple macro was parsed successfully               *
  *               FAIL    - macro does not point at valid simple macro         *
  *                                                                            *
  * Comments: Simple macros have format {<host>:<key>.<func>(<params>)}        *
@@ -652,15 +637,15 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: finds token {} inside expression starting at specified position   *
- *          also searches for reference if requested                          *
+ * Purpose: Finds token {} inside expression starting at the specified        *
+ *          position and also searches for reference if requested.            *
  *                                                                            *
- * Parameters: expression   - [IN] the expression                             *
- *             pos          - [IN] the starting position                      *
- *             token        - [OUT] the token data                            *
+ * Parameters: expression   - [IN]                                            *
+ *             pos          - [IN] starting position                          *
+ *             token        - [OUT]                                           *
  *             token_search - [IN] specify if references will be searched     *
  *                                                                            *
- * Return value: SUCCEED - the token was parsed successfully                  *
+ * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - expression does not contain valid token.           *
  *                                                                            *
  * Comments: The token field locations are specified as offsets from the      *
@@ -823,12 +808,12 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *                                                                            *
  * Purpose: parses token with nested macros                                   *
  *                                                                            *
- * Parameters: expression   - [IN] the expression                             *
- *             macro        - [IN] the beginning of the token                 *
+ * Parameters: expression   - [IN]                                            *
+ *             macro        - [IN] beginning of token                         *
  *             token_search - [IN] specify if references will be searched     *
- *             token        - [OUT] the token data                            *
+ *             token        - [OUT]                                           *
  *                                                                            *
- * Return value: SUCCEED - the token was parsed successfully                  *
+ * Return value: SUCCEED - token was parsed successfully                      *
  *               FAIL    - macro does not point at valid function or simple   *
  *                         macro                                              *
  *                                                                            *

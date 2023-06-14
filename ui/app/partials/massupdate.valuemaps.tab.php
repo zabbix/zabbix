@@ -47,9 +47,7 @@ $rename_container = (new CTable())
 		_('Action')
 	])
 	->setFooter(new CCol(
-		(new CButton('null', _('Add')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('element-table-add')
+		(new CButtonLink(_('Add')))->addClass('element-table-add')
 	));
 
 $remove_container = (new CDiv())->addClass('valuemap-remove');
