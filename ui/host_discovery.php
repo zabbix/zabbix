@@ -413,6 +413,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
 			'lld_macro_paths' => prepareLldMacroPaths(getRequest('lld_macro_paths', [])),
+			'filter' => prepareLldFilter([
+				'evaltype' => getRequest('evaltype', DB::getDefault('items', 'evaltype')),
+				'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
+				'conditions' => getRequest('conditions', [])
+			]),
 			'overrides' => prepareLldOverrides(getRequest('overrides', [])),
 
 			// Type fields.
@@ -470,16 +475,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'publickey' => getRequest('publickey', DB::getDefault('items', 'publickey')),
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
-
-		$lld_filter = prepareLldFilter([
-			'evaltype' => getRequest('evaltype', DB::getDefault('items', 'evaltype')),
-			'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
-			'conditions' => getRequest('conditions', [])
-		]);
-
-		if ($lld_filter) {
-			$input['filter'] = $lld_filter;
-		}
 
 		$result = true;
 

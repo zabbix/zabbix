@@ -2035,9 +2035,9 @@ function prepareLldMacroPaths(array $macro_paths): array {
  *
  * @param array $filter  Array of LLD filters, as received from form submit.
  *
- * @return array
+ * @return array|null
  */
-function prepareLldFilter(array $filter): array {
+function prepareLldFilter(array $filter): ?array {
 	ksort($filter['conditions']);
 
 	foreach ($filter['conditions'] as $i => &$condition) {
@@ -2055,7 +2055,7 @@ function prepareLldFilter(array $filter): array {
 	unset($condition);
 
 	if (!$filter['conditions']) {
-		return [];
+		return null;
 	}
 
 	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) == 1) {
@@ -2080,6 +2080,7 @@ function prepareLldFilter(array $filter): array {
 function prepareLldOverrides(array $overrides): array {
 	foreach ($overrides as &$override) {
 		if (!array_key_exists('filter', $override)) {
+			$override['filter'] = null;
 			continue;
 		}
 
@@ -2228,7 +2229,7 @@ function getMainItemFieldNames(array $input): array {
 				];
 			}
 			else {
-				return ['lifetime', 'description', 'status', 'filters'];
+				return ['lifetime', 'description', 'status', 'filter'];
 			}
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
