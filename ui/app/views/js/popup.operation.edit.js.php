@@ -72,8 +72,6 @@ window.operation_popup = new class {
 				this._processTypeOfCalculation();
 			}
 		});
-
-		this.#updateHostTagsFields(this.data.optag);
 	}
 
 	_changeView(operation_type) {
@@ -179,17 +177,14 @@ window.operation_popup = new class {
 	 */
 	#hostTagsFields() {
 		this.form.querySelector('#operation-host-tags').style.display = '';
-
-		const fields = ['operation-host-tags'];
-
-		this._enableFormFields(fields);
+		this._enableFormFields(['operation-host-tags']);
 
 		if (this.data.optag.length == 0) {
 			this.data.optag = [];
 			this.data.optag.push({row_index: 0});
-
-			this.#updateHostTagsFields(this.data.optag);
 		}
+
+		this.#updateHostTagsFields(this.data.optag);
 	}
 
 	/**
@@ -200,10 +195,13 @@ window.operation_popup = new class {
 	#updateHostTagsFields(tags) {
 		const tags_table = this.form.querySelector('#tags-table');
 		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
+		const form_rows = tags_table.querySelectorAll('.form_row');
 
 		tags.forEach((row, index) => {
-			row.row_index = index;
-			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
+			if (![...form_rows].some((form_row) => index == form_row.getAttribute('data-id'))) {
+				row.row_index = index;
+				tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
+			}
 		});
 	}
 
