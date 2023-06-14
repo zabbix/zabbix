@@ -90,7 +90,7 @@ static void	process_agent_result(void *data)
 	ret = agent_context->ret;
 
 	zbx_async_check_agent_clean(agent_context);
-	zbx_tcp_close(&agent_context->s);
+
 	zbx_free(agent_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
