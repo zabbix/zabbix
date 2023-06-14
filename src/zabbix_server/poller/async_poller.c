@@ -161,7 +161,7 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 	if (0 == poller_config->interfaces.num_data)
 		return;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "updating:%d interfaces", poller_config->interfaces.num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, poller_config->interfaces.num_data);
 
 	zbx_timespec(&timespec);
 
@@ -210,6 +210,8 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 		zbx_availability_send(ZBX_IPC_AVAILABILITY_REQUEST, data, (zbx_uint32_t)data_offset, NULL);
 		zbx_free(data);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	async_check_items(evutil_socket_t fd, short events, void *arg)
