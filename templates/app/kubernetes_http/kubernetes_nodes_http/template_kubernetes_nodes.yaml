@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-07T13:26:47Z'
+  date: '2023-06-14T08:13:46Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1289,20 +1289,20 @@ zabbix_export:
           master_item:
             key: kube.nodes
           lld_macro_paths:
-            - lld_macro: '{#NAME}'
-              path: $.metadata.name
-            - lld_macro: '{#IP}'
-              path: $.internalIP
-            - lld_macro: '{#ROLES}'
-              path: $.status.roles
-            - lld_macro: '{#ENDPOINT}'
-              path: $.status.agent
             - lld_macro: '{#ARCH}'
               path: '$.metadata.labels[''kubernetes.io/arch'']'
-            - lld_macro: '{#OS}'
-              path: '$.metadata.labels[''kubernetes.io/os'']'
             - lld_macro: '{#CLUSTER_HOSTNAME}'
               path: $.clusterhostname
+            - lld_macro: '{#ENDPOINT}'
+              path: $.status.agent
+            - lld_macro: '{#IP}'
+              path: $.internalIP
+            - lld_macro: '{#NAME}'
+              path: $.metadata.name
+            - lld_macro: '{#OS}'
+              path: '$.metadata.labels[''kubernetes.io/os'']'
+            - lld_macro: '{#ROLES}'
+              path: $.status.roles
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1592,12 +1592,12 @@ zabbix_export:
           master_item:
             key: kube.nodes
           lld_macro_paths:
+            - lld_macro: '{#NAMESPACE}'
+              path: $.namespace
             - lld_macro: '{#NODE}'
               path: $.hostname
             - lld_macro: '{#POD}'
               path: $.name
-            - lld_macro: '{#NAMESPACE}'
-              path: $.namespace
           preprocessing:
             - type: JSONPATH
               parameters:
