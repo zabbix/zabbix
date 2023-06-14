@@ -90,7 +90,6 @@ static void	process_agent_result(void *data)
 	ret = agent_context->ret;
 
 	zbx_async_check_agent_clean(agent_context);
-
 	zbx_free(agent_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
@@ -216,9 +215,9 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 
 static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 {
-	zbx_dc_item_t		item, *items;
-	AGENT_RESULT		results[ZBX_MAX_HTTPAGENT_ITEMS];
-	int			errcodes[ZBX_MAX_HTTPAGENT_ITEMS];
+	zbx_dc_item_t		*items;
+	AGENT_RESULT		results[ZBX_MAX_ITEMS];
+	int			errcodes[ZBX_MAX_ITEMS];
 	zbx_timespec_t		timespec;
 	int			i, num;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
@@ -228,7 +227,6 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
 
-	items = &item;
 	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
 			poller_config->processing, &items);
 
@@ -250,7 +248,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	/* process item values */
 	for (i = 0; i < num; i++)
 	{
-		if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
+		if (NOTSUPPORTED == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
 			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
 					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
@@ -264,8 +262,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	zbx_clean_items(items, num, results);
 	zbx_dc_config_clean_items(items, NULL, num);
 
-	if (items != &item)
-		zbx_free(items);
+	zbx_free(items);
 exit:
 	zbx_preprocessor_flush();
 
@@ -303,7 +300,7 @@ static void	zbx_interface_status_clean(zbx_interface_status *interface_status)
 	zbx_free(interface_status->error);
 }
 
-static void	http_agent_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
+static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		event_callback_fn async_check_items_callback)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -393,11 +390,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 
-	http_agent_poller_init(&poller_config, poller_args_in, async_check_items);
-	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
-			poller_update_selfmon_counter, &poller_config);
+	async_poller_init(&poller_config, poller_args_in, async_check_items);
 	poller_config.state = ZBX_PROCESS_STATE_BUSY;
 	poller_config.info = info;
+
+	poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
+			poller_update_selfmon_counter, &poller_config);
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -438,6 +436,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		}
 	}
 
+	event_base_dispatch(poller_config.base);
+
+	zbx_async_httpagent_destroy();
 	http_agent_poller_destroy(&poller_config);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

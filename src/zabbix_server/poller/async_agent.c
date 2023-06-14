@@ -203,6 +203,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 	agent_context->key = item->key;
 	agent_context->key_orig = zbx_strdup(NULL, item->key_orig);
 	item->key = NULL;
+
 	zbx_init_agent_result(&agent_context->result);
 
 	switch (agent_context->host.tls_connect)

@@ -227,7 +227,10 @@ CURLM	*zbx_async_httpagent_init(struct event_base *ev,
 
 void	zbx_async_httpagent_destroy(void)
 {
-	curl_multi_cleanup(curl_handle);
-	event_free(curl_timeout);
+	if (NULL != curl_handle)
+		curl_multi_cleanup(curl_handle);
+
+	if (NULL != curl_timeout)
+		event_free(curl_timeout);
 }
 
