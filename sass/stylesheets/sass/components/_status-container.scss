@@ -11,21 +11,7 @@
 	vertical-align: top;
 	border-width: 1px;
 	border-style: solid;
-
-	&:not(:last-of-type) {
-		padding-right: 4px;
-		border-right-style: none;
-	}
-
-	&:first-of-type {
-		border-top-left-radius: 2px;
-		border-bottom-left-radius: 2px;
-	}
-
-	&:last-of-type {
-		border-top-right-radius: 2px;
-		border-bottom-right-radius: 2px;
-	}
+	border-radius: 2px;
 }
 
 .status-container {
@@ -35,6 +21,23 @@
 
 	&:not(:first-of-type) {
 		margin-left: 3px;
+	}
+
+	[class^="status-"] {
+		&:not(:last-of-type) {
+			padding-right: 4px;
+			border-right-style: none;
+		}
+
+		&:not(:first-of-type) {
+			border-top-left-radius: 0;
+			border-bottom-left-radius: 0;
+		}
+
+		&:not(:last-of-type) {
+			border-top-right-radius: 0;
+			border-bottom-right-radius: 0;
+		}
 	}
 }
 
@@ -47,7 +50,6 @@
 	@extend %status;
 
 	border-color: $status-border-color;
-	border-radius: 0;
 }
 
 .status-green {
