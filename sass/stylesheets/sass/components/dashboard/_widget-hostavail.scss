@@ -1,0 +1,44 @@
+// Widget view.
+
+div.dashboard-widget-hostavail {
+	.host-avail-widget {
+		td:not(:first-child) {
+			border-left: 1px dotted $table-border-color;
+		}
+
+		.host-avail-true {
+			background: $host-avail-true-bg-color;
+		}
+
+		.host-avail-false {
+			background: $host-avail-false-bg-color;
+		}
+
+		.host-avail-unknown {
+			background: $host-avail-unknown-bg-color;
+		}
+
+		.host-avail-total {
+			background: $host-avail-total-bg-color;
+		}
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-hostavail {
+		.host-avail-widget {
+			td:not(:first-child) {
+				border-left: 1px solid $ui-border-color;
+			}
+
+			.host-avail-true,
+			.host-avail-false,
+			.host-avail-unknown,
+			.host-avail-total {
+				background: transparent;
+			}
+		}
+	}
+}

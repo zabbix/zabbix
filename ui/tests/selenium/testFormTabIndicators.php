@@ -665,7 +665,7 @@ class testFormTabIndicators extends CWebTest {
 
 		// Open widget configuration form if indicator check is performed on dachboard.
 		if ($data['url'] === 'zabbix.php?action=dashboard.view') {
-			$this->query('class:btn-widget-edit')->one()->click();
+			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
@@ -961,7 +961,7 @@ class testFormTabIndicators extends CWebTest {
 				if ($action === USER_ACTION_REMOVE) {
 					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
 					COverlayDialogElement::find()->one()->scrollToTop();
-					$form->query('class:btn-remove')->all()->click();
+					$form->query('class:js-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {

@@ -161,9 +161,7 @@ $parameters_exec_table = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-add')
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				))->setColSpan(2)
 			)
 	);
@@ -177,9 +175,8 @@ $parameters_exec_template = (new CTemplateTag('exec_params_template'))
 				->setAttribute('value', '#{value}')
 				->setId('parameters_exec_#{rowNum}_value')
 				->removeId(),
-			(new CSimpleButton(_('Remove')))
+			(new CButtonLink(_('Remove')))
 				->removeId()
-				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-remove')
 		]))->addClass('form_row')
 	);
@@ -239,9 +236,7 @@ $parameters_table = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('webhook-param-add')
+					(new CButtonLink(_('Add')))->addClass('webhook-param-add')
 				))->setColSpan(2)
 			)
 	);
@@ -257,9 +252,8 @@ $webhook_params_template = (new CTemplateTag('webhook_params_template'))
 				->addStyle('width: 100%;')
 				->setAttribute('value', '#{value}')
 				->removeId(),
-			(new CSimpleButton(_('Remove')))
+			(new CButtonLink(_('Remove')))
 				->removeId()
-				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('js-remove')
 		]))->addClass('form_row')
 	);
@@ -386,12 +380,8 @@ $message_template = (new CTemplateTag('message-templates-row-tmpl'))
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
 			(new CHorList([
-				(new CSimpleButton(_('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-action', 'edit'),
-				(new CSimpleButton(_('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('js-remove-msg-template')
+				(new CButtonLink(_('Edit')))->setAttribute('data-action', 'edit'),
+				(new CButtonLink(_('Remove')))->addClass('js-remove-msg-template')
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setAttribute('data-message-type', '#{message_type}')
 	);
@@ -414,8 +404,7 @@ $message_templates_form_grid = (new CFormGrid())
 						->setId('message-templates-footer')
 						->addItem(
 							(new CCol(
-								(new CSimpleButton(_('Add')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Add')))
 									->setAttribute('data-action', 'add')
 									->addClass('msg-template-add')
 							))->setColSpan(2)

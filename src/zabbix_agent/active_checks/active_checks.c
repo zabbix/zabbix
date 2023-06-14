@@ -372,16 +372,16 @@ out:
 static void	add_command(const char *key, zbx_uint64_t id)
 {
 	zbx_active_command_t	*command;
-	zbx_cmd_hash_t		*cmd_hash, cmd_hash_loc;
+	zbx_cmd_hash_t		cmd_hash_loc;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' id:" ZBX_FS_UI64, __func__, key, id);
 
-	if (NULL == (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_search(&commands_hash, &id)))
+	if (NULL == zbx_hashset_search(&commands_hash, &id))
 	{
 		cmd_hash_loc.id = id;
 		cmd_hash_loc.ttl = time(NULL) + SEC_PER_HOUR;
 
-		cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_insert(&commands_hash, &cmd_hash_loc, sizeof(cmd_hash_loc));
+		zbx_hashset_insert(&commands_hash, &cmd_hash_loc, sizeof(cmd_hash_loc));
 
 		command = (zbx_active_command_t *)zbx_malloc(NULL, sizeof(zbx_active_command_t));
 
@@ -1523,7 +1523,6 @@ out:
 
 static void	process_command(zbx_active_command_t *command)
 {
-	int		ret;
 	AGENT_RESULT	result;
 	char		**pvalue, *empty = "", *error = ZBX_NOTSUPPORTED_MSG;
 	unsigned char	state = ITEM_STATE_NORMAL;
@@ -1532,7 +1531,7 @@ static void	process_command(zbx_active_command_t *command)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = zbx_execute_agent_check(command->key, 0, &result)))
+	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result))
 	{
 		state = ITEM_STATE_NOTSUPPORTED;
 		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))

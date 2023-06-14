@@ -121,19 +121,19 @@ $discoveryForm->addItem([
 			'content' => (new CSimpleButton(_('Enable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massenable')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'discovery.disable' => [
 			'content' => (new CSimpleButton(_('Disable')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdisable')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'discovery.delete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdelete')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'discovery')
 ]);

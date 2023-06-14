@@ -34,7 +34,7 @@ $html_page = (new CHtmlPage())
 		(new CList())
 			->addItem((new CSimpleButton(_('Create media type')))->setId('js-create'))
 			->addItem(
-				(new CButton('', _('Import')))
+				(new CSimpleButton(_('Import')))
 					->onClick(
 						'return PopUp("popup.import", {
 							rules_preset: "mediatype", '.
@@ -44,7 +44,6 @@ $html_page = (new CHtmlPage())
 							dialogue_class: "modal-popup-generic"
 						});'
 					)
-					->removeId()
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)

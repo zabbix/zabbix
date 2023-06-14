@@ -32,7 +32,7 @@ $form = (new CForm())
 	->addVar('eventsource', $data['eventsource']);
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 // Action tab.
 $action_tab = (new CFormGrid())
@@ -58,8 +58,7 @@ $formula = (new CTextBox('formula', $data['formula'], false, DB::getFieldLength(
 	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $condition_hidden_data = (new CCol([
-	(new CButton(null, _('Remove')))
-		->addClass(ZBX_STYLE_BTN_LINK)
+	(new CButtonLink(_('Remove')))
 		->addClass('js-remove-condition'),
 	(new CInput('hidden'))
 		->setAttribute('value', '#{conditiontype}')
@@ -156,10 +155,9 @@ $condition_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))
 					->addClass('js-condition-create')
+					->setAttribute('data-eventsource', $data['eventsource'])
 			))->setColSpan(4)
 		)
 );

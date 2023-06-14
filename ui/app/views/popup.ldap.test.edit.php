@@ -70,7 +70,7 @@ $form = (new CForm('post', $form_action))
 	->addItem((new CScriptTag('ldap_test_edit_popup.init();'))->setOnDocumentReady());
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 foreach ($data['ldap_config'] as $field => $value) {
 	$form->addVar($field, $value);

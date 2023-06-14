@@ -24,7 +24,7 @@
  * @var array $data
  */
 
-$this->includeJsFile('proxy.list.js.php');
+$this->includeJsFile('administration.proxy.list.js.php');
 
 $filter = (new CFilter())
 	->addVar('action', 'proxy.list')
@@ -184,7 +184,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			(new CLink($proxy['host']))
 				->addClass('js-edit-proxy')
 				->setAttribute('data-proxyid', $proxyid)
-		))->addClass(ZBX_STYLE_WORDBREAK),
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$info_icons ? [$version, NBSP(), makeInformationList($info_icons)] : $version,
@@ -206,25 +206,25 @@ $form->addItem(
 			'content' => (new CSimpleButton(_('Refresh configuration')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-refresh-proxy-config')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'proxy.host.massenable' => [
 			'content' => (new CSimpleButton(_('Enable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massenable-proxy-host')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'proxy.host.massdisable' => [
 			'content' => (new CSimpleButton(_('Disable hosts')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdisable-proxy-host')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'proxy.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-proxy')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'proxy')
 );

@@ -155,6 +155,7 @@ func (c *DiskCache) updateCommandRange() (err error) {
 		return
 	}
 	c.oldestCommand = clock
+
 	return
 }
 
@@ -223,6 +224,7 @@ func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId 
 		" FROM command_%d"+
 		" ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from command table: %s", err.Error())
+
 		return nil, 0, err
 	}
 
@@ -237,6 +239,7 @@ func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId 
 			}
 		} else {
 			rows.Close()
+			_ = rows.Err()
 			return nil, 0, err
 		}
 		results = append(results, &result)
@@ -318,7 +321,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	defer cacheLock.Unlock()
 	if maxDataId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId); err != nil {
-			return fmt.Errorf("cannot delete from data_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from data_%d: %w", c.serverID, err)
 		}
 		if err = c.updateDataRange(); err != nil {
 			return
@@ -326,7 +329,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if maxLogId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId); err != nil {
-			return fmt.Errorf("cannot delete from log_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from log_%d: %w", c.serverID, err)
 		}
 		if err = c.updateLogRange(); err != nil {
 			return
@@ -334,7 +337,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if maxCommandId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM command_%d WHERE id<=?", c.serverID), maxCommandId); err != nil {
-			return fmt.Errorf("cannot delete from command_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from command_%d: %w", c.serverID, err)
 		}
 		if err = c.updateCommandRange(); err != nil {
 			return

@@ -31,7 +31,7 @@ $form = (new CForm())
 	->addVar('operation[recovery]', $data['recovery']);
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
@@ -397,10 +397,9 @@ $conditions_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))
 					->addClass('operation-condition-list-footer')
+					->setAttribute('data-eventsource', $data['eventsource'])
 			))->setColSpan(4)
 		)
 );
@@ -419,9 +418,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 						->addClass('label'),
 					new CCol('#{name}'),
 					(new CCol([
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-remove'),
+						(new CButtonLink(_('Remove')))->addClass('js-remove'),
 						(new CInput('hidden'))
 							->setAttribute('value', '#{conditiontype}')
 							->setName('operation[opconditions][#{row_index}][conditiontype]'),

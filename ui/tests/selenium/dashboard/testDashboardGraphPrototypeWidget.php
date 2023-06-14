@@ -345,7 +345,8 @@ class testDashboardGraphPrototypeWidget extends CWebTest {
 			$form->fill($data['fields']);
 		}
 		$form->submit();
-		$dashboard->getWidget($widget['Name']);
+		COverlayDialogElement::ensureNotPresent();
+		$dashboard->waitUntilReady()->getWidget($widget['Name']);
 		$dashboard->save();
 		$this->page->removeFocus();
 		sleep(1);

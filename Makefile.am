@@ -109,22 +109,17 @@ gettext:
 
 css_theme_blue:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss ui/assets/styles/blue-theme.css
-	cp ui/assets/styles/blue-theme.css sass/stylesheets/screen.css
 
 css_theme_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss ui/assets/styles/dark-theme.css
-	cp ui/assets/styles/dark-theme.css sass/stylesheets/dark-theme.css
 
 css_hc_light:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-light.scss ui/assets/styles/hc-light.css
-	cp ui/assets/styles/hc-light.css sass/stylesheets/hc-light.css
 
 css_hc_dark:
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/hc-dark.scss ui/assets/styles/hc-dark.css
-	cp ui/assets/styles/hc-dark.css sass/stylesheets/hc-dark.css
 
-css_icons:
-	cp sass/img/icon-sprite.svg ui/assets/img/
+css_images:
 	cp sass/img/browser-sprite.png ui/assets/img/
 	cp sass/apple-touch-icon-120x120-precomposed.png ui/assets/img/
 	cp sass/apple-touch-icon-152x152-precomposed.png ui/assets/img/
@@ -134,7 +129,22 @@ css_icons:
 	cp sass/touch-icon-192x192.png ui/assets/img/
 	cp sass/favicon.ico ui/
 
-css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
+icons_build:
+	cd sass/icons
+	npm run generate
+	cp sass/icons/dist/_icons.scss sass/stylesheets/sass/base/
+	cp sass/icons/dist/zabbix-icons.svg ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.ttf ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.woff ui/assets/fonts/
+	cp sass/icons/dist/zabbix-icons.woff2 ui/assets/fonts/
+
+icons_cleanup:
+	cd sass/icons
+	npm run cleanup
+
+css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_images
+
+icons: icons_build css icons_cleanup
 
 ## cmocka test support
 if TESTS

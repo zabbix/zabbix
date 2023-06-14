@@ -39,9 +39,10 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 
 		$view->addItem(
 			(new CDiv(
-				(new CButton('override_add', [(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add new override')]))
-					->addClass(ZBX_STYLE_BTN_ALT)
+				(new CButton('override_add', _('Add new override')))
 					->setId('override-add')
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass(ZBX_ICON_PLUS_SMALL)
 			)),
 			'overrides-foot'
 		);
@@ -78,7 +79,7 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 					template: "#overrides-row",
 					allow_empty: true,
 					beforeRow: ".overrides-foot",
-					remove: ".'.ZBX_STYLE_BTN_REMOVE.'",
+					remove: ".js-remove",
 					add: "#override-add",
 					row: ".'.ZBX_STYLE_OVERRIDES_LIST_ITEM.'"
 				})
@@ -361,17 +362,15 @@ class CWidgetFieldGraphOverrideView extends CWidgetFieldView {
 			$host_pattern_field,
 			$item_pattern_field,
 			(new CDiv(
-				(new CButton())
-					->setAttribute('title', _('Delete'))
-					->addClass(ZBX_STYLE_BTN_REMOVE)
-					->removeId()
+				(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
 			))->addClass('list-item-actions'),
 			(new CList($inputs))
 				->addClass(ZBX_STYLE_OVERRIDES_OPTIONS_LIST)
 				->addItem(
-					(new CButton(null, (new CSpan())->addClass(ZBX_STYLE_PLUS_ICON)))
-						->setAttribute('data-row', $row_num)
+					(new CSimpleButton())
 						->addClass(ZBX_STYLE_BTN_ALT)
+						->addClass(ZBX_ICON_PLUS_SMALL)
+						->setAttribute('data-row', $row_num)
 				)
 		]))->addClass(ZBX_STYLE_OVERRIDES_LIST_ITEM);
 	}

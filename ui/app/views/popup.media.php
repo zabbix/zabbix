@@ -112,19 +112,22 @@ $form = (new CForm())
 	->setId('media_form');
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form->addItem([
 	$media_form,
+	(new CInput('submit', 'submit'))->addStyle('display: none;'),
 	(new CTag('script'))
 		->addItem((new CRow([
-			(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))
-				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CCol(
+				(new CTextBox('sendto_emails[#{rowNum}]', ''))
+					->setAriaRequired()
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			)),
-			(new CCol((new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			(new CCol(
+				(new CButton('sendto_emails[#{rowNum}][remove]', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('element-table-remove')
 			))
 		]))
 			->addClass('form_row')

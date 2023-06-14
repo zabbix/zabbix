@@ -1092,7 +1092,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$buttons = ['Add', 'Cancel'];
 		}
 
-		$dialog = COverlayDialogElement::find()->one()->waitUntilVisible();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 		$this->assertEquals($title, $dialog->getTitle());
 

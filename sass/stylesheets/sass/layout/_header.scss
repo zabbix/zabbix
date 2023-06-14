@@ -45,6 +45,23 @@ header {
 				line-height: 1.2;
 			}
 		}
+
+		.zi-star,
+		.zi-star-filled {
+			padding: 0;
+			vertical-align: middle;
+			font-size: 0;
+
+			&::before {
+				padding: 0 2px;
+			}
+		}
+
+		.zi-star-filled {
+			&::before {
+				color: $gold;
+			}
+		}
 	}
 
 	.header-kioskmode-controls {
@@ -80,6 +97,7 @@ header {
 		box-sizing: border-box;
 		display: block;
 		height: 25px;
+		margin-bottom: 0;
 
 		h1 {
 			padding-right: 1em;
@@ -95,12 +113,17 @@ header {
 				border-right: 2px solid $font-color;
 				border-bottom: 2px solid $font-color;
 				transform: rotate(45deg);
-				transition: border-color .2s ease-out;
+
+				@if $ui-transitions {
+					transition: border-color $ui-controls-transition-duration ease-out;
+				}
 			}
 		}
 
 		&:hover,
 		&:focus {
+			margin-bottom: 0;
+
 			h1::after {
 				border-color: $link-hover-color;
 			}
