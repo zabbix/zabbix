@@ -131,8 +131,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
-		$this->openMediaTypeTemplates('new');
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$overlay = $this->openMediaTypeTemplates('new');
 		$this->assertEquals('New media type', $overlay->getTitle());
 		// Check message templates tab.
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
@@ -146,6 +145,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
 		$message_form = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$this->assertEquals('Message template', $message_form->getTitle());
 		$form = $message_form->query('id:mediatype-message-form')->asForm()->one();
 		$this->assertEquals(['Message type', 'Subject', 'Message'], $form->getLabels()->asText());
 		$form->getField('Message type')->checkValue('Problem');
@@ -157,8 +157,8 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
+		$message_form->waitUntilNotVisible();
 		$templates_list->invalidate();
-		COverlayDialogElement::find()->one()->waitUntilReady();
 		$row = $templates_list->findRow('Message type', 'Problem');
 
 		// Check that both buttons in column Actions are clickable.
@@ -837,7 +837,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	 */
 	public function testFormAdministrationMediaTypeMessageTemplates_Update($data) {
 		// Open configuration of an existing media type, update its format if needed and switch to Message templates tab.
-		$this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
+		$overlay = $this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Edit the list of existing message templates or remove all message templates if corresponding key exists.
 		if (array_key_exists('remove_all', $data)) {
@@ -846,12 +846,12 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		else {
 			$this->modifyMessageTemplates($data);
 		}
-		COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->submit();
+		$overlay->asForm()->submit();
 		COverlayDialogElement::ensureNotPresent();
 		// Open message template list of the edited media type and check that message template updates took place.
 		$this->query('link', $data['media_type'])->waitUntilClickable()->one()->click();
-		$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$media_form = $overlay->asForm();
+		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$media_form = $message_overlay->asForm();
 		$media_form->selectTab('Message templates');
 		$templates_list->invalidate();
 		if (array_key_exists('remove_all', $data)) {
@@ -864,7 +864,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			);
 			$this->checkMessageTemplates($data, $templates_list);
 		}
-		$overlay->close();
+		$message_overlay->close();
 	}
 
 	public function testFormAdministrationMediaTypeMessageTemplates_SimpleUpdate() {
@@ -948,8 +948,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					// Open the corresponding message template and check its content according to the values in data provider.
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-					$form = $message_overlay->asForm();
-					$form->checkValue($template);
+					$message_overlay->asForm()->checkValue($template);
 					$message_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
 					break;
 				case 'Remove':
@@ -962,6 +961,11 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	/**
 	 * Function creates new or opens existing media type, modifies media type parameters and opens message templates tab.
+	 *
+	 * @param string $media_type		the name of existing media type or the 'new' keyword to create a new media type
+	 * @param array $media_type_fields  media type field values to fill in the form
+	 *
+	 * @return COverlayDialogElement
 	 */
 	private function openMediaTypeTemplates($media_type, $media_type_fields = null) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
@@ -974,5 +978,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			$media_form->fill($media_type_fields);
 		}
 		$media_form->selectTab('Message templates');
+
+		return $overlay;
 	}
 }
