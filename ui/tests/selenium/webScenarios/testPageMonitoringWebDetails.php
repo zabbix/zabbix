@@ -31,7 +31,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 	use TableTrait;
 
-	protected const HOST_NAME = 'Host with web scenarios';
+	protected const HOST_NAME = 'Host for web scenarios';
 
 	protected static $host_id;
 	protected static $httptest_id;
@@ -82,8 +82,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			[
 				[
 					'name' => 'Many steps',
-					'item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0],
-					'steps' => $this->getGeneratedStepNames(50)
+					'steps' => array_fill(0, 50, [])
 				]
 			],
 			[
@@ -105,6 +104,54 @@ class testPageMonitoringWebDetails extends CWebTest {
 						['name' => "\nNewline\n"]
 					]
 				]
+			],
+			[
+				[
+					'name' => 'Result - OK',
+					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0],
+					'expected_totals' => ['Response time' => '16m 39s 123.46ms', 'Status' => 'OK'],
+					'steps' => [
+						[
+							'item_data' => [
+								HTTPSTEP_ITEM_TYPE_RSPCODE => 200,
+								HTTPSTEP_ITEM_TYPE_TIME => 0.123456,
+								HTTPSTEP_ITEM_TYPE_IN => 3000
+							],
+							'expected_data' => [
+								'Speed' => '2.93 KBps',
+								'Response time' => '123.46ms',
+								'Response code' => '200',
+								'Status' => 'OK'
+							]
+						],
+						[
+							'item_data' => [
+								HTTPSTEP_ITEM_TYPE_RSPCODE => 404,
+								HTTPSTEP_ITEM_TYPE_TIME => 999,
+								HTTPSTEP_ITEM_TYPE_IN => 1099511627776
+							],
+							'expected_data' => [
+								'Speed' => '1 TBps',
+								'Response time' => '16m 39s',
+								'Response code' => '404',
+								'Status' => 'OK'
+							]
+						]
+					]
+				]
+			],
+			[
+				[
+					'name' => 'Result - Unknown error',
+					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 1],
+					'expected_totals' => ['Status' => 'Unknown error'],
+					'steps' => [
+						['expected_data' => ['Status' => 'OK']],
+						['expected_data' => ['Status' => 'Unknown error']],
+						['expected_data' => ['Status' => 'Unknown']],
+						['expected_data' => ['Status' => 'Unknown']]
+					]
+				]
 			]
 		];
 	}
@@ -119,7 +166,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$api_steps = [];
 		foreach ($data['steps'] as $i => $step){
 			$api_step = [];
-			$api_step['name'] = $step['name'];
+			$api_step['name'] = $step['name'] ?? 'Step '.$i + 1;
 			$api_step['url'] = 'http://example.com';
 			$api_step['no'] = $i;
 			$api_steps[] = $api_step;
@@ -135,8 +182,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 		]);
 		$httptest_id = $response['httptestids'][0];
 
-		// Generate data for web scenario items.
-		foreach ($data['item_data'] ?? [] as $data_type => $data_value){
+		// Generate data for global web scenario items.
+		foreach ($data['global_item_data'] ?? [] as $data_type => $data_value) {
 			$sql = 'SELECT ti.itemid FROM httptestitem ti '.
 				'JOIN items i ON ti.itemid=i.itemid '.
 				'WHERE ti.httptestid = '.$httptest_id.' '.
@@ -146,9 +193,9 @@ class testPageMonitoringWebDetails extends CWebTest {
 		}
 
 		// Generate data for step items.
-		foreach ($data['steps'] as $i => $step){
+		foreach ($data['steps'] as $i => $step) {
 			// Each step has several item types.
-			foreach ($step['item_data'] ?? [] as $data_type => $data_value){
+			foreach ($step['item_data'] ?? [] as $data_type => $data_value) {
 				$sql = 'SELECT si.itemid FROM httpstepitem si '.
 						'JOIN httpstep s ON si.httpstepid=s.httpstepid '.
 						'JOIN httptest t ON s.httptestid=t.httptestid '.
@@ -167,39 +214,15 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Assert data table.
 		$expected_rows = [];
-		foreach ($data['steps'] as $step){
+		foreach ($data['steps'] as $i => $step) {
 			// Whitespace at the beginning and end should not be displayed.
-			$expected_row = ['Step' => trim($step['name'])];
+			$expected_row = ['Step' => trim($step['name'] ?? 'Step '.$i + 1)];
 			$expected_row = array_merge($expected_row, $step['expected_data'] ?? []);
 			$expected_rows[] = $expected_row;
 		}
 		// The table contains an additional TOTAL row.
-		$expected_rows[] = ['Step' => 'TOTAL'];
+		$expected_rows[] = array_merge(['Step' => 'TOTAL'], $data['expected_totals'] ?? []);
 		$this->assertTableData($expected_rows);
 
-	}
-
-	/**
-	 * Generates an array of steps with a length of $count.
-	 */
-	protected  function getGeneratedStepNames($count) {
-		$result = [];
-		for ($i = 1; $i <= $count; $i++) {
-			$result[] = [
-				'name' => 'Step-'.$i,
-				'item_data' => [
-					HTTPSTEP_ITEM_TYPE_RSPCODE => 200,
-					HTTPSTEP_ITEM_TYPE_TIME => 0.123456,
-					HTTPSTEP_ITEM_TYPE_IN => 3000
-				],
-				'expected_data' => [
-					'Speed' => '2.93 KBps',
-					'Response time' => '123.46ms',
-					'Response code' => '200',
-					'Status' => 'OK'
-				]
-			];
-		}
-		return $result;
 	}
 }
