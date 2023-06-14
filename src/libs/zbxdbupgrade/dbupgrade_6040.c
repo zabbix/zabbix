@@ -30,6 +30,11 @@ static int	DBpatch_6040000(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6040001(void)
+{
+	return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+}
+
 #endif
 
 DBPATCH_START(6040)
@@ -37,5 +42,6 @@ DBPATCH_START(6040)
 /* version, duplicates flag, mandatory flag */
 
 DBPATCH_ADD(6040000, 0, 1)
+DBPATCH_ADD(6040001, 0, 0)
 
 DBPATCH_END()
