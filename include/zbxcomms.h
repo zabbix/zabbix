@@ -22,8 +22,6 @@
 
 #include "zbxalgo.h"
 #include "zbxtime.h"
-#include <stddef.h>
-#include <stdint.h>
 
 #define ZBX_IPV4_MAX_CIDR_PREFIX	32	/* max number of bits in IPv4 CIDR prefix */
 #define ZBX_IPV6_MAX_CIDR_PREFIX	128	/* max number of bits in IPv6 CIDR prefix */

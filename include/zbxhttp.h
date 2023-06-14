@@ -42,6 +42,7 @@ void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
 
 #ifdef HAVE_LIBCURL
+
 typedef struct
 {
 	char	*data;

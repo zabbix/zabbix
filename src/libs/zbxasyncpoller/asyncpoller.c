@@ -27,14 +27,12 @@
 
 typedef struct
 {
-	void		*data;
-
+	void				*data;
 	zbx_async_task_process_cb_t	process_cb;
 	zbx_async_task_clear_cb_t	free_cb;
-
-	struct event	*tx_event;
-	struct event	*rx_event;
-	struct event	*timeout_event;
+	struct event			*tx_event;
+	struct event			*rx_event;
+	struct event			*timeout_event;
 }
 zbx_async_task_t;
 
@@ -49,33 +47,45 @@ static void	async_task_remove(zbx_async_task_t *task)
 	zbx_free(task);
 }
 
+static const char	*task_state_to_str(zbx_async_task_state_t task_state)
+{
+	switch (task_state)
+	{
+		case ZBX_ASYNC_TASK_WRITE:
+			return "ZBX_ASYNC_TASK_WRITE";
+		case ZBX_ASYNC_TASK_READ:
+			return "ZBX_ASYNC_TASK_READ";
+		default:
+			return "ZBX_ASYNC_TASK_STOP";
+	}
+}
+
 static void	async_event(evutil_socket_t fd, short what, void *arg)
 {
 	zbx_async_task_t	*task = (zbx_async_task_t *)arg;
 	int			ret;
-	char			*ret_str;
 
 	ZBX_UNUSED(fd);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (ZBX_ASYNC_TASK_STOP == (ret = task->process_cb(what, task->data)))
-		async_task_remove(task);
+	ret = task->process_cb(what, task->data);
 
-	if (ZBX_ASYNC_TASK_READ == ret)
-		event_add(task->rx_event, NULL);
+	switch (ret)
+	{
+		case ZBX_ASYNC_TASK_STOP:
+			async_task_remove(task);
+			break;
+		case ZBX_ASYNC_TASK_READ:
+			event_add(task->rx_event, NULL);
+			break;
+		case ZBX_ASYNC_TASK_WRITE:
+			event_add(task->tx_event, NULL);
+			break;
 
-	if (ZBX_ASYNC_TASK_WRITE == ret)
-		event_add(task->tx_event, NULL);
+	}	
 
-	if (ZBX_ASYNC_TASK_STOP == ret)
-		ret_str = "ZBX_ASYNC_TASK_STOP";
-	else if (ZBX_ASYNC_TASK_READ == ret)
-		ret_str = "ZBX_ASYNC_TASK_READ";
-	else
-		ret_str = "ZBX_ASYNC_TASK_WRITE";
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, ret_str);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, task_state_to_str(ret));
 }
 
 void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,

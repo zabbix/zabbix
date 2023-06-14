@@ -370,6 +370,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	unsigned char		poller_type = poller_args_in->poller_type;
 	struct timeval		tv = {1, 0};
 	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
 
@@ -394,7 +395,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	poller_config.state = ZBX_PROCESS_STATE_BUSY;
 	poller_config.info = info;
 
-	if (ZBX_POLLER_TYPE_HTTPAGENT == process_type)
+	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
 		poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
 				poller_update_selfmon_counter, &poller_config);
