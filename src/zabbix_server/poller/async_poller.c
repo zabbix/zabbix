@@ -1,8 +1,6 @@
 #include "log.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
-#include "zbxhttp.h"
-#include "zbxcacheconfig.h"
 #include <event.h>
 #include <event2/thread.h>
 #include "poller.h"
@@ -13,13 +11,9 @@
 #include "zbxnix.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
-#include "zbxtime.h"
-#include "zbxtypes.h"
-#include "httpagent_async.h"
 #include "async_httpagent.h"
 #include "async_agent.h"
 #include "zbx_availability_constants.h"
-#include "checks_agent.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 typedef struct
@@ -40,8 +34,8 @@ static void	process_agent_result(void *data)
 	zbx_interface_status	*interface_status;
 	int			ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host.host,
-			agent_context->interface.addr, agent_context->key,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__,
+			agent_context->host.host, agent_context->interface.addr, agent_context->key,
 			zbx_tcp_connection_type_name(agent_context->host.tls_connect));
 
 	zbx_timespec(&timespec);
@@ -420,9 +414,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 			sec = zbx_time();
 			zbx_update_env(get_process_type_string(process_type), sec);
 
-			zbx_setproctitle("%s #%d [got %d values, queued %d in " ZBX_FS_DBL " sec]",
+			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
-				poller_config.queued, zbx_time() - sec);
+				poller_config.queued);
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
