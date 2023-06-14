@@ -1,1 +1,1 @@
-....I..... [ZBX-22889] fixed performance problems on PostgreSQL due to missing problem.cause_eventid index (mprihodko)
+....I..... [ZBX-22889] fixed performance problems by creating problem.cause_eventid index (mprihodko)
