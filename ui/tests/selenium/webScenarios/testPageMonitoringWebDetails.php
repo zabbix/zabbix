@@ -22,12 +22,6 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
-define('HTTPSTEP_ITEM_TYPE_RSPCODE', 0); // Response code.
-define('HTTPSTEP_ITEM_TYPE_TIME', 1); // Response time, in seconds.
-define('HTTPSTEP_ITEM_TYPE_IN', 2); // Download speed, in bytes per second.
-define('HTTPSTEP_ITEM_TYPE_LASTSTEP', 3); // Download speed, in bytes per second.
-define('HTTPSTEP_ITEM_TYPE_LASTERROR', 4); // Download speed, in bytes per second.
-
 /**
  * @backup hosts
  *
@@ -88,8 +82,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 			[
 				[
 					'name' => 'Many steps',
-					'steps' => $this->getGeneratedStepNames(50),
-					'item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0]
+					'item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0],
+					'steps' => $this->getGeneratedStepNames(50)
 				]
 			],
 			[
@@ -121,7 +115,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 * @dataProvider getWebScenarioData
 	 */
 	public function testPageMonitoringWebDetails_DataDisplay($data) {
-		// Fill in step data so that they can be created with API.
+		// Fill in step data so that a web scenario can be created with API.
 		$api_steps = [];
 		foreach ($data['steps'] as $i => $step){
 			$api_step = [];
@@ -131,7 +125,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$api_steps[] = $api_step;
 		}
 
-		// Create a new web scenario.
+		// Create the web scenario.
 		$response = CDataHelper::call('httptest.create', [
 			[
 				'name' => $data['name'],
@@ -141,10 +135,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 		]);
 		$httptest_id = $response['httptestids'][0];
 
-		CTestArrayHelper::get();
-
-		// Generate item data for the table. For the entire web scenario.
-		foreach ($data['item_data'] as $data_type => $data_value){
+		// Generate data for web scenario items.
+		foreach ($data['item_data'] ?? [] as $data_type => $data_value){
 			$sql = 'SELECT ti.itemid FROM httptestitem ti '.
 				'JOIN items i ON ti.itemid=i.itemid '.
 				'WHERE ti.httptestid = '.$httptest_id.' '.
@@ -153,10 +145,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 			CDataHelper::addItemData($item_id, $data_value);
 		}
 
-		// Generate item data for the table. For each step.
+		// Generate data for step items.
 		foreach ($data['steps'] as $i => $step){
-			// Each step can have different types of data.
-			foreach ($step['item_data'] as $data_type => $data_value){
+			// Each step has several item types.
+			foreach ($step['item_data'] ?? [] as $data_type => $data_value){
 				$sql = 'SELECT si.itemid FROM httpstepitem si '.
 						'JOIN httpstep s ON si.httpstepid=s.httpstepid '.
 						'JOIN httptest t ON s.httptestid=t.httptestid '.
@@ -174,13 +166,16 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertEquals('Details of web scenario: '.trim($data['name']), $this->query('id:page-title-general')->one()->getText());
 
 		// Assert data table.
-		$expected_steps = [];
+		$expected_rows = [];
 		foreach ($data['steps'] as $step){
-			$expected_steps[] = ['Step' => trim($step['name'])];
+			// Whitespace at the beginning and end should not be displayed.
+			$expected_row = ['Step' => trim($step['name'])];
+			$expected_row = array_merge($expected_row, $step['expected_data'] ?? []);
+			$expected_rows[] = $expected_row;
 		}
 		// The table contains an additional TOTAL row.
-		$expected_steps[] = ['Step' => 'TOTAL'];
-		$this->assertTableData($expected_steps);
+		$expected_rows[] = ['Step' => 'TOTAL'];
+		$this->assertTableData($expected_rows);
 
 	}
 
@@ -198,9 +193,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 					HTTPSTEP_ITEM_TYPE_IN => 3000
 				],
 				'expected_data' => [
-					HTTPSTEP_ITEM_TYPE_RSPCODE => '200',
-					HTTPSTEP_ITEM_TYPE_TIME => '123.46ms',
-					HTTPSTEP_ITEM_TYPE_IN => '3000'
+					'Speed' => '2.93 KBps',
+					'Response time' => '123.46ms',
+					'Response code' => '200',
+					'Status' => 'OK'
 				]
 			];
 		}
