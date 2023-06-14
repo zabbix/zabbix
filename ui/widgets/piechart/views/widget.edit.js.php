@@ -607,11 +607,37 @@ window.widget_piechart_form = new class {
 	}
 
 	_updateForm() {
-
+		// Data set tab changes.
 		const dataset = this._getOpenedDataset();
+		const datasets = this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
+		let items_type = [];
+		let is_total = false;
 
 		if (dataset !== null) {
 			this._updateDatasetLabel(dataset);
+		}
+
+		for (let i = 0; i < datasets.length; i++) {
+			const item_type_selector = `input[name="ds[${i}][type][]"]`;
+			const item_type_fields = document.querySelectorAll(item_type_selector);
+
+			if (item_type_fields) {
+				items_type.push(item_type_fields);
+			}
+		}
+
+		if (items_type !== null) {
+			for (let i = 0; i < datasets.length; i++) {
+				for (let j = 0; j < items_type[i].length; j++) {
+					if (items_type[i][j].value == <?= PIE_CHART_ITEM_TOTAL ?>) {
+						is_total = true;
+					}
+				}
+			}
+
+			for (let k = 0; k < datasets.length; k++) {
+				document.querySelector(`[name="ds[${k}][dataset_aggregation]"]`).disabled = is_total;
+			}
 		}
 
 		// Displaying options tab.
