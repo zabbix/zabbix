@@ -18,8 +18,6 @@ libzbxagent_a_SOURCES = \
 	listener.c \
 	listener.h \
 	metrics.h \
-	vmstats.c \
-	vmstats.h \
 	zbxconf.c \
 	zbxconf.h \
 	zbxkstat.c \

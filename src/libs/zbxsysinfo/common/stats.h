@@ -20,6 +20,8 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
+#include "../sysinfo.h"
+
 #include "zbxthreads.h"
 
 #ifndef _WINDOWS
@@ -28,10 +30,6 @@
 #endif
 
 #include "cpustat.h"
-
-#ifdef _AIX
-#	include "vmstats.h"
-#endif
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)	/* Solaris */
 #	include "zbxkstat.h"
