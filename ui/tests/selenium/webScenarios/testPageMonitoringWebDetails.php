@@ -107,6 +107,14 @@ class testPageMonitoringWebDetails extends CWebTest {
 			],
 			[
 				[
+					'name' => STRING_64,
+					'steps' => [
+						['name' => STRING_64]
+					]
+				]
+			],
+			[
+				[
 					'name' => 'Result - OK',
 					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0],
 					'expected_totals' => ['Response time' => '16m 39s 123.46ms', 'Status' => 'OK'],
@@ -142,6 +150,15 @@ class testPageMonitoringWebDetails extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Result - empty',
+					'expected_totals' => ['Status' => ''],
+					'steps' => [
+						['expected_data' => ['Status' => '']]
+					]
+				]
+			],
+			[
+				[
 					'name' => 'Result - Unknown error',
 					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 1],
 					'expected_totals' => ['Status' => 'Unknown error'],
@@ -152,12 +169,29 @@ class testPageMonitoringWebDetails extends CWebTest {
 						['expected_data' => ['Status' => 'Unknown']]
 					]
 				]
+			],
+			[
+				[
+					'name' => 'Result - Error',
+					'global_item_data' => [
+						HTTPSTEP_ITEM_TYPE_LASTSTEP => 1,
+						HTTPSTEP_ITEM_TYPE_LASTERROR => 'TEST ERROR TEXT 🙂🙃'
+					],
+					'expected_totals' => ['Status' => 'Error: TEST ERROR TEXT 🙂🙃'],
+					'steps' => [
+						['expected_data' => ['Status' => 'OK']],
+						['expected_data' => ['Status' => 'Error: TEST ERROR TEXT 🙂🙃']],
+						['expected_data' => ['Status' => 'Unknown']],
+						['expected_data' => ['Status' => 'Unknown']]
+					]
+				]
 			]
 		];
 	}
 
 	/**
 	 * Test the display of data in the table.
+	 * Additional complexity comes from the Status column, as the values there are dynamic (not from the DB).
 	 *
 	 * @dataProvider getWebScenarioData
 	 */
@@ -184,6 +218,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Generate data for global web scenario items.
 		foreach ($data['global_item_data'] ?? [] as $data_type => $data_value) {
+			// Gets id of the correct item.
 			$sql = 'SELECT ti.itemid FROM httptestitem ti '.
 				'JOIN items i ON ti.itemid=i.itemid '.
 				'WHERE ti.httptestid = '.$httptest_id.' '.
@@ -196,6 +231,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		foreach ($data['steps'] as $i => $step) {
 			// Each step has several item types.
 			foreach ($step['item_data'] ?? [] as $data_type => $data_value) {
+				// Gets id of the correct item.
 				$sql = 'SELECT si.itemid FROM httpstepitem si '.
 						'JOIN httpstep s ON si.httpstepid=s.httpstepid '.
 						'JOIN httptest t ON s.httptestid=t.httptestid '.
