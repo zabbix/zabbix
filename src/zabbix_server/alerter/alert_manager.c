@@ -1349,10 +1349,10 @@ static void	am_sync_watchdog(zbx_am_t *manager, zbx_am_media_t **medias, int med
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() recipients:%d", __func__, manager->watchdog.num_data);
 }
 
-static int	check_allowed_path(const char *allowed_path, const char *path, char **error)
+static int	check_allowed_path(const char *allowed, const char *path, char **error)
 {
-	char	*absolute_path;
-	int	absolute_path_len, allowed_path_len, ret = FAIL;
+	char	*absolute_path = NULL, *absolute_allowed = NULL;
+	int	absolute_path_len, absolute_allowed_len, ret = FAIL;
 
 	if (NULL == (absolute_path = realpath(path, NULL)))
 	{
@@ -1360,25 +1360,32 @@ static int	check_allowed_path(const char *allowed_path, const char *path, char *
 		return FAIL;
 	}
 
-	absolute_path_len = strlen(absolute_path);
-
-	if (absolute_path_len < (allowed_path_len = strlen(allowed_path)))
+	if (NULL == (absolute_allowed = realpath(allowed, NULL)))
 	{
-		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
-				allowed_path);
+		*error = zbx_dsprintf(*error, "cannot resolve allowed path %s", zbx_strerror(errno));
 		goto out;
 	}
 
-	if (0 != memcmp(allowed_path, absolute_path, allowed_path_len))
+	absolute_path_len = strlen(absolute_path);
+
+	if (absolute_path_len < (absolute_allowed_len = strlen(absolute_allowed)))
 	{
 		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
-				allowed_path);
+				absolute_allowed);
+		goto out;
+	}
+
+	if (0 != memcmp(absolute_allowed, absolute_path, absolute_allowed_len))
+	{
+		*error = zbx_dsprintf(*error, "absolute path '%s' is not in allowed path '%s'", absolute_path,
+				absolute_allowed);
 		goto out;
 	}
 
 	ret = SUCCEED;
 out:
 	zbx_free(absolute_path);
+	zbx_free(absolute_allowed);
 
 	return ret;
 }

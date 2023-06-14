@@ -281,7 +281,7 @@ class CConfigurationImport {
 							if (!array_key_exists($name, $triggers_refs)
 									|| !array_key_exists($expression, $triggers_refs[$name])
 									|| !array_key_exists($recovery_expression, $triggers_refs[$name][$expression])) {
-								$triggers_refs[$name][$expression] = [];
+								$triggers_refs[$name][$expression][$recovery_expression] = [];
 							}
 						}
 					}

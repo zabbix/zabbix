@@ -236,6 +236,9 @@ class CApiInputValidator {
 
 			case API_TIMESTAMP:
 				return self::validateTimestamp($rule, $data, $path, $error);
+
+			case API_ANY:
+				return true;
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -306,6 +309,7 @@ class CApiInputValidator {
 			case API_UNEXPECTED:
 			case API_LAT_LNG_ZOOM:
 			case API_TIMESTAMP:
+			case API_ANY:
 				return true;
 
 			case API_OBJECT:
@@ -1231,6 +1235,7 @@ class CApiInputValidator {
 	 *                                                                           API_ALLOW_UNEXPECTED
 	 * @param mixed  $rule['fields'][<field_name>]['default']         (optional)
 	 * @param string $rule['fields'][<field_name>]['default_source']  (optional)
+	 * @param bool   $rule['fields'][<field_name>]['unset']           (optional)
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1281,7 +1286,7 @@ class CApiInputValidator {
 						$multiple_rule += ['flags' => 0x00];
 						$multiple_rule['flags'] = ($field_rule['flags'] & API_REQUIRED) | $multiple_rule['flags'];
 						$matched_multiple_rule = $multiple_rule +
-							array_intersect_key($field_rule, array_flip(['default', 'default_source']));
+							array_intersect_key($field_rule, array_flip(['default', 'default_source', 'unset']));
 						break;
 					}
 				}
@@ -1320,8 +1325,13 @@ class CApiInputValidator {
 				if (!self::validateData($field_rule, $data[$field_name], $subpath, $error)) {
 					return false;
 				}
+
 				if ($flags & API_DEPRECATED) {
 					trigger_error(_s('Parameter "%1$s" is deprecated.', $subpath), E_USER_NOTICE);
+				}
+
+				if (array_key_exists('unset', $field_rule)) {
+					unset($data[$field_name]);
 				}
 			}
 			elseif ($flags & API_REQUIRED) {
@@ -1514,8 +1524,8 @@ class CApiInputValidator {
 	 * @param array  $rule
 	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_NULL, API_NORMALIZE, API_PRESERVE_KEYS,
 	 *                                           API_ALLOW_UNEXPECTED
-	 * @param array  $rule['fields']
-	 * @param int    $rule['length']  (optional)
+	 * @param array  $rule['fields']  Rules of the objects fields. Optional if length is zero.
+	 * @param int    $rule['length']  (optional) Allowed count of objects.
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
@@ -1540,7 +1550,12 @@ class CApiInputValidator {
 		}
 
 		if (array_key_exists('length', $rule) && count($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
+			$error = ($rule['length'] == 0)
+				? _s('Invalid parameter "%1$s": %2$s.', $path, _('should be empty'))
+				: _s('Invalid parameter "%1$s": %2$s.', $path,
+					_s('maximum number of array elements is %1$s', $rule['length'])
+				);
+
 			return false;
 		}
 
@@ -2722,7 +2737,6 @@ class CApiInputValidator {
 	 * UUIDv4 validator.
 	 *
 	 * @param array  $rule
-	 * @param int    $rule['flags']  (optional) API_NOT_EMPTY
 	 * @param mixed  $data
 	 * @param string $path
 	 * @param string $error
