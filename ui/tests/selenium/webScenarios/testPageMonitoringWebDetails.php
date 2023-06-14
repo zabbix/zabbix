@@ -49,7 +49,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		$response = CDataHelper::call('httptest.create', [
 			[
-				'name' => 'Web scenario',
+				'name' => 'Layout',
 				'hostid' => self::$host_id,
 				'steps' => [
 					[
@@ -67,7 +67,15 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 * Test the general layout.
 	 */
 	public function testPageMonitoringWebDetails_Layout() {
-		$this->page->login()->open('httpdetails.php?httptestid='.self::$web_scenario_id)->waitUntilReady();
+		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
+
+		// Assert title.
+		$this->assertEquals('Details of web scenario: Layout', $this->query('id:page-title-general')->one()->getText());
+
+		// Assert table column names.
+		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'],
+				$this->query('tag:th')->all()->asText()
+		);
 
 		// Assert filter.
 		/*$form = $this->query('name:zbx_filter')->asForm()->one();
@@ -221,8 +229,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 			// Gets id of the correct item.
 			$sql = 'SELECT ti.itemid FROM httptestitem ti '.
 				'JOIN items i ON ti.itemid=i.itemid '.
-				'WHERE ti.httptestid = '.$httptest_id.' '.
-				'AND ti.type = '.$data_type;
+				'WHERE ti.httptestid='.$httptest_id.' '.
+				'AND ti.type='.$data_type;
 			$item_id = CDBHelper::getValue($sql);
 			CDataHelper::addItemData($item_id, $data_value);
 		}
@@ -236,8 +244,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 						'JOIN httpstep s ON si.httpstepid=s.httpstepid '.
 						'JOIN httptest t ON s.httptestid=t.httptestid '.
 						'WHERE t.httptestid = '.$httptest_id.' '.
-						'AND s.no = '.$i.' '.
-						'AND si.type = '.$data_type;
+						'AND s.no='.$i.' '.
+						'AND si.type='.$data_type;
 				$item_id = CDBHelper::getValue($sql);
 				CDataHelper::addItemData($item_id, $data_value);
 			}
@@ -259,6 +267,5 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// The table contains an additional TOTAL row.
 		$expected_rows[] = array_merge(['Step' => 'TOTAL'], $data['expected_totals'] ?? []);
 		$this->assertTableData($expected_rows);
-
 	}
 }
