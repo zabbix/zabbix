@@ -518,7 +518,8 @@ function convertUnitsUptime($value) {
  *
  * @return string
  */
-function convertUnitsS($value, $ignore_millisec = false) {
+function convertUnitsS($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		bool $decimals_exact = false) {
 	$value = (float) $value;
 	$value_abs = abs($value);
 
@@ -600,7 +601,9 @@ function convertUnitsS($value, $ignore_millisec = false) {
 	$result = [];
 
 	foreach (array_filter($parts) as $part_unit => $part_value) {
-		$result[] = formatFloat($part_value, ['decimals' => ZBX_UNITS_ROUNDOFF_SUFFIXED]).$units[$part_unit];
+		$result[] = formatFloat($part_value, ['decimals' => $decimals,
+				'decimals_exact' => $decimals_exact
+			]).$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
@@ -770,7 +773,8 @@ function convertUnitsRaw(array $options): array {
 
 	if ($units === 's') {
 		return [
-			'value' => convertUnitsS($value, $options['ignore_milliseconds']),
+			'value' => convertUnitsS($value, $options['ignore_milliseconds'], $options['decimals'],
+				$options['decimals_exact']),
 			'units' => '',
 			'is_numeric' => false
 		];
