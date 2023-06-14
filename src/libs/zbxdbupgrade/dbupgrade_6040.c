@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
 /*
@@ -32,7 +33,10 @@ static int	DBpatch_6040000(void)
 
 static int	DBpatch_6040001(void)
 {
-	return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+
+	return SUCCEED;
 }
 
 #endif
