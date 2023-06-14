@@ -189,7 +189,10 @@
 #endif
 
 #ifdef HAVE_NETDB_H
-#	include <netdb.h>
+#if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
+#define _USE_IRS
+#endif
+#       include <netdb.h>
 #endif
 
 #ifdef HAVE_SYS_WAIT_H
