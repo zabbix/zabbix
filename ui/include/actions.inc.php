@@ -633,6 +633,31 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 				$result[$i][] = [bold(_('Remove host')), BR()];
 				break;
 
+			case OPERATION_TYPE_HOST_TAGS_ADD:
+			case OPERATION_TYPE_HOST_TAGS_REMOVE:
+				CArrayHelper::sort($operation['optag'], ['tag', 'value']);
+
+				$tags = [];
+				foreach ($operation['optag'] as $tag) {
+					$value = getTagString($tag, TAG_NAME_FULL);
+
+					if ($value !== '') {
+						$tags[] = (new CSpan($value))
+							->addClass(ZBX_STYLE_TAG)
+							->setHint(getTagString($tag));
+					}
+				}
+
+				if ($operation['operationtype'] == OPERATION_TYPE_HOST_TAGS_ADD) {
+					$result[$i][] = bold(_('Add host tags').': ');
+				}
+				else {
+					$result[$i][] = bold(_('Remove host tags').': ');
+				}
+
+				$result[$i][] = $tags;
+				break;
+
 			case OPERATION_TYPE_HOST_ENABLE:
 				$result[$i][] = [bold(_('Enable host')), BR()];
 				break;
@@ -804,6 +829,8 @@ function getAllowedOperations($eventsource) {
 			OPERATION_TYPE_COMMAND,
 			OPERATION_TYPE_HOST_ADD,
 			OPERATION_TYPE_HOST_REMOVE,
+			OPERATION_TYPE_HOST_TAGS_ADD,
+			OPERATION_TYPE_HOST_TAGS_REMOVE,
 			OPERATION_TYPE_GROUP_ADD,
 			OPERATION_TYPE_GROUP_REMOVE,
 			OPERATION_TYPE_TEMPLATE_ADD,
@@ -820,6 +847,8 @@ function getAllowedOperations($eventsource) {
 			OPERATION_TYPE_COMMAND,
 			OPERATION_TYPE_HOST_ADD,
 			OPERATION_TYPE_HOST_REMOVE,
+			OPERATION_TYPE_HOST_TAGS_ADD,
+			OPERATION_TYPE_HOST_TAGS_REMOVE,
 			OPERATION_TYPE_GROUP_ADD,
 			OPERATION_TYPE_GROUP_REMOVE,
 			OPERATION_TYPE_TEMPLATE_ADD,
@@ -865,7 +894,9 @@ function operation_type2str($type) {
 		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink template'),
 		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode'),
 		OPERATION_TYPE_RECOVERY_MESSAGE => _('Notify all involved'),
-		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved')
+		OPERATION_TYPE_UPDATE_MESSAGE => _('Notify all involved'),
+		OPERATION_TYPE_HOST_TAGS_ADD => _('Add host tags'),
+		OPERATION_TYPE_HOST_TAGS_REMOVE => _('Remove host tags')
 	];
 
 	if (is_null($type)) {

@@ -30,6 +30,7 @@ window.operation_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.actionid = actionid;
 		this.row_index = data.row_index;
+		this.data = data;
 
 		if (document.getElementById('operation-condition-list')) {
 			this.condition_count = (document.getElementById('operation-condition-list').rows.length - 2);
@@ -38,8 +39,8 @@ window.operation_popup = new class {
 		this._loadViews();
 		this._processTypeOfCalculation();
 
-		if (data.opconditions.length > 0) {
-			data.opconditions.map((row, index) => {
+		if (this.data.opconditions.length > 0) {
+			this.data.opconditions.map((row, index) => {
 				this._createOperationConditionsRow(row, index);
 			})
 		}
@@ -71,6 +72,8 @@ window.operation_popup = new class {
 				this._processTypeOfCalculation();
 			}
 		});
+
+		this.#updateHostTagsFields(this.data.optag);
 	}
 
 	_changeView(operation_type) {
@@ -111,6 +114,11 @@ window.operation_popup = new class {
 			case <?= OPERATION_TYPE_HOST_REMOVE ?>:
 			case <?= OPERATION_TYPE_HOST_ENABLE ?>:
 			case <?= OPERATION_TYPE_HOST_DISABLE ?>:
+				break;
+
+			case <?= OPERATION_TYPE_HOST_TAGS_ADD ?>:
+			case <?= OPERATION_TYPE_HOST_TAGS_REMOVE ?>:
+				this.#hostTagsFields();
 				break;
 
 			case <?= OPERATION_TYPE_UPDATE_MESSAGE ?>:
@@ -164,6 +172,39 @@ window.operation_popup = new class {
 		this.hostgroup_ms.multiSelect('setDisabledEntries',
 			[... this.form.querySelectorAll('[name^="operation[opgroup]["]')].map((input) => input.value)
 		);
+	}
+
+	/**
+	 * Toggles displaying of host tag fields. If there is no data, add one row of tag and value row with empty fields.
+	 */
+	#hostTagsFields() {
+		this.form.querySelector('#operation-host-tags').style.display = '';
+
+		const fields = ['operation-host-tags'];
+
+		this._enableFormFields(fields);
+
+		if (this.data.optag.length == 0) {
+			this.data.optag = [];
+			this.data.optag.push({row_index: 0});
+
+			this.#updateHostTagsFields(this.data.optag);
+		}
+	}
+
+	/**
+	 * Add a list of tags to the name and value fields. Inserts rows before "Add" button.
+	 *
+	 * @param {array} tags  Array of tag names and values.
+	 */
+	#updateHostTagsFields(tags) {
+		const tags_table = this.form.querySelector('#tags-table');
+		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
+
+		tags.forEach((row, index) => {
+			row.row_index = index;
+			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
+		});
 	}
 
 	_templateFields() {
