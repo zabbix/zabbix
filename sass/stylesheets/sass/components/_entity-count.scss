@@ -1,0 +1,24 @@
+.entity-count {
+	display: inline-block;
+	padding: 0 3px;
+	min-width: 10px;
+	line-height: 16px;
+	text-align: center;
+	background-color: $ui-bg-selected-color;
+	border-radius: 2px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+
+	&,
+	&:hover,
+	&:focus,
+	&:link,
+	&:visited {
+		color: $font-selected-color;
+		border-bottom: none;
+	}
+
+	&:focus {
+		box-shadow: 0 0 0 2px $btn-focus-outline-color;
+	}
+}

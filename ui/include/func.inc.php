@@ -1781,22 +1781,14 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 					->addClass($show_details ? ZBX_STYLE_ARROW_UP : ZBX_STYLE_ARROW_DOWN)
 				)
 				->setAttribute('aria-expanded', $show_details ? 'true' : 'false')
-				->onClick('javascript: '.
-					'showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\')'.
-						'.find(\'.'.ZBX_STYLE_MSG_DETAILS_BORDER.'\'));'.
-					'jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");'.
-					'jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0)'
-				);
+				->onClick('
+					showHide(jQuery(this).siblings(\'.'.ZBX_STYLE_MSG_DETAILS.'\'));
+					jQuery("#details-arrow", $(this)).toggleClass("'.ZBX_STYLE_ARROW_UP.' '.ZBX_STYLE_ARROW_DOWN.'");
+					jQuery(this).attr(\'aria-expanded\', jQuery(this).find(\'.'.ZBX_STYLE_ARROW_DOWN.'\').length == 0);
+				');
 		}
 
 		$list = (new CList())->addClass(ZBX_STYLE_LIST_DASHED);
-		if ($title !== null) {
-			$list->addClass(ZBX_STYLE_MSG_DETAILS_BORDER);
-
-			if (!$show_details) {
-				$list->setAttribute('style', 'display: none;');
-			}
-		}
 
 		foreach ($messages as $message) {
 			$list->addItem($message['message']);
@@ -1805,10 +1797,10 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 		$msg_details = (new CDiv())
 			->addClass(ZBX_STYLE_MSG_DETAILS)
 			->addItem($list);
-	}
 
-	if ($title !== null) {
-		$title = new CSpan($title);
+		if ($title !== null && !$show_details) {
+			$msg_details->addStyle('display: none;');
+		}
 	}
 
 	$aria_labels = [
@@ -1818,16 +1810,18 @@ function makeMessageBox(string $class, array $messages, string $title = null, bo
 	];
 
 	// Details link should be in front of title.
-	$msg_box = (new CTag('output', true, [$link_details, $title, $msg_details]))
+	$msg_box = (new CTag('output', true, [$link_details, $title !== null ? new CSpan($title) : null, $msg_details]))
 		->addClass($class)
 		->setAttribute('role', 'contentinfo')
 		->setAttribute('aria-label', $aria_labels[$class]);
 
 	if ($show_close_box) {
-		$msg_box->addItem((new CSimpleButton())
-			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
-			->setTitle(_('Close')));
+		$msg_box->addItem(
+			(new CSimpleButton())
+				->addClass(ZBX_STYLE_BTN_OVERLAY_CLOSE)
+				->onClick('jQuery(this).closest(\'.'.$class.'\').remove();')
+				->setTitle(_('Close'))
+		);
 	}
 
 	return $msg_box;

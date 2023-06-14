@@ -289,7 +289,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
 				&& $trigger['triggerDiscovery']['ts_delete'] > 0) {
-			$info_icons[] = getTriggerLifetimeIndicator(time(), $trigger['triggerDiscovery']['ts_delete']);
+			$info_icons[] = getTriggerLifetimeIndicator(time(), (int) $trigger['triggerDiscovery']['ts_delete']);
 		}
 	}
 
@@ -376,7 +376,8 @@ $triggers_form->addItem([
 					->removeId()
 			],
 			'popup.massupdate.trigger' => [
-				'content' => (new CButton('', _('Mass update')))
+				'content' => (new CSimpleButton(_('Mass update')))
+					->addClass(ZBX_STYLE_BTN_ALT)
 					->onClick(
 						"openMassupdatePopup('popup.massupdate.trigger', {".
 							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('trigger').
@@ -385,8 +386,6 @@ $triggers_form->addItem([
 							trigger_element: this
 						});"
 					)
-					->addClass(ZBX_STYLE_BTN_ALT)
-					->removeAttribute('id')
 			],
 			'trigger.massdelete' => [
 				'name' => _('Delete'),

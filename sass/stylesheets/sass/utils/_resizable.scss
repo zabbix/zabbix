@@ -3,28 +3,28 @@
 }
 
 .ui-resizable-border-n {
-	border-top: 1px solid $form-border-focus-color;
+	border-top: 1px solid $form-focus-border-color;
 	height: 5px;
 	margin: 0 .25rem;
 	flex: 1;
 }
 
 .ui-resizable-border-e {
-	border-right: 1px solid $form-border-focus-color;
+	border-right: 1px solid $form-focus-border-color;
 	width: 5px;
 	margin: .25rem 0;
 	flex: 1;
 }
 
 .ui-resizable-border-s {
-	border-bottom: 1px solid $form-border-focus-color;
+	border-bottom: 1px solid $form-focus-border-color;
 	height: 5px;
 	margin: 0 .25rem;
 	flex: 1;
 }
 
 .ui-resizable-border-w {
-	border-left: 1px solid $form-border-focus-color;
+	border-left: 1px solid $form-focus-border-color;
 	width: 5px;
 	margin: .25rem 0;
 	flex: 1;
@@ -164,7 +164,7 @@
 	height: 7px;
 	position: absolute;
 	background-color: $ui-bg-color;
-	border: 1px solid $form-border-focus-color;
+	border: 1px solid $form-focus-border-color;
 	border-radius: 100%;
 }
 
