@@ -1808,6 +1808,116 @@ div.dashboard-widget-item .dashboard-grid-widget-body .bold {
 div.dashboard-widget-item a:link {
   border-bottom: none; }
 
+form.dashboard-widget-piechart {
+  width: 1110px; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
+    grid-column: 1 / -1; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
+    border-top: 1px solid #444444; }
+  form.dashboard-widget-piechart .pie-chart-widget-config-tabs .ui-tabs-nav {
+    position: sticky;
+    top: 0;
+    background: #070707;
+    z-index: 3; }
+  form.dashboard-widget-piechart .table-forms-container, form.dashboard-widget-piechart .browser-warning-container {
+    margin: 0;
+    border: 1px solid #444444;
+    border-top: none; }
+  form.dashboard-widget-piechart .table-forms-separator {
+    padding: 0; }
+  form.dashboard-widget-piechart .dataset-head,
+  form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
+    display: contents; }
+  form.dashboard-widget-piechart .dataset-head .multiselect {
+    width: 100%; }
+  form.dashboard-widget-piechart .dataset-body .form-grid {
+    padding-top: 0; }
+    form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
+      grid-column-start: 4; }
+  form.dashboard-widget-piechart .drag-icon {
+    position: absolute;
+    top: 5px;
+    left: -14px; }
+  form.dashboard-widget-piechart .td-drag-icon .drag-icon {
+    top: 0;
+    left: 9px;
+    margin-right: 5px; }
+  form.dashboard-widget-piechart .list-item-actions {
+    grid-column: span 1 / -1;
+    text-align: right; }
+    form.dashboard-widget-piechart .list-item-actions .btn-remove {
+      top: 0;
+      right: 0;
+      vertical-align: baseline; }
+  form.dashboard-widget-piechart .items-list {
+    grid-column: 3 / span 3; }
+  form.dashboard-widget-piechart .list-vertical-accordion {
+    position: relative;
+    margin-left: 15px;
+    padding-left: 0; }
+    form.dashboard-widget-piechart .list-vertical-accordion.sortable {
+      overflow: visible;
+      margin-top: -5px;
+      margin-bottom: 5px; }
+  form.dashboard-widget-piechart .list-accordion-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
+    grid-gap: 10px;
+    align-items: start;
+    padding: 5px 0; }
+    form.dashboard-widget-piechart .list-accordion-item > label {
+      overflow: hidden;
+      line-height: 24px;
+      text-align: left;
+      text-overflow: ellipsis; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-opened::before {
+      content: ' ';
+      position: absolute;
+      top: 24px;
+      bottom: 0;
+      left: 121px;
+      width: 2px;
+      background: #444444; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .multiselect {
+      height: 24px;
+      overflow: hidden; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
+      border: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-type,
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
+      display: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-body {
+      display: none; }
+    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .items-list {
+      padding-left: 0; }
+  form.dashboard-widget-piechart .single-item-table .table-col-handle {
+    width: 26px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-no {
+    width: 20px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-color {
+    width: 24px; }
+  form.dashboard-widget-piechart .single-item-table .table-col-action {
+    width: 55px; }
+  form.dashboard-widget-piechart .single-item-table th {
+    padding: 5px 5px 5px 0; }
+  form.dashboard-widget-piechart .single-item-table .single-item-table-row td {
+    padding: 0 5px 5px 0; }
+  form.dashboard-widget-piechart .single-item-table .single-item-table-row:last-child td {
+    padding-bottom: 0; }
+  form.dashboard-widget-piechart .single-item-table tfoot td {
+    padding: 5px 5px 5px 10px; }
+  form.dashboard-widget-piechart .no-items-message {
+    display: none;
+    line-height: 24px;
+    color: #cacaca; }
+
+div.dashboard-widget-piechart {
+  overflow-x: hidden; }
+
 div.dashboard-widget-slareport .date-vertical {
   writing-mode: vertical-lr;
   transform: rotate(180deg); }
@@ -2015,116 +2125,6 @@ div.dashboard-widget-tophosts .link-action {
 div.dashboard-widget-tophosts z-bar-gauge {
   min-width: 64px;
   height: 20px; }
-
-form.dashboard-widget-piechart {
-  width: 1110px; }
-  form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
-    grid-column: 1 / -1; }
-  form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
-    border-top: 1px solid #444444; }
-  form.dashboard-widget-piechart .pie-chart-widget-config-tabs .ui-tabs-nav {
-    position: sticky;
-    top: 0;
-    background: #070707;
-    z-index: 3; }
-  form.dashboard-widget-piechart .table-forms-container, form.dashboard-widget-piechart .browser-warning-container {
-    margin: 0;
-    border: 1px solid #444444;
-    border-top: none; }
-  form.dashboard-widget-piechart .table-forms-separator {
-    padding: 0; }
-  form.dashboard-widget-piechart .dataset-head,
-  form.dashboard-widget-piechart .dataset-body.list-accordion-item-body {
-    display: contents; }
-  form.dashboard-widget-piechart .dataset-head .multiselect {
-    width: 100%; }
-  form.dashboard-widget-piechart .dataset-body .form-grid {
-    padding-top: 0; }
-    form.dashboard-widget-piechart .dataset-body .form-grid:first-child {
-      grid-column-start: 4; }
-  form.dashboard-widget-piechart .drag-icon {
-    position: absolute;
-    top: 5px;
-    left: -14px; }
-  form.dashboard-widget-piechart .td-drag-icon .drag-icon {
-    top: 0;
-    left: 9px;
-    margin-right: 5px; }
-  form.dashboard-widget-piechart .list-item-actions {
-    grid-column: span 1 / -1;
-    text-align: right; }
-    form.dashboard-widget-piechart .list-item-actions .btn-remove {
-      top: 0;
-      right: 0;
-      vertical-align: baseline; }
-  form.dashboard-widget-piechart .items-list {
-    grid-column: 3 / span 3; }
-  form.dashboard-widget-piechart .list-vertical-accordion {
-    position: relative;
-    margin-left: 15px;
-    padding-left: 0; }
-    form.dashboard-widget-piechart .list-vertical-accordion.sortable {
-      overflow: visible;
-      margin-top: -5px;
-      margin-bottom: 5px; }
-  form.dashboard-widget-piechart .list-accordion-item {
-    position: relative;
-    display: grid;
-    grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
-    grid-gap: 10px;
-    align-items: start;
-    padding: 5px 0; }
-    form.dashboard-widget-piechart .list-accordion-item > label {
-      overflow: hidden;
-      line-height: 24px;
-      text-align: left;
-      text-overflow: ellipsis; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-opened::before {
-      content: ' ';
-      position: absolute;
-      top: 24px;
-      bottom: 0;
-      left: 121px;
-      width: 2px;
-      background: #444444; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .multiselect {
-      height: 24px;
-      overflow: hidden; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .table-forms-separator {
-      border: none; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table thead,
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table tfoot,
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-handle,
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-type,
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-head .single-item-table .table-col-action {
-      display: none; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .dataset-body {
-      display: none; }
-    form.dashboard-widget-piechart .list-accordion-item.list-accordion-item-closed .items-list {
-      padding-left: 0; }
-  form.dashboard-widget-piechart .single-item-table .table-col-handle {
-    width: 26px; }
-  form.dashboard-widget-piechart .single-item-table .table-col-no {
-    width: 20px; }
-  form.dashboard-widget-piechart .single-item-table .table-col-color {
-    width: 24px; }
-  form.dashboard-widget-piechart .single-item-table .table-col-action {
-    width: 55px; }
-  form.dashboard-widget-piechart .single-item-table th {
-    padding: 5px 5px 5px 0; }
-  form.dashboard-widget-piechart .single-item-table .single-item-table-row td {
-    padding: 0 5px 5px 0; }
-  form.dashboard-widget-piechart .single-item-table .single-item-table-row:last-child td {
-    padding-bottom: 0; }
-  form.dashboard-widget-piechart .single-item-table tfoot td {
-    padding: 5px 5px 5px 10px; }
-  form.dashboard-widget-piechart .no-items-message {
-    display: none;
-    line-height: 24px;
-    color: #cacaca; }
-
-div.dashboard-widget-piechart {
-  overflow-x: hidden; }
 
 .diff {
   padding: 4px;
@@ -6342,7 +6342,7 @@ span.is-loading {
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-svggraph .list-accordion-item > label, form.dashboard-widget-piechart .list-accordion-item > label, .drag-icon,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > label, form.dashboard-widget-svggraph .list-accordion-item > label, .drag-icon,
 .ui-draggable .dashboard-widget-head {
   cursor: move;
   cursor: grab; }
