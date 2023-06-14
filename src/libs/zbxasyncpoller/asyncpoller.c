@@ -83,7 +83,7 @@ static void	async_event(evutil_socket_t fd, short what, void *arg)
 			event_add(task->tx_event, NULL);
 			break;
 
-	}	
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, task_state_to_str(ret));
 }
