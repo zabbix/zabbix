@@ -291,7 +291,10 @@ static int	DBpatch_6050024(void)
 
 static int	DBpatch_6050025(void)
 {
-	return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+
+	return SUCCEED;
 }
 
 #endif
