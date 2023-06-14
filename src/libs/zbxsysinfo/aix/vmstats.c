@@ -21,8 +21,6 @@
 #include "../sysinfo.h"
 #include "../common/stats.h"
 
-#include "zbxlog.h"
-
 int	system_stat(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char	*section, *type;
