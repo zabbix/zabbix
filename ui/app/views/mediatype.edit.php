@@ -499,8 +499,7 @@ $form
 			'smtp_server_default' => $email_defaults['smtp_server'],
 			'smtp_email_default' =>  $email_defaults['smtp_email']
 		]).');'))->setOnDocumentReady()
-	)
-	->addStyle('display: none;');
+	);
 
 if ($data['mediatypeid']) {
 	$buttons = [
