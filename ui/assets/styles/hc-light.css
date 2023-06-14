@@ -6744,9 +6744,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
   .leaflet-control .navigate-home-button::before,
   .leaflet-control .geomap-filter-button::before {
     vertical-align: middle; }
-.leaflet-control .navigate-home-button::before {
-  top: -1px;
-  color: #555555; }
 .leaflet-control.disabled {
   background-color: #ffffff;
   opacity: 1; }

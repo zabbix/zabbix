@@ -4066,13 +4066,6 @@ z-select,
 		}
 	}
 
-	.navigate-home-button, {
-		&::before {
-			top: -1px;
-			color: $icon-color;
-		}
-	}
-
 	&.disabled {
 		background-color: $white;
 		opacity: 1;
