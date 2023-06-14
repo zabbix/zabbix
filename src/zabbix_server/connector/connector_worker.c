@@ -43,8 +43,9 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 {
 	zbx_connector_t	connector;
 	int		i;
-	char		*str = NULL, *out = NULL, *error = NULL;
+	char		*str = NULL, *out = NULL, *error = NULL, *info = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
+	int		ret;
 
 	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector,
 			connector_data_points);
@@ -65,26 +66,29 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_http_context_create(&context);
 
-	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers, query_fields,
+	if (SUCCEED == (ret = zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers, query_fields,
 			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0, connector.timeout,
 			connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
 			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON,
-			HTTP_STORE_RAW, config_source_ip, &error))
+			HTTP_STORE_RAW, config_source_ip, &error)))
 	{
-		char		*info = NULL;
 		long		response_code;
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context);
 
-		if (SUCCEED == (zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &out, &error)))
+		if (SUCCEED == (ret = zbx_http_handle_response(context.easyhandle, &context, err, &response_code,
+				&out, &error)))
 		{
-			if (FAIL == zbx_int_in_list(status_codes, (int)response_code))
+			if (FAIL == (ret = zbx_int_in_list(status_codes, (int)response_code)))
 			{
 				error = zbx_dsprintf(NULL, "Response code \"%ld\" did not match any of the"
 						" required status codes \"%s\"", response_code, status_codes);
 			}
 		}
+	}
 
+	if (FAIL == ret)
+	{
 		if (NULL != out)
 		{
 			struct zbx_json_parse	jp;
@@ -116,10 +120,6 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
 
 		zbx_free(info);
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send data to \"%s\": %s", connector.url, error);
 	}
 
 	zbx_http_context_destroy(&context);
