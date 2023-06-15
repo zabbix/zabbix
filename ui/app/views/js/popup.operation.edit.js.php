@@ -104,7 +104,10 @@ window.operation_popup = new class {
 					row_index = 0;
 				}
 
-				e.target.closest('tr').insertAdjacentHTML('beforebegin', template.evaluate({row_index: row_index}));
+				this.data.optag.push({tag: '', value:'', row_index: row_index});
+				e.target.closest('tr').insertAdjacentHTML('beforebegin', template.evaluate({
+					tag: '', value: '', row_index: row_index
+				}));
 			}
 		});
 	}

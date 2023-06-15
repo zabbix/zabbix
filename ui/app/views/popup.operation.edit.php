@@ -347,12 +347,16 @@ $form_grid->addItem(
 			->addItem(
 				(new CRow([
 					(new CCol(
-						(new CTextAreaFlexible('tags[#{row_index}][tag]', '#{tag}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}',
+							['add_post_js' => false]
+						))
 							->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
 							->setAttribute('placeholder', _('tag'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 					(new CCol(
-						(new CTextAreaFlexible('tags[#{row_index}][value]', '#{value}', ['add_post_js' => false]))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}',
+							['add_post_js' => false]
+						))
 							->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
 							->setAttribute('placeholder', _('value'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),

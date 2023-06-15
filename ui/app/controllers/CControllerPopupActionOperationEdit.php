@@ -262,6 +262,7 @@ class CControllerPopupActionOperationEdit extends CController {
 			'evaltype' => (string) CONDITION_EVAL_TYPE_AND_OR,
 			'opconditions' => [],
 			'opgroup' => [],
+			'optag' => [],
 			'optemplate' => [],
 			'opinventory' => [
 				'inventory_mode' => (string) HOST_INVENTORY_MANUAL
