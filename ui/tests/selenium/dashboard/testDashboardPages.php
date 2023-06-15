@@ -37,14 +37,14 @@ class testDashboardPages extends CWebTest {
 	 *
 	 * @var string
 	 */
-	const NEXT_BUTTON = 'xpath://button[@class="dashboard-next-page btn-iterator-page-next"]';
+	const NEXT_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-next-page")]';
 
 	/**
 	 * Previous page button in dashboard.
 	 *
 	 * @var string
 	 */
-	const PREVIOUS_BUTTON = 'xpath://button[@class="dashboard-previous-page btn-iterator-page-previous"]';
+	const PREVIOUS_BUTTON = 'xpath://button[contains(@class, "btn-dashboard-previous-page")]';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -296,7 +296,6 @@ class testDashboardPages extends CWebTest {
 		$page_menu->select('Properties');
 		$this->checkPageProperties();
 		$this->query('id:dashboard-cancel')->one()->click();
-		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
 		// Check Stop/Start slideshow.
@@ -620,16 +619,15 @@ class testDashboardPages extends CWebTest {
 
 		// Switch pages next/previous.
 		$dashboard = CDashboardElement::find()->one();
-		foreach (['next-page', 'previous-page'] as $direction) {
-			$widget_name = ['First', 'Second', 'Third'];
-			if ($direction === 'previous-page') {
-				$widget_name = ['First', 'Third', 'Second'];
-			}
+		foreach (['btn-dashboard-kioskmode-next-page', 'btn-dashboard-kioskmode-previous-page'] as $direction) {
+			$widget_name = ($direction === 'btn-dashboard-kioskmode-next-page')
+				? ['First', 'Second', 'Third']
+				: ['First', 'Third', 'Second'];
 
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
-						->one()->click();
+						->one()->hoverMouse()->click();
 			}
 		}
 
@@ -647,7 +645,9 @@ class testDashboardPages extends CWebTest {
 		$this->page->assertHeader('Dashboard for kiosk');
 	}
 
-	// Check default period change for page.
+	/**
+	 * Check default period change for page.
+	 */
 	public function testDashboardPages_DefaultPeriod() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for page delete'])
 				->waitUntilReady();

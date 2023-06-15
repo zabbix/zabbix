@@ -84,11 +84,11 @@ pre {
 }
 
 a {
+	color: $link-color;
+	text-decoration: none;
 
-	&:link {
-		color: $link-color;
-		text-decoration: none;
-		transition: color .2s ease-out;
+	@if $ui-transitions {
+		transition: color $ui-controls-transition-duration ease-out;
 	}
 
 	&:visited {
@@ -149,6 +149,10 @@ svg a {
 		fill: $link-active-color;
 		text-decoration: underline;
 	}
+}
+
+.monospace-font {
+	font-family: $font-stack-mono;
 }
 
 .float-left {

@@ -24,7 +24,7 @@
 
 #include "zbxserver.h"
 #include "macrofunc.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxexpr.h"
 #include "zbxcachevalue.h"
 #include "mocks/valuecache/valuecache_mock.h"

@@ -177,10 +177,10 @@ class testDashboardGeomapWidget extends CWebTest {
 				"\nThe maximum zoom level is \"0\".".
 				"\nInitial view is ignored if the default view is set.";
 
-		$form->query('xpath:.//label[text()="Initial view"]/a')->one()->click();
+		$form->getLabel('Initial view')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 	}
 
