@@ -134,7 +134,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $filter['age']                   (optional) usable together with 'age_state' and only for
 	 *                                                           TRIGGERS_OPTION_(RECENT|IN)_PROBLEM
 	 * @param array  $filter['severities']            (optional)
-	 * @param int    $filter['unacknowledged']        (optional)
+	 * @param int    $filter['acknowledgement_status'] (optional)
 	 * @param array  $filter['tags']                  (optional)
 	 * @param string $filter['tags'][]['tag']
 	 * @param string $filter['tags'][]['value']
@@ -251,9 +251,6 @@ class CScreenProblem extends CScreenBase {
 					$options['severities'] = $filter['severities'];
 				}
 			}
-			if (array_key_exists('unacknowledged', $filter) && $filter['unacknowledged']) {
-				$options['acknowledged'] = false;
-			}
 			if (array_key_exists('evaltype', $filter)) {
 				$options['evaltype'] = $filter['evaltype'];
 			}
@@ -269,8 +266,33 @@ class CScreenProblem extends CScreenBase {
 				unset($options['symptom']);
 			}
 
+			$filter_options = [];
+
 			if (array_key_exists('cause_eventid', $filter) && $filter['cause_eventid']) {
-				$options['filter'] = ['cause_eventid' => $filter['cause_eventid']];
+				$filter_options['cause_eventid'] = $filter['cause_eventid'];
+			}
+
+			if (array_key_exists('acknowledgement_status', $filter)) {
+				switch ($filter['acknowledgement_status']) {
+					case ZBX_ACK_STATUS_UNACK:
+						$options['acknowledged'] = false;
+						break;
+
+					case ZBX_ACK_STATUS_ACK:
+						$options['acknowledged'] = true;
+
+						if (array_key_exists('acknowledged_by_me', $filter) && $filter['acknowledged_by_me'] == 1) {
+							$filter_options += [
+								'action' => ZBX_PROBLEM_UPDATE_ACKNOWLEDGE,
+								'action_userid' => CUser::$userData['userid']
+							];
+						}
+						break;
+				}
+			}
+
+			if ($filter_options) {
+				$options['filter'] = $filter_options;
 			}
 
 			$problems = ($filter['show'] == TRIGGERS_OPTION_ALL)
@@ -972,7 +994,7 @@ class CScreenProblem extends CScreenBase {
 			));
 
 			$this->data['filter']['compact_view']
-				? $header_check_box->addStyle('width: 20px;')
+				? $header_check_box->addStyle('width: 16px;')
 				: $header_check_box->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			$link = $url->getUrl();
@@ -990,23 +1012,23 @@ class CScreenProblem extends CScreenBase {
 			// There are cause events displayed on page that have symptoms. Maximum column count.
 			if ($do_causes_have_symptoms) {
 				$col_header_1 = (new CColHeader())->addClass(ZBX_STYLE_SECOND_COL);
-				$col_header_2 = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
+				$col_header_2 = new CColHeader();
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header_1->addStyle('width: 28px;');
-					$header[] = $col_header_2->addStyle('width: 20px;');
+					$header[] = $col_header_1->addStyle('width: 18px;');
+					$header[] = $col_header_2->addStyle('width: 18px;');
 				}
 				else {
-					$header[] = $col_header_1->addStyle('width: 20px;');
+					$header[] = $col_header_1->addStyle(ZBX_STYLE_CELL_WIDTH);
 					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
 			// There might be cause events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
-				$col_header = (new CColHeader())->addClass(ZBX_STYLE_THIRD_COL);
+				$col_header = new CColHeader();
 
 				if ($this->data['filter']['compact_view']) {
-					$header[] = $col_header->addStyle('width: 20px;');
+					$header[] = $col_header->addStyle('width: 16px;');
 				}
 				else {
 					$header[] = $col_header->addClass(ZBX_STYLE_CELL_WIDTH);
@@ -1030,6 +1052,8 @@ class CScreenProblem extends CScreenBase {
 				$header[] = $header_clock;
 			}
 
+			$table = new CTableInfo();
+
 			// Create table.
 			if ($this->data['filter']['compact_view']) {
 				if ($this->data['filter']['show_tags'] == SHOW_TAGS_NONE) {
@@ -1051,47 +1075,45 @@ class CScreenProblem extends CScreenBase {
 					}
 				}
 
-				$table = (new CTableInfo())
-					->setHeader(array_merge($header, [
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						)->addStyle('width: 120px;'),
-						$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
-						$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
-						(new CColHeader(_('Info')))->addStyle('width: 24px;'),
-						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 42%;'),
-						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
-							->addStyle('width: 58%;'),
-						(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
-						(new CColHeader(_('Update')))->addStyle('width: 40px;'),
-						(new CColHeader(_('Actions')))->addStyle('width: 64px;'),
-						$tags_header
-					]))
-						->addClass(ZBX_STYLE_COMPACT_VIEW)
-						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+				$table->setHeader(array_merge($header, [
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					)->addStyle('width: 120px;'),
+					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
+					$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
+					(new CColHeader(_('Info')))->addStyle('width: 24px;'),
+					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)
+						->addStyle('width: 42%;'),
+					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link)
+						->addStyle('width: 58%;'),
+					(new CColHeader(_('Duration')))->addStyle('width: 73px;'),
+					(new CColHeader(_('Update')))->addStyle('width: 40px;'),
+					(new CColHeader(_('Actions')))->addStyle('width: 89px;'),
+					$tags_header
+				]))
+					->addClass(ZBX_STYLE_COMPACT_VIEW)
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 			}
 			else {
-				$table = (new CTableInfo())
-					->setHeader(array_merge($header, [
-						make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
-							$link
-						),
-						$show_recovery_data
-							? (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH)
-							: null,
-						$show_recovery_data ? _('Status') : null,
-						_('Info'),
-						make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
-						make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
-						($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
-							? _('Operational data')
-							: null,
-						_('Duration'),
-						_('Update'),
-						_('Actions'),
-						$this->data['filter']['show_tags'] ? _('Tags') : null
-					]));
+				$table->setHeader(array_merge($header, [
+					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
+						$link
+					),
+					$show_recovery_data
+						? (new CColHeader(_('Recovery time')))->addClass(ZBX_STYLE_CELL_WIDTH)
+						: null,
+					$show_recovery_data ? _('Status') : null,
+					_('Info'),
+					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link),
+					make_sorting_header(_('Problem'), 'name', $this->data['sort'], $this->data['sortorder'], $link),
+					($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY)
+						? _('Operational data')
+						: null,
+					_('Duration'),
+					_('Update'),
+					_('Actions'),
+					$this->data['filter']['show_tags'] ? _('Tags') : null
+				]));
 			}
 
 			$tags = $this->data['filter']['show_tags']
@@ -1366,7 +1388,7 @@ class CScreenProblem extends CScreenBase {
 			$cell_status = new CSpan($value_str);
 
 			if (isEventUpdating($in_closing, $problem)) {
-				$cell_status->addClass('blink');
+				$cell_status->addClass('js-blink');
 			}
 
 			// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -1407,9 +1429,9 @@ class CScreenProblem extends CScreenBase {
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
 						: _('Inaccessible user');
 
-					$info_icons[] = (new CSimpleButton())
-						->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-						->addClass('blink')
+					$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
+						->addClass(ZBX_STYLE_COLOR_ICON)
+						->addClass('js-blink')
 						->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 				}
 				elseif ($problem['suppression_data']) {
@@ -1427,10 +1449,7 @@ class CScreenProblem extends CScreenBase {
 			}
 
 			if ($data['filter']['compact_view'] && $data['filter']['show_suppressed'] && count($info_icons) > 1) {
-				$cell_info = (new CButton(null))
-					->addClass(ZBX_STYLE_ICON_WIZARD_ACTION)
-					->addStyle('margin-left: -3px;')
-					->setHint(makeInformationList($info_icons));
+				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
 				$cell_info = makeInformationList($info_icons);
@@ -1494,9 +1513,7 @@ class CScreenProblem extends CScreenBase {
 
 			$checkbox_col = new CCol(new CCheckBox('eventids['.$problem['eventid'].']', $problem['eventid']));
 			$empty_col = new CCol();
-			$symptom_col = (new CCol(
-				makeActionIcon(['icon' => ZBX_STYLE_ACTION_ICON_SYMPTOM, 'title' => _('Symptom')])
-			));
+			$symptom_col = (new CCol(new CIcon(ZBX_ICON_ARROW_TOP_RIGHT, _('Symptom'))));
 
 			if ($data['show_timeline']) {
 				$checkbox_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -1512,8 +1529,8 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['symptom_count'] > 0) {
 					// Show symptom counter and collapse/expand button.
 					$symptom_count_span = (new CSpan($problem['symptom_count']))
-						->addClass(ZBX_STYLE_TAG)
-						->addStyle('max-width: 22px;');
+						->addClass(ZBX_STYLE_ENTITY_COUNT)
+						->addStyle('max-width: 3ch;');
 
 					if ($problem['symptom_count'] >= 1000) {
 						$symptom_count_span->setHint($problem['symptom_count']);
@@ -1521,13 +1538,12 @@ class CScreenProblem extends CScreenBase {
 
 					$symptom_count_col = (new CCol($symptom_count_span))->addClass(ZBX_STYLE_SECOND_COL);
 
-					$collapse_expand_col = (new CCol(
-						(new CButton(null))
+					$collapse_expand_col = new CCol(
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Expand')))
+							->addClass(ZBX_STYLE_COLLAPSED)
 							->setAttribute('data-eventid', $problem['eventid'])
 							->setAttribute('data-action', 'show_symptoms')
-							->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
-							->setTitle(_('Expand'))
-					))->addClass(ZBX_STYLE_THIRD_COL);
+					);
 
 					if ($data['show_timeline']) {
 						$symptom_count_col->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
@@ -1550,7 +1566,7 @@ class CScreenProblem extends CScreenBase {
 							->addClass('problem-row')
 							->addItem([
 								$empty_col->addClass(ZBX_STYLE_SECOND_COL),
-								$empty_col->addClass(ZBX_STYLE_THIRD_COL)
+								$empty_col
 							]);
 					}
 					elseif ($data['show_two_columns']) {
@@ -1578,7 +1594,7 @@ class CScreenProblem extends CScreenBase {
 					$row = (new CRow([
 						$empty_col,
 						$checkbox_col,
-						$symptom_col->addClass(ZBX_STYLE_THIRD_COL)
+						$symptom_col
 					]))
 						->addClass(ZBX_STYLE_PROBLEM_NESTED)
 						->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
@@ -1599,9 +1615,7 @@ class CScreenProblem extends CScreenBase {
 				 * column.
 				 */
 				if (!$nested && $data['show_three_columns']) {
-					$row->addItem(
-						$empty_col->addClass(ZBX_STYLE_THIRD_COL)
-					);
+					$row->addItem($empty_col);
 				}
 			}
 
@@ -1614,8 +1628,8 @@ class CScreenProblem extends CScreenBase {
 				$row->addItem([
 					$cell_clock->addClass(ZBX_STYLE_TIMELINE_DATE),
 					(new CCol())
-							->addClass(ZBX_STYLE_TIMELINE_AXIS)
-							->addClass(ZBX_STYLE_TIMELINE_DOT),
+						->addClass(ZBX_STYLE_TIMELINE_AXIS)
+						->addClass(ZBX_STYLE_TIMELINE_DOT),
 					(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD)
 				]);
 			}
@@ -1697,9 +1711,7 @@ class CScreenProblem extends CScreenBase {
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					))->addClass(ZBX_STYLE_TABLE_STATS)
 				))->addClass(ZBX_STYLE_PAGING_BTN_CONTAINER)
-			))
-				->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL)
-				->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+			))->addClass(ZBX_STYLE_PROBLEM_NESTED_SMALL);
 
 			if ($data['show_timeline']) {
 				$colspan = 1;
@@ -1714,9 +1726,7 @@ class CScreenProblem extends CScreenBase {
 					$colspan++;
 				}
 
-				$empty_col = (new CCol())
-					->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD)
-					->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD);
+				$empty_col = (new CCol())->addClass(ZBX_STYLE_PROBLEM_EXPAND_TD);
 
 				if ($colspan > 1) {
 					$empty_col->setColSpan($colspan);
@@ -1724,12 +1734,8 @@ class CScreenProblem extends CScreenBase {
 
 				$row->addItem([
 					$empty_col,
-					(new CCol())
-						->addClass(ZBX_STYLE_TIMELINE_AXIS)
-						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
-					(new CCol())
-						->addClass(ZBX_STYLE_TIMELINE_TD)
-						->addClass(ZBX_STYLE_SYMPTOM_LIMIT_TD),
+					(new CCol())->addClass(ZBX_STYLE_TIMELINE_AXIS),
+					(new CCol())->addClass(ZBX_STYLE_TIMELINE_TD),
 					$symptom_limit_col->setColSpan($table->getNumCols() - $colspan - 2)
 				]);
 			}

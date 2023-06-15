@@ -20,7 +20,6 @@
 #include "lld.h"
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
@@ -224,7 +223,6 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 					break;
 				case ZBX_REGEXP_NO_MATCH:
 					*result = (ZBX_CONDITION_OPERATOR_NOT_REGEXP == condition->op ? 1 : 0);
-					break;
 					break;
 				default:
 					*err_msg = zbx_strdcatf(*err_msg,

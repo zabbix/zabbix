@@ -20,6 +20,6 @@
 #ifndef ZABBIX_SPECSYSINFO_H
 #define ZABBIX_SPECSYSINFO_H
 
-extern ZBX_METRIC	parameters_specific[];
+zbx_metric_t	*get_parameters_specific(void);
 
 #endif /* ZABBIX_SPECSYSINFO_H */

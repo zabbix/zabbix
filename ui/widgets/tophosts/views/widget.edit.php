@@ -29,7 +29,7 @@
 $form = new CWidgetFormView($data);
 
 $groupids = array_key_exists('groupids', $data['fields'])
-	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
 	: null;
 
 $column = $form->registerField(new CWidgetFieldSelectView($data['fields']['column']));
@@ -37,7 +37,7 @@ $column = $form->registerField(new CWidgetFieldSelectView($data['fields']['colum
 $form
 	->addField($groupids)
 	->addField(array_key_exists('hostids', $data['fields'])
-		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 		: null
 	)
@@ -60,8 +60,8 @@ $form
 		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add item column')))
 			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
 	])
-	->addField(array_key_exists('count', $data['fields'])
-		? new CWidgetFieldIntegerBoxView($data['fields']['count'])
+	->addField(array_key_exists('show_lines', $data['fields'])
+		? new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 		: null
 	)
 	->includeJsFile('widget.edit.js.php')

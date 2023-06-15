@@ -19,7 +19,6 @@
 
 #include "httptest.h"
 
-#include "log.h"
 #include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"

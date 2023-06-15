@@ -42,10 +42,7 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-step-row">
 	<?= (new CRow([
-			(new CCol((new CDiv())
-				->addClass(ZBX_STYLE_DRAG_ICON)
-				->addStyle('top: 0px;')
-			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSpan('1:'))->setAttribute('data-row-num', ''),
 			(new CLink('#{name}', 'javascript:httpconf.steps.open(#{no});')),
 			'#{timeout}',
@@ -53,9 +50,8 @@
 				->setAttribute('data-hintbox', '#{enabled_hint}'),
 			'#{required}',
 			'#{status_codes}',
-			(new CCol((new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('element-table-remove')
+			(new CCol(
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
@@ -65,9 +61,7 @@
 
 <script type="text/x-jquery-tmpl" id="scenario-pair-row">
 	<?= (new CRow([
-			(new CCol([
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CTextBox(null, '#{name}'))
 				->setAttribute('placeholder', _('name'))
 				->setAttribute('data-type', 'name')
@@ -78,9 +72,7 @@
 				->setAttribute('data-type', 'value')
 				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove')
+				(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
@@ -240,8 +232,25 @@
 			handle: 'div.' + httpconf.ZBX_STYLE_DRAG_ICON,
 			tolerance: 'pointer',
 			opacity: 0.6,
+			helper: (e, ui) => {
+				for (const td of ui.find('>td')) {
+					const $td = $(td);
+					$td.attr('width', $td.width())
+				}
+
+				// When dragging element on safari, it jumps out of the table.
+				if (SF) {
+					// Move back draggable element to proper position.
+					ui.css('left', (ui.offset().left - 2) + 'px');
+				}
+
+				return ui;
+			},
 			start: function(e, ui) {
 				ui.placeholder.height(ui.item.height());
+			},
+			stop: (e, ui) => {
+				ui.item.find('>td').removeAttr('width');
 			}
 		};
 	}

@@ -21,7 +21,6 @@
 #include "dbupgrade_macros.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxcrypto.h"
 #include "zbxnum.h"
 

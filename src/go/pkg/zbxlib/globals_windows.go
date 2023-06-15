@@ -33,6 +33,7 @@ package zbxlib
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/param.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/interval.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_str.o
+#cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/common_log.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/components_strings_representations.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/libc_wrappers.o
 #cgo LDFLAGS: ${SRCDIR}/../../../../build/mingw/output/file.o
@@ -87,8 +88,17 @@ const char	title_message[] = "agent";
 const char	*usage_message[] = {};
 const char	*help_message[] = {};
 
-ZBX_METRIC	parameters_common[] = {NULL};
-ZBX_METRIC	parameters_common_local[] = {NULL};
+zbx_metric_t	parameters_common[] = {NULL};
+zbx_metric_t	*get_parameters_common(void)
+{
+	return &parameters_common[0];
+}
+
+zbx_metric_t	parameters_common_local[] = {NULL};
+zbx_metric_t	*get_parameters_common_local(void)
+{
+	return &parameters_common_local[0];
+}
 
 #define ZBX_MESSAGE_BUF_SIZE	1024
 

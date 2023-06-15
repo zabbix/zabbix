@@ -52,9 +52,7 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-$remove_button = (new CButton(null, _('Remove')))
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('js-remove');
+$remove_button = (new CButtonLink(_('Remove')))->addClass('js-remove');
 
 $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))->addItem(
 	(new CRow([
@@ -235,14 +233,12 @@ $condition_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->onClick(
-						'return PopUp("popup.condition.event.corr", '.
-							json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
-							{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
-						);'
-					)
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))->onClick(
+					'return PopUp("popup.condition.event.corr", '.
+						json_encode(['type' => ZBX_POPUP_CONDITION_TYPE_EVENT_CORR]).',
+						{dialogue_class: "modal-popup-medium", dialogueid: "event_corr_condition"}
+					);'
+				)
 			))->setColSpan(4)
 		)
 );

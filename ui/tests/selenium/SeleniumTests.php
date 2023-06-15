@@ -196,6 +196,7 @@ require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 
 // Tags.
+require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
@@ -466,6 +467,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageServicesSlaReport');
 
 		// Tags.
+		$suite->addTestSuite('testFormTagsConnectors');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsServices');

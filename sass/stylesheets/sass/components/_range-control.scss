@@ -20,19 +20,19 @@ $range-input-width: 31px;
 		vertical-align: top;
 		opacity: 0;
 		cursor: pointer;
-		-webkit-appearance: none; /* Hides the slider so that custom slider can be made */
-		-moz-appearance: none; /* Hides the slider so that custom slider can be made */
+		-webkit-appearance: none; // Hides the slider so that custom slider can be made.
+		-moz-appearance: none; // Hides the slider so that custom slider can be made.
 
 		&:focus {
 			outline: none;
 		}
 
-		/* Special styling for WebKit/Blink */
+		// Special styling for WebKit/Blink.
 		&::-webkit-slider-thumb,
 		&::-moz-range-thumb {
 			height: $range-thumb-size;
 			width: $range-thumb-size;
-			margin-top: 1px; /* You need to specify a margin in Chrome, but in Firefox and IE it is automatic */
+			margin-top: 1px; // You need to specify a margin in Chrome, but in Firefox and IE it is automatic.
 			opacity: 0;
 		}
 
