@@ -136,16 +136,19 @@ css_icons:
 
 css: css_theme_blue css_theme_dark css_hc_light css_hc_dark css_icons
 
+
+## list of modules which should be built with testing suite
+MODULES = \
+	dummy
+
 modules_build:
-	-@for i in src/modules/*/Makefile; do \
-		dir=$${i%/Makefile}; \
-		$(MAKE) -C $$dir; \
+	-@for module in $(MODULES); do \
+		$(MAKE) -C src/modules/$$module; \
 	done
 
 modules_clean:
-	-@for i in src/modules/*/Makefile; do \
-		dir=$${i%/Makefile}; \
-		$(MAKE) -C $$dir clean; \
+	-@for module in $(MODULES); do \
+		$(MAKE) -C src/modules/$$module; \
 	done
 
 ## cmocka test support
