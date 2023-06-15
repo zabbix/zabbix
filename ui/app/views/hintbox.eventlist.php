@@ -148,7 +148,7 @@ if (array_key_exists('problems', $data)) {
 		$cell_status = new CSpan($value_str);
 
 		if (isEventUpdating($in_closing, $problem)) {
-			$cell_status->addClass('blink');
+			$cell_status->addClass('js-blink');
 		}
 
 		// Add colors and blinking to span depending on configuration and trigger parameters.

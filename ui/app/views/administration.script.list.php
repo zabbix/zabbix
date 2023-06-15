@@ -236,7 +236,7 @@ $scriptsForm->addItem([
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdelete')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'script')
 ]);

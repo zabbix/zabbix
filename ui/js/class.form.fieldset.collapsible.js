@@ -37,6 +37,9 @@ class CFormFieldsetCollapsible {
 			const is_collapsed = this._target.classList.contains(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED);
 
 			this._target.classList.toggle(CFormFieldsetCollapsible.ZBX_STYLE_COLLAPSED, !is_collapsed);
+
+			this._toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
+			this._toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 			this._toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 		});
 

@@ -21,7 +21,7 @@
 
 #include "zbxconf.h"
 #include "zbxsysinfo.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"

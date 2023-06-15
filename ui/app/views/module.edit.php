@@ -28,7 +28,7 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('module')))->removeId())
 	->setName('module-form')
 	->addVar('moduleid', $data['moduleid'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'))
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->setAttribute('autofocus', 'autofocus');
 
 $module_form = (new CFormGrid())

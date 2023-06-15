@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxstr.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 
 #define ZBX_QSC_BUFSIZE	8192	/* QueryServiceConfig() and QueryServiceConfig2() maximum output buffer size */

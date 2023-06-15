@@ -125,7 +125,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[contains(@class, "js-widget-edit")])[1]'
 						]
 					]
 				]
@@ -436,7 +436,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://button[@class="btn-action"]'
+							'element' => 'xpath://button[@id="dashboard-actions"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
@@ -701,7 +701,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[contains(@class, "js-widget-edit")])[1]'
 						]
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic'
@@ -2431,7 +2431,7 @@ class testDocumentationLinks extends CWebTest {
 		}
 
 		// Get the documentation link and compare it with expected result.
-		$link = $location->query('class:icon-doc-link')->one();
+		$link = $location->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
@@ -2525,7 +2525,7 @@ class testDocumentationLinks extends CWebTest {
 		$dialog = $this->query('id:map-window')->one()->waitUntilVisible();
 
 		// Maps contain headers for all map elements, so only the visible one should be checked.
-		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
+		$link = $dialog->query('class:zi-help-small')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
 
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 	}

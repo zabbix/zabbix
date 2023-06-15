@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxregexp.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 #include <sys/procfs.h>

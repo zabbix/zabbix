@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxexpr.h"
 
 static unsigned char	mock_get_cycle(const char *path)

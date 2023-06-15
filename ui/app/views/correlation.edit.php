@@ -41,9 +41,7 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-$remove_button = (new CButton(null, _('Remove')))
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('js-condition-remove');
+$remove_button = (new CButtonLink(_('Remove')))->addClass('js-condition-remove');
 
 $condition_tag_template = (new CTemplateTag('condition-tag-row-tmpl'))
 	->addItem(
@@ -185,9 +183,8 @@ $condition_table = (new CTable())
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
+					(new CButtonLink(_('Add')))
 						->setAttribute('data-action', 'add')
-						->addClass(ZBX_STYLE_BTN_LINK)
 						->addClass('js-condition-add')
 				))->setColSpan(4)
 			)
