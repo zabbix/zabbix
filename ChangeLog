@@ -1,9 +1,26 @@
 Changes for 6.0.19rc1
 
 New features:
+.........T [ZBXNEXT-8465] updated JS scripts in Kubernetes templates; thanks to Erik Berg for proposals in JS improvement (egordymov)
+........S. [ZBXNEXT-8467] updated max supported TimescaleDB version to 2.11 (mprihodko)
+..F....... [ZBXNEXT-7072] fixed hintbox to be automatically closed when target element disappears (miks)
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+...G...... [ZBX-22399] added tls and default support to MQTT plugin for Zabbix agent 2 (esneiders)
+..F....... [ZBX-20280] fixed page selection in dashboard after refresh (apoga)
+...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
+.......PS. [ZBX-22805] increased memory allocation limit for JavaScript execution from 64M to 512M (akozlovs)
+...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
+.........T [ZBX-21573] optimised preprocessing steps in the AWS EC2 by HTTP template (aiantsen)
+..F....... [ZBX-16326] fixed displaying of first and last data points on the graphs (Sasha)
+.........T [ZBX-22467] fixed missing bracket in trigger event name in Windows templates (drasikhov)
+..F....... [ZBX-22738] fixed flickering debug info while editing empty dashboards (averza)
+..F....... [ZBX-22231] removed host and interface macros resolution from http proxy fields in items, item prototypes and discovery rules test dialogues (epulke)
+..F....... [ZBX-21194] fixed all forms submission on Enter keypress for Safari browser (acikuns)
+...G...... [ZBX-22762] fixed race condition in Zabbix agent 2 when reading filesystem (arimdjonoks)
+A.F....... [ZBX-21804] removed requirement for write permissions on hosts, host groups, triggers, discovery rules, discovery checks and proxies when creating or updating actions (gcalenko)
+..F....... [ZBX-22243] fixed navigation away from edited dashboard without user confirmation (averza)
 ..F....... [ZBX-22418] fixed popup form fields overlapping labels when textarea width is resized (agriscenko)
 ........S. [ZBX-19590] changed count_foreach to add 0 when no data are in the requested period (wiper)
 ..F....... [ZBX-22681] fixed wrongly displayed revert button for text macros in host, template and host prototype clone form (miks)
@@ -2581,6 +2598,7 @@ Changes for 5.0.36rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
 ..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
 A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
 ..F....... [ZBX-22644] fixed graph widget not showing all problems for multiple items with dataset aggregation enabled (dfofanovs)
