@@ -833,7 +833,7 @@
 							title: item.name
 						}))
 						.append($('<span>')
-							.addClass('subfilter-disable-btn')
+							.addClass([ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALLER])
 							.on('click', function() {
 								if (!ms.options.disabled && !item_disabled) {
 									removeSelected($obj, item.id);

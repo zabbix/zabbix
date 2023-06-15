@@ -23,10 +23,6 @@
 #include "zbxlog.h"
 #include "zbxstr.h"
 
-ZBX_METRIC	parameter_hostname =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
-
 static void	retrieve_hostname(char *buffer, int len, char **error)
 {
 	if (SUCCEED != gethostname(buffer, len))

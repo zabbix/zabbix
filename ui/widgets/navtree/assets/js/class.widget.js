@@ -285,19 +285,19 @@ class CWidgetNavTree extends CWidget {
 	_activateContentsEvents() {
 		if (this._state === WIDGET_STATE_ACTIVE && this._has_contents) {
 			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
 					button.addEventListener('click', this._events.addChild);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
 					button.addEventListener('click', this._events.addMaps);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+				for (const button of this._target.querySelectorAll('.js-edit')) {
 					button.addEventListener('click', this._events.editItem);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+				for (const button of this._target.querySelectorAll('.js-remove')) {
 					button.addEventListener('click', this._events.removeItem);
 				}
 			}
@@ -318,19 +318,19 @@ class CWidgetNavTree extends CWidget {
 	_deactivateContentsEvents() {
 		if (this._has_contents) {
 			if (this._is_edit_mode) {
-				for (const button of this._target.querySelectorAll('.js-button-add-child')) {
+				for (const button of this._target.querySelectorAll('.js-add-child')) {
 					button.removeEventListener('click', this._events.addChild);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-add-maps')) {
+				for (const button of this._target.querySelectorAll('.js-add-maps')) {
 					button.removeEventListener('click', this._events.addMaps);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-edit')) {
+				for (const button of this._target.querySelectorAll('.js-edit')) {
 					button.removeEventListener('click', this._events.editItem);
 				}
 
-				for (const button of this._target.querySelectorAll('.js-button-remove')) {
+				for (const button of this._target.querySelectorAll('.js-remove')) {
 					button.removeEventListener('click', this._events.removeItem);
 				}
 			}
@@ -505,81 +505,65 @@ class CWidgetNavTree extends CWidget {
 		}
 
 		const tree_row = document.createElement('div');
-
 		tree_row.classList.add('tree-row');
 		li_item.appendChild(tree_row);
 
-		let tools;
-		let problems;
-
-		if (this._is_edit_mode) {
-			tools = document.createElement('div');
-			tools.classList.add('tools');
-			tree_row.appendChild(tools);
-		}
-		else {
-			problems = document.createElement('div');
-			problems.classList.add('problem-icon-list');
-			tree_row.appendChild(problems);
-		}
-
 		const content = document.createElement('div');
-
 		content.classList.add('content');
 		tree_row.appendChild(content);
 
 		const margin_lvl = document.createElement('div');
-
 		margin_lvl.classList.add('margin-lvl');
 		content.appendChild(margin_lvl);
 
 		if (this._is_edit_mode) {
-			const button_add_child = document.createElement('input');
+			const tools = document.createElement('div');
+			tools.classList.add('tools');
+			tree_row.appendChild(tools);
 
+			const button_add_child = document.createElement('button');
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
-			button_add_child.classList.add('btn-add', 'js-button-add-child');
-			button_add_child.setAttribute('data-id', item.id);
+			button_add_child.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_PLUS, 'js-add-child');
 			button_add_child.disabled = depth >= this._max_depth;
+			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
-			const button_add_maps = document.createElement('input');
-
+			const button_add_maps = document.createElement('button');
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
-			button_add_maps.classList.add('btn-import', 'js-button-add-maps');
+			button_add_maps.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'js-add-maps');
 			button_add_maps.disabled = depth >= this._max_depth;
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
 			if (editable) {
-				const button_edit = document.createElement('input');
-
+				const button_edit = document.createElement('button');
 				button_edit.type = 'button';
 				button_edit.title = t('Edit');
-				button_edit.classList.add('btn-edit', 'js-button-edit');
+				button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_PENCIL, 'js-edit');
 				button_edit.setAttribute('data-id', item.id);
 				tools.appendChild(button_edit);
 
 				const button_remove = document.createElement('button');
-
 				button_remove.type = 'button';
 				button_remove.title = t('Remove');
-				button_remove.classList.add('btn-remove', 'js-button-remove');
+				button_remove.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_REMOVE_SMALL, 'js-remove');
 				button_remove.setAttribute('data-id', item.id);
 				tools.appendChild(button_remove);
+
+				const drag = document.createElement('div');
+				drag.classList.add('drag-icon');
+				content.appendChild(drag);
 			}
 		}
-
-		if (this._is_edit_mode && editable) {
-			const drag = document.createElement('div');
-
-			drag.classList.add('drag-icon');
-			content.appendChild(drag);
+		else {
+			const problems = document.createElement('div');
+			problems.classList.add('problem-icon-list');
+			tree_row.appendChild(problems);
 		}
 
 		const arrow = document.createElement('div');
-
 		arrow.classList.add('arrow');
 		content.appendChild(arrow);
 

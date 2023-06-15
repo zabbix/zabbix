@@ -115,7 +115,7 @@ $output = [
 			->addItem((new CVar('test_expression', 1))->removeId())
 			->addItem([
 				$form_list,
-				(new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)
+				(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)
 			])
 		]))->toString(),
 	'buttons' => [

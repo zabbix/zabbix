@@ -1,0 +1,78 @@
+.ui-tabs-nav {
+	height: 30px;
+	line-height: 30px;
+	border-bottom: 1px solid $table-border-color;
+
+	li {
+		display: inline-block;
+		outline: none;
+
+		.btn,
+		button {
+			margin-left: 5px;
+		}
+	}
+
+	.ui-tabs-anchor:not(.btn) {
+		border: none;
+		padding: 8px 10px;
+
+		@if $ui-transitions {
+			transition: background-color $ui-controls-transition-duration ease-out;
+		}
+
+		&:hover,
+		&:focus,
+		&:active {
+			background-color: $ui-hover-bg-color;
+		}
+	}
+
+	.ui-tabs-active {
+		.ui-tabs-anchor:not(.btn) {
+			padding-bottom: 6px;
+			background-color: transparent;
+			border-bottom: 3px solid $ui-tab-bg-selected-color;
+			color: $font-color;
+			cursor: default;
+		}
+
+		.btn {
+			height: auto;
+			padding-bottom: 7px;
+			margin-bottom: 0;
+			color: $font-color;
+			background-color: $ui-bg-color;
+			border-color: $ui-border-color;
+			border-bottom: 0;
+			border-bottom-right-radius: 0;
+			border-bottom-left-radius: 0;
+
+			&:hover,
+			&:focus,
+			&:active {
+				background-color: $ui-hover-bg-color;
+			}
+		}
+	}
+
+	.ui-state-focus {
+		.ui-tabs-anchor:not(:focus) {
+			box-shadow: 0 0 0 2px $btn-focus-outline-color;
+		}
+	}
+
+	.ui-state-disabled {
+		.ui-tabs-anchor {
+			cursor: default;
+			color: $btn-disabled-color;
+			background-color: transparent;
+			border: none;
+
+			&:hover {
+				background-color: transparent;
+				box-shadow: none;
+			}
+		}
+	}
+}
