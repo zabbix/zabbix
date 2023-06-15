@@ -518,8 +518,8 @@ function convertUnitsUptime($value) {
  *
  * @return string
  */
-function convertUnitsS($value, bool $ignore_millisec = false, int $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
-		bool $decimals_exact = false) {
+function convertUnitsS($value, $ignore_millisec = false, $decimals = ZBX_UNITS_ROUNDOFF_SUFFIXED,
+		$decimals_exact = false) {
 	$value = (float) $value;
 	$value_abs = abs($value);
 
