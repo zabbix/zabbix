@@ -496,8 +496,7 @@ $buttons = [
 		'action' => 'operation_popup.submit();'
 	]
 ];
-sdff('$operation in popup.action.edit view');
-sdff($operation);
+
 $output = [
 	'header' => _('Operation details'),
 	'body' => $form->toString(),
