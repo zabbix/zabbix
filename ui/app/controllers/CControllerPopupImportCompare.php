@@ -41,7 +41,7 @@ class CControllerPopupImportCompare extends CController {
 		if (!$ret) {
 			$output = [];
 			if (($messages = getMessages()) !== null) {
-				$output['error'] = $messages->toString();
+				$output['errors'] = $messages->toString();
 			}
 
 			$this->setResponse((new CControllerResponseData(['main_block' => json_encode($output)]))->disableView());
@@ -131,7 +131,7 @@ class CControllerPopupImportCompare extends CController {
 
 		$data = [
 			'title' => _('Templates'),
-			'error' => null,
+			'errors' => null,
 			'import_overlayid' => $this->getInput('import_overlayid'),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
@@ -141,7 +141,7 @@ class CControllerPopupImportCompare extends CController {
 		if ($result === false) {
 			CMessageHelper::setErrorTitle(_('Import failed'));
 
-			$data['error'] = [
+			$data['errors'] = [
 				'title' => CMessageHelper::getTitle(),
 				'messages' => array_column(filter_messages(), 'message')
 			];
