@@ -33,7 +33,7 @@ $form = (new CForm('post', $form_action))
 	->setName('user-group-mapping-edit-form');
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $usergroup_multiselect = (new CMultiSelect([
 	'name' => 'user_groups[]',

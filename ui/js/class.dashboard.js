@@ -18,6 +18,7 @@
 **/
 
 
+const ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES = 'btn-dashboard-page-properties';
 const ZBX_STYLE_DASHBOARD_IS_MULTIPAGE = 'dashboard-is-multipage';
 const ZBX_STYLE_DASHBOARD_IS_EDIT_MODE = 'dashboard-is-edit-mode';
 const ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE = 'is-scrollable';
@@ -166,11 +167,7 @@ class CDashboard {
 
 		this._announceWidgets();
 
-		let dashboard_page = this._getRestorableDashboardPage();
-
-		if (dashboard_page === null) {
-			dashboard_page = this._dashboard_pages.keys().next().value;
-		}
+		const dashboard_page = this._getInitialDashboardPage();
 
 		this._selectDashboardPage(dashboard_page);
 
@@ -230,6 +227,11 @@ class CDashboard {
 		}
 
 		if (this._buttons.slideshow !== null) {
+			if (this._is_kiosk_mode) {
+				this._buttons.slideshow.classList.remove(ZBX_ICON_PLAY);
+				this._buttons.slideshow.classList.add(ZBX_ICON_PAUSE);
+			}
+
 			this._buttons.slideshow.classList.remove('slideshow-state-stopped');
 			this._buttons.slideshow.classList.add('slideshow-state-started');
 
@@ -254,6 +256,11 @@ class CDashboard {
 		}
 
 		if (this._buttons.slideshow !== null) {
+			if (this._is_kiosk_mode) {
+				this._buttons.slideshow.classList.remove(ZBX_ICON_PAUSE);
+				this._buttons.slideshow.classList.add(ZBX_ICON_PLAY);
+			}
+
 			this._buttons.slideshow.classList.remove('slideshow-state-started');
 			this._buttons.slideshow.classList.add('slideshow-state-stopped');
 
@@ -918,9 +925,11 @@ class CDashboard {
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (!this._is_edit_mode) {
-			this._storeSelectedDashboardPage(dashboard_page);
+		if (this._data.templateid === null || !this._is_edit_mode) {
+			this._setInitialDashboardPage(dashboard_page);
+		}
 
+		if (!this._is_edit_mode) {
 			this._keepSteadyConfigurationChecker();
 
 			if (this._isSlideshowRunning()) {
@@ -1022,37 +1031,51 @@ class CDashboard {
 		}
 	}
 
-	_storeSelectedDashboardPage(dashboard_page) {
-		sessionStorage.setItem('dashboard.selected_dashboard_page', JSON.stringify({
-			dashboardid: this._data.dashboardid,
-			dashboard_pageid: dashboard_page.getDashboardPageId(),
-			is_kiosk_mode: this._is_kiosk_mode
-		}));
+	_setInitialDashboardPage(dashboard_page) {
+		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
+
+		const url = new URL(location.href);
+
+		if (dashboard_page_index > 0) {
+			url.searchParams.set('page', dashboard_page_index + 1);
+		}
+		else {
+			url.searchParams.delete('page');
+		}
+
+		history.replaceState(null, null, url);
 	}
 
-	_getRestorableDashboardPage() {
-		let stored_data = sessionStorage.getItem('dashboard.selected_dashboard_page');
+	_getInitialDashboardPage() {
+		const url = new URL(location.href);
 
-		if (stored_data === null) {
-			return null;
-		}
+		if (url.searchParams.has('page')) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+			const dashboard_page_index = parseInt(url.searchParams.get('page')) - 1;
 
-		stored_data = JSON.parse(stored_data);
-
-		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode === this._is_kiosk_mode) {
-			return null;
-		}
-
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			if (stored_data.dashboard_pageid === dashboard_page.getDashboardPageId()) {
-				return dashboard_page;
+			if (dashboard_page_index in dashboard_pages) {
+				return dashboard_pages[dashboard_page_index];
 			}
 		}
-		return null;
+
+		return this._dashboard_pages.keys().next().value;
 	}
 
 	getSelectedDashboardPage() {
 		return this._selected_dashboard_page;
+	}
+
+	getDashboardPageIndex(dashboard_page) {
+		if (this._is_kiosk_mode) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+
+			return dashboard_pages.indexOf(dashboard_page);
+		}
+
+		const tabs = [...this._tabs.getList().children];
+		const data = this._dashboard_pages.get(dashboard_page);
+
+		return tabs.indexOf(data.tab);
 	}
 
 	save() {
@@ -1644,7 +1667,7 @@ class CDashboard {
 		if (!this._is_kiosk_mode) {
 			const has_aria_expanded = this._tabs
 				.getList()
-				.querySelector('.btn-dashboard-page-properties[aria-expanded="true"]') !== null;
+				.querySelector(`.${ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES}[aria-expanded="true"]`) !== null;
 
 			if (has_aria_expanded) {
 				return true;
@@ -1696,7 +1719,7 @@ class CDashboard {
 			properties_button.title = t('Actions');
 			properties_button.setAttribute('aria-expanded', 'false');
 			properties_button.setAttribute('aria-haspopup', 'true');
-			properties_button.classList.add('btn-dashboard-page-properties');
+			properties_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE, ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES);
 
 			tab_contents.append(properties_button);
 		}
@@ -2007,6 +2030,8 @@ class CDashboard {
 			},
 
 			tabsSort: () => {
+				this._setInitialDashboardPage(this._selected_dashboard_page);
+
 				this._is_unsaved = true;
 			},
 
@@ -2019,7 +2044,7 @@ class CDashboard {
 					if (dashboard_page !== this._selected_dashboard_page) {
 						this._selectDashboardPage(dashboard_page, {is_async: true});
 					}
-					else if (e.target.classList.contains('btn-dashboard-page-properties')) {
+					else if (e.target.classList.contains(ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES)) {
 						jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 							new jQuery.Event(e)
 						);
@@ -2037,7 +2062,7 @@ class CDashboard {
 						if (dashboard_page !== this._selected_dashboard_page) {
 							this._selectDashboardPage(dashboard_page, {is_async: true});
 						}
-						else if (e.target.classList.contains('btn-dashboard-page-properties')) {
+						else if (e.target.classList.contains(ZBX_STYLE_BTN_DASHBOARD_PAGE_PROPERTIES)) {
 							jQuery(e.target).menuPopup(this._getDashboardPageActionsContextMenu(dashboard_page),
 								new jQuery.Event(e)
 							);

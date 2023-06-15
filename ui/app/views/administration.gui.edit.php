@@ -72,7 +72,7 @@ elseif (!$all_locales_available) {
 $gui_tab = (new CFormList())
 	->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()),
 		($language_error !== '')
-			? [$lang_select, (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')]
+			? [$lang_select, makeErrorIcon($language_error)]
 			: $lang_select
 	)
 	->addRow(new CLabel(_('Default time zone'), 'label-default-timezone'),

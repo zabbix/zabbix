@@ -149,7 +149,9 @@ class WidgetMap extends CDiv
 							(new CSpan())
 								->addClass(ZBX_STYLE_BTN_BACK_MAP)
 								->addItem(
-									(new CDiv())->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON)
+									(new CDiv())
+										->addClass(ZBX_STYLE_BTN_BACK_MAP_ICON)
+										->addClass(ZBX_ICON_CHEVRON_LEFT)
 								)
 								->addItem(
 									(new CDiv())
@@ -164,7 +166,7 @@ class WidgetMap extends CDiv
 			}
 
 			$map_div = (new CDiv(
-				(new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_INLINE_SR_ONLY))
+				(new CDiv($this->sysmap_data['aria_label']))->addClass(ZBX_STYLE_SYSMAP_CAPTION))
 			)->addClass('sysmap-widget-container');
 
 			$this->addStyle('position:relative;');

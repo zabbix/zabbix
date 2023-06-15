@@ -199,18 +199,18 @@ var AudioControl = {
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-time-to-blink="60">test 1</span>
- *      <span class="blink" data-time-to-blink="30">test 2</span>
- *      <span class="blink" data-toggle-class="normal">test 3</span>
- *      <span class="blink">test 3</span>
+ *      <span class="js-blink" data-time-to-blink="60">test 1</span>
+ *      <span class="js-blink" data-time-to-blink="30">test 2</span>
+ *      <span class="js-blink" data-toggle-class="normal">test 3</span>
+ *      <span class="js-blink">test 3</span>
  *      <script type="text/javascript">
  *          jQuery(document).ready(function(
  *              jqBlink.blink();
  *          ));
  *      </script>
- * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
+ * Elements with class 'js-blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
- * For elements with class 'blink' and attribute 'data-toggle-class' class will be toggled.
+ * For elements with class 'js-blink' and attribute 'data-toggle-class' class will be toggled.
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
@@ -223,7 +223,7 @@ var jqBlink = {
 		var that = this;
 
 		setInterval(function() {
-			var $collection = jQuery('.blink');
+			var $collection = jQuery('.js-blink');
 
 			$collection.each(function() {
 				var $el = jQuery(this),
@@ -235,14 +235,14 @@ var jqBlink = {
 
 				if (blink) {
 					if (typeof $el.data('toggleClass') !== 'undefined') {
-						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
+						$el.toggleClass($el.data('toggleClass'));
 					}
 					else {
-						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+						$el.css('opacity', that.shown ? '1' : '0');
 					}
 				}
 				else if (that.shown) {
-					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
+					$el.removeClass('js-blink').removeClass($el.data('toggleClass')).css('opacity', 1);
 				}
 			});
 
@@ -482,7 +482,7 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn',
+					'class': 'btn-overlay-close',
 					'title': t('S_CLOSE')
 				}
 			)
@@ -699,9 +699,12 @@ function toggleSection(id, profile_idx) {
 	const section = document.getElementById(id);
 	const toggle = section.querySelector('.section-toggle');
 
-	let is_collapsed = section.classList.contains('section-collapsed');
+	let is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
 
-	section.classList.toggle('section-collapsed', !is_collapsed);
+	section.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
+
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
 	if (profile_idx !== '') {
@@ -870,6 +873,7 @@ function getConditionFormula(conditions, evalType) {
 			remove_next_sibling: false,
 			disable: '.element-table-disable',
 			counter: null,
+			allow_empty: false,
 			beforeRow: null,
 			rows: [],
 			dataCallback: function(data) {
@@ -892,8 +896,12 @@ function getConditionFormula(conditions, evalType) {
 				// add the new row before the row with the "Add" button
 				var beforeRow = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
-					:  $(this).closest('tr');
+					: $(this).closest('tr');
 				addRow(table, beforeRow, options);
+
+				if (!options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
 
 				table.trigger('afteradd.dynamicRows', options);
 			});
@@ -902,6 +910,15 @@ function getConditionFormula(conditions, evalType) {
 			table.on('click', options.remove, function() {
 				// remove the parent row
 				removeRow(table, $(this).closest(options.row), options);
+
+				if (!options.allow_empty && $(options.row, table).length === 0) {
+					table.trigger('beforeadd.dynamicRows', options);
+
+					addRow(table, $(options.add, table).closest('tr'), options);
+					$(options.remove, table).attr('disabled', true);
+
+					table.trigger('afteradd.dynamicRows', options);
+				}
 			});
 
 			// disable buttons
@@ -910,11 +927,16 @@ function getConditionFormula(conditions, evalType) {
 				disableRow($(this).closest(options.row));
 			});
 
-			if (typeof options.rows === 'object') {
+			table.on('change', options, function() {
+				if (!options.allow_empty) {
+					$(options.remove, table).attr('disabled', false);
+				}
+			});
+
+			if (options.rows.length > 0) {
 				var before_row = (options['beforeRow'] !== null)
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
-
 				initRows(table, before_row, options);
 			}
 		});
@@ -986,6 +1008,7 @@ function getConditionFormula(conditions, evalType) {
 		if (options.remove_next_sibling) {
 			row.next().remove();
 		}
+
 		row.remove();
 
 		table.trigger('tableupdate.dynamicRows', options);
