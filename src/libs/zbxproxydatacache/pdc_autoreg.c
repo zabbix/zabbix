@@ -91,21 +91,21 @@ static int	pdc_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
  * Purpose: free autoregistration record                                      *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_list_free_autoreg(zbx_list_t *list, zbx_pdc_autoreg_t *ar)
+static void	pdc_list_free_autoreg(zbx_list_t *list, zbx_pdc_autoreg_t *row)
 {
-	if (NULL != ar->host)
-		list->mem_free_func(ar->host);
+	if (NULL != row->host)
+		list->mem_free_func(row->host);
 
-	if (NULL != ar->listen_ip)
-		list->mem_free_func(ar->listen_ip);
+	if (NULL != row->listen_ip)
+		list->mem_free_func(row->listen_ip);
 
-	if (NULL != ar->listen_dns)
-		list->mem_free_func(ar->listen_dns);
+	if (NULL != row->listen_dns)
+		list->mem_free_func(row->listen_dns);
 
-	if (NULL != ar->host_metadata)
-		list->mem_free_func(ar->host_metadata);
+	if (NULL != row->host_metadata)
+		list->mem_free_func(row->host_metadata);
 
-	list->mem_free_func(ar);
+	list->mem_free_func(row);
 }
 
 /******************************************************************************
@@ -177,7 +177,7 @@ static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 				break;
 			}
 
-			zbx_list_iterator_peek(&li, (void **)&row);
+			(void)zbx_list_iterator_peek(&li, (void **)&row);
 
 			zbx_json_addobject(j, NULL);
 			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
@@ -196,8 +196,6 @@ static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 
 		zbx_json_close(j);
 	}
-
-	pdc->autoreg_lastid = *lastid;
 
 	return records_num;
 }
@@ -342,7 +340,6 @@ int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
 {
 	int	state;
-
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 

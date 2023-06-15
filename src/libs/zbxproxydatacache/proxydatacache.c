@@ -114,7 +114,7 @@ static int	pdc_has_history(const char *table_name)
 
 	zbx_db_free_result(result);
 
-	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table_name);
+	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table_name, lastid);
 
 	result = zbx_db_select_n(sql, 1);
 
@@ -325,6 +325,7 @@ void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_u
 void	pdc_flush(zbx_pdc_t *pdc)
 {
 	pdc_autoreg_flush(pdc);
+	pdc_discovery_flush(pdc);
 
 	/* TODO: handle discovery and history */
 }

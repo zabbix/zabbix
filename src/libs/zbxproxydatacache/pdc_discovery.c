@@ -21,6 +21,7 @@
 #include "zbxproxydatacache.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+#include "zbxcachehistory.h"
 
 static zbx_history_table_t	dht = {
 	"proxy_dhistory", "dhistory_lastid",
@@ -37,121 +38,21 @@ static zbx_history_table_t	dht = {
 		}
 };
 
+static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next);
+
 struct zbx_pdc_discovery_data
 {
-	zbx_pdc_state_t			state;
-	zbx_vector_pdc_discovery_ptr_t	rows;
-	zbx_db_insert_t			db_insert;
+	zbx_pdc_state_t	state;
+	zbx_list_t	rows;
+	zbx_db_insert_t	db_insert;
 };
 
-static void	pdc_discovery_free(zbx_pdc_discovery_t *row)
+static void	pdc_list_discovery_free(zbx_list_t *list, zbx_pdc_discovery_t *row)
 {
-	zbx_free(row->ip);
-	zbx_free(row->dns);
-	zbx_free(row->value);
-	zbx_free(row);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: open discovery data cache                                         *
- *                                                                            *
- * Return value: The discovery data cache handle                              *
- *                                                                            *
- ******************************************************************************/
-zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
-{
-	zbx_pdc_discovery_data_t	*data;
-
-	data = (zbx_pdc_discovery_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_data_t));
-	data->state = pdc_dst[pdc_cache->state];
-
-	if (PDC_MEMORY == data->state)
-	{
-		/*
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
-		data->state = PDC_DATABASE_ONLY;
-		*/
-
-		/* zbx_vector_pdc_discovery_ptr_create(&data->rows); */
-	}
-
-	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
-	{
-		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
-				"value", "status", "dcheckid", "dns", NULL);
-	}
-
-	return data;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: flush the cached discovery data and free the handle               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
-{
-	if (PDC_MEMORY == data->state)
-	{
-		zbx_vector_pdc_discovery_ptr_clear_ext(&data->rows, pdc_discovery_free);
-		zbx_vector_pdc_discovery_ptr_destroy(&data->rows);
-	}
-	else
-	{
-		zbx_db_insert_autoincrement(&data->db_insert, "id");
-		(void)zbx_db_insert_execute(&data->db_insert);
-		zbx_db_insert_clean(&data->db_insert);
-	}
-
-	zbx_free(data);
-}
-
-static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
-		const char *ip, const char *dns, int port, int status, const char *value, int clock)
-{
-	if (PDC_MEMORY == data->state)
-	{
-		zbx_pdc_discovery_t	*row;
-
-		row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
-		row->druleid = druleid;
-		row->dcheckid = dcheckid;
-		row->ip = zbx_strdup(NULL, ip);
-		row->dns = zbx_strdup(NULL, dns);
-		row->port = port;
-		row->status = status;
-		row->value = zbx_strdup(NULL, value);
-		row->clock = clock;
-		zbx_vector_pdc_discovery_ptr_append(&data->rows, row);
-	}
-	else
-	{
-		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
-				dcheckid, dns);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write service data into discovery data cache                      *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
-		const char *ip, const char *dns, int port, int status, const char *value, int clock)
-{
-	pdc_discovery_write_service(data, druleid, dcheckid, ip, dns, port, status, value, clock);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: write host data into discovery data cache                         *
- *                                                                            *
- ******************************************************************************/
-void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
-		const char *dns, int status, int clock)
-{
-	pdc_discovery_write_service(data, druleid, 0, ip, dns, 0, status, "", clock);
+	list->mem_free_func(row->ip);
+	list->mem_free_func(row->dns);
+	list->mem_free_func(row->value);
+	list->mem_free_func(row);
 }
 
 static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
@@ -179,32 +80,416 @@ static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 	return records_num;
 }
 
-int	zbx_pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+		const char *ip, const char *dns, int port, int status, const char *value, int clock)
 {
-	if (PDC_MEMORY == pdc_src[pdc_cache->state])
+	if (PDC_MEMORY == data->state)
 	{
-		/*
-		zabbix_log(LOG_LEVEL_WARNING, "proxy data memory cache not implemented, forcing database cache");
-		pdc_cache->state = PDC_DATABASE_ONLY;
-		*/
-	}
+		zbx_pdc_discovery_t	*row;
 
-	if (PDC_DATABASE == pdc_src[pdc_cache->state])
-	{
-		return pdc_get_discovery(j, lastid, more);
+		row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
+		row->druleid = druleid;
+		row->dcheckid = dcheckid;
+		row->ip = zbx_strdup(NULL, ip);
+		row->dns = zbx_strdup(NULL, dns);
+		row->port = port;
+		row->status = status;
+		row->value = zbx_strdup(NULL, value);
+		row->clock = clock;
+
+		zbx_list_append(&data->rows, row, NULL);
 	}
 	else
-		return 0;
-}
-
-void	zbx_pdc_set_discovery_lastid(const zbx_uint64_t lastid)
-{
-	pdc_set_lastid(dht.table, dht.lastidfield, lastid);
+	{
+		zbx_db_insert_add_values(&data->db_insert, __UINT64_C(0), clock, druleid, ip, port, value, status,
+				dcheckid, dns);
+	}
 }
 
 void	pdc_discovery_flush(zbx_pdc_t *pdc)
 {
+	pdc_discovery_add_rows_db(&pdc->discovery, NULL);
+
 	if (0 != pdc->discovery_lastid)
 		pdc_set_lastid("proxy_dhistory", "discovery_lastid", pdc->discovery_lastid);
+}
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add discovery row to memory cache                                 *
+ *                                                                            *
+ * Parameters: pdc - [IN] proxy data cache                                    *
+ *             src - [IN] row to add                                          *
+ *             now - [IN] current time                                        *
+ *                                                                            *
+ * Return value: SUCCEED - the row was cached successfully                    *
+ *               FAIL    - not enough memory in cache                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	pdc_discovery_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_discovery_t *src, time_t now)
+{
+	zbx_pdc_discovery_t	*row;
+	int			ret;
+
+	if (NULL == (row = (zbx_pdc_discovery_t *)pdc_malloc(sizeof(zbx_pdc_discovery_t))))
+		return FAIL;
+
+	memset(row, 0, sizeof(zbx_pdc_discovery_t));
+
+	if (NULL == (row->ip = pdc_strdup(src->ip)))
+		goto out;
+
+	if (NULL == (row->dns = pdc_strdup(src->dns)))
+		goto out;
+
+	if (NULL == (row->value = pdc_strdup(src->value)))
+		goto out;
+
+	row->druleid = src->druleid;
+	row->dcheckid = src->dcheckid;
+	row->clock = src->clock;
+	row->status = src->status;
+	row->port = src->port;
+	row->write_clock = now;
+
+	ret = zbx_list_append(&pdc->discovery, row, NULL);
+out:
+	if (SUCCEED != ret)
+		pdc_list_discovery_free(&pdc->discovery, row);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add discovery rows to memory cache                                *
+ *                                                                            *
+ * Parameters: pdc  - [IN] proxy data cache                                   *
+ *             rows - [IN] rows to add                                        *
+ *                                                                            *
+ * Return value: NULL if all rows were added successfully. Otherwise the list *
+ *               item of first failed row is returned                         *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *rows)
+{
+	zbx_list_iterator_t	li;
+	zbx_list_item_t		*head = pdc->discovery.head;
+	zbx_pdc_discovery_t	*row;
+	int			rows_num = 0;
+	time_t			now;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
+	zbx_list_iterator_init(rows, &li);
+
+	while (SUCCEED == zbx_list_iterator_next(&li))
+	{
+		(void)zbx_list_iterator_peek(&li, (void **)&row);
+
+		if (SUCCEED != pdc_discovery_add_row_mem(pdc, row, now))
+			break;
+
+		rows_num++;
+	}
+
+	/* set cached row ids */
+	if (0 < rows_num)
+	{
+		zbx_uint64_t	id;
+
+		id = zbx_dc_get_nextid("proxy_dhistory", rows_num);
+
+		zbx_list_iterator_init_with(&pdc->discovery, head, &li);
+		do
+		{
+			(void)zbx_list_iterator_peek(&li, (void **)&row);
+			row->id = id++;
+		}
+		while (SUCCEED == zbx_list_iterator_next(&li));
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
+
+	return (SUCCEED == zbx_list_iterator_is_finished(&li) ? NULL : li.current);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add discovery rows to database cache                              *
+ *                                                                            *
+ * Parameters: rows - [IN] rows to add                                        *
+ *             next - [IN] next row to add                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
+{
+	zbx_list_iterator_t	li;
+	zbx_pdc_discovery_t	*row;
+	zbx_db_insert_t		db_insert;
+	int			rows_num = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
+			"dcheckid", "dns", NULL);
+
+	zbx_list_iterator_init_with(rows, next, &li);
+
+	do
+	{
+		(void)zbx_list_iterator_peek(&li, (void **)&row);
+
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row->clock, row->druleid, row->ip, row->port,
+				row->value, row->status, row->dcheckid, row->dns);
+
+		rows_num++;
+	}
+	while (SUCCEED == zbx_list_iterator_next(&li));
+
+	zbx_db_insert_autoincrement(&db_insert, "id");
+	(void)zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get discovery records from memory cache                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	pdc_discovery_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int			records_num = 0;
+	zbx_list_iterator_t	li;
+	zbx_pdc_discovery_t	*row;
+	void			*ptr;
+
+	if (SUCCEED == zbx_list_peek(&pdc->discovery, &ptr))
+	{
+		zbx_json_addarray(j, ZBX_PROTO_TAG_DISCOVERY_DATA);
+		zbx_list_iterator_init(&pdc->discovery, &li);
+
+		while (SUCCEED == zbx_list_iterator_next(&li))
+		{
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset)
+			{
+				*more = 1;
+				break;
+			}
+
+			(void)zbx_list_iterator_peek(&li, (void **)&row);
+
+			zbx_json_addobject(j, NULL);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->clock);
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_DRULE, row->druleid);
+			zbx_json_adduint64(j, ZBX_PROTO_TAG_DCHECK, row->dcheckid);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_IP, row->ip, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_DNS, row->dns, ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->port);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, row->value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addint64(j, ZBX_PROTO_TAG_STATUS, row->status);
+			zbx_json_close(j);
+
+			records_num++;
+			*lastid = row->id;
+		}
+
+		zbx_json_close(j);
+	}
+
+	return records_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: clear sent autoregistration records                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_discovery_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
+{
+	zbx_pdc_discovery_t	*row;
+
+	while (SUCCEED == zbx_list_peek(&pdc->discovery, (void **)&row))
+	{
+		if (row->id > lastid)
+			break;
+
+		zbx_list_pop(&pdc->discovery, NULL);
+		pdc_list_discovery_free(&pdc->discovery, row);
+	}
+}
+
+/* public api */
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: open discovery data cache                                         *
+ *                                                                            *
+ * Return value: The discovery data cache handle                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
+{
+	zbx_pdc_discovery_data_t	*data;
+
+	data = (zbx_pdc_discovery_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_data_t));
+
+	pdc_lock();
+	if (PDC_DATABASE == (data->state = pdc_dst[pdc_cache->state]))
+		pdc_cache->db_handles_num++;
+	pdc_unlock();
+
+	if (PDC_MEMORY == data->state)
+	{
+		zbx_list_create(&data->rows);
+	}
+	else
+	{
+		zbx_db_insert_prepare(&data->db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port",
+				"value", "status", "dcheckid", "dns", NULL);
+	}
+
+	return data;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush the cached discovery data and free the handle               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
+{
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (PDC_MEMORY == data->state)
+	{
+		zbx_list_item_t		*next = NULL;
+		zbx_pdc_discovery_t	*row;
+
+		pdc_lock();
+
+		/* check if the destination has not changed while collecting data to write */
+		if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+		{
+			if (NULL == (next = pdc_discovery_add_rows_mem(pdc_cache, &data->rows)))
+			{
+				pdc_unlock();
+				goto out;
+			}
+
+			if (PDC_DATABASE_MEMORY == pdc_cache->state)
+			{
+				/* transition to memory cache failed, disable memory cache until restart */
+				pdc_fallback_to_database(pdc_cache);
+			}
+			else
+			{
+				/* initiate transition to database cache */
+				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
+			}
+		}
+
+		/* not all rows were added to memory cache - flush them to database */
+		pdc_cache->db_handles_num++;
+		pdc_unlock();
+
+		pdc_discovery_add_rows_db(&data->rows, next);
+
+		while (SUCCEED == zbx_list_pop(&data->rows, (void **)&row))
+			pdc_list_discovery_free(&data->rows, row);
+
+		zbx_list_destroy(&data->rows);
+	}
+	else
+	{
+		zbx_db_insert_autoincrement(&data->db_insert, "id");
+		(void)zbx_db_insert_execute(&data->db_insert);
+		zbx_db_insert_clean(&data->db_insert);
+	}
+
+	pdc_lock();
+	pdc_cache->db_handles_num--;
+	pdc_unlock();
+
+out:
+	zbx_free(data);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write service data into discovery data cache                      *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+		const char *ip, const char *dns, int port, int status, const char *value, int clock)
+{
+	pdc_discovery_write_service(data, druleid, dcheckid, ip, dns, port, status, value, clock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write host data into discovery data cache                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
+		const char *dns, int status, int clock)
+{
+	pdc_discovery_write_service(data, druleid, 0, ip, dns, 0, status, "", clock);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get discovery rows for sending to server                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pdc_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+{
+	int	state, ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
+
+	pdc_lock();
+
+	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
+		ret = pdc_discovery_get_mem(pdc_cache, j, lastid, more);
+
+	pdc_unlock();
+
+	if (PDC_DATABASE == state)
+		ret = pdc_get_discovery(j, lastid, more);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update last sent discovery record id                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_discovery_set_lastid(const zbx_uint64_t lastid)
+{
+	int	state;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
+
+	pdc_lock();
+
+	pdc_cache->discovery_lastid = lastid;
+
+	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
+		pdc_discovery_clear(pdc_cache, lastid);
+
+	pdc_unlock();
+
+	if (PDC_DATABASE == state)
+		pdc_set_lastid(dht.table, dht.lastidfield, lastid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

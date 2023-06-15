@@ -248,6 +248,22 @@ void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: initialize list iterator starting with the specified item         *
+ *                                                                            *
+ * Parameters: list     - [IN]                                                *
+ *             next     - [IN] item to start with                             *
+ *             iterator - [OUT] iterator to be initialized                    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_list_iterator_init_with(zbx_list_t *list, zbx_list_item_t *next, zbx_list_iterator_t *iterator)
+{
+	iterator->list = list;
+	iterator->next = (NULL != next ? next->next : list->head);
+	iterator->current = next;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: advance list iterator                                             *
  *                                                                            *
  * Parameters: iterator - [IN] iterator to be advanced                        *
@@ -268,6 +284,22 @@ int	zbx_list_iterator_next(zbx_list_iterator_t *iterator)
 
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: advance list iterator                                             *
+ *                                                                            *
+ * Parameters: iterator - [IN] iterator to be advanced                        *
+ *                                                                            *
+ * Return value: SUCCEED is returned if next list item exists, otherwise,     *
+ *               FAIL is returned.                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_list_iterator_is_finished(zbx_list_iterator_t *iterator)
+{
+	return (NULL != iterator->next ? FAIL : SUCCEED);
+}
+
 
 /******************************************************************************
  *                                                                            *

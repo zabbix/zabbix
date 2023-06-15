@@ -114,7 +114,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = zbx_pdc_get_discovery(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_pdc_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
@@ -254,7 +254,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					zbx_pdc_set_discovery_lastid(discovery_lastid);
+					zbx_pdc_discovery_set_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
 					zbx_pdc_autoreg_set_lastid(areg_lastid);
