@@ -1179,7 +1179,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$data['fields']['Name'] = trim($data['fields']['Name']);
 				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
-				CDashboardElement::find()->asDashboard()->one()->waitUntilReady()->getWidget($name)->waitUntilVisible();
+				CDashboardElement::find()->waitUntilReady()->one()->getWidget($name);
 			}
 			$this->query('button:Save changes')->one()->click();
 
@@ -1204,7 +1204,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->page->waitUntilReady();
 
 			if ($check !== 'dashboard action') {
-				$reopened_form = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible()->getWidget($name)->edit();
+				$reopened_form = CDashboardElement::find()->waitUntilReady()->one()->getWidget($name)->edit();
 			}
 			else {
 				$this->query('id:dashboard-config')->one()->click();
