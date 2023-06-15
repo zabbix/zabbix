@@ -251,9 +251,6 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	if (0 != pdc->autoreg_lastid)
-		pdc_set_lastid("proxy_autoreg_host", "autoreg_host_lastid", pdc->autoreg_lastid);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -344,8 +341,6 @@ void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pdc_lock();
-
-	pdc_cache->autoreg_lastid = lastid;
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
 		pdc_autoreg_clear(pdc_cache, lastid);

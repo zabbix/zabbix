@@ -27,6 +27,7 @@
 int	zbx_pdc_init(zbx_uint64_t size, int age, char **error);
 
 void	zbx_pdc_update_state(int more);
+void	zbx_pdc_flush(void);
 
 /* discovery */
 

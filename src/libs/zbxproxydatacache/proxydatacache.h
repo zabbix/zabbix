@@ -113,10 +113,6 @@ typedef struct
 	zbx_list_t		discovery;
 	zbx_list_t		autoreg;
 
-	zbx_uint64_t		history_lastid;
-	zbx_uint64_t		discovery_lastid;
-	zbx_uint64_t		autoreg_lastid;
-
 	zbx_pdc_state_t		state;
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;

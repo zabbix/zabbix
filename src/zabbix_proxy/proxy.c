@@ -1022,6 +1022,7 @@ static void	zbx_on_exit(int ret)
 	zbx_ipc_service_free_env();
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
+	zbx_pdc_flush();
 	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_free_configuration_cache();
 	zbx_db_close();
@@ -1482,6 +1483,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
+	/* TODO: get parameters from configuration file */
 	if (FAIL == zbx_pdc_init(ZBX_MEBIBYTE * 128, SEC_PER_DAY, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy data cache: %s", error);

@@ -45,6 +45,8 @@ zbx_pdc_state_t	pdc_dst[] = {PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY,
 /* remap states to outgoing data source - database or memory */
 zbx_pdc_state_t	pdc_src[] = {PDC_DATABASE, PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY};
 
+const char	*pdc_state_desc[] = {"database only", "database", "database->memory", "memory", "memory->database"};
+
 void	pdc_lock()
 {
 	if (NULL != pdc_cache->mutex)
@@ -130,9 +132,14 @@ static int	pdc_has_history(const char *table_name)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set cache state and log the changes                               *
+ *                                                                            *
+ ******************************************************************************/
 void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *message)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %d -> %d", __func__, pdc->state, state);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s => %s", __func__, pdc_state_desc[pdc->state], pdc_state_desc[state]);
 
 	switch (state)
 	{
@@ -432,4 +439,13 @@ void	zbx_pdc_update_state(int more)
 	pdc_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+}
+
+void	zbx_pdc_flush(void)
+{
+	zbx_db_begin();
+	pdc_flush(pdc_cache);
+	zbx_db_commit();
+
+	pdc_cache->state = PDC_DATABASE_ONLY;
 }

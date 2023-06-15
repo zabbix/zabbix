@@ -251,15 +251,27 @@ void	zbx_list_iterator_init(zbx_list_t *list, zbx_list_iterator_t *iterator)
  * Purpose: initialize list iterator starting with the specified item         *
  *                                                                            *
  * Parameters: list     - [IN]                                                *
- *             next     - [IN] item to start with                             *
+ *             next     - [IN] item to start with, if NULL the iterator       *
+ *                             will be start with first item                  *
  *             iterator - [OUT] iterator to be initialized                    *
  *                                                                            *
+ *  Return value: SUCCEED - iterator was initialized successfully             *
+ *                FAIL    - list is empty                                     *
+ *                                                                            *
  ******************************************************************************/
-void	zbx_list_iterator_init_with(zbx_list_t *list, zbx_list_item_t *next, zbx_list_iterator_t *iterator)
+int	zbx_list_iterator_init_with(zbx_list_t *list, zbx_list_item_t *next, zbx_list_iterator_t *iterator)
 {
+	if (NULL == next)
+	{
+		zbx_list_iterator_init(list, iterator);
+		return zbx_list_iterator_next(iterator);
+	}
+
 	iterator->list = list;
-	iterator->next = (NULL != next ? next->next : list->head);
+	iterator->next = next->next;
 	iterator->current = next;
+
+	return SUCCEED;
 }
 
 /******************************************************************************

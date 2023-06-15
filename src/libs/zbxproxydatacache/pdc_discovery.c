@@ -80,7 +80,7 @@ static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 	return records_num;
 }
 
-static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
+static void	pdc_discovery_write_row(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		const char *ip, const char *dns, int port, int status, const char *value, int clock)
 {
 	if (PDC_MEMORY == data->state)
@@ -88,6 +88,7 @@ static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint
 		zbx_pdc_discovery_t	*row;
 
 		row = (zbx_pdc_discovery_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_t));
+		row->id = 0;
 		row->druleid = druleid;
 		row->dcheckid = dcheckid;
 		row->ip = zbx_strdup(NULL, ip);
@@ -108,10 +109,11 @@ static void	pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint
 
 void	pdc_discovery_flush(zbx_pdc_t *pdc)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	pdc_discovery_add_rows_db(&pdc->discovery, NULL);
 
-	if (0 != pdc->discovery_lastid)
-		pdc_set_lastid("proxy_dhistory", "discovery_lastid", pdc->discovery_lastid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -174,10 +176,11 @@ out:
 static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *rows)
 {
 	zbx_list_iterator_t	li;
-	zbx_list_item_t		*head = pdc->discovery.head;
+	zbx_list_item_t		*next = pdc->discovery.tail;
 	zbx_pdc_discovery_t	*row;
 	int			rows_num = 0;
 	time_t			now;
+	zbx_uint64_t		id = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -197,11 +200,13 @@ static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *r
 	/* set cached row ids */
 	if (0 < rows_num)
 	{
-		zbx_uint64_t	id;
-
 		id = zbx_dc_get_nextid("proxy_dhistory", rows_num);
 
-		zbx_list_iterator_init_with(&pdc->discovery, head, &li);
+		if (NULL != next)
+			next = next->next;
+
+		zbx_list_iterator_init_with(&pdc->discovery, next, &li);
+
 		do
 		{
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
@@ -210,7 +215,7 @@ static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *r
 		while (SUCCEED == zbx_list_iterator_next(&li));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d nextid:" ZBX_FS_UI64, __func__, rows_num, id);
 
 	return (SUCCEED == zbx_list_iterator_is_finished(&li) ? NULL : li.current);
 }
@@ -230,27 +235,30 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 	zbx_db_insert_t		db_insert;
 	int			rows_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:0x%p", __func__, next);
 
-	zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
-			"dcheckid", "dns", NULL);
-
-	zbx_list_iterator_init_with(rows, next, &li);
-
-	do
+	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
-		(void)zbx_list_iterator_peek(&li, (void **)&row);
+		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value", "status",
+				"dcheckid", "dns", NULL);
 
-		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), row->clock, row->druleid, row->ip, row->port,
-				row->value, row->status, row->dcheckid, row->dns);
+		do
+		{
+			(void)zbx_list_iterator_peek(&li, (void **)&row);
+			zbx_db_insert_add_values(&db_insert, row->id, row->clock, row->druleid, row->ip, row->port,
+					row->value, row->status, row->dcheckid, row->dns);
 
-		rows_num++;
+			rows_num++;
+		}
+		while (SUCCEED == zbx_list_iterator_next(&li));
+
+		/* when flushing local cache need to set row ids */
+		if (0 == row->id)
+			zbx_db_insert_autoincrement(&db_insert, "id");
+
+		(void)zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 	}
-	while (SUCCEED == zbx_list_iterator_next(&li));
-
-	zbx_db_insert_autoincrement(&db_insert, "id");
-	(void)zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
@@ -305,7 +313,7 @@ static int	pdc_discovery_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: clear sent autoregistration records                               *
+ * Purpose: clear sent discovery records                                      *
  *                                                                            *
  ******************************************************************************/
 static void	pdc_discovery_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
@@ -322,6 +330,26 @@ static void	pdc_discovery_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
 	}
 }
 
+static void	pdc_discovery_data_free(zbx_pdc_discovery_data_t *data)
+{
+
+	if (PDC_MEMORY == data->state)
+	{
+		zbx_pdc_discovery_t	*row;
+
+		while (SUCCEED == zbx_list_pop(&data->rows, (void **)&row))
+			pdc_list_discovery_free(&data->rows, row);
+
+		zbx_list_destroy(&data->rows);
+	}
+	else
+	{
+		zbx_db_insert_clean(&data->db_insert);
+	}
+
+	zbx_free(data);
+}
+
 /* public api */
 
 /******************************************************************************
@@ -334,6 +362,8 @@ static void	pdc_discovery_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
 zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
 {
 	zbx_pdc_discovery_data_t	*data;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	data = (zbx_pdc_discovery_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_discovery_data_t));
 
@@ -352,6 +382,8 @@ zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
 				"value", "status", "dcheckid", "dns", NULL);
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
 	return data;
 }
 
@@ -366,56 +398,54 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 
 	if (PDC_MEMORY == data->state)
 	{
-		zbx_list_item_t		*next = NULL;
-		zbx_pdc_discovery_t	*row;
+		void	*ptr;
 
-		pdc_lock();
-
-		/* check if the destination has not changed while collecting data to write */
-		if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+		if (SUCCEED == zbx_list_peek(&data->rows, &ptr))
 		{
-			if (NULL == (next = pdc_discovery_add_rows_mem(pdc_cache, &data->rows)))
+			zbx_list_item_t		*next = NULL;
+			zbx_pdc_discovery_t	*row;
+
+			pdc_lock();
+
+			/* check if the destination has not changed while collecting data to write */
+			if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 			{
-				pdc_unlock();
-				goto out;
+				if (NULL == (next = pdc_discovery_add_rows_mem(pdc_cache, &data->rows)))
+				{
+					pdc_unlock();
+					goto out;
+				}
+
+				if (PDC_DATABASE_MEMORY == pdc_cache->state)
+				{
+					/* transition to memory cache failed, disable memory cache until restart */
+					pdc_fallback_to_database(pdc_cache);
+				}
+				else
+				{
+					/* initiate transition to database cache */
+					pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
+				}
 			}
 
-			if (PDC_DATABASE_MEMORY == pdc_cache->state)
-			{
-				/* transition to memory cache failed, disable memory cache until restart */
-				pdc_fallback_to_database(pdc_cache);
-			}
-			else
-			{
-				/* initiate transition to database cache */
-				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
-			}
+			/* not all rows were added to memory cache - flush them to database */
+			pdc_cache->db_handles_num++;
+			pdc_unlock();
+
+			pdc_discovery_add_rows_db(&data->rows, next);
 		}
-
-		/* not all rows were added to memory cache - flush them to database */
-		pdc_cache->db_handles_num++;
-		pdc_unlock();
-
-		pdc_discovery_add_rows_db(&data->rows, next);
-
-		while (SUCCEED == zbx_list_pop(&data->rows, (void **)&row))
-			pdc_list_discovery_free(&data->rows, row);
-
-		zbx_list_destroy(&data->rows);
 	}
 	else
 	{
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
 		(void)zbx_db_insert_execute(&data->db_insert);
-		zbx_db_insert_clean(&data->db_insert);
 	}
 
 	pdc_lock();
 	pdc_cache->db_handles_num--;
 	pdc_unlock();
-
 out:
-	zbx_free(data);
+	pdc_discovery_data_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -428,7 +458,7 @@ out:
 void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		const char *ip, const char *dns, int port, int status, const char *value, int clock)
 {
-	pdc_discovery_write_service(data, druleid, dcheckid, ip, dns, port, status, value, clock);
+	pdc_discovery_write_row(data, druleid, dcheckid, ip, dns, port, status, value, clock);
 }
 
 /******************************************************************************
@@ -439,7 +469,7 @@ void	zbx_pdc_discovery_write_service(zbx_pdc_discovery_data_t *data, zbx_uint64_
 void	zbx_pdc_discovery_write_host(zbx_pdc_discovery_data_t *data, zbx_uint64_t druleid, const char *ip,
 		const char *dns, int status, int clock)
 {
-	pdc_discovery_write_service(data, druleid, 0, ip, dns, 0, status, "", clock);
+	pdc_discovery_write_row(data, druleid, 0, ip, dns, 0, status, "", clock);
 }
 
 /******************************************************************************
@@ -480,8 +510,6 @@ void	zbx_pdc_discovery_set_lastid(const zbx_uint64_t lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pdc_lock();
-
-	pdc_cache->discovery_lastid = lastid;
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
 		pdc_discovery_clear(pdc_cache, lastid);

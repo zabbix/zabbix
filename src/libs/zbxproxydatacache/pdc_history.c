@@ -534,6 +534,4 @@ void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
 
 void	pdc_history_flush(zbx_pdc_t *pdc)
 {
-	if (0 != pdc->history_lastid)
-		pdc_set_lastid("proxy_history", "history_lastid", pdc->history_lastid);
 }
