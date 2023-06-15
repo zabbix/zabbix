@@ -146,16 +146,14 @@ if (typeof addPopupValues === 'undefined') {
 						&& !$.contains(this.placeholder[0], itemElement)
 						&& (this.options.type == 'semi-dynamic' ? !$.contains(this.element[0], itemElement) : true)) {
 					if (!this.hovering && !$(itemElement).hasClass('opened')) {
-						const uiObj = this;
-
 						$(itemElement).addClass('hovering');
 
-						this.hovering = setTimeout(function() {
+						this.hovering = setTimeout(() => {
 							$(itemElement)
 								.removeClass('closed')
 								.addClass('opened');
 
-							uiObj.refreshPositions();
+							this.refreshPositions();
 						}, opt.parent_expand_delay);
 					}
 
@@ -253,32 +251,29 @@ if (typeof addPopupValues === 'undefined') {
 
 			if (direction_moved === 'right' && levels_moved) {
 				const drop_to = prev_item;
-				const uiObj = this;
 				const hovered_branch_depth = drop_to[0].getElementsByClassName('tree-list')[0].dataset.depth;
 
 				this._isAllowed(prev_item, level, level + child_levels);
 
 				if (hovered_branch_depth < this.options.max_depth + 1) {
-					this.changing_parent = setTimeout(function() {
+					this.changing_parent = setTimeout(() => {
 						$(drop_to)
 							.addClass('highlighted-parent opened')
 							.removeClass('closed');
 
 						if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
-							$('>.tree-list', drop_to).prepend(uiObj.placeholder);
+							$('>.tree-list', drop_to).prepend(this.placeholder);
 						}
 						else {
-							$('>.tree-list', drop_to).append(uiObj.placeholder);
+							$('>.tree-list', drop_to).append(this.placeholder);
 						}
 
-						uiObj.refreshPositions();
+						this.refreshPositions();
 					}, opt.parent_change_delay);
 				}
 			}
 
 			else if (direction_moved === 'left' && levels_moved) {
-				const uiObj = this;
-
 				let drop_to = $(this.currentItem[0]).closest('.tree-item');
 				let one_before = null;
 
@@ -292,18 +287,18 @@ if (typeof addPopupValues === 'undefined') {
 
 				$(drop_to).addClass('highlighted-parent');
 
-				this.changing_parent = setTimeout(function() {
+				this.changing_parent = setTimeout(() => {
 					if (one_before && one_before.length) {
-						$(uiObj.placeholder).insertAfter(one_before);
+						$(this.placeholder).insertAfter(one_before);
 					}
 					else {
-						$('>.tree-list', drop_to).append(uiObj.placeholder);
+						$('>.tree-list', drop_to).append(this.placeholder);
 					}
 
 					if (drop_to.children('.tree-list').children('li:visible:not(.ui-sortable-helper)').length < 1) {
 						drop_to.removeClass('opened');
 					}
-					uiObj.refreshPositions();
+					this.refreshPositions();
 				}, opt.parent_change_delay);
 
 				this._isAllowed(prev_item, level, level + child_levels);
