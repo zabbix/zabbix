@@ -22,7 +22,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
-#include "log.h"
+#include "zbxlog.h"
 
 /* the size of temporary buffer used to read from output stream */
 #define PIPE_BUFFER_SIZE	4096

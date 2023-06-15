@@ -143,12 +143,11 @@ else {
 			$linked_templates->addRow([
 				$template_link->addClass(ZBX_STYLE_WORDWRAP),
 				(new CCol(
-					(new CSimpleButton(_('Unlink')))
+					(new CButtonLink(_('Unlink')))
 						->setAttribute('data-templateid', $template['templateid'])
 						->onClick('
 							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
 						')
-						->addClass(ZBX_STYLE_BTN_LINK)
 				))->addClass(ZBX_STYLE_NOWRAP)
 			]);
 		}

@@ -34,7 +34,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Dashboards')))
 					->setId('dashboard')
-					->setIcon('icon-dashboards')
+					->setIcon(ZBX_ICON_DASHBOARD)
 					->setAction('dashboard.view')
 					->setAliases(['dashboard.list'])
 			);
@@ -74,7 +74,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Monitoring')))
 					->setId('view')
-					->setIcon('icon-monitoring')
+					->setIcon(ZBX_ICON_EYE_ALT)
 					->setSubMenu(new CMenu($submenu_monitoring))
 			);
 		}
@@ -101,7 +101,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Services')))
 					->setId('services')
-					->setIcon('icon-services')
+					->setIcon(ZBX_ICON_HIERARCHY)
 					->setSubMenu(new CMenu($submenu_services))
 			);
 		}
@@ -121,7 +121,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Inventory')))
 					->setId('cm')
-					->setIcon('icon-inventory')
+					->setIcon(ZBX_ICON_LIST)
 					->setSubMenu(new CMenu($submenu_inventory))
 			);
 		}
@@ -159,7 +159,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Reports')))
 					->setId('reports')
-					->setIcon('icon-reports')
+					->setIcon(ZBX_ICON_REPORT)
 					->setSubMenu(new CMenu($submenu_reports))
 			);
 		}
@@ -214,7 +214,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Data collection')))
 					->setId('config')
-					->setIcon('icon-data-collection')
+					->setIcon(ZBX_ICON_DOWNLOAD)
 					->setSubMenu(new CMenu($submenu_data_collection))
 			);
 		}
@@ -291,7 +291,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Alerts')))
 					->setId('alerts')
-					->setIcon('icon-alerts')
+					->setIcon(ZBX_ICON_ENVELOPE)
 					->setSubMenu(new CMenu($submenu_alerts))
 			);
 		}
@@ -328,7 +328,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Users')))
 					->setId('users-menu')
-					->setIcon('icon-users')
+					->setIcon(ZBX_ICON_USERS)
 					->setSubMenu(new CMenu($submenu_users))
 			);
 		}
@@ -399,7 +399,7 @@ class CMenuHelper {
 			$menu->add(
 				(new CMenuItem(_('Administration')))
 					->setId('admin')
-					->setIcon('icon-administration')
+					->setIcon(ZBX_ICON_COG)
 					->setSubMenu(new CMenu($submenu_administration))
 			);
 		}
@@ -420,14 +420,14 @@ class CMenuHelper {
 			$menu
 				->add(
 					(new CMenuItem(_('Support')))
-						->setIcon('icon-support')
+						->setIcon(ZBX_ICON_SUPPORT)
 						->setUrl(new CUrl(getSupportUrl($lang)))
 						->setTitle(_('Zabbix Technical Support'))
 						->setTarget('_blank')
 				)
 				->add(
 					(new CMenuItem(_('Integrations')))
-						->setIcon('icon-integrations')
+						->setIcon(ZBX_ICON_Z)
 						->setUrl(new CUrl(getIntegrationsUrl($lang)))
 						->setTitle(_('Zabbix Integrations'))
 						->setTarget('_blank')
@@ -436,7 +436,7 @@ class CMenuHelper {
 
 		$menu->add(
 			(new CMenuItem(_('Help')))
-				->setIcon('icon-help')
+				->setIcon(ZBX_ICON_HELP)
 				->setUrl(new CUrl(CBrandHelper::getHelpUrl()))
 				->setTitle(_('Help'))
 				->setTarget('_blank')
@@ -450,14 +450,14 @@ class CMenuHelper {
 		if (CWebUser::isGuest()) {
 			$menu->add(
 				(new CMenuItem(_('Guest user')))
-					->setIcon('icon-guest')
+					->setIcon(ZBX_ICON_USER)
 					->setTitle(getUserFullname($user))
 			);
 		}
 		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
-					->setIcon('icon-profile')
+					->setIcon(ZBX_ICON_USER_FILLED)
 					->setTitle(getUserFullname($user))
 					->setSubMenu(new CMenu([
 						(new CMenuItem(_('Profile')))
@@ -470,7 +470,7 @@ class CMenuHelper {
 		else {
 			$menu->add(
 				(new CMenuItem(_('User settings')))
-					->setIcon('icon-profile')
+					->setIcon(ZBX_ICON_USER_FILLED)
 					->setAction('userprofile.edit')
 					->setTitle(getUserFullname($user))
 			);
@@ -478,7 +478,7 @@ class CMenuHelper {
 
 		$menu->add(
 			(new CMenuItem(_('Sign out')))
-				->setIcon('icon-signout')
+				->setIcon(ZBX_ICON_SIGNOUT)
 				->setUrl(new CUrl('#signout'))
 				->setTitle(_('Sign out'))
 				->onClick('ZABBIX.logout(event)')

@@ -35,7 +35,7 @@ $form = (new CForm())
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
-$form->addItem((new CInput('submit', null))->addStyle('display: none;'));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid())
 	->addItem([
@@ -69,9 +69,7 @@ $form_grid = (new CFormGrid())
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('step-query-field-row-tmpl'))->addItem(
@@ -89,9 +87,7 @@ $form_grid = (new CFormGrid())
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')
@@ -121,9 +117,7 @@ $form_grid = (new CFormGrid())
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('step-post-field-row-tmpl'))->addItem(
@@ -142,9 +136,7 @@ $form_grid = (new CFormGrid())
 							->setMaxlength(2000)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')
@@ -173,14 +165,12 @@ $form_grid = (new CFormGrid())
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('step-variable-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol())->addStyle('width: 6px;'),
+						(new CCol())->addStyle('width: 15px;'),
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
@@ -192,9 +182,7 @@ $form_grid = (new CFormGrid())
 							->setMaxlength(2000)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))->addClass('form_row')
 				)
@@ -213,9 +201,7 @@ $form_grid = (new CFormGrid())
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('step-header-row-tmpl'))->addItem(
@@ -234,9 +220,7 @@ $form_grid = (new CFormGrid())
 							->setMaxlength(2000)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')

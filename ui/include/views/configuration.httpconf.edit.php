@@ -121,7 +121,7 @@ $scenario_tab
 		new CFormField(
 			(new CTextBox('http_proxy', $data['http_proxy'], false, DB::getFieldLength('httptest', 'http_proxy')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAttribute('placeholder', '[protocol://][user[:password]@]proxy.example.com[:port]')
+				->setAttribute('placeholder', _('[protocol://][user[:password]@]proxy.example.com[:port]'))
 				->disableAutocomplete()
 		)
 	])
@@ -135,14 +135,12 @@ $scenario_tab
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('variable-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol())->addStyle('width: 6px;'),
+						(new CCol())->addStyle('width: 15px;'),
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
@@ -154,9 +152,7 @@ $scenario_tab
 							->setMaxlength(2000)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))->addClass('form_row')
 				)
@@ -175,9 +171,7 @@ $scenario_tab
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-add')
+							(new CButtonLink(_('Add')))->addClass('element-table-add')
 						))->setColSpan(5)
 					),
 				(new CTemplateTag('header-row-tmpl'))->addItem(
@@ -196,9 +190,7 @@ $scenario_tab
 							->setMaxlength(2000)
 							->setAttribute('placeholder', _('value')),
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('element-table-remove')
+							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')
@@ -226,7 +218,7 @@ $steps_tab = (new CFormGrid())->addItem([
 				->addClass('list-numbered')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->setHeader([
-					(new CColHeader())->setWidth('15'),
+					new CColHeader(),
 					(new CColHeader())->setWidth('15'),
 					(new CColHeader(_('Name')))->setWidth('150'),
 					(new CColHeader(_('Timeout')))->setWidth('50'),
@@ -240,9 +232,7 @@ $steps_tab = (new CFormGrid())->addItem([
 				->addItem(
 					(new CTag('tfoot', true))->addItem(
 						(new CCol(!$data['templated']
-							? (new CSimpleButton(_('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('js-add-step')
+							? (new CButtonLink(_('Add')))->addClass('js-add-step')
 							: null
 						))->setColSpan(8)
 					)
@@ -293,9 +283,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						'#{required}',
 						'#{status_codes}',
 						(new CCol(
-							(new CSimpleButton(_('Remove')))
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('js-remove-step')
+							(new CButtonLink(_('Remove')))->addClass('js-remove-step')
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->setAttribute('data-row_index', '#{row_index}')

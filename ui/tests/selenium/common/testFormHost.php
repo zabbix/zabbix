@@ -312,14 +312,14 @@ class testFormHost extends CWebTest {
 		}
 
 		// Check hintbox.
-		$form->query('class:icon-help-hint')->one()->waitUntilClickable()->click();
+		$form->query('class:zi-help-filled-small')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
 		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Close host form popup to avoid unexpected alert in further cases.
@@ -2121,7 +2121,7 @@ class testFormHost extends CWebTest {
 					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
 
 					// Check hintbox.
-					$form->query('class:icon-help-hint')->one()->click();
+					$form->query('class:zi-help-filled-small')->one()->click();
 					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
 							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
@@ -2129,7 +2129,7 @@ class testFormHost extends CWebTest {
 					);
 
 					// Close the hint-box.
-					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [

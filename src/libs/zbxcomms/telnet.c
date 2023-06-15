@@ -20,7 +20,7 @@
 #include "zbxcomms.h"
 #include "comms.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxstr.h"
 
 #define CMD_IAC		255

@@ -53,7 +53,8 @@ zbx_hash_t		discoverer_task_hash(const void *data);
 int			discoverer_task_compare(const void *d1, const void *d2);
 void			discoverer_task_clear(zbx_discoverer_task_t *task);
 void			discoverer_task_free(zbx_discoverer_task_t *task);
-void			discoverer_job_tasks_free(zbx_discoverer_job_t *job);
+zbx_uint64_t		discoverer_task_check_count_get(zbx_discoverer_task_t *task);
+zbx_uint64_t		discoverer_job_tasks_free(zbx_discoverer_job_t *job);
 void			discoverer_job_free(zbx_discoverer_job_t *job);
 zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, int cfg_timeout);
 

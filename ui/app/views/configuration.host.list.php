@@ -387,7 +387,7 @@ foreach ($data['hosts'] as $host) {
 	$info_icons = [];
 
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
+		$info_icons[] = getHostLifetimeIndicator($current_time, (int) $host['hostDiscovery']['ts_delete']);
 	}
 
 	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
@@ -544,7 +544,9 @@ $form->addItem([
 			)
 		],
 		'popup.massupdate.host' => [
-			'content' => (new CButton('', _('Mass update')))
+			'content' => (new CSimpleButton(_('Mass update')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-no-chkbxrange')
 				->onClick(
 					"openMassupdatePopup('popup.massupdate.host', {".
 						CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".$csrf_token_massupdate.
@@ -553,15 +555,13 @@ $form->addItem([
 						trigger_element: this
 					});"
 				)
-				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
 		],
 		'host.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->onClick('view.massDeleteHosts(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
-				->removeAttribute('id')
+				->addClass('js-no-chkbxrange')
+				->removeId()
 		]
 	], 'hosts')
 ]);

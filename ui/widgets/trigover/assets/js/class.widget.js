@@ -25,20 +25,7 @@ class CWidgetTrigerOver extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response) => {
-				for (let i = overlays_stack.length - 1; i >= 0; i--) {
-					const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-					if (overlay.type === 'hintbox') {
-						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
-
-						if (this._body.contains(element)) {
-							hintBox.deleteHint(overlay.element);
-						}
-					}
-				}
-
 				clearMessages();
-
 				addMessage(makeMessageBox('good', [], response.success.title));
 
 				if (this._state === WIDGET_STATE_ACTIVE) {
