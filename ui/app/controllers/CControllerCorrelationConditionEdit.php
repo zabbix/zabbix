@@ -20,9 +20,9 @@
 
 
 /**
- * Actions operation new condition popup.
+ * Controller class containing operations for adding conditions.
  */
-class CControllerPopupConditionOperations extends CController {
+class CControllerCorrelationConditionEdit extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -31,12 +31,11 @@ class CControllerPopupConditionOperations extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'type' =>			'required|in '.ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-			'source' =>			'required|in '.EVENT_SOURCE_TRIGGERS,
-			'condition_type' =>	'in '.CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-			'operator' =>		'in '.CONDITION_OPERATOR_EQUAL,
-			'value' =>			'in '.implode(',', [EVENT_NOT_ACKNOWLEDGED, EVENT_ACKNOWLEDGED]),
-			'row_index' =>		'int32'
+			'conditiontype' => 'db corr_condition.type|in '.implode(',', [ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+				ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP,
+				ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+				ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+			])
 		];
 
 		$ret = $this->validateInput($fields);
@@ -55,23 +54,36 @@ class CControllerPopupConditionOperations extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TRIGGER_ACTIONS);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
 	}
 
 	protected function doAction(): void {
-		$this->setResponse(new CControllerResponseData(
-			[
-				'title' => _('New condition'),
-				'action' => $this->getAction(),
-				'row_index' => $this->getInput('row_index'),
-				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
-				'last_type' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'allowed_conditions' => [CONDITION_TYPE_EVENT_ACKNOWLEDGED],
-				'user' => [
-					'debug_mode' => $this->getDebugMode()
-				]
+		$output = [
+			'title' => _('New condition'),
+			'conditiontype' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+			'row_index' => $this->getInput('row_index', 0),
+			'last_type' => $this->getConditionLastType(),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
 			]
-		));
+		];
+
+		$this->setResponse(new CControllerResponseData($output));
+	}
+
+	/**
+	 * Remember the last selected condition.
+	 *
+	 * @return string
+	 */
+	protected function getConditionLastType(): string {
+		$last_type = CProfile::get('popup.condition.events_last_type', ZBX_CORR_CONDITION_OLD_EVENT_TAG);
+
+		if ($this->hasInput('conditiontype') && $this->getInput('conditiontype') != $last_type) {
+			CProfile::update('popup.condition.events_last_type', $this->getInput('conditiontype'), PROFILE_TYPE_INT);
+			$last_type = $this->getInput('conditiontype');
+		}
+
+		return $last_type;
 	}
 }

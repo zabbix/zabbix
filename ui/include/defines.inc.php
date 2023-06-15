@@ -1773,9 +1773,8 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // Condition popup types.
-define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION', 0);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 
 // Tab indicator names.
 define('TAB_INDICATOR_AUTH_HTTP', 'http');

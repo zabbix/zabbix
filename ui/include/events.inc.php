@@ -198,7 +198,7 @@ function make_event_details(array $event, array $allowed) {
 				}
 			}
 			else {
-				$correlation_name = _('Correlation rule');
+				$correlation_name = _('Event correlation rule');
 			}
 
 			$table->addRow([_('Resolved by'), $correlation_name]);
