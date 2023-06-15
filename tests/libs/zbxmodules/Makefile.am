@@ -1,10 +1,12 @@
 noinst_PROGRAMS = \
-	server_module_load
+	server_module_load \
+	proxy_module_load \
+	agent_module_load
 
 COMMMON_SOURCES = \
 	../../zbxmocktest.h
 
-COMMON_LIBS = \
+COMMON_LIBS1 = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
@@ -15,8 +17,9 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
-	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
+
+COMMON_LIBS2 = \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
@@ -45,8 +48,11 @@ COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
+SERVER_LIBS = \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a
+
 server_module_load_SOURCES = \
-	server_module_load.c \
+	generic_module_load.c \
 	$(COMMMON_SOURCES)
 
 server_module_load_CFLAGS = \
@@ -56,4 +62,42 @@ server_module_load_CFLAGS = \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
-server_module_load_LDADD = $(COMMON_LIBS) @SERVER_LIBS@
+server_module_load_LDADD = $(COMMON_LIBS1) $(SERVER_LIBS) $(COMMON_LIBS2) @SERVER_LIBS@
+
+PROXY_LIBS = \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a
+
+proxy_module_load_SOURCES = \
+	generic_module_load.c \
+	$(COMMMON_SOURCES)
+
+proxy_module_load_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
+
+proxy_module_load_LDADD = $(COMMON_LIBS1) $(PROXY_LIBS) $(COMMON_LIBS2) @PROXY_LIBS@
+
+AGENT_LIBS = \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a
+
+agent_module_load_SOURCES = \
+	generic_module_load.c \
+	$(COMMMON_SOURCES)
+
+agent_module_load_CFLAGS = \
+	-I@top_srcdir@/tests \
+	-I@top_srcdir@/src \
+	$(CMOCKA_CFLAGS) \
+	$(YAML_CFLAGS) \
+	$(TLS_CFLAGS)
+
+agent_module_load_LDADD = $(COMMON_LIBS1) $(AGENT_LIBS) $(COMMON_LIBS2) \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
+	@AGENT_LIBS@
