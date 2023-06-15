@@ -34,7 +34,7 @@ class CControllerPopupImport extends CController {
 			$output = [];
 
 			if (($messages = getMessages()) !== null) {
-				$output['errors'] = $messages->toString();
+				$output['error'] = $messages->toString();
 			}
 
 			$this->setResponse(
@@ -166,7 +166,8 @@ class CControllerPopupImport extends CController {
 			}
 			else {
 				CMessageHelper::setErrorTitle(_('Import failed'));
-				$output['errors'] = [
+
+				$output['error'] = [
 					'title' => CMessageHelper::getTitle(),
 					'messages' => array_column(filter_messages(), 'message')
 				];
