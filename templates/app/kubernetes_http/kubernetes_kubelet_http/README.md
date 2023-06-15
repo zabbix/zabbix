@@ -23,7 +23,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.4/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -82,7 +82,7 @@ Don't forget change macros {$KUBE.KUBELET.URL}, {$KUBE.API.TOKEN}.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pods discovery||Dependent item|kube.kubelet.pods.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Pods discovery||Dependent item|kube.kubelet.pods.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Item prototypes for Pods discovery
 
