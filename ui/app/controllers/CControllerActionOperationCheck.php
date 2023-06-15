@@ -206,13 +206,15 @@ class CControllerActionOperationCheck extends CController {
 					}
 
 					if ($tag === '' && $value !== '') {
-						error(_('Tag name cannot be empty'));
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 
 						return false;
 					}
 
 					if (array_key_exists($tag, $tags) && $tags[$tag] === $value) {
-						error(_('Tag already exists'));
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'),
+							_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
+						);
 
 						return false;
 					}
@@ -221,7 +223,7 @@ class CControllerActionOperationCheck extends CController {
 				}
 
 				if (!$tags) {
-					error(_('At least one tag must be added'));
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
 
 					return false;
 				}
