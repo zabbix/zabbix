@@ -38,9 +38,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			])
 			->setFooter(new CRow(
 				new CCol(
-					(new CSimpleButton(_('Add')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-add')
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				)
 			));
 

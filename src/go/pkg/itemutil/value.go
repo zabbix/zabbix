@@ -75,5 +75,6 @@ func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.R
 	default:
 		value = ValueToString(u)
 	}
+
 	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
 }
