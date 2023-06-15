@@ -108,6 +108,8 @@ window.operation_popup = new class {
 				e.target.closest('tr').insertAdjacentHTML('beforebegin', template.evaluate({
 					tag: '', value: '', row_index: row_index
 				}));
+
+				jQuery(`#operation_optag_${row_index}_tag, #operation_optag_${row_index}_value`).textareaFlexible();
 			}
 		});
 	}
@@ -238,6 +240,9 @@ window.operation_popup = new class {
 		this.data.optag.forEach((row) => {
 			if (![...form_rows].some((form_row) => row.row_index == form_row.getAttribute('data-id'))) {
 				tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
+
+				jQuery(`#operation_optag_${row.row_index}_tag, #operation_optag_${row.row_index}_value`)
+					.textareaFlexible();
 			}
 		});
 	}
