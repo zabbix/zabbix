@@ -35,10 +35,11 @@ class CControllerTemplateEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>	'db hosts.hostid',
-			'groupids' =>	'array_db hosts_groups.groupid'
+			'groupids' =>	'array_db hosts_groups.groupid',
+			'clone' =>		'in 1'
 		];
 
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput($fields) && $this->checkCloneSourceHostId();
 
 		if (!$ret) {
 			$this->setResponse(
@@ -51,6 +52,19 @@ class CControllerTemplateEdit extends CController {
 		}
 
 		return $ret;
+	}
+
+	/**
+	 * Check if source hostid is given to clone host.
+	 *
+	 * @return bool
+	 */
+	protected function checkCloneSourceHostId(): bool {
+		if ($this->hasInput('clone')) {
+			return $this->hasInput('templateid');
+		}
+
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
@@ -95,7 +109,7 @@ class CControllerTemplateEdit extends CController {
 			'valuemaps' => []
 		];
 
-		if ($templateid !== null) {
+		if ($this->hasInput('templateid')) {
 			$dbTemplates = API::Template()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'selectTemplateGroups' => ['groupid'],
@@ -126,6 +140,7 @@ class CControllerTemplateEdit extends CController {
 			}
 			unset($macro);
 
+			// todo - change to sort
 			order_result($data['dbTemplate']['valuemaps'], 'name');
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 
@@ -147,7 +162,7 @@ class CControllerTemplateEdit extends CController {
 
 //		$data['clear_templates'] = $clear_templates;
 
-		$data = array_merge($this->template, $data);
+//		$data = array_merge($this->template, $data);
 
 		// description
 		$data['description'] = ($data['templateid'] !== null)
@@ -155,12 +170,11 @@ class CControllerTemplateEdit extends CController {
 			: getRequest('description', '');
 
 		// tags
-		if (!array_key_exists('tags', $data)) {
+		if (count($data['tags']) == 0) {
 			$data['tags'][] = ['tag' => '', 'value' => ''];
 		}
-		else {
-			CArrayHelper::sort($data['tags'], ['tag', 'value']);
-		}
+
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
 		// Add already linked and new templates.
 		$templates = [];
@@ -169,8 +183,9 @@ class CControllerTemplateEdit extends CController {
 		foreach ($linked_templates as $template) {
 			$linked_template_ids[$template['templateid']] = $template['templateid'];
 		}
+
 		// todo - add add_templates
-		$add_templates = getRequest('add_templates', []);
+		$add_templates = $this->getInput('add_templates', []);
 
 		if ($linked_templates || $add_templates) {
 			$templates = API::Template()->get([
@@ -202,7 +217,7 @@ class CControllerTemplateEdit extends CController {
 			$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
 		}
 
-		// Sort only after inherited macros are added. Otherwise the list will look chaotic.
+		// Sort only after inherited macros are added. Otherwise, the list will look chaotic.
 		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
 		// The empty inputs will not be shown if there are inherited macros, for example.

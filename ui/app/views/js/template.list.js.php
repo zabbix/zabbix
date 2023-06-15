@@ -31,11 +31,11 @@
 <script>
 	const view = new class {
 		init() {
-			this._initActions();
-			this._initFilter();
+			this.#initActions();
+			this.#initFilter();
 		}
 
-		_initActions() {
+		#initActions() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-massupdate')) {
 					openMassupdatePopup('template.massupdate', {
@@ -48,24 +48,22 @@
 					);
 				}
 				else if (e.target.classList.contains('js-massdelete')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), false);
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), false);
 				}
 				else if (e.target.classList.contains('js-massdelete-clear')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this._edit({templateid: e.target.dataset.templateid})
+					this.#edit({templateid: e.target.dataset.templateid}, e.target.dataset.templateid)
 				}
 			});
 
 			document.getElementById('js-create').addEventListener('click', (e) => {
-					this._edit({groupids: JSON.parse(e.target.dataset.groupids)})
-			}
-
-			);
+				this.#edit({groupids: JSON.parse(e.target.dataset.groupids)})
+			});
 		}
 
-		_initFilter() {
+		#initFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
@@ -81,12 +79,12 @@
 			const filter_fields = ['#filter_groups_', '#filter_templates_']
 
 			filter_fields.forEach(filter => {
-				$(filter).on('change', () => this._updateMultiselect($(filter)));
-				this._updateMultiselect($(filter));
+				$(filter).on('change', () => this.#updateMultiselect($(filter)));
+				this.#updateMultiselect($(filter));
 			})
 		}
 
-		_edit(parameters) {
+		#edit(parameters) {
 			const overlay = PopUp('template.edit', parameters, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
@@ -114,9 +112,19 @@
 
 				location.href = location.href;
 			});
+
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				this.#edit({templateid:e.detail.templateid}, e.detail.templateid)
+			})
 		}
 
-		_delete(target, templateids, clear) {
+
+		preventNavigation = function(event) {
+			event.preventDefault();
+			event.returnValue = '';
+		};
+
+		#delete(target, templateids, clear) {
 			let confirmation;
 			const curl = new Curl('zabbix.php');
 
@@ -190,7 +198,7 @@
 				});
 		}
 
-		_updateMultiselect($ms) {
+		#updateMultiselect($ms) {
 			$ms.multiSelect('setDisabledEntries', [...$ms.multiSelect('getData').map((entry) => entry.id)]);
 		}
 	};

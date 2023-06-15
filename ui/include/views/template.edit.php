@@ -29,13 +29,8 @@ $tabs = new CTabView();
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
-	->setName('templatesForm');
-
-if ($data['templateid'] !== null) {
-	$form->addVar('templateid', $data['templateid']);
-}
-
-//$form->addVar('clear_templates', $data['clear_templates']);
+	->setName('templatesForm')
+	->addVar('clear_templates', $data['clear_templates'] ?: []);
 
 // Template tab.
 $template_tab = (new CFormGrid())
@@ -59,7 +54,7 @@ $template_tab = (new CFormGrid())
 	]);
 
 $templates_field_items = [];
-// todo - add data from JS
+
 if ($data['linked_templates']) {
 	$linked_templates= (new CTable())
 		->setHeader([_('Name'), _('Action')])
@@ -68,16 +63,10 @@ if ($data['linked_templates']) {
 		->addStyle('width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
 
 	foreach ($data['linked_templates'] as $template) {
-		$linked_templates->addItem(
-			(new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId()
-		);
-
 		if (array_key_exists($template['templateid'], $data['writable_templates'])) {
-			$template_link = (new CLink(
-					$template['name'],
-					'templates.php?form=update&templateid='.$template['templateid']
-				))
-					->setTarget('_blank');
+			$template_link = (new CLink($template['name']))
+				->addClass('js-edit-linked')
+				->setAttribute('data-templateid', $template['templateid']);
 		}
 		else {
 			$template_link = new CSpan($template['name']);
@@ -85,30 +74,24 @@ if ($data['linked_templates']) {
 
 		$template_link->addClass(ZBX_STYLE_WORDWRAP);
 
-		$clone_mode = $data['form'] === 'clone';
-
 		$linked_templates->addRow([
 			$template_link,
 			(new CCol(
 				new CHorList([
 					(new CSimpleButton(_('Unlink')))
 						->setAttribute('data-templateid', $template['templateid'])
-						->onClick('
-							submitFormWithParam("'.$form->getName().'", `unlink[${this.dataset.templateid}]`, 1);
-						')
+						->addClass('unlink')
 						->addClass(ZBX_STYLE_BTN_LINK),
-					(array_key_exists($template['templateid'], $data['original_templates']) && !$clone_mode)
+					(array_key_exists($template['templateid'], $data['original_templates']))
 						? (new CSimpleButton(_('Unlink and clear')))
 							->setAttribute('data-templateid', $template['templateid'])
-							->onClick('
-								submitFormWithParam("'.$form->getName().'",
-									`unlink_and_clear[${this.dataset.templateid}]`, 1
-								);
-							')
+							->addClass('unlink-and-clear')
 							->addClass(ZBX_STYLE_BTN_LINK)
 						: null
 				])
-			))->addClass(ZBX_STYLE_NOWRAP)
+			))
+				->addItem((new CVar('templates['.$template['templateid'].']', $template['templateid']))->removeId())
+				->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'conditions_'.$template['templateid']);
 	}
 
@@ -198,7 +181,6 @@ $form->addItem(
 );
 
 // Macros tab.
-// todo - rewrite to form grid
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
 $macros_tab = (new CFormList('macrosFormList'))
@@ -213,8 +195,8 @@ $macros_tab = (new CFormList('macrosFormList'))
 	]), 'macros_container');
 
 // Value mapping tab.
-$valuemap_tab = (new CFormList('valuemap-formlist'))->addRow(null,
-	new CPartial('configuration.valuemap', [
+$valuemap_tab = (new CFormList('valuemap-formlist'))
+	->addRow(null, new CPartial('configuration.valuemap', [
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
@@ -375,7 +357,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
-				'data' => $data,
+				'template' => $data,
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

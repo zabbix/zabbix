@@ -27,16 +27,17 @@ class CControllerTemplateCreate extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'template_name' =>	'required|db hosts.host|not_empty',
-			'visiblename' =>	'db hosts.name',
-			'groups' =>			'required|array',
-			'description' =>	'db hosts.description',
-			'tags' =>			'array',
-			'macros' =>			'array',
-			'valuemaps' =>		'array',
-			'templates' =>		'array_db hosts.hostid',
-			'add_templates' =>	'array_db hosts.hostid'
-			// 'clear_templates' =>	'array_db hosts.hostid'
+			'template_name' =>		'required|db hosts.host|not_empty',
+			'visiblename' =>		'db hosts.name',
+			'groups' =>				'required|array',
+			'description' =>		'db hosts.description',
+			'tags' =>				'array',
+			'macros' =>				'array',
+			'valuemaps' =>			'array',
+			'templates' =>			'array_db hosts.hostid',
+			'add_templates' =>		'array_db hosts.hostid',
+			'clear_templates' =>	'array_db hosts.hostid',
+			'clone' => 				'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,7 +61,6 @@ class CControllerTemplateCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$macros = $this->getInput('macros', []);
 		$tags = $this->getInput('tags', []);
 
 		foreach ($tags as $key => $tag) {
@@ -78,6 +78,9 @@ class CControllerTemplateCreate extends CController {
 				unset($tags[$key]['type']);
 			}
 		}
+
+		// Remove inherited macros data.
+		$macros = cleanInheritedMacros($this->getInput('macros', []));
 
 		// Remove empty new macro lines.
 		$macros = array_filter($macros, function($macro) {
@@ -122,6 +125,67 @@ class CControllerTemplateCreate extends CController {
 
 		$template_name = $this->getInput('template_name', '');
 
+		// Configuration for template cloning.
+		$clone = $this->hasInput('clone');
+		if ($clone) {
+			$warnings = [];
+
+			// todo - move this to edit controller:
+			if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
+				// Reset macro type and value.
+				$macros = array_map(function($value) {
+					return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
+						? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
+						: $value;
+				}, $macros);
+
+				$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+			}
+
+			$macros = array_map(function($macro) {
+				return array_diff_key($macro, array_flip(['hostmacroid']));
+			}, $macros);
+
+			$groups = $this->getInput('groups', []);
+			$groupids = [];
+
+			// Remove inaccessible groups from request, but leave "new".
+			foreach ($groups as $group) {
+				if (!is_array($group)) {
+					$groupids[] = $group;
+				}
+			}
+
+			if ($groupids) {
+				$groups_allowed = API::TemplateGroup()->get([
+					'output' => [],
+					'groupids' => $groupids,
+					'editable' => true,
+					'preservekeys' => true
+				]);
+
+				if (count($groupids) != count($groups_allowed)) {
+					$warnings[] = _("The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template.");
+				}
+
+				foreach ($groups as $idx => $group) {
+					if (!is_array($group) && !array_key_exists($group, $groups_allowed)) {
+						unset($groups[$idx]);
+					}
+				}
+
+				$_REQUEST['groups'] = $groups;
+			}
+
+			if ($warnings) {
+				if (count($warnings) > 1) {
+					CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
+				}
+
+				array_map('CMessageHelper::addWarning', $warnings);
+			}
+		}
+
 		$save_macros = $macros;
 
 		foreach ($save_macros as &$macro) {
@@ -141,6 +205,8 @@ class CControllerTemplateCreate extends CController {
 
 		$result = API::Template()->create($template);
 
+		$input_templateid = $this->getInput('templateid', 0);
+
 		if ($result) {
 			$input_templateid = reset($result['templateids']);
 		}
@@ -149,13 +215,20 @@ class CControllerTemplateCreate extends CController {
 		$valuemaps = $this->getinput('valuemaps', []);
 		$ins_valuemaps = [];
 
+		if ($clone) {
+			foreach ($valuemaps as &$valuemap) {
+				unset($valuemap['valuemapid']);
+			}
+			unset($valuemap);
+		}
+
 		foreach ($valuemaps as $valuemap) {
 			$ins_valuemaps[] = $valuemap + ['hostid' => $input_templateid];
 		}
 
-		// todo - fix exceptions:
+		// todo - check this:
 		if ($ins_valuemaps && !API::ValueMap()->create($ins_valuemaps)) {
-			throw new Exception();
+			$result = false;
 		}
 
 		$output = [];

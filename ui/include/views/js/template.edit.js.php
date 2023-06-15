@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -21,94 +21,91 @@
 
 /**
  * @var CView $this
- * @var array $data
  */
 ?>
 
 window.template_edit_popup = new class {
 
-	init({data}) {
+	init({template}) {
 		this.overlay = overlays_stack.getById('templates-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.data = data;
-		this.templateid = data.templateid;
+		this.templateid = template.templateid;
+		this.template = template;
+		this.linked_templateids = Object.keys(this.template.linked_templates);
+		this.clone_template = 0;
 
-		this._initMacrosTab();
+		this.#initActions();
+	}
 
-		const $groups_ms = $('#groups_, #group_links_');
-		const $template_ms = $('#add_templates_');
+	#initActions() {
+		this.#initMacrosTab();
+		this.#updateMultiselect();
+		this.unlink_clear_templateids = {};
 
-		$template_ms.on('change', (e) => {
-			$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
+		this.form.addEventListener('click', (e) => {
+			if (e.target.classList.contains('js-edit-linked')) {
+				this.#editLinkedTemplate({templateid: e.target.dataset.templateid}, e.target.dataset.templateid);
+
+			}
+			else if (e.target.classList.contains('unlink')) {
+				e.target.closest('tr').remove();
+
+				this.linked_templateids = this.linked_templateids.filter(value =>
+					value !== e.target.dataset.templateid
+				);
+
+				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
+
+			}
+			else if (e.target.classList.contains('unlink-and-clear')) {
+				e.target.closest('tr').remove();
+
+				this.linked_templateids = this.linked_templateids.filter(value =>
+					value !== e.target.dataset.templateid
+				);
+
+				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
+				this.unlink_clear_templateids[`${e.target.dataset.templateid}`] = e.target.dataset.templateid
+				this.#unlinkAndClearTemplate(e.target, e.target.dataset.templateid)
+			}
 		});
-
-
-		$groups_ms.on('change', () => {
-			$groups_ms.multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
-					.map((input) => input.value)
-			);
-		});
-	}
-
-	/**
-	 * Collects ids of currently active (linked + new) templates.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	getAllTemplates() {
-		return this.getLinkedTemplates().concat(this.getNewTemplates());
-	}
-
-	/**
-	 * Helper to get linked template IDs as an array.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	getLinkedTemplates() {
-		const linked_templateids = [];
-
-		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
-			linked_templateids.push(input.value);
-		});
-
-		return linked_templateids;
-	}
-
-	/**
-	 * Helper to get added template IDs as an array.
-	 *
-	 * @return {array}  Templateids.
-	 */
-	getNewTemplates() {
-		const $template_multiselect = $('#add_templates_'),
-			templateids = [];
-
-		// Readonly forms don't have multiselect.
-		if ($template_multiselect.length) {
-			$template_multiselect.multiSelect('getData').forEach(template => {
-				templateids.push(template.id);
-			});
-		}
-
-		return templateids;
-	}
-
-	_initMacrosTab() {
-		const linked_templateids = <?= json_encode($data['linked_templates']) ?>;
 
 		// Add visible name input field placeholder.
-		$('#template_name')
-			.on('input keydown paste', function () {
-				$('#visiblename').attr('placeholder', $(this).val());
-			})
-			.trigger('input');
+		const template_name = this.form.querySelector('#template_name');
+		const visible_name = this.form.querySelector('#visiblename');
 
-		this.macros_manager = new HostMacrosManager(<?= json_encode([
-			'readonly' => $data['readonly'],
-			'parent_hostid' => array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
-		]) ?>);
+		template_name.addEventListener('input', () => visible_name.placeholder = template_name.value);
+		template_name.dispatchEvent(new Event('input'));
+	}
+
+	#unlinkAndClearTemplate(button, templateid) {
+		const clear_tmpl = document.createElement('input');
+		clear_tmpl.type = 'hidden';
+		clear_tmpl.name = 'clear_templates[]';
+		clear_tmpl.value = templateid;
+		button.form.appendChild(clear_tmpl);
+	}
+
+	#editLinkedTemplate(parameters) {
+		// todo - get approval about warning message.
+		// todo - wait for decision about checking changes in form.
+		const confirmation = <?= json_encode(
+			_('Open the linked template configuration form? Any changes you made may not be saved.')
+		) ?>;
+
+		if (!window.confirm(confirmation)) {
+			return;
+		}
+
+		this.dialogue.dispatchEvent(new CustomEvent('edit.linked', {detail: {templateid: parameters.templateid}}));
+	}
+
+	#initMacrosTab() {
+		this.macros_manager = new HostMacrosManager({
+			readonly: this.template.readonly,
+			parent_hostid: this.template.parent_hostid ?? null
+		});
 
 		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
@@ -118,15 +115,15 @@ window.template_edit_popup = new class {
 
 				// Please note that macro initialization must take place once and only when the tab is visible.
 				if (event.type === 'tabsactivate') {
-					let panel_templateids = panel.data('templateids') || [],
-						templateids = this.getAddTemplates();
+					let panel_templateids = panel.data('templateids') || [];
+					const templateids = this.#getAddTemplates();
 
 					if (panel_templateids.xor(templateids).length > 0) {
 						panel.data('templateids', templateids);
 
 						this.macros_manager.load(
-							document.querySelector('input[name=show_inherited_macros]:checked').value == 1,
-							linked_templateids.concat(templateids)
+							this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
+							this.linked_templateids.concat(templateids)
 						);
 
 						panel.data('macros_initialized', true);
@@ -138,50 +135,34 @@ window.template_edit_popup = new class {
 				}
 
 				// Initialize macros.
-				<?php if ($data['readonly']): ;?>
-				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
-				<?php else: ?>
-				this.macros_manager.initMacroTable(
-					document.querySelector('input[name=show_inherited_macros]:checked').value == 1
-				);
-				<?php endif ?>
+				if (this.template.readonly) {
+					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+				}
+				else {
+					this.macros_manager.initMacroTable(
+						this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1
+					);
+				}
 
 				panel.data('macros_initialized', true);
 			}
 		});
 
-		document.querySelector('#show_inherited_macros').onchange = (e) => {
+		this.form.querySelector('#show_inherited_macros').onchange = () => {
 			this.macros_manager.load(
-				document.querySelector('input[name=show_inherited_macros]:checked').value == 1, linked_templateids.concat(this.getAddTemplates())
+				this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
+				this.linked_templateids.concat(this.#getAddTemplates())
 			);
-		};
-	}
-
-	/**
-	 * Collects IDs selected in "Add templates" multiselect.
-	 *
-	 * @returns {array|getAddTemplates.templateids}
-	 */
-	getAddTemplates() {
-		const $ms = $('#add_templates_');
-		let templateids = [];
-
-		// Readonly forms don't have multiselect.
-		if ($ms.length) {
-			// Collect IDs from Multiselect.
-			$ms.multiSelect('getData').forEach(function (template) {
-				templateids.push(template.id);
-			});
 		}
-
-		return templateids;
 	}
 
 	clone({title, buttons}) {
 		this.templateid = null;
+		this.clone_template = 1;
 
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
+		this.overlay.containFocus();
 		this.overlay.recoverFocus();
 	}
 
@@ -198,7 +179,7 @@ window.template_edit_popup = new class {
 			data.clear = 1;
 		}
 
-		this._post(curl.getUrl(), data, (response) => {
+		this.#post(curl.getUrl(), data, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
@@ -212,21 +193,73 @@ window.template_edit_popup = new class {
 			fields.templateid = this.templateid;
 		}
 
-		// todo - trim fields
+		if (this.clone_template === 1) {
+			fields.clone = 1;
+		}
 
+		this.#trimFields(fields);
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', this.templateid === null ? 'template.create' : 'template.update');
 
-		this._post(curl.getUrl(), fields, (response) => {
+		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 		});
 	}
 
-	_post(url, data, success_callback) {
+	#trimFields(fields) {
+		// Trim all string fields.
+		for (let key in fields) {
+			if (typeof fields[key] === 'string') {
+				fields[key] = fields[key].trim();
+			}
+		}
+
+		// Trim tag input fields.
+		if ('tags' in fields) {
+			for (const key in fields.tags) {
+				const tag = fields.tags[key];
+				tag.tag = tag.tag.trim();
+
+				if ('name' in tag) {
+					tag.name = tag.name.trim();
+				}
+				if ('value' in tag) {
+					tag.value = tag.value.trim();
+				}
+			}
+		}
+
+		// Trim macro input fields.
+		if ('macros' in fields) {
+			for (const key in fields.macros) {
+				const macro = fields.macros[key];
+				macro.macro = macro.macro.trim();
+
+				if ('value' in macro) {
+					macro.value = macro.value.trim();
+				}
+				if ('description' in macro) {
+					macro.description = macro.description.trim();
+				}
+			}
+		}
+
+		return fields;
+	}
+
+	/**
+	 * Sends a POST request to the specified URL with the provided data and executes the success_callback function.
+	 *
+	 * @param {string}   url               The URL to send the POST request to.
+	 * @param {object}   data              The data to send with the POST request.
+	 * @param {callback} success_callback  The function to execute when a successful response is received.
+	 */
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -265,5 +298,81 @@ window.template_edit_popup = new class {
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
+	}
+
+	#updateMultiselect() {
+		const $groups_ms = $('#groups_, #group_links_');
+		const $template_ms = $('#add_templates_');
+
+		$template_ms.on('change', () => $template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates()));
+
+		$groups_ms.on('change', () =>
+			$groups_ms.multiSelect('setDisabledEntries',
+				[...document.querySelectorAll('[name^="groups["], [name^="group_links["]')].map((input) => input.value)
+			)
+		);
+	}
+
+	/**
+	 * Collects IDs selected in "Add templates" multiselect.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getAddTemplates() {
+		const $ms = $('#add_templates_');
+		let templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($ms.length) {
+			// Collect IDs from Multiselect.
+			$ms.multiSelect('getData').forEach(function (template) {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
+	}
+
+	/**
+	 * Collects ids of currently active (linked + new) templates.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getAllTemplates() {
+		return this.#getLinkedTemplates().concat(this.#getNewTemplates());
+	}
+
+	/**
+	 * Helper to get linked template IDs as an array.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getLinkedTemplates() {
+		const linked_templateids = [];
+
+		this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+			linked_templateids.push(input.value);
+		});
+
+		return linked_templateids;
+	}
+
+	/**
+	 * Helper to get added template IDs as an array.
+	 *
+	 * @return {array}  Templateids.
+	 */
+	#getNewTemplates() {
+		const $template_multiselect = $('#add_templates_');
+		const templateids = [];
+
+		// Readonly forms don't have multiselect.
+		if ($template_multiselect.length) {
+			$template_multiselect.multiSelect('getData').forEach(template => {
+				templateids.push(template.id);
+			});
+		}
+
+		return templateids;
 	}
 }

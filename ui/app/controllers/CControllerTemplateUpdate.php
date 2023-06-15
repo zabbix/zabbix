@@ -26,20 +26,18 @@ class CControllerTemplateUpdate extends CController {
 	}
 
 	protected function checkInput(): bool {
-		// todo - add all fields + validation rules
 		$fields = [
 			'templateid' =>			'required|db hosts.hostid',
 			'template_name' =>		'required|db hosts.host|not_empty',
 			'visiblename' =>		'db hosts.name',
 			'groups' =>				'required|array',
+			'description' =>		'db hosts.description',
 			'tags' =>				'array',
 			'macros' =>				'array',
 			'valuemaps' =>			'array',
-			'description' =>		'db hosts.description',
-			// linked templates:
 			'templates' =>			'array_db hosts.hostid',
 			'add_templates' =>		'array_db hosts.hostid',
-			'clear_templates' =>	'array_db hosts.hostid',
+			'clear_templates' =>	'array_db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -64,7 +62,6 @@ class CControllerTemplateUpdate extends CController {
 
 	protected function doAction(): void {
 		$templateid = $this->getInput('templateid');
-		$macros = $this->getInput('macros', []);
 		$tags = $this->getInput('tags', []);
 
 		foreach ($tags as $key => $tag) {
@@ -83,6 +80,9 @@ class CControllerTemplateUpdate extends CController {
 			}
 		}
 
+		// Remove inherited macros data.
+		$macros = cleanInheritedMacros($this->getInput('macros', []));
+
 		// Remove empty new macro lines.
 		$macros = array_filter($macros, function($macro) {
 			$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
@@ -95,7 +95,6 @@ class CControllerTemplateUpdate extends CController {
 		}
 		unset($macro);
 
-
 		// Value maps.
 		$valuemaps = $this->getinput('valuemaps', []);
 		$ins_valuemaps = [];
@@ -107,7 +106,6 @@ class CControllerTemplateUpdate extends CController {
 			'preservekeys' => true
 		]);
 
-
 		foreach ($valuemaps as $valuemap) {
 			if (array_key_exists('valuemapid', $valuemap)) {
 				$upd_valuemaps[] = $valuemap;
@@ -118,7 +116,7 @@ class CControllerTemplateUpdate extends CController {
 			}
 		}
 
-		// todo - check exceptions:
+		// todo - fix exceptions:
 		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
 			throw new Exception();
 		}
@@ -156,8 +154,8 @@ class CControllerTemplateUpdate extends CController {
 		// Linked templates.
 		$templates = [];
 
-		foreach (array_merge($this->getInput('templates', []), $this->getInput('add_templates', [])) as $templateid) {
-			$templates[] = ['templateid' => $templateid];
+		foreach (array_merge($this->getInput('templates', []), $this->getInput('add_templates', [])) as $linked_id) {
+			$templates[] = ['templateid' => $linked_id];
 		}
 
 		$template_name = $this->getInput('template_name', '');

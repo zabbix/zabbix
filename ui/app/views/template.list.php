@@ -187,14 +187,12 @@ foreach ($data['templates'] as $template) {
 			$linked_templates_output[] = ', ';
 		}
 
-		$url = (new CUrl('templates.php'))
-			->setArgument('form', 'update')
-			->setArgument('templateid', $parent_template['templateid']);
-
 		if (array_key_exists($parent_template['templateid'], $data['editable_templates'])) {
-			$linked_templates_output[] = (new CLink($parent_template['name'], $url))
+			$linked_templates_output[] = (new CLink($parent_template['name']))
+				->addClass('js-edit')
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
+				->addClass(ZBX_STYLE_GREY)
+				->setAttribute('data-templateid', $parent_template['templateid']);
 		}
 		else {
 			$linked_templates_output[] = (new CSpan($parent_template['name']))
@@ -217,12 +215,11 @@ foreach ($data['templates'] as $template) {
 		}
 
 		if (array_key_exists($child_template['templateid'], $data['editable_templates'])) {
-			$url = (new CUrl('templates.php'))
-				->setArgument('form', 'update')
-				->setArgument('templateid', $child_template['templateid']);
-			$linked_to_output[] = (new CLink($child_template['name'], $url))
+			$linked_to_output[] = (new CLink($child_template['name']))
+				->addClass('js-edit')
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREY);
+				->addClass(ZBX_STYLE_GREY)
+				->setAttribute('data-templateid', $child_template['templateid']);
 		}
 		else {
 			$linked_to_output[] = (new CSpan($child_template['name']))
