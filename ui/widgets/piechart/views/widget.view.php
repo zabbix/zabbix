@@ -28,4 +28,8 @@
 
 $view = (new CWidgetView($data))->addItem('widget created - debugging purposes');
 
+if ($data['info'] !== null) {
+	$view->setVar('info', $data['info']);
+}
+
 $view->show();
