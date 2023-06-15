@@ -30,7 +30,7 @@ $form = (new CForm())
 	->addVar('action', 'popup.scheduledreport.create');
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form->addItem(new CPartial('scheduledreport.formgrid.html', [
 	'source' => 'popup',

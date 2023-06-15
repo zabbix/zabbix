@@ -94,6 +94,39 @@ if (array_key_exists('templates', $data['filter'])) {
 
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
+	switch ($options['itemtype']) {
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_AGENT;
+			break;
+
+		case ITEM_TYPE_SIMPLE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SIMPLE_CHECK;
+			break;
+
+		case ITEM_TYPE_SNMPTRAP:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SNMP_TRAP;
+			break;
+
+		case ITEM_TYPE_INTERNAL:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_INTERNAL;
+			break;
+
+		case ITEM_TYPE_DB_MONITOR:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_DB_MONITOR;
+			break;
+
+		case ITEM_TYPE_IPMI:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_IPMI_AGENT;
+			break;
+
+		case ITEM_TYPE_JMX:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_JMX_AGENT;
+			break;
+	}
+
+	$output['doc_url'] = CDocHelper::getUrl($popup_doc_url);
+
 	$types_select = (new CSelect('itemtype'))
 		->setId('itemtype')
 		->setFocusableElementId('label-itemtype')
@@ -398,7 +431,14 @@ switch ($data['popup_type']) {
 
 					popup_generic.closePopup(event);
 				');
-			$table->addRow([$name, $item['description']]);
+
+			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_HELP)
+				->setTitle(_('Help'))
+				->setTarget('_blank');
+
+			$table->addRow([$name, $item['description'], $documentation_link]);
 		}
 		unset($data['table_records']);
 		break;
@@ -876,7 +916,7 @@ $output['script_inline'] = $this->readJsFile('popup.generic.js.php').
 
 if ($form) {
 	// Enable form submitting on Enter.
-	$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 	$form->addItem($table);
 
