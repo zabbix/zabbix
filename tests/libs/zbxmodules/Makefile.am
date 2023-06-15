@@ -1,5 +1,5 @@
 noinst_PROGRAMS = \
-	server_load
+	server_module_load
 
 COMMMON_SOURCES = \
 	../../zbxmocktest.h
@@ -45,15 +45,15 @@ COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
-server_load_SOURCES = \
-	server_load.c \
+server_module_load_SOURCES = \
+	server_module_load.c \
 	$(COMMMON_SOURCES)
 
-server_load_CFLAGS = \
+server_module_load_CFLAGS = \
 	-I@top_srcdir@/tests \
 	-I@top_srcdir@/src \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
-server_load_LDADD = $(COMMON_LIBS) @SERVER_LIBS@
+server_module_load_LDADD = $(COMMON_LIBS) @SERVER_LIBS@
