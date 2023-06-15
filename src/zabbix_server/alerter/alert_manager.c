@@ -392,13 +392,15 @@ static void	zbx_am_update_webhook(zbx_am_t *manager, zbx_am_mediatype_t *mediaty
 
 	if (NULL == mediatype->script || 0 != strcmp(mediatype->script, script))
 	{
+		zbx_free(mediatype->script_bin);
+		zbx_free(mediatype->script);
+
 		if (SUCCEED != zbx_es_is_env_initialized(&manager->es))
 		{
 			if (SUCCEED != zbx_es_init_env(&manager->es, &mediatype->error))
 				return;
 		}
 
-		zbx_free(mediatype->script_bin);
 		if (SUCCEED != zbx_es_compile(&manager->es, script, &mediatype->script_bin, &mediatype->script_bin_sz,
 				&mediatype->error))
 		{
