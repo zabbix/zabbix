@@ -60,16 +60,51 @@ window.operation_popup = new class {
 			this._processTypeOfCalculation();
 		}
 
+		const tags_table = this.form.querySelector('#tags-table');
+		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
+
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
 				this._openConditionsPopup(e.target);
 			}
 			else if (e.target.classList.contains('element-table-remove')) {
+				// Remove tag row both visually and from the data array by index that maches row index.
+				const row = e.target.closest('tr');
+
+				this.data.optag.forEach((element, index) => {
+					if (element.row_index == row.getAttribute('data-id')) {
+						this.data.optag.splice(index, 1);
+					}
+				});
+
+				row.remove();
+
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 				this._processTypeOfCalculation();
+			}
+			else if (e.target.classList.contains('element-table-add')) {
+				// First gets maximum index of existing tag rows and then adds one more row with incremented index.
+				const form_rows = tags_table.querySelectorAll('.form_row');
+				let row_index = -Infinity;
+
+				[...form_rows].forEach((row) => {
+					const id = parseInt(row.getAttribute('data-id'));
+
+					if (id > row_index) {
+						row_index = id;
+					}
+				});
+
+				row_index++;
+
+				if (row_index == -Infinity) {
+					row_index = 0;
+				}
+
+				e.target.closest('tr').insertAdjacentHTML('beforebegin', template.evaluate({row_index: row_index}));
 			}
 		});
 	}
@@ -173,33 +208,32 @@ window.operation_popup = new class {
 	}
 
 	/**
-	 * Toggles displaying of host tag fields. If there is no data, add one row of tag and value row with empty fields.
+	 * Toggles displaying of host tag fields. If there is no data, add one row of empty tag and value. Add an arbitrary
+	 * index for each tag row is it doesn't have one yet. This is then used to indentify which rows exist when changing
+	 * to and from Add and Remove host tags options. Insert rows before the "Add" button row.
 	 */
 	#hostTagsFields() {
 		this.form.querySelector('#operation-host-tags').style.display = '';
 		this._enableFormFields(['operation-host-tags']);
 
-		if (this.data.optag.length == 0) {
-			this.data.optag = [];
-			this.data.optag.push({row_index: 0});
-		}
-
-		this.#updateHostTagsFields(this.data.optag);
-	}
-
-	/**
-	 * Add a list of tags to the name and value fields. Inserts rows before "Add" button.
-	 *
-	 * @param {array} tags  Array of tag names and values.
-	 */
-	#updateHostTagsFields(tags) {
 		const tags_table = this.form.querySelector('#tags-table');
 		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
 		const form_rows = tags_table.querySelectorAll('.form_row');
 
-		tags.forEach((row, index) => {
-			if (![...form_rows].some((form_row) => index == form_row.getAttribute('data-id'))) {
-				row.row_index = index;
+		if (this.data.optag.length == 0 && form_rows.length == 0) {
+			this.data.optag = [];
+			this.data.optag.push({tag: '', value:'', row_index: 0});
+		}
+		else {
+			this.data.optag.map((row, index) => {
+				if (row.row_index === undefined) {
+					row.row_index = index;
+				}
+			});
+		}
+
+		this.data.optag.forEach((row) => {
+			if (![...form_rows].some((form_row) => row.row_index == form_row.getAttribute('data-id'))) {
 				tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
 			}
 		});
