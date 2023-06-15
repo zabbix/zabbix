@@ -1,7 +1,4 @@
-noinst_PROGRAMS = \
-	server_module_load \
-	proxy_module_load \
-	agent_module_load
+noinst_PROGRAMS =
 
 COMMMON_SOURCES = \
 	../../zbxmocktest.h
@@ -48,6 +45,10 @@ COMMON_LIBS2 = \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
+if SERVER
+
+noinst_PROGRAMS += server_module_load
+
 SERVER_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a
 
@@ -64,6 +65,12 @@ server_module_load_CFLAGS = \
 
 server_module_load_LDADD = $(COMMON_LIBS1) $(SERVER_LIBS) $(COMMON_LIBS2) @SERVER_LIBS@
 
+endif
+
+if PROXY
+
+noinst_PROGRAMS += proxy_module_load
+
 PROXY_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a
 
@@ -79,6 +86,12 @@ proxy_module_load_CFLAGS = \
 	$(TLS_CFLAGS)
 
 proxy_module_load_LDADD = $(COMMON_LIBS1) $(PROXY_LIBS) $(COMMON_LIBS2) @PROXY_LIBS@
+
+endif
+
+if AGENT
+
+noinst_PROGRAMS += agent_module_load
 
 AGENT_LIBS = \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
@@ -101,3 +114,5 @@ agent_module_load_LDADD = $(COMMON_LIBS1) $(AGENT_LIBS) $(COMMON_LIBS2) \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	@AGENT_LIBS@
+
+endif
