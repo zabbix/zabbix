@@ -49,9 +49,6 @@ if SERVER
 
 noinst_PROGRAMS += server_module_load
 
-SERVER_LIBS = \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a
-
 server_module_load_SOURCES = \
 	generic_module_load.c \
 	$(COMMMON_SOURCES)
@@ -63,16 +60,15 @@ server_module_load_CFLAGS = \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
-server_module_load_LDADD = $(COMMON_LIBS1) $(SERVER_LIBS) $(COMMON_LIBS2) @SERVER_LIBS@
+server_module_load_LDADD = $(COMMON_LIBS1) \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(COMMON_LIBS2) @SERVER_LIBS@
 
 endif
 
 if PROXY
 
 noinst_PROGRAMS += proxy_module_load
-
-PROXY_LIBS = \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a
 
 proxy_module_load_SOURCES = \
 	generic_module_load.c \
@@ -85,17 +81,15 @@ proxy_module_load_CFLAGS = \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
-proxy_module_load_LDADD = $(COMMON_LIBS1) $(PROXY_LIBS) $(COMMON_LIBS2) @PROXY_LIBS@
+proxy_module_load_LDADD = $(COMMON_LIBS1) \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
+	$(COMMON_LIBS2) @PROXY_LIBS@
 
 endif
 
 if AGENT
 
 noinst_PROGRAMS += agent_module_load
-
-AGENT_LIBS = \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a
 
 agent_module_load_SOURCES = \
 	generic_module_load.c \
@@ -108,7 +102,10 @@ agent_module_load_CFLAGS = \
 	$(YAML_CFLAGS) \
 	$(TLS_CFLAGS)
 
-agent_module_load_LDADD = $(COMMON_LIBS1) $(AGENT_LIBS) $(COMMON_LIBS2) \
+agent_module_load_LDADD = $(COMMON_LIBS1) \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
+	$(COMMON_LIBS2) \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/zabbix_agent/libzbxagent.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
