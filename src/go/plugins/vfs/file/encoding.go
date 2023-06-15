@@ -34,31 +34,32 @@ import (
 	"unsafe"
 )
 
-func verifyEncoder(encoder string, bytecount int, inbuf []byte) string {
-	if "" == encoder {
+func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {
+	/* try to guess encoding using Byte Order Mark (BOM) if it exists */
+	if "" == encoding {
 		if bytecount > 3 && 0xef == inbuf[0] && 0xbb == inbuf[1] && 0xbf == inbuf[2] {
-			encoder = "UTF-8"
+			encoding = "UTF-8"
 		} else if bytecount > 2 && 0xff == inbuf[0] && 0xfe == inbuf[1] {
-			encoder = "UTF-16LE"
+			encoding = "UTF-16LE"
 		} else if bytecount > 2 && 0xfe == inbuf[0] && 0xff == inbuf[1] {
-			encoder = "UTF-16BE"
+			encoding = "UTF-16BE"
 		}
 	}
 
-	return encoder
+	return encoding
 }
 
-func decode(encoder string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
+func decode(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
 	if bytecount == 0 {
 		return inbuf, 0
 	}
-	if encoder = verifyEncoder(encoder, bytecount, inbuf); encoder == "" {
+	if encoding = findEncodingFromBOM(encoding, inbuf, bytecount); encoding == "" {
 		return inbuf, bytecount
 	}
 	tocode := C.CString("UTF-8")
 	log.Tracef("Calling C function \"free()\"")
 	defer C.free(unsafe.Pointer(tocode))
-	fromcode := C.CString(encoder)
+	fromcode := C.CString(encoding)
 	log.Tracef("Calling C function \"free()\"")
 	defer C.free(unsafe.Pointer(fromcode))
 

@@ -68,6 +68,7 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
 	for ii := 0; ii < szbyte; ii++ {
 		if a[aStartOffset+ii] != b[bStartOffset+ii] {
 			ee = false
+			break
 		}
 	}
 
@@ -116,7 +117,7 @@ func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte in
 	return buf, i, nil
 }
 
-func (p *Plugin) readFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
+func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
 	var szbyte int
 	var offset int64
 	var cr, lf []byte

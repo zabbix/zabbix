@@ -534,7 +534,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
+	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
@@ -564,7 +564,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (-1 == nbytes)	/* error occurred */
+	if (ZBX_READ_ERR == nbytes)	/* error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
@@ -656,7 +656,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
+	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
@@ -679,12 +679,12 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 
-	if (-2 == nbytes)
+	if (ZBX_READ_NO_NEWLINE_ERR == nbytes)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file, failed to find line feed"));
 		goto err;
 	}
-	else if (-1 == nbytes)	/* error occurred */
+	else if (ZBX_READ_ERR == nbytes)	/* error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;

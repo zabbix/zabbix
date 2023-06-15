@@ -75,13 +75,16 @@ void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **l
  *                                                                            *
  * Return value: On success, the number of bytes read is returned (0 (zero)   *
  *               indicates end of file).                                      *
- *               On error, -1 is returned and errno is set appropriately.     *
+ *               On error, -1 (ZBX_READ_ERR) is returned and errno is set     *
+ *               appropriately.                                               *
+ *               If new line was not found, -2 (ZBX_READ_NO_NEWLINE_ERR) is   *
+ *               returned.                                                    *
  *                                                                            *
  * Comments: Reading stops after a newline. If the newline is read, it is     *
  *           stored into the buffer.                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
+int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding)
 {
 	size_t		i, szbyte;
 	ssize_t		nbytes;
@@ -90,7 +93,7 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 	int		lf_found = 0;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
-		return -1;
+		return ZBX_READ_ERR;
 
 	if (0 >= (nbytes = read(fd, buf, count)))
 		return (int)nbytes;
@@ -131,11 +134,11 @@ int	zbx_read(int fd, char *buf, size_t count, const char *encoding)
 				0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE") ||
 				0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE")))
 	{
-		return -2;
+		return ZBX_READ_NO_NEWLINE_ERR;
 	}
 
 	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))
-		return -1;
+		return ZBX_READ_ERR;
 
 	return (int)i;
 }

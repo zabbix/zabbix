@@ -99,7 +99,7 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 
 		initial = false
 		curline++
-		buf, nbytes, err = p.readFile(f, encoder)
+		buf, nbytes, err = p.readTextLineFromFile(f, encoder)
 		if err != nil {
 			return nil, err
 		}

@@ -100,7 +100,7 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		}
 
 		curline++
-		buf, nbytes, err = p.readFile(f, encoder)
+		buf, nbytes, err = p.readTextLineFromFile(f, encoder)
 		if err != nil {
 			return nil, err
 		}
