@@ -1077,6 +1077,19 @@ in:
 out:
   return: FAIL
 ---
+test case: jsonpath13
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: |- 
+      {"a":{"\ud800": 1}}
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: $.a
+out:
+  return: FAIL
+---
 test case: validate_range(1, 5, 10)
 in:
   value:
@@ -2245,4 +2258,265 @@ in:
 out:
   return: SUCCEED
   value: "O K"
+---
+test case: HMAC in JavaScript - Invalid algorithm
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('xxx', 'xxx', 'yyy');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - MD5
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('md5', 'xxx', 'yyy');"
+out:
+  return: SUCCEED
+  value: 'd8e8efd954dabfdbfd69398d92ad62d1'
+---
+test case: HMAC in JavaScript - SHA-256
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx', 'yyy');"
+out:
+  return: SUCCEED
+  value: '97f50eed1079c9460f2bb9ddf7dc2e4258471f301ad2c1f14ad50144c4de4303'
+---
+test case: HMAC in JavaScript - Invalid key
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', null, 'yyy');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Missing key
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256');"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Invalid data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx', null);"
+out:
+  return: FAIL
+---
+test case: HMAC in JavaScript - Missing data
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return hmac('sha256', 'xxx');"
+out:
+  return: FAIL
+---
+test case: RS256 in JavaScript - single line pkey w/o newlines
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('sha256', '-----BEGIN RSA PRIVATE KEY-----MIICXgIBAAKBgQCsDnSry3s269UFKpYvptshcmKZ4ZXxqj6771qr/oEOtRa/o+8JmFtucELQg7HrzRUwxG9htmCuSZ+eOcMQ7vJOrgS+1Ol01P+Ol/PdFFeT5utqzG2NaYSIs/oLAaTkiDUkDBhnG6Ns0xWgJlRomR2W4RI8Os/zKh9eccRaZorjQwIDAQABAoGBAKT300vo9QHqyruCYq/bxx1hpEKw9ejZd/8P9xsUEb/9R4uF7iqAB6JzRszQiKZzY473uWexyy8w7jdyYKL6yB2vCMLdy68nxoIYcjSrk3F/kC47ga7NKCS8T21OFarxhRzxqgF6rg/mfrgeT7nxD1EM0vk6mCSmftbaVZE7M/KRAkEA4FDqvtjen9RrROe2Al23h/1gDqgL9rJ5SzSbwwYmzRA/XYlfH7k9RPGQahzq15IHrdxN04Ov2dVRyybbR0A1awJBAMRb3+P1yKzIkkTGYE2ZWctBcDCnzwwaKKZuWX7OfA+ZPNUm+L6Owg4gztHIAA6DyizXxaHhh8qcL0A6nx7hJ4kCQQCjrces3LiNrcVcMSuZTGMYYuVNrIeWSqLBIrEpvHphlaJ3ET8M+fDgNtgm5dTi2daqoZ9UYLnXXJXjhAXrVsnjAkEAnn8ahcNLLEzp5CHMclaqKGq1yFBry/UBgvXnv3ekpGKou9UtS4OoGAdbafHqOc0fUHsKx9Rn65+OdGXdMuvDIQJAJ+L5i2iRo4TuNpHxMCPN/3bamMlDktIfPlVLbuEcinG1XZ9zs9Y1J738iCF2d56wlApbYGqw4vp9+CdX62LoMw==-----END RSA PRIVATE KEY-----', 'test');"
+out:
+  return: SUCCEED
+  value: '272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5'
+---
+test case: RS256 in JavaScript - single line pkey with newlines
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQCsDnSry3s269UFKpYvptshcmKZ4ZXxqj6771qr/oEOtRa/o+8J\nmFtucELQg7HrzRUwxG9htmCuSZ+eOcMQ7vJOrgS+1Ol01P+Ol/PdFFeT5utqzG2N\naYSIs/oLAaTkiDUkDBhnG6Ns0xWgJlRomR2W4RI8Os/zKh9eccRaZorjQwIDAQAB\nAoGBAKT300vo9QHqyruCYq/bxx1hpEKw9ejZd/8P9xsUEb/9R4uF7iqAB6JzRszQ\niKZzY473uWexyy8w7jdyYKL6yB2vCMLdy68nxoIYcjSrk3F/kC47ga7NKCS8T21O\nFarxhRzxqgF6rg/mfrgeT7nxD1EM0vk6mCSmftbaVZE7M/KRAkEA4FDqvtjen9Rr\nROe2Al23h/1gDqgL9rJ5SzSbwwYmzRA/XYlfH7k9RPGQahzq15IHrdxN04Ov2dVR\nyybbR0A1awJBAMRb3+P1yKzIkkTGYE2ZWctBcDCnzwwaKKZuWX7OfA+ZPNUm+L6O\nwg4gztHIAA6DyizXxaHhh8qcL0A6nx7hJ4kCQQCjrces3LiNrcVcMSuZTGMYYuVN\nrIeWSqLBIrEpvHphlaJ3ET8M+fDgNtgm5dTi2daqoZ9UYLnXXJXjhAXrVsnjAkEA\nnn8ahcNLLEzp5CHMclaqKGq1yFBry/UBgvXnv3ekpGKou9UtS4OoGAdbafHqOc0f\nUHsKx9Rn65+OdGXdMuvDIQJAJ+L5i2iRo4TuNpHxMCPN/3bamMlDktIfPlVLbuEc\ninG1XZ9zs9Y1J738iCF2d56wlApbYGqw4vp9+CdX62LoMw==\n-----END RSA PRIVATE KEY-----';
+      return sign('sha256', pkey, 'test');
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - single line pkey with missing newline before END block
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN RSA PRIVATE KEY-----\nMIICXgIBAAKBgQCsDnSry3s269UFKpYvptshcmKZ4ZXxqj6771qr/oEOtRa/o+8J\nmFtucELQg7HrzRUwxG9htmCuSZ+eOcMQ7vJOrgS+1Ol01P+Ol/PdFFeT5utqzG2N\naYSIs/oLAaTkiDUkDBhnG6Ns0xWgJlRomR2W4RI8Os/zKh9eccRaZorjQwIDAQAB\nAoGBAKT300vo9QHqyruCYq/bxx1hpEKw9ejZd/8P9xsUEb/9R4uF7iqAB6JzRszQ\niKZzY473uWexyy8w7jdyYKL6yB2vCMLdy68nxoIYcjSrk3F/kC47ga7NKCS8T21O\nFarxhRzxqgF6rg/mfrgeT7nxD1EM0vk6mCSmftbaVZE7M/KRAkEA4FDqvtjen9Rr\nROe2Al23h/1gDqgL9rJ5SzSbwwYmzRA/XYlfH7k9RPGQahzq15IHrdxN04Ov2dVR\nyybbR0A1awJBAMRb3+P1yKzIkkTGYE2ZWctBcDCnzwwaKKZuWX7OfA+ZPNUm+L6O\nwg4gztHIAA6DyizXxaHhh8qcL0A6nx7hJ4kCQQCjrces3LiNrcVcMSuZTGMYYuVN\nrIeWSqLBIrEpvHphlaJ3ET8M+fDgNtgm5dTi2daqoZ9UYLnXXJXjhAXrVsnjAkEA\nnn8ahcNLLEzp5CHMclaqKGq1yFBry/UBgvXnv3ekpGKou9UtS4OoGAdbafHqOc0f\nUHsKx9Rn65+OdGXdMuvDIQJAJ+L5i2iRo4TuNpHxMCPN/3bamMlDktIfPlVLbuEc\ninG1XZ9zs9Y1J738iCF2d56wlApbYGqw4vp9+CdX62LoMw==-----END RSA PRIVATE KEY-----';
+      return sign('sha256', pkey, 'test');
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - single line pkey with missing newline before BEGIN block
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN RSA PRIVATE KEY-----MIICXgIBAAKBgQCsDnSry3s269UFKpYvptshcmKZ4ZXxqj6771qr/oEOtRa/o+8J\nmFtucELQg7HrzRUwxG9htmCuSZ+eOcMQ7vJOrgS+1Ol01P+Ol/PdFFeT5utqzG2N\naYSIs/oLAaTkiDUkDBhnG6Ns0xWgJlRomR2W4RI8Os/zKh9eccRaZorjQwIDAQAB\nAoGBAKT300vo9QHqyruCYq/bxx1hpEKw9ejZd/8P9xsUEb/9R4uF7iqAB6JzRszQ\niKZzY473uWexyy8w7jdyYKL6yB2vCMLdy68nxoIYcjSrk3F/kC47ga7NKCS8T21O\nFarxhRzxqgF6rg/mfrgeT7nxD1EM0vk6mCSmftbaVZE7M/KRAkEA4FDqvtjen9Rr\nROe2Al23h/1gDqgL9rJ5SzSbwwYmzRA/XYlfH7k9RPGQahzq15IHrdxN04Ov2dVR\nyybbR0A1awJBAMRb3+P1yKzIkkTGYE2ZWctBcDCnzwwaKKZuWX7OfA+ZPNUm+L6O\nwg4gztHIAA6DyizXxaHhh8qcL0A6nx7hJ4kCQQCjrces3LiNrcVcMSuZTGMYYuVN\nrIeWSqLBIrEpvHphlaJ3ET8M+fDgNtgm5dTi2daqoZ9UYLnXXJXjhAXrVsnjAkEA\nnn8ahcNLLEzp5CHMclaqKGq1yFBry/UBgvXnv3ekpGKou9UtS4OoGAdbafHqOc0f\nUHsKx9Rn65+OdGXdMuvDIQJAJ+L5i2iRo4TuNpHxMCPN/3bamMlDktIfPlVLbuEc\ninG1XZ9zs9Y1J738iCF2d56wlApbYGqw4vp9+CdX62LoMw==\n-----END RSA PRIVATE KEY-----';
+      return sign('sha256', pkey, 'test');
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - spaces instead of newlines
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN RSA PRIVATE KEY----- MIICXgIBAAKBgQCsDnSry3s269UFKpYvptshcmKZ4ZXxqj6771qr/oEOtRa/o+8J mFtucELQg7HrzRUwxG9htmCuSZ+eOcMQ7vJOrgS+1Ol01P+Ol/PdFFeT5utqzG2N aYSIs/oLAaTkiDUkDBhnG6Ns0xWgJlRomR2W4RI8Os/zKh9eccRaZorjQwIDAQAB AoGBAKT300vo9QHqyruCYq/bxx1hpEKw9ejZd/8P9xsUEb/9R4uF7iqAB6JzRszQ iKZzY473uWexyy8w7jdyYKL6yB2vCMLdy68nxoIYcjSrk3F/kC47ga7NKCS8T21O FarxhRzxqgF6rg/mfrgeT7nxD1EM0vk6mCSmftbaVZE7M/KRAkEA4FDqvtjen9Rr ROe2Al23h/1gDqgL9rJ5SzSbwwYmzRA/XYlfH7k9RPGQahzq15IHrdxN04Ov2dVR yybbR0A1awJBAMRb3+P1yKzIkkTGYE2ZWctBcDCnzwwaKKZuWX7OfA+ZPNUm+L6O wg4gztHIAA6DyizXxaHhh8qcL0A6nx7hJ4kCQQCjrces3LiNrcVcMSuZTGMYYuVN rIeWSqLBIrEpvHphlaJ3ET8M+fDgNtgm5dTi2daqoZ9UYLnXXJXjhAXrVsnjAkEA nn8ahcNLLEzp5CHMclaqKGq1yFBry/UBgvXnv3ekpGKou9UtS4OoGAdbafHqOc0f UHsKx9Rn65+OdGXdMuvDIQJAJ+L5i2iRo4TuNpHxMCPN/3bamMlDktIfPlVLbuEc inG1XZ9zs9Y1J738iCF2d56wlApbYGqw4vp9+CdX62LoMw== -----END RSA PRIVATE KEY-----';
+      return sign('sha256', pkey, 'test');
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - PKCS#8
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN PRIVATE KEY-----MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAKwOdKvLezbr1QUqli+m2yFyYpnhlfGqPrvvWqv+gQ61Fr+j7wmYW25wQtCDsevNFTDEb2G2YK5Jn545wxDu8k6uBL7U6XTU/46X890UV5Pm62rMbY1phIiz+gsBpOSINSQMGGcbo2zTFaAmVGiZHZbhEjw6z/MqH15xxFpmiuNDAgMBAAECgYEApPfTS+j1AerKu4Jir9vHHWGkQrD16Nl3/w/3GxQRv/1Hi4XuKoAHonNGzNCIpnNjjve5Z7HLLzDuN3JgovrIHa8Iwt3LryfGghhyNKuTcX+QLjuBrs0oJLxPbU4VqvGFHPGqAXquD+Z+uB5PufEPUQzS+TqYJKZ+1tpVkTsz8pECQQDgUOq+2N6f1GtE57YCXbeH/WAOqAv2snlLNJvDBibNED9diV8fuT1E8ZBqHOrXkget3E3Tg6/Z1VHLJttHQDVrAkEAxFvf4/XIrMiSRMZgTZlZy0FwMKfPDBoopm5Zfs58D5k81Sb4vo7CDiDO0cgADoPKLNfFoeGHypwvQDqfHuEniQJBAKOtx6zcuI2txVwxK5lMYxhi5U2sh5ZKosEisSm8emGVoncRPwz58OA22Cbl1OLZ1qqhn1RguddcleOEBetWyeMCQQCefxqFw0ssTOnkIcxyVqooarXIUGvL9QGC9ee/d6SkYqi71S1Lg6gYB1tp8eo5zR9QewrH1Gfrn450Zd0y68MhAkAn4vmLaJGjhO42kfEwI83/dtqYyUOS0h8+VUtu4RyKcbVdn3Oz1jUnvfyIIXZ3nrCUCltgarDi+n34J1frYugz-----END PRIVATE KEY-----';
+      return sign('sha256', pkey, 'test');
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - data as Uint8Array
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: |
+      var pkey = '-----BEGIN PRIVATE KEY-----MIICeAIBADANBgkqhkiG9w0BAQEFAASCAmIwggJeAgEAAoGBAKwOdKvLezbr1QUqli+m2yFyYpnhlfGqPrvvWqv+gQ61Fr+j7wmYW25wQtCDsevNFTDEb2G2YK5Jn545wxDu8k6uBL7U6XTU/46X890UV5Pm62rMbY1phIiz+gsBpOSINSQMGGcbo2zTFaAmVGiZHZbhEjw6z/MqH15xxFpmiuNDAgMBAAECgYEApPfTS+j1AerKu4Jir9vHHWGkQrD16Nl3/w/3GxQRv/1Hi4XuKoAHonNGzNCIpnNjjve5Z7HLLzDuN3JgovrIHa8Iwt3LryfGghhyNKuTcX+QLjuBrs0oJLxPbU4VqvGFHPGqAXquD+Z+uB5PufEPUQzS+TqYJKZ+1tpVkTsz8pECQQDgUOq+2N6f1GtE57YCXbeH/WAOqAv2snlLNJvDBibNED9diV8fuT1E8ZBqHOrXkget3E3Tg6/Z1VHLJttHQDVrAkEAxFvf4/XIrMiSRMZgTZlZy0FwMKfPDBoopm5Zfs58D5k81Sb4vo7CDiDO0cgADoPKLNfFoeGHypwvQDqfHuEniQJBAKOtx6zcuI2txVwxK5lMYxhi5U2sh5ZKosEisSm8emGVoncRPwz58OA22Cbl1OLZ1qqhn1RguddcleOEBetWyeMCQQCefxqFw0ssTOnkIcxyVqooarXIUGvL9QGC9ee/d6SkYqi71S1Lg6gYB1tp8eo5zR9QewrH1Gfrn450Zd0y68MhAkAn4vmLaJGjhO42kfEwI83/dtqYyUOS0h8+VUtu4RyKcbVdn3Oz1jUnvfyIIXZ3nrCUCltgarDi+n34J1frYugz-----END PRIVATE KEY-----';
+      return sign('sha256', pkey, new Uint8Array([0x74, 0x65, 0x73, 0x74]));
+out:
+  return: SUCCEED
+  value: "272f1ef9012b81365bd29f929cfd63dc8a0bafbfaf1fb0bb1a6982d04260ee888573e7591e0e8076a3d8eb9da7a85bd57e61b4504abcfd62815f88cb0c6955fe4bab6d0b4361182182e316a96c83d5ab9ac8e314b5f11eabcefbeb520ec41b04b52323aedcf53b630a232f0a63c66a4cc4411241160ccb30409525c9c51a06d5"
+---
+test case: RS256 in JavaScript - Invalid algorithm
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('q', pkey, 'test');"
+out:
+  return: FAIL
+---
+test case: RS256 in JavaScript - Invalid pkey
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('q', 'invalid', 'test');"
+out:
+  return: FAIL
+---
+test case: RS256 in JavaScript - Missing pkey
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('q');"
+out:
+  return: FAIL
+---
+test case: RS256 in JavaScript - Invalid data
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('q', 'invalid', '');"
+out:
+  return: FAIL
+---
+test case: RS256 in JavaScript - Missing data
+in:
+  encryption_required: 1
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "a"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return sign('q', 'pkey');"
+out:
+  return: FAIL
 ...

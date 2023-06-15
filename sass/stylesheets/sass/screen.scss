@@ -293,6 +293,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -446,7 +453,6 @@ form {
 			padding-bottom: 0;
 			border-bottom: 0;
 			box-shadow: inset 0 -1px 0 0 rgba($font-color, .1);
-			color: $font-color;
 			height: 22px;
 			vertical-align: middle;
 			white-space: nowrap;
@@ -942,6 +948,10 @@ form {
 	display: table-cell;
 	vertical-align: top;
 
+	&.expression-cell {
+		line-height: 24px;
+	}
+
 	&:last-child {
 		.dashboard-widget {
 			margin: 0 0 10px;
@@ -1431,6 +1441,16 @@ form {
 			&:last-child {
 				padding-right: 0;
 			}
+
+			&.na-bg,
+			&.normal-bg,
+			&.info-bg,
+			&.average-bg,
+			&.warning-bg,
+			&.high-bg,
+			&.disaster-bg {
+				padding-left: 5px;
+			}
 		}
 
 		.wrap-multiple-controls {
@@ -1619,7 +1639,9 @@ textarea {
 	}
 	padding: 4px 5px;
 	margin: 0;
+	min-height: 24px;
 	overflow: auto;
+	resize: vertical;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -2526,6 +2548,21 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
+}
+
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);
@@ -3065,6 +3102,10 @@ $form-icon-btn: (
 			position: relative;
 			@extend %webkit-scrollbar;
 
+			> form {
+				padding: 2px 0;
+			}
+
 			.table-forms {
 				.table-forms-td-right {
 					padding-right: 8px;
@@ -3188,14 +3229,6 @@ $form-icon-btn: (
 	.list-table {
 		white-space: normal;
 		border: 0;
-
-		th {
-			@extend %dashboard-widget-td;
-		}
-
-		td {
-			@extend %dashboard-widget-td;
-		}
 	}
 
 	.table-paging {

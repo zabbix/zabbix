@@ -68,7 +68,7 @@ typedef struct
 }
 ZBX_TABLE;
 
-extern const ZBX_TABLE	tables[];
+extern ZBX_TABLE	tables[];
 extern const char	*const db_schema;
 extern const char	*const db_schema_fkeys[];
 extern const char	*const db_schema_fkeys_drop[];

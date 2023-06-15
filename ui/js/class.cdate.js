@@ -18,8 +18,6 @@
 **/
 
 var CDate = function () {
-	this.tmpDate = new Date();
-
 	this.clientDate = (arguments.length > 0)
 		? new Date(arguments[0])
 		: new Date();
@@ -32,20 +30,15 @@ CDate.prototype = {
 	tzDiff:		0,			// server and client TZ diff
 	clientDate:	null,	// clients(JS, Browser) date object
 	serverDate:	null,	// servers(PHP, Unix) date object
-	tmpDate:	null,		// inner usage
 
 	calcTZdiff: function(time) {
-		var ddTZOffset;
-
-		if (typeof(time) != 'undefined') {
-			this.tmpDate.setTime(time);
-			ddTZOffset = this.tmpDate.getTimezoneOffset() * -60;
-		}
-		else {
-			ddTZOffset = this.serverDate.getTimezoneOffset() * -60;
+		if (time === undefined) {
+			time = new Date().getTime();
 		}
 
-		this.tzDiff = ddTZOffset - PHP_TZ_OFFSET;
+		const timestamp = Object.keys(PHP_TZ_OFFSETS).reverse().find((ts) => ts * 1000 <= time);
+
+		this.tzDiff = this.clientDate.getTimezoneOffset() * -60 - PHP_TZ_OFFSETS[timestamp];
 	},
 
 	/**
@@ -159,14 +152,6 @@ CDate.prototype = {
 		return this.getTime();
 	},
 
-	getFormattedDate: function() {
-		var fDate = this.getFullYear() + '-' + (this.getMonth() + 1) + '-' + this.getDate();
-		fDate += ' ' + this.getHours() + ':' + this.getMinutes() + ':' + this.getSeconds();
-		fDate += ' ' + tzOffsetHours + ':' + this.tzOffset / 3600;
-
-		return fDate;
-	},
-
 	toString: function() {
 		return this.serverDate.toString();
 	},
@@ -177,10 +162,6 @@ CDate.prototype = {
 		this.calcTZdiff();
 
 		return this.getTime();
-	},
-
-	getTimezoneOffset: function() {
-		return parseInt(-PHP_TZ_OFFSET / 60);
 	},
 
 	getMilliseconds: function() {
@@ -295,10 +276,9 @@ CDate.prototype = {
 
 	setTime: function(arg) {
 		arg = parseInt(arg, 10);
-
 		this.server = 0;
+		this.clientDate.setTime(arg);
 		this.calcTZdiff(arg);
 		this.serverDate.setTime(arg - this.tzDiff * 1000);
-		this.clientDate.setTime(arg);
 	}
 };

@@ -534,7 +534,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '"request": "active checks", "host": "host"']
 					],
 					'details' => 'Invalid parameter "posts": JSON is expected.'
@@ -551,7 +551,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => 'xml version="1.0" encoding="UTF-8"?<zabbix_export></zabbix_export>']
 					],
 					'details' => 'Invalid parameter "posts": (4) Start tag expected, \'<\' not found [Line: 1 | Column: 1].'
@@ -568,7 +568,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'XML data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'XML data'],
 						'Request body' => ['id' => 'posts', 'value' => '']
 					],
 					'details' => 'Invalid parameter "posts": XML is expected.'
@@ -969,7 +969,7 @@ class testMassUpdateItems extends CWebTest{
 						'Type' => ['id' => 'type', 'value' => 'HTTP agent'],
 						'Host interface' => ['id' => 'interface-select', 'value' => '127.0.5.1:10051'],
 						'URL' => ['id' => 'url', 'value' => 'https//:zabbix.com'],
-						'Request body type' => ['id' => 'post_type', 'value' => 'JSON data'],
+						'Request body type' => ['id' => 'post_type_container', 'value' => 'JSON data'],
 						'Request body' => ['id' => 'posts', 'value' => '{"request": "active checks", "host": "host"}'],
 						'Headers' => [
 							[
@@ -988,7 +988,8 @@ class testMassUpdateItems extends CWebTest{
 						'Update interval' => ['Delay' => '86400'],
 						'Enable trapping' => ['id' => 'allow_traps', 'value' => 'Yes']
 					]
-				]
+				],
+				'screenshot' => true
 			],
 			[
 				[
@@ -1267,6 +1268,13 @@ class testMassUpdateItems extends CWebTest{
 
 				case 'Headers':
 					$form->query('xpath:.//div[@id="headers_pairs"]/table')->asMultifieldTable()->one()->fill($value);
+
+					// Take a screenshot to test draggable object position of headers in mass update.
+					if (array_key_exists('screenshot', $data)) {
+						$this->page->removeFocus();
+						$this->assertScreenshot($form->query('id:headers_pairs')->waitUntilPresent()->one(), 'Item mass update headers'.$prototypes);
+					}
+
 					break;
 
 				case 'Master item':
@@ -1664,7 +1672,8 @@ class testMassUpdateItems extends CWebTest{
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '5'],
 						['type' => 'Prometheus pattern', 'parameter_1' => 'cpu_usage_system', 'parameter_2' => 'label',
 								'parameter_3' => 'label_name']
-					]
+					],
+					'Screenshot' => true
 				]
 			]
 		];
@@ -1688,6 +1697,16 @@ class testMassUpdateItems extends CWebTest{
 
 		if ($data['Preprocessing steps'] !== []) {
 			$this->addPreprocessingSteps($data['Preprocessing steps']);
+
+			// Take a screenshot to test draggable object position of preprocessing steps in mass update.
+			if (array_key_exists('Screenshot', $data)) {
+				$this->page->removeFocus();
+
+				// It is necessary because of unexpected viewport shift.
+				$this->page->updateViewport();
+				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(), 'Item mass update preprocessing'.$prototypes);
+			}
+
 		}
 
 		$dialog->query('button:Update')->one()->waitUntilClickable()->click();

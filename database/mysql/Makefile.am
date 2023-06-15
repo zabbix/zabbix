@@ -9,6 +9,9 @@ schema.sql: $(top_srcdir)/create/src/schema.tmpl $(top_srcdir)/create/bin/gen_sc
 
 history_pk_prepare.sql: $(top_srcdir)/create/bin/gen_history_pk.pl
 	$(top_srcdir)/create/bin/gen_history_pk.pl $(DATABASE) > history_pk_prepare.sql
+
+clean:
+	rm -f schema.sql data.sql history_pk_prepare.sql
 endif
 
 EXTRA_DIST = \
@@ -18,5 +21,3 @@ EXTRA_DIST = \
 	double.sql \
 	history_pk_prepare.sql
 
-clean:
-	rm -f schema.sql data.sql history_pk_prepare.sql

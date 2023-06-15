@@ -525,6 +525,6 @@ class CFilterParser extends CParser {
 	 * @return string
 	 */
 	public static function quoteString(string $value): string {
-		return '"'.strtr($value, ['\\' => '\\\\', '"' => '\\"']).'"';
+		return '"'.strtr($value, ['"' => '\\"']).'"';
 	}
 }

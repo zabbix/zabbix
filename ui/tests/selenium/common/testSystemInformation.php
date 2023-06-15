@@ -82,6 +82,13 @@ class testSystemInformation extends CWebTest {
 			]
 		];
 
+		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
+		$file_path = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
+		$pattern = array('/[$]ZBX_SERVER/','/[$]ZBX_SERVER_PORT/');
+		$replace = array('// $ZBX_SERVER','// $ZBX_SERVER_PORT');
+		$content = preg_replace($pattern, $replace, file_get_contents($file_path), 1);
+		file_put_contents($file_path, $content);
+
 		// Insert HA cluster data into ha_node table.
 		foreach ($nodes as $node) {
 			DBexecute('INSERT INTO ha_node (ha_nodeid, name, address, port, lastaccess, status, ha_sessionid) '.
@@ -89,11 +96,6 @@ class testSystemInformation extends CWebTest {
 					', '.$node['port'].', '.$node['lastaccess'].', '.$node['status'].', '.zbx_dbstr($node['ha_sessionid']).');'
 			);
 		}
-
-		// Update Zabbix frontend config to make sure that the address of the active node is shown correctly in tests.
-		$file_name = dirname(__FILE__).'/../../../conf/zabbix.conf.php';
-		$config = strtr(file_get_contents($file_name), ['$ZBX_SERVER ' => '// $ZBX_SERVER ', '$ZBX_SERVER_PORT' => '// $ZBX_SERVER_PORT']);
-		file_put_contents($file_name, $config);
 
 		// Get the time when config is updated - it is needed to know how long to wait until update of Zabbix server status.
 		self::$update_timestamp = time();
@@ -115,9 +117,8 @@ class testSystemInformation extends CWebTest {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
-		$this->page->login()->open($url)->waitUntilReady();
 
-		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
+		$this->page->login()->open($url)->waitUntilReady();
 		$current_time = time();
 
 		if (!$dashboardid) {
@@ -154,7 +155,8 @@ class testSystemInformation extends CWebTest {
 			 */
 			$last_expected = [];
 
-			for ($i = 0; $i <= 10; $i++) {
+			// Negative $i values are considered because current_time may be defined before data in sysinfo widget gets displayed.
+			for ($i = -2; $i <= 6; $i++) {
 				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
 

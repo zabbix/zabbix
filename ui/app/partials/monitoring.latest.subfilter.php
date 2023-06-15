@@ -55,9 +55,8 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	foreach ($subfilters[$key] as $value => $element) {
 		if ($element['selected']) {
 			$subfilter_options[$key][] = (new CSpan([
-				(new CLinkAction($element['name']))->onClick(CHtml::encode(
-					'view.unsetSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-				)),
+				(new CLinkAction($element['name']))
+					->onClick('view.unsetSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'),
 				' ',
 				new CSup($element['count'])
 			]))
@@ -70,9 +69,8 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 				$count_text = $key !== 'data' || $subfilter_used ? $element['count'] : '';
 
 				$subfilter_options[$key][] = (new CSpan([
-					(new CLinkAction($element['name']))->onClick(CHtml::encode(
-						'view.setSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'
-					)),
+					(new CLinkAction($element['name']))
+						->onClick('view.setSubfilter('.json_encode(['subfilter_'.$key.'[]', $value]).')'),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$count_text)
 				]))->addClass(ZBX_STYLE_SUBFILTER);

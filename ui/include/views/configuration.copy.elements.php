@@ -66,9 +66,7 @@ $form_list->addRow(new CLabel(_('Target type'), 'copy_type'),
 );
 
 // append multiselect wrapper to form list
-$form_list->addRow((new CLabel(_('Target'), 'copy_targetids_ms'))->setAsteriskMark(),
-	(new CDiv())->setId('copy_targets')
-);
+$form_list->addRow((new CLabel(_('Target'), 'copy_targetids_ms'))->setAsteriskMark(), '', 'copy_targets');
 
 // append tabs to form
 $tab_view = (new CTabView())->addTab('elements_tab', '', $form_list);

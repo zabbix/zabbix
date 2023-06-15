@@ -1,5 +1,5 @@
 zabbix_export:
-  version: '5.4'
+  version: '6.0'
   date: '2021-04-26T13:40:40Z'
   media_types:
     -
