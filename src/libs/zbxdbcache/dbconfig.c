@@ -9411,6 +9411,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 	return num;
 }
 
+#ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
  * Purpose: Get array of items for IPMI poller                                *
@@ -9503,6 +9504,7 @@ int	DCconfig_get_ipmi_poller_items(int now, DC_ITEM *items, int items_num, int *
 
 	return num;
 }
+#endif /* HAVE_OPENIPMI */
 
 /******************************************************************************
  *                                                                            *
