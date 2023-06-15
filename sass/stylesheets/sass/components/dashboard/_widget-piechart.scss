@@ -46,22 +46,8 @@ form.dashboard-widget-piechart {
 			padding-top: 0;
 
 			&:first-child {
-				grid-column-start: 4;
+				grid-column-start: 5;
 			}
-		}
-	}
-
-	.drag-icon {
-		position: absolute;
-		top: 5px;
-		left: -14px;
-	}
-
-	.td-drag-icon {
-		.drag-icon {
-			top: 0;
-			left: 9px;
-			margin-right: 5px;
 		}
 	}
 
@@ -69,21 +55,17 @@ form.dashboard-widget-piechart {
 		grid-column: span 1 / -1;
 		text-align: right;
 
-		.btn-remove {
-			top: 0;
-			right: 0;
-			vertical-align: baseline;
+		.btn-icon {
+			@extend %button-size-medium;
 		}
 	}
 
 	.items-list {
-		grid-column: 3 / span 3;
+		grid-column: 4 / span 3;
 	}
 
 	.list-vertical-accordion {
 		position: relative;
-		margin-left: 15px;
-		padding-left: 0;
 
 		&.sortable {
 			overflow: visible;
@@ -95,13 +77,24 @@ form.dashboard-widget-piechart {
 	.list-accordion-item {
 		position: relative;
 		display: grid;
-		grid-template-columns: 100px 24px 24px 1fr 1fr 24px;
+		grid-template-columns: 5px 100px 24px 24px 1fr 1fr 24px;
 		grid-gap: 10px;
 		align-items: start;
 		padding: 5px 0;
 
+		> .drag-icon {
+			height: 24px;
+			margin-left: -2px;
+
+			&:not(.disabled) {
+				& + label {
+					@extend %cursor-drag;
+				}
+			}
+		}
+
 		> label {
-			@extend %cursor-drag;
+			pointer-events: initial;
 			overflow: hidden;
 			line-height: 24px;
 			text-align: left;
@@ -114,9 +107,13 @@ form.dashboard-widget-piechart {
 				position: absolute;
 				top: 24px;
 				bottom: 0;
-				left: 121px;
+				left: 136px;
 				width: 2px;
 				background: $ui-border-color;
+			}
+
+			.single-item-table {
+				.table-col-name { width: 1%; }
 			}
 		}
 
@@ -153,7 +150,7 @@ form.dashboard-widget-piechart {
 	}
 
 	.single-item-table {
-		.table-col-handle { width: 26px; }
+		.table-col-handle { width: 12px; }
 		.table-col-no { width: 20px; }
 		.table-col-color { width: 24px; }
 		.table-col-action { width: 55px; }
@@ -164,6 +161,17 @@ form.dashboard-widget-piechart {
 
 		.single-item-table-row td {
 			padding: 0 5px 5px 0;
+
+			&.table-col-name {
+				padding-right: 10px;
+			}
+		}
+
+		th,
+		td {
+			&:first-child {
+				padding-left: 5px;
+			}
 		}
 
 		.single-item-table-row:last-child td {
@@ -180,12 +188,6 @@ form.dashboard-widget-piechart {
 		line-height: 24px;
 		color: $font-alt-color;
 	}
-}
-
-[theme="hc-dark"] form.dashboard-widget-piechart {
-}
-
-[theme="hc-light"] form.dashboard-widget-piechart {
 }
 
 // Widget view.

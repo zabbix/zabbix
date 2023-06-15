@@ -289,6 +289,22 @@ static int	DBpatch_6050024(void)
 	return FAIL;
 }
 
+static int	DBpatch_6050025(void)
+{
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
+	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "piechart", "widgets/piechart", 1, "[]");
+	zbx_db_insert_autoincrement(&db_insert, "moduleid");
+	int ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -320,5 +336,6 @@ DBPATCH_ADD(6050021, 0, 1)
 DBPATCH_ADD(6050022, 0, 1)
 DBPATCH_ADD(6050023, 0, 1)
 DBPATCH_ADD(6050024, 0, 1)
+DBPATCH_ADD(6050025, 0, 1)
 
 DBPATCH_END()

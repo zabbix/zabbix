@@ -22,6 +22,8 @@
 namespace Widgets\SvgGraph\Includes;
 
 use CButton,
+	CButtonIcon,
+	CButtonLink,
 	CCheckBox,
 	CCol,
 	CColor,

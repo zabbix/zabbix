@@ -71,6 +71,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/dashboard/widget-item";
 @import "components/dashboard/widget-map";
 @import "components/dashboard/widget-navtree";
+@import "components/dashboard/widget-piechart";
 @import "components/dashboard/widget-problemsbysv";
 @import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
@@ -1957,10 +1958,10 @@ select {
 
 	.form-grid {
 		// 100px label column width for use in popup forms.
-		grid-template-columns: minmax(var(--label-width, 100px), max-content) auto;
+		grid-template-columns: minmax(var(--label-width, 100px), max-content) 1fr;
 
 		&.form-grid-1-1 {
-			grid-template-columns: repeat(2, minmax(100px, max-content) auto);
+			grid-template-columns: repeat(2, minmax(100px, max-content) 1fr);
 		}
 
 		&.form-grid-3-1 {

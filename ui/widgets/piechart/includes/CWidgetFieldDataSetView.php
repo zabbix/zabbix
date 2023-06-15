@@ -22,6 +22,8 @@
 namespace Widgets\PieChart\Includes;
 
 use CButton,
+	CButtonIcon,
+	CButtonLink,
 	CCol,
 	CColor,
 	CDiv,
@@ -83,18 +85,18 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	public function getFooterView(): CList {
 		return (new CList())
 			->addClass(ZBX_STYLE_BTN_SPLIT)
-			->addItem([
-				(new CButton(null, [
-					(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON),
-					_('Add new data set')
-				]))
+			->addItem(
+				(new CSimpleButton(_('Add new data set')))
 					->setId('dataset-add')
-					->addClass(ZBX_STYLE_BTN_ALT),
-				(new CButton(null, ZWSPACE()))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass(ZBX_ICON_PLUS_SMALL)
+			)
+			->addItem(
+				(new CSimpleButton())
 					->setId('dataset-menu')
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
-			]);
+					->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
+			);
 	}
 
 	public function getTemplates(): array {
@@ -112,11 +114,13 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	private function getDataSetLayout(array $value, int $dataset_type, bool $is_opened,
-												$row_num = '#{rowNum}'): CListItem {
+			$row_num = '#{rowNum}'): CListItem {
 		$field_name = $this->field->getName();
 
 		$dataset_head = [
-			new CDiv((new CSimpleButton(NBSP()))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)),
+			new CDiv(
+				(new CButtonIcon(ZBX_ICON_CHEVRON_UP))->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE)
+			),
 			new CVar($field_name.'['.$row_num.'][dataset_type]', $dataset_type, '')
 		];
 
@@ -242,9 +246,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 								(new CList())
 									->addClass(ZBX_STYLE_INLINE_FILTER_FOOTER)
 									->addItem(
-										(new CSimpleButton(_('Add')))
-											->addClass(ZBX_STYLE_BTN_LINK)
-											->addClass('js-add-item')
+										(new CButtonLink(_('Add')))->addClass('js-add')
 									)
 							))->setColSpan(5)
 						)
@@ -256,20 +258,17 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		}
 
 		$dataset_head[] = (new CDiv(
-			(new CButton())
-				->setAttribute('title', _('Delete'))
-				->addClass(ZBX_STYLE_BTN_REMOVE)
-				->removeId()
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALLER, _('Delete')))->addClass('js-remove')
 		))->addClass('list-item-actions');
 
 		return (new CListItem([
-			(new CLabel(''))
-				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
-				->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_DRAG_ICON)
 				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
 				->addClass('js-main-drag-icon'),
+			(new CLabel(''))
+				->addClass(ZBX_STYLE_SORTABLE_DRAG_HANDLE)
+				->addClass('js-dataset-label'),
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_HEAD)
 				->addClass('dataset-head')
@@ -277,61 +276,62 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 			(new CDiv())
 				->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM_BODY)
 				->addClass('dataset-body')
-				->addItem([(new CFormGrid())
-					->addItem([
-						new CLabel([
-							_('Aggregation function'),
-							makeHelpIcon(_('Aggregates each item in the data set.'))
-						], 'label-'.$field_name.'_'.$row_num.'_aggregate_function'),
-						new CFormField(
-							(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
-								->setId($field_name.'_'.$row_num.'_aggregate_function')
-								->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
-								->setValue((int) $value['aggregate_function'])
-								->addOptions(CSelect::createOptionsFromArray([
-									AGGREGATE_LAST => $this->aggr_fnc2str(AGGREGATE_LAST),
-									AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-									AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-									AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-									AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-									AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM),
-									AGGREGATE_FIRST => $this->aggr_fnc2str(AGGREGATE_FIRST)
-								]))
-								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-						)
-					])
-					->addItem([
-						new CLabel([
-							_('Data set aggregation'),
-							makeHelpIcon(_('Aggregates the whole data set.'))
-						], 'label-'.$field_name.'_'.$row_num.'_dataset_aggregation'),
-						new CFormField(
-							(new CSelect($field_name.'['.$row_num.'][dataset_aggregation]'))
-								->setId($field_name.'_'.$row_num.'_dataset_aggregation')
-								->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
-								->setValue((int) $value['dataset_aggregation'])
-								->addOptions(CSelect::createOptionsFromArray([
-									AGGREGATE_NONE => $this->aggr_fnc2str(AGGREGATE_NONE),
-									AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
-									AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
-									AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
-									AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
-									AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM)
-								]))
-								->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-						)
-					])
-					->addItem([
-						new CLabel([
-							_('Data set label'),
-							makeHelpIcon(_('Also used as legend label for aggregated data sets.'))
-						], $field_name.'_'.$row_num.'_data_set_label'),
-						new CFormField(
-							(new CTextBox($field_name.'['.$row_num.'][data_set_label]', $value['data_set_label']))
-								->setId($field_name.'_'.$row_num.'_data_set_label')
-								->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-						)
-					])
+				->addItem([
+					(new CFormGrid())
+						->addItem([
+							new CLabel([
+								_('Aggregation function'),
+								makeHelpIcon(_('Aggregates each item in the data set.'))
+							], 'label-'.$field_name.'_'.$row_num.'_aggregate_function'),
+							new CFormField(
+								(new CSelect($field_name.'['.$row_num.'][aggregate_function]'))
+									->setId($field_name.'_'.$row_num.'_aggregate_function')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
+									->setValue((int) $value['aggregate_function'])
+									->addOptions(CSelect::createOptionsFromArray([
+										AGGREGATE_LAST => $this->aggr_fnc2str(AGGREGATE_LAST),
+										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM),
+										AGGREGATE_FIRST => $this->aggr_fnc2str(AGGREGATE_FIRST)
+									]))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+						->addItem([
+							new CLabel([
+								_('Data set aggregation'),
+								makeHelpIcon(_('Aggregates the whole data set.'))
+							], 'label-'.$field_name.'_'.$row_num.'_dataset_aggregation'),
+							new CFormField(
+								(new CSelect($field_name.'['.$row_num.'][dataset_aggregation]'))
+									->setId($field_name.'_'.$row_num.'_dataset_aggregation')
+									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_dataset_aggregation')
+									->setValue((int) $value['dataset_aggregation'])
+									->addOptions(CSelect::createOptionsFromArray([
+										AGGREGATE_NONE => $this->aggr_fnc2str(AGGREGATE_NONE),
+										AGGREGATE_MIN => $this->aggr_fnc2str(AGGREGATE_MIN),
+										AGGREGATE_MAX => $this->aggr_fnc2str(AGGREGATE_MAX),
+										AGGREGATE_AVG => $this->aggr_fnc2str(AGGREGATE_AVG),
+										AGGREGATE_COUNT => $this->aggr_fnc2str(AGGREGATE_COUNT),
+										AGGREGATE_SUM => $this->aggr_fnc2str(AGGREGATE_SUM)
+									]))
+									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							)
+						])
+						->addItem([
+							new CLabel([
+								_('Data set label'),
+								makeHelpIcon(_('Also used as legend label for aggregated data sets.'))
+							], $field_name.'_'.$row_num.'_data_set_label'),
+							new CFormField(
+								(new CTextBox($field_name.'['.$row_num.'][data_set_label]', $value['data_set_label']))
+									->setId($field_name.'_'.$row_num.'_data_set_label')
+									->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+							)
+						])
 				])
 		]))
 			->addClass(ZBX_STYLE_LIST_ACCORDION_ITEM)
@@ -342,11 +342,9 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 	}
 
 	private function getItemRowTemplate($ds_num = '#{dsNum}', $row_num = '#{rowNum}', $itemid = '#{itemid}',
-											$name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
+			$name = '#{name}', $color = '#{color}', $type = '#{type}'): CRow {
 		return (new CRow([
-			(new CCol(
-				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-			))
+			(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))
 				->addClass('table-col-handle')
 				->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol(

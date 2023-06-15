@@ -22,11 +22,12 @@
 namespace Widgets\SvgGraph\Includes;
 
 use CButton,
+	CButtonIcon,
+	CSimpleButton,
 	CDiv,
 	CList,
 	CListItem,
 	CPatternSelect,
-	CSpan,
 	CTemplateTag,
 	CVar,
 	CWidgetFieldView;
