@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-14T13:15:19Z'
+  date: '2023-06-15T09:36:24Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -556,7 +556,7 @@ zabbix_export:
             key: kube.pods
           lld_macro_paths:
             - lld_macro: '{#NAMESPACE}'
-              path: $.labels.namespace
+              path: $.metadata.namespace
             - lld_macro: '{#NAME}'
               path: $.metadata.name
           preprocessing:
