@@ -1159,8 +1159,6 @@ footer {
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 0 0; }
-      .form-grid .table-forms-separator td .drag-icon {
-        width: 15px; }
     .form-grid .table-forms-separator tfoot td {
       padding-bottom: 0; }
 

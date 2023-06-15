@@ -65,7 +65,6 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-query-fields')
-					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
@@ -113,7 +112,6 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-post-fields')
-					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
@@ -161,8 +159,7 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-variables')
-					->addClass(ZBX_STYLE_CELL_TOP)
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -170,7 +167,7 @@ $form_grid = (new CFormGrid())
 					),
 				(new CTemplateTag('step-variable-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol())->addStyle('width: 15px;'),
+						'',
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
@@ -197,7 +194,6 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-headers')
-					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(

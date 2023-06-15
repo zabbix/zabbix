@@ -131,8 +131,7 @@ $scenario_tab
 			(new CDiv([
 				(new CTable())
 					->setId('variables')
-					->addClass(ZBX_STYLE_CELL_TOP)
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -140,7 +139,7 @@ $scenario_tab
 					),
 				(new CTemplateTag('variable-row-tmpl'))->addItem(
 					(new CRow([
-						(new CCol())->addStyle('width: 15px;'),
+						'',
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
@@ -167,7 +166,6 @@ $scenario_tab
 			(new CDiv([
 				(new CTable())
 					->setId('headers')
-					->addClass(ZBX_STYLE_CELL_TOP)
 					->setHeader(['', _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
