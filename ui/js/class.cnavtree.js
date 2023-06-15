@@ -58,7 +58,7 @@ if (typeof addPopupValues === 'undefined') {
 		},
 
 		_mouseDrag: function(event) {
-			const o = this.options;
+			const opt = this.options;
 
 			// Compute the helpers position.
 			this.position = this._generatePosition(event);
@@ -73,34 +73,34 @@ if (typeof addPopupValues === 'undefined') {
 				if (this.scrollParent[0] != document && this.scrollParent[0].tagName != 'HTML') {
 
 					if ((this.overflowOffset.top + this.scrollParent[0].offsetHeight)
-							- event.pageY < o.scrollSensitivity) {
-						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop + o.scrollSpeed;
+							- event.pageY < opt.scrollSensitivity) {
+						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop + opt.scrollSpeed;
 					}
-					else if (event.pageY - this.overflowOffset.top < o.scrollSensitivity) {
-						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop - o.scrollSpeed;
+					else if (event.pageY - this.overflowOffset.top < opt.scrollSensitivity) {
+						this.scrollParent[0].scrollTop = this.scrollParent[0].scrollTop - opt.scrollSpeed;
 					}
 
 					if ((this.overflowOffset.left + this.scrollParent[0].offsetWidth)
-							- event.pageX < o.scrollSensitivity) {
-						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft + o.scrollSpeed;
+							- event.pageX < opt.scrollSensitivity) {
+						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft + opt.scrollSpeed;
 					}
-					else if (event.pageX - this.overflowOffset.left < o.scrollSensitivity) {
-						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft - o.scrollSpeed;
+					else if (event.pageX - this.overflowOffset.left < opt.scrollSensitivity) {
+						this.scrollParent[0].scrollLeft = this.scrollParent[0].scrollLeft - opt.scrollSpeed;
 					}
 				}
 				else {
-					if (event.pageY - $(document).scrollTop() < o.scrollSensitivity) {
-						$(document).scrollTop($(document).scrollTop() - o.scrollSpeed);
+					if (event.pageY - $(document).scrollTop() < opt.scrollSensitivity) {
+						$(document).scrollTop($(document).scrollTop() - opt.scrollSpeed);
 					}
-					else if ($(window).height() - (event.pageY - $(document).scrollTop()) < o.scrollSensitivity) {
-						$(document).scrollTop($(document).scrollTop() + o.scrollSpeed);
+					else if ($(window).height() - (event.pageY - $(document).scrollTop()) < opt.scrollSensitivity) {
+						$(document).scrollTop($(document).scrollTop() + opt.scrollSpeed);
 					}
 
-					if (event.pageX - $(document).scrollLeft() < o.scrollSensitivity) {
-						$(document).scrollLeft($(document).scrollLeft() - o.scrollSpeed);
+					if (event.pageX - $(document).scrollLeft() < opt.scrollSensitivity) {
+						$(document).scrollLeft($(document).scrollLeft() - opt.scrollSpeed);
 					}
-					else if ($(window).width() - (event.pageX - $(document).scrollLeft()) < o.scrollSensitivity) {
-						$(document).scrollLeft($(document).scrollLeft() + o.scrollSpeed);
+					else if ($(window).width() - (event.pageX - $(document).scrollLeft()) < opt.scrollSensitivity) {
+						$(document).scrollLeft($(document).scrollLeft() + opt.scrollSpeed);
 					}
 
 				}
@@ -146,17 +146,15 @@ if (typeof addPopupValues === 'undefined') {
 						&& !$.contains(this.placeholder[0], itemElement)
 						&& (this.options.type == 'semi-dynamic' ? !$.contains(this.element[0], itemElement) : true)) {
 					if (!this.hovering && !$(itemElement).hasClass('opened')) {
-						const uiObj = this;
-
 						$(itemElement).addClass('hovering');
 
-						this.hovering = setTimeout(function() {
+						this.hovering = setTimeout(() => {
 							$(itemElement)
 								.removeClass('closed')
 								.addClass('opened');
 
-							uiObj.refreshPositions();
-						}, o.parent_expand_delay);
+							this.refreshPositions();
+						}, opt.parent_expand_delay);
 					}
 
 					if (!this.mouseentered) {
@@ -237,48 +235,45 @@ if (typeof addPopupValues === 'undefined') {
 			 */
 			if (parent_item !== null && next_item === null
 					&& (this.positionAbs.left <= parent_item.offset().left
-						|| this.positionAbs.left <= o.indent_size * -0.6)) {
+						|| this.positionAbs.left <= opt.indent_size * -0.6)) {
 				direction_moved = 'left';
 			}
 			// If item is moved to the right and there is sibling element before, put it as a child of it.
-			else if (prev_item !== null && this.positionAbs.left >= prev_item.offset().left + o.indent_size) {
+			else if (prev_item !== null && this.positionAbs.left >= prev_item.offset().left + opt.indent_size) {
 				direction_moved = 'right';
 			}
 
 			if (direction_moved) {
-				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / o.indent_size);
+				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / opt.indent_size);
 			}
 
 			$('.highlighted-parent').removeClass('highlighted-parent');
 
 			if (direction_moved === 'right' && levels_moved) {
 				const drop_to = prev_item;
-				const uiObj = this;
 				const hovered_branch_depth = drop_to[0].getElementsByClassName('tree-list')[0].dataset.depth;
 
 				this._isAllowed(prev_item, level, level + child_levels);
 
 				if (hovered_branch_depth < this.options.max_depth + 1) {
-					this.changing_parent = setTimeout(function() {
+					this.changing_parent = setTimeout(() => {
 						$(drop_to)
 							.addClass('highlighted-parent opened')
 							.removeClass('closed');
 
 						if (prev_offset_top && (prev_offset_top <= prev_item.offset().top)) {
-							$('>.tree-list', drop_to).prepend(uiObj.placeholder);
+							$('>.tree-list', drop_to).prepend(this.placeholder);
 						}
 						else {
-							$('>.tree-list', drop_to).append(uiObj.placeholder);
+							$('>.tree-list', drop_to).append(this.placeholder);
 						}
 
-						uiObj.refreshPositions();
-					}, o.parent_change_delay);
+						this.refreshPositions();
+					}, opt.parent_change_delay);
 				}
 			}
 
 			else if (direction_moved === 'left' && levels_moved) {
-				const uiObj = this;
-
 				let drop_to = $(this.currentItem[0]).closest('.tree-item');
 				let one_before = null;
 
@@ -292,19 +287,20 @@ if (typeof addPopupValues === 'undefined') {
 
 				$(drop_to).addClass('highlighted-parent');
 
-				this.changing_parent = setTimeout(function() {
+				this.changing_parent = setTimeout(() => {
 					if (one_before && one_before.length) {
-						$(uiObj.placeholder).insertAfter(one_before);
+						$(this.placeholder).insertAfter(one_before);
 					}
 					else {
-						$('>.tree-list', drop_to).append(uiObj.placeholder);
+						$('>.tree-list', drop_to).append(this.placeholder);
 					}
 
 					if (drop_to.children('.tree-list').children('li:visible:not(.ui-sortable-helper)').length < 1) {
 						drop_to.removeClass('opened');
 					}
-					uiObj.refreshPositions();
-				}, o.parent_change_delay);
+
+					this.refreshPositions();
+				}, opt.parent_change_delay);
 
 				this._isAllowed(prev_item, level, level + child_levels);
 			}
