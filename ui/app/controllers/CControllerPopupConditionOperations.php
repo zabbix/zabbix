@@ -62,6 +62,8 @@ class CControllerPopupConditionOperations extends CController {
 		$this->setResponse(new CControllerResponseData(
 			[
 				'title' => _('New condition'),
+				'action' => $this->getAction(),
+				'row_index' => $this->getInput('row_index'),
 				'type' => ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION,
 				'last_type' => CONDITION_TYPE_EVENT_ACKNOWLEDGED,
 				'source' => EVENT_SOURCE_TRIGGERS,
