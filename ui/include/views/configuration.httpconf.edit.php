@@ -157,7 +157,7 @@ $scenario_tab
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 	])
 	->addItem([
@@ -166,7 +166,7 @@ $scenario_tab
 			(new CDiv([
 				(new CTable())
 					->setId('headers')
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -196,7 +196,7 @@ $scenario_tab
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 	])
 	->addItem([

@@ -71,7 +71,8 @@
 
 			jQuery('#variables').dynamicRows({
 				template: '#variable-row-tmpl',
-				rows: variables
+				rows: variables,
+				allow_empty: true
 			});
 
 			this._initTextareaFlexible($variables);
@@ -83,7 +84,8 @@
 			$headers
 				.dynamicRows({
 					template: '#header-row-tmpl',
-					rows: headers
+					rows: headers,
+					allow_empty: true
 				})
 				.on('tableupdate.dynamicRows', (e) => {
 					this._toggleDragIcon(e.target);
@@ -137,13 +139,13 @@
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
-				helper: function(e, ui) {
+				helper: (e, ui) => {
 					for (let td of ui.find('>td')) {
 						const $td = jQuery(td);
 						$td.attr('width', $td.width());
 					}
 
-					// When dragging element on safari, it jumps out of the table.
+					// When dragging element on Safari, it jumps out of the table.
 					if (SF) {
 						// Move back draggable element to proper position.
 						ui.css('left', (ui.offset().left - 2) + 'px');
@@ -151,12 +153,12 @@
 
 					return ui;
 				},
-				stop: function(e, ui) {
+				start: (e, ui) => {
+					ui.placeholder.height(ui.item.height());
+				},
+				stop: (e, ui) => {
 					ui.item.find('>td').removeAttr('width');
 					ui.item.removeAttr('style');
-				},
-				start: function(e, ui) {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
 				}
 			});
 		}

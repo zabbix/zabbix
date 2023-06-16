@@ -65,7 +65,7 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-query-fields')
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -112,7 +112,7 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-post-fields')
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
@@ -194,7 +194,7 @@ $form_grid = (new CFormGrid())
 			(new CDiv([
 				(new CTable())
 					->setId('step-headers')
-					->setHeader(['', _('Name'), '', _('Value'), ''])
+					->setHeader([(new CColHeader())->setWidth(12), _('Name'), '', _('Value'), ''])
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))->addClass('element-table-add')
