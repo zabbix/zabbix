@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerPopupMediatypeTestSend extends CController {
+class CControllerMediatypeTestSend extends CController {
 
 	/**
 	 * Mediatype object.
@@ -28,7 +28,11 @@ class CControllerPopupMediatypeTestSend extends CController {
 	 */
 	private $mediatype;
 
-	protected function checkInput() {
+	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' =>	'fatal|required|db media_type.mediatypeid',
 			'sendto' =>			'string|not_empty',
@@ -53,8 +57,8 @@ class CControllerPopupMediatypeTestSend extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
 	/**
@@ -62,7 +66,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 	 *
 	 * @return bool
 	 */
-	protected function validateMediaType() {
+	protected function validateMediaType(): bool {
 		$mediatypes = API::MediaType()->get([
 			'output' => ['type', 'status'],
 			'mediatypeids' => $this->getInput('mediatypeid')
@@ -108,7 +112,7 @@ class CControllerPopupMediatypeTestSend extends CController {
 		return $ret;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		switch ($this->mediatype['type']) {
