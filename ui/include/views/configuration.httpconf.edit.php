@@ -216,7 +216,7 @@ $steps_tab = (new CFormGrid())->addItem([
 				->addClass('list-numbered')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->setHeader([
-					new CColHeader(),
+					(new CColHeader())->setWidth('12'),
 					(new CColHeader())->setWidth('15'),
 					(new CColHeader(_('Name')))->setWidth('150'),
 					(new CColHeader(_('Timeout')))->setWidth('50'),
@@ -275,21 +275,25 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CSpan(':'))->addClass('list-numbered-item'),
-						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
-						'#{timeout}',
-						'#{url}',
-						'#{required}',
-						'#{status_codes}',
+						(new CCol(
+							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
+						))->addStyle('max-width: 150px;'),
+						(new CCol('#{timeout}'))->addStyle('max-width: 50px;'),
+						(new CCol('#{url}'))->addStyle('max-width: 200px;'),
+						(new CCol('#{required}'))->addStyle('max-width: 75px;'),
+						(new CCol('#{status_codes}'))->addStyle('max-width: 90px;'),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('js-remove-step')
-						))->addClass(ZBX_STYLE_NOWRAP)
+						))
+							->addClass(ZBX_STYLE_NOWRAP)
+							->addStyle('max-width: 50px;')
 					]))
 						->setAttribute('data-row_index', '#{row_index}')
 						->addClass('sortable')
 				)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setWidth('695')
+			->setWidth('689')
 	))->setAriaRequired()
 ]);
 
