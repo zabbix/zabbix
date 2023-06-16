@@ -2543,14 +2543,14 @@ $icon-widget-btn: (
 %form-readonly {
 	color: $font-color;
 	-webkit-text-fill-color: $font-color;
-	background-color: $form-disabled-bg-color !important;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-border-color;
 }
 
 %form-disabled {
 	color: $form-disabled-font-color;
 	-webkit-text-fill-color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
 
 	&::placeholder {
