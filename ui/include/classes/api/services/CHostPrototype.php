@@ -853,6 +853,7 @@ class CHostPrototype extends CHostBase {
 				$internal_fields + $upd_host + $nested_object_fields + $inventory_fields
 			);
 		}
+		unset($host);
 
 		if ($upd_hosts) {
 			DB::update('hosts', $upd_hosts);
