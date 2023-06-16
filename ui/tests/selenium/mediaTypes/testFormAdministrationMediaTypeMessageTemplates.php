@@ -168,7 +168,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		// Check that it is possible to edit a newly created message template.
 		$row->query('button:Edit')->one()->click();
 		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-		$message_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+		$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		// Check that it is possible to remove a newly created message template.
 		$row->query('button:Remove')->one()->click();
@@ -476,7 +476,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 						new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
 				)->asText();
 				$this->assertContains($template['Message type'], $disabled_options);
-				$message_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+				$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 			}
 		}
 	}
@@ -949,7 +949,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
 					$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$message_overlay->asForm()->checkValue($template);
-					$message_overlay->query('class:overlay-close-btn')->one()->click()->waitUntilNotVisible();
+					$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 					break;
 				case 'Remove':
 					// Check that the previously removed row is not present in message template list.
