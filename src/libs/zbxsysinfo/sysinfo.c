@@ -24,8 +24,6 @@
 #include "zbxlog.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "zbxnix.h"
-#else
-#include "zbxthreads.h"
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
@@ -34,6 +32,7 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 #include "zbxfile.h"
+#include "zbxthreads.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
