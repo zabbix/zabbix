@@ -208,6 +208,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		foreach ($steps as &$step) {
 			$step['no'] = $i++;
 
+			foreach (['query_fields', 'variables', 'headers'] as $field) {
+				$step[$field] = array_key_exists($field, $step) ? $step[$field] : [];
+			}
+
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = array_key_exists('post_fields', $step) ? $step['post_fields'] : [];
 			}
