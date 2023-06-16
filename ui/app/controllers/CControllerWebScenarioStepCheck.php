@@ -112,6 +112,8 @@ class CControllerWebScenarioStepCheck extends CController {
 			}
 		}
 
+		$unique_variables = [];
+
 		foreach (['query_fields', 'post_fields', 'variables', 'headers'] as $field) {
 			foreach ($this->getInput($field, []) as $i => $pair) {
 				if ($pair['name'] === '' && $pair['value'] !== '') {
@@ -122,12 +124,24 @@ class CControllerWebScenarioStepCheck extends CController {
 					$ret = false;
 				}
 
-				if ($field === 'variables' && $pair['name'] !== '' && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', $field.'/'.($i + 1).'/name',
-						_('is not enclosed in {} or is malformed')
-					));
+				if ($field === 'variables') {
+					if ($pair['name'] !== '' && preg_match('/^{[^{}]+}$/', $pair['name']) !== 1) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', $field.'/'.($i + 1).'/name',
+							_('is not enclosed in {} or is malformed')
+						));
 
-					$ret = false;
+						$ret = false;
+					}
+
+					if (array_key_exists($pair['name'], $unique_variables)) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', $field.'/'.($i + 1),
+							_s('value %1$s already exists', '(name)=('.$pair['name'].')')
+						));
+
+						$ret = false;
+					}
+
+					$unique_variables[$pair['name']] = true;
 				}
 			}
 		}
