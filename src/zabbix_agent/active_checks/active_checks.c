@@ -506,11 +506,10 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	if (*config_revision_local > config_revision)
 	{
 		zbx_hashset_iter_t	iter;
-		zbx_cmd_hash_t		*cmd_hash;
 
 		zbx_hashset_iter_reset(&commands_hash, &iter);
 
-		while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
+		while (NULL != zbx_hashset_iter_next(&iter))
 			zbx_hashset_iter_remove(&iter);
 
 		zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
