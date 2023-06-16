@@ -30,8 +30,7 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('script-form')
 	->setName('scripts')
-	->addVar('scriptid', $data['scriptid'])
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addVar('scriptid', $data['scriptid']);
 
 $parameters_table = (new CTable())
 	->setId('parameters-table')

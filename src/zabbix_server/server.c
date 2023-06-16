@@ -1129,7 +1129,7 @@ static void	zbx_on_exit(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zbx_close_log();
+	zabbix_close_log();
 
 	zbx_locks_destroy();
 
@@ -1741,13 +1741,13 @@ out:
 
 static int	server_restart_logger(char **error)
 {
-	zbx_close_log();
+	zabbix_close_log();
 	zbx_locks_destroy();
 
 	if (SUCCEED != zbx_locks_create(error))
 		return FAIL;
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1914,7 +1914,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);

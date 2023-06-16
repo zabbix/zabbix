@@ -1308,7 +1308,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['triggers']                      List of triggers.
 	 * @param int        $data['today']                         Timestamp of today's date.
 	 * @param array      $data['users']                         List of users.
-	 * @param array      $data['correlations']                  List of event correlations.
+	 * @param array      $data['correlations']                  List of correlations.
 	 * @param array      $data['dependencies']                  List of trigger dependencies.
 	 * @param array      $data['filter']                        Problem filter.
 	 * @param int        $data['filter']['show']                "Show" filter option.
@@ -1405,10 +1405,10 @@ class CScreenProblem extends CScreenBase {
 				if ($problem['correlationid'] != 0) {
 					$info_icons[] = makeInformationIcon(
 						array_key_exists($problem['correlationid'], $data['correlations'])
-							? _s('Resolved by event correlation rule "%1$s".',
+							? _s('Resolved by correlation rule "%1$s".',
 								$data['correlations'][$problem['correlationid']]['name']
 							)
-							: _('Resolved by event correlation rule.')
+							: _('Resolved by correlation rule.')
 					);
 				}
 				elseif ($problem['userid'] != 0) {

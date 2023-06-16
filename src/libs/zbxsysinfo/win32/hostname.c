@@ -27,8 +27,8 @@ static void	retrieve_hostname(char *buffer, int len, char **error)
 {
 	if (SUCCEED != gethostname(buffer, len))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", zbx_strerror_from_system(WSAGetLastError()));
-		*error = zbx_dsprintf(NULL, "Cannot obtain host name: %s", zbx_strerror_from_system(WSAGetLastError()));
+		zabbix_log(LOG_LEVEL_ERR, "gethostname() failed: %s", strerror_from_system(WSAGetLastError()));
+		*error = zbx_dsprintf(NULL, "Cannot obtain host name: %s", strerror_from_system(WSAGetLastError()));
 	}
 }
 
@@ -56,10 +56,10 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (0 == GetComputerName(computerName, &dwSize))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "GetComputerName() failed: %s",
-					zbx_strerror_from_system(GetLastError()));
+					strerror_from_system(GetLastError()));
 
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain computer name: %s",
-					zbx_strerror_from_system(GetLastError())));
+					strerror_from_system(GetLastError())));
 
 			return SYSINFO_RET_FAIL;
 		}
@@ -106,7 +106,7 @@ int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				zbx_free(name);
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain FQDN: %s",
-						zbx_strerror_from_system(WSAGetLastError())));
+						strerror_from_system(WSAGetLastError())));
 				return SYSINFO_RET_FAIL;
 			}
 

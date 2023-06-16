@@ -71,13 +71,13 @@ static void	zbx_ifrow_init(zbx_ifrow_t *pIfRow)
 			if (NULL == (pGetIfEntry2 = (pGetIfEntry2_t)GetProcAddress(module, "GetIfEntry2")))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "GetProcAddress failed with error: %s",
-						zbx_strerror_from_system(GetLastError()));
+						strerror_from_system(GetLastError()));
 			}
 		}
 		else
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "GetModuleHandle failed with error: %s",
-					zbx_strerror_from_system(GetLastError()));
+					strerror_from_system(GetLastError()));
 		}
 
 		check_done = TRUE;
@@ -357,7 +357,7 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 	   actual data we want */
 	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
 		goto clean;
 	}
 
@@ -374,7 +374,7 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 	/* Make a second call to GetIfTable to get the actual data we want. */
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
 		goto clean;
 	}
 
@@ -386,7 +386,7 @@ static int	get_if_stats(const char *if_name, zbx_ifrow_t *ifrow)
 		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(ifrow)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_call_get_if_entry failed with error: %s",
-					zbx_strerror_from_system(dwRetVal));
+					strerror_from_system(dwRetVal));
 			continue;
 		}
 #define ZBX_GUID_LEN	38
@@ -604,9 +604,9 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* Make a second call to GetIfTable to get the actual data we want. */
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
-				zbx_strerror_from_system(dwRetVal)));
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -620,7 +620,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "zbx_ifrow_call_get_if_entry failed with error: %s",
-					zbx_strerror_from_system(dwRetVal));
+					strerror_from_system(dwRetVal));
 			continue;
 		}
 
@@ -704,9 +704,9 @@ int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 	   actual data we want */
 	if (NO_ERROR != (dwRetVal = GetIpAddrTable(pIPAddrTable, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIpAddrTable failed with error: %s", strerror_from_system(dwRetVal));
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain IP address information: %s",
-				zbx_strerror_from_system(dwRetVal)));
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -723,9 +723,9 @@ int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* Make a second call to GetIfTable to get the actual data we want. */
 	if (NO_ERROR != (dwRetVal = GetIfTable(pIfTable, &dwSize, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetIfTable failed with error: %s", strerror_from_system(dwRetVal));
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain network interface information: %s",
-				zbx_strerror_from_system(dwRetVal)));
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 
@@ -745,7 +745,7 @@ int	net_if_list(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NO_ERROR != (dwRetVal = zbx_ifrow_call_get_if_entry(&ifrow)))
 			{
 				zabbix_log(LOG_LEVEL_ERR, "zbx_ifrow_call_get_if_entry failed with error: %s",
-						zbx_strerror_from_system(dwRetVal));
+						strerror_from_system(dwRetVal));
 				continue;
 			}
 
@@ -832,9 +832,9 @@ int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "GetTcpTable failed with error: %s", zbx_strerror_from_system(dwRetVal));
+		zabbix_log(LOG_LEVEL_DEBUG, "GetTcpTable failed with error: %s", strerror_from_system(dwRetVal));
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s",
-				zbx_strerror_from_system(dwRetVal)));
+				strerror_from_system(dwRetVal)));
 		goto clean;
 	}
 

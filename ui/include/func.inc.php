@@ -1591,8 +1591,8 @@ function formatFloat(float $number, array $options = []): string {
 * @return float
 */
 function truncateFloat(float $number): float {
-	if (is_infinite($number)) {
-		return $number;
+	if ($number == INF) {
+		return INF;
 	}
 
 	return (float) sprintf('%.'.(ZBX_FLOAT_DIG - 1).'E', $number);

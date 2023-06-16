@@ -21,41 +21,41 @@
 
 class CControllerCorrelationEdit extends CController {
 
-	/**
-	 * @var mixed
-	 */
 	private $correlation = [];
 
-	protected function init(): void {
+	protected function init() {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
+	protected function checkInput() {
 		$fields = [
-			'correlationid' => 'db correlation.correlationid'
+			'correlationid' =>	'db correlation.correlationid',
+			'name' =>			'db correlation.name',
+			'description' =>	'db correlation.description',
+			'evaltype' =>		'db correlation.evaltype|in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]),
+			'status' =>			'db correlation.status|in '.implode(',', [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]),
+			'formula' =>		'db correlation.formula',
+			'op_close_new' =>	'in 1',
+			'op_close_old' =>	'in 1',
+			'conditions' =>		'array',
+			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$this->setResponse(new CControllerResponseFatal());
 		}
 
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
+	protected function checkPermissions() {
 		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
 			return false;
 		}
 
-		if ($this->hasInput('correlationid')) {
+		if ($this->hasInput('correlationid') && !$this->hasInput('form_refresh')) {
 			$correlations = API::Correlation()->get([
 				'output' => ['correlationid', 'name', 'description', 'status'],
 				'selectFilter' => ['formula', 'conditions', 'evaltype'],
@@ -81,30 +81,30 @@ class CControllerCorrelationEdit extends CController {
 		return true;
 	}
 
-	protected function doAction(): void {
+	protected function doAction() {
 		$data = $this->correlation + DB::getDefaults('correlation') + [
-			'correlationid' => null,
+			'new_condition' => $this->getInput('new_condition', []),
+			'allowedOperations' => CCorrelationHelper::getOperationTypes(),
+			'allowedConditions' => CCorrelationHelper::getConditionTypes(),
+			'correlationid' => $this->getInput('correlationid', 0),
 			'op_close_new' => false,
 			'op_close_old' => false,
-			'conditions' => []
+			'conditions' => [],
+			'form_refresh' => 0
 		];
 
-		foreach ($data['conditions'] as &$condition) {
-			$condition += [
-				'operator' => array_key_exists('operator', $condition)
-					? (int) $condition['operator']
-					: CONDITION_OPERATOR_EQUAL,
-				'conditiontype' => (int) $condition['type']
-			];
-			$condition['operator_name'] = CCorrelationHelper::getLabelByOperator($condition['operator']);
+		$this->getInputs($data, ['correlationid', 'name', 'description', 'status', 'op_close_new', 'op_close_old',
+			'evaltype', 'formula', 'conditions', 'form_refresh'
+		]);
 
-			unset($condition['type']);
+		foreach ($data['conditions'] as $row_index => &$condition) {
+			$condition += [
+				'row_index' => $row_index
+			];
 		}
 		unset($condition);
 
 		$groupids = array_column($data['conditions'], 'groupid', 'groupid');
-		$group_names = [];
-
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
@@ -112,19 +112,11 @@ class CControllerCorrelationEdit extends CController {
 				'preservekeys' => true
 			]);
 
-			$group_names = array_column($groups, 'name', 'groupid');
+			$data['group_names'] = array_column($groups, 'name', 'groupid');
 		}
-
-		foreach ($data['conditions'] as &$condition) {
-			if (array_key_exists('groupid', $condition)
-					&& array_key_exists($condition['groupid'], $group_names)) {
-				$condition['groupid'] = [$condition['groupid'] => $group_names[$condition['groupid']]];
-			}
+		else {
+			$data['group_names'] = [];
 		}
-		unset($condition);
-
-		$data['conditions'] = array_values($data['conditions']);
-		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));

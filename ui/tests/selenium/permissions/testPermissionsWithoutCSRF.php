@@ -256,16 +256,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'create'
+					'link' => 'zabbix.php?action=correlation.edit',
+					'return_button' => true
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'update'
+					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit',
+					'return_button' => true
 				]
 			],
 			// #26 Discovery create.

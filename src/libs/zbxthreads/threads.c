@@ -112,7 +112,7 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (*thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", zbx_strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", strerror_from_system(GetLastError()));
 		*thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #else
@@ -153,19 +153,19 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if (WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE))
 	{
-		zbx_error("Error on thread waiting. [%s]", zbx_strerror_from_system(GetLastError()));
+		zbx_error("Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
 	if (0 == GetExitCodeThread(thread, &dwstatus))
 	{
-		zbx_error("Error on thread exit code receiving. [%s]", zbx_strerror_from_system(GetLastError()));
+		zbx_error("Error on thread exit code receiving. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
 	if (0 == CloseHandle(thread))
 	{
-		zbx_error("Error on thread closing. [%s]", zbx_strerror_from_system(GetLastError()));
+		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 	status = dwstatus;

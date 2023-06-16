@@ -819,7 +819,7 @@ static int	perform_data_sending(zbx_thread_sendval_args *sendval_args, int old_s
 		if (-1 == pipe(sendval_args[i].fds))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "Cannot create data pipe: %s",
-					zbx_strerror_from_system((unsigned long)errno));
+					strerror_from_system((unsigned long)errno));
 			threads[i] = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 			continue;
 		}
@@ -1519,7 +1519,7 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1874,7 +1874,7 @@ exit:
 	}
 #endif
 	zbx_config_tls_free(zbx_config_tls);
-	zbx_close_log();
+	zabbix_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif

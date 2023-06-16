@@ -456,6 +456,15 @@ class testUrlUserPermissions extends CLegacyWebTest {
 				]
 			]],
 			[[
+				'url' => 'zabbix.php?action=correlation.edit',
+				'title' =>	'Event correlation rules',
+				'users' => [
+					'guest' => false,
+					'user-zabbix' => false,
+					'admin-zabbix' => false
+				]
+			]],
+			[[
 				'url' => 'zabbix.php?action=discovery.list',
 				'title' =>	'Configuration of discovery rules',
 				'header' => 'Discovery rules',

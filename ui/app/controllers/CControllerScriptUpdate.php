@@ -73,7 +73,11 @@ class CControllerScriptUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS);
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_SCRIPTS)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {

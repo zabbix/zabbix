@@ -236,7 +236,7 @@ static int	vfs_file_exists_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 				goto err;
 			default:
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-						zbx_strerror_from_system(error)));
+						strerror_from_system(error)));
 				goto err;
 		}
 	}
@@ -1441,7 +1441,7 @@ int	zbx_vfs_file_info(const char *filename, struct zbx_json *j, int array, char 
 				goto err;
 			default:
 				*error = zbx_dsprintf(NULL, "Cannot obtain file information: %s",
-						zbx_strerror_from_system(last_error));
+						strerror_from_system(last_error));
 				goto err;
 		}
 	}

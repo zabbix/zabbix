@@ -61,7 +61,7 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Event correlation rules');
 		$this->zbxTestCheckHeader('Event correlation');
 		// Check "Create correlation" button.
-		$this->assertTrue($this->query('button:Create event correlation')->one()->isClickable());
+		$this->zbxTestAssertElementText("//button[@data-url='zabbix.php?action=correlation.edit']", 'Create correlation');
 
 		// Check table headers.
 		$this->assertEquals(['', 'Name', 'Conditions', 'Operations', 'Status'],
@@ -178,13 +178,12 @@ class testPageEventCorrelation extends CLegacyWebTest {
 	public function testPageEventCorrelation_SingleEnableDisableByLink($data) {
 		$this->zbxTestLogin('zabbix.php?action=correlation.list');
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
-
 		// Enable or disable correlation by its link
-		$this->zbxTestClickXpathWait('//a[contains(@class,"link-action")][@data-correlationid="'.$id['correlationid'].'"]');
+		$this->zbxTestClickXpathWait("//a[contains(@onclick,'correlationids%5B0%5D=".$id['correlationid']."')]");
 
 		// Check correlation message.
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', ($data['make_status'] === ZBX_CORRELATION_ENABLED)
-				? 'Event correlation enabled' : 'Event correlation disabled'
+				? 'Correlation enabled' : 'Correlation disabled'
 		);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
@@ -200,12 +199,12 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		$id = DBfetch(DBselect('SELECT correlationid FROM correlation WHERE name='.zbx_dbstr($data['name'])));
 		$this->zbxTestCheckboxSelect('correlationids_'.$id['correlationid']);
 
-		$button = ($data['make_status'] === ZBX_CORRELATION_ENABLED) ? 'Enable' : 'Disable';
-		$this->query('button', $button)->waitUntilClickable()->one()->click();
+		$this->zbxTestClickButton(($data['make_status'] === ZBX_CORRELATION_ENABLED)
+				? 'correlation.enable' : 'correlation.disable'
+		);
 		$this->zbxTestAcceptAlert();
-
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', ($data['make_status'] === ZBX_CORRELATION_ENABLED)
-				? 'Event correlation enabled' : 'Event correlation disabled'
+				? 'Correlation enabled' : 'Correlation disabled'
 		);
 
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']
@@ -213,21 +212,21 @@ class testPageEventCorrelation extends CLegacyWebTest {
 		);
 	}
 
-	public function testPageEventCorrelation_EnableAll() {
-		$this->zbxTestLogin('zabbix.php?action=correlation.list');
-		$this->zbxTestCheckboxSelect('all_items');
-		$this->query('button:Enable')->waitUntilClickable()->one()->click();
-		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Event correlations enabled');
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
-	}
-
 	public function testPageEventCorrelation_DisableAll() {
 		$this->zbxTestLogin('zabbix.php?action=correlation.list');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->query('button:Disable')->waitUntilClickable()->one()->click();
+		$this->zbxTestClickButton('correlation.enable');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Event correlations disabled');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations enabled');
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_DISABLED));
+	}
+
+	public function testPageEventCorrelation_EnableAll() {
+		$this->zbxTestLogin('zabbix.php?action=correlation.list');
+		$this->zbxTestCheckboxSelect('all_items');
+		$this->zbxTestClickButton('correlation.disable');
+		$this->zbxTestAcceptAlert();
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations disabled');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE status ='.ZBX_CORRELATION_ENABLED));
 	}
 
@@ -237,18 +236,18 @@ class testPageEventCorrelation extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=correlation.list');
 		$this->zbxTestCheckboxSelect('correlationids_'.$id['correlationid']);
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestClickButton('correlation.delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Event correlation deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlation deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation WHERE correlationid = '.$id['correlationid']));
 	}
 
 	public function testPageEventCorrelation_DeleteAll() {
 		$this->zbxTestLogin('zabbix.php?action=correlation.list');
 		$this->zbxTestCheckboxSelect('all_items');
-		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->zbxTestClickButton('correlation.delete');
 		$this->zbxTestAcceptAlert();
-		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Event correlations deleted');
+		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Correlations deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM correlation'));
 	}
 }

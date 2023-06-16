@@ -128,8 +128,7 @@ static void	log_if_buffer_too_small(const char *function_name, DWORD sz)
  *                ZBX_QSC_BUFSIZE bytes !                                     *
  * Return value:                                                              *
  *      SUCCEED - data were successfully copied into 'buf'                    *
- *      FAIL    - use zbx_strerror_from_system(GetLastError()) to see what    *
- *                failed                                                      *
+ *      FAIL    - use strerror_from_system(GetLastError() to see what failed  *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf)
@@ -153,11 +152,10 @@ static int	zbx_get_service_config(SC_HANDLE hService, LPQUERY_SERVICE_CONFIG buf
  *     dwInfoLevel - [IN] QueryServiceConfig2() parameter 'dwInfoLevel'       *
  *     buf         - [OUT] QueryServiceConfig2() parameter 'lpBuffer'.        *
  *                   Pointer to a caller supplied buffer with size            *
- *                   ZBX_QSC_BUFSIZE bytes !                                  *
+ *                   ZBX_QSC_BUFSIZE bytes !                                 *
  * Return value:                                                              *
  *      SUCCEED - data were successfully copied into 'buf'                    *
- *      FAIL    - use zbx_strerror_from_system(GetLastError()) to see what    *
- *            failed                                                          *
+ *      FAIL    - use strerror_from_system(GetLastError() to see what failed  *
  *                                                                            *
  ******************************************************************************/
 static int	zbx_get_service_config2(SC_HANDLE hService, DWORD dwInfoLevel, LPBYTE buf)
@@ -193,7 +191,7 @@ static int	check_trigger_start(SC_HANDLE h_srv, const char *service_name)
 		if((6 <= version_info->dwMajorVersion) && (1 <= version_info->dwMinorVersion))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain startup trigger information of service \"%s\": %s",
-					service_name, zbx_strerror_from_system(GetLastError()));
+					service_name, strerror_from_system(GetLastError()));
 		}
 	}
 
@@ -214,7 +212,7 @@ static int	check_delayed_start(SC_HANDLE h_srv, const char *service_name)
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain automatic delayed start information of service \"%s\": %s",
-				service_name, zbx_strerror_from_system(GetLastError()));
+				service_name, strerror_from_system(GetLastError()));
 	}
 
 	return FAIL;
@@ -292,7 +290,7 @@ int	discover_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf_qsc))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
-						service_name_utf8, zbx_strerror_from_system(GetLastError()));
+						service_name_utf8, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
@@ -301,7 +299,7 @@ int	discover_services(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf_scd))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
-						service_name_utf8, zbx_strerror_from_system(GetLastError()));
+						service_name_utf8, strerror_from_system(GetLastError()));
 				goto next;
 			}
 
@@ -490,7 +488,7 @@ int	get_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != zbx_get_service_config2(h_srv, SERVICE_CONFIG_DESCRIPTION, buf))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service description: %s",
-					zbx_strerror_from_system(GetLastError())));
+					strerror_from_system(GetLastError())));
 			CloseServiceHandle(h_srv);
 			CloseServiceHandle(h_mgr);
 			return SYSINFO_RET_FAIL;
@@ -511,7 +509,7 @@ int	get_service_info(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != zbx_get_service_config(h_srv, (LPQUERY_SERVICE_CONFIG)buf_qsc))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service configuration: %s",
-					zbx_strerror_from_system(GetLastError())));
+					strerror_from_system(GetLastError())));
 			CloseServiceHandle(h_srv);
 			CloseServiceHandle(h_mgr);
 			return SYSINFO_RET_FAIL;

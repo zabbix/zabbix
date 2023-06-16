@@ -10679,8 +10679,8 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           icmpping* simple checks. In other cases only single item is      *
  *           retrieved.                                                       *
  *                                                                            *
- *           IPMI poller queue are handled by                                 *
- *           zbx_dc_config_get_ipmi_poller_items() function.                  *
+ *           IPMI poller queue are handled by DCconfig_get_ipmi_poller_items()*
+ *           function.                                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, zbx_dc_item_t **items)
@@ -10821,7 +10821,6 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 	return num;
 }
 
-#ifdef HAVE_OPENIPMI
 /******************************************************************************
  *                                                                            *
  * Purpose: Get array of items for IPMI poller                                *
@@ -10916,7 +10915,6 @@ int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeo
 
 	return num;
 }
-#endif /* HAVE_OPENIPMI */
 
 /******************************************************************************
  *                                                                            *

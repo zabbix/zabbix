@@ -726,8 +726,8 @@ typedef struct
 }
 zbx_list_iterator_t;
 
-void	zbx_list_create(zbx_list_t *list);
-void	zbx_list_create_ext(zbx_list_t *list, zbx_mem_malloc_func_t mem_malloc_func,
+void	zbx_list_create(zbx_list_t *queue);
+void	zbx_list_create_ext(zbx_list_t *queue, zbx_mem_malloc_func_t mem_malloc_func,
 		zbx_mem_free_func_t mem_free_func);
 void	zbx_list_destroy(zbx_list_t *list);
 void	zbx_list_append(zbx_list_t *list, void *value, zbx_list_item_t **inserted);
