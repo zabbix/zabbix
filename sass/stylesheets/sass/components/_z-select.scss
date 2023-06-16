@@ -123,8 +123,7 @@ z-select,
 
 	&[readonly] {
 		button {
-			@extend %form-disabled;
-			color: $font-color !important;
+			@extend %form-readonly;
 
 			&:focus {
 				border-color: $form-border-focus-color;

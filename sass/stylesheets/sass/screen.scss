@@ -1620,8 +1620,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1862,6 +1861,7 @@ select {
 
 	&::placeholder {
 		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
 		opacity: 1;
 	}
 }
@@ -2538,6 +2538,13 @@ $icon-widget-btn: (
 		opacity: .3;
 		background-color: transparent;
 	}
+}
+
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color !important;
+	border-color: $form-border-color;
 }
 
 %form-disabled {
