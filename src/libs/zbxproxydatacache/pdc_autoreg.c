@@ -171,7 +171,7 @@ static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 
 		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
-			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset)
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num == ZBX_MAX_HRECORDS_TOTAL)
 			{
 				*more = 1;
 				break;
@@ -229,6 +229,7 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 	zbx_pdc_autoreg_t	*row;
 	zbx_db_insert_t		db_insert;
 	void			*ptr;
+	int			rows_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -243,6 +244,7 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 		{
 			zbx_db_insert_add_values(&db_insert, row->id, row->host, row->listen_ip, row->listen_dns,
 					row->listen_port, row->tls_accepted, row->host_metadata, row->flags, row->clock);
+			rows_num++;
 
 			pdc_list_free_autoreg(&pdc->autoreg, row);
 		}
@@ -251,7 +253,7 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 		zbx_db_insert_clean(&db_insert);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
 
 /* public api */

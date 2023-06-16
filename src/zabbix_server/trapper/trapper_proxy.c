@@ -130,7 +130,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_get_interface_availability_data(&j, &availability_ts);
-	zbx_pdc_get_history(&j, &history_lastid, &more_history);
+	zbx_pdc_history_get_rows(&j, &history_lastid, &more_history);
 	zbx_pdc_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
 	zbx_pdc_autoreg_get_rows(&j, &areg_lastid, &more_areg);
 	zbx_proxy_get_host_active_availability(&j);

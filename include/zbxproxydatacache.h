@@ -72,7 +72,7 @@ void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t
 		const char *value, const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime,
 		int timestamp, int logeventid, int severity, const char *source);
 
-int	zbx_pdc_get_history(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
+int	zbx_pdc_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 
 void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid);
 

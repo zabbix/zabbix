@@ -47,7 +47,7 @@ struct zbx_pdc_discovery_data
 	zbx_db_insert_t	db_insert;
 };
 
-static void	pdc_list_discovery_free(zbx_list_t *list, zbx_pdc_discovery_t *row)
+static void	pdc_list_free_discovery(zbx_list_t *list, zbx_pdc_discovery_t *row)
 {
 	list->mem_free_func(row->ip);
 	list->mem_free_func(row->dns);
@@ -55,7 +55,7 @@ static void	pdc_list_discovery_free(zbx_list_t *list, zbx_pdc_discovery_t *row)
 	list->mem_free_func(row);
 }
 
-static int	pdc_get_discovery(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pdc_get_discovery_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
 	zbx_uint64_t	id;
@@ -136,28 +136,30 @@ static int	pdc_discovery_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_discovery_t *src, t
 	if (NULL == (row = (zbx_pdc_discovery_t *)pdc_malloc(sizeof(zbx_pdc_discovery_t))))
 		return FAIL;
 
-	memset(row, 0, sizeof(zbx_pdc_discovery_t));
+	memcpy(row, src, sizeof(zbx_pdc_discovery_t));
 
 	if (NULL == (row->ip = pdc_strdup(src->ip)))
+	{
+		row->dns = NULL;
+		row->value = NULL;
 		goto out;
+	}
 
 	if (NULL == (row->dns = pdc_strdup(src->dns)))
+	{
+		row->value = NULL;
 		goto out;
+	}
 
 	if (NULL == (row->value = pdc_strdup(src->value)))
 		goto out;
 
-	row->druleid = src->druleid;
-	row->dcheckid = src->dcheckid;
-	row->clock = src->clock;
-	row->status = src->status;
-	row->port = src->port;
 	row->write_clock = now;
 
 	ret = zbx_list_append(&pdc->discovery, row, NULL);
 out:
 	if (SUCCEED != ret)
-		pdc_list_discovery_free(&pdc->discovery, row);
+		pdc_list_free_discovery(&pdc->discovery, row);
 
 	return ret;
 }
@@ -234,8 +236,9 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 	zbx_pdc_discovery_t	*row;
 	zbx_db_insert_t		db_insert;
 	int			rows_num = 0;
+	zbx_uint64_t		lastid;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:0x%p", __func__, next);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
 
 	if (SUCCEED == zbx_list_iterator_init_with(rows, next, &li))
 	{
@@ -247,13 +250,15 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 			(void)zbx_list_iterator_peek(&li, (void **)&row);
 			zbx_db_insert_add_values(&db_insert, row->id, row->clock, row->druleid, row->ip, row->port,
 					row->value, row->status, row->dcheckid, row->dns);
-
 			rows_num++;
+			lastid = row->id;
+
+			pdc_list_free_discovery(rows, row);
 		}
 		while (SUCCEED == zbx_list_iterator_next(&li));
 
 		/* when flushing local cache need to set row ids */
-		if (0 == row->id)
+		if (0 == lastid)
 			zbx_db_insert_autoincrement(&db_insert, "id");
 
 		(void)zbx_db_insert_execute(&db_insert);
@@ -282,7 +287,7 @@ static int	pdc_discovery_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_
 
 		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
-			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset)
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num == ZBX_MAX_HRECORDS_TOTAL)
 			{
 				*more = 1;
 				break;
@@ -326,7 +331,7 @@ static void	pdc_discovery_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
 			break;
 
 		zbx_list_pop(&pdc->discovery, NULL);
-		pdc_list_discovery_free(&pdc->discovery, row);
+		pdc_list_free_discovery(&pdc->discovery, row);
 	}
 }
 
@@ -338,7 +343,7 @@ static void	pdc_discovery_data_free(zbx_pdc_discovery_data_t *data)
 		zbx_pdc_discovery_t	*row;
 
 		while (SUCCEED == zbx_list_pop(&data->rows, (void **)&row))
-			pdc_list_discovery_free(&data->rows, row);
+			pdc_list_free_discovery(&data->rows, row);
 
 		zbx_list_destroy(&data->rows);
 	}
@@ -403,7 +408,6 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 		if (SUCCEED == zbx_list_peek(&data->rows, &ptr))
 		{
 			zbx_list_item_t		*next = NULL;
-			zbx_pdc_discovery_t	*row;
 
 			pdc_lock();
 
@@ -491,7 +495,7 @@ int	zbx_pdc_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mo
 	pdc_unlock();
 
 	if (PDC_DATABASE == state)
-		ret = pdc_get_discovery(j, lastid, more);
+		ret = pdc_get_discovery_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);
 
@@ -500,7 +504,7 @@ int	zbx_pdc_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mo
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update last sent discovery record id                              *
+ * Purpose: update database lastid/clear memory records                       *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pdc_discovery_set_lastid(const zbx_uint64_t lastid)

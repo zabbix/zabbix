@@ -67,8 +67,8 @@ ZBX_PTR_VECTOR_DECL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
 
 typedef union
 {
-	const char	*str;
-	size_t		offset;
+	char	*str;
+	size_t	offset;
 }
 zbx_pdc_str_t;
 
@@ -78,8 +78,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	zbx_uint64_t	lastlogsize;
 	zbx_timespec_t	ts;		/* clock + ns */
-	zbx_pdc_str_t	source;
-	zbx_pdc_str_t	value;
+	char		*value;
+	char		*source;
 	int		timestamp;
 	int		severity;
 	int		logeventid;

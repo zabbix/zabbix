@@ -97,7 +97,7 @@ char	*pdc_strdup(const char *str)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_has_history(const char *table_name)
+static int	pdc_has_history(const char *table, const char *field)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -105,9 +105,9 @@ static int	pdc_has_history(const char *table_name)
 	int		ret;
 	char		sql[MAX_STRING_LEN];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:%s", __func__, table_name);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:%s", __func__, table);
 
-	result = zbx_db_select("select nextid from ids where table_name='%s' and field_name='id'", table_name);
+	result = zbx_db_select("select nextid from ids where table_name='%s' and field_name='%s'", table, field);
 
 	if (NULL == (row = zbx_db_fetch(result)))
 		lastid = 0;
@@ -116,7 +116,7 @@ static int	pdc_has_history(const char *table_name)
 
 	zbx_db_free_result(result);
 
-	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table_name, lastid);
+	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table, lastid);
 
 	result = zbx_db_select_n(sql, 1);
 
@@ -182,8 +182,9 @@ static void	pdc_cache_set_init_state(zbx_pdc_t *pdc)
 {
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == pdc_has_history("proxy_history") || SUCCEED == pdc_has_history("proxy_dhistory") ||
-			SUCCEED == pdc_has_history("proxy_autoreg_host"))
+	if (SUCCEED == pdc_has_history("proxy_history", "history_lastid") ||
+			SUCCEED == pdc_has_history("proxy_dhistory", "dhistory_lastid") ||
+			SUCCEED == pdc_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
 	{
 		pdc_cache_set_state(pdc, PDC_DATABASE, "proxy data cache initialized in database mode");
 	}
@@ -333,8 +334,7 @@ void	pdc_flush(zbx_pdc_t *pdc)
 {
 	pdc_autoreg_flush(pdc);
 	pdc_discovery_flush(pdc);
-
-	/* TODO: handle discovery and history */
+	pdc_history_flush(pdc);
 }
 
 void	pdc_fallback_to_database(zbx_pdc_t *pdc)
@@ -342,9 +342,14 @@ void	pdc_fallback_to_database(zbx_pdc_t *pdc)
 	pdc_flush(pdc);
 
 	pdc_cache_set_state(pdc, PDC_DATABASE, "aborted proxy data cache transition to memory mode: not enough space");
-
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update proxy data cache state based on records left and handles   *
+ *          pending                                                           *
+ *                                                                            *
+ ******************************************************************************/
 static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 {
 	switch (pdc->state)
@@ -361,10 +366,9 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 			}
 			break;
 		case PDC_DATABASE:
-			if (0 != more)
-				break;
-			pdc_cache_set_state(pdc, PDC_DATABASE_MEMORY, "no more database records to upload");
-			ZBX_FALLTHROUGH;
+			if (ZBX_PROXY_DATA_DONE == more)
+				pdc_cache_set_state(pdc, PDC_DATABASE_MEMORY, "no more database records to upload");
+			break;
 		case PDC_DATABASE_MEMORY:
 			if (ZBX_PROXY_DATA_DONE == more && 0 == pdc_cache->db_handles_num)
 				pdc_cache_set_state(pdc, PDC_MEMORY, NULL);
@@ -430,9 +434,15 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update proxy data cache state based on records left and handles   *
+ *          pending                                                           *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_pdc_update_state(int more)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() more:%d", more);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() more:%d", __func__, more);
 
 	pdc_lock();
 	pdc_update_state(pdc_cache, more);
@@ -441,6 +451,11 @@ void	zbx_pdc_update_state(int more)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush cache to database                                           *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_pdc_flush(void)
 {
 	zbx_db_begin();
