@@ -824,8 +824,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
-		$clearance_min = $rows * 0.05;
-		$clearance_max = $rows * 0.1;
+		$clearance_min = min(0.5, $rows * 0.05);
+		$clearance_max = min(1, $rows * 0.1);
 
 		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
@@ -854,6 +854,10 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 			$min = truncateFloat($min);
 			$max = truncateFloat($max);
 
+			if (is_infinite($min) || is_infinite($max)) {
+				break;
+			}
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -874,6 +878,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'power' => $power
 			];
 
+			// Expression optimized to avoid overflow.
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {

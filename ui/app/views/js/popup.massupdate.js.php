@@ -73,7 +73,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj = macros_elem.originalObject;
 	}
 
-	$(obj.querySelector('#tbl_macros')).dynamicRows({template: '#macro-row-tmpl'});
+	$(obj.querySelector('#tbl_macros')).dynamicRows({template: '#macro-row-tmpl', allow_empty: true});
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
 			$('.macro-input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
@@ -116,7 +116,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		obj = tags_elem.originalObject;
 	}
 
-	$(obj.querySelector('.tags-table')).dynamicRows({template: '#tag-row-tmpl'});
+	$(obj.querySelector('.tags-table')).dynamicRows({template: '#tag-row-tmpl', allow_empty: true});
 	$(obj.querySelector('.tags-table'))
 		.on('click', 'button.element-table-add', () => {
 			$('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
@@ -306,12 +306,13 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	obj.querySelectorAll('[name=valuemap_massupdate]').forEach((elem) => elem.addEventListener('click',
 		(event) => toggleVisible(obj, event.currentTarget.value)
 	));
-	obj.querySelectorAll('.element-table-addfrom').forEach(elm => elm.addEventListener('click',
+	obj.querySelectorAll('.js-element-table-addfrom').forEach(elm => elm.addEventListener('click',
 		(event) => openAddfromPopup(event.target)
 	));
 
 	$('#valuemap-rename-table').dynamicRows({
 		template: '#valuemap-rename-row-tmpl',
+		allow_empty: true,
 		row: '.form_row',
 		rows: [{from: '', to: ''}]
 	});

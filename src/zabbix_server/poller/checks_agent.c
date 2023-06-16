@@ -19,7 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
@@ -101,7 +100,10 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_s
 			ret = NETWORK_ERROR;
 	}
 	else
+	{
 		ret = NETWORK_ERROR;
+		goto out;
+	}
 
 	if (SUCCEED == ret)
 	{

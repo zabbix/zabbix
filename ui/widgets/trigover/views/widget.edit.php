@@ -27,7 +27,7 @@
  */
 
 $groupids = array_key_exists('groupids', $data['fields'])
-	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'],	$data['captions']['ms']['groups']['groupids'])
+	? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'], $data['captions']['groups']['groupids'])
 	: null;
 
 (new CWidgetFormView($data))
@@ -36,7 +36,7 @@ $groupids = array_key_exists('groupids', $data['fields'])
 	)
 	->addField($groupids)
 	->addField(array_key_exists('hostids', $data['fields'])
-		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['ms']['hosts']['hostids']))
+		? (new CWidgetFieldMultiSelectHostView($data['fields']['hostids'], $data['captions']['hosts']['hostids']))
 			->setFilterPreselect(['id' => $groupids->getId(), 'submit_as' => 'groupid'])
 		: null
 	)

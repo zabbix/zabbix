@@ -1884,7 +1884,7 @@ zabbix_export:
                   description: 'Server is not available.'
                   tags:
                     - tag: scope
-                      value: avialability
+                      value: availability
             - uuid: 10cfb75db0ef4a9fb33670480303522b
               name: 'HAProxy {#PXNAME} {#SVNAME}: Sessions per second'
               type: DEPENDENT

@@ -20,7 +20,6 @@
 #include "anomalystl.h"
 
 #include "zbxnum.h"
-#include "log.h"
 #include "zbxeval.h"
 
 ZBX_PTR_VECTOR_DECL(VV, zbx_vector_history_record_t *)

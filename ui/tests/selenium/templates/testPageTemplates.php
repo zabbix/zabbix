@@ -45,12 +45,13 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->zbxTestLogin('templates.php');
 		$this->zbxTestCheckTitle('Configuration of templates');
 		$this->zbxTestCheckHeader('Templates');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->getField('Template groups')->select('Templates/SAN');
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->templateName);
 
-		$table = $this->query('class:list-table')->asTable()->one();
 		$headers = ['', 'Name', 'Hosts', 'Items', 'Triggers', 'Graphs', 'Dashboards', 'Discovery', 'Web', 'Vendor',
 				'Version', 'Linked templates', 'Linked to templates', 'Tags'
 		];
