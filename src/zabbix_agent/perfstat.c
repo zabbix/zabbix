@@ -241,7 +241,7 @@ static int	set_object_names(void)
 	if (PDH_MORE_DATA != (pdh_status = PdhEnumObjects(NULL, NULL, NULL, &sz, PERF_DETAIL_WIZARD, refresh)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot obtain required buffer size: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
+				zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 		goto out;
 	}
 
@@ -265,7 +265,7 @@ static int	set_object_names(void)
 	if (ERROR_SUCCESS != (pdh_status = PdhEnumObjects(NULL, NULL, objects, &sz, PERF_DETAIL_WIZARD, FALSE)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot obtain objects list: %s",
-				strerror_from_module(pdh_status, L"PDH.DLL"));
+				zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 		zbx_free(objects);
 		goto out;
 	}
@@ -531,7 +531,7 @@ void	collect_perfstat(void)
 		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() call to PdhCollectQueryData() failed: %s",
-				__func__, strerror_from_module(pdh_status, L"PDH.DLL"));
+				__func__, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 
 		goto out;
 	}
@@ -606,7 +606,7 @@ void	collect_perfstat(void)
 		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot calculate performance counter value \"%s\": %s",
-					cptr->counterpath, strerror_from_module(pdh_status, L"PDH.DLL"));
+					cptr->counterpath, zbx_strerror_from_module(pdh_status, L"PDH.DLL"));
 
 			deactivate_perf_counter(cptr);
 		}

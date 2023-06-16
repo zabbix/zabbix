@@ -256,16 +256,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'create'
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'update'
 				]
 			],
 			// #26 Discovery create.
@@ -456,16 +456,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'update'
 				]
 			],
 			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'create'
 				]
 			],
 			// #51 Script update.

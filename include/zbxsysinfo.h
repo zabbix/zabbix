@@ -94,8 +94,8 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
 		get_config_source_ip_f);
 
 void	zbx_init_metrics(void);
-int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
-void	zbx_free_metrics_ext(ZBX_METRIC **metrics);
+int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len);
+void	zbx_free_metrics_ext(zbx_metric_t **metrics);
 void	zbx_free_metrics(void);
 
 void	zbx_init_key_access_rules(void);
@@ -111,8 +111,8 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
 void	zbx_remove_user_parameters(void);
-void	zbx_get_metrics_copy(ZBX_METRIC **metrics);
-void	zbx_set_metrics(ZBX_METRIC *metrics);
+void	zbx_get_metrics_copy(zbx_metric_t **metrics);
+void	zbx_set_metrics(zbx_metric_t *metrics);
 void	zbx_test_parameters(void);
 void	zbx_test_parameter(const char *key);
 
