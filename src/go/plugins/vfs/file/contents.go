@@ -32,10 +32,10 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, errors.New("Wrong number of parameters")
 	}
 
-	var encoder string
+	var encoding string
 
 	if len(params) == 2 {
-		encoder = params[1]
+		encoding = params[1]
 	}
 
 	f, err := stdOs.Stat(params[0])
@@ -60,7 +60,7 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
 
-	outbuf, outbytes := decode(encoder, buf.Bytes(), len(buf.Bytes()))
+	outbuf, outbytes := decode(encoding, buf.Bytes(), len(buf.Bytes()))
 	xs := string(outbuf[:outbytes])
 
 	return strings.TrimRight(xs, "\n\r"), nil

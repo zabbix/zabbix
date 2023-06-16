@@ -46,9 +46,9 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		return nil, errors.New("Invalid second parameter.")
 	}
 
-	var encoder string
+	var encoding string
 	if len(params) > 2 {
-		encoder = params[2]
+		encoding = params[2]
 	}
 
 	if len(params) < 4 || "" == params[3] {
@@ -100,12 +100,12 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		}
 
 		curline++
-		buf, nbytes, err = p.readTextLineFromFile(f, encoder)
+		buf, nbytes, err = p.readTextLineFromFile(f, encoding)
 		if err != nil {
 			return nil, err
 		}
 
-		x, outbytes := decode(encoder, buf, nbytes)
+		x, outbytes := decode(encoding, buf, nbytes)
 
 		xs := string(x[:outbytes])
 
