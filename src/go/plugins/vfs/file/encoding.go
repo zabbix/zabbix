@@ -49,11 +49,11 @@ func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {
 	return encoding
 }
 
-func decode(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
+func decodeToUTF8(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbytecount int) {
 	if bytecount == 0 {
 		return inbuf, 0
 	}
-	if encoding = findEncodingFromBOM(encoding, inbuf, bytecount); encoding == "" {
+	if encoding == "" {
 		return inbuf, bytecount
 	}
 	tocode := C.CString("UTF-8")

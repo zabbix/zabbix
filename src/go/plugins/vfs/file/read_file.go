@@ -100,7 +100,8 @@ func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte in
 	return buf, i
 }
 
-func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
+func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf []byte, nbytes int,
+	updatedEncoding string, err error) {
 	var szbyte int
 	var offset int64
 	var cr, lf []byte
@@ -109,27 +110,28 @@ func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf
 
 	offset, err = targetFile.Seek(0, io.SeekCurrent)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, encoding, err
 	}
 
 	nbytes, err = targetFile.Read(buf)
 	if err != nil {
 		if !errors.Is(err, io.EOF) {
-			return nil, 0, err
+			return nil, 0, encoding, err
 		}
 	}
 	if 0 >= nbytes {
-		return buf, nbytes, nil
+		return buf, nbytes, encoding, nil
 	}
 
+	encoding = findEncodingFromBOM(encoding, buf, nbytes)
 	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
 
 	/* nbytes can be smaller than szbyte. If the target file was encoded in UTF-8 and contained a single
 	   character, but the target encoding was mistakenly set to UTF-32. Then nbytes will be 1 and szbyte
 	   will be 4. Similarly, if bytes read produces a remainder that does not fit szbyte - we can safely
 	   assume the file contains the encoding different from the one provided to us.*/
-	if nbytes < szbyte || (nbytes % szbyte != 0) {
-		return nil, 0, fmt.Errorf("Cannot read from file. Wrong encoding detected.")
+	if nbytes < szbyte || (nbytes%szbyte != 0) {
+		return nil, 0, encoding, fmt.Errorf("Cannot read from file. Wrong encoding detected.")
 	}
 
 	var i int
@@ -137,8 +139,8 @@ func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf
 
 	_, err = targetFile.Seek(offset+int64(i), io.SeekStart)
 	if err != nil {
-		return nil, 0, err
+		return nil, 0, encoding, err
 	}
 
-	return buf, i, nil
+	return buf, i, encoding, nil
 }

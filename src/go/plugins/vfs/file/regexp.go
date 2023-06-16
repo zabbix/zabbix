@@ -75,8 +75,8 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		output = params[5]
 	}
 
-	var rx *regexp.Regexp
-	if rx, err = regexp.Compile(params[1]); err != nil {
+	var compiledRegexp *regexp.Regexp
+	if compiledRegexp, err = regexp.Compile(params[1]); err != nil {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
@@ -88,9 +88,9 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 	defer f.Close()
 
 	initial := true
-	nbytes := 0
-	var buf []byte
-	for 0 < nbytes || initial {
+	undecodedBufNumBytes := 0
+	var undecodedBuf []byte
+	for 0 < undecodedBufNumBytes || initial {
 		elapsed := time.Since(start)
 
 		if elapsed.Seconds() > float64(p.options.Timeout) {
@@ -99,17 +99,17 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 
 		initial = false
 		curline++
-		buf, nbytes, err = p.readTextLineFromFile(f, encoding)
+		undecodedBuf, undecodedBufNumBytes, encoding, err = p.readTextLineFromFile(f, encoding)
 		if err != nil {
 			return nil, err
 		}
-		x, outbytes := decode(encoding, buf, nbytes)
+		utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
 
-		xs := string(x[:outbytes])
-		xs = strings.TrimRight(xs, "\r\n")
+		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
+		utf8_bufStr = strings.TrimRight(utf8_bufStr, "\r\n")
 
 		if curline >= startline {
-			if out, ok := zbxregexp.ExecuteRegex([]byte(xs), rx, []byte(output)); ok {
+			if out, ok := zbxregexp.ExecuteRegex([]byte(utf8_bufStr), compiledRegexp, []byte(output)); ok {
 				return out, nil
 			}
 		}

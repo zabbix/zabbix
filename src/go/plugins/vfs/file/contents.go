@@ -55,13 +55,13 @@ func (p *Plugin) exportContents(params []string) (result interface{}, err error)
 	}
 	defer file.Close()
 
-	buf := bytes.Buffer{}
-	if _, err = buf.ReadFrom(file); err != nil {
+	undecodedBuf := bytes.Buffer{}
+	if _, err = undecodedBuf.ReadFrom(file); err != nil {
 		return nil, fmt.Errorf("Cannot read from file: %s", err)
 	}
+	encoding = findEncodingFromBOM(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf.Bytes(), len(undecodedBuf.Bytes()))
+	utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
-	outbuf, outbytes := decode(encoding, buf.Bytes(), len(buf.Bytes()))
-	xs := string(outbuf[:outbytes])
-
-	return strings.TrimRight(xs, "\n\r"), nil
+	return strings.TrimRight(utf8_bufStr, "\n\r"), nil
 }

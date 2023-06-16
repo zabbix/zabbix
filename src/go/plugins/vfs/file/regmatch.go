@@ -90,9 +90,9 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 	defer f.Close()
 
 	initial := true
-	nbytes := 0
-	var buf []byte
-	for 0 < nbytes || initial {
+	undecodedBufNumBytes := 0
+	var undecodedBuf []byte
+	for 0 < undecodedBufNumBytes || initial {
 		initial = false
 		elapsed := time.Since(start)
 		if elapsed.Seconds() > float64(p.options.Timeout) {
@@ -100,17 +100,16 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		}
 
 		curline++
-		buf, nbytes, err = p.readTextLineFromFile(f, encoding)
+
+		undecodedBuf, undecodedBufNumBytes, encoding, err = p.readTextLineFromFile(f, encoding)
 		if err != nil {
 			return nil, err
 		}
-
-		x, outbytes := decode(encoding, buf, nbytes)
-
-		xs := string(x[:outbytes])
+		utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
 
 		if curline >= startline {
-			if match := r.Match([]byte(xs)); match {
+			if match := r.Match([]byte(utf8_bufStr)); match {
 				ret = 1
 			}
 		}
