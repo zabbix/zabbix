@@ -235,7 +235,7 @@
 					this.step_list.querySelector('tbody').appendChild(new_row);
 				}
 
-				this._toggleDragIcon(this.step_list);
+				this._initSortable(jQuery('#steps'));
 			});
 		}
 
