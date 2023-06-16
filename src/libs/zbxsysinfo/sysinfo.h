@@ -83,13 +83,14 @@ typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result, H
 typedef int (*zbx_metric_func_t)(AGENT_REQUEST *request, AGENT_RESULT *result);
 #endif
 
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
 typedef struct
 {
-	zbx_uint64_t	total;
-	zbx_uint64_t	not_used;
-	zbx_uint64_t	used;
-	double		pfree;
-	double		pused;
+	zbx_uint64_t		total;
+	zbx_uint64_t		not_used;
+	zbx_uint64_t		used;
+	double			pfree;
+	double			pused;
 }
 zbx_fs_metrics_t;
 
@@ -103,10 +104,20 @@ typedef struct
 }
 zbx_mpoint_t;
 
+typedef struct
+{
+	char			*mpoint;
+	char			*type;
+}
+zbx_fsname_t;
+
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
+int	zbx_fsname_compare(const void *fs1, const void *fs2);
+#endif
+
 int	sysinfo_get_config_timeout(void);
 
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result);
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint);
 
 #ifndef _WINDOWS
 int	hostname_handle_params(AGENT_REQUEST *request, AGENT_RESULT *result, char *hostname);
