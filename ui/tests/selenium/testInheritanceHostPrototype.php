@@ -411,7 +411,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'create_enabled' => true,
 					'hostgroup' => 'Hypervisors',
 					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
-					'template' => 'macOS',
+					'template' => 'macOS by Zabbix agent',
 					'inventory' => 'Manual',
 					'check_form' => true
 				]

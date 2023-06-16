@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-10T10:13:12Z'
+  date: '2023-05-22T14:40:45Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -3966,7 +3966,7 @@ zabbix_export:
           history: 7d
           value_type: FLOAT
           units: '%'
-          description: 'The percantage of workers. Not applicable to the data warehouses.'
+          description: 'The percentage of workers. Not applicable to the data warehouses.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -9178,23 +9178,6 @@ zabbix_export:
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.premium.os.disk.cache.read.miss
-    - uuid: 62a9a5e1fb044a52a0b534bd4eeea914
-      name: 'Azure Microsoft SQL: Connections'
-      graph_items:
-        - color: 199C0D
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.connections.successful
-        - sortorder: '1'
-          color: F63100
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.connections.failed.system
-        - sortorder: '2'
-          color: 00611C
-          item:
-            host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.firewall.blocked
     - uuid: 3b278de1b81a4be7acc865568962c323
       name: 'Azure Microsoft SQL: Connections'
       graph_items:
@@ -9212,18 +9195,23 @@ zabbix_export:
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.firewall.blocked
-    - uuid: 083d307db8954fc59e8e5cfccefc16c1
-      name: 'Azure Microsoft SQL: CPU usage'
+    - uuid: 62a9a5e1fb044a52a0b534bd4eeea914
+      name: 'Azure Microsoft SQL: Connections'
       graph_items:
         - color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.cpu.limit
+            key: azure.db.mssql.connections.successful
         - sortorder: '1'
           color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.cpu.used
+            key: azure.db.mssql.connections.failed.system
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
+            key: azure.db.mssql.firewall.blocked
     - uuid: fe250a5f509d45babea9fcd12accbcac
       name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
@@ -9236,18 +9224,18 @@ zabbix_export:
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
             key: azure.db.mssql.cpu.used
-    - uuid: f541b6591683433aba4b3e58a8ad1e5c
-      name: 'Azure Microsoft SQL: Storage utilization'
+    - uuid: 083d307db8954fc59e8e5cfccefc16c1
+      name: 'Azure Microsoft SQL: CPU usage'
       graph_items:
         - color: 199C0D
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.storage.used
+            key: azure.db.mssql.cpu.limit
         - sortorder: '1'
           color: F63100
           item:
             host: 'Azure Microsoft SQL Serverless Database by HTTP'
-            key: azure.db.mssql.storage.allocated
+            key: azure.db.mssql.cpu.used
     - uuid: ec5714017c744484be8c264d24a0e694
       name: 'Azure Microsoft SQL: Storage utilization'
       graph_items:
@@ -9259,6 +9247,18 @@ zabbix_export:
           color: F63100
           item:
             host: 'Azure Microsoft SQL Database by HTTP'
+            key: azure.db.mssql.storage.allocated
+    - uuid: f541b6591683433aba4b3e58a8ad1e5c
+      name: 'Azure Microsoft SQL: Storage utilization'
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
+            key: azure.db.mssql.storage.used
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Azure Microsoft SQL Serverless Database by HTTP'
             key: azure.db.mssql.storage.allocated
     - uuid: 89256a1eba8c49d2b7469a68ff050ac5
       name: 'Azure MongoDB: Latency'

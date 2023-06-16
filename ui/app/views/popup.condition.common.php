@@ -192,7 +192,6 @@ switch ($data['type']) {
 							'srcfld1' => 'triggerid',
 							'dstfrm' => $form->getName(),
 							'dstfld1' => 'trigger_new_condition',
-							'editable' => true,
 							'noempty' => true
 						]
 					]
@@ -235,8 +234,7 @@ switch ($data['type']) {
 							'srctbl' => 'hosts',
 							'srcfld1' => 'hostid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'host_new_condition',
-							'editable' => true
+							'dstfld1' => 'host_new_condition'
 						]
 					]
 				]))
@@ -266,8 +264,7 @@ switch ($data['type']) {
 							'srctbl' => 'host_groups',
 							'srcfld1' => 'groupid',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'hostgroup_new_condition',
-							'editable' => true
+							'dstfld1' => 'hostgroup_new_condition'
 						]
 					]
 				]))
@@ -341,8 +338,7 @@ switch ($data['type']) {
 							'srcfld1' => 'hostid',
 							'srcfld2' => 'host',
 							'dstfrm' => $form->getName(),
-							'dstfld1' => 'template_new_condition',
-							'editable' => true
+							'dstfld1' => 'template_new_condition'
 						]
 					]
 				]))
@@ -408,8 +404,7 @@ switch ($data['type']) {
 								'srcfld2' => 'name',
 								'dstfrm' => $form->getName(),
 								'dstfld1' => 'dcheck_new_condition_value',
-								'dstfld2' => 'dcheck',
-								'writeonly' => '1'
+								'dstfld2' => 'dcheck'
 							]).', {dialogue_class: "modal-popup-generic"});'
 						)
 				];
@@ -684,10 +679,10 @@ switch ($data['type']) {
 		break;
 }
 
-$form->addItem([
-	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
-]);
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],

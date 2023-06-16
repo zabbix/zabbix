@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:31:29Z'
+  date: '2023-06-07T11:30:47Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -1385,7 +1385,7 @@ zabbix_export:
                 - uuid: 32f7d131336348178069bbafbdabcfee
                   expression: 'min(/Windows physical disks by Zabbix agent active/perf_counter_en["\PhysicalDisk({#DEVNAME})\Avg. Disk sec/Read",60],15m) > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}'
                   name: '{#DEVNAME}: Disk read request responses are too high'
-                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m'
+                  event_name: '{#DEVNAME}: Disk read request responses are too high (read > {$VFS.DEV.READ.AWAIT.WARN:"{#DEVNAME}"}s for 15m)'
                   priority: WARNING
                   description: 'This trigger might indicate the disk {#DEVNAME} saturation.'
                   manual_close: 'YES'

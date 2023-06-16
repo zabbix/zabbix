@@ -124,8 +124,7 @@ if ($check_actionids) {
 		'actionids' => array_keys($check_actionids),
 		'filter' => [
 			'eventsource' => $eventsource
-		],
-		'editable' => true
+		]
 	]);
 
 	if (count($actions) != count($check_actionids)) {
@@ -513,8 +512,7 @@ elseif (hasRequest('action') && getRequest('action') == 'action.massdelete' && h
 if (hasRequest('action') && hasRequest('g_actionid') && !$result) {
 	$actions = API::Action()->get([
 		'actionids' => getRequest('g_actionid'),
-		'output' => [],
-		'editable' => true
+		'output' => []
 	]);
 	uncheckTableRows(null, zbx_objectValues($actions, 'actionid'));
 }
@@ -552,8 +550,7 @@ if (hasRequest('form')) {
 			'selectUpdateOperations' => ['operationtype', 'opmessage', 'opmessage_grp', 'opmessage_usr', 'opcommand',
 				'opcommand_grp', 'opcommand_hst'
 			],
-			'actionids' => $data['actionid'],
-			'editable' => true
+			'actionids' => $data['actionid']
 		]);
 		$data['action'] = reset($data['action']);
 	}
@@ -740,7 +737,6 @@ else {
 		],
 		'selectFilter' => ['formula', 'conditions', 'evaltype'],
 		'selectOperations' => API_OUTPUT_EXTEND,
-		'editable' => true,
 		'sortfield' => $sortField,
 		'limit' => $limit
 	]);
