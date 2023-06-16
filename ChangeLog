@@ -3855,6 +3855,9 @@ Changes for 5.0.36rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
+.......PS. [ZBX-22148] fixed crash when updating webhook to JavaScript that cannot be compiled (vso)
 ...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
 ..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
 A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
