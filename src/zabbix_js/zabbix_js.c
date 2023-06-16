@@ -194,7 +194,7 @@ int	main(int argc, char **argv)
 		goto clean;
 	}
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, loglevel, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, loglevel, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		goto clean;
@@ -250,7 +250,7 @@ int	main(int argc, char **argv)
 	ret = SUCCEED;
 	printf("\n%s\n", result);
 close:
-	zabbix_close_log();
+	zbx_close_log();
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif
