@@ -3592,10 +3592,8 @@ textarea {
   min-height: 24px;
   overflow: auto;
   resize: vertical; }
-  textarea[readonly] {
-    color: #000000 !important; }
-    textarea[readonly]:focus {
-      border-color: #000000; }
+  textarea[readonly]:focus {
+    border-color: #000000; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -4200,20 +4198,20 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     background-color: transparent; }
 
 z-select[readonly] .focusable,
-.z-select[readonly] .focusable, input[readonly] {
+.z-select[readonly] .focusable, input[readonly], textarea[readonly] {
   color: #000000;
   -webkit-text-fill-color: #000000;
   background-color: #f0f0f0;
   border-color: #888888; }
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] .focusable,
-.z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+.z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #9f9f9f;
   -webkit-text-fill-color: #9f9f9f;
   background-color: #f0f0f0;
   border-color: #9f9f9f; }
   .radio-list-control input[type="radio"][disabled] + label::placeholder, z-select[disabled] .focusable::placeholder,
-  .z-select[disabled] .focusable::placeholder, .multiselect[aria-disabled]::placeholder, input[disabled]::placeholder, textarea[disabled]::placeholder, textarea[readonly]::placeholder, select option[disabled]::placeholder, select[disabled]::placeholder, select[readonly]::placeholder, .checkbox-radio[readonly] span::placeholder, .checkbox-radio[readonly] + label span::placeholder, .checkbox-radio[disabled] + label span::placeholder, .macro-input-group button.btn-dropdown-toggle:disabled::placeholder {
+  .z-select[disabled] .focusable::placeholder, .multiselect[aria-disabled]::placeholder, input[disabled]::placeholder, textarea[disabled]::placeholder, select option[disabled]::placeholder, select[disabled]::placeholder, select[readonly]::placeholder, .checkbox-radio[readonly] span::placeholder, .checkbox-radio[readonly] + label span::placeholder, .checkbox-radio[disabled] + label span::placeholder, .macro-input-group button.btn-dropdown-toggle:disabled::placeholder {
     color: #c8c8c8;
     -webkit-text-fill-color: #c8c8c8;
     opacity: 1; }

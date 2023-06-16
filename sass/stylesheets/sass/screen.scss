@@ -1642,8 +1642,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-border-focus-color;
