@@ -92,8 +92,6 @@ class CControllerDiscoveryList extends CController {
 				'status' => ($filter['status'] == -1) ? null : $filter['status']
 			],
 			'editable' => true,
-			'sortfield' => $sort_field,
-			'sortorder' => $sort_order,
 			'limit' => $limit
 		]);
 
