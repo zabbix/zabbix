@@ -233,7 +233,6 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 	// immediately fail direct checks and ignore bulk requests when shutting down
 	if m.shutdownSeconds != shutdownInactive {
 		m.processUpdateRequestShutdown(update)
-
 	} else {
 		m.processUpdateRequestRun(update)
 	}

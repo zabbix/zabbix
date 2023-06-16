@@ -73,8 +73,8 @@ const char	*usage_message[] = {};
 unsigned char	program_type	= 0x80;
 const char	*help_message[] = {};
 
-ZBX_METRIC	parameters_agent[] = {NULL};
-ZBX_METRIC	parameters_specific[] = {NULL};
+zbx_metric_t	parameters_agent[] = {NULL};
+zbx_metric_t	parameters_specific[] = {NULL};
 
 int	zbx_procstat_collector_started(void)
 {
@@ -92,7 +92,7 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 	return SYSINFO_RET_FAIL;
 }
 
-char	*strerror_from_system(zbx_syserror_t error)
+char	*zbx_strerror_from_system(zbx_syserror_t error)
 {
 	return zbx_strerror(errno);
 }
