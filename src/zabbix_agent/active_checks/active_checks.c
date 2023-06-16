@@ -1402,6 +1402,7 @@ static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);
+
 	el->flags = flags;
 	el->id = ++last_valueid;
 

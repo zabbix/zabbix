@@ -556,24 +556,16 @@ zabbix_export:
                   value: '{#NAME}'
           master_item:
             key: kube.pods
+          lld_macro_paths:
+            - lld_macro: '{#NAME}'
+              path: $.metadata.name
+            - lld_macro: '{#NAMESPACE}'
+              path: $.metadata.namespace
           preprocessing:
-            - type: JAVASCRIPT
+            - type: JSONPATH
               parameters:
-                - |
-                  var input = JSON.parse(value),
-                      output = [];
-                  
-                  input.items.forEach(function (pod) {
-                      output.push({
-                          '{#NAME}': pod.metadata.name,
-                          '{#NAMESPACE}': pod.metadata.namespace
-                      });
-                  });
-                  
-                  return JSON.stringify(output);
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
+                - $.items
+              error_handler: DISCARD_VALUE
         - uuid: cb42f71e6bfb4661861e3601e31eeaa6
           name: 'REST client requests discovery'
           type: DEPENDENT
