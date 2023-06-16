@@ -24,6 +24,8 @@
 #include "zbxlog.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "zbxnix.h"
+#else
+#include "zbxthreads.h"
 #endif
 #include "zbxalgo.h"
 #include "zbxregexp.h"
