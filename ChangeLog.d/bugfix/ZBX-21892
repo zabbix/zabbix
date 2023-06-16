@@ -1,1 +1,0 @@
-...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
