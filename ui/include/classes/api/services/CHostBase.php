@@ -1342,7 +1342,7 @@ abstract class CHostBase extends CApiService {
 					$upd_hostids[$i] = $host[$id_field_name];
 				}
 				else {
-					unset($host['templates'], $db_hosts[$host[$id_field_name]]['templates']);
+					unset($host['templates'], $host['templates_clear'], $db_hosts[$host[$id_field_name]]['templates']);
 				}
 			}
 		}
