@@ -813,6 +813,7 @@ class CAction extends CApiService {
 		self::updateOperationGroups($actions, $db_actions);
 		self::updateOperationTemplates($actions, $db_actions);
 		self::updateOperationInventories($actions, $db_actions);
+		self::updateOperationTags($actions, $db_actions);
 	}
 
 	/**
@@ -1452,6 +1453,93 @@ class CAction extends CApiService {
 	}
 
 	/**
+	 * @param array      $actions
+	 * @param array|null $db_actions
+	 */
+	private static function updateOperationTags(array &$actions, array $db_actions = null): void {
+		$is_update = ($db_actions !== null);
+
+		$ins_optags = [];
+		$del_optags = [];
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
+
+				foreach ($action[$operation_group] as &$operation) {
+					// Proceed only if operation type is OPERATION_TYPE_HOST_TAGS_ADD or OPERATION_TYPE_HOST_TAGS_REMOVE.
+					if (!array_key_exists('optag', $operation)) {
+						continue;
+					}
+
+					$db_operation = array_key_exists($operation['operationid'], $db_operations)
+						? $db_operations[$operation['operationid']]
+						: [];
+
+					$db_optags = array_key_exists('optag', $db_operation)
+						? $db_operation['optag']
+						: [];
+
+					foreach ($operation['optag'] as &$optag) {
+						if ($db_optags) {
+							foreach ($db_optags as $db_optag) {
+								if ($optag['tag'] == $db_optag['tag'] && $optag['value'] == $db_optag['value']) {
+									$optag['optagid'] = $db_optag['optagid'];
+									unset($db_optag[$optag['operationid']]); // kaut kas te nav
+								}
+							}
+						}
+						else {
+							$ins_optags[] = ['operationid' => $operation['operationid']] + $optag;
+						}
+					}
+					unset($optag);
+
+					$del_optags = array_merge($del_optags, array_column($db_optags, 'optagid'));
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+
+		if ($del_optags) {
+			DB::delete('optag', ['optagid' => $del_optags]);
+		}
+
+		if ($ins_optags) {
+			$optagids = DB::insert('optag', $ins_optags);
+		}
+
+		foreach ($actions as &$action) {
+			foreach (self::OPERATION_GROUPS as $operation_group) {
+				if (!array_key_exists($operation_group, $action)) {
+					continue;
+				}
+
+				foreach ($action[$operation_group] as &$operation) {
+					if (!array_key_exists('optag', $operation)) {
+						continue;
+					}
+
+					foreach ($operation['optag'] as &$optag) {
+						if (!array_key_exists('optagid', $optag)) {
+							$optag['optagid'] = array_shift($optagids);
+						}
+					}
+					unset($optag);
+				}
+				unset($operation);
+			}
+		}
+		unset($action);
+	}
+
+	/**
 	 * @param array $actionids
 	 *
 	 * @throws APIException
@@ -1476,6 +1564,7 @@ class CAction extends CApiService {
 		DB::delete('opgroup', ['operationid' => $operationids]);
 		DB::delete('optemplate', ['operationid' => $operationids]);
 		DB::delete('opinventory', ['operationid' => $operationids]);
+		DB::delete('optag', ['operationid' => $operationids]);
 		DB::delete('opconditions', ['operationid' => $operationids]);
 
 		DB::delete('operations', ['actionid' => $actionids]);
@@ -1619,6 +1708,7 @@ class CAction extends CApiService {
 			$opgroup = [];
 			$optemplate = [];
 			$opinventory = [];
+			$optag = [];
 
 			foreach ($operations as $operationid => $operation) {
 				unset($operations[$operationid]['recovery']);
@@ -1645,6 +1735,10 @@ class CAction extends CApiService {
 						break;
 					case OPERATION_TYPE_HOST_INVENTORY:
 						$opinventory[] = $operationid;
+						break;
+					case OPERATION_TYPE_HOST_TAGS_ADD:
+					case OPERATION_TYPE_HOST_TAGS_REMOVE:
+						$optag[] = $operationid;
 						break;
 				}
 			}
@@ -1813,6 +1907,26 @@ class CAction extends CApiService {
 						$operationid = $db_opinventory['operationid'];
 						unset($db_opinventory['operationid']);
 						$operations[$operationid]['opinventory'] = $db_opinventory;
+					}
+				}
+			}
+
+			// get OPERATION_TYPE_HOST_TAGS_ADD, OPERATION_TYPE_HOST_TAGS_REMOVE data
+			if ($optag) {
+				if ($this->outputIsRequested('optag', $options['selectOperations'])) {
+					foreach ($optag as $operationid) {
+						$operations[$operationid]['optag'] = [];
+					}
+
+					$db_optags = DBselect(
+						'SELECT o.operationid,o.tag,o.value'.
+						' FROM optag o'.
+						' WHERE '.dbConditionInt('o.operationid', $optag)
+					);
+					while ($db_optag = DBfetch($db_optags)) {
+						$operationid = $db_optag['operationid'];
+						unset($db_optag['operationid']);
+						$operations[$operationid]['optag'][] = $db_optag;
 					}
 				}
 			}
@@ -2398,8 +2512,11 @@ class CAction extends CApiService {
 			]]
 		];
 
+		$operations = getAllowedOperations($eventsource)[$recovery];
+		asort($operations);
+
 		$operationtype_field = [
-			'operationtype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', getAllowedOperations($eventsource)[$recovery])]
+			'operationtype' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $operations)]
 		];
 
 		switch ($recovery) {
@@ -2433,6 +2550,13 @@ class CAction extends CApiService {
 							'opinventory' =>	['type' => API_MULTIPLE, 'rules' => [
 													['if' => ['field' => 'operationtype', 'in' => OPERATION_TYPE_HOST_INVENTORY], 'type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 														'inventory_mode' =>	['type' => API_INT32, 'in' => implode(',', [HOST_INVENTORY_MANUAL, HOST_INVENTORY_AUTOMATIC])]
+													]],
+													['else' => true, 'type' => API_UNEXPECTED]
+							]],
+							'optag' =>			 ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'operationtype', 'in' => implode(',', [OPERATION_TYPE_HOST_TAGS_ADD, OPERATION_TYPE_HOST_TAGS_REMOVE])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['tag', 'value']], 'fields' => [
+														'tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('optag', 'tag')],
+														'value' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('optag', 'value')]
 													]],
 													['else' => true, 'type' => API_UNEXPECTED]
 							]]
@@ -3465,16 +3589,18 @@ class CAction extends CApiService {
 		}
 
 		$operationids = array_fill_keys([
-			'opconditions', 'opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate'
+			'opconditions', 'opmessage_grp', 'opmessage_usr', 'opcommand_grp', 'opcommand_hst', 'opgroup', 'optemplate',
+			'optag'
 		], []);
 
 		$db_operations = DBselect(
 			'SELECT o.operationid,o.actionid,o.operationtype,o.esc_period,o.esc_step_from,o.esc_step_to,o.evaltype,'.
-				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode'.
+				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode,t.tag,t.value'.
 			' FROM operations o'.
 				' LEFT JOIN opmessage m ON m.operationid=o.operationid'.
 				' LEFT JOIN opcommand c ON c.operationid=o.operationid'.
 				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
+				' LEFT JOIN optag i ON t.operationid=o.operationid'.
 			' WHERE '.dbConditionId('o.actionid', $actionids['operations'])
 		);
 
@@ -3542,6 +3668,14 @@ class CAction extends CApiService {
 
 				case OPERATION_TYPE_HOST_INVENTORY:
 					$operation['opinventory']['inventory_mode'] = $db_operation['inventory_mode'];
+					break;
+
+				case OPERATION_TYPE_HOST_TAGS_ADD:
+				case OPERATION_TYPE_HOST_TAGS_REMOVE:
+					$operation['optag'] = [
+						'tag' => $db_operation['tag'],
+						'value' => $db_operation['value']
+					];
 					break;
 			}
 
