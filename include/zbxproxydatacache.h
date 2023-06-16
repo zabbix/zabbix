@@ -24,10 +24,20 @@
 #include "zbxtime.h"
 #include "zbxjson.h"
 
+typedef struct
+{
+	zbx_uint64_t	mem_used;
+	zbx_uint64_t	mem_total;
+	int		state;
+}
+zbx_pdc_stats_t;
+
 int	zbx_pdc_init(zbx_uint64_t size, int age, char **error);
 
 void	zbx_pdc_update_state(int more);
 void	zbx_pdc_flush(void);
+
+int	zbx_pdc_get_stats(zbx_pdc_stats_t *stats, char **error);
 
 /* discovery */
 

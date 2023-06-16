@@ -468,3 +468,27 @@ void	zbx_pdc_flush(void)
 
 	pdc_cache->state = PDC_DATABASE_ONLY;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy data cache statistics                                   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pdc_get_stats(zbx_pdc_stats_t *stats, char **error)
+{
+	if (ZBX_MUTEX_NULL == pdc_cache->mutex)
+	{
+		*error = zbx_strdup(NULL, "Proxy data cache is disabled.");
+		return FAIL;
+	}
+
+	pdc_lock();
+
+	stats->mem_total = pdc_mem->total_size;
+	stats->mem_used = pdc_mem->total_size - pdc_mem->free_size;
+	stats->state = pdc_cache->state;
+
+	pdc_unlock();
+
+	return SUCCEED;
+}
