@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -19,13 +19,13 @@
 **/
 
 
-class CControllerPopupMediatypeTestEdit extends CController {
+class CControllerMediatypeTestEdit extends CController {
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'mediatypeid' => 'fatal|required|db media_type.mediatypeid'
 		];
@@ -45,11 +45,11 @@ class CControllerPopupMediatypeTestEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return ($this->getUserType() == USER_TYPE_SUPER_ADMIN);
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$mediatype = API::MediaType()->get([
 			'output' => ['type', 'name', 'status', 'parameters'],
 			'mediatypeids' => $this->getInput('mediatypeid')

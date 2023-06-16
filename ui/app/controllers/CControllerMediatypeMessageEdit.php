@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -22,20 +22,20 @@
 /**
  * Controller class containing operations for adding and updating media type message templates.
  */
-class CControllerPopupMediatypeMessage extends CController {
+class CControllerMediatypeMessageEdit extends CController {
 
 	/**
 	 * @var array  An array with all message template types.
 	 */
 	protected $message_types = [];
 
-	protected function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 
 		$this->message_types = CMediatypeHelper::getAllMessageTypes();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'type' =>				'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
 			'content_type' =>		'in '.SMTP_MESSAGE_FORMAT_PLAIN_TEXT.','.SMTP_MESSAGE_FORMAT_HTML,
@@ -61,11 +61,11 @@ class CControllerPopupMediatypeMessage extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		return true;
+	protected function checkPermissions(): bool {
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'type' => $this->getInput('type'),
 			'content_type' => $this->getInput('content_type'),
@@ -76,20 +76,20 @@ class CControllerPopupMediatypeMessage extends CController {
 			'message' => $this->getInput('message', '')
 		];
 
-		if (!$this->hasInput('message_type')) {
+		if ($this->hasInput('message_type')) {
+			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
+			$data['eventsource'] = $from['eventsource'];
+			$data['recovery'] = $from['recovery'];
+		}
+		else {
 			$diff = array_diff($this->message_types, $data['message_types']);
 			$diff = reset($diff);
-			$data['message_type'] = $diff ? $diff : CMediatypeHelper::MSG_TYPE_PROBLEM;
+			$data['message_type'] = $diff ?: CMediatypeHelper::MSG_TYPE_PROBLEM;
 			$message_template = CMediatypeHelper::getMessageTemplate($data['type'], $data['message_type'],
 				$data['content_type']
 			);
 			$data['subject'] = $message_template['subject'];
 			$data['message'] = $message_template['message'];
-		}
-		else {
-			$from = CMediatypeHelper::transformFromMessageType($data['message_type']);
-			$data['eventsource'] = $from['eventsource'];
-			$data['recovery'] = $from['recovery'];
 		}
 
 		$output = [
