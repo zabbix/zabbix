@@ -25,5 +25,6 @@
 #include "zbxtypes.h"
 
 void	pdc_discovery_flush(zbx_pdc_t *pdc);
+int	pdc_discovery_check_age(zbx_pdc_t *pdc);
 
 #endif

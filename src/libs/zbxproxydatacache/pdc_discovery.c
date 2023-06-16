@@ -355,6 +355,21 @@ static void	pdc_discovery_data_free(zbx_pdc_discovery_data_t *data)
 	zbx_free(data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if oldest record is within allowed age                      *
+ *                                                                            *
+ ******************************************************************************/
+int	pdc_discovery_check_age(zbx_pdc_t *pdc)
+{
+	zbx_pdc_discovery_t	*row;
+
+	if (SUCCEED != zbx_list_peek(&pdc->discovery, (void **)&row) || time(NULL) - row->write_clock < pdc->max_age)
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /* public api */
 
 /******************************************************************************
@@ -411,8 +426,11 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 
 			pdc_lock();
 
-			/* check if the destination has not changed while collecting data to write */
-			if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+			if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_discovery_check_age(pdc_cache))
+			{
+				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "cached records are too old");
+			}
+			else if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 			{
 				if (NULL == (next = pdc_discovery_add_rows_mem(pdc_cache, &data->rows)))
 				{

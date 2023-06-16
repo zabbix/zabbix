@@ -24,5 +24,6 @@
 #include "proxydatacache.h"
 
 void	pdc_history_flush(zbx_pdc_t *pdc);
+int	pdc_history_check_age(zbx_pdc_t *pdc);
 
 #endif

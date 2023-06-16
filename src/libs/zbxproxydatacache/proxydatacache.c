@@ -346,8 +346,8 @@ void	pdc_fallback_to_database(zbx_pdc_t *pdc)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update proxy data cache state based on records left and handles   *
- *          pending                                                           *
+ * Purpose: update proxy data cache state after successful upload based on    *
+ *          records left and handles pending                                  *
  *                                                                            *
  ******************************************************************************/
 static void	pdc_update_state(zbx_pdc_t *pdc, int more)
@@ -355,7 +355,10 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 	switch (pdc->state)
 	{
 		case PDC_MEMORY:
-			/* TODO: check for age */
+			/* memory state can switch to database when:        */
+			/*   1) no space left to cache data                 */
+			/*   2) cached data exceeds maximum age             */
+			/* Both cases ar checked when adding data to cache. */
 			break;
 		case PDC_MEMORY_DATABASE:
 			if (ZBX_PROXY_DATA_DONE == more)
@@ -374,6 +377,7 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 				pdc_cache_set_state(pdc, PDC_MEMORY, NULL);
 			break;
 		case PDC_DATABASE_ONLY:
+			/* no state switching from database only mode */
 			break;
 	}
 }

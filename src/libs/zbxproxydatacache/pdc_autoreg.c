@@ -256,6 +256,21 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if oldest record is within allowed age                      *
+ *                                                                            *
+ ******************************************************************************/
+int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
+{
+	zbx_pdc_autoreg_t	*row;
+
+	if (SUCCEED != zbx_list_peek(&pdc->autoreg, (void **)&row) || time(NULL) - row->write_clock < pdc->max_age)
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /* public api */
 
 /******************************************************************************
@@ -272,8 +287,12 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 
 	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 	{
-		if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type, host_metadata,
-				flags, clock))
+		if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_autoreg_check_age(pdc_cache))
+		{
+			pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "cached records are too old");
+		}
+		else if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type,
+				host_metadata, flags, clock))
 		{
 			pdc_unlock();
 			goto out;
