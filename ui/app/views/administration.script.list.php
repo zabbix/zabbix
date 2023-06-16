@@ -68,8 +68,8 @@ $html_page = (new CHtmlPage())
 							->addValue(_('Manual host action'), ZBX_SCRIPT_SCOPE_HOST)
 							->addValue(_('Manual event action'), ZBX_SCRIPT_SCOPE_EVENT)
 							->setModern()
-				)
-			])
+					)
+				])
 		])
 		->addVar('action', 'script.list')
 	);
@@ -236,7 +236,7 @@ $scriptsForm->addItem([
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->setId('js-massdelete')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'script')
 ]);

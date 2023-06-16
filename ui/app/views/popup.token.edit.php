@@ -36,7 +36,7 @@ $token_form = (new CForm('post', $url))
 	->addVar('tokenid', $data['tokenid']);
 
 // Enable form submitting on Enter.
-$token_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$token_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['admin_mode'] === '0') {
 	$token_form->addVar('userid', CWebUser::$data['userid']);

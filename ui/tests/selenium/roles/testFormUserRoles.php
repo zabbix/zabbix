@@ -1429,14 +1429,14 @@ class testFormUserRoles extends CWebTest {
 					if (is_array($tags)) {
 						if (count($tags) > 3) {
 							$table->findRow('Name', $service['Name'])->getColumn($tag_type)
-									->query('class:icon-wizard-action')->one()->click();
+									->query('class:zi-more')->one()->click();
 							$popup = $this->query('xpath://div[@data-hintboxid]')->one()->waitUntilReady();
 							foreach ($tags as $tag) {
 								$this->assertTrue($popup->query("xpath:.//div[text()=".CXPathHelper::escapeQuotes($tag)."]")
 										->one(false)->isValid()
 								);
 							}
-							$popup->query('class:overlay-close-btn')->one()->click();
+							$popup->query('class:btn-overlay-close')->one()->click();
 
 							// Leave only 3 tags in array as it is the maximal number of tags displayed in table per row.
 							array_splice($tags, 3);

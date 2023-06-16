@@ -125,7 +125,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[contains(@class, "js-widget-edit")])[1]'
 						]
 					]
 				]
@@ -436,7 +436,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://button[@class="btn-action"]'
+							'element' => 'xpath://button[@id="dashboard-actions"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
@@ -701,7 +701,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath:(//button[contains(@class, "btn-widget-edit")])[1]'
+							'element' => 'xpath:(//button[contains(@class, "js-widget-edit")])[1]'
 						]
 					],
 					'doc_link' => '/en/manual/web_interface/frontend_sections/dashboards/widgets/graph_classic'
@@ -1451,14 +1451,26 @@ class testDocumentationLinks extends CWebTest {
 			// #150 Create event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?action=correlation.edit',
+					'url' => 'zabbix.php?action=correlation.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create event correlation'
+						]
+					],
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
 			// #151 Edit event correlation form view.
 			[
 				[
-					'url' => 'zabbix.php?correlationid=99002&action=correlation.edit',
+					'url' => 'zabbix.php?action=correlation.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Event correlation for update'
+						]
+					],
 					'doc_link' => '/en/manual/config/event_correlation/global#configuration'
 				]
 			],
@@ -1801,21 +1813,33 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/mediatypes'
 				]
 			],
-			// #193 Administration -> Media type -> Create form view.
+			// #193 Alerts -> Media type -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create media type'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #194 Administration -> Media type -> Edit form view.
+			// #194 Alerts -> Media type -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Email'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #195 Administration -> Media type -> Import view.
+			// #195 Alerts -> Media type -> Import view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -1828,14 +1852,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
-			// #196 Administration -> Scripts list view.
+			// #196 Alerts -> Scripts list view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts'
 				]
 			],
-			// #197 Administration -> Scripts -> Create form view.
+			// #197 Alerts -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
@@ -1848,7 +1872,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
-			// #198 Administration -> Scripts -> Edit form view.
+			// #198 Alerts -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
@@ -2419,7 +2443,7 @@ class testDocumentationLinks extends CWebTest {
 		}
 
 		// Get the documentation link and compare it with expected result.
-		$link = $location->query('class:icon-doc-link')->one();
+		$link = $location->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
@@ -2513,7 +2537,7 @@ class testDocumentationLinks extends CWebTest {
 		$dialog = $this->query('id:map-window')->one()->waitUntilVisible();
 
 		// Maps contain headers for all map elements, so only the visible one should be checked.
-		$link = $dialog->query('class:icon-doc-link')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
+		$link = $dialog->query('class:zi-help-small')->all()->filter(new CElementFilter(CElementFilter::VISIBLE))->first();
 
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 	}

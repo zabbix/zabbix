@@ -67,7 +67,6 @@ type updateRequest struct {
 	sink                       resultcache.Writer
 	firstActiveChecksRefreshed bool
 	requests                   []*plugin.Request
-	commands                   []*agent.RemoteCommand
 	expressions                []*glexpr.Expression
 	now                        time.Time
 }
@@ -155,31 +154,13 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requets (single passive and internal checks).
-func (m *Manager) processUpdateRequest(update *updateRequest) {
-	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
-
-	// immediately fail direct checks and ignore bulk requests when shutting down
-	if m.shutdownSeconds != shutdownInactive {
-		if update.clientID <= agent.MaxBuiltinClientID {
-			if len(update.requests) == 1 {
-				update.sink.Write(&plugin.Result{
-					Itemid: update.requests[0].Itemid,
-					Error:  errors.New("Cannot obtain item value during shutdown process."),
-					Ts:     update.now,
-				})
-			} else {
-				log.Warningf("[%d] direct checks can contain only single request while received %d requests",
-					update.clientID, len(update.requests))
-			}
-		}
-		return
-	}
-
+func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
 		if len(update.requests) == 0 {
 			log.Debugf("[%d] skipping empty update for unregistered client", update.clientID)
+
 			return
 		}
 		log.Debugf("[%d] registering new client", update.clientID)
@@ -217,6 +198,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 			}
 			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: update.now})
 			log.Debugf("[%d] cannot monitor metric \"%s\": %s", update.clientID, r.Key, err.Error())
+
 			continue
 		}
 
@@ -228,6 +210,32 @@ func (m *Manager) processUpdateRequest(update *updateRequest) {
 	}
 
 	m.cleanupClient(c, update.now)
+}
+
+func (m *Manager) processUpdateRequestShutdown(update *updateRequest) {
+	if update.clientID <= agent.MaxBuiltinClientID {
+		if len(update.requests) == 1 {
+			update.sink.Write(&plugin.Result{
+				Itemid: update.requests[0].Itemid,
+				Error:  errors.New("Cannot obtain item value during shutdown process."),
+				Ts:     update.now,
+			})
+		} else {
+			log.Warningf("[%d] direct checks can contain only single request while received %d requests",
+				update.clientID, len(update.requests))
+		}
+	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest) {
+	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
+
+	// immediately fail direct checks and ignore bulk requests when shutting down
+	if m.shutdownSeconds != shutdownInactive {
+		m.processUpdateRequestShutdown(update)
+	} else {
+		m.processUpdateRequestRun(update)
+	}
 }
 
 func (m *Manager) processCommandRequest(update *commandRequest) {
@@ -626,7 +634,8 @@ func (m *Manager) UpdateTasks(clientID uint64, writer resultcache.Writer, firstA
 	}
 }
 
-func (m *Manager) UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand, now time.Time) {
+func (m *Manager) UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand,
+	now time.Time) {
 	m.input <- &commandRequest{
 		clientID: clientID,
 		sink:     writer,
@@ -662,7 +671,8 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}}, time.Now())
+	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}},
+		time.Now())
 
 	select {
 	case r := <-w:

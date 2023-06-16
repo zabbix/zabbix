@@ -119,9 +119,7 @@ $http_form_list->addRow(_('Variables'), (new CDiv(
 		->setHeader(['', _('Name'), '', _('Value'), ''])
 		->addRow((new CRow([
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
+				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(5)
 		])))
 ))
@@ -137,9 +135,7 @@ $http_form_list->addRow(_('Headers'), (new CDiv(
 		->setHeader(['', _('Name'), '', _('Value'), ''])
 		->addRow((new CRow([
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
+				(new CButtonLink(_('Add')))->addClass('element-table-add')
 			))->setColSpan(5)
 		])))
 ))
@@ -201,7 +197,7 @@ $http_step_form_list = new CFormList();
 $steps_table = (new CTable())
 	->addClass('httpconf-steps-dynamic-row')
 	->setHeader([
-		(new CColHeader())->setWidth('15'),
+		new CColHeader(),
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('150'),
 		(new CColHeader(_('Timeout')))->setWidth('50'),
@@ -216,9 +212,7 @@ $steps_table = (new CTable())
 if (!$this->data['templated']) {
 	$steps_table->addRow(
 		(new CCol(
-			(new CButton(null, _('Add')))
-				->addClass('element-table-add')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Add')))->addClass('element-table-add')
 		))->setColSpan(8)
 	);
 }
