@@ -77,8 +77,8 @@ void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **l
  *               indicates end of file).                                      *
  *               On error, -1 (ZBX_READ_ERR) is returned and errno is set     *
  *               appropriately.                                               *
- *               If new line was not found, -2 (ZBX_READ_NO_NEWLINE_ERR) is   *
- *               returned.                                                    *
+ *               If the wrong decoding is detected, -2                        *
+ *               (ZBX_READ_WRONG_ENCODING) is returned.                       *
  *                                                                            *
  * Comments: Reading stops after a newline. If the newline is read, it is     *
  *           stored into the buffer.                                          *
@@ -90,7 +90,6 @@ int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *en
 	ssize_t		nbytes;
 	const char	*cr, *lf;
 	zbx_offset_t	offset;
-	int		lf_found = 0;
 
 	if ((zbx_offset_t)-1 == (offset = zbx_lseek(fd, 0, SEEK_CUR)))
 		return ZBX_READ_ERR;
@@ -99,13 +98,19 @@ int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *en
 		return (int)nbytes;
 
 	zbx_find_cr_lf_szbyte(encoding, &cr, &lf, &szbyte);
+	zabbix_log(LOG_LEVEL_INFORMATION, "OMEGA, nbytes: %lu, szbyte: %lu", nbytes, szbyte);
+
+	/* nbytes can be smaller than szbyte. If the target file was encoded in UTF-8 and contained a single */
+	/* character, but the target encoding was mistakenly set to UTF-32. Then nbytes will be 1 and szbyte */
+	/* will be 4. */
+	if (nbytes < szbyte )
+		return ZBX_READ_WRONG_ENCODING;
 
 	for (i = 0; i <= (size_t)nbytes - szbyte; i += szbyte)
 	{
 		if (0 == memcmp(&buf[i], lf, szbyte))	/* LF (Unix) */
 		{
 			i += szbyte;
-			lf_found = 1;
 			break;
 		}
 
@@ -116,25 +121,8 @@ int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *en
 				i += szbyte;
 
 			i += szbyte;
-			lf_found = 1;
 			break;
 		}
-	}
-
-	/* list of encodings taken from zbx_find_cr_lf_szbyte() */
-	if ((0 == lf_found) &&
-			(0 == strcasecmp(encoding, "UNICODE") || 0 == strcasecmp(encoding, "UNICODELITTLE") ||
-			0 == strcasecmp(encoding, "UTF-16") || 0 == strcasecmp(encoding, "UTF-16LE") ||
-			0 == strcasecmp(encoding, "UTF16") || 0 == strcasecmp(encoding, "UTF16LE") ||
-			0 == strcasecmp(encoding, "UCS-2") || 0 == strcasecmp(encoding, "UCS-2LE") ||
-				0 == strcasecmp(encoding, "UNICODEBIG") || 0 == strcasecmp(encoding, "UNICODEFFFE") ||
-				0 == strcasecmp(encoding, "UTF-16BE") || 0 == strcasecmp(encoding, "UTF16BE") ||
-				0 == strcasecmp(encoding, "UCS-2BE") ||
-				0 == strcasecmp(encoding, "UTF-32") || 0 == strcasecmp(encoding, "UTF-32LE") ||
-				0 == strcasecmp(encoding, "UTF32") || 0 == strcasecmp(encoding, "UTF32LE") ||
-				0 == strcasecmp(encoding, "UTF-32BE") || 0 == strcasecmp(encoding, "UTF32BE")))
-	{
-		return ZBX_READ_NO_NEWLINE_ERR;
 	}
 
 	if ((zbx_offset_t)-1 == zbx_lseek(fd, offset + (zbx_offset_t)i, SEEK_SET))

@@ -34,7 +34,7 @@ int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
 void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
 
 #define ZBX_READ_ERR		-1
-#define ZBX_READ_NO_NEWLINE_ERR	-2
+#define ZBX_READ_WRONG_ENCODING	-2
 int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);

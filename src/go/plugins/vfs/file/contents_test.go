@@ -70,6 +70,13 @@ func TestFileContentsEncoding(t *testing.T) {
 		0x38, 0x04, 0x00, 0x00, 0x40, 0x04, 0x00, 0x00, 0x3f, 0x04, 0x00, 0x00, 0x38, 0x04, 0x00, 0x00,
 		0x47, 0x04, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00}
 
+	// a
+	fileSingleCharNoNewLine := []byte{0x61}
+
+	// alphabeta
+	fileManyCharsNoNewLine := []byte{
+		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
+
 	tests := []*testCase{
 		{fileContents: fileContents_UTF_8, targetEncoding: "", targetContents: "августа"},
 		{fileContents: fileContents_2_UTF_8, targetEncoding: "", targetContents: "августа"},
@@ -84,7 +91,19 @@ func TestFileContentsEncoding(t *testing.T) {
 		{fileContents: fileContents_UTF_16BE, targetEncoding: "UTF-16BE",
 			targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
 		{fileContents: fileContents_UTF_32LE, targetEncoding: "UTF-32LE",
-			targetContents: "ロシアデスマン\n\n🌭\nкирпич"}}
+			targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "", targetContents: "a"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "", targetContents: "alphabeta"},
+		// wrong encodings
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
+		{fileContents: fileContents_ISO_8859_5, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileContents_ISO_8859_5, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "UTF-16BE", targetContents: ""},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-16BE", targetContents: "慬灨慢整"},
+		{fileContents: fileSingleCharNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
+	}
 
 	for i, c := range tests {
 		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
@@ -109,8 +128,9 @@ func TestFileContentsEncoding(t *testing.T) {
 		}
 
 		if contents != c.targetContents {
-			t.Errorf("vfs.file.contents (testCase[%d]) returned invalid result: ->%s<-, expected: ->%s<-, %x NEXT %x",
-				i, contents, c.targetContents, []byte(contents), []byte(c.targetContents))
+			t.Errorf(`vfs.file.contents (testCase[%d]) returned invalid result: ->%s<-,
+				expected: ->%s<-, (bytes: %x and %x)`, i, contents, c.targetContents,
+				[]byte(contents), []byte(c.targetContents))
 		}
 	}
 }

@@ -67,7 +67,7 @@ func decode(encoding string, inbuf []byte, bytecount int) (outbuf []byte, outbyt
 	cd, err := C.iconv_open(tocode, fromcode)
 
 	if err != nil {
-		return inbuf, 0
+		return inbuf, bytecount
 	}
 
 	outbuf = make([]byte, bytecount)

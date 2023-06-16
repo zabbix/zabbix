@@ -564,7 +564,12 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (ZBX_READ_ERR == nbytes)	/* error occurred */
+	if (ZBX_READ_WRONG_ENCODING == nbytes)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file. Wrong encoding detected."));
+		goto err;
+	}
+	else if (ZBX_READ_ERR == nbytes)	/* general error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
@@ -678,10 +683,9 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 			break;
 	}
 
-
-	if (ZBX_READ_NO_NEWLINE_ERR == nbytes)
+	if (ZBX_READ_WRONG_ENCODING == nbytes)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file, failed to find line feed"));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file. Wrong encoding detected."));
 		goto err;
 	}
 	else if (ZBX_READ_ERR == nbytes)	/* error occurred */

@@ -46,9 +46,12 @@ func TestExecuteRegex(t *testing.T) {
 		{input: `b:xyz"`, pattern: `b:([^ ]+)`, output: `\\1`, result: `\1`, match: true},
 		{input: `a:1 b:2`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `1,2`, match: true},
 		{input: `a:\2 b:xyz`, pattern: `a:([^ ]+) b:([^ ]+)`, output: `\1,\2`, result: `\2,xyz`, match: true},
-		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\@`, result: `value: 10`, match: true},
-		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\0`, result: `value: 10`, match: true},
-		{input: `a:9 b:2`, pattern: `a:([^\d ]+) | b:([^ ]+)`, output: `\0,\1,\2`, result: ` b:2,,2`, match: true},
+		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\@`, result: `value: 10`,
+			match: true},
+		{input: `a value: 10 in text"`, pattern: `value: ([0-9]+)`, output: `\0`, result: `value: 10`,
+			match: true},
+		{input: `a:9 b:2`, pattern: `a:([^\d ]+) | b:([^ ]+)`, output: `\0,\1,\2`, result: ` b:2,,2`,
+			match: true},
 	}
 
 	for _, c := range tests {
@@ -115,7 +118,7 @@ func TestFileRegexpOutput(t *testing.T) {
 	// 127.0.0.1 localhost
 	// 127.0.1.1 zabbix
 	//
-	hosts_file := []byte{
+	hostsFile := []byte{
 		0x31, 0x00, 0x32, 0x00, 0x37, 0x00, 0x2e, 0x00, 0x30, 0x00, 0x2e, 0x00, 0x30, 0x00, 0x2e, 0x00,
 		0x31, 0x00, 0x20, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x63, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x68, 0x00,
 		0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x0a, 0x00, 0x31, 0x00, 0x32, 0x00, 0x37, 0x00, 0x2e, 0x00,
@@ -125,7 +128,7 @@ func TestFileRegexpOutput(t *testing.T) {
 	// 127.0.0.1 локалхост
 	// 127.0.1.1 заббикс
 	//
-	hosts_file_ru := []byte{
+	hostsFile_RU := []byte{
 		0x31, 0x00, 0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x37, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00,
 		0x30, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00,
 		0x31, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x3b, 0x04, 0x00, 0x00, 0x3e, 0x04, 0x00, 0x00,
@@ -162,8 +165,8 @@ func TestFileRegexpOutput(t *testing.T) {
 		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "2",
 			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
 
-		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1", lineEnd: "",
-			targetStringGroup: "", targetContents: "выхухоль"},
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-16LE", lineStart: "1",
+			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль"},
 
 		{fileContents: fileContents_UTF_16LE, targetSearch: "выхухоль2\n", targetEncoding: "UTF-16LE",
 			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
@@ -181,23 +184,23 @@ func TestFileRegexpOutput(t *testing.T) {
 			targetEncoding: "", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: "127.0.0.1 localhost"},
 
-		{fileContents: hosts_file, targetSearch: "localhost",
+		{fileContents: hostsFile, targetSearch: "localhost",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: "127.0.0.1 localhost"},
 
-		{fileContents: hosts_file, targetSearch: "ll",
+		{fileContents: hostsFile, targetSearch: "ll",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: ""},
 
-		{fileContents: hosts_file, targetSearch: "zabbix",
+		{fileContents: hostsFile, targetSearch: "zabbix",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: "127.0.1.1 zabbix"},
 
-		{fileContents: hosts_file, targetSearch: "локалхост",
+		{fileContents: hostsFile, targetSearch: "локалхост",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: ""},
 
-		{fileContents: hosts_file_ru, targetSearch: "локалхост",
+		{fileContents: hostsFile_RU, targetSearch: "локалхост",
 			targetEncoding: "UTF-32LE", lineStart: "", lineEnd: "", targetStringGroup: "",
 			targetContents: "127.0.0.1 локалхост"},
 
@@ -205,7 +208,19 @@ func TestFileRegexpOutput(t *testing.T) {
 		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
 			lineEnd: "", targetStringGroup: "", targetContents: ""},
 		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5", lineStart: "2",
-			lineEnd: "", targetStringGroup: "", targetContents: ""}}
+			lineEnd: "", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-16LE",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: ""},
+
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: ""}}
 
 	for i, c := range tests {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
@@ -242,24 +257,25 @@ func TestFileRegexpOutput(t *testing.T) {
 		}
 	}
 
+	// a
+	fileSingleCharNoNewLine := []byte{0x61}
+
+	// alphabeta
+	fileManyCharsNoNewLine := []byte{
+		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
+
 	// wrong encodings, but we can detect this
-	tests_wrong_encodings := []*testCase{
-		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-16LE",
-			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2\n"},
+	testsWrongEncodings := []*testCase{
+		{fileContents: fileSingleCharNoNewLine, targetSearch: "a", targetEncoding: "UTF-32BE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "a"},
 
-		{fileContents: fileContents_3_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE",
-			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
-
-		{fileContents: fileContents_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE",
-			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
-
-		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE",
-			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль\n"},
+		{fileContents: fileManyCharsNoNewLine, targetSearch: "alpha", targetEncoding: "UTF-16LE",
+			lineStart: "1", lineEnd: "", targetStringGroup: "", targetContents: "alpha"},
 	}
 
-	expected_error := "No line feed detected"
+	expectedError := "Cannot read from file. Wrong encoding detected."
 
-	for i, c := range tests_wrong_encodings {
+	for i, c := range testsWrongEncodings {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
 
@@ -270,9 +286,9 @@ func TestFileRegexpOutput(t *testing.T) {
 
 		if result, err := impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
 			c.lineStart, c.lineEnd, c.targetStringGroup}, nil); err != nil {
-			if err.Error() != expected_error {
+			if err.Error() != expectedError {
 				t.Errorf("vfs.file.regexp testcase[%d] failed with unexpected error: %s, expected: %s",
-					i, err.Error(), expected_error)
+					i, err.Error(), expectedError)
 			}
 		} else {
 			t.Errorf("vfs.file.regexp testcase[%d] did NOT return error, result: %s", i, result)

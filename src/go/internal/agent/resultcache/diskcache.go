@@ -240,6 +240,7 @@ func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId 
 		} else {
 			rows.Close()
 			_ = rows.Err()
+
 			return nil, 0, err
 		}
 		results = append(results, &result)

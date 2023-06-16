@@ -68,6 +68,7 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
 	for ii := 0; ii < szbyte; ii++ {
 		if a[aStartOffset+ii] != b[bStartOffset+ii] {
 			ee = false
+
 			break
 		}
 	}
@@ -75,15 +76,12 @@ func (p *Plugin) bytesCompare(a []byte, b []byte, szbyte int, aStartOffset int, 
 	return ee
 }
 
-func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte int, encoding string) ([]byte,
-	int, error) {
-	lf_found := 0
+func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte int) ([]byte, int) {
 	var i int
 
 	for i = 0; i <= nbytes-szbyte; i += szbyte {
 		if p.bytesCompare(buf, lf, szbyte, i, 0) { /* LF (Unix) */
 			i += szbyte
-			lf_found = 1
 
 			break
 		}
@@ -94,27 +92,12 @@ func (p *Plugin) checkLF(buf []byte, lf []byte, cr []byte, nbytes int, szbyte in
 				i += szbyte
 			}
 			i += szbyte
-			lf_found = 1
 
 			break
 		}
 	}
 
-	if (0 == lf_found) &&
-		(strings.EqualFold(encoding, "UNICODE") || strings.EqualFold(encoding, "UNICODELITTLE") ||
-			strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
-			strings.EqualFold(encoding, "UTF16") || strings.EqualFold(encoding, "UTF16LE") ||
-			strings.EqualFold(encoding, "UCS-2") || strings.EqualFold(encoding, "UCS-2LE") ||
-			strings.EqualFold(encoding, "UNICODEBIG") || strings.EqualFold(encoding, "UNICODEFFFE") ||
-			strings.EqualFold(encoding, "UTF-16BE") || strings.EqualFold(encoding, "UTF16BE") ||
-			strings.EqualFold(encoding, "UCS-2BE") ||
-			strings.EqualFold(encoding, "UTF-32") || strings.EqualFold(encoding, "UTF-32LE") ||
-			strings.EqualFold(encoding, "UTF32") || strings.EqualFold(encoding, "UTF32LE") ||
-			strings.EqualFold(encoding, "UTF-32BE") || strings.EqualFold(encoding, "UTF32BE")) {
-		return nil, 0, fmt.Errorf("No line feed detected")
-	}
-
-	return buf, i, nil
+	return buf, i
 }
 
 func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf []byte, nbytes int, err error) {
@@ -141,10 +124,15 @@ func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf
 
 	cr, lf, szbyte = p.find_CR_LF_Szbyte(encoding)
 
-	var i int
-	if buf, i, err = p.checkLF(buf, lf, cr, nbytes, szbyte, encoding); err != nil {
-		return nil, 0, err
+	/* nbytes can be smaller than szbyte. If the target file was encoded in UTF-8 and contained a single
+	   character, but the target encoding was mistakenly set to UTF-32. Then nbytes will be 1 and szbyte
+	   will be 4. */
+	if nbytes < szbyte {
+		return nil, 0, fmt.Errorf("Cannot read from file. Wrong encoding detected.")
 	}
+
+	var i int
+	buf, i = p.checkLF(buf, lf, cr, nbytes, szbyte)
 
 	_, err = targetFile.Seek(offset+int64(i), io.SeekStart)
 	if err != nil {

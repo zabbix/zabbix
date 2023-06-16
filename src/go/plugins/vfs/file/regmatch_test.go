@@ -80,7 +80,7 @@ func TestFileRegmatch(t *testing.T) {
 	// 127.0.0.1 localhost
 	// 127.0.1.1 zabbix
 	//
-	hosts_file := []byte{
+	hostsFile := []byte{
 		0x31, 0x00, 0x32, 0x00, 0x37, 0x00, 0x2e, 0x00, 0x30, 0x00, 0x2e, 0x00, 0x30, 0x00, 0x2e, 0x00,
 		0x31, 0x00, 0x20, 0x00, 0x6c, 0x00, 0x6f, 0x00, 0x63, 0x00, 0x61, 0x00, 0x6c, 0x00, 0x68, 0x00,
 		0x6f, 0x00, 0x73, 0x00, 0x74, 0x00, 0x0a, 0x00, 0x31, 0x00, 0x32, 0x00, 0x37, 0x00, 0x2e, 0x00,
@@ -90,7 +90,7 @@ func TestFileRegmatch(t *testing.T) {
 	// 127.0.0.1 локалхост
 	// 127.0.1.1 заббикс
 	//
-	hosts_file_ru := []byte{
+	hostsFile_RU := []byte{
 		0x31, 0x00, 0x00, 0x00, 0x32, 0x00, 0x00, 0x00, 0x37, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00,
 		0x30, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00, 0x30, 0x00, 0x00, 0x00, 0x2e, 0x00, 0x00, 0x00,
 		0x31, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x3b, 0x04, 0x00, 0x00, 0x3e, 0x04, 0x00, 0x00,
@@ -129,26 +129,30 @@ func TestFileRegmatch(t *testing.T) {
 		{fileContents: []byte("127.0.0.1 localhost\n127.0.1.1 zabbix\n\n"), targetSearch: "localhost",
 			targetEncoding: "", lineStart: "", lineEnd: "", match: 1},
 
-		{fileContents: hosts_file, targetSearch: "localhost",
+		{fileContents: hostsFile, targetSearch: "localhost",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", match: 1},
 
-		{fileContents: hosts_file, targetSearch: "ll",
+		{fileContents: hostsFile, targetSearch: "ll",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", match: 0},
 
-		{fileContents: hosts_file, targetSearch: "zabbix",
+		{fileContents: hostsFile, targetSearch: "zabbix",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", match: 1},
 
-		{fileContents: hosts_file, targetSearch: "локалхост",
+		{fileContents: hostsFile, targetSearch: "локалхост",
 			targetEncoding: "UTF-16LE", lineStart: "", lineEnd: "", match: 0},
 
-		{fileContents: hosts_file_ru, targetSearch: "локалхост",
+		{fileContents: hostsFile_RU, targetSearch: "локалхост",
 			targetEncoding: "UTF-32LE", lineStart: "", lineEnd: "", match: 1},
 
 		// wrong encodings, but we cannot detect this and there is no expected match
 		{fileContents: fileContents_1_UTF_16LE, targetSearch: "(error)", targetEncoding: "iso-8859-5",
 			lineStart: "", lineEnd: "", match: 0},
 		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "iso-8859-5",
-			lineStart: "2", lineEnd: "", match: 0}}
+			lineStart: "2", lineEnd: "", match: 0},
+		{fileContents: fileContents_2_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "2", lineEnd: "", match: 0},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE",
+			lineStart: "1", lineEnd: "", match: 0}}
 	for i, c := range tests {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
@@ -161,7 +165,7 @@ func TestFileRegmatch(t *testing.T) {
 
 		if result, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
 			c.lineStart, c.lineEnd}, nil); err != nil {
-			t.Errorf("vfs.file.regmatch returned error %s", err.Error())
+			t.Errorf("vfs.file.regmatch[%d] returned error %s", i, err.Error())
 
 			return
 		}
@@ -182,19 +186,25 @@ func TestFileRegmatch(t *testing.T) {
 		}
 	}
 
+	// a
+	fileSingleCharNoNewLine := []byte{0x61}
+
+	// alphabeta
+	fileManyCharsNoNewLine := []byte{
+		0x61, 0x6c, 0x70, 0x68, 0x61, 0x62, 0x65, 0x74, 0x61}
+
 	// wrong encodings, but we can detect this
-	tests_wrong_encodings := []*testCase{
+	testsWrongEncodings := []*testCase{
 		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-16LE",
 			lineStart: "", lineEnd: "", match: 1},
 		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "(а)", targetEncoding: "UTF-32BE",
 			lineStart: "", lineEnd: "", match: 1},
-		{fileContents: fileContents_2_UTF_16LE, targetSearch: "хух", targetEncoding: "UTF-32BE",
-			lineStart: "2", lineEnd: "", match: 1},
-		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-16LE",
-			lineStart: "1", lineEnd: "", match: 1},
-	}
-	expected_error := "No line feed detected"
-	for i, c := range tests_wrong_encodings {
+		{fileContents: fileSingleCharNoNewLine, targetSearch: "a", targetEncoding: "UTF-16LE",
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileManyCharsNoNewLine, targetSearch: "a", targetEncoding: "UTF-32BE",
+			lineStart: "", lineEnd: "", match: 1}}
+	expectedError := "Cannot read from file. Wrong encoding detected."
+	for i, c := range testsWrongEncodings {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {
 			t.Errorf("failed to created file: %s", err1.Error())
 
@@ -203,9 +213,9 @@ func TestFileRegmatch(t *testing.T) {
 
 		if _, err := impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
 			c.lineStart, c.lineEnd}, nil); err != nil {
-			if err.Error() != expected_error {
-				t.Errorf("vfs.file.regmatch testcase[%d] failed with unexpected error: %s, expected: %s",
-					i, err.Error(), expected_error)
+			if err.Error() != expectedError {
+				t.Errorf(`vfs.file.regmatch testcase[%d] failed with unexpected error: %s,
+					expected: %s`, i, err.Error(), expectedError)
 			}
 		} else {
 			t.Errorf("vfs.file.regmatch testcase[%d] did NOT return error", i)
