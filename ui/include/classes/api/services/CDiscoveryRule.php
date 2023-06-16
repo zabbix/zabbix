@@ -1196,13 +1196,13 @@ class CDiscoveryRule extends CItemGeneral {
 			'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($condition_table, 'value')]
 		];
 
-		return ['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'fields' => [
+		return ['type' => API_OBJECT, 'fields' => [
 			'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION])],
 			'formula' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($base_table, 'formula')],
 								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault($base_table, 'formula')]
 			]],
-			'conditions' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED | API_NORMALIZE | API_NOT_EMPTY, 'rules' => [
+			'conditions' =>	['type' => API_MULTIPLE, 'flags' => API_REQUIRED | API_NORMALIZE, 'rules' => [
 								['if' => ['field' => 'evaltype', 'in' => CONDITION_EVAL_TYPE_EXPRESSION], 'type' => API_OBJECTS, 'uniq' => [['formulaid']], 'fields' => [
 									'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED]
 								] + $condition_fields],
@@ -1614,7 +1614,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$condition_formula_parser = new CConditionFormula();
 
 		foreach ($objects as $i => $object) {
-			if (!array_key_exists('filter', $object) || $object['filter'] === null
+			if (!array_key_exists('filter', $object)
 					|| $object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 				continue;
 			}
@@ -1886,17 +1886,6 @@ class CDiscoveryRule extends CItemGeneral {
 		$condition_pk = DB::getPk($condition_table);
 
 		$_upd_objectids = $db_objects !== null ? [] : null;
-
-		foreach ($objects as $i => &$object) {
-			if (array_key_exists('filter', $object) && $object['filter'] === null) {
-				$object['filter'] = [
-					'evaltype' => DB::getDefault($base_table, 'evaltype'),
-					'formula' => DB::getDefault('lld_override', 'formula'),
-					'conditions' => []
-				];
-			}
-		}
-		unset($object);
 
 		self::updateFilterConditions($objects, $db_objects, $_upd_objectids, $base_table, $condition_table);
 

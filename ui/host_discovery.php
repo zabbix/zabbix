@@ -393,6 +393,18 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			throw new Exception();
 		}
 
+		$overrides = getRequest('overrides', []);
+		$db_item = null;
+
+		if (hasRequest('update')) {
+			$options = $overrides ? ['selectOverrides' => ['step']] : [];
+
+			$db_item = API::DiscoveryRule()->get([
+				'output' => ['itemid', 'templateid'],
+				'itemids' => $itemid
+			] + $options)[0];
+		}
+
 		$delay_flex = getRequest('delay_flex', []);
 
 		if (!isValidCustomIntervals($delay_flex, true)) {
@@ -418,7 +430,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'formula' => getRequest('formula', DB::getDefault('items', 'formula')),
 				'conditions' => getRequest('conditions', [])
 			]),
-			'overrides' => prepareLldOverrides(getRequest('overrides', [])),
+			'overrides' => prepareLldOverrides($overrides, $db_item),
 
 			// Type fields.
 			// The fields used for multiple item types.
@@ -495,12 +507,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		if (hasRequest('update')) {
-			$db_items = API::DiscoveryRule()->get([
-				'output' => ['templateid'],
-				'itemids' => $itemid
-			]);
-
-			$item = getSanitizedItemFields($input + $db_items[0] + [
+			$item = getSanitizedItemFields($input + $db_item + [
 				'flags' => ZBX_FLAG_DISCOVERY_RULE,
 				'hosts' => $hosts
 			]);

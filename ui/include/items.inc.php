@@ -2035,13 +2035,13 @@ function prepareLldMacroPaths(array $macro_paths): array {
  *
  * @param array $filter  Array of LLD filters, as received from form submit.
  *
- * @return array|null
+ * @return array
  */
-function prepareLldFilter(array $filter): ?array {
+function prepareLldFilter(array $filter): array {
 	ksort($filter['conditions']);
 
 	foreach ($filter['conditions'] as $i => &$condition) {
-		if ($condition['macro'] === '') {
+		if ($condition['macro'] === '' && $condition['value'] === '') {
 			unset($filter['conditions'][$i]);
 			continue;
 		}
@@ -2054,13 +2054,15 @@ function prepareLldFilter(array $filter): ?array {
 	}
 	unset($condition);
 
-	if (!$filter['conditions']) {
-		return null;
-	}
+	$filter['conditions'] = array_values($filter['conditions']);
 
-	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) == 1) {
+	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION && count($filter['conditions']) <= 1) {
 		$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
 		$filter['formula'] = '';
+
+		if ($filter['conditions']) {
+			$filter['conditions'][0]['formulaid'] = '';
+		}
 	}
 
 	if ($filter['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
@@ -2071,23 +2073,28 @@ function prepareLldFilter(array $filter): ?array {
 }
 
 /**
- * Format LLD rule filter data received via form for API input.
+ * Format LLD rule overrides data received via form for API input.
  *
- * @param array $filter  Array of LLD filters, as received from form submit.
+ * @param array      $overrides             Array of LLD overrides, as received from form submit.
+ * @param array|null $db_item
+ * @param array      $db_item['overrides']
  *
  * @return array
  */
-function prepareLldOverrides(array $overrides): array {
+function prepareLldOverrides(array $overrides, ?array $db_item): array {
+	$db_overrides = $db_item !== null && $overrides ? array_column($db_item['overrides'], null, 'step') : [];
+
 	foreach ($overrides as &$override) {
-		if (!array_key_exists('filter', $override)) {
-			$override['filter'] = null;
-			continue;
+		if (!array_key_exists($override['step'], $db_overrides)
+				&& !array_key_exists('conditions', $override['filter'])) {
+			unset($override['filter']);
+		}
+		elseif (!array_key_exists('conditions', $override['filter'])) {
+			$override['filter']['conditions'] = [];
 		}
 
-		foreach ($override['filter']['conditions'] as &$condition) {
-			if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
-				$condition['formulaid'] = '';
-			}
+		if (!array_key_exists('operations', $override)) {
+			$override['operations'] = [];
 		}
 	}
 	unset($override);
@@ -2224,13 +2231,19 @@ function getMainItemFieldNames(array $input): array {
 
 		case ZBX_FLAG_DISCOVERY_RULE:
 			if ($input['templateid'] == 0) {
-				return ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
-					'lld_macro_paths', 'filter', 'overrides'
+				$field_names = ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
+					'lld_macro_paths', 'overrides'
 				];
 			}
 			else {
-				return ['lifetime', 'description', 'status', 'filter'];
+				$field_names = ['lifetime', 'description', 'status'];
 			}
+
+			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {
+				$field_names[] = 'filter';
+			}
+
+			return $field_names;
 
 		case ZBX_FLAG_DISCOVERY_PROTOTYPE:
 			if ($input['templateid'] == 0) {
