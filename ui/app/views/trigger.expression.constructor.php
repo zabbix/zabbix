@@ -79,8 +79,7 @@ if ($data['expression_type'] === 'expression') {
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['readonly']
 						? (new CCol(
-						(new CSimpleButton(_('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->addClass('js_remove_expression')
 							->setAttribute('data-id', $e['id'])
 					))->addClass(ZBX_STYLE_NOWRAP)
@@ -141,8 +140,7 @@ if ($data['expression_type'] === 'recovery_expression') {
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['readonly']
 						? (new CCol(
-						(new CSimpleButton(_('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setAttribute('data-id', $e['id'])
 							->addClass('js_remove_recovery_expression')
 					))->addClass(ZBX_STYLE_NOWRAP)

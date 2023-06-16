@@ -177,8 +177,7 @@ $expression_constructor_buttons[] = (new CButton('replace_expression', _('Replac
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
-$input_method_toggle = (new CButton('expression_constructor', _('Expression constructor')))
-	->addClass(ZBX_STYLE_BTN_LINK)
+$input_method_toggle = (new CButtonLink( _('Expression constructor')))
 	->setId('expression-constructor');
 
 $expression_row[] = [
@@ -199,10 +198,7 @@ $trigger_form_grid->addItem(
 		->addStyle('display: none')
 );
 
-$input_method_toggle = (new CDiv(
-	(new CSimpleButton(_('Close expression constructor')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-));
+$input_method_toggle = (new CDiv(new CButtonLink(_('Close expression constructor'))));
 $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 	->addStyle('display: none')
 	->setId('close-expression-constructor')
@@ -272,8 +268,7 @@ $recovery_constructor_buttons[] = (new CSimpleButton(_('Replace')))
 	->setEnabled(!$readonly);
 
 
-$input_method_toggle = (new CSimpleButton(_('Expression constructor')))
-	->addClass(ZBX_STYLE_BTN_LINK)
+$input_method_toggle = (new CButtonLink(_('Expression constructor')))
 	->setId('recovery-expression-constructor');
 
 $recovery_expression_row[] = [
@@ -294,8 +289,7 @@ $trigger_form_grid->addItem(
 		->addStyle('display: none')
 );
 
-$input_method_toggle = (new CSimpleButton(_('Close expression constructor')))
-	->addClass(ZBX_STYLE_BTN_LINK);
+$input_method_toggle = new CButtonLink(_('Close expression constructor'));
 
 $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 	->addStyle('display: none')

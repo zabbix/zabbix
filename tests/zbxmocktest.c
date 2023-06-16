@@ -21,7 +21,7 @@
 
 #include "zbxnum.h"
 #include "zbxtypes.h"
-#include "log.h"
+#include "zbxlog.h"
 
 /* unresolved symbols needed for linking */
 

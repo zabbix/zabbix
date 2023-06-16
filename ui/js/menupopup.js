@@ -1997,7 +1997,7 @@ jQuery(function($) {
 		}
 
 		if (options.selected) {
-			link.addClass('selected');
+			link.addClass(['selected', ZBX_ICON_CHECK]);
 		}
 
 		if (options.class) {

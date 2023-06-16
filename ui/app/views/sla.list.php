@@ -146,7 +146,7 @@ foreach ($data['slas'] as $slaid => $sla) {
 		$sla['timezone'] !== ZBX_DEFAULT_TIMEZONE
 			? $sla['timezone']
 			: CTimezoneHelper::getTitle(CTimezoneHelper::getSystemTimezone(), _('System default')),
-		CSlaHelper::getScheduleTag($sla['schedule']),
+		CSlaHelper::getScheduleCaption($sla['schedule']),
 		$sla_report_tag,
 		$status_tag
 	];
@@ -163,19 +163,19 @@ if ($data['has_access'][CRoleHelper::ACTIONS_MANAGE_SLA]) {
 				'content' => (new CSimpleButton(_('Enable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massenable-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'sla.massdisable' => [
 				'content' => (new CSimpleButton(_('Disable')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdisable-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			],
 			'sla.massdelete' => [
 				'content' => (new CSimpleButton(_('Delete')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massdelete-sla')
-					->addClass('no-chkbxrange')
+					->addClass('js-no-chkbxrange')
 			]
 		], 'sla')
 	);

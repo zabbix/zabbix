@@ -26,6 +26,7 @@
 #define ZBX_PROTO_TAG_CLOCK			"clock"
 #define ZBX_PROTO_TAG_NS			"ns"
 #define ZBX_PROTO_TAG_DATA			"data"
+#define ZBX_PROTO_TAG_COMMANDS			"commands"
 #define ZBX_PROTO_TAG_REGEXP			"regexp"
 #define ZBX_PROTO_TAG_DELAY			"delay"
 #define ZBX_PROTO_TAG_REFRESH_UNSUPPORTED	"refresh_unsupported"
@@ -205,6 +206,7 @@
 #define ZBX_PROTO_TAG_REMOVED_HOSTIDS		"del_hostids"
 #define ZBX_PROTO_TAG_REMOVED_MACRO_HOSTIDS	"del_macro_hostids"
 #define ZBX_PROTO_TAG_ACKNOWLEDGEID		"acknowledgeid"
+#define ZBX_PROTO_TAG_WAIT			"wait"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

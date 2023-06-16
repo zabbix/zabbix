@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcomms.h"
 #include "zbxconf.h"
@@ -299,7 +299,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg	= {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 char	*opt = NULL;
 
@@ -1161,7 +1161,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1394,7 +1394,7 @@ void	zbx_free_service_resources(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 #ifndef _WINDOWS
 	zbx_locks_destroy();
@@ -1434,9 +1434,9 @@ int	main(int argc, char **argv)
 	/* into windows event log while zabbix_log is not ready */
 	if (ZBX_TASK_START == t.task && 0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
-		zbx_config_log_t	log_cfg	= {NULL, NULL, LOG_TYPE_SYSTEM, 1};
+		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
 	}
 #endif
 
@@ -1578,7 +1578,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 #ifdef _WINDOWS
 			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
-				zabbix_close_log();
+				zbx_close_log();
 #endif
 			break;
 	}

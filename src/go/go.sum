@@ -1,11 +1,7 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230328072810-77ed282adaf3 h1:KNudAUf1TdCuxlMD0voq1iv0sjtGZesaV710NuSU3qs=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230328072810-77ed282adaf3/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230418090847-15954c22fe83 h1:iIiHsg5+eRVqLaPK120KJxPFjadzpYvLTlN3awJI6/Y=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230418090847-15954c22fe83/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230425092047-963c1f3428c3 h1:zBsddZ3Pzo+y7ld15TmC0nEKC1ANGBCB7IbnKUvsu5M=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230425092047-963c1f3428c3/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230503081642-61ed4a9d9246 h1:nRrITHmaXPmQCAvnBnJ5ked8E4eTQw2fl2opZ6KYyV8=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230503081642-61ed4a9d9246/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da h1:SGrLbxs3//G2fEtQSUNJFix1wZN+5h5fegZbIMZNuWg=
+git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da/go.mod h1:F82aoIfLotyv5ExPLCnbUXklH89O6iS1jeU1Kh3lYGs=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69/go.mod h1:L1AbZdiDllfyYH5l5OkAaZtk7VkWe89bPJFmnDBNHxg=
 github.com/Microsoft/go-winio v0.6.0 h1:slsWYD/zyx7lCXoZVlvQrj0hPTM1HI4+v1sIda2yDvg=
@@ -20,8 +16,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143 h1:K9CFK8HRZWzmoIWbpA7u0XYLggCyfa/N77eVaq/nUiA=
 github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143/go.mod h1:BLhrehfVmtABJWBZTJV8HyPWCSZoiMzjjcZ3+vHHhPI=
-github.com/eclipse/paho.mqtt.golang v1.4.1 h1:tUSpviiL5G3P9SZZJPC4ZULZJsxQKXxfENpMvdbAXAI=
-github.com/eclipse/paho.mqtt.golang v1.4.1/go.mod h1:JGt0RsEwEX+Xa/agj90YJ9d9DH2b7upDZMK9HRbFvCA=
+github.com/eclipse/paho.mqtt.golang v1.4.2 h1:66wOzfUHSSI1zamx7jR6yMEI5EuHnT1G6rNA5PM12m4=
+github.com/eclipse/paho.mqtt.golang v1.4.2/go.mod h1:JGt0RsEwEX+Xa/agj90YJ9d9DH2b7upDZMK9HRbFvCA=
 github.com/fsnotify/fsnotify v1.5.4 h1:jRbGcIw6P2Meqdwuo0H1p6JVLbL5DHKAKlYndzMwVZI=
 github.com/fsnotify/fsnotify v1.5.4/go.mod h1:OVB6XrOHzAwXMpEM7uPOzcehqUV2UqJxmVXmkdnm1bU=
 github.com/go-ldap/ldap v3.0.3+incompatible h1:HTeSZO8hWMS1Rgb2Ziku6b8a7qRIZZMHjsvuZyatzwk=

@@ -1482,8 +1482,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 									->setReadonly($readonly)
 							),
 							(new CCol(
-								(new CSimpleButton(_('Remove')))
-									->addClass(ZBX_STYLE_BTN_LINK)
+								(new CButtonLink(_('Remove')))
 									->addClass('js-group-json-action-delete')
 									->setEnabled(!$readonly && $count > 3)
 							))->addClass(ZBX_STYLE_NOWRAP)
@@ -1508,8 +1507,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 								(new CTag('tfoot', true))
 									->addItem(
 										(new CCol(
-											(new CSimpleButton(_('Add')))
-												->addClass(ZBX_STYLE_BTN_LINK)
+											(new CButtonLink(_('Add')))
 												->addClass('js-group-json-action-add')
 												->setEnabled(!$readonly)
 										))->setColSpan(4)
