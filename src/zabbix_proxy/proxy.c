@@ -335,6 +335,11 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
 
+#define ZBX_CONFIG_DEFAULT_DATA_CACHE_AGE	(SEC_PER_MIN * 10)
+
+static zbx_uint64_t	config_data_cache_size	= 0;
+static int		config_data_cache_age	= 0;
+
 /* proxy has no any events processing */
 static const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= NULL,
@@ -715,6 +720,32 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == config_proxyconfig_frequency)
 		config_proxyconfig_frequency = 10;
 
+	if (0 == config_data_cache_size && 0 != config_data_cache_age)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter requires \"DataCacheSize\"");
+		err = 1;
+	}
+
+	if (0 != config_data_cache_size)
+	{
+		if (0 != config_proxy_local_buffer)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheSize\" configuration parameter cannot be used together with "
+					"\"ProxyLocalBuffer\"");
+			err = 1;
+		}
+
+		if (config_data_cache_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter must be less than "
+					"\"ProxyOfflineBuffer\"");
+			err = 1;
+		}
+
+		if (0 == config_data_cache_age)
+			config_data_cache_age = ZBX_CONFIG_DEFAULT_DATA_CACHE_AGE;
+	}
+
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
 	if (0 != err)
@@ -948,6 +979,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			INT_MAX},
 		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"DataCacheSize",			&config_data_cache_size,		TYPE_UINT64,
+			PARM_OPT,	0,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"DataCacheAge",			&config_data_cache_age,		TYPE_INT,
+			PARM_OPT,	SEC_PER_MIN * 10,	SEC_PER_DAY * 10},
 		{NULL}
 	};
 
@@ -1484,7 +1519,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
 	/* TODO: get parameters from configuration file */
-	if (FAIL == zbx_pdc_init(ZBX_MEBIBYTE * 128, SEC_PER_DAY, &error))
+	if (FAIL == zbx_pdc_init(config_data_cache_size, config_data_cache_age, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy data cache: %s", error);
 		zbx_free(error);

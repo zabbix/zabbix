@@ -144,7 +144,7 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
 	switch (state)
 	{
 		case PDC_DATABASE_ONLY:
-			zabbix_log(LOG_LEVEL_DEBUG, "proxy data cache disabled");
+			zabbix_log(LOG_LEVEL_WARNING, "proxy data cache disabled");
 			break;
 		case PDC_DATABASE:
 			if (NULL != message)
