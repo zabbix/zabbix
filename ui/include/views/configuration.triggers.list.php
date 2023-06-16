@@ -163,12 +163,9 @@ $html_page = (new CHtmlPage())
 			(new CList())
 				->addItem(
 					$data['single_selected_hostid'] != 0
-						? new CRedirectButton(_('Create trigger'),
-							(new CUrl('triggers.php'))
-								->setArgument('hostid', $data['single_selected_hostid'])
-								->setArgument('form', 'create')
-								->setArgument('context', $data['context'])
-						)
+						? (new CSimpleButton(_('Create trigger')))
+							->setId('js-create')
+							->setAttribute('data-hostid', $data['single_selected_hostid'])
 						: (new CButton('form',
 							$data['context'] === 'host'
 								? _('Create trigger (select host first)')
@@ -246,13 +243,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = (new CLink(
-		$trigger['description'],
-		(new CUrl('triggers.php'))
-			->setArgument('form', 'update')
-			->setArgument('triggerid', $triggerid)
-			->setArgument('context', $data['context'])
-	))->addClass(ZBX_STYLE_WORDWRAP);
+	$description[] = (new CLink($trigger['description']))
+		->addClass('js-trigger-edit')
+		->setAttribute('data-triggerid', $triggerid)
+		->setAttribute('data-hostid', $data['single_selected_hostid'])
+		->addClass(ZBX_STYLE_WORDWRAP);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -264,12 +259,10 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$dep_trigger_desc =
 				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
-			$trigger_deps[] = (new CLink($dep_trigger_desc,
-				(new CUrl('triggers.php'))
-					->setArgument('form', 'update')
-					->setArgument('triggerid', $dep_trigger['triggerid'])
-					->setArgument('context', $data['context'])
-			))
+			$trigger_deps[] = (new CLink($dep_trigger_desc))
+				->addClass('js-trigger-edit')
+				->setAttribute('data-triggerid', $dep_trigger['triggerid'])
+				->setAttribute('data-hostid', $data['single_selected_hostid'])
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(triggerIndicatorStyle($dep_trigger['status']));
 
@@ -406,7 +399,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_triggerid'
+		'checkbox_object' => 'g_triggerid',
+		'context' => $data['context']
 	]).');
 '))
 	->setOnDocumentReady()

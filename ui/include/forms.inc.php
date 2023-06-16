@@ -2011,7 +2011,7 @@ function getTriggerFormData(array $data) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
 
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['expression'], $_REQUEST['expr_target_single'],
+				$new_expr = remakeExpression($data['expression'], $data['expr_target_single'],
 					$data['expression_action'], $data['expr_temp'], $error
 				);
 
@@ -2062,7 +2062,7 @@ function getTriggerFormData(array $data) {
 			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
 
 			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['recovery_expression'], $_REQUEST['recovery_expr_target_single'],
+				$new_expr = remakeExpression($data['recovery_expression'], $data['recovery_expr_target_single'],
 					$data['recovery_expression_action'], $data['recovery_expr_temp'], $error
 				);
 

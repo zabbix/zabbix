@@ -1357,7 +1357,7 @@ function getMenuPopupTriggerMacro(options) {
 		items[items.length] = {
 			label: expression.label,
 			clickCallback: function() {
-				var expressionInput = jQuery('#expr_temp');
+				var expressionInput = jQuery('#expression');
 
 				if (expressionInput.val().length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 					return false;

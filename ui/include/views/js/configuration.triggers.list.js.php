@@ -30,10 +30,12 @@
 
 <script>
 	const view = {
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, context}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.context = context;
 
+			// TODO this needs to be rewritten to JS
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -56,6 +58,7 @@
 		},
 
 		_initActions() {
+			// TODO this probably will be reworked
 			document.querySelector('.js-copy').addEventListener('click', () => {
 				const overlay = this.openCopyPopup();
 				const dialogue = overlay.$dialogue[0];
@@ -74,6 +77,49 @@
 
 					location.href = location.href;
 				});
+			});
+
+			document.getElementById('js-create').addEventListener('click', (e) => this._edit({
+				'hostid': e.target.dataset.hostid,
+				'context': this.context
+			}));
+
+			document.querySelectorAll('.js-trigger-edit').forEach((trigger) => {
+				trigger.addEventListener('click', (e) => {
+					this._edit({
+						'triggerid': e.target.dataset.triggerid,
+						'hostid': e.target.dataset.hostid,
+						'context': this.context
+					})
+				});
+			})
+		},
+
+		_edit(parameters = {}) {
+			const overlay = PopUp('trigger.edit', parameters, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
 			});
 		},
 

@@ -1114,8 +1114,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					}
 
 					$url = (new CLinkAction($element['expression']))
-						->setId($expressionId)
-						->onClick('copy_expression(this.id, '.$type.');');
+						->setId($expressionId);
 				}
 
 				$expr = expressionLevelDraw($next, $level);

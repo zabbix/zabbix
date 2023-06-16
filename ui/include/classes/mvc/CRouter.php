@@ -310,6 +310,8 @@ class CRouter {
 		'token.update'								=> ['CControllerTokenUpdate',							'layout.json',			null],
 		'trigdisplay.edit'							=> ['CControllerTrigDisplayEdit',						'layout.htmlpage',		'administration.trigdisplay.edit'],
 		'trigdisplay.update'						=> ['CControllerTrigDisplayUpdate',						null,					null],
+		'trigger.expression.constructor'			=> ['CControllerTriggerExpressionConstructor',			'layout.json',			'trigger.expression.constructor'],
+		'trigger.edit'								=> ['CControllerTriggerEdit',							'layout.json',			'trigger.edit'],
 		'user.create'								=> ['CControllerUserCreate',							null,					null],
 		'user.delete'								=> ['CControllerUserDelete',							null,					null],
 		'user.edit'									=> ['CControllerUserEdit',								'layout.htmlpage',		'administration.user.edit'],

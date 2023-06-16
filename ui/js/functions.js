@@ -59,11 +59,11 @@ function delete_expression(id, type) {
 function copy_expression(id, type) {
 	// If type is expression.
 	if (type == 0) {
-		var element = document.getElementsByName('expr_temp')[0];
+		var element = document.getElementsByName('expression')[0];
 	}
 	// Type is recovery expression.
 	else {
-		var element = document.getElementsByName('recovery_expr_temp')[0];
+		var element = document.getElementsByName('recovery_expression')[0];
 	}
 
 	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
