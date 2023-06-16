@@ -243,6 +243,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					continue;
 				}
 
+				if ($pair_type === 'variables') {
+					$pair['name'] = trim($pair['name']);
+				}
+
 				$httpTest[$pair_type][] = $pair;
 			}
 		}
