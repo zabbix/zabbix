@@ -202,7 +202,9 @@ func TestFileRegmatch(t *testing.T) {
 		{fileContents: fileSingleCharNoNewLine, targetSearch: "a", targetEncoding: "UTF-16LE",
 			lineStart: "", lineEnd: "", match: 1},
 		{fileContents: fileManyCharsNoNewLine, targetSearch: "a", targetEncoding: "UTF-32BE",
-			lineStart: "", lineEnd: "", match: 1}}
+			lineStart: "", lineEnd: "", match: 1},
+		{fileContents: fileContents_1_ISO_8859_5, targetSearch: "хух", targetEncoding: "UTF-32BE",
+			lineStart: "2", lineEnd: "", match: 0}}
 	expectedError := "Cannot read from file. Wrong encoding detected."
 	for i, c := range testsWrongEncodings {
 		if err1 := os.WriteFile(filename, c.fileContents, 0644); err1 != nil {

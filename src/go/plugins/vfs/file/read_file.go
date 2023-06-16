@@ -126,8 +126,9 @@ func (p *Plugin) readTextLineFromFile(targetFile *os.File, encoding string) (buf
 
 	/* nbytes can be smaller than szbyte. If the target file was encoded in UTF-8 and contained a single
 	   character, but the target encoding was mistakenly set to UTF-32. Then nbytes will be 1 and szbyte
-	   will be 4. */
-	if nbytes < szbyte {
+	   will be 4. Similarly, if bytes read produces a remainder that does not fit szbyte - we can safely
+	   assume the file contains the encoding different from the one provided to us.*/
+	if nbytes < szbyte || (nbytes % szbyte != 0) {
 		return nil, 0, fmt.Errorf("Cannot read from file. Wrong encoding detected.")
 	}
 
