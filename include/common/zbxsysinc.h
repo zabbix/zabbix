@@ -462,4 +462,10 @@
 #	include <poll.h>
 #endif
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	define zbx_get_thread_id()	(long int)GetCurrentThreadId()
+#else
+#	define zbx_get_thread_id()	(long int)getpid()
+#endif
+
 #endif
