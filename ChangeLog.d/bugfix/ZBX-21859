@@ -1,1 +1,0 @@
-...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
