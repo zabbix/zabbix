@@ -84,11 +84,23 @@ class CItemGeneralHelper {
 	 * @throws Exception
 	 */
 	protected static function getDestinationHostInterfaces(array $src_items, array $dst_options): array {
-		if (!array_key_exists('hostids', $dst_options)) {
-			return [];
-		}
-
 		$dst_hostids = reset($dst_options);
+
+		if (!array_key_exists('hostids', $dst_options)) {
+			$dst_interfaceids = [];
+
+			if (in_array(reset($src_items)['hosts'][0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])) {
+				foreach ($src_items as $src_item) {
+					if ($src_item['interfaceid'] != 0) {
+						foreach ($dst_hostids as $dst_hostid) {
+							$dst_interfaceids[$src_item['itemid']][$dst_hostid] = 0;
+						}
+					}
+				}
+			}
+
+			return $dst_interfaceids;
+		}
 
 		$item_indexes = [];
 		$dst_interfaceids = [];
