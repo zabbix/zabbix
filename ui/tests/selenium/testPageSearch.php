@@ -35,7 +35,7 @@ class testPageSearch extends CWebTest {
 
 	protected $search_string = 'Test object';
 
-	protected $widgets = [
+	protected static $widgets = [
 		'hosts' => [
 			'key' => 'hosts',
 			'selector' => 'id:search_hosts_widget',
@@ -93,7 +93,7 @@ class testPageSearch extends CWebTest {
 	public function prepareData() {
 		// This is needed so that all links in Search results are active. Also get IDs for checking links.
 		$response = CDataHelper::call('hostgroup.create', [['name' => $this->search_string.' Hostgroup']]);
-		$this->widgets['hostgroups']['link_id'] = $response['groupids'][0];
+		self::$widgets['hostgroups']['link_id'] = $response['groupids'][0];
 
 		$response = CDataHelper::createHosts([
 			[
@@ -143,7 +143,7 @@ class testPageSearch extends CWebTest {
 			[
 				'host' => $this->search_string.' Host',
 				'groups' => [
-					'groupid' => $this->widgets['hostgroups']['link_id']
+					'groupid' => self::$widgets['hostgroups']['link_id']
 				],
 				'interfaces' => [
 					'type' => 1,
@@ -155,23 +155,23 @@ class testPageSearch extends CWebTest {
 				]
 			]
 		]);
-		$this->widgets['hosts']['link_id'] = $response['hostids'][$this->search_string.' Host'];
+		self::$widgets['hosts']['link_id'] = $response['hostids'][$this->search_string.' Host'];
 
 		$response = CDataHelper::createTemplates([
 			[
 				'host' => $this->search_string.' Template',
 				'groups' => [
-					'groupid' => $this->widgets['hostgroups']['link_id']
+					'groupid' => self::$widgets['hostgroups']['link_id']
 				]
 			]
 		]);
-		$this->widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
+		self::$widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
 	}
 
 	/**
-	 * Check layout of the Search form and result page.
+	 * Check the layout of the Search form.
 	 */
-	public function testPageSearch_Layout() {
+	public function testPageSearch_LayoutForm() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 
@@ -179,13 +179,11 @@ class testPageSearch extends CWebTest {
 		$search_button = $form->query('tag:button')->one();
 		$this->assertEquals(255, $search_field->getAttribute('maxlength'));
 		$this->assertEquals('off', $search_field->getAttribute('autocomplete'));
-		$this->assertFalse($search_button->isEnabled());
 		$this->assertFalse($search_button->isClickable());
 		$this->verifyThatSuggestionsNotShown();
 
 		// Check suggestion highlighting.
 		$search_field->fill($this->search_string);
-		$this->assertTrue($search_button->isEnabled());
 		$this->assertTrue($search_button->isClickable());
 		$highlighted_text = $this->query('class:suggest-found')->waitUntilVisible()->one()->getText();
 		$this->assertEquals(strtolower($this->search_string), strtolower($highlighted_text));
@@ -193,25 +191,37 @@ class testPageSearch extends CWebTest {
 		// Check that suggestions disappear after deleting input.
 		$search_field->fill('');
 		$this->verifyThatSuggestionsNotShown();
-		$this->assertFalse($search_button->isEnabled());
 		$this->assertFalse($search_button->isClickable());
 
 		$search_field->fill($this->search_string);
 		$search_button->waitUntilClickable()->click();
-		$this->assertEquals('Search: '.$this->search_string, $this->query('id:page-title-general')->waitUntilVisible()->one()->getText());
+		$this->page->assertHeader('Search: '.$this->search_string);
+	}
 
-		// Assert result widget layout.
-		foreach ($this->widgets as $widget_params) {
+	/**
+	 * Check the layout of the Search result page.
+	 */
+	public function testPageSearch_LayoutPage() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+		$form->query('id:search')->one()->fill($this->search_string);
+		$form->submit();
+
+		$this->page->assertHeader('Search: '.$this->search_string);
+		$this->page->assertTitle('Search');
+
+		// Assert result widget layout for each widget.
+		foreach (self::$widgets as $widget_params) {
 			$widget = $this->query($widget_params['selector'])->one();
 			$this->assertEquals($widget_params['title'], $widget->query('xpath:.//h4')->one()->getText());
 
+			$table = $widget->query('xpath:.//table')->asTable()->one();
+
 			// Check column names.
-			$this->assertEquals(array_column($widget_params['columns'], 'name'),
-					$this->query($widget_params['table_selector']."//th")->all()->asText()
-			);
+			$this->assertEquals(array_column($widget_params['columns'], 'name'), $table->getHeadersText());
 
 			// Check table links.
-			$table_first_row = $widget->query('xpath:.//table')->asTable()->one()->getRow(0);
+			$table_first_row = $table->getRow(0);
 
 			foreach ($widget_params['columns'] as $i => $column) {
 				// The same column name is sometimes used twice so need to access column by index.
@@ -225,6 +235,9 @@ class testPageSearch extends CWebTest {
 					$expected_href = str_replace('{id}', $widget_params['link_id'], $column['href']);
 					$this->assertEquals($expected_href, $column_element->query('tag:a')->one()->getAttribute('href'));
 				}
+				else {
+					$this->assertFalse($column_element->isAttributePresent('href'));
+				}
 			}
 
 			// Check expanding functionality.
@@ -234,13 +247,11 @@ class testPageSearch extends CWebTest {
 
 			$collapse_button->click();
 			$widget_body->waitUntilNotVisible();
-			$this->assertFalse($widget_body->isDisplayed());
 			$this->assertEquals('Expand', $collapse_button->getAttribute('title'));
 
 			$expand_button = $widget->query('class:btn-widget-expand')->one();
 			$expand_button->click();
 			$widget_body->waitUntilVisible();
-			$this->assertTrue($widget_body->isDisplayed());
 		}
 	}
 
@@ -345,10 +356,12 @@ class testPageSearch extends CWebTest {
 		if (CTestArrayHelper::get($data, 'count_from_db')) {
 			$template_sql = 'SELECT NULL FROM hosts WHERE LOWER(host) LIKE \'%'.$data['search_string'].'%\' AND status=3';
 			$hostgroup_sql = 'SELECT NULL FROM hstgrp WHERE LOWER(name) LIKE \'%'.$data['search_string'].'%\'';
-			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid '.
-				'WHERE h.status in (0,1) AND h.flags in (0,4) AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\' '.
-				'OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\' OR i.dns LIKE \'%'.$data['search_string'].'%\' '.
-				'OR i.ip LIKE \'%'.$data['search_string'].'%\')';
+			$host_sql = 'SELECT DISTINCT(h.host) FROM hosts h INNER JOIN interface i on i.hostid=h.hostid'.
+					' WHERE h.status in (0,1) AND h.flags in (0,4)'.
+					' AND (LOWER(h.host) LIKE \'%'.$data['search_string'].'%\''.
+					' OR LOWER(h.name) LIKE \'%'.$data['search_string'].'%\''.
+					' OR i.dns LIKE \'%'.$data['search_string'].'%\''.
+					' OR i.ip LIKE \'%'.$data['search_string'].'%\')';
 
 			$db_count = [];
 			foreach (['hosts' => $host_sql, 'host_groups' => $hostgroup_sql, 'templates' => $template_sql] as $type => $sql) {
@@ -361,21 +374,21 @@ class testPageSearch extends CWebTest {
 		$form->query('id:search')->one()->fill($data['search_string']);
 		$form->submit();
 
-		$title = $this->query('id:page-title-general')->waitUntilVisible()->one()->getText();
-		$this->assertEquals('Search: '.$data['search_string'], $title);
+		$this->page->assertHeader('Search: '.$data['search_string']);
 
 		// Verify each widget type.
-		foreach ($this->widgets as $widget_params) {
+		foreach (self::$widgets as $widget_params) {
 			$widget = $this->query($widget_params['selector'])->one();
 
 			// Assert table data, but only if count from DB is not set.
 			if (!CTestArrayHelper::get($data, 'count_from_db')) {
-				$this->assertTableData(($data[$widget_params['key']] ?? []), $widget_params['table_selector']);
+				$this->assertTableData(CTestArrayHelper::get($data, $widget_params['key'], []), $widget_params['table_selector']);
 			}
 
 			// Assert table stats.
-			$expected_count = CTestArrayHelper::get($data, 'count_from_db') ? $db_count[$widget_params['key']] :
-					(isset($data[$widget_params['key']]) ? count($data[$widget_params['key']]) : 0);
+			$expected_count = CTestArrayHelper::get($data, 'count_from_db')
+				? $db_count[$widget_params['key']]
+				: (isset($data[$widget_params['key']]) ? count($data[$widget_params['key']]) : 0);
 			$footer_text = $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			// Only a maximum of 100 records are displayed at once.
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
