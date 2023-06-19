@@ -328,13 +328,13 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 #endif
 
 #if defined(HAVE_GNUTLS)
-
 static void	tls_socket_event(gnutls_session_t session, ssize_t err, short *event)
 {
 	ZBX_UNUSED(err);
 	*event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
 
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: wait for socket to be available for read or write depending on    *
@@ -378,19 +378,19 @@ static int	tls_is_nonblocking_error(ssize_t err)
 #endif
 
 #if defined(HAVE_OPENSSL)
-static int	tls_socket_event(SSL *ctx, ssize_t ssl_err, short *event)
+static void	tls_socket_event(SSL *ctx, ssize_t ssl_err, short *event)
 {
 	ZBX_UNUSED(ctx);
 	switch (ssl_err)
 	{
 		case SSL_ERROR_WANT_READ:
 			*event = POLLIN;
-			return SUCCEED;
+			break;
 		case SSL_ERROR_WANT_WRITE:
 			*event = POLLOUT;
-			return SUCCEED;
+			break;
 		default:
-			return FAIL;
+			break;
 	}
 }
 /******************************************************************************
@@ -2893,7 +2893,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
-		if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
+		if (SUCCEED == tls_is_nonblocking_error(err))
 		{
 			if (NULL != event)
 			{
@@ -3206,7 +3206,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 		ssl_err = SSL_get_error(s->tls_ctx->ctx, res);
 
-		if (SSL_ERROR_WANT_READ != ssl_err && SSL_ERROR_WANT_WRITE != ssl_err)
+		if (SUCCEED != tls_is_nonblocking_error(ssl_err))
 			break;
 
 		if (NULL != event)
@@ -3891,12 +3891,6 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 			if (offset == (ssize_t)len)
 				break;
-
-			if (NULL != event)
-			{
-				*event = POLLOUT;
-				return offset;
-			}
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
