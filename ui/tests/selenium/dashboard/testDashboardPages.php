@@ -629,7 +629,7 @@ class testDashboardPages extends CWebTest {
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
-						->one()->click();
+						->one()->hoverMouse()->click();
 			}
 		}
 
