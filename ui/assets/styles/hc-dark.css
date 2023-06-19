@@ -1102,7 +1102,6 @@ footer {
       width: auto; }
     .form-grid table .sortable td {
       padding-bottom: 0;
-      vertical-align: middle;
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
@@ -5359,10 +5358,8 @@ z-select button.focusable,
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #333333; }
-  .overlay-dialogue .table-forms-td-right td {
-    vertical-align: middle; }
-    .overlay-dialogue .table-forms-td-right td label {
-      display: block; }
+  .overlay-dialogue .table-forms-td-right td label {
+    display: block; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
