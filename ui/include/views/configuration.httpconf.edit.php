@@ -399,13 +399,18 @@ if ($data['httptestid'] != 0) {
 	))->setEnabled(!$data['templated']);
 	$buttons[] = new CButtonCancel(url_param('context'));
 
-	$webscenario_tabs->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$webscenario_tabs->setFooter(
+		(new CFormGrid(
+			new CFormActions(new CSubmit('update', _('Update')), $buttons)
+		))->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_ACTIONS)
+	);
 }
 else {
-	$webscenario_tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('context'))]
-	));
+	$webscenario_tabs->setFooter(
+		(new CFormGrid(
+			new CFormActions(new CSubmit('add', _('Add')), [new CButtonCancel(url_param('context'))])
+		))->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_ACTIONS)
+	);
 }
 
 $form->addItem($webscenario_tabs);
