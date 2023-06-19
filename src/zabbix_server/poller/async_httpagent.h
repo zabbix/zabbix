@@ -24,6 +24,7 @@
 #include "httpagent_async.h"
 #include "module.h"
 #include "async_poller.h"
+#include "zbxhttp.h"
 
 typedef struct
 {

@@ -21,7 +21,6 @@
 #define ZABBIX_ASYNC_AGENT_H
 
 #include "zbxcacheconfig.h"
-#include "httpagent_async.h"
 #include "module.h"
 #include "../../libs/zbxasyncpoller/asyncpoller.h"
 #include "async_poller.h"

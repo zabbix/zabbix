@@ -3,6 +3,7 @@
 DIST_SUBDIRS = \
 	zbxalgo \
 	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
 	zbxavailability \
 	zbxconnector \
@@ -72,7 +73,7 @@ DIST_SUBDIRS = \
 
 if SERVER
 SERVER_SUBDIRS = \
-	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
 	zbxavailability \
 	zbxconnector \

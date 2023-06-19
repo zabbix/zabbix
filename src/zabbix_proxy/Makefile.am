@@ -107,7 +107,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
-	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a
+	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
 
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
 
