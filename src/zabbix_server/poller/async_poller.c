@@ -367,7 +367,6 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	double			sec;
 	time_t			last_stat_time;
 	zbx_ipc_async_socket_t	rtc;
 	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
@@ -375,7 +374,6 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	unsigned char		poller_type = poller_args_in->poller_type;
-	struct timeval		tv = {1, 0};
 	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -384,18 +382,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
-#endif
-
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 
 	async_poller_init(&poller_config, poller_args_in, async_check_items);
+	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 	poller_config.state = ZBX_PROCESS_STATE_BUSY;
 	poller_config.info = info;
 
@@ -404,6 +397,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
 				poller_update_selfmon_counter, &poller_config);
 	}
+	else
+	{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+#endif
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -411,7 +410,11 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		unsigned char	*rtc_data;
 
 		if (0 == evtimer_pending(poller_config.async_check_items_timer, NULL))
+		{
+			struct timeval	tv = {1, 0};
+
 			evtimer_add(poller_config.async_check_items_timer, &tv);
+		}
 
 		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
 		{
@@ -425,8 +428,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
 		{
-			sec = zbx_time();
-			zbx_update_env(get_process_type_string(process_type), sec);
+			zbx_update_env(get_process_type_string(process_type), zbx_time());
 
 			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
