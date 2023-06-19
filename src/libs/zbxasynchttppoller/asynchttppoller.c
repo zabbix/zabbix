@@ -54,6 +54,9 @@ static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout:%ld", __func__, timeout_ms);
 
+	ZBX_UNUSED(multi);
+	ZBX_UNUSED(userp);
+
 	if(0 > timeout_ms)
 	{
 		evtimer_del(curl_timeout);
@@ -89,7 +92,7 @@ static void	check_multi_info(void)
 				process_httpagent_result(message->easy_handle, message->data.result);
 				break;
 			default:
-				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%d", message->msg);
+				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%u", message->msg);
 				break;
 		}
 	}
@@ -100,6 +103,10 @@ static void	on_timeout(evutil_socket_t fd, short events, void *arg)
 	int	running_handles;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(events);
+	ZBX_UNUSED(arg);
 
 	http_agent_action(http_agent_action_arg);
 	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
@@ -116,9 +123,11 @@ static void	curl_perform(int fd, short event, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if(event & EV_READ)
+	ZBX_UNUSED(fd);
+
+	if (event & EV_READ)
 		flags |= CURL_CSELECT_IN;
-	if(event & EV_WRITE)
+	if (event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
 
 	http_agent_action(http_agent_action_arg);
@@ -156,6 +165,9 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	int			events = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() action:%d", __func__, action);
+
+	ZBX_UNUSED(easy);
+	ZBX_UNUSED(userp);
 
 	switch (action)
 	{
