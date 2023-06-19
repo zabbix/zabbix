@@ -135,8 +135,13 @@ class CWebTest extends CTest {
 				$this->fail('Test case errors.');
 			}
 		}
+	}
 
-		if ($this->hasFailed() || $this->getStatus() === null || $errors) {
+	/**
+	 * @inheritdoc
+	 */
+	protected function tearDown() : void {
+		if ($this->hasFailed() || $this->getStatus() === null) {
 			$this->captureScreenshot();
 		}
 	}
@@ -153,8 +158,8 @@ class CWebTest extends CTest {
 		}
 		catch (Exception $exception) {
 			// Error handling is not missing here.
+			}
 		}
-	}
 
 	/**
 	 * @inheritdoc
