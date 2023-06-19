@@ -71,8 +71,7 @@
 
 			jQuery('#variables').dynamicRows({
 				template: '#variable-row-tmpl',
-				rows: variables,
-				allow_empty: true
+				rows: variables
 			});
 
 			this._initTextareaFlexible($variables);
@@ -84,8 +83,7 @@
 			$headers
 				.dynamicRows({
 					template: '#header-row-tmpl',
-					rows: headers,
-					allow_empty: true
+					rows: headers
 				})
 				.on('tableupdate.dynamicRows', (e) => {
 					this._toggleDragIcon(e.target);

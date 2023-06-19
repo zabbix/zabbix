@@ -92,8 +92,7 @@ window.webscenario_step_edit_popup = new class {
 
 		$query_fields.dynamicRows({
 			template: '#step-query-field-row-tmpl',
-			rows: query_fields,
-			allow_empty: true
+			rows: query_fields
 		});
 
 		this.#initTextareaFlexible($query_fields);
@@ -105,8 +104,7 @@ window.webscenario_step_edit_popup = new class {
 
 		$post_fields.dynamicRows({
 			template: '#step-post-field-row-tmpl',
-			rows: post_fields,
-			allow_empty: true
+			rows: post_fields
 		});
 
 		this.#initTextareaFlexible($post_fields);
@@ -118,8 +116,7 @@ window.webscenario_step_edit_popup = new class {
 
 		$variables.dynamicRows({
 			template: '#step-variable-row-tmpl',
-			rows: variables,
-			allow_empty: true
+			rows: variables
 		});
 
 		this.#initTextareaFlexible($variables);
@@ -130,8 +127,7 @@ window.webscenario_step_edit_popup = new class {
 
 		$headers.dynamicRows({
 			template: '#step-header-row-tmpl',
-			rows: headers,
-			allow_empty: true
+			rows: headers
 		});
 
 		this.#initTextareaFlexible($headers);
