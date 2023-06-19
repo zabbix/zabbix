@@ -409,6 +409,12 @@ char	*zbx_strdup2(const char *filename, int line, char *old, const char *str);
 
 void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+#	define zbx_get_thread_id()	(long int)GetCurrentThreadId()
+#else
+#	define zbx_get_thread_id()	(long int)getpid()
+#endif
+
 #define zbx_free(ptr)		\
 				\
 do				\
