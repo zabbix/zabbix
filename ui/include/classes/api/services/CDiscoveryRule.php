@@ -2079,6 +2079,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$del_overrideids = [];
 
 		$_upd_itemids = $db_items !== null ? [] : null;
+		$_upd_overrides = [];
 
 		foreach ($items as $i => &$item) {
 			if (!array_key_exists('overrides', $item)) {
@@ -2089,6 +2090,7 @@ class CDiscoveryRule extends CItemGeneral {
 			$db_overrides = $db_items !== null
 				? array_column($db_items[$item['itemid']]['overrides'], null, 'step')
 				: [];
+			$db_override_steps = array_column($db_items[$item['itemid']]['overrides'], 'step', 'name');
 
 			foreach ($item['overrides'] as &$override) {
 				if (array_key_exists($override['step'], $db_overrides)) {
@@ -2097,6 +2099,16 @@ class CDiscoveryRule extends CItemGeneral {
 					unset($db_overrides[$override['step']]);
 
 					$upd_override = DB::getUpdatedValues('lld_override', $override, $db_override);
+
+					if (array_key_exists($override['name'], $db_override_steps)
+							&& $override['step'] != $db_override_steps[$override['name']]) {
+						$_upd_overrides[] = [
+							'values' => $upd_override,
+							'where' => ['lld_overrideid' => $db_override['lld_overrideid']]
+						];
+
+						$upd_override = ['name' => '#'.$db_override['lld_overrideid']];
+					}
 
 					if ($upd_override) {
 						$upd_overrides[] = [
@@ -2129,7 +2141,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		if ($upd_overrides) {
-			DB::update('lld_override', $upd_overrides);
+			DB::update('lld_override', array_merge($upd_overrides, $_upd_overrides));
 		}
 
 		if ($ins_overrides) {
