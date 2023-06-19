@@ -1102,7 +1102,6 @@ footer {
       width: auto; }
     .form-grid table .sortable td {
       padding-bottom: 0;
-      vertical-align: middle;
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
@@ -1134,7 +1133,7 @@ footer {
     display: inline-flex;
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
-      padding: 5px 5px 5px 0; }
+      padding: 5px 5px 0 0; }
     .form-grid .table-forms-separator tfoot td {
       padding-bottom: 0; }
 
@@ -5359,10 +5358,8 @@ z-select button.focusable,
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #333333; }
-  .overlay-dialogue .table-forms-td-right td {
-    vertical-align: middle; }
-    .overlay-dialogue .table-forms-td-right td label {
-      display: block; }
+  .overlay-dialogue .table-forms-td-right td label {
+    display: block; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -6649,6 +6646,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .form-grid .subscriptions-table .icon {
   margin-right: 3px;
   vertical-align: text-bottom; }
+.form-grid .tags-table {
+  width: auto; }
+  .form-grid .tags-table tr:not(.form_row) td {
+    padding-top: 0; }
 
 .import-compare {
   display: flex;
@@ -6670,6 +6671,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
+.overlay-dialogue #host-form #tagsFormList .form-field,
+.overlay-dialogue #host-form #macrosFormList .form-field,
+.overlay-dialogue #host-form #valuemap-formlist .form-field {
+  grid-column-start: 1; }
 .overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
 .overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {
