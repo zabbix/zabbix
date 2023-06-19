@@ -75,7 +75,7 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
  *          ITEM_VALUE_TYPE_LOG not containing meta information in result     *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
+static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
 	int	flags;
 	char	buffer[64], *pvalue;
@@ -106,9 +106,7 @@ static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_hi
 		pvalue = (char *)"";
 	}
 
-	/* TODO: in the case of numeric values the stack value is passed and currently is stored by reference */
-	/* which will cause this to fail                                                                      */
-	zbx_pdc_history_write_value(handle, h->itemid, h->state, pvalue, &h->ts, flags);
+	zbx_pdc_history_write_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, now);
 }
 
 /******************************************************************************
@@ -119,7 +117,7 @@ static void	dc_add_proxy_history(zbx_pdc_history_data_t *handle, const zbx_dc_hi
  *          ITEM_VALUE_TYPE_LOG containing meta information in result         *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
+static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
 	char		buffer[64], *pvalue;
 	int		flags;
@@ -149,10 +147,8 @@ static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_
 		pvalue = (char *)"";
 	}
 
-	/* TODO: in the case of numeric values the stack value is passed and currently is stored by reference */
-	/* which will cause this to fail                                                                      */
 	zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, pvalue, &h->ts, flags, h->lastlogsize,
-			h->mtime, 0, 0, 0, "");
+			h->mtime, 0, 0, 0, "", now);
 }
 
 /******************************************************************************
@@ -163,7 +159,7 @@ static void	dc_add_proxy_history_meta(zbx_pdc_history_data_t *handle, const zbx_
  *          ITEM_VALUE_TYPE_LOG                                               *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
+static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
 	zbx_uint64_t	lastlogsize;
 	int		mtime, flags;
@@ -186,7 +182,8 @@ static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_d
 		}
 
 		zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, log->value, &h->ts, flags, lastlogsize,
-				mtime, log->timestamp, log->logeventid, log->severity, ZBX_NULL2EMPTY_STR(log->source));
+				mtime, log->timestamp, log->logeventid, log->severity, ZBX_NULL2EMPTY_STR(log->source),
+				now);
 	}
 	else
 	{
@@ -194,8 +191,8 @@ static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_d
 
 		flags = ZBX_PROXY_HISTORY_FLAG_META | ZBX_PROXY_HISTORY_FLAG_NOVALUE;
 
-		zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, "", &h->ts, flags, h->lastlogsize, h->mtime,
-				0, 0, 0, "");
+		zbx_pdc_history_write_meta_value(handle, h->itemid, h->state, "", &h->ts, flags, h->lastlogsize,
+				h->mtime, 0, 0, 0, "", now);
 	}
 }
 
@@ -204,9 +201,9 @@ static void	dc_add_proxy_history_log(zbx_pdc_history_data_t *handle, const zbx_d
  * Purpose: helper function for DCmass_proxy_add_history()                    *
  *                                                                            *
  ******************************************************************************/
-static void	dc_add_proxy_history_notsupported(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h)
+static void	dc_add_proxy_history_notsupported(zbx_pdc_history_data_t *handle, const zbx_dc_history_t *h, time_t now)
 {
-	zbx_pdc_history_write_value(handle, h->itemid, h->state, ZBX_NULL2EMPTY_STR(h->value.err), &h->ts, 0);
+	zbx_pdc_history_write_value(handle, h->itemid, h->state, ZBX_NULL2EMPTY_STR(h->value.err), &h->ts, 0, now);
 }
 
 /******************************************************************************
@@ -221,8 +218,11 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 {
 	int			i, history_count = 0;
 	zbx_pdc_history_data_t	*handle;
+	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	now = time(NULL);
 
 	handle = zbx_pdc_history_open();
 
@@ -232,7 +232,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
-			dc_add_proxy_history_notsupported(handle, h);
+			dc_add_proxy_history_notsupported(handle, h, now);
 			history_count++;
 			continue;
 		}
@@ -243,19 +243,19 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 		switch (h->value_type)
 		{
 			case ITEM_VALUE_TYPE_LOG:
-				dc_add_proxy_history_log(handle, h);
+				dc_add_proxy_history_log(handle, h, now);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 				if (0 != (h->flags & ZBX_DC_FLAG_META))
-					dc_add_proxy_history_meta(handle, h);
+					dc_add_proxy_history_meta(handle, h, now);
 				else
-					dc_add_proxy_history(handle, h);
+					dc_add_proxy_history(handle, h, now);
 				break;
 			case ITEM_VALUE_TYPE_NONE:
-				dc_add_proxy_history(handle, h);
+				dc_add_proxy_history(handle, h, now);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 			default:

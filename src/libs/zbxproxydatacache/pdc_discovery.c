@@ -109,11 +109,15 @@ static void	pdc_discovery_write_row(zbx_pdc_discovery_data_t *data, zbx_uint64_t
 
 void	pdc_discovery_flush(zbx_pdc_t *pdc)
 {
-	zbx_uint64_t	lastid;
+	zbx_uint64_t		lastid;
+	zbx_pdc_discovery_t	*row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pdc_discovery_add_rows_db(&pdc->discovery, NULL, &lastid);
+
+	while (SUCCEED == zbx_list_pop(&pdc->discovery, (void **)&row))
+		pdc_list_free_discovery(&pdc->discovery, row);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -254,8 +258,6 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, z
 					row->value, row->status, row->dcheckid, row->dns);
 			rows_num++;
 			*lastid = row->id;
-
-			pdc_list_free_discovery(rows, row);
 		}
 		while (SUCCEED == zbx_list_iterator_next(&li));
 
@@ -268,7 +270,6 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, z
 		}
 		else
 			(void)zbx_db_insert_execute(&db_insert);
-
 
 		zbx_db_insert_clean(&db_insert);
 	}
@@ -438,7 +439,7 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 
 			if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_discovery_check_age(pdc_cache))
 			{
-				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "cached records are too old");
+				pdc_fallback_to_database(pdc_cache, "cached records are too old");
 			}
 			else if (PDC_MEMORY == pdc_dst[pdc_cache->state])
 			{
@@ -451,7 +452,8 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 				if (PDC_DATABASE_MEMORY == pdc_cache->state)
 				{
 					/* transition to memory cache failed, disable memory cache until restart */
-					pdc_fallback_to_database(pdc_cache);
+					pdc_fallback_to_database(pdc_cache, "aborted proxy data cache transition to"
+							" memory mode: not enough space");
 				}
 				else
 				{

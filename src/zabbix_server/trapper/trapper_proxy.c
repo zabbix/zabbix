@@ -198,6 +198,8 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		if (0 != areg_lastid)
 			zbx_pdc_autoreg_set_lastid(areg_lastid);
 
+		zbx_pdc_update_state(more);
+
 		if (0 != tasks.values_num)
 		{
 			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
@@ -214,8 +216,6 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		}
 
 		zbx_db_commit();
-
-		zbx_pdc_update_state(more);
 	}
 	else
 	{

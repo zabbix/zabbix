@@ -260,13 +260,15 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_pdc_autoreg_set_lastid(areg_lastid);
 
 				zbx_db_commit();
-
-				zbx_pdc_update_state(*more);
 			}
+
+			zbx_pdc_update_state(*more);
 		}
 
 		zbx_disconnect_from_server(&sock);
 	}
+	else
+
 clean:
 	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
 	zbx_vector_tm_task_destroy(&tasks);

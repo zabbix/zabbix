@@ -337,11 +337,11 @@ void	pdc_flush(zbx_pdc_t *pdc)
 	pdc_history_flush(pdc);
 }
 
-void	pdc_fallback_to_database(zbx_pdc_t *pdc)
+void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message)
 {
 	pdc_flush(pdc);
 
-	pdc_cache_set_state(pdc, PDC_DATABASE, "aborted proxy data cache transition to memory mode: not enough space");
+	pdc_cache_set_state(pdc, PDC_DATABASE, message);
 }
 
 /******************************************************************************
@@ -377,7 +377,9 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 					pdc_cache->history_lastid_db <= pdc_cache->history_lastid_sent &&
 					pdc_cache->discovery_lastid_db <= pdc_cache->discovery_lastid_sent &&
 					pdc_cache->autoreg_lastid_db <= pdc_cache->autoreg_lastid_sent)
+			{
 				pdc_cache_set_state(pdc, PDC_MEMORY, NULL);
+			}
 			break;
 		case PDC_DATABASE_ONLY:
 			/* no state switching from database only mode */

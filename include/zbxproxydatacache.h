@@ -76,11 +76,11 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void);
 void	zbx_pdc_history_close(zbx_pdc_history_data_t *data);
 
 void	zbx_pdc_history_write_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
-		const zbx_timespec_t *ts, int flags);
+		const zbx_timespec_t *ts, int flags, time_t now);
 
 void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state,
 		const char *value, const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime,
-		int timestamp, int logeventid, int severity, const char *source);
+		int timestamp, int logeventid, int severity, const char *source, time_t now);
 
 int	zbx_pdc_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more);
 

@@ -2648,6 +2648,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	}
 
 	self->autoincrement = -1;
+	self->lastid = 0;
 
 	zbx_vector_ptr_create(&self->fields);
 	zbx_vector_ptr_create(&self->rows);
@@ -2915,6 +2916,8 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 			values[self->autoincrement].ui64 = id++;
 		}
+
+		self->lastid = id - 1;
 	}
 
 #ifndef HAVE_ORACLE

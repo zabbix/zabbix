@@ -237,8 +237,6 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 		zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns",
 				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", NULL);
 
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
 		while (SUCCEED == zbx_list_pop(&pdc->autoreg, (void **)&row))
 		{
 			zbx_db_insert_add_values(&db_insert, row->id, row->host, row->listen_ip, row->listen_dns,
@@ -290,7 +288,7 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 	{
 		if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_autoreg_check_age(pdc_cache))
 		{
-			pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "cached records are too old");
+			pdc_fallback_to_database(pdc_cache, "cached records are too old");
 		}
 		else if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type,
 				host_metadata, flags, clock))
@@ -302,7 +300,8 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 		if (PDC_DATABASE_MEMORY == pdc_cache->state)
 		{
 			/* transition to memory cache failed, disable memory cache until restart */
-			pdc_fallback_to_database(pdc_cache);
+			pdc_fallback_to_database(pdc_cache, "aborted proxy data cache transition to memory mode:"
+					" not enough space");
 		}
 		else
 		{

@@ -86,7 +86,7 @@ typedef struct
 	int		state;
 	int		mtime;
 	int		flags;
-	int		write_clock;
+	time_t		write_clock;
 }
 zbx_pdc_history_t;
 
@@ -164,7 +164,7 @@ void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_histor
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);
 
 void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
-void	pdc_fallback_to_database(zbx_pdc_t *pdc);
+void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message);
 
 
 #endif
