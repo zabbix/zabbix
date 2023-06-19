@@ -30,6 +30,7 @@
 			this.recovery_popup_parameters = recovery_popup_parameters;
 			this.form_name = form_name;
 			this.readonly = readonly;
+			this.triggerid = triggerid;
 			this.expression = this.form.querySelector('#expression');
 			this.expression_full = this.form.querySelector('#expression-full');
 			this.description = this.form.querySelector('#description');
@@ -285,7 +286,7 @@
 				close_recovery_expression_constructor.style.display = 'none';
 				recovery_expression.readOnly = this.readonly ? true : false;
 				insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
-				recovery_expression.value = this.expression_full.value;
+				recovery_expression.value = this.form.querySelector('#recovery-expression-full').value;
 			}
 		}
 
@@ -442,7 +443,17 @@
 			}
 		}
 
-		_post(url, data) {
+		submit() {
+			const fields = getFormFields(this.form);
+			fields.description = fields.description.trim();
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', this.triggerid !== 0 ? 'trigger.update' : 'trigger.create');
+
+			this.#post(curl.getUrl(), fields);
+		}
+
+		#post(url, data) {
 			fetch(url, {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
@@ -454,7 +465,6 @@
 						throw {error: response.error};
 					}
 					overlayDialogueDestroy(this.overlay.dialogueid);
-					uncheckTableRows('action_' + this.eventsource, response.keepids ?? []);
 
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
 				})
