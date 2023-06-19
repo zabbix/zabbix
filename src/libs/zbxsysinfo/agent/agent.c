@@ -18,12 +18,13 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
 #include "agent.h"
 
 #include "modbtype.h"
 
-extern char			*CONFIG_HOSTNAMES;
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+//extern char			*CONFIG_HOSTNAMES;
+//extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern char			*CONFIG_HOST_METADATA;
 extern char			*CONFIG_HOST_METADATA_ITEM;
 
@@ -54,16 +55,16 @@ static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
-	if (NULL == CONFIG_HOSTNAME)
+	if (NULL == sysinfo_get_config_hostname())
 	{
 		char	*p;
 
-		SET_STR_RESULT(result, NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ?
-				zbx_dsprintf(NULL, "%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
-				zbx_strdup(NULL, CONFIG_HOSTNAMES));
+		SET_STR_RESULT(result, NULL != (p = strchr(sysinfo_get_config_hostnames(), ',')) ?
+				zbx_dsprintf(NULL, "%.*s", (int)(p - sysinfo_get_config_hostnames()), sysinfo_get_config_hostnames()) :
+				zbx_strdup(NULL, sysinfo_get_config_hostnames()));
 	}
 	else
-		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
+		SET_STR_RESULT(result, zbx_strdup(NULL, sysinfo_get_config_hostname()));
 
 	return SYSINFO_RET_OK;
 }

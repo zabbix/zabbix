@@ -31,14 +31,16 @@
 static char	*CONFIG_PID_FILE = NULL;
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAMES		= NULL;
+//char	*CONFIG_HOSTNAMES		= NULL;
+ZBX_PROPERTY_DECL_CONST(char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
 char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
-ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
+//ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
+ZBX_PROPERTY_DECL_THREAD_LOCAL(char *, zbx_config_hostname, NULL)
 
 ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)
 ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
@@ -567,7 +569,7 @@ static void	set_defaults(void)
 	AGENT_RESULT	result;
 	char		**value = NULL;
 
-	if (NULL == CONFIG_HOSTNAMES)
+	if (NULL == zbx_config_hostnames)
 	{
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
@@ -586,7 +588,7 @@ static void	set_defaults(void)
 				zabbix_log(LOG_LEVEL_WARNING, "hostname truncated to [%s])", *value);
 			}
 
-			CONFIG_HOSTNAMES = zbx_strdup(CONFIG_HOSTNAMES, *value);
+			zbx_config_hostnames = zbx_strdup(zbx_config_hostnames, *value);
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
@@ -594,7 +596,7 @@ static void	set_defaults(void)
 		zbx_free_agent_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
-		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAMES);
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", zbx_config_hostnames);
 
 	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
 	{
@@ -758,6 +760,7 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 		config_active_args[forks].config_source_ip = zbx_config_source_ip;
+		config_active_args[forks].config_hostname = zbx_config_hostname;
 	}
 
 	return SUCCEED;
@@ -847,7 +850,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ServerActive",		&active_hosts,				TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"Hostname",			&CONFIG_HOSTNAMES,			TYPE_STRING_LIST,
+		{"Hostname",			&zbx_config_hostnames,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -983,7 +986,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	log_file_cfg.log_type = zbx_get_log_type(log_file_cfg.log_type_str);
 
 	zbx_vector_str_create(&hostnames);
-	parse_hostnames(CONFIG_HOSTNAMES, &hostnames);
+	parse_hostnames(zbx_config_hostnames, &hostnames);
 
 	if (NULL != active_hosts && '\0' != *active_hosts)
 	{
@@ -1150,7 +1153,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	if (0 != (flags & ZBX_TASK_FLAG_FOREGROUND))
 	{
 		printf("Starting Zabbix Agent [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
-				CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
+				zbx_config_hostnames, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_locks_create(&error))
@@ -1179,7 +1182,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #endif
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
-			CONFIG_HOSTNAMES, ZABBIX_VERSION, ZABBIX_REVISION);
+			zbx_config_hostnames, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
@@ -1410,7 +1413,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_common(zbx_log_impl);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip);
+			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif
@@ -1480,9 +1483,9 @@ int	main(int argc, char **argv)
 
 				zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
 
-				first_hostname = NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ? zbx_dsprintf(NULL,
-						"%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
-						zbx_strdup(NULL, CONFIG_HOSTNAMES);
+				first_hostname = NULL != (p = strchr(zbx_config_hostnames, ',')) ? zbx_dsprintf(NULL,
+						"%.*s", (int)(p - zbx_config_hostnames), zbx_config_hostnames) :
+						zbx_strdup(NULL, zbx_config_hostnames);
 				zbx_snprintf(ZABBIX_SERVICE_NAME, sizeof(ZABBIX_SERVICE_NAME), "%s [%s]",
 						APPLICATION_NAME, first_hostname);
 				zbx_snprintf(ZABBIX_EVENT_SOURCE, sizeof(ZABBIX_EVENT_SOURCE), "%s [%s]",

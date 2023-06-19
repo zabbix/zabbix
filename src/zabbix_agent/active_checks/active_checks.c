@@ -45,7 +45,7 @@
 #	include "zbxnix.h"
 #endif
 
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+/*extern*/ ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern int			CONFIG_HEARTBEAT_FREQUENCY;
 extern char			*CONFIG_HOST_INTERFACE;
 extern char			*CONFIG_HOST_INTERFACE_ITEM;
@@ -1608,7 +1608,7 @@ static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_conf
 }
 
 static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
-		int config_timeout, const char *config_source_ip)
+		int config_timeout, const char *config_source_ip, const char *config_hostname)
 {
 	char	*error = NULL;
 	int	i, now;
@@ -1645,7 +1645,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		{
 			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
 					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout,
-					config_source_ip);
+					config_source_ip, config_hostname);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
@@ -1914,7 +1914,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
+					activechks_args_in->config_hostname);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 			{

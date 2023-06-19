@@ -49,7 +49,7 @@
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
+//extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -3843,7 +3843,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 /******************************************************************************
  *                                                                            *
- * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
+ * Comments: Function body is thread-safe if config_hostname is not updated   *
  *           while log checks are running. Uses callback function             *
  *           process_value_cb, so overall thread-safety depends on caller.    *
  *           Otherwise supposed to be thread-safe, see pick_logfiles()        *
@@ -3853,7 +3853,8 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4080,7 +4081,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, config_hostname,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
 			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout,
 			config_source_ip);
@@ -4109,7 +4110,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
 					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout,
 					config_source_ip) || 0 != jumped)
