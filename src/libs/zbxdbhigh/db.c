@@ -3155,6 +3155,16 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: return the last id assigned by autoincrement                      *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
+{
+	return self->lastid;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: determine is it a server or a proxy database                      *
  *                                                                            *
  * Return value: ZBX_DB_SERVER - server database                              *

@@ -373,7 +373,10 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 				pdc_cache_set_state(pdc, PDC_DATABASE_MEMORY, "no more database records to upload");
 			break;
 		case PDC_DATABASE_MEMORY:
-			if (ZBX_PROXY_DATA_DONE == more && 0 == pdc_cache->db_handles_num)
+			if (ZBX_PROXY_DATA_DONE == more && 0 == pdc_cache->db_handles_num &&
+					pdc_cache->history_lastid_db <= pdc_cache->history_lastid_sent &&
+					pdc_cache->discovery_lastid_db <= pdc_cache->discovery_lastid_sent &&
+					pdc_cache->autoreg_lastid_db <= pdc_cache->autoreg_lastid_sent)
 				pdc_cache_set_state(pdc, PDC_MEMORY, NULL);
 			break;
 		case PDC_DATABASE_ONLY:

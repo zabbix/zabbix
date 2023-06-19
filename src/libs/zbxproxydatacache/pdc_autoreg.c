@@ -39,18 +39,17 @@ static zbx_history_table_t	areg = {
 };
 
 static void	pdc_autoreg_write_host_db(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, int flags, int clock)
+		unsigned int connection_type, const char *host_metadata, int flags, int clock, zbx_uint64_t *lastid)
 {
 	zbx_db_insert_t	db_insert;
-	zbx_uint64_t	id;
 
-	id = zbx_db_get_maxid("proxy_autoreg_host");
+	*lastid = zbx_db_get_maxid("proxy_autoreg_host");
 
 	zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns", "listen_port",
 			"tls_accepted", "host_metadata", "flags", "clock", NULL);
 
-	zbx_db_insert_add_values(&db_insert, id, host, ip, dns, (int)port, (int)connection_type, host_metadata, flags,
-			clock);
+	zbx_db_insert_add_values(&db_insert, *lastid, host, ip, dns, (int)port, (int)connection_type, host_metadata,
+			flags, clock);
 
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
@@ -281,6 +280,8 @@ int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
 void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
+	zbx_uint64_t	lastid;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pdc_lock();
@@ -315,9 +316,10 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 	pdc_cache->db_handles_num++;
 	pdc_unlock();
 
-	pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock);
+	pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock, &lastid);
 
 	pdc_lock();
+	pdc_cache->autoreg_lastid_db = lastid;
 	pdc_cache->db_handles_num--;
 	pdc_unlock();
 out:
@@ -362,6 +364,8 @@ void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pdc_lock();
+
+	pdc_cache->autoreg_lastid_sent = lastid;
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
 		pdc_autoreg_clear(pdc_cache, lastid);

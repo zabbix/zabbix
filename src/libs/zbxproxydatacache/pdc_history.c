@@ -25,7 +25,7 @@
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
 
-static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next);
+static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
 
 struct zbx_pdc_history_data
 {
@@ -514,16 +514,16 @@ static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *row
  *                                                                            *
  * Purpose: add history rows to database cache                                *
  *                                                                            *
- * Parameters: rows - [IN] rows to add                                        *
- *             next - [IN] next row to add                                    *
- *                                                                            *
+ * Parameters: rows   - [IN] rows to add                                      *
+ *             next   - [IN] next row to add                                  *
+ *             lastid - [OUT] last inserted id                                *
+ *
  ******************************************************************************/
-static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
+static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid)
 {
 	zbx_list_iterator_t	li;
 	zbx_pdc_history_t	*row;
 	int			rows_num = 0;
-	zbx_uint64_t		lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
 
@@ -541,15 +541,21 @@ static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 					row->source, row->severity, row->value, row->logeventid, row->ts.ns, row->state,
 					row->lastlogsize, row->mtime, row->flags);
 			rows_num++;
-			lastid = row->id;
+			*lastid = row->id;
 
 			pdc_list_free_history(rows, row);
 		}
 		while (SUCCEED == zbx_list_iterator_next(&li));
 
 		/* when flushing local cache need to set row ids */
-		if (0 == lastid)
+		if (0 == *lastid)
+		{
 			zbx_db_insert_autoincrement(&db_insert, "id");
+			(void)zbx_db_insert_execute(&db_insert);
+			*lastid = zbx_db_insert_get_lastid(&db_insert);
+		}
+		else
+			(void)zbx_db_insert_execute(&db_insert);
 
 		(void)zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
@@ -561,9 +567,11 @@ static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 
 void	pdc_history_flush(zbx_pdc_t *pdc)
 {
+	zbx_uint64_t	lastid;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pdc_history_add_rows_db(&pdc->history, NULL);
+	pdc_history_add_rows_db(&pdc->history, NULL, &lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -668,6 +676,8 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
  ******************************************************************************/
 void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 {
+	zbx_uint64_t	lastid;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (PDC_MEMORY == data->state)
@@ -708,16 +718,18 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 			pdc_cache->db_handles_num++;
 			pdc_unlock();
 
-			pdc_history_add_rows_db(&data->rows, next);
+			pdc_history_add_rows_db(&data->rows, next, &lastid);
 		}
 	}
 	else
 	{
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
 		(void)zbx_db_insert_execute(&data->db_insert);
+		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}
 
 	pdc_lock();
+	pdc_cache->discovery_lastid_db = lastid;
 	pdc_cache->db_handles_num--;
 	pdc_unlock();
 out:
@@ -788,6 +800,8 @@ void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pdc_lock();
+
+	pdc_cache->history_lastid_sent = lastid;
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
 		pdc_history_clear(pdc_cache, lastid);

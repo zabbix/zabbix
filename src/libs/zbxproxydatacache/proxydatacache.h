@@ -117,6 +117,17 @@ typedef struct
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;
 	zbx_mutex_t		mutex;
+
+	/* ids of last records uploaded to server */
+	zbx_uint64_t		history_lastid_sent;
+	zbx_uint64_t		discovery_lastid_sent;
+	zbx_uint64_t		autoreg_lastid_sent;
+
+	/* ids of last records inserted into database */
+	zbx_uint64_t		history_lastid_db;
+	zbx_uint64_t		discovery_lastid_db;
+	zbx_uint64_t		autoreg_lastid_db;
+
 }
 zbx_pdc_t;
 

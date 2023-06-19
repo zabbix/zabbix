@@ -38,7 +38,7 @@ static zbx_history_table_t	dht = {
 		}
 };
 
-static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next);
+static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
 
 struct zbx_pdc_discovery_data
 {
@@ -109,9 +109,11 @@ static void	pdc_discovery_write_row(zbx_pdc_discovery_data_t *data, zbx_uint64_t
 
 void	pdc_discovery_flush(zbx_pdc_t *pdc)
 {
+	zbx_uint64_t	lastid;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pdc_discovery_add_rows_db(&pdc->discovery, NULL);
+	pdc_discovery_add_rows_db(&pdc->discovery, NULL, &lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -226,17 +228,17 @@ static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *r
  *                                                                            *
  * Purpose: add discovery rows to database cache                              *
  *                                                                            *
- * Parameters: rows - [IN] rows to add                                        *
- *             next - [IN] next row to add                                    *
+ * Parameters: rows   - [IN] rows to add                                      *
+ *             next   - [IN] next row to add                                  *
+ *             lastid - [OUT] last inserted id                                *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
+static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid)
 {
 	zbx_list_iterator_t	li;
 	zbx_pdc_discovery_t	*row;
 	zbx_db_insert_t		db_insert;
 	int			rows_num = 0;
-	zbx_uint64_t		lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
 
@@ -251,17 +253,23 @@ static void	pdc_discovery_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next)
 			zbx_db_insert_add_values(&db_insert, row->id, row->clock, row->druleid, row->ip, row->port,
 					row->value, row->status, row->dcheckid, row->dns);
 			rows_num++;
-			lastid = row->id;
+			*lastid = row->id;
 
 			pdc_list_free_discovery(rows, row);
 		}
 		while (SUCCEED == zbx_list_iterator_next(&li));
 
 		/* when flushing local cache need to set row ids */
-		if (0 == lastid)
+		if (0 == *lastid)
+		{
 			zbx_db_insert_autoincrement(&db_insert, "id");
+			(void)zbx_db_insert_execute(&db_insert);
+			*lastid = zbx_db_insert_get_lastid(&db_insert);
+		}
+		else
+			(void)zbx_db_insert_execute(&db_insert);
 
-		(void)zbx_db_insert_execute(&db_insert);
+
 		zbx_db_insert_clean(&db_insert);
 	}
 
@@ -414,6 +422,8 @@ zbx_pdc_discovery_data_t	*zbx_pdc_discovery_open(void)
  ******************************************************************************/
 void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 {
+	zbx_uint64_t	lastid;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (PDC_MEMORY == data->state)
@@ -454,16 +464,18 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 			pdc_cache->db_handles_num++;
 			pdc_unlock();
 
-			pdc_discovery_add_rows_db(&data->rows, next);
+			pdc_discovery_add_rows_db(&data->rows, next, &lastid);
 		}
 	}
 	else
 	{
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
 		(void)zbx_db_insert_execute(&data->db_insert);
+		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}
 
 	pdc_lock();
+	pdc_cache->discovery_lastid_db = lastid;
 	pdc_cache->db_handles_num--;
 	pdc_unlock();
 out:
@@ -532,6 +544,8 @@ void	zbx_pdc_discovery_set_lastid(const zbx_uint64_t lastid)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
 	pdc_lock();
+
+	pdc_cache->discovery_lastid_sent = lastid;
 
 	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
 		pdc_discovery_clear(pdc_cache, lastid);

@@ -687,6 +687,8 @@ typedef struct
 	zbx_vector_ptr_t	rows;
 	/* index of autoincrement field */
 	int			autoincrement;
+	/* the last id assigned by autoincrement */
+	zbx_uint64_t		lastid;
 }
 zbx_db_insert_t;
 
@@ -698,6 +700,8 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...);
 int	zbx_db_insert_execute(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *self);
 void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name);
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
+
 int	zbx_db_get_database_type(void);
 
 typedef struct
