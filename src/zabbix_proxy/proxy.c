@@ -335,7 +335,8 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
 
-#define ZBX_CONFIG_DEFAULT_DATA_CACHE_AGE	(SEC_PER_MIN * 10)
+#define ZBX_CONFIG_DATA_CACHE_SIZE_MIN		(ZBX_KIBIBYTE * 128)
+#define ZBX_CONFIG_DATA_CACHE_AGE_DEFAULT	(SEC_PER_MIN * 10)
 
 static zbx_uint64_t	config_data_cache_size	= 0;
 static int		config_data_cache_age	= 0;
@@ -728,6 +729,12 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != config_data_cache_size)
 	{
+		if (ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_data_cache_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"CacheSize\" configuration parameter");
+			err = 1;
+		}
+
 		if (0 != config_proxy_local_buffer)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheSize\" configuration parameter cannot be used together with "
@@ -743,7 +750,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 
 		if (0 == config_data_cache_age)
-			config_data_cache_age = ZBX_CONFIG_DEFAULT_DATA_CACHE_AGE;
+			config_data_cache_age = ZBX_CONFIG_DATA_CACHE_AGE_DEFAULT;
 	}
 
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
