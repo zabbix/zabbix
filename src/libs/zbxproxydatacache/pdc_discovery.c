@@ -475,8 +475,12 @@ void	zbx_pdc_discovery_close(zbx_pdc_discovery_data_t *data)
 	}
 
 	pdc_lock();
-	pdc_cache->discovery_lastid_db = lastid;
+
+	if (pdc_cache->discovery_lastid_db < lastid)
+		pdc_cache->discovery_lastid_db = lastid;
+
 	pdc_cache->db_handles_num--;
+
 	pdc_unlock();
 out:
 	pdc_discovery_data_free(data);

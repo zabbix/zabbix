@@ -319,8 +319,12 @@ void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dn
 	pdc_autoreg_write_host_db(host, ip, dns, port, connection_type, host_metadata, flags, clock, &lastid);
 
 	pdc_lock();
-	pdc_cache->autoreg_lastid_db = lastid;
+
+	if (pdc_cache->autoreg_lastid_db < lastid)
+		pdc_cache->autoreg_lastid_db = lastid;
+
 	pdc_cache->db_handles_num--;
+
 	pdc_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

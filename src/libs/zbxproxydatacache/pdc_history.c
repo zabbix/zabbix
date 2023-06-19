@@ -729,8 +729,12 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 	}
 
 	pdc_lock();
-	pdc_cache->discovery_lastid_db = lastid;
+
+	if (pdc_cache->discovery_lastid_db , lastid)
+		pdc_cache->discovery_lastid_db = lastid;
+
 	pdc_cache->db_handles_num--;
+
 	pdc_unlock();
 out:
 	pdc_history_data_free(data);
