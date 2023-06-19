@@ -230,7 +230,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	items = &item;
 	num = zbx_dc_config_get_poller_items(poller_config->poller_type, poller_config->config_timeout,
-			poller_config->processing, &items);
+			poller_config->processing, poller_config->config_max_concurrent_checks_per_poller, &items);
 
 	if (0 == num)
 		goto exit;
@@ -327,6 +327,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unavailable_delay = poller_args_in->config_unavailable_delay;
 	poller_config->config_unreachable_delay = poller_args_in->config_unreachable_delay;
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
+	poller_config->config_max_concurrent_checks_per_poller = poller_args_in->config_max_concurrent_checks_per_poller;
 
 	if (NULL == (poller_config->async_check_items_timer = evtimer_new(poller_config->base,
 			async_check_items_callback, poller_config)))

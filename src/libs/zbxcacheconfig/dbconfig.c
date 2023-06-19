@@ -10693,7 +10693,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		zbx_dc_item_t **items)
+		int config_max_concurrent_checks_per_poller, zbx_dc_item_t **items)
 {
 	int			now, num = 0, max_items;
 	zbx_binary_heap_t	*queue;
@@ -10713,11 +10713,11 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			max_items = ZBX_MAX_PINGER_ITEMS;
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
-			if (0 == (max_items = ZBX_MAX_HTTPAGENT_ITEMS - processing))
+			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
 				goto out;
 			break;
 		case ZBX_POLLER_TYPE_AGENT:
-			if (0 == (max_items = ZBX_MAX_AGENT_ITEMS - processing))
+			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
 				goto out;
 			break;
 		default:

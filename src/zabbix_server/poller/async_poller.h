@@ -35,6 +35,7 @@ typedef struct
 	int			config_unavailable_delay;
 	int			config_unreachable_delay;
 	int			config_unreachable_period;
+	int			config_max_concurrent_checks_per_poller;
 	int			config_timeout;
 	const char		*config_source_ip;
 	struct event		*async_check_items_timer;

@@ -767,7 +767,7 @@ int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint6
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		zbx_dc_item_t **items);
+		int config_max_concurrent_checks_per_poller, zbx_dc_item_t **items);
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);
 int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
