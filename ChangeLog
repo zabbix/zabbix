@@ -32,7 +32,7 @@ A......... [ZBX-22941] prevented clearing of the user macro secret values on inh
 ...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
 .......PS. [ZBX-22805] increased memory allocation limit for JavaScript execution from 64M to 512M (akozlovs)
 ..F....... [ZBX-21877] fixed unnecessary proxy name wrapping into multiple lines in proxy list (averza)
-..F....... [ZBX-22264] added a disable feature for dynamic row remove button (dfofanovs)
+..F....... [ZBX-22264] added optional empty state for dynamic rows library (dfofanovs)
 .......PS. [ZBX-22697] fixed VMware tags update error related to curl communication problems (MVekslers)
 .........T [ZBX-21573] optimized preprocessing steps in the AWS EC2 by HTTP template (aiantsen)
 ..F....... [ZBX-16326] fixed displaying of the first and last data points on the graphs (Sasha)
