@@ -83,7 +83,7 @@
 					break;
 			}
 
-			$('#copy_targets').html($multiselect);
+			$('#copy_targets > .table-forms-td-right').html($multiselect);
 
 			$multiselect.multiSelectHelper(helper_options);
 		},

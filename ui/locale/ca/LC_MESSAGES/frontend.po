@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-05-06 07:48+0000\n"
+"PO-Revision-Date: 2023-06-03 06:24+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2835,6 +2835,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a cau
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -2855,6 +2860,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -2886,6 +2896,41 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\" 
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè es produiria un enllaç circular (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a l'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops al prototip d'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a l'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops al prototip d'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
