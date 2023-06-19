@@ -682,8 +682,9 @@ static void	ipmi_manager_deactivate_interface(zbx_ipmi_manager_t *manager, zbx_u
 
 	if (SUCCEED == errcode)
 	{
-		zbx_deactivate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, item.key_orig, &data,
-			&data_alloc, &data_offset, unavailable_delay, unreachable_period, unreachable_delay, error);
+		zbx_deactivate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host,
+			item.key_orig, &data, &data_alloc, &data_offset, unavailable_delay, unreachable_period,
+			unreachable_delay, error);
 		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 	}
 
