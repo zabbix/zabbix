@@ -1453,6 +1453,8 @@ class CAction extends CApiService {
 	}
 
 	/**
+	 * Inserts and deletes operations with host tags.
+	 *
 	 * @param array      $actions
 	 * @param array|null $db_actions
 	 */
@@ -1460,11 +1462,10 @@ class CAction extends CApiService {
 		$is_update = ($db_actions !== null);
 
 		$ins_optags = [];
-		$del_optags = [];
+		$del_optagids = [];
 
 		foreach ($actions as &$action) {
 			foreach (self::OPERATION_GROUPS as $operation_group) {
-
 				if (!array_key_exists($operation_group, $action)) {
 					continue;
 				}
@@ -1472,7 +1473,6 @@ class CAction extends CApiService {
 				$db_operations = $is_update ? $db_actions[$action['actionid']][$operation_group] : [];
 
 				foreach ($action[$operation_group] as &$operation) {
-					// Proceed only if operation type is OPERATION_TYPE_HOST_TAGS_ADD or OPERATION_TYPE_HOST_TAGS_REMOVE.
 					if (!array_key_exists('optag', $operation)) {
 						continue;
 					}
@@ -1486,29 +1486,34 @@ class CAction extends CApiService {
 						: [];
 
 					foreach ($operation['optag'] as &$optag) {
+						$tag_exists = false;
+
 						if ($db_optags) {
-							foreach ($db_optags as $db_optag) {
-								if ($optag['tag'] == $db_optag['tag'] && $optag['value'] == $db_optag['value']) {
+							foreach ($db_optags as $idx => $db_optag) {
+								if ($optag['tag'] === $db_optag['tag'] && $optag['value'] === $db_optag['value']) {
 									$optag['optagid'] = $db_optag['optagid'];
-									unset($db_optag[$optag['operationid']]); // kaut kas te nav
+									unset($db_optags[$idx]);
+									$tag_exists = true;
+									break;
 								}
 							}
 						}
-						else {
+
+						if (!$tag_exists) {
 							$ins_optags[] = ['operationid' => $operation['operationid']] + $optag;
 						}
 					}
 					unset($optag);
 
-					$del_optags = array_merge($del_optags, array_column($db_optags, 'optagid'));
+					$del_optagids = array_merge($del_optagids, array_column($db_optags, 'optagid'));
 				}
 				unset($operation);
 			}
 		}
 		unset($action);
 
-		if ($del_optags) {
-			DB::delete('optag', ['optagid' => $del_optags]);
+		if ($del_optagids) {
+			DB::delete('optag', ['optagid' => $del_optagids]);
 		}
 
 		if ($ins_optags) {
@@ -3595,12 +3600,11 @@ class CAction extends CApiService {
 
 		$db_operations = DBselect(
 			'SELECT o.operationid,o.actionid,o.operationtype,o.esc_period,o.esc_step_from,o.esc_step_to,o.evaltype,'.
-				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode,t.tag,t.value'.
+				'o.recovery,m.default_msg,m.subject,m.message,m.mediatypeid,c.scriptid,i.inventory_mode'.
 			' FROM operations o'.
 				' LEFT JOIN opmessage m ON m.operationid=o.operationid'.
 				' LEFT JOIN opcommand c ON c.operationid=o.operationid'.
 				' LEFT JOIN opinventory i ON i.operationid=o.operationid'.
-				' LEFT JOIN optag i ON t.operationid=o.operationid'.
 			' WHERE '.dbConditionId('o.actionid', $actionids['operations'])
 		);
 
@@ -3672,10 +3676,7 @@ class CAction extends CApiService {
 
 				case OPERATION_TYPE_HOST_TAGS_ADD:
 				case OPERATION_TYPE_HOST_TAGS_REMOVE:
-					$operation['optag'] = [
-						'tag' => $db_operation['tag'],
-						'value' => $db_operation['value']
-					];
+					$operationids['optag'][$db_operation['operationid']] = true;
 					break;
 			}
 
@@ -3774,6 +3775,19 @@ class CAction extends CApiService {
 			while ($db_optemplate = DBfetch($db_optemplates)) {
 				$db_opdata[$db_optemplate['operationid']]['optemplate'][$db_optemplate['optemplateid']] =
 					array_diff_key($db_optemplate, array_flip(['operationid']));
+			}
+		}
+
+		if ($operationids['optag']) {
+			$options = [
+				'output' => ['optagid', 'operationid', 'tag', 'value'],
+				'filter' => ['operationid' => array_keys($operationids['optag'])]
+			];
+			$db_optags = DBselect(DB::makeSql('optag', $options));
+
+			while ($db_optag = DBfetch($db_optags)) {
+				$db_opdata[$db_optag['operationid']]['optag'][$db_optag['optagid']] =
+					array_diff_key($db_optag, array_flip(['operationid']));
 			}
 		}
 
