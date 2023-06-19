@@ -140,24 +140,29 @@
 				tolerance: 'pointer',
 				opacity: 0.6,
 				helper: (e, ui) => {
-					for (let td of ui.find('>td')) {
+					for (const td of ui.find('>td')) {
 						const $td = jQuery(td);
-						$td.attr('width', $td.width());
+						const width = Math.floor($td.width());
+
+						$td.css({
+							'width': width,
+							'max-width': width
+						});
 					}
 
 					// When dragging element on Safari, it jumps out of the table.
 					if (SF) {
 						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
+						ui.css('top', 0);
 					}
 
 					return ui;
 				},
-				start: (e, ui) => {
-					ui.placeholder.height(ui.item.height());
-				},
 				stop: (e, ui) => {
-					ui.item.find('>td').removeAttr('width');
+					for (const td of ui.item.find('>td')) {
+						jQuery(td).removeAttr('style');
+					}
+
 					ui.item.removeAttr('style');
 				}
 			});
