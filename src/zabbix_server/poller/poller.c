@@ -39,7 +39,7 @@
 #include "zbxcrypto.h"
 #include "zbxjson.h"
 #include "zbxhttp.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxcomms.h"

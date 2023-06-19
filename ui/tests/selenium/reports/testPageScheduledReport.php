@@ -159,7 +159,7 @@ class testPageScheduledReport extends CWebTest {
 
 		// Check all columns and info icon for one report.
 		$row = $table->findRow('Name', $expired_report['Name']);
-		$row->getColumn('Info')->query('class:status-yellow')->one()->click();
+		$row->getColumn('Info')->query('class:zi-i-warning')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 		$this->assertEquals($expired_report['Info'], $hint->getText());
 		$hint->close();

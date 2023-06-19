@@ -20,7 +20,7 @@
 #include "checks_agent.h"
 #include "async_agent.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxsysinfo.h"
 #include "zbx_availability_constants.h"

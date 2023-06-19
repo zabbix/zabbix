@@ -27,7 +27,7 @@
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 
 #include "zbxthreads.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcrypto.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
@@ -2905,7 +2905,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, 0))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				goto out;
 			}
 
@@ -3037,7 +3037,7 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 				{
 					zbx_snprintf_alloc(error, error_alloc, error_offset, "%s()"
 							" I/O error: %s", func,
-							strerror_from_system(zbx_socket_last_error()));
+							zbx_strerror_from_system(zbx_socket_last_error()));
 				}
 				else
 				{
@@ -3229,7 +3229,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
 
@@ -3464,7 +3464,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, 0))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				goto out;
 			}
 
@@ -3740,7 +3740,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait for TLS handshake: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			goto out;
 		}
 
@@ -3881,7 +3881,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				return ZBX_PROTO_ERROR;
 			}
 		}
@@ -3959,7 +3959,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait socket: %s",
-					strerror_from_system(zbx_socket_last_error()));
+					zbx_strerror_from_system(zbx_socket_last_error()));
 			return ZBX_PROTO_ERROR;
 		}
 
@@ -4038,7 +4038,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				break;
 			}
 
@@ -4087,7 +4087,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
-						strerror_from_system(zbx_socket_last_error()));
+						zbx_strerror_from_system(zbx_socket_last_error()));
 				break;
 			}
 

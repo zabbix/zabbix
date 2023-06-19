@@ -105,15 +105,16 @@ class testInheritanceWeb extends CLegacyWebTest {
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
 
-		$this->zbxTestClick('tab_stepTab');
+		$this->zbxTestClick('tab_steps-tab');
 		foreach ($data['addStep'] as $step) {
-			$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
-			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step['name']);
+			$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+			$this->zbxTestLaunchOverlayDialog('New step of web scenario');
+			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="name"]', $step['name']);
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//a[contains(@href,"javascript:httpconf.steps.open")]'));
+			COverlayDialogElement::find()->one()->ensureNotPresent();
+//			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//a[contains(@href,"javascript:httpconf.steps.open")]'));
 			$this->zbxTestTextPresent($step['name']);
 		}
 

@@ -940,6 +940,63 @@ abstract class CItemGeneralOld extends CApiService {
 	}
 
 	/**
+	 * Check that no items with repeating keys would be inherited to a single host or template.
+	 *
+	 * @param array $tpl_items
+	 * @param array $chd_hosts
+	 *
+	 * @throws APIException
+	 */
+	private function checkDoubleInheritedNames(array $tpl_items, array $chd_hosts): void {
+		$templateids = array_unique(array_column($tpl_items, 'hostid'));
+
+		$tpl_links = [];
+
+		foreach ($chd_hosts as $chd_host) {
+			foreach ($chd_host['parentTemplates'] as $template) {
+				if (!in_array($template['templateid'], $templateids)) {
+					continue;
+				}
+
+				$tpl_links[$template['templateid']][] = $chd_host['hostid'];
+			}
+		}
+
+		$item_indexes = [];
+
+		foreach ($tpl_items as $i => $tpl_item) {
+			if (!array_key_exists($tpl_item['hostid'], $tpl_links)) {
+				continue;
+			}
+
+			$item_indexes[$tpl_item['key_']][] = $i;
+		}
+
+		foreach ($item_indexes as $key => $indexes) {
+			if (count($indexes) == 1) {
+				continue;
+			}
+
+			$hostids = [];
+
+			foreach ($indexes as $i) {
+				$templateid = $tpl_items[$i]['hostid'];
+				$same_hosts = array_intersect($tpl_links[$templateid], $hostids);
+
+				if ($same_hosts) {
+					$hostid = reset($same_hosts);
+
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						sprintf($this->getErrorMsg(self::ERROR_EXISTS_TEMPLATE), $key, $chd_hosts[$hostid]['host'])
+					);
+				}
+
+				$hostids = array_merge($hostids, $tpl_links[$templateid]);
+			}
+		}
+	}
+
+	/**
 	 * Prepares and returns an array of child items, inherited from items $tpl_items on the given hosts.
 	 *
 	 * @param array      $tpl_items
@@ -977,6 +1034,8 @@ abstract class CItemGeneralOld extends CApiService {
 		if (!$chd_hosts) {
 			return [];
 		}
+
+		$this->checkDoubleInheritedNames($tpl_items, $chd_hosts);
 
 		$chd_items_tpl = [];
 		$chd_items_key = [];

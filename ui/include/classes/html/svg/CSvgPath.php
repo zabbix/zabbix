@@ -31,13 +31,13 @@ class CSvgPath extends CSvgTag {
 	}
 
 	public function moveTo($x, $y): self {
-		$this->directions .= ' M'.floor($x).','.ceil($y);
+		$this->directions .= ' M'.round($x).','.ceil($y);
 
 		return $this;
 	}
 
 	public function lineTo($x, $y): self {
-		$this->directions .= ' L'.floor($x).','.ceil($y);
+		$this->directions .= ' L'.round($x).','.ceil($y);
 
 		return $this;
 	}

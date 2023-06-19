@@ -360,7 +360,7 @@ class CSetupWizard extends CForm {
 	protected function bodyToString($destroy = true): string {
 		$setup_left = (new CDiv())
 			->addClass(ZBX_STYLE_SETUP_LEFT)
-			->addItem((new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass('setup-logo'))
+			->addItem(makeLogo(LOGO_TYPE_NORMAL))
 			->addItem($this->getList());
 
 		$setup_right = (new CDiv($this->getStage()))->addClass(ZBX_STYLE_SETUP_RIGHT);
@@ -452,9 +452,7 @@ class CSetupWizard extends CForm {
 			$language_error = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
 		}
 
-		$language_error = ($language_error !== '')
-			? (makeErrorIcon($language_error))->addStyle('margin-left: 5px;')
-			: null;
+		$language_error = $language_error !== '' ? makeErrorIcon($language_error) : null;
 
 		$language_select = (new CFormList())
 			->addRow(new CLabel(_('Default language'), $lang_select->getFocusableElementId()), [

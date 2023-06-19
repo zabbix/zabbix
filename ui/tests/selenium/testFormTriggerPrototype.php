@@ -361,7 +361,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		}
 
 		// Check hintbox.
-		$this->query('class:icon-help-hint')->one()->click();
+		$this->query('class:zi-help-filled-small')->one()->click();
 		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
 
 		// Assert text.
@@ -893,14 +893,16 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 				if (isset($constructor['elementError'])) {
 					$count = CTestArrayHelper::get($constructor, 'element_count', 1);
-					$this->assertEquals($count, $this->query('xpath://a[@class="icon-info status-red"]')->all()->count());
+					$this->assertEquals($count,
+							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
+					);
 					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
 				}
 				else {
-					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
+					$this->zbxTestAssertElementNotPresentXpath('//button['.CXPathHelper::fromClass('zi-i-negative').']');
 				}
 			}
 		}

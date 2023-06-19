@@ -140,8 +140,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$count = $this->isTemplateDashboard() ? 1 : $this->fields_values['count'];
-		$master_item_values = array_slice($master_item_values, 0, $count, true);
+		$show_lines = $this->isTemplateDashboard() ? 1 : $this->fields_values['show_lines'];
+		$master_item_values = array_slice($master_item_values, 0, $show_lines, true);
 		$master_items = array_intersect_key($master_items, $master_item_values);
 
 		$master_hostids = [];

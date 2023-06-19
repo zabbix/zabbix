@@ -19,7 +19,7 @@
 
 #include "asyncpoller.h"
 #include "zbxtime.h"
-#include "log.h"
+#include "zbxlog.h"
 
 #ifdef HAVE_LIBEVENT
 #	include <event.h>

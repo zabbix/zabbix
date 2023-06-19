@@ -20,7 +20,6 @@
 #include "zbxhttp.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 

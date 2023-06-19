@@ -21,7 +21,6 @@
 #include "zbxserver.h"
 #include "evalfunc.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"

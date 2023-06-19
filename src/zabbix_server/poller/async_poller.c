@@ -1,4 +1,4 @@
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include <event.h>

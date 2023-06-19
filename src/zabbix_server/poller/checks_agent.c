@@ -19,7 +19,6 @@
 
 #include "checks_agent.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "../../libs/zbxasyncpoller/asyncpoller.h"
 #include "zbx_availability_constants.h"
@@ -134,7 +133,10 @@ int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_s
 			ret = NETWORK_ERROR;
 	}
 	else
+	{
 		ret = NETWORK_ERROR;
+		goto out;
+	}
 
 	if (SUCCEED == ret)
 		zbx_agent_handle_response(&s, received_len, &ret, item->interface.addr, result);

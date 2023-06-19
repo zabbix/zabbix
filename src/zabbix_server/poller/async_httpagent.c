@@ -20,7 +20,7 @@
 #include "checks_agent.h"
 #include "async_httpagent.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 
 static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)

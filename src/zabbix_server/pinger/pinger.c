@@ -20,7 +20,7 @@
 #include "pinger.h"
 #include "zbxserver.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxnix.h"

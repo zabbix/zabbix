@@ -24,7 +24,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 
@@ -63,6 +63,7 @@
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
+#include "../zabbix_server/scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -295,7 +296,7 @@ ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
 
 static char	*config_server		= NULL;
 int	CONFIG_SERVER_PORT;
-char	*CONFIG_HOSTNAME		= NULL;
+static char	*config_hostname	= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
@@ -333,7 +334,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
 
@@ -488,7 +489,7 @@ static void	zbx_set_defaults(void)
 
 	config_startup_time = time(NULL);
 
-	if (NULL == CONFIG_HOSTNAME)
+	if (NULL == config_hostname)
 	{
 		if (NULL == CONFIG_HOSTNAME_ITEM)
 			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
@@ -506,7 +507,7 @@ static void	zbx_set_defaults(void)
 				zabbix_log(LOG_LEVEL_WARNING, "proxy name truncated to [%s])", *value);
 			}
 
-			CONFIG_HOSTNAME = zbx_strdup(CONFIG_HOSTNAME, *value);
+			config_hostname = zbx_strdup(config_hostname, *value);
 		}
 		else
 			zabbix_log(LOG_LEVEL_WARNING, "failed to get proxy name from [%s])", CONFIG_HOSTNAME_ITEM);
@@ -515,7 +516,7 @@ static void	zbx_set_defaults(void)
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", config_hostname);
 	}
 
 	if (NULL == zbx_config_dbhigh->config_dbhost)
@@ -593,14 +594,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	char	*ch_error;
 	int	err = 0;
 
-	if (NULL == CONFIG_HOSTNAME)
+	if (NULL == config_hostname)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		err = 1;
 	}
-	else if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
+	else if (FAIL == zbx_check_hostname(config_hostname, &ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter '%s': %s", CONFIG_HOSTNAME,
+		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter '%s': %s", config_hostname,
 				ch_error);
 		zbx_free(ch_error);
 		err = 1;
@@ -762,7 +763,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_MAND,	0,			0},
 		{"ServerPort",			&CONFIG_SERVER_PORT,			TYPE_INT,
 			PARM_OPT,	1024,			32767},
-		{"Hostname",			&CONFIG_HOSTNAME,			TYPE_STRING,
+		{"Hostname",			&config_hostname,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1046,6 +1047,8 @@ static void	zbx_on_exit(int ret)
 
 	zbx_db_deinit();
 
+	zbx_deinit_remote_commands_cache();
+
 	/* free vmware support */
 	zbx_vmware_destroy();
 
@@ -1057,7 +1060,7 @@ static void	zbx_on_exit(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 	zbx_locks_destroy();
 
@@ -1094,6 +1097,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
@@ -1290,7 +1294,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_rtc_t				rtc;
 	zbx_timespec_t				rtc_timeout = {1, 0};
 
-	zbx_config_comms_args_t			config_comms = {zbx_config_tls, CONFIG_HOSTNAME, config_server,
+	zbx_config_comms_args_t			config_comms = {zbx_config_tls, config_hostname, config_server,
 								config_proxymode, zbx_config_timeout,
 								zbx_config_source_ip};
 	zbx_thread_args_t			thread_args;
@@ -1299,14 +1303,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_max_concurrent_checks_per_poller};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_program_type, zbx_config_timeout,
-								&config_server_addrs, CONFIG_HOSTNAME,
+								&config_server_addrs, config_hostname,
 								zbx_config_source_ip, config_proxyconfig_frequency};
 	zbx_thread_datasender_args		datasender_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 								&config_server_addrs, zbx_config_source_ip,
-								CONFIG_HOSTNAME, config_proxydata_frequency};
+								config_hostname, config_proxydata_frequency};
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_program_type,
 								config_startup_time, zbx_config_enable_remote_commands,
-								zbx_config_log_remote_commands};
+								zbx_config_log_remote_commands, config_hostname};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_program_type, zbx_config_timeout,
 								CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERER],
@@ -1318,7 +1322,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
 #ifdef HAVE_OPENIPMI
-	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay};
+	zbx_thread_ipmi_manager_args		ipmimanager_args = {zbx_config_timeout, config_unavailable_delay,
+								config_unreachable_period, config_unreachable_delay};
 #endif
 	zbx_thread_pp_manager_args		preproc_man_args = {
 							.workers_num = CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],
@@ -1333,7 +1338,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		printf("Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).\nPress Ctrl+C to exit.\n\n",
 				ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
-				CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+				config_hostname, ZABBIX_VERSION, ZABBIX_REVISION);
 	}
 
 	if (FAIL == zbx_ipc_service_init_env(CONFIG_SOCKET_PATH, &error))
@@ -1350,7 +1355,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);
@@ -1400,7 +1405,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Proxy (%s) [%s]. Zabbix %s (revision %s).",
 			ZBX_PROXYMODE_PASSIVE == config_proxymode ? "passive" : "active",
-			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+			config_hostname, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "SNMP monitoring:       " SNMP_FEATURE_STATUS);
@@ -1526,6 +1531,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
 		}
+
+		if (SUCCEED != zbx_init_remote_commands_cache(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/
@@ -1596,6 +1608,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;

@@ -493,7 +493,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
@@ -777,7 +777,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[
@@ -1107,7 +1107,7 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 0,
-										'name' => 'unacknowledged',
+										'name' => 'acknowledgement_status',
 										'value' => 1
 									],
 									[

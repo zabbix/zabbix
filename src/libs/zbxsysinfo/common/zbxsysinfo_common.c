@@ -21,7 +21,6 @@
 #include "zbxsysinfo.h"
 
 #include "../sysinfo.h"
-#include "log.h"
 #include "vfs_file.h"
 #include "dir.h"
 #include "net.h"
@@ -45,14 +44,19 @@ static int	only_active(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	system_run_no_remote(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_common_local[] =
+static zbx_metric_t	parameters_common_local[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.run",		CF_HAVEPARAMS,	system_run_no_remote, 	"echo test"},
 	{NULL}
 };
 
-ZBX_METRIC	parameters_common[] =
+zbx_metric_t	*get_parameters_common_local(void)
+{
+	return &parameters_common_local[0];
+}
+
+static zbx_metric_t	parameters_common[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"system.localtime",	CF_HAVEPARAMS,	system_localtime,	"utc"},
@@ -92,6 +96,11 @@ ZBX_METRIC	parameters_common[] =
 
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_common(void)
+{
+	return &parameters_common[0];
+}
 
 static const char	*user_parameter_dir = NULL;
 
