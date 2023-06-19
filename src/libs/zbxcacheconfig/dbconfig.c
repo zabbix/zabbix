@@ -10694,7 +10694,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
 		int config_max_concurrent_checks_per_poller, zbx_dc_item_t **items)
 {
-	int			now, num = 0, max_items;
+	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
@@ -10714,10 +10714,16 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
 				goto out;
+
+			items_alloc = max_items;
+			*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
 			break;
 		case ZBX_POLLER_TYPE_AGENT:
 			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
 				goto out;
+
+			items_alloc = max_items;
+			*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
 			break;
 		default:
 			max_items = 1;
@@ -10820,7 +10826,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 				}
 			}
 
-			if (1 < max_items)
+			if (1 < max_items && 0 == items_alloc)
 				*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * max_items);
 		}
 
