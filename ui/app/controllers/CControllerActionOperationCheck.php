@@ -197,29 +197,31 @@ class CControllerActionOperationCheck extends CController {
 
 				$tags = [];
 
-				foreach ($operation['optag'] as $optag) {
-					$tag = trim($optag['tag']);
-					$value = trim($optag['value']);
+				if (array_key_exists('optag', $operation)) {
+					foreach ($operation['optag'] as $optag) {
+						$tag = trim($optag['tag']);
+						$value = trim($optag['value']);
 
-					if ($tag === '' && $value === '') {
-						continue;
+						if ($tag === '' && $value === '') {
+							continue;
+						}
+
+						if ($tag === '' && $value !== '') {
+							error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
+
+							return false;
+						}
+
+						if (array_key_exists($tag, $tags) && $tags[$tag] === $value) {
+							error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'),
+								_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
+							);
+
+							return false;
+						}
+
+						$tags[$tag] = $value;
 					}
-
-					if ($tag === '' && $value !== '') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'), _('cannot be empty')));
-
-						return false;
-					}
-
-					if (array_key_exists($tag, $tags) && $tags[$tag] === $value) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Tag'),
-							_s('value "%1$s" already exists', '(tag, value)=('.$tag.', '.$value.')'))
-						);
-
-						return false;
-					}
-
-					$tags[$tag] = $value;
 				}
 
 				if (!$tags) {
