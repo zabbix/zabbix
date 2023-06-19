@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-13T12:06:09Z'
+  date: '2023-06-13T14:10:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1636,7 +1636,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -2000,13 +2000,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL MSSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
                 - name: 'GCP Cloud SQL MSSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2'
@@ -2187,7 +2187,7 @@ zabbix_export:
                   value: availability
             - uuid: 3d7e054340e94b09b085e508b9b76841
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -2208,7 +2208,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
+                The instance is in suspended state. 
                 It is not available, for example, due to problems with billing. 
                 
               tags:
@@ -2216,7 +2216,7 @@ zabbix_export:
                   value: availability
             - uuid: 378b4d62582d416db7cb7fd6ed099ac9
               expression: 'last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6'
-              name: 'GCP Cloud SQL MSSQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL MSSQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -3717,7 +3717,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4021,7 +4021,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL by HTTP'
       description: |
         Get GCP Cloud SQL MySQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4145,13 +4145,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL MySQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
                 - name: 'GCP Cloud SQL MySQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4'
                 - name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1'
-                - name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
                 - name: 'GCP Cloud SQL MySQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2'
@@ -4465,7 +4465,7 @@ zabbix_export:
                   value: availability
             - uuid: 65831fed3d19425c86933db4034ed565
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5'
-              name: 'GCP Cloud SQL MySQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL MySQL: Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -4486,7 +4486,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
+                The instance is in suspended state. 
                 It is not available, for example, due to problems with billing. 
                 
               tags:
@@ -4494,7 +4494,7 @@ zabbix_export:
                   value: availability
             - uuid: 1387f9a2ef194d5bb5d1e548fc4eb8d3
               expression: 'last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6'
-              name: 'GCP Cloud SQL MySQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL MySQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -5126,7 +5126,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MySQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -5581,7 +5581,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -5705,13 +5705,13 @@ zabbix_export:
               dependencies:
                 - name: 'GCP Cloud SQL PostgreSQL: Failed to get the instance state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in maintenance'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1'
-                - name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
+                - name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
                 - name: 'GCP Cloud SQL PostgreSQL: Instance is stopped by the owner'
                   expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2'
@@ -5892,7 +5892,7 @@ zabbix_export:
                   value: availability
             - uuid: 1a2efb6f755444c0bab85d2778018eb1
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Failed state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in failed state'
               priority: AVERAGE
               description: |
                 The instance creation failed, or an operation left the instance in an own bad state.
@@ -5913,7 +5913,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: Instance is in suspended state'
               priority: WARNING
               description: |
-                The instance is in Suspended state. 
+                The instance is in suspended state. 
                 It is not available, for example, due to problems with billing. 
                 
               tags:
@@ -5921,7 +5921,7 @@ zabbix_export:
                   value: availability
             - uuid: 5f1084f744b444f3b803110baf703973
               expression: 'last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6'
-              name: 'GCP Cloud SQL PostgreSQL: Instance is in Unknown state'
+              name: 'GCP Cloud SQL PostgreSQL: Instance is in unknown state'
               priority: AVERAGE
               description: |
                 The state of the instance is unknown.
@@ -7101,7 +7101,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7495,7 +7495,7 @@ zabbix_export:
       name: 'GCP Compute Engine Instance by HTTP'
       description: |
         Discover GCP Compute Engine instances by HTTP with script item usage.
-        This template will be connected to discovered entities automatically with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         

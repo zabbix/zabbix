@@ -47,7 +47,8 @@ This template has been tested on:
        
 **IMPORTANT!!!**
 
-     All the instances/quotas/metrics discovered are related to particular GCP project. To monitor the several GCP projects - create the corresponding service accounts/Zabbix hosts.
+     All the instances/quotas/metrics discovered are related to particular GCP project. 
+     To monitor several GCP projects - create their corresponding service accounts/Zabbix hosts.
 
      GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
 
@@ -189,7 +190,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -291,7 +292,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -348,13 +349,13 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MySQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MySQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}`|Average||
 |GCP Cloud SQL MySQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL MySQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
+|GCP Cloud SQL MySQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MySQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2`|Info||
 |GCP Cloud SQL MySQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4`|Info||
-|GCP Cloud SQL MySQL: Instance is in Failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
-|GCP Cloud SQL MySQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
+|GCP Cloud SQL MySQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 5`|Average||
+|GCP Cloud SQL MySQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 6`|Average||
 |GCP Cloud SQL MySQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 10`|Average||
-|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MySQL: Instance is in suspended state</li><li>GCP Cloud SQL MySQL: Instance is in maintenance</li><li>GCP Cloud SQL MySQL: Instance is in Failed state</li><li>GCP Cloud SQL MySQL: Instance is in Unknown state</li><li>GCP Cloud SQL MySQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL MySQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MySQL: Instance is in suspended state</li><li>GCP Cloud SQL MySQL: Instance is in maintenance</li><li>GCP Cloud SQL MySQL: Instance is in failed state</li><li>GCP Cloud SQL MySQL: Instance is in unknown state</li><li>GCP Cloud SQL MySQL: Failed to get the instance state</li></ul>|
 
 # GCP Cloud SQL MySQL Replica by HTTP
 
@@ -378,7 +379,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -422,7 +423,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -477,13 +478,13 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL PostgreSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL PostgreSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}`|Average||
 |GCP Cloud SQL PostgreSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL PostgreSQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
+|GCP Cloud SQL PostgreSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
 |GCP Cloud SQL PostgreSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2`|Info||
 |GCP Cloud SQL PostgreSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4`|Info||
-|GCP Cloud SQL PostgreSQL: Instance is in Failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
-|GCP Cloud SQL PostgreSQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
+|GCP Cloud SQL PostgreSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 5`|Average||
+|GCP Cloud SQL PostgreSQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 6`|Average||
 |GCP Cloud SQL PostgreSQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 10`|Average||
-|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL PostgreSQL: Instance is in suspended state</li><li>GCP Cloud SQL PostgreSQL: Instance is in maintenance</li><li>GCP Cloud SQL PostgreSQL: Instance is in Failed state</li><li>GCP Cloud SQL PostgreSQL: Instance is in Unknown state</li><li>GCP Cloud SQL PostgreSQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL PostgreSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL PostgreSQL: Instance is in suspended state</li><li>GCP Cloud SQL PostgreSQL: Instance is in maintenance</li><li>GCP Cloud SQL PostgreSQL: Instance is in failed state</li><li>GCP Cloud SQL PostgreSQL: Instance is in unknown state</li><li>GCP Cloud SQL PostgreSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule GCP Cloud SQL PostgreSQL: Databases discovery
 
@@ -531,7 +532,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -577,7 +578,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
@@ -651,13 +652,13 @@ This template will be connected to discovered entities automatically with all re
 |GCP Cloud SQL MSSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MSSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}`|Average||
 |GCP Cloud SQL MSSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
-|GCP Cloud SQL MSSQL: Instance is in suspended state|<p>The instance is in Suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
+|GCP Cloud SQL MSSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MSSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2`|Info||
 |GCP Cloud SQL MSSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4`|Info||
-|GCP Cloud SQL MSSQL: Instance is in Failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
-|GCP Cloud SQL MSSQL: Instance is in Unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
+|GCP Cloud SQL MSSQL: Instance is in failed state|<p>The instance creation failed, or an operation left the instance in an own bad state.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 5`|Average||
+|GCP Cloud SQL MSSQL: Instance is in unknown state|<p>The state of the instance is unknown.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 6`|Average||
 |GCP Cloud SQL MSSQL: Failed to get the instance state|<p>Failed to get the instance state. Check access permissions to GCP API or service account.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 10`|Average||
-|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MSSQL: Instance is in suspended state</li><li>GCP Cloud SQL MSSQL: Instance is in maintenance</li><li>GCP Cloud SQL MSSQL: Instance is in Failed state</li><li>GCP Cloud SQL MSSQL: Instance is in Unknown state</li><li>GCP Cloud SQL MSSQL: Failed to get the instance state</li></ul>|
+|GCP Cloud SQL MSSQL: Database engine is down|<p>Database engine is down.If an instance experiences unplanned (non-maintenance) downtime, the instance state will still be RUNNING, but the database engine state metric will report 0.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.db.state)=0`|Average|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Instance is stopped by the owner</li><li>GCP Cloud SQL MSSQL: Instance is in suspended state</li><li>GCP Cloud SQL MSSQL: Instance is in maintenance</li><li>GCP Cloud SQL MSSQL: Instance is in failed state</li><li>GCP Cloud SQL MSSQL: Instance is in unknown state</li><li>GCP Cloud SQL MSSQL: Failed to get the instance state</li></ul>|
 
 ### LLD rule Resources discovery
 
@@ -728,7 +729,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be connected to discovered entities automatically with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all required parameters pre-defined.
 
 ### Macros used
 
