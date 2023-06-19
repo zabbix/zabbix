@@ -36,8 +36,10 @@ struct zbx_pdc_history_data
 
 static void	pdc_list_free_history(zbx_list_t *list, zbx_pdc_history_t *row)
 {
-	list->mem_free_func(row->value);
-	list->mem_free_func(row->source);
+	if (NULL != row->value)
+		list->mem_free_func(row->value);
+	if (NULL != row->source)
+		list->mem_free_func(row->source);
 	list->mem_free_func(row);
 }
 
@@ -427,7 +429,7 @@ static int	pdc_history_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 static int	pdc_history_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_history_t *src)
 {
 	zbx_pdc_history_t	*row;
-	int			ret;
+	int			ret = FAIL;
 
 	if (NULL == (row = (zbx_pdc_history_t *)pdc_malloc(sizeof(zbx_pdc_history_t))))
 		return FAIL;
@@ -487,24 +489,26 @@ static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *row
 	/* set cached row ids */
 	if (0 < rows_num)
 	{
+		zbx_list_iterator_t	li_id;
+
 		id = zbx_dc_get_nextid("proxy_history", rows_num);
 
 		if (NULL != next)
 			next = next->next;
 
-		zbx_list_iterator_init_with(&pdc->history, next, &li);
+		zbx_list_iterator_init_with(&pdc->history, next, &li_id);
 
 		do
 		{
-			(void)zbx_list_iterator_peek(&li, (void **)&row);
+			(void)zbx_list_iterator_peek(&li_id, (void **)&row);
 			row->id = id++;
 		}
-		while (SUCCEED == zbx_list_iterator_next(&li));
+		while (SUCCEED == zbx_list_iterator_next(&li_id));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d nextid:" ZBX_FS_UI64, __func__, rows_num, id);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p" ZBX_FS_UI64, __func__, rows_num, li.current);
 
-	return (SUCCEED == zbx_list_iterator_is_finished(&li) ? NULL : li.current);
+	return li.current;
 }
 
 /******************************************************************************

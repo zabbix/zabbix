@@ -731,7 +731,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		if (ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_data_cache_size)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"CacheSize\" configuration parameter");
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheSize\" configuration parameter");
 			err = 1;
 		}
 

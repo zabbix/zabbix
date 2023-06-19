@@ -294,24 +294,10 @@ int	zbx_list_iterator_next(zbx_list_iterator_t *iterator)
 		return SUCCEED;
 	}
 
+	iterator->current = NULL;
+
 	return FAIL;
 }
-
-/******************************************************************************
- *                                                                            *
- * Purpose: advance list iterator                                             *
- *                                                                            *
- * Parameters: iterator - [IN] iterator to be advanced                        *
- *                                                                            *
- * Return value: SUCCEED is returned if next list item exists, otherwise,     *
- *               FAIL is returned.                                            *
- *                                                                            *
- ******************************************************************************/
-int	zbx_list_iterator_is_finished(zbx_list_iterator_t *iterator)
-{
-	return (NULL != iterator->next ? FAIL : SUCCEED);
-}
-
 
 /******************************************************************************
  *                                                                            *

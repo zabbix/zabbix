@@ -745,6 +745,5 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
-int	zbx_list_iterator_is_finished(zbx_list_iterator_t *iterator);
 
 #endif /* ZABBIX_ZBXALGO_H */

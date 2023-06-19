@@ -49,9 +49,12 @@ struct zbx_pdc_discovery_data
 
 static void	pdc_list_free_discovery(zbx_list_t *list, zbx_pdc_discovery_t *row)
 {
-	list->mem_free_func(row->ip);
-	list->mem_free_func(row->dns);
-	list->mem_free_func(row->value);
+	if (NULL != row->ip)
+		list->mem_free_func(row->ip);
+	if (NULL != row->dns)
+		list->mem_free_func(row->dns);
+	if (NULL != row->value)
+		list->mem_free_func(row->value);
 	list->mem_free_func(row);
 }
 
@@ -137,7 +140,7 @@ void	pdc_discovery_flush(zbx_pdc_t *pdc)
 static int	pdc_discovery_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_discovery_t *src, time_t now)
 {
 	zbx_pdc_discovery_t	*row;
-	int			ret;
+	int			ret = FAIL;
 
 	if (NULL == (row = (zbx_pdc_discovery_t *)pdc_malloc(sizeof(zbx_pdc_discovery_t))))
 		return FAIL;
@@ -208,24 +211,26 @@ static zbx_list_item_t	*pdc_discovery_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *r
 	/* set cached row ids */
 	if (0 < rows_num)
 	{
+		zbx_list_iterator_t	li_id;
+
 		id = zbx_dc_get_nextid("proxy_dhistory", rows_num);
 
 		if (NULL != next)
 			next = next->next;
 
-		zbx_list_iterator_init_with(&pdc->discovery, next, &li);
+		zbx_list_iterator_init_with(&pdc->discovery, next, &li_id);
 
 		do
 		{
-			(void)zbx_list_iterator_peek(&li, (void **)&row);
+			(void)zbx_list_iterator_peek(&li_id, (void **)&row);
 			row->id = id++;
 		}
-		while (SUCCEED == zbx_list_iterator_next(&li));
+		while (SUCCEED == zbx_list_iterator_next(&li_id));
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d nextid:" ZBX_FS_UI64, __func__, rows_num, id);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p" ZBX_FS_UI64, __func__, rows_num, li.current);
 
-	return (SUCCEED == zbx_list_iterator_is_finished(&li) ? NULL : li.current);
+	return li.current;
 }
 
 /******************************************************************************
