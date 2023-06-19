@@ -289,7 +289,15 @@ static int	DBpatch_6050024(void)
 	return FAIL;
 }
 
-static int  DBpatch_6050025(void)
+static int	DBpatch_6050025(void)
+{
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+
+	return SUCCEED;
+}
+
+static int  DBpatch_6050026(void)
 {
 	const zbx_db_table_t table =
 			{"optag", "optagid", 0,
@@ -306,15 +314,14 @@ static int  DBpatch_6050025(void)
 	return DBcreate_table(&table);
 }
 
-static int  DBpatch_6050026(void)
+static int  DBpatch_6050027(void)
 {
 	return DBcreate_index("optag", "optag_1", "operationid", 0);
 }
 
-static int	DBpatch_6050027(void)
+static int	DBpatch_6050028(void)
 {
-	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0,
-			ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("optag", 1, &field);
 }
@@ -353,5 +360,6 @@ DBPATCH_ADD(6050024, 0, 1)
 DBPATCH_ADD(6050025, 0, 1)
 DBPATCH_ADD(6050026, 0, 1)
 DBPATCH_ADD(6050027, 0, 1)
+DBPATCH_ADD(6050028, 0, 1)
 
 DBPATCH_END()

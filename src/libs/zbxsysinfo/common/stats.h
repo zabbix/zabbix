@@ -20,6 +20,8 @@
 #ifndef ZABBIX_STATS_H
 #define ZABBIX_STATS_H
 
+#include "../sysinfo.h"
+
 #include "zbxthreads.h"
 
 #ifndef _WINDOWS
@@ -28,10 +30,6 @@
 #endif
 
 #include "cpustat.h"
-
-#ifdef _AIX
-#	include "vmstats.h"
-#endif
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)	/* Solaris */
 #	include "zbxkstat.h"
@@ -66,10 +64,6 @@ extern ZBX_DISKDEVICES_DATA	*diskdevices;
 extern int			my_diskstat_shmid;
 #endif
 
-ZBX_THREAD_ENTRY(collector_thread, args);
-
-int	init_collector_data(char **error);
-void	free_collector_data(void);
 void	diskstat_shm_init(void);
 void	diskstat_shm_reattach(void);
 void	diskstat_shm_extend(void);

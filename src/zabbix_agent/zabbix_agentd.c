@@ -87,7 +87,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxmodules.h"
 #endif
 
-#include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #	include "zbxwin32.h"
@@ -1161,7 +1160,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1233,7 +1232,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_collector_data(&error))
+	if (SUCCEED != zbx_init_collector_data(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
@@ -1382,7 +1381,7 @@ void	zbx_free_service_resources(int ret)
 #endif
 	zbx_free_metrics();
 	zbx_alias_list_free();
-	free_collector_data();
+	zbx_free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
 	free_perf_collector();
@@ -1394,7 +1393,7 @@ void	zbx_free_service_resources(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Agent stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 #ifndef _WINDOWS
 	zbx_locks_destroy();
@@ -1436,7 +1435,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zabbix_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
 	}
 #endif
 
@@ -1578,7 +1577,7 @@ int	main(int argc, char **argv)
 			load_aliases(CONFIG_ALIASES);
 #ifdef _WINDOWS
 			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
-				zabbix_close_log();
+				zbx_close_log();
 #endif
 			break;
 	}

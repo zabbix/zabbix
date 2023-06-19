@@ -1,6 +1,9 @@
 Changes for 7.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-8413] moved Alerts->Media types configuration form to modal window (esekace)
+.........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in K8s templates (drasikhov)
+..F....... [ZBXNEXT-8445] changed Data collection->Event correlation form to modal window (Ivo)
 .........T [ZBXNEXT-8465] updated JS scripts in Kubernetes templates; thanks to Erik Berg for proposals in JS improvement (egordymov)
 ...G...PS. [ZBXNEXT-297] added remote command execution via active checks (akozlovs)
 .........T [ZBXNEXT-8447] added new discovery manager, worker and queue metrics to Zabbix server and proxy health templates (drasikhov)
@@ -9,6 +12,16 @@ New features:
 A.F.I..... [ZBXNEXT-2299] implemented problem/event filtering by performed update actions and user; reworked problem filter to support filtering by acknowledgement status and current user (miks)
 
 Bug fixes:
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
+...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
+A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
+....I..... [ZBX-22889] fixed performance problems by creating problem.cause_eventid index (mprihodko)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+..F....... [ZBX-22903] fixed scale calculation for Graph and Graph (classic) widgets (averza)
+.......P.. [ZBX-22838] fixed Zabbix proxy reporting JSON error instead of TCP (vso)
+........S. [ZBX-22904] fixed streaming of metrics with large float numbers (vso)
+.......PS. [ZBX-22148] fixed crash when updating webhook to JavaScript that cannot be compiled (vso)
+...G...... [ZBX-22868] fixed Zabbix agent 2 plugin Defaults when hardcoded value is provided (esneiders)
 ...G...... [ZBX-22399] added tls and default support to MQTT plugin for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-20280] fixed page selection in dashboard after refresh (apoga)
 ...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
@@ -89,12 +102,23 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.4rc1
 
 New features:
+.........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in K8s templates (drasikhov)
 .........T [ZBXNEXT-8465] updated JS scripts in Kubernetes templates; thanks to Erik Berg for proposals in JS improvement (egordymov)
 ........S. [ZBXNEXT-8467] updated max supported TimescaleDB version to 2.11 (mprihodko)
 ..F....... [ZBXNEXT-7072] fixed hintbox to be automatically closed when target element disappears (miks)
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
+...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
+A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
+....I..... [ZBX-22889] fixed performance problems by creating problem.cause_eventid index (mprihodko)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+..F....... [ZBX-22903] fixed scale calculation for Graph and Graph (classic) widgets (averza)
+.......P.. [ZBX-22838] fixed Zabbix proxy reporting JSON error instead of TCP (vso)
+........S. [ZBX-22904] fixed streaming of metrics with large float numbers (vso)
+.......PS. [ZBX-22148] fixed crash when updating webhook to JavaScript that cannot be compiled (vso)
+...G...... [ZBX-22868] fixed Zabbix agent 2 plugin Defaults when hardcoded value is provided (esneiders)
 ...G...... [ZBX-22399] added tls and default support to MQTT plugin for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-20280] fixed page selection in dashboard after refresh (apoga)
 ...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
@@ -1346,12 +1370,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.19rc1
 
 New features:
+.........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in K8s templates (drasikhov)
 .........T [ZBXNEXT-8465] updated JS scripts in Kubernetes templates; thanks to Erik Berg for proposals in JS improvement (egordymov)
 ........S. [ZBXNEXT-8467] updated max supported TimescaleDB version to 2.11 (mprihodko)
 ..F....... [ZBXNEXT-7072] fixed hintbox to be automatically closed when target element disappears (miks)
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
+A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
+...G...... [ZBX-22695] fixed eventlog duplicate timestamps (asestakovs)
+..F....... [ZBX-22903] fixed scale calculation for Graph and Graph (classic) widgets (averza)
+.......PS. [ZBX-22148] fixed crash when updating webhook to JavaScript that cannot be compiled (vso)
+...G...... [ZBX-22868] fixed Zabbix agent 2 plugin Defaults when hardcoded value is provided (esneiders)
 ...G...... [ZBX-22399] added tls and default support to MQTT plugin for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-20280] fixed page selection in dashboard after refresh (apoga)
 ...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
@@ -3943,6 +3975,9 @@ Changes for 5.0.36rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-21859] fixed active checks sometimes not being executed on Zabbix agent2 if checks for plugin have long and short update intervals (vso)
+...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems which have identical mount point (asestakovs)
+.......PS. [ZBX-22148] fixed crash when updating webhook to JavaScript that cannot be compiled (vso)
 ...G...... [ZBX-22798] fixed incorrect output of vfs.file.contents when reading frequently modified file (dgoloscapov, vso)
 ..F....... [ZBX-22397] fixed disabled input field text color on Safari (miks)
 A......... [ZBX-20263] prevented the ability to link two or more templates with matching item keys to a host or template (epulke, vmaksimovs)
