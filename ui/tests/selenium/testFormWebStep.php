@@ -485,10 +485,8 @@ class testFormWebStep extends CLegacyWebTest {
 						['name' => '{test}'],
 						['name' => '{test}']
 					],
-					'error_webform' => true,
-					'error_msg' => 'Cannot add web scenario',
 					'errors' => [
-						'Invalid parameter "/1/steps/1/variables/2": value (name)=({test}) already exists.'
+						'Incorrect value for field "variables/2": value (name)=({test}) already exists.'
 					]
 				]
 			],
@@ -1018,12 +1016,6 @@ class testFormWebStep extends CLegacyWebTest {
 				$this->assertEquals($data['check_url'], $url);
 			}
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Cancel"]');
-		}
-
-		if (array_key_exists('error_webform', $data)) {
-			$this->zbxTestWaitForPageToLoad();
-			COverlayDialogElement::ensureNotPresent();
-			$this->zbxTestClickWait('add');
 		}
 
 		switch ($data['expected']) {

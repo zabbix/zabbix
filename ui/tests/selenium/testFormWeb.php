@@ -1471,7 +1471,7 @@ class testFormWeb extends CLegacyWebTest {
 		// Take a screenshot to test draggable object position of web steps.
 		if (array_key_exists('screenshot', $data)) {
 			$this->page->removeFocus();
-			$this->assertScreenshot($this->query('class:httpconf-steps-dynamic-row')->waitUntilPresent()->one(), 'Web steps');
+			$this->assertScreenshot($this->query('id:steps')->waitUntilPresent()->one(), 'Web steps');
 		}
 
 		$this->zbxTestClickWait('add');
