@@ -72,7 +72,7 @@ static int	agent_task_process(short event, void *data)
 		/* initialization */
 		agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%x", __func__,
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d", __func__,
 				get_agent_step_string(agent_context->step), event);
 
 		zbx_tcp_send_context_init(agent_context->key, strlen(agent_context->key), 0,
@@ -82,7 +82,7 @@ static int	agent_task_process(short event, void *data)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%x", __func__,
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d", __func__,
 				get_agent_step_string(agent_context->step), event);
 	}
 

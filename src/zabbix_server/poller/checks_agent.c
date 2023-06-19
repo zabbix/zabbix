@@ -30,7 +30,7 @@
 extern unsigned char	program_type;
 #endif
 
-int	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
+void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "get value from agent result: '%s'", s->buffer);
 

@@ -61,7 +61,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_vector_connector_data_point_clear_ext(connector_data_points, zbx_connector_data_point_free);
 #ifdef HAVE_LIBCURL
-	char			query_fields[] = "", headers[] = "", posts[] = "", status_codes[] = "200";
+	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
 
 	zbx_http_context_create(&context);
