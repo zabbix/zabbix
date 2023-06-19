@@ -436,6 +436,7 @@ class CAudit {
 		'action.operations.opcommand_hst' => 'opcommand_hstid',
 		'action.operations.opgroup' => 'opgroupid',
 		'action.operations.optemplate' => 'optemplateid',
+		'action.operations.optag' => 'optagid',
 		'action.recovery_operations' => 'operationid',
 		'action.recovery_operations.opmessage_grp' => 'opmessage_grpid',
 		'action.recovery_operations.opmessage_usr' => 'opmessage_usrid',
