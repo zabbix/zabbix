@@ -27,46 +27,62 @@
 <script>
 	const view = new class {
 
+		/** @type {HTMLFormElement} */
+		#form;
+
+		/** @type {boolean} */
+		#is_templated = false;
+
+		/** @type {HTMLTableElement} */
+		#step_list;
+
+		/** @type {Object} */
+		#templates = {};
+
+		/** @type {Object} */
+		#events = {};
+
+		/** @type {boolean} */
+		#variables_headers_initialized = false;
+
 		constructor() {
-			this._registerEvents();
-			this.templates = {};
-			this.variables_headers_initialized = false;
+			this.#registerEvents();
 		}
 
 		init({is_templated, variables, headers, steps}) {
-			this.form = document.getElementById('webscenario-form');
-			this.is_templated = is_templated;
-			this.step_list = document.getElementById('steps');
+			this.#form = document.getElementById('webscenario-form');
+			this.#is_templated = is_templated;
+			this.#step_list = document.getElementById('steps');
 
-			this._initTemplates();
+			this.#initTemplates();
 
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
-				if (panel.attr('id') === 'scenario-tab' && !this.variables_headers_initialized) {
-					this._initVariables(variables);
-					this._initHeaders(headers);
+				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
+					this.#initVariables(variables);
+					this.#initHeaders(headers);
 
-					this.variables_headers_initialized = true;
+					this.#variables_headers_initialized = true;
 				}
 			});
 
-			this._initSteps(steps);
+			this.#initSteps(steps);
 
 			for (const id of ['agent', 'authentication']) {
-				document.getElementById(id).addEventListener('change', () => this._updateForm());
+				document.getElementById(id).addEventListener('change', () => this.#updateForm());
 			}
 
-			this._updateForm();
+			this.#updateForm();
 		}
 
-		_initTemplates() {
-			this.templates.step_row = new Template(
-				document.getElementById(this.is_templated ? 'step-row-templated-tmpl' : 'step-row-tmpl').innerHTML
+		#initTemplates() {
+			this.#templates.step_row = new Template(
+				document.getElementById(this.#is_templated ? 'step-row-templated-tmpl' : 'step-row-tmpl').innerHTML
 			);
 		}
 
-		_initVariables(variables) {
+		#initVariables(variables) {
 			const $variables = jQuery('#variables');
 
 			jQuery('#variables').dynamicRows({
@@ -74,10 +90,10 @@
 				rows: variables
 			});
 
-			this._initTextareaFlexible($variables);
+			this.#initTextareaFlexible($variables);
 		}
 
-		_initHeaders(headers) {
+		#initHeaders(headers) {
 			const $headers = jQuery('#headers');
 
 			$headers
@@ -86,37 +102,37 @@
 					rows: headers
 				})
 				.on('tableupdate.dynamicRows', (e) => {
-					this._toggleDragIcon(e.target);
+					this.#toggleDragIcon(e.target);
 					jQuery(e.target).sortable({disabled: e.target.querySelectorAll('.sortable').length < 2});
 				});
 
-			this._initTextareaFlexible($headers);
-			this._initSortable($headers);
+			this.#initTextareaFlexible($headers);
+			this.#initSortable($headers);
 		}
 
-		_initSteps(steps) {
+		#initSteps(steps) {
 			for (const [row_index, step] of Object.entries(steps)) {
 				step.row_index = row_index;
-				this.step_list.querySelector('tbody').appendChild(this._prepareStepRow(step));
+				this.#step_list.querySelector('tbody').appendChild(this.#prepareStepRow(step));
 			}
 
-			this.step_list.addEventListener('click', (e) => {
+			this.#step_list.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-add-step')) {
-					this._editStep();
+					this.#editStep();
 				}
 				else if (e.target.classList.contains('js-edit-step')) {
-					this._editStep(e.target.closest('tr'));
+					this.#editStep(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove-step')) {
 					e.target.closest('tr').remove();
-					this._toggleDragIcon(this.step_list);
+					this.#toggleDragIcon(this.#step_list);
 				}
 			});
 
-			this._initSortable(jQuery('#steps'));
+			this.#initSortable(jQuery('#steps'));
 		}
 
-		_initTextareaFlexible($element) {
+		#initTextareaFlexible($element) {
 			$element
 				.on('afteradd.dynamicRows', (e) => {
 					jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', e.target).textareaFlexible();
@@ -125,8 +141,8 @@
 				.textareaFlexible();
 		}
 
-		_initSortable($element) {
-			this._toggleDragIcon($element[0]);
+		#initSortable($element) {
+			this.#toggleDragIcon($element[0]);
 
 			$element.sortable({
 				disabled: $element[0].querySelectorAll('.sortable').length < 2,
@@ -166,7 +182,7 @@
 			});
 		}
 
-		_toggleDragIcon(container) {
+		#toggleDragIcon(container) {
 			const is_disabled = container.querySelectorAll('.sortable').length < 2;
 
 			for (const drag_icon of container.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
@@ -174,9 +190,9 @@
 			}
 		}
 
-		_prepareStepRow(step) {
+		#prepareStepRow(step) {
 			const template = document.createElement('template');
-			template.innerHTML = this.templates.step_row.evaluate(step);
+			template.innerHTML = this.#templates.step_row.evaluate(step);
 			const row = template.content.firstChild;
 
 			for (const field of ['query_fields', 'post_fields', 'variables', 'headers']) {
@@ -197,13 +213,13 @@
 			return row;
 		}
 
-		_editStep(row = null) {
+		#editStep(row = null) {
 			let popup_params;
 			let row_index = 0;
 			const names = [];
 			const row_indexes = [];
 
-			for (const row of this.step_list.querySelectorAll('tbody tr[data-row_index]')) {
+			for (const row of this.#step_list.querySelectorAll('tbody tr[data-row_index]')) {
 				names.push(row.querySelector('[name="steps[' + row.dataset.row_index + '][name]"]').value);
 				row_indexes.push(row.dataset.row_index);
 			}
@@ -216,7 +232,7 @@
 				form.append(...fields);
 				const step_data = getFormFields(form).steps[row_index];
 
-				popup_params = {edit: 1, templated: this.is_templated, names, ...step_data};
+				popup_params = {edit: 1, templated: this.#is_templated, names, ...step_data};
 			}
 			else {
 				if (row_indexes) {
@@ -229,27 +245,27 @@
 			const overlay = PopUp('webscenario.step.edit', popup_params, {dialogueid: 'webscenario-step-edit'});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				const new_row = this._prepareStepRow({row_index, ...e.detail});
+				const new_row = this.#prepareStepRow({row_index, ...e.detail});
 
 				if (row !== null) {
 					row.replaceWith(new_row);
 				}
 				else {
-					this.step_list.querySelector('tbody').appendChild(new_row);
+					this.#step_list.querySelector('tbody').appendChild(new_row);
 				}
 
-				this._initSortable(jQuery('#steps'));
+				this.#initSortable(jQuery('#steps'));
 			});
 		}
 
-		_updateForm() {
+		#updateForm() {
 			const agent_other = document.getElementById('agent').value == <?= ZBX_AGENT_OTHER ?>;
-			for (const field of this.form.querySelectorAll('.js-field-agent-other')) {
+			for (const field of this.#form.querySelectorAll('.js-field-agent-other')) {
 				field.style.display = agent_other ? '' : 'none';
 			}
 
 			const authentication_none = document.getElementById('authentication').value == <?= ZBX_HTTP_AUTH_NONE ?>;
-			for (const field of this.form.querySelectorAll('.js-field-http-user, .js-field-http-password')) {
+			for (const field of this.#form.querySelectorAll('.js-field-http-user, .js-field-http-password')) {
 				field.style.display = authentication_none ? 'none' : '';
 			}
 		}
@@ -258,10 +274,10 @@
 			e.preventDefault();
 			const host_data = {hostid};
 
-			this._openHostPopup(host_data);
+			this.#openHostPopup(host_data);
 		}
 
-		_openHostPopup(host_data) {
+		#openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
@@ -269,9 +285,9 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this._events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this._events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this._events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.#events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.#events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.#events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -279,13 +295,13 @@
 
 		refresh() {
 			const curl = new Curl('');
-			const fields = getFormFields(this.form);
+			const fields = getFormFields(this.#form);
 
 			post(curl.getUrl(), fields);
 		}
 
-		_registerEvents() {
-			this._events = {
+		#registerEvents() {
+			this.#events = {
 				hostSuccess(e) {
 					const data = e.detail;
 
