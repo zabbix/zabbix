@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-13T14:10:20Z'
+  date: '2023-06-19T15:35:35Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -7984,7 +7984,7 @@ zabbix_export:
             - uuid: fa918889bcb84d3886254f00f0df288c
               expression: 'min(/GCP Compute Engine Instance by HTTP/gcp.gce.memory.ram_pused,15m) >= {$GCE.RAM.UTIL.MAX}'
               name: 'GCP Compute Engine: High memory utilization'
-              event_name: 'GCP Compute Engine:High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
+              event_name: 'GCP Compute Engine: High memory utilization (over {$GCE.RAM.UTIL.MAX}% for 15m)'
               priority: AVERAGE
               description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
