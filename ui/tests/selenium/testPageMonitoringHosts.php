@@ -490,7 +490,7 @@ class testPageMonitoringHosts extends CWebTest {
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
 		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableResult('Name');
+		$start_contents = $this->getTableColumnData('Name');
 
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
@@ -506,7 +506,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
 		$this->assertTableStats($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableResult('Name'));
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
 
 	// Checking that Show suppressed problems filter works.
@@ -716,10 +716,10 @@ class testPageMonitoringHosts extends CWebTest {
 			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
 			$query->one()->click();
 			$this->page->waitUntilReady();
-			$after_listing = $this->getTableResult($listing);
+			$after_listing = $this->getTableColumnData($listing);
 			$query->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertEquals(array_reverse($after_listing), $this->getTableResult($listing));
+			$this->assertEquals(array_reverse($after_listing), $this->getTableColumnData($listing));
 		}
 	}
 
@@ -754,20 +754,6 @@ class testPageMonitoringHosts extends CWebTest {
 			$problems = $row->query('xpath://td/a[text()="Problems"]/following::sup')->one()->getText();
 			$this->assertEquals((int)$problems, $result);
 		}
-	}
-
-	/**
-	 * Get data from chosen column.
-	 *
-	 * @param string $column		Column name, where value should be checked
-	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
-		$result = [];
-		foreach ($table->getRows() as $row) {
-			$result[] = $row->getColumn($column)->getText();
-		}
-		return $result;
 	}
 
 	/**
