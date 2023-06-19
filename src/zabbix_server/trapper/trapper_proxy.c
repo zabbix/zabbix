@@ -151,11 +151,11 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		more = ZBX_PROXY_DATA_DONE;
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
 	if (0 != history_lastid && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
-		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
+		zbx_json_addint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{
@@ -188,7 +188,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 
 			zbx_db_free_result(result);
 
-			zbx_reset_proxy_history_count(history_maxid - history_lastid);
+			zbx_reset_proxy_history_count((int)(history_maxid - history_lastid));
 			zbx_pdc_set_history_lastid(history_lastid);
 		}
 
@@ -272,8 +272,8 @@ static void	send_task_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		zbx_tm_json_serialize_tasks(&j, &tasks);
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
+	zbx_json_addint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
 
 	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
 	{

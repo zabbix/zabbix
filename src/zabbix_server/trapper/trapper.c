@@ -54,6 +54,7 @@
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
+extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
 {
@@ -366,7 +367,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->type;
+				zbx_uint64_t		id = (zbx_uint64_t)item->type;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -427,7 +428,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			}
 
 			zbx_json_close(&json);
-			zbx_json_adduint64(&json, "total", queue.values_num);
+			zbx_json_addint64(&json, "total", queue.values_num);
 
 			break;
 	}

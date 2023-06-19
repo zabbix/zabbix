@@ -2187,8 +2187,8 @@ static int	process_autoregistration_contents(struct zbx_json_parse *jp_data, zbx
 			continue;
 		}
 
-		zbx_autoreg_prepare_host(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flags,
-				itemtime);
+		zbx_autoreg_prepare_host(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata,
+				(unsigned short)flags, (int)itemtime);
 	}
 
 	if (0 != autoreg_hosts.values_num)

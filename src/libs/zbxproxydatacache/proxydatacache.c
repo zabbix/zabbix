@@ -47,13 +47,13 @@ zbx_pdc_state_t	pdc_src[] = {PDC_DATABASE, PDC_DATABASE, PDC_DATABASE, PDC_MEMOR
 
 const char	*pdc_state_desc[] = {"database only", "database", "database->memory", "memory", "memory->database"};
 
-void	pdc_lock()
+void	pdc_lock(void)
 {
 	if (NULL != pdc_cache->mutex)
 		zbx_mutex_lock(pdc_cache->mutex);
 }
 
-void	pdc_unlock()
+void	pdc_unlock(void)
 {
 	if (NULL != pdc_cache->mutex)
 		zbx_mutex_unlock(pdc_cache->mutex);
@@ -259,7 +259,7 @@ try_again:
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, *lastid - *id - 1,
-						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -330,7 +330,7 @@ void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_u
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-void	pdc_flush(zbx_pdc_t *pdc)
+static void	pdc_flush(zbx_pdc_t *pdc)
 {
 	pdc_autoreg_flush(pdc);
 	pdc_discovery_flush(pdc);

@@ -69,7 +69,7 @@ static void	autoreg_process_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
 				" where");
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
-				(const char **)hosts.values, hosts.values_num);
+				(const char * const *)hosts.values, hosts.values_num);
 
 		result = zbx_db_select("%s", sql);
 
@@ -131,7 +131,7 @@ static void	autoreg_process_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 				" from autoreg_host"
 				" where");
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
-				(const char **)hosts.values, hosts.values_num);
+				(const char * const *)hosts.values, hosts.values_num);
 
 		result = zbx_db_select("%s", sql);
 
@@ -159,8 +159,8 @@ static void	autoreg_process_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 
 static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 {
-	const zbx_autoreg_host_t	*p1 = *(const zbx_autoreg_host_t **)d1;
-	const zbx_autoreg_host_t	*p2 = *(const zbx_autoreg_host_t **)d2;
+	const zbx_autoreg_host_t	*p1 = *(const zbx_autoreg_host_t * const *)d1;
+	const zbx_autoreg_host_t	*p2 = *(const zbx_autoreg_host_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(p1->hostid, p2->hostid);
 
@@ -316,8 +316,8 @@ void	zbx_autoreg_prepare_host(zbx_vector_ptr_t *autoreg_hosts, const char *host,
 }
 
 void	zbx_autoreg_update_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock,
-		const zbx_events_funcs_t *events_cbs)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
+		int clock, const zbx_events_funcs_t *events_cbs)
 {
 	zbx_vector_ptr_t	autoreg_hosts;
 

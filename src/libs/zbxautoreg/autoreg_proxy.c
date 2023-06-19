@@ -21,13 +21,13 @@
 #include "zbxproxydatacache.h"
 
 void	zbx_autoreg_update_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock,
-		const zbx_events_funcs_t *events_cbs)
+		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flags,
+		int clock, const zbx_events_funcs_t *events_cbs)
 {
 	ZBX_UNUSED(proxy_hostid);
 	ZBX_UNUSED(events_cbs);
 
-	zbx_pdc_autoreg_write_host(host, ip, dns, port, connection_type, host_metadata, flags, clock);
+	zbx_pdc_autoreg_write_host(host, ip, dns, port, connection_type, host_metadata, (int)flags, clock);
 }
 
 void	zbx_autoreg_host_free(zbx_autoreg_host_t *autoreg_host)

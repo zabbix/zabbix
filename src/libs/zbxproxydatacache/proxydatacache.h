@@ -151,8 +151,8 @@ typedef struct
 }
 zbx_history_table_t;
 
-void	pdc_lock();
-void	pdc_unlock();
+void	pdc_lock(void);
+void	pdc_unlock(void);
 void	*pdc_malloc(size_t size);
 void	*pdc_realloc(void *ptr, size_t size);
 void	pdc_free(void *ptr);
@@ -165,6 +165,5 @@ void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_histor
 
 void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
 void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message);
-
 
 #endif

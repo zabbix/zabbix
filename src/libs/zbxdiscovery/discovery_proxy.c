@@ -31,24 +31,24 @@ void	zbx_discovery_close(void *handle)
 }
 
 void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
-		const char *dns, int status, int now, zbx_add_event_func_t add_event_cb)
+		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(dhost);
 	ZBX_UNUSED(add_event_cb);
 
-	zbx_pdc_discovery_write_host((zbx_pdc_discovery_data_t *)handle, druleid, ip, dns, status, now);
+	zbx_pdc_discovery_write_host((zbx_pdc_discovery_data_t *)handle, druleid, ip, dns, status, (int)now);
 }
 
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
-		int status, const char *value, int now, zbx_add_event_func_t add_event_cb)
+		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	ZBX_UNUSED(unique_dcheckid);
 	ZBX_UNUSED(dhost);
 	ZBX_UNUSED(add_event_cb);
 
 	zbx_pdc_discovery_write_service((zbx_pdc_discovery_data_t *)handle, druleid, dcheckid, ip, dns, port, status,
-			value, now);
+			value, (int)now);
 }
 
 

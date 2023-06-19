@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "pdc_history.h"
 #include "zbxproxydatacache.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
@@ -142,7 +143,7 @@ try_again:
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
 						" Waiting " ZBX_FS_DBL " sec, retrying.",
 						__func__, id - lastid - 1,
-						t_sleep.tv_sec + t_sleep.tv_nsec / 1e9);
+						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1e9);
 				nanosleep(&t_sleep, &t_rem);
 				goto try_again;
 			}
@@ -218,10 +219,11 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 	zbx_dc_item_t			*dc_items;
 
 	zbx_vector_pdc_history_ptr_create(&records);
-	zbx_vector_pdc_history_ptr_reserve(&records, rows->values_num);
+	zbx_vector_pdc_history_ptr_reserve(&records, (size_t)rows->values_num);
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_uint64_reserve(&itemids, rows->values_num);
-	zbx_hashset_create(&nodata_itemids, rows->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_reserve(&itemids, (size_t)rows->values_num);
+	zbx_hashset_create(&nodata_itemids, (size_t)rows->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* filter out duplicate novalue updates */
 	for (i = rows->values_num - 1; i >= 0; i--)
@@ -238,10 +240,10 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 		zbx_vector_uint64_append(&itemids, rows->values[i]->itemid);
 	}
 
-	dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, records.values_num * sizeof(zbx_dc_item_t));
-	errcodes = (int *)zbx_malloc(NULL, records.values_num * sizeof(int));
+	dc_items = (zbx_dc_item_t *)zbx_malloc(NULL, (size_t)records.values_num * sizeof(zbx_dc_item_t));
+	errcodes = (int *)zbx_malloc(NULL, (size_t)records.values_num * sizeof(int));
 
-	zbx_dc_config_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
+	zbx_dc_config_get_items_by_itemids(dc_items, itemids.values, errcodes, (size_t)itemids.values_num);
 
 	for (i = records.values_num - 1; i >= 0; i--)
 	{
@@ -269,18 +271,18 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 		zbx_json_addobject(j, NULL);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_ID, row->id);
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_ITEMID, row->itemid);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_CLOCK, row->ts.sec);
-		zbx_json_adduint64(j, ZBX_PROTO_TAG_NS, row->ts.ns);
+		zbx_json_addint64(j, ZBX_PROTO_TAG_CLOCK, row->ts.sec);
+		zbx_json_addint64(j, ZBX_PROTO_TAG_NS, row->ts.ns);
 
 		if (ZBX_PROXY_HISTORY_FLAG_NOVALUE != (row->flags & ZBX_PROXY_HISTORY_MASK_NOVALUE))
 		{
 			if (ITEM_STATE_NORMAL != row->state)
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_STATE, row->state);
+				zbx_json_addint64(j, ZBX_PROTO_TAG_STATE, row->state);
 
 			if (0 == (row->flags & ZBX_PROXY_HISTORY_FLAG_NOVALUE))
 			{
 				if (0 != row->timestamp)
-					zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, row->timestamp);
+					zbx_json_addint64(j, ZBX_PROTO_TAG_LOGTIMESTAMP, row->timestamp);
 
 				if ('\0' != *row->source)
 				{
@@ -289,10 +291,10 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 				}
 
 				if (0 != row->severity)
-					zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGSEVERITY, row->severity);
+					zbx_json_addint64(j, ZBX_PROTO_TAG_LOGSEVERITY, row->severity);
 
 				if (0 != row->logeventid)
-					zbx_json_adduint64(j, ZBX_PROTO_TAG_LOGEVENTID, row->logeventid);
+					zbx_json_addint64(j, ZBX_PROTO_TAG_LOGEVENTID, row->logeventid);
 
 				zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, row->value, ZBX_JSON_TYPE_STRING);
 			}
@@ -300,7 +302,7 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 			if (0 != (row->flags & ZBX_PROXY_HISTORY_FLAG_META))
 			{
 				zbx_json_adduint64(j, ZBX_PROTO_TAG_LASTLOGSIZE, row->lastlogsize);
-				zbx_json_adduint64(j, ZBX_PROTO_TAG_MTIME, row->mtime);
+				zbx_json_addint64(j, ZBX_PROTO_TAG_MTIME, row->mtime);
 			}
 		}
 
@@ -312,7 +314,7 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 			break;
 	}
 
-	zbx_dc_config_clean_items(dc_items, errcodes, itemids.values_num);
+	zbx_dc_config_clean_items(dc_items, errcodes, (size_t)itemids.values_num);
 	zbx_free(errcodes);
 	zbx_free(dc_items);
 

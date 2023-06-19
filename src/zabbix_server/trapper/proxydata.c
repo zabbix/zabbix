@@ -31,7 +31,8 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 {
 	struct zbx_json		json;
 	zbx_vector_tm_task_t	tasks;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
+	int			ret;
+	unsigned char		flags = ZBX_TCP_PROTOCOL;
 
 	zbx_vector_tm_task_create(&tasks);
 
@@ -189,7 +190,7 @@ out:
 		int	lastaccess;
 
 		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
-			lastaccess = time(NULL);
+			lastaccess = (int)time(NULL);
 		else
 			lastaccess = ts->sec;
 

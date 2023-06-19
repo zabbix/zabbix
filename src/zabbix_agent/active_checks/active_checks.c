@@ -854,25 +854,25 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
 				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
 			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
+				zbx_json_addint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
 		}
 
 		if (0 != el->timestamp)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
+			zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
 
 		if (NULL != el->source)
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
 
 		if (0 != el->severity)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
+			zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
 
 		if (0 != el->logeventid)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
+			zbx_json_addint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
 
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ID, el->id);
 
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
 		zbx_json_close(&json);
 	}
 
@@ -884,8 +884,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			config_timeout, 0, level, config_tls)))
 	{
 		zbx_timespec(&ts);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

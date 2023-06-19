@@ -18,6 +18,7 @@
 **/
 
 #include "zbxcachehistory.h"
+#include "zbxcachehistory_proxy.h"
 #include "dbcache.h"
 #include "zbxdbsyncer.h"
 #include "zbxnix.h"
@@ -286,7 +287,7 @@ static void	DCmass_proxy_prepare_itemdiff(zbx_dc_history_t *history, int history
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_reserve(item_diff, history_num);
+	zbx_vector_ptr_reserve(item_diff, (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -324,7 +325,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num)
 	zbx_vector_uint64_t	itemids;
 
 	zbx_vector_uint64_create(&itemids);
-	zbx_vector_uint64_reserve(&itemids, history_num);
+	zbx_vector_uint64_reserve(&itemids, (size_t)history_num);
 
 	for (i = 0; i < history_num; i++)
 		zbx_vector_uint64_append(&itemids, history[i].itemid);

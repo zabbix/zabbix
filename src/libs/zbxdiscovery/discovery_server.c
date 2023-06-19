@@ -476,7 +476,7 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
  *                                                                            *
  ******************************************************************************/
 void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
-		const char *dns, int status, int now, zbx_add_event_func_t add_event_cb)
+		const char *dns, int status, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -486,7 +486,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 	ZBX_UNUSED(dns);
 
 	if (0 != dhost->dhostid)
-		discovery_update_host_status(dhost, status, now, add_event_cb);
+		discovery_update_host_status(dhost, status, (int)now, add_event_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -498,7 +498,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
  ******************************************************************************/
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
-		int status, const char *value, int now, zbx_add_event_func_t add_event_cb)
+		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
 {
 	DB_DSERVICE	dservice;
 
@@ -519,7 +519,7 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 
 	/* service was not registered because we do not add down service */
 	if (0 != dservice.dserviceid)
-		discovery_update_service_status(dhost, &dservice, status, value, now, add_event_cb);
+		discovery_update_service_status(dhost, &dservice, status, value, (int)now, add_event_cb);
 
 	zbx_free(dservice.value);
 

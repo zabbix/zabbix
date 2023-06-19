@@ -1338,7 +1338,7 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
  *                                                                               *
  *********************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char **values, const int num)
+		const char * const *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
 
