@@ -861,6 +861,25 @@
 		this.new_id = 0;
 		this.sort_index = [];
 
+		operations.sort((a, b) => {
+			const a_operator = this.operatorName(a.operator);
+			const b_operator = this.operatorName(b.operator);
+
+			if (a.operationobject < b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator < b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value < b.value)) {
+				return -1;
+			}
+
+			if (a.operationobject > b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator > b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value > b.value)) {
+				return 1;
+			}
+
+			return 0;
+		});
+
 		operations.forEach(function(operation, no) {
 			this.data[no + 1] = new Operation(operation, no + 1);
 			this.sort_index.push(no + 1);
