@@ -6,7 +6,8 @@ noinst_LIBRARIES = 			\
 
 # common
 libzbxcachehistory_a_SOURCES = \
-	dbcache.c
+	dbcache.c \
+	dbcache.h
 
 libzbxcachehistory_a_CFLAGS = \
 	-I$(top_srcdir)/src/zabbix_server/ \
