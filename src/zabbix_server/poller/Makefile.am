@@ -32,7 +32,6 @@ libzbxpoller_a_SOURCES = \
 	telnet_run.h \
 	checks_telnet.c \
 	checks_telnet.h \
-	httpagent_async.c \
 	async_poller.c \ 
 	async_poller.h \
 	async_agent.h \ 

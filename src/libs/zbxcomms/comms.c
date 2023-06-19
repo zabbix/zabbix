@@ -651,7 +651,7 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 			if (NULL != event)
 			{
 				*event = POLLOUT;
-				return ZBX_PROTO_ERROR;
+				return offset;
 			}
 
 			if (-1 == (rc = zbx_socket_poll(&pd, 1, ZBX_SOCKET_POLL_TIMEOUT)))
@@ -683,12 +683,6 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 			if (offset == (ssize_t)len)
 				break;
-
-			if (NULL != event)
-			{
-				*event = POLLOUT;
-				return offset;
-			}
 		}
 
 		if (SUCCEED != zbx_socket_check_deadline(s))
