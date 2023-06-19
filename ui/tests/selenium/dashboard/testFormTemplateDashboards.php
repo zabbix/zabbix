@@ -598,9 +598,6 @@ class testFormTemplateDashboards extends CWebTest {
 		$form->submit();
 
 		$this->query('link:Cancel')->one()->waitUntilClickable()->click();
-
-		// Close the opened alert so that the next running scenario would not fail.
-		$this->page->acceptAlert();
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
@@ -1035,6 +1032,7 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
 
 		$form = CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
+		COverlayDialogElement::find()->waitUntilReady();
 		$form->fill($data['fields']);
 		$this->page->removeFocus();
 		COverlayDialogElement::find()->waitUntilReady();
@@ -1181,7 +1179,7 @@ class testFormTemplateDashboards extends CWebTest {
 					$data['fields']['Name'] = trim($data['fields']['Name']);
 				}
 				$name = ($data['fields']['Name'] === '') ? 'Local' : $data['fields']['Name'];
-				CDashboardElement::find()->asDashboard()->one()->getWidget($name)->waitUntilVisible();
+				CDashboardElement::find()->waitUntilReady()->one()->getWidget($name);
 			}
 			$this->query('button:Save changes')->one()->click();
 
@@ -1206,7 +1204,7 @@ class testFormTemplateDashboards extends CWebTest {
 			$this->page->waitUntilReady();
 
 			if ($check !== 'dashboard action') {
-				$reopened_form = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible()->getWidget($name)->edit();
+				$reopened_form = CDashboardElement::find()->waitUntilReady()->one()->getWidget($name)->edit();
 			}
 			else {
 				$this->query('id:dashboard-config')->one()->click();

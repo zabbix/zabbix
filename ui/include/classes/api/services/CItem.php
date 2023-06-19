@@ -28,6 +28,8 @@ class CItem extends CItemGeneral {
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	/**
 	 * Define a set of supported pre-processing rules.
 	 *
@@ -474,14 +476,8 @@ class CItem extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		parent::checkInput($items);
+
 		self::validateInventoryLinks($items);
-
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-			unset($item['itemid']);
-		}
-		unset($item);
-
 		$this->validateDependentItems($items);
 
 		foreach ($items as &$item) {

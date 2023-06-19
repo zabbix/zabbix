@@ -1630,6 +1630,7 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, int 
 		zbx_token_t *token);
 
 int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char op);
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op);
 
 int	zbx_expression_next_constant(const char *str, size_t pos, zbx_strloc_t *loc);
 char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);

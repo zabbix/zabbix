@@ -314,10 +314,10 @@ function makeGraphTemplatePrefix($graphid, array $parent_templates, $flag, bool 
 				->setArgument('filter_hostids', [$template['hostid']]);
 		}
 
-		$name = (new CLink(CHtml::encode($template['name']), $url))->addClass(ZBX_STYLE_LINK_ALT);
+		$name = (new CLink($template['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 	}
 	else {
-		$name = new CSpan(CHtml::encode($template['name']));
+		$name = new CSpan($template['name']);
 	}
 
 	return [$name->addClass(ZBX_STYLE_GREY), NAME_DELIMITER];
@@ -354,13 +354,13 @@ function makeGraphTemplatesHtml($graphid, array $parent_templates, $flag, bool $
 				$url->setArgument('hostid', $template['hostid']);
 			}
 
-			$name = new CLink(CHtml::encode($template['name']), $url);
+			$name = new CLink($template['name'], $url);
 		}
 		else {
-			$name = (new CSpan(CHtml::encode($template['name'])))->addClass(ZBX_STYLE_GREY);
+			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
 		}
 
-		array_unshift($list, $name, '&nbsp;&rArr;&nbsp;');
+		array_unshift($list, $name, [NBSP(), RARR(), NBSP()]);
 
 		$graphid = $parent_templates['links'][$graphid]['graphid'];
 	}
@@ -549,6 +549,7 @@ function get_next_color($palettetype = 0) {
 function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 	$x = (int) $x;
 	$y = (int) $y;
+	$string = strtr($string, ['&' => '&#38;']);
 
 	if ((preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) || ZBX_FONT_NAME == ZBX_GRAPH_FONT_NAME) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
@@ -590,6 +591,8 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
  * @return array
  */
 function imageTextSize($fontsize, $angle, $string) {
+	$string = strtr($string, ['&' => '&#38;']);
+
 	if (preg_match(ZBX_PREG_DEF_FONT_STRING, $string) && $angle != 0) {
 		$ttf = ZBX_FONTPATH.'/'.ZBX_FONT_NAME.'.ttf';
 	}
@@ -821,8 +824,8 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 	];
 
 	for ($rows = $rows_min; $rows <= $rows_max; $rows++) {
-		$clearance_min = $rows * 0.05;
-		$clearance_max = $rows * 0.1;
+		$clearance_min = min(0.5, $rows * 0.05);
+		$clearance_max = min(1, $rows * 0.1);
 
 		foreach (yieldGraphScaleInterval($scale_min, $scale_max, $is_binary, $power, $rows) as $interval) {
 			if ($interval == INF) {
@@ -851,6 +854,10 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 			$min = truncateFloat($min);
 			$max = truncateFloat($max);
 
+			if (is_infinite($min) || is_infinite($max)) {
+				break;
+			}
+
 			if ($min > $scale_min || $max < $scale_max) {
 				continue;
 			}
@@ -871,6 +878,7 @@ function calculateGraphScaleExtremes(float $data_min, float $data_max, bool $is_
 				'power' => $power
 			];
 
+			// Expression optimized to avoid overflow.
 			$result_value = ($scale_min - $min) / $interval + ($max - $scale_max) / $interval;
 
 			if ($best_result_value === null || $result_value < $best_result_value) {

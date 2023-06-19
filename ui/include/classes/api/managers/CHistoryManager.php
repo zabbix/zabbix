@@ -94,11 +94,10 @@ class CHistoryManager {
 
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
-				'SELECT itemid'.
+				'SELECT DISTINCT itemid'.
 				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
-					($period !== null ? ' AND clock>'.$period : '').
-				' GROUP BY itemid'
+					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
 
 			$results += array_intersect_key($items, array_flip($type_results));
@@ -1015,8 +1014,7 @@ class CHistoryManager {
 		];
 
 		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$period = $time_to - $time_from;
 
 			// Additional grouping for line graphs.
 			$aggs['max_clock'] = [
@@ -1026,15 +1024,14 @@ class CHistoryManager {
 			];
 
 			// Clock value is divided by 1000 as it is stored as milliseconds.
-			$formula = 'Math.floor((params.width*((doc[\'clock\'].value.getMillis()/1000+params.delta)%params.size))'.
-					'/params.size)';
+			$formula = "Math.round(params.width*(doc['clock'].value.getMillis()/1000-params.time_from)/params.period)";
 
 			$script = [
 				'inline' => $formula,
 				'params' => [
 					'width' => (int)$width,
-					'delta' => $delta,
-					'size' => $size
+					'time_from' => $time_from,
+					'period' => $period
 				]
 			];
 			$aggs = [
@@ -1123,12 +1120,10 @@ class CHistoryManager {
 		$sql_select_extra = '';
 
 		if ($width !== null) {
-			$size = $time_to - $time_from;
-			$delta = $size - $time_from % $size;
+			$period = $time_to - $time_from;
 
 			// Required for 'group by' support of Oracle.
-			$calc_field = 'round('.$width.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$delta, $size)
-					.'/('.$size.'),0)';
+			$calc_field = 'round('.$width.'*('.zbx_dbcast_2bigint('clock').'-'.$time_from.')/'.$period.',0)';
 
 			$sql_select_extra = ','.$calc_field.' AS i';
 			$group_by .= ','.$calc_field;
