@@ -1532,9 +1532,7 @@ class CAction extends CApiService {
 					}
 
 					foreach ($operation['optag'] as &$optag) {
-						if (!array_key_exists('optagid', $optag)) {
-							$optag['optagid'] = array_shift($optagids);
-						}
+						unset($optag['optagid']);
 					}
 					unset($optag);
 				}
