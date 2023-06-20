@@ -144,20 +144,20 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
 	switch (state)
 	{
 		case PDC_DATABASE_ONLY:
-			zabbix_log(LOG_LEVEL_WARNING, "witched proxy data cache to database mode: %s", message);
+			zabbix_log(LOG_LEVEL_DEBUG, "witched proxy data cache to database mode: %s", message);
 			break;
 		case PDC_DATABASE:
-			zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to database mode: %s", message);
+			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to database mode: %s", message);
 			break;
 		case PDC_DATABASE_MEMORY:
-			zabbix_log(LOG_LEVEL_WARNING, "initiated proxy data cache transition to memory mode: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to memory mode: %s",
 					message);
 			break;
 		case PDC_MEMORY:
-			zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to memory mode: %s", message);
+			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to memory mode: %s", message);
 			break;
 		case PDC_MEMORY_DATABASE:
-			zabbix_log(LOG_LEVEL_WARNING, "initiated proxy data cache transition to database mode: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to database mode: %s",
 					message);
 			break;
 	}
