@@ -565,6 +565,17 @@ class CFormElement extends CElement {
 	}
 
 	/**
+	 * Check if field is marked as required in form.
+	 *
+	 * @param string $label    field label text
+	 *
+	 * @return boolean
+	 */
+	public function isRequired($label) {
+		return $this->getLabel($label)->hasClass($this->required_label);
+	}
+
+	/**
 	 * Get the mandatory labels marked with an asterisk.
 	 *
 	 * @return array
@@ -574,17 +585,6 @@ class CFormElement extends CElement {
 				->filter(CElementFilter::VISIBLE)->asText();
 
 		return array_values($labels);
-	}
-
-	/**
-	 * Check if field is marked as required in form.
-	 *
-	 * @param string $label    field label text
-	 *
-	 * @return boolean
-	 */
-	public function isRequired($label) {
-		return $this->getLabel($label)->hasClass($this->required_label);
 	}
 
 	/**
