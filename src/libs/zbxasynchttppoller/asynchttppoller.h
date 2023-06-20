@@ -23,7 +23,7 @@
 #include "event.h"
 #include "zbxhttp.h"
 
-typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err);
+typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err, void *arg);
 typedef void (*httpagent_action_callback_fn)(void *arg);
 
 CURLM	*zbx_async_httpagent_init(struct event_base *ev,

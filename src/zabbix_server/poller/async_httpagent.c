@@ -44,7 +44,6 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_pol
 
 	httpagent_context_create(httpagent_context);
 
-	httpagent_context->poller_config = poller_config;
 	httpagent_context->item_context.itemid = item->itemid;
 	httpagent_context->item_context.hostid = item->host.hostid;
 	httpagent_context->item_context.value_type = item->value_type;

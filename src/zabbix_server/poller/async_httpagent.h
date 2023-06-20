@@ -39,7 +39,6 @@ zbx_dc_item_context_t;
 
 typedef struct
 {
-	zbx_poller_config_t	*poller_config;
 	zbx_http_context_t	http_context;
 	zbx_dc_item_context_t	item_context;
 }

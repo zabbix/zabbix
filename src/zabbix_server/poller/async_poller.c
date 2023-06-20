@@ -96,7 +96,7 @@ static void	process_agent_result(void *data)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
 
-static void	process_httpagent_result(CURL *easy_handle, CURLcode err)
+static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
 	long			response_code;
 	char			*error, *out = NULL;
@@ -105,8 +105,11 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err)
 	zbx_httpagent_context	*httpagent_context;
 	zbx_dc_item_context_t	*item_context;
 	zbx_timespec_t		timespec;
+	zbx_poller_config_t	*poller_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	poller_config = (zbx_poller_config_t *)arg;
 
 	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
 
@@ -134,16 +137,16 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err)
 	zbx_free_agent_result(&result);
 	zbx_free(out);
 
-	zbx_vector_uint64_append(&httpagent_context->poller_config->itemids, httpagent_context->item_context.itemid);
-	zbx_vector_int32_append(&httpagent_context->poller_config->errcodes, SUCCEED);
-	zbx_vector_int32_append(&httpagent_context->poller_config->lastclocks, timespec.sec);
+	zbx_vector_uint64_append(&poller_config->itemids, httpagent_context->item_context.itemid);
+	zbx_vector_int32_append(&poller_config->errcodes, SUCCEED);
+	zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
 
-	httpagent_context->poller_config->processing--;
-	httpagent_context->poller_config->processed++;
+	poller_config->processing--;
+	poller_config->processed++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, httpagent_context->item_context.itemid);
 
-	curl_multi_remove_handle(httpagent_context->poller_config->curl_handle, easy_handle);
+	curl_multi_remove_handle(poller_config->curl_handle, easy_handle);
 	zbx_async_check_httpagent_clean(httpagent_context);
 	zbx_free(httpagent_context);
 
