@@ -32,6 +32,7 @@ struct zbx_pdc_history_data
 {
 	zbx_pdc_state_t	state;
 	zbx_list_t	rows;
+	int		rows_num;
 	zbx_db_insert_t	db_insert;
 };
 
@@ -76,6 +77,7 @@ static void	pdc_history_add_value(zbx_pdc_history_data_t *data, zbx_uint64_t ite
 		row->write_clock = now;
 
 		zbx_list_append(&data->rows, row, NULL);
+		data->rows_num++;
 	}
 	else
 	{
@@ -457,6 +459,27 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: set ids to new history rows                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_history_set_row_ids(zbx_list_t *rows, int rows_num)
+{
+	zbx_uint64_t		id;
+	zbx_pdc_history_t	*row;
+	zbx_list_iterator_t	li;
+
+	id = zbx_dc_get_nextid("proxy_history", rows_num);
+	zbx_list_iterator_init(rows, &li);
+
+	while (SUCCEED == zbx_list_iterator_next(&li))
+	{
+		(void)zbx_list_iterator_peek(&li, (void **)&row);
+		row->id = id++;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: add history rows to memory cache                                *
  *                                                                            *
  * Parameters: pdc  - [IN] proxy data cache                                   *
@@ -469,10 +492,8 @@ out:
 static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *rows)
 {
 	zbx_list_iterator_t	li;
-	zbx_list_item_t		*next = pdc->history.tail;
 	zbx_pdc_history_t	*row;
 	int			rows_num = 0;
-	zbx_uint64_t		id = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -488,27 +509,7 @@ static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *row
 		rows_num++;
 	}
 
-	/* set cached row ids */
-	if (0 < rows_num)
-	{
-		zbx_list_iterator_t	li_id;
-
-		id = zbx_dc_get_nextid("proxy_history", rows_num);
-
-		if (NULL != next)
-			next = next->next;
-
-		zbx_list_iterator_init_with(&pdc->history, next, &li_id);
-
-		do
-		{
-			(void)zbx_list_iterator_peek(&li_id, (void **)&row);
-			row->id = id++;
-		}
-		while (SUCCEED == zbx_list_iterator_next(&li_id));
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p" ZBX_FS_UI64, __func__, rows_num, li.current);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
 
 	return li.current;
 }
@@ -548,16 +549,7 @@ static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx
 		}
 		while (SUCCEED == zbx_list_iterator_next(&li));
 
-		/* when flushing local cache need to set row ids */
-		if (0 == *lastid)
-		{
-			zbx_db_insert_autoincrement(&db_insert, "id");
-			(void)zbx_db_insert_execute(&db_insert);
-			*lastid = zbx_db_insert_get_lastid(&db_insert);
-		}
-		else
-			(void)zbx_db_insert_execute(&db_insert);
-
+		(void)zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
 
@@ -567,15 +559,11 @@ static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx
 
 void	pdc_history_flush(zbx_pdc_t *pdc)
 {
-	zbx_uint64_t		lastid;
-	zbx_pdc_history_t	*row;
+	zbx_uint64_t	lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pdc_history_add_rows_db(&pdc->history, NULL, &lastid);
-
-	while (SUCCEED == zbx_list_pop(&pdc->history, (void **)&row))
-		pdc_list_free_history(&pdc->history, row);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -585,7 +573,7 @@ void	pdc_history_flush(zbx_pdc_t *pdc)
  * Purpose: clear sent history records                                      *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_history_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
+void	pdc_history_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
 {
 	zbx_pdc_history_t	*row;
 
@@ -634,6 +622,16 @@ int	pdc_history_check_age(zbx_pdc_t *pdc)
 	return FAIL;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write discovery last sent record id to database                   *
+ *                                                                            *
+ ******************************************************************************/
+void	pdc_history_set_lastid(zbx_uint64_t lastid)
+{
+	pdc_set_lastid("proxy_history", "history_lastid", lastid);
+}
+
 /* public api */
 
 /******************************************************************************
@@ -659,6 +657,7 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
 	if (PDC_MEMORY == data->state)
 	{
 		zbx_list_create(&data->rows);
+		data->rows_num = 0;
 	}
 
 	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
@@ -686,50 +685,61 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 
 	if (PDC_MEMORY == data->state)
 	{
-		void	*ptr;
+		zbx_list_item_t	*next = NULL;
 
-		if (SUCCEED == zbx_list_peek(&data->rows, &ptr))
+		if (0 == data->rows_num)
+			goto out;
+
+		pdc_history_set_row_ids(&data->rows, data->rows_num);
+
+		pdc_lock();
+
+		if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_history_check_age(pdc_cache))
 		{
-			zbx_list_item_t		*next = NULL;
-
-			pdc_lock();
-
-			if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_history_check_age(pdc_cache))
+			pdc_fallback_to_database(pdc_cache, "cached records are too old");
+		}
+		else if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+		{
+			if (NULL == (next = pdc_history_add_rows_mem(pdc_cache, &data->rows)))
 			{
-				pdc_fallback_to_database(pdc_cache, "cached records are too old");
-			}
-			else if (PDC_MEMORY == pdc_dst[pdc_cache->state])
-			{
-				if (NULL == (next = pdc_history_add_rows_mem(pdc_cache, &data->rows)))
-				{
-					pdc_unlock();
-					goto out;
-				}
-
-				if (PDC_DATABASE_MEMORY == pdc_cache->state)
-				{
-					/* transition to memory cache failed, disable memory cache until restart */
-					pdc_fallback_to_database(pdc_cache, "aborted proxy data cache transition to"
-							" memory mode: not enough space");
-				}
-				else
-				{
-					/* initiate transition to database cache */
-					pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
-				}
+				pdc_unlock();
+				goto out;
 			}
 
-			/* not all rows were added to memory cache - flush them to database */
-			pdc_cache->db_handles_num++;
-			pdc_unlock();
+			if (PDC_DATABASE_MEMORY == pdc_cache->state)
+			{
+				pdc_fallback_to_database(pdc_cache, "not enough space to complete transition to memory"
+						" mode");
+			}
+			else
+			{
+				/* initiate transition to database cache */
+				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
+			}
+		}
 
+		/* not all rows were added to memory cache - flush them to database */
+		pdc_cache->db_handles_num++;
+		pdc_unlock();
+
+		do
+		{
+			zbx_db_begin();
 			pdc_history_add_rows_db(&data->rows, next, &lastid);
 		}
+		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
 	else
 	{
 		zbx_db_insert_autoincrement(&data->db_insert, "id");
-		(void)zbx_db_insert_execute(&data->db_insert);
+
+		do
+		{
+			zbx_db_begin();
+			(void)zbx_db_insert_execute(&data->db_insert);
+		}
+		while (ZBX_DB_DOWN == zbx_db_commit());
+
 		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}
 
@@ -818,7 +828,7 @@ void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
 	pdc_unlock();
 
 	if (PDC_DATABASE == state)
-		pdc_set_lastid("proxy_history", "history_lastid", lastid);
+		pdc_history_set_lastid(lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

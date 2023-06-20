@@ -23,7 +23,9 @@
 #include "zbxproxydatacache.h"
 #include "proxydatacache.h"
 
+void	pdc_autoreg_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid);
 void	pdc_autoreg_flush(zbx_pdc_t *pdc);
+void	pdc_autoreg_set_lastid(zbx_uint64_t lastid);
 int	pdc_autoreg_check_age(zbx_pdc_t *pdc);
 
 #endif

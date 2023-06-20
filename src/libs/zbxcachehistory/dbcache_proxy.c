@@ -46,24 +46,22 @@ static size_t		sql_alloc = 4 * ZBX_KIBIBYTE;
  ******************************************************************************/
 static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 {
+	size_t	sql_offset = 0;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != item_diff->values_num)
-	{
-		size_t	sql_offset = 0;
 
-		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
-				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
+	zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
+			ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
-			zbx_db_execute("%s", sql);
-	}
+	if (sql_offset > 16)	/* In ORACLE always present begin..end; */
+		zbx_db_execute("%s", sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -408,15 +406,17 @@ void	zbx_sync_proxy_history(int *values_num, int *triggers_num, const zbx_events
 		proxy_prepare_history(history, history_items.values_num);
 
 		DCmass_proxy_prepare_itemdiff(history, history_num, &item_diff);
+		DBmass_proxy_add_history(history, history_num);
 
-		do
+		if (0 != item_diff.values_num)
 		{
-			zbx_db_begin();
-
-			DBmass_proxy_add_history(history, history_num);
-			DBmass_proxy_update_items(&item_diff);
+			do
+			{
+				zbx_db_begin();
+				DBmass_proxy_update_items(&item_diff);
+			}
+			while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 		}
-		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
 
 		dbcache_lock();
 

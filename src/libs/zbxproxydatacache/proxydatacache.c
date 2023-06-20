@@ -144,23 +144,17 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
 	switch (state)
 	{
 		case PDC_DATABASE_ONLY:
-			zabbix_log(LOG_LEVEL_WARNING, "proxy data cache disabled");
+			zabbix_log(LOG_LEVEL_WARNING, "witched proxy data cache to database mode: %s", message);
 			break;
 		case PDC_DATABASE:
-			if (NULL != message)
-				zabbix_log(LOG_LEVEL_WARNING, "%s", message);
-			else
-				zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to database mode");
+			zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to database mode: %s", message);
 			break;
 		case PDC_DATABASE_MEMORY:
 			zabbix_log(LOG_LEVEL_WARNING, "initiated proxy data cache transition to memory mode: %s",
 					message);
 			break;
 		case PDC_MEMORY:
-			if (NULL != message)
-				zabbix_log(LOG_LEVEL_WARNING, "%s", message);
-			else
-				zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to memory mode");
+			zabbix_log(LOG_LEVEL_WARNING, "switched proxy data cache to memory mode: %s", message);
 			break;
 		case PDC_MEMORY_DATABASE:
 			zabbix_log(LOG_LEVEL_WARNING, "initiated proxy data cache transition to database mode: %s",
@@ -186,10 +180,10 @@ static void	pdc_cache_set_init_state(zbx_pdc_t *pdc)
 			SUCCEED == pdc_has_history("proxy_dhistory", "dhistory_lastid") ||
 			SUCCEED == pdc_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
 	{
-		pdc_cache_set_state(pdc, PDC_DATABASE, "proxy data cache initialized in database mode");
+		pdc_cache_set_state(pdc, PDC_DATABASE, "unsent database records found");
 	}
 	else
-		pdc_cache_set_state(pdc, PDC_MEMORY, "proxy data cache initialized in memory mode");
+		pdc_cache_set_state(pdc, PDC_MEMORY, "no unsent database records found");
 
 	zbx_db_close();
 }
@@ -330,17 +324,45 @@ void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_u
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: flush cached lastids to the database                              *
+ *                                                                            *
+ ******************************************************************************/
+static void	pdc_flush_lastids(zbx_pdc_t *pdc)
+{
+	if (0 != pdc->history_lastid_sent)
+		pdc_history_set_lastid(pdc->history_lastid_sent);
+
+	if (0 != pdc->discovery_lastid_sent)
+		pdc_discovery_set_lastid(pdc->discovery_lastid_sent);
+
+	if (0 != pdc->autoreg_lastid_sent)
+		pdc_autoreg_set_lastid(pdc->autoreg_lastid_sent);
+}
+
 static void	pdc_flush(zbx_pdc_t *pdc)
 {
-	pdc_autoreg_flush(pdc);
-	pdc_discovery_flush(pdc);
-	pdc_history_flush(pdc);
+	do
+	{
+		zbx_db_begin();
+
+		pdc_autoreg_flush(pdc);
+		pdc_discovery_flush(pdc);
+		pdc_history_flush(pdc);
+
+		pdc_flush_lastids(pdc);
+	}
+	while (ZBX_DB_DOWN == zbx_db_commit());
+
+	pdc_history_clear(pdc, UINT64_MAX);
+	pdc_discovery_clear(pdc, UINT64_MAX);
+	pdc_autoreg_clear(pdc, UINT64_MAX);
 }
 
 void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message)
 {
 	pdc_flush(pdc);
-
 	pdc_cache_set_state(pdc, PDC_DATABASE, message);
 }
 
@@ -363,9 +385,10 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 		case PDC_MEMORY_DATABASE:
 			if (ZBX_PROXY_DATA_DONE == more)
 			{
-				/* cache is empty, but flush also updates in database */
-				pdc_flush(pdc);
-				pdc_cache_set_state(pdc, PDC_DATABASE, NULL);
+				zbx_db_begin();
+				pdc_flush_lastids(pdc);
+				zbx_db_commit();
+				pdc_cache_set_state(pdc, PDC_DATABASE, "memory records have been uploaded");
 			}
 			break;
 		case PDC_DATABASE:
@@ -378,7 +401,7 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
 					pdc_cache->discovery_lastid_db <= pdc_cache->discovery_lastid_sent &&
 					pdc_cache->autoreg_lastid_db <= pdc_cache->autoreg_lastid_sent)
 			{
-				pdc_cache_set_state(pdc, PDC_MEMORY, NULL);
+				pdc_cache_set_state(pdc, PDC_MEMORY, "database records have been uploaded");
 			}
 			break;
 		case PDC_DATABASE_ONLY:
@@ -413,7 +436,7 @@ int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
 		memset(pdc_cache, 0, sizeof(zbx_pdc_t));
 
 		pdc_cache->mutex = ZBX_MUTEX_NULL;
-		pdc_cache_set_state(pdc_cache, PDC_DATABASE_ONLY, NULL);
+		pdc_cache_set_state(pdc_cache, PDC_DATABASE_ONLY, "proxy data cache has been disabled");
 
 		ret = SUCCEED;
 
@@ -467,10 +490,7 @@ void	zbx_pdc_update_state(int more)
  ******************************************************************************/
 void	zbx_pdc_flush(void)
 {
-	zbx_db_begin();
 	pdc_flush(pdc_cache);
-	zbx_db_commit();
-
 	pdc_cache->state = PDC_DATABASE_ONLY;
 }
 

@@ -2918,6 +2918,8 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 		}
 
 		self->lastid = id - 1;
+		/* reset autoincrement so execute could be retried with the same ids */
+		self->autoincrement = -1;
 	}
 
 #ifndef HAVE_ORACLE

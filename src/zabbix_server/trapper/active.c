@@ -91,14 +91,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
 	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
-	do
-	{
-		zbx_db_begin();
-
-		zbx_autoreg_update_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-				(unsigned short)flag, now, events_cbs);
-	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
+	zbx_autoreg_update_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag, now,
+			events_cbs);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
