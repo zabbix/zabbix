@@ -300,7 +300,7 @@ class testFormTemplateDashboards extends CWebTest {
 								'Status (descending)',
 								'Status (ascending)',
 								'Recipient (descending)',
-								'Recipient (ascending)',
+								'Recipient (ascending)'
 							],
 							'value' => 'Time (descending)'
 						],
@@ -496,7 +496,7 @@ class testFormTemplateDashboards extends CWebTest {
 					],
 					'hints' => [
 						[
-							'locator' => 'class:icon-help-hint',
+							'label' => 'Initial view',
 							'text' => "Comma separated center coordinates and zoom level to display when the widget ".
 									"is initially loaded.\n".
 									"Supported formats:\n".
@@ -639,19 +639,216 @@ class testFormTemplateDashboards extends CWebTest {
 					'hidden_fields' => [
 						[
 							'field' => 'Description',
-							'screenshot' => true
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-description"]',
+							'contents' => [
+								[
+									'field_locator' => 'id:description',
+									'value' => '{ITEM.NAME}',
+									'attributes' => [
+										'maxlength' => 2048,
+										'aria-required' => 'true',
+										'rows' => 7
+									]
+								],
+								[
+									'field' => 'Horizontal position',
+									'type' => 'radio_button',
+									'possible_values' => ['Left', 'Center', 'Right'],
+									'value' => 'Center'
+								],
+								[
+									'field' => 'Size',
+									'element_locator' => 'id:desc_size',
+									'value' => 15,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Vertical position',
+									'type' => 'radio_button',
+									'possible_values' => ['Top', 'Middle', 'Bottom'],
+									'value' => 'Bottom'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								]
+							]
 						],
 						[
 							'field' => 'Value',
-							'screenshot' => true
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value"]',
+							'contents' => [
+								[
+									'field' => 'Decimal places',
+									'value' => 2,
+									'element_locator' => 'id:decimal_places',
+									'attributes' => [
+										'maxlength' => 2
+									]
+								],
+								[
+									'field' => 'Size',
+									'element_locator' => 'id:decimal_size',
+									'value' => 35,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Horizontal position',
+									'type' => 'radio_button',
+									'possible_values' => ['Left', 'Center', 'Right'],
+									'value' => 'Center'
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'value_size',
+									'value' => 45,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Vertical position',
+									'type' => 'radio_button',
+									'possible_values' => ['Top', 'Middle', 'Bottom'],
+									'value' => 'Middle'
+								],
+								[
+									'field' => 'Bold',
+									'element_locator' => 'id:value_bold',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field' => 'Color',
+									'field_locator' => 'id:lbl_value_color',
+									'type' => 'color_picker'
+								],
+								[
+									'field_locator' => 'id:units_show',
+									'type' => 'checkbox',
+									'value' => true
+								],
+								[
+									'field_locator' => 'xpath:.//label[text()="Units"]/../following-sibling::div[1]/input',
+									'attributes' => [
+										'maxlength' => 255
+									]
+								],
+								[
+									'field' => 'Position',
+									'type' => 'dropdown',
+									'field_id' => 'units_pos',
+									'possible_values' => [
+										'Before value',
+										'Above value',
+										'After value',
+										'Below value'
+									],
+									'value' => 'After value'
+								],
+								[
+									'field' => 'Size',
+									'field_id' => 'units_size',
+									'value' => 35,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'field_id' => 'units_bold',
+									'value' => true
+								],
+								[
+									'field' => 'Color',
+									'field_locator' => 'id:lbl_units_color',
+									'type' => 'color_picker'
+								]
+							]
 						],
 						[
 							'field' => 'Time',
-							'screenshot' => true
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-time"]',
+							'contents' => [
+								[
+									'field' => 'Horizontal position',
+									'type' => 'radio_button',
+									'possible_values' => ['Left', 'Center', 'Right'],
+									'value' => 'Center'
+								],
+								[
+									'field' => 'Size',
+									'element_locator' => 'id:time_size',
+									'value' => 15,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								],
+								[
+									'field' => 'Vertical position',
+									'type' => 'radio_button',
+									'possible_values' => ['Top', 'Middle', 'Bottom'],
+									'value' => 'Top'
+								],
+								[
+									'field' => 'Bold',
+									'type' => 'checkbox',
+									'value' => false
+								],
+								[
+									'field' => 'Color',
+									'type' => 'color_picker'
+								]
+							]
 						],
 						[
 							'field' => 'Change indicator',
-							'screenshot' => true
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-change-indicator"]',
+							'contents' => [
+								[
+									'field_locator' => 'id:change-indicator-up',
+									'type' => 'indicator'
+								],
+								[
+									'field_locator' => 'xpath:.//input[@id="up_color"]/..',
+									'type' => 'color_picker'
+								],
+								[
+									'field_locator' => 'id:change-indicator-down',
+									'type' => 'indicator'
+								],
+								[
+									'field_locator' => 'xpath:.//input[@id="down_color"]/..',
+									'type' => 'color_picker'
+								],
+								[
+									'field_locator' => 'id:change-indicator-updown',
+									'type' => 'indicator'
+								],
+								[
+									'field_locator' => 'xpath:.//input[@id="updown_color"]/..',
+									'type' => 'color_picker'
+								]
+							]
 						],
 						[
 							'field' => 'Background color',
@@ -660,7 +857,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Thresholds',
 							'type' => 'table',
-							'headers' => ['Threshold', 'Action'],
+							'headers' => ['', 'Threshold', 'Action'],
 							'buttons' => ['Add']
 						]
 					],
@@ -669,16 +866,21 @@ class testFormTemplateDashboards extends CWebTest {
 					],
 					'hints' => [
 						[
-							'locator' => 'id:item-value-thresholds-warning',
-							'text' => 'This setting applies only to numeric data.'
-						],
-						[
-							'locator' => 'class:icon-help-hint',
+							'label' => 'Description',
 							'text' => "Supported macros:\n".
 									"{HOST.*}\n".
 									"{ITEM.*}\n".
 									"{INVENTORY.*}\n".
 									"User macros"
+						],
+						[
+							'label' => 'Position',
+							'text' => 'Position is ignored for s, uptime and unixtime units.'
+						],
+						[
+							'label' => 'Thresholds',
+							'type' => 'warning',
+							'text' => 'This setting applies only to numeric data.'
 						]
 					]
 				]
@@ -862,7 +1064,9 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'field' => 'Acknowledgement status',
-							'type' => 'screenshot'
+							'type' => 'radio_button',
+							'possible_values' => ['all', 'Unacknowledged', 'Acknowledged'],
+							'value' => 'all'
 						],
 						[
 							'field' => 'Sort entries by',
@@ -873,7 +1077,7 @@ class testFormTemplateDashboards extends CWebTest {
 								'Severity (descending)',
 								'Severity (ascending)',
 								'Problem (descending)',
-								'Problem (ascending)',
+								'Problem (ascending)'
 							],
 							'value' => 'Time (descending)'
 						],
@@ -895,8 +1099,8 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Tag name',
 							'type' => 'radio_button',
-							'possible_values' => ['None', '1', '2', '3'],
-							'value' => 'None'
+							'possible_values' => ['Full', 'Shortened', 'None'],
+							'value' => 'Full'
 						],
 						[
 							'field' => 'Tag display priority',
@@ -906,7 +1110,8 @@ class testFormTemplateDashboards extends CWebTest {
 							]
 						],
 						[
-							'field' => 'id:acknowledged_by_me',
+							'skip_mandatory_check' => true,
+							'field_locator' => 'xpath:.//label[text()="By me"]/../following-sibling::li/input[@type="checkbox"]',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -1091,7 +1296,7 @@ class testFormTemplateDashboards extends CWebTest {
 						[
 							'field' => 'Show data in maintenance',
 							'type' => 'checkbox',
-							'value' => false
+							'value' => true
 						]
 					]
 				]
@@ -1121,7 +1326,8 @@ class testFormTemplateDashboards extends CWebTest {
 					],
 					'hints' => [
 						[
-							'locator' => 'xpath:.//a[@class="icon-info status-yellow"]',
+							'label' => 'Type',
+							'type' => 'warning',
 							'text' => 'Widget is deprecated.'
 						]
 					]
@@ -1173,14 +1379,17 @@ class testFormTemplateDashboards extends CWebTest {
 		foreach (['hidden_fields', 'disabled_fields'] as $no_access_fields) {
 			if (array_key_exists($no_access_fields, $data)) {
 				foreach ($data[$no_access_fields] as $no_access_field) {
-					$form_field = $widget_form->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($no_access_field['field'])
-							."]/following-sibling::div[1]")->one(false);
-
 					if ($no_access_fields === 'hidden_fields') {
-						$this->assertFalse($form_field->isDisplayed());
+						$this->assertFalse($widget_form->query("xpath:.//label[text()=".
+								CXPathHelper::escapeQuotes($no_access_field['field'])."]/following-sibling::div[1]")
+								->one(false)->isDisplayed()
+						);
 					}
 					else {
-						$this->assertFalse($form_field->isEnabled());
+						$field_locator = (array_key_exists('field', $no_access_field))
+							? $no_access_field['field']
+							: $no_access_field['field_locator'];
+						$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
 					}
 				}
 
@@ -1216,12 +1425,15 @@ class testFormTemplateDashboards extends CWebTest {
 		if (array_key_exists('hints', $data)) {
 			foreach ($data['hints'] as $hint) {
 				// Open hint and check text.
-				$widget_form->query($hint['locator'])->one()->click();
+				$class = (CTestArrayHelper::get($hint, 'type', 'help') === 'warning') ? 'zi-i-warning' : 'zi-help-filled-small';
+				$button = $widget_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($hint['label']).']/button')->one();
+				$this->assertStringContainsString($class, $button->getAttribute('class'));
+				$button->click();
 				$hint_dialog = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent()->one();
 				$this->assertEquals($hint['text'], $hint_dialog->getText());
 
 				// Close hint.
-				$hint_dialog->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint_dialog->waitUntilNotPresent();
 			}
 
@@ -1244,10 +1456,23 @@ class testFormTemplateDashboards extends CWebTest {
 				$field = $widget_form->getField($field_details['field']);
 			}
 
+			if (array_key_exists('replaces', $field_details)) {
+				$this->assertFalse($widget_form->getField($field_details['replaces'])->isDisplayed());
+			}
+
 			if (CTestArrayHelper::get($field_details, 'type') === 'complex_field') {
 				foreach ($field_details['contents'] as $sub_field_details) {
-					$sub_field = $field->query("xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field']).
-							"]/following-sibling::div[1]")->one();
+					if (array_key_exists('field', $sub_field_details)) {
+						$label_xpath = "xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field'])."]";
+						$field_locator =  array_key_exists('field_id', $sub_field_details)
+							? $label_xpath."/following-sibling::div/*[@id=".CXPathHelper::escapeQuotes($sub_field_details['field_id'])."]"
+							: $label_xpath.'/following-sibling::div[1]';
+					}
+					else {
+						$field_locator = $sub_field_details['field_locator'];
+					}
+
+					$sub_field = $field->query($field_locator)->one();
 					$this->checkFieldParameters($sub_field_details, null, $sub_field);
 				}
 			}
@@ -1285,7 +1510,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 				case 'checkbox':
 					$element = $element->asCheckbox();
-					$this->assertEquals($default_value, $element->getValue());
+					$this->assertEquals($default_value, $element->isChecked());
 					break;
 
 				case 'multiselect':
@@ -1295,6 +1520,7 @@ class testFormTemplateDashboards extends CWebTest {
 					break;
 
 				case 'dropdown':
+					$element = $element->asDropdown();
 					$this->assertEquals($default_value, $element->getValue());
 					$this->assertEquals($field_details['possible_values'], $element->getOptions()->asText());
 					break;
@@ -1334,10 +1560,49 @@ class testFormTemplateDashboards extends CWebTest {
 					$this->assertEquals($default_value, $element->getValue());
 					break;
 
+				case 'table':
+					$table = $element->asTable();
+					$this->assertEquals($field_details['headers'], $table->getHeadersText());
+
+					$this->assertEquals($field_details['buttons'], $table->query('tag:button')->all()
+							->filter(CElementFilter::CLICKABLE)->asText()
+					);
+					break;
+
+				case 'tags_table':
+					$radio = $element->asSegmentedRadio();
+					$this->assertEquals('And/Or', $radio->getValue());
+					$this->assertEquals(['And/Or', 'Or'], $radio->getLabels()->asText());
+
+					$table = $radio->query('xpath:./../following-sibling::div[1]')->one();
+					$inputs = [
+						'id:tags_0_tag' => 'tag',
+						'id:tags_0_value' => 'value'
+					];
+
+					foreach ($inputs as $locator => $placeholder) {
+						$input = $table->query($locator)->one();
+						$this->assertEquals(255, $input->getAttribute('maxlength'));
+						$this->assertEquals($placeholder, $input->getAttribute('placeholder'));
+					}
+
+					$operator = $table->query('id:tags_0_operator')->one()->asDropdown();
+					$this->assertEquals($field_details['default_operator'], $operator->getValue());
+					$this->assertEquals($field_details['operators'], $operator->getOptions()->asText());
+
+					$this->assertEquals(['Remove', 'Add'], $table->query('class:btn-link')->all()
+							->filter(CElementFilter::CLICKABLE)->asText()
+					);
+					break;
+
+				case 'indicator':
+					$this->assertTrue($element->isDisplayed());
+					$this->assertEquals('', $element->query('tag:polygon')->one()->getAttribute('style'));
+					break;
 			}
 
 			// Complex field elements don't have mandatory fields, so no use wasting time on checkingif they are mandatory.
-			if ($widget_form) {
+			if ($widget_form && !CTestArrayHelper::get($field_details, 'skip_mandatory_check')) {
 				$mandatory = CTestArrayHelper::get($field_details, 'mandatory');
 				$this->assertEquals($mandatory, $widget_form->isRequired($field_details['field']));
 			}
