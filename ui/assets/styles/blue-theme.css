@@ -2854,6 +2854,12 @@ pre, pre a, pre td, pre span {
 form.is-loading {
   position: relative; }
 
+.form-submit-hidden {
+  position: absolute;
+  visibility: hidden;
+  min-height: 0;
+  max-height: 0; }
+
 .list-table {
   width: 100%;
   background-color: #ffffff;
@@ -3631,7 +3637,9 @@ textarea {
   font-size: 1em;
   padding: 4px 5px;
   margin: 0;
-  overflow: auto; }
+  min-height: 24px;
+  overflow: auto;
+  resize: vertical; }
   textarea[readonly] {
     color: #1f2c33 !important; }
     textarea[readonly]:focus {
@@ -4235,10 +4243,23 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
+.safari textarea[readonly], .macro-input-group button.btn-dropdown-toggle:disabled {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
+
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari z-select[disabled] button, z-select[disabled] .safari button,
+.safari .z-select[disabled] button,
+.z-select[disabled] .safari button, .safari z-select[readonly] button, z-select[readonly] .safari button,
+.safari .z-select[readonly] button,
+.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span, .safari .checkbox-radio[readonly] + label span, .checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
+.safari textarea[readonly], .safari .macro-input-group button.btn-dropdown-toggle:disabled, .macro-input-group .safari button.btn-dropdown-toggle:disabled {
+  -webkit-text-fill-color: #acbbc2; }
+.safari input[readonly],
+.safari textarea[readonly] {
+  -webkit-text-fill-color: #1f2c33 !important; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
@@ -4624,6 +4645,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       margin: 0 -10px 10px;
       padding: 0 10px;
       position: relative; }
+      .overlay-dialogue.modal .overlay-dialogue-body > form {
+        padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
