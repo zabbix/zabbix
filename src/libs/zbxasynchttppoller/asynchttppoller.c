@@ -35,7 +35,6 @@
 #include "zbxtypes.h"
 #include "asynchttppoller.h"
 
-static ZBX_THREAD_LOCAL struct event_base	*base;
 static ZBX_THREAD_LOCAL struct event		*curl_timeout;
 static ZBX_THREAD_LOCAL CURLM			*curl_handle;
 
@@ -141,13 +140,13 @@ static void	curl_perform(int fd, short event, void *arg)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd)
+static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd, struct event_base *event_base)
 {
 	zbx_curl_context_t	*context;
 
 	context = (zbx_curl_context_t *) malloc(sizeof(*context));
 	context->sockfd = sockfd;
-	context->event = event_new(base, sockfd, 0, curl_perform, context);
+	context->event = event_new(event_base, sockfd, 0, curl_perform, context);
 
 	return context;
 }
@@ -163,6 +162,7 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 {
 	zbx_curl_context_t	*curl_context;
 	int			events = 0;
+	struct event_base	*event_base = (struct event_base *)userp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() action:%d", __func__, action);
 
@@ -174,7 +174,7 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 		case CURL_POLL_IN:
 		case CURL_POLL_OUT:
 		case CURL_POLL_INOUT:
-			curl_context = socketp ? (zbx_curl_context_t *)socketp : create_curl_context(s);
+			curl_context = socketp ? (zbx_curl_context_t *)socketp : create_curl_context(s, event_base);
 
 			curl_multi_assign(curl_handle, s, (void *) curl_context);
 
@@ -186,7 +186,7 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 			events |= EV_PERSIST;
 
 			event_del(curl_context->event);
-			event_assign(curl_context->event, base, curl_context->sockfd, events, curl_perform,
+			event_assign(curl_context->event, event_base, curl_context->sockfd, events, curl_perform,
 					curl_context);
 			event_add(curl_context->event, NULL);
 
@@ -216,7 +216,6 @@ CURLM	*zbx_async_httpagent_init(struct event_base *ev,
 	CURLMcode	merr;
 	CURLcode	err;
 
-	base = ev;
 	process_httpagent_result = process_httpagent_result_callback;
 	http_agent_action = httpagent_action_callback;
 	http_agent_action_arg = arg;
@@ -240,13 +239,20 @@ CURLM	*zbx_async_httpagent_init(struct event_base *ev,
 		exit(EXIT_FAILURE);
 	}
 
+	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_SOCKETDATA, ev)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETDATA: %s", curl_multi_strerror(merr));
+		exit(EXIT_FAILURE);
+	}
+	
+
 	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERFUNCTION: %s", curl_multi_strerror(merr));
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (curl_timeout = evtimer_new(base, on_timeout, NULL)))
+	if (NULL == (curl_timeout = evtimer_new(ev, on_timeout, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create timer event");
 		exit(EXIT_FAILURE);
