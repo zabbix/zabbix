@@ -190,7 +190,7 @@ class testPageMonitoringWeb extends CWebTest {
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
 			$this->assertTrue($this->query('xpath://li[@aria-expanded='.CXPathHelper::escapeQuotes($status).']')
-				->one()->isPresent()
+					->one()->isPresent()
 			);
 			//$this->query('xpath://a[@class="filter-trigger ui-tabs-anchor"]')->one()->click();
 			$this->query('xpath://a[@id="ui-id-1"]')->one()->click();
@@ -199,7 +199,7 @@ class testPageMonitoringWeb extends CWebTest {
 		// Check fields maximum length.
 		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
 			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')
-				->one()->getAttribute('maxlength')
+					->one()->getAttribute('maxlength')
 			);
 		}
 
@@ -277,7 +277,7 @@ class testPageMonitoringWeb extends CWebTest {
 		$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($popupitems));
 		$this->assertTrue($popup->query('xpath://a[@aria-label="View, ' .
-			$disabled . '" and @class="menu-popup-item disabled"]')->one()->isPresent()
+				$disabled . '" and @class="menu-popup-item disabled"]')->one()->isPresent()
 		);
 		$popup->close();
 	}
