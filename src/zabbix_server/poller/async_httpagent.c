@@ -35,7 +35,8 @@ void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context)
 	zbx_http_context_destroy(&httpagent_context->http_context);
 }
 
-int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
+int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
+		CURLM *curl_handle)
 {
 	char			*error = NULL;
 	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
@@ -59,7 +60,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_pol
 			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
 			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
 			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
-			item->output_format, poller_config->config_source_ip, &error))
+			item->output_format, config_source_ip, &error))
 	{
 		SET_MSG_RESULT(result, error);
 
@@ -75,8 +76,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_pol
 		goto fail;
 	}
 
-	if (CURLM_OK != (merr = curl_multi_add_handle(poller_config->curl_handle,
-			httpagent_context->http_context.easyhandle)))
+	if (CURLM_OK != (merr = curl_multi_add_handle(curl_handle, httpagent_context->http_context.easyhandle)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot add a standard curl handle to the multi stack: %s",
 				curl_multi_strerror(merr)));
@@ -84,7 +84,6 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_pol
 		goto fail;
 	}
 
-	poller_config->processing++;
 	return SUCCEED;
 fail:
 	zbx_async_check_httpagent_clean(httpagent_context);
