@@ -22,22 +22,33 @@
 
 	window.trigger_edit_popup = new class {
 
-		init({form_name, triggerid, expression_popup_parameters, recovery_popup_parameters, readonly}) {
-			this.overlay = overlays_stack.getById('trigger-edit');
-			this.dialogue = this.overlay.$dialogue[0];
-			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		init({form_name, triggerid, expression_popup_parameters, recovery_popup_parameters, readonly,
+				db_dependencies
+		}) {
 			this.expression_popup_parameters = expression_popup_parameters;
 			this.recovery_popup_parameters = recovery_popup_parameters;
 			this.form_name = form_name;
 			this.readonly = readonly;
 			this.triggerid = triggerid;
+			this.db_dependencies = db_dependencies;
+			this.overlay = overlays_stack.getById('trigger-edit');
+			this.dialogue = this.overlay.$dialogue[0];
+			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 			this.expression = this.form.querySelector('#expression');
 			this.expression_full = this.form.querySelector('#expression-full');
 			this.description = this.form.querySelector('#description');
 
+			window.addPopupValues = (data) => {
+				this.addPopupValues(data.values);
+			}
+
 			this.#initActions();
 			this.#changeRecoveryMode();
 			this.#changeCorrelationMode();
+
+			if (this.db_dependencies) {
+				this.#loadDependencyTable(this.db_dependencies);
+			}
 		}
 
 		#initActions() {
@@ -123,8 +134,40 @@
 				else if (e.target.classList.contains('js-recovery-expression')) {
 					copy_expression(e.target.id, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 				}
+				else if (e.target.id === 'add-dep-trigger' || e.target.id === 'add-dep-template-trigger'
+						|| e.target.id === 'add_dep_host_trigger') {
+					this.#addDepTrigger(e.target);
+				}
+				else if (e.target.classList.contains('js-remove-dependency')) {
+					this.#removeDependency(e.target.dataset.triggerid);
+				}
 			});
 		}
+
+		#addDepTrigger(button) {
+			let popup_parameters = {
+				srctbl: 'triggers',
+				srcfld1: 'triggerid',
+				reference: 'deptrigger',
+				multiselect: 1,
+				with_triggers: 1
+			};
+
+			if (button.id === 'add-dep-trigger') {
+				popup_parameters.hostid = button.dataset.hostid;
+				popup_parameters.real_hosts = 1;
+			}
+			else if (button.id === 'add-dep-template-trigger') {
+				popup_parameters.srctbl = 'template_triggers';
+				popup_parameters.templateid = button.dataset.templateid;
+			}
+			else {
+				popup_parameters.real_hosts = 1;
+			}
+
+			PopUp('popup.generic', popup_parameters, {dialogue_class: 'modal-popup-generic'});
+		}
+
 
 		#changeRecoveryMode() {
 			const recovery_mode = this.form.querySelector('input[name=recovery_mode]:checked').value;
@@ -181,20 +224,36 @@
 		 * @see init.js add.popup event
 		 */
 		addPopupValues(data) {
-			if (!('object' in data) || data.object !== 'deptrigger') {
-				return false;
-			}
+			let template;
 
-			for (let i = 0; i < data.values.length; i++) {
-				create_var(this.form_name, 'new_dependency[' + i + ']', data.values[i].triggerid, false);
-			}
+			Object.values(data).forEach((dependency) => {
+				const element = {description: dependency.description, triggerid: dependency.triggerid};
 
-			create_var(this.form_name, 'add_dependency', 1, true);
+				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
+
+				document
+					.querySelector('#dependency-table tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate(element));
+			})
 		}
 
-		removeDependency(triggerid) {
-			jQuery('#dependency_' + triggerid).remove();
-			jQuery('#dependencies_' + triggerid).remove();
+		#loadDependencyTable(data) {
+			const dependencies = [];
+
+			Object.values(data).forEach((dependency) => {
+				let hosts = dependency.hosts.map(item => item['name']);
+				let description = hosts.join(', ') + <?= json_encode(NAME_DELIMITER) ?> + dependency.description;
+
+				dependencies.push({description: description, triggerid: dependency.triggerid});
+			})
+
+			this.addPopupValues(dependencies);
+		}
+
+		#removeDependency(triggerid) {
+			const dependency_element = document.querySelector('#dependency_' + triggerid);
+
+			dependency_element.parentNode.removeChild(dependency_element);
 		}
 
 		refresh() {

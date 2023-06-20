@@ -362,12 +362,12 @@ $trigger_form_grid
 	->addItem([new CLabel(_('Enabled')), new CFormField((new CCheckBox('status'))->setChecked($status))]);
 
 // Append tabs to form.
-$triggersTab = new CTabView();
-$triggersTab->setSelected(0);
-$triggersTab->addTab('triggersTab', _('Trigger'), $trigger_form_grid);
+$triggers_tab = new CTabView();
+$triggers_tab->setSelected(0);
+$triggers_tab->addTab('triggers_tab', _('Trigger'), $trigger_form_grid);
 
 // tags
-$triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
+$triggers_tab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
 		'source' => 'trigger',
 		'tags' => $data['tags'],
 		'show_inherited_tags' => array_key_exists('show_inherited_tags', $data) ? $data['show_inherited_tags'] : false,
@@ -381,40 +381,26 @@ $triggersTab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab
 /*
  * Dependencies tab
  */
-$dependenciesFormGrid = new CFormGrid();
-$dependenciesTable = (new CTable())
+$dependencies_form_grid = new CFormGrid();
+$dependencies_table = (new CTable())
 	->setId('dependency-table')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), $discovered_trigger ? null : _('Action')]);
 
-if ($data['db_dependencies']) {
-	foreach ($data['db_dependencies'] as $dependency) {
-		$trigger_form->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
-
-		$dep_trigger_description =
-			implode(', ', zbx_objectValues($dependency['hosts'], 'name')).NAME_DELIMITER.$dependency['description'];
-
-		$dependenciesTable->addRow(
-			(new CRow([
-				(new CLink($dep_trigger_description,
-					(new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $dependency['triggerid'])
-						->setArgument('context', $data['context'])
-				))->setTarget('_blank'),
-				(new CCol(
-					$discovered_trigger
-						? null
-						: (new CButton('remove', _('Remove')))
-						->setAttribute('data-triggerid', $dependency['triggerid'])
-						->onClick('view.removeDependency(this.dataset.triggerid)')
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->removeId()
-				))->addClass(ZBX_STYLE_NOWRAP)
-			]))->setId('dependency_'.$dependency['triggerid'])
-		);
-	}
-}
+$dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addItem(
+	(new CRow([
+		(new CLink(['#{description}'],
+			(new CUrl('zabbix.php'))
+				->setArgument('triggerid', '#{triggerid}')
+				->setArgument('context', $data['context'])
+		)),
+		(new CButtonLink(_('Remove')))
+			->addClass('js-remove-dependency')
+			->setAttribute('data-triggerid', '#{triggerid}'),
+		(new CInput('hidden', 'dependencies[]', '#{triggerid}'))
+			->setId('dependencies_'.'#{triggerid}')
+	]))->setId('dependency_'.'#{triggerid}')
+);
 
 
 $buttons = null;
@@ -423,64 +409,37 @@ if (!$discovered_trigger) {
 	$buttons = $data['context'] === 'host'
 		? (new CButton('add_dep_trigger', _('Add')))
 			->setAttribute('data-hostid', $data['hostid'])
-//			->setId('add-dep-trigger')
-			->onClick('
-				PopUp("popup.generic", {
-					srctbl: "triggers",
-					srcfld1: "triggerid",
-					reference: "deptrigger",
-					hostid: this.dataset.hostid,
-					multiselect: 1,
-					with_triggers: 1,
-					real_hosts: 1
-				}, {dialogue_class: "modal-popup-generic"});
-			')
+			->setId('add-dep-trigger')
 			->addClass(ZBX_STYLE_BTN_LINK)
 		: new CHorList([
 				(new CButton('add_dep_trigger', _('Add')))
 					->setAttribute('data-templateid', $data['hostid'])
 					->setId('add-dep-template-trigger')
-					->onClick('
-						PopUp("popup.generic", {
-							srctbl: "template_triggers",
-							srcfld1: "triggerid",
-							reference: "deptrigger",
-							templateid: this.dataset.templateid,
-							multiselect: 1,
-							with_triggers: 1
-						}, {dialogue_class: "modal-popup-generic"});
-					')
 					->addClass(ZBX_STYLE_BTN_LINK),
 				(new CButton('add_dep_host_trigger', _('Add host trigger')))
-					->onClick('
-						PopUp("popup.generic", {
-							srctbl: "triggers",
-							srcfld1: "triggerid",
-							reference: "deptrigger",
-							multiselect: 1,
-							with_triggers: 1,
-							real_hosts: 1
-						}, {dialogue_class: "modal-popup-generic"});
-					')
+					->setId('add_dep_host_trigger')
 					->addClass(ZBX_STYLE_BTN_LINK)
 		]);
 }
 
-$dependenciesTable->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol($buttons))->setColSpan(4)
-		)
-);
+$dependencies_table
+	->addItem(
+		(new CTag('tfoot', true))
+			->addItem(
+				(new CCol($buttons))->setColSpan(4)
+			)
+	)
+	->addItem($dependency_template_default);
 
-$dependenciesFormGrid->addItem([_('Dependencies'),
-	(new CDiv($dependenciesTable))
+
+$dependencies_form_grid->addItem([_('Dependencies'),
+	(new CDiv($dependencies_table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
 
 
-$triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormGrid, TAB_INDICATOR_DEPENDENCY);
+$triggers_tab->addTab('dependenciesTab', _('Dependencies'), $dependencies_form_grid, TAB_INDICATOR_DEPENDENCY);
 
 if (!$data['triggerid']) {
 	$buttons = [
@@ -538,13 +497,14 @@ else {
 
 // Append tabs to form.
 $trigger_form
-	->addItem($triggersTab)
+	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
 			'form_name' => $trigger_form->getName(),
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $expression_popup_parameters,
 			'recovery_popup_parameters' => $recovery_popup_parameters,
-			'readonly' => $readonly
+			'readonly' => $readonly,
+			'db_dependencies' => $data['db_dependencies']
 		]).');'))->setOnDocumentReady()
 );
 

@@ -76,7 +76,8 @@ class CControllerTriggerEdit extends CController {
 	protected function doAction() {
 		$data = [
 			'triggerid' => $this->getInput('triggerid', 0),
-			'hostid' => $this->getInput('hostid', 0)
+			'hostid' => $this->getInput('hostid', 0),
+			'dependencies' => []
 		];
 
 		$data = getTriggerFormData($data);
@@ -95,6 +96,7 @@ class CControllerTriggerEdit extends CController {
 		$data['recovery_mode'] = array_key_exists('recovery_mode', $data) ? $data['recovery_mode'] : 0;
 		$data['type'] = array_key_exists('type', $data) ? $data['type'] : '0';
 		$data['event_name'] = array_key_exists('event_name', $data) ? $data['event_name'] : $data['description'];
+		$data['db_dependencies'] = array_key_exists('db_dependencies', $data) ? $data['db_dependencies'] : [];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
