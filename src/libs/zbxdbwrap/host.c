@@ -20,7 +20,6 @@
 #include "template.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
 #include "zbxcacheconfig.h"
 #include "zbxserver.h"
 #include "audit/zbxaudit_host.h"

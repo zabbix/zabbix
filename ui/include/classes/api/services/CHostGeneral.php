@@ -235,7 +235,7 @@ abstract class CHostGeneral extends CHostBase {
 			}
 
 			if ($check_double_linkage) {
-				$this->checkDoubleLinkageNew($ins_templates, $del_links);
+				$this->checkDoubleLinkageNew($ins_templates, $del_links, null);
 			}
 
 			$this->checkTriggerDependenciesOfInsTemplates($ins_templates);
@@ -312,7 +312,7 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	protected function updateTemplates(array &$hosts, ?array $db_hosts = null, array &$upd_hostids = null): void {
+	protected function updateTemplates(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		parent::updateTemplates($hosts, $db_hosts);

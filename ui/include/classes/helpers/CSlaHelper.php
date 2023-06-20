@@ -247,11 +247,11 @@ final class CSlaHelper {
 	 *
 	 * @throws Exception
 	 *
-	 * @return CTag
+	 * @return array
 	 */
-	public static function getScheduleTag(array $schedule): CTag {
+	public static function getScheduleCaption(array $schedule): array {
 		if (!$schedule) {
-			return new CSpan(_('24x7'));
+			return [new CSpan(_('24x7'))];
 		}
 
 		$hint = (new CTableInfo())->setHeader(
@@ -262,11 +262,11 @@ final class CSlaHelper {
 			$hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);
 		}
 
-		return (new CSpan(_('Custom')))
-			->addItem(
-				(new CSpan())
-					->addClass('icon-description')
-					->setHint($hint)
-			);
+		return [
+			new CSpan(_('Custom')),
+			(new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
+				->setAttribute('data-content', '?')
+				->setHint($hint)
+		];
 	}
 }

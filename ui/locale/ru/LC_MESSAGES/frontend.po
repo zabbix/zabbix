@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-18 17:43+0000\n"
-"Last-Translator: Artem <art17-game@mail.ru>\n"
+"PO-Revision-Date: 2023-05-26 12:20+0000\n"
+"Last-Translator: Lidija <lidija.marsova@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -20,7 +20,7 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
 #, c-format
 msgid "\"%1$s\" date must be less than \"%2$s\" date."
-msgstr "Дата \"%1$s\" должна быть меньше чем \"%2$s\" дата."
+msgstr "Дата \"%1$s\" должна быть меньше, чем дата \"%2$s\"."
 
 #: include/classes/db/MysqlDbBackend.php:70
 #: include/classes/db/OracleDbBackend.php:142
@@ -56,7 +56,7 @@ msgstr "\"%1$s\" должно быть пустой строкой или бол
 #: include/classes/api/services/CItemGeneral.php:1399
 #, c-format
 msgid "\"%1$s\" value must be less than or equal to \"%2$s\" value"
-msgstr "Значение \"%1$s\" должно быть меньше или равно \"%2$s\" значению"
+msgstr "Значение \"%1$s\" должно быть меньше или равно значению \"%2$s\""
 
 #: include/classes/import/validators/C10XmlValidator.php:360
 #: include/classes/import/validators/C10XmlValidator.php:383
@@ -96,20 +96,20 @@ msgstr[2] "%1$d дней"
 #, c-format
 msgctxt "screen reader"
 msgid "%1$d matches for %2$s found"
-msgstr "%1$d соответсвует для %2$s найденых"
+msgstr "Найдено %1$d совпадений для %2$s"
 
 #: app/controllers/CControllerWidgetProblemsView.php:55
 #, c-format
 msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
-msgstr[0] "отображено %1$d из %3$d%2$s проблемы"
+msgstr[0] ""
 msgstr[1] "отображено %1$d из %3$d%2$s проблем"
 msgstr[2] "отображено %1$d из %3$d%2$s проблем"
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
 msgid "%1$d problems selected."
-msgstr "%1$d выбрано проблем."
+msgstr "Выбрано %1$d проблем."
 
 #: chart4.php:94
 #, c-format
@@ -590,6 +590,11 @@ msgstr "Подтвержденные события ПРОБЛЕМА"
 #: app/views/administration.trigdisplay.edit.php:77
 msgid "Acknowledged RESOLVED events"
 msgstr "Подтвержденные РЕШЕННЫЕ события"
+
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1987,6 +1992,11 @@ msgstr "Болгарский (bg_BG)"
 msgid "By host"
 msgstr "По узлу сети"
 
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
+
 #: report2.php:196
 msgid "By trigger template"
 msgstr "По шаблону триггера"
@@ -2455,6 +2465,11 @@ msgstr "Не возможно создать зависимость протот
 msgid "Cannot create discovery rule"
 msgstr "Не удалось создать правило обнаружения"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Не удалось создать соответствие иконок"
@@ -2491,6 +2506,10 @@ msgstr "Не возможно создать конфигурационный ф
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "Не удалось создать роль пользователя"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2561,6 +2580,13 @@ msgstr[2] "Не удалось удалить правила обнаружен�
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "Не удалось удалить правила обнаружения"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2884,6 +2910,13 @@ msgstr[0] "Не удалось деактивировать правило об�
 msgstr[1] "Не удалось деактивировать правила обнаружения"
 msgstr[2] "Не удалось деактивировать правила обнаружения"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2993,6 +3026,13 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Не удалось активировать правило обнаружения"
 msgstr[1] "Не удалось активировать правила обнаружения"
 msgstr[2] "Не удалось активировать правила обнаружения"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3492,6 +3532,11 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к у
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Не удалось присоединить \"%1$s\" шаблон к узлу сети \"%2$s\" из-за выражения триггера \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3512,6 +3557,11 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к п
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Не удалось присоединить \"%1$s\" шаблон к прототипу узлов сети \"%2$s\" из-за выражения триггера \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3543,6 +3593,41 @@ msgstr "Не удалось присоединить \"%1$s\" шаблон к ш
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Не удалось присоединить шаблон \"%1$s\" к шаблону \"%2$s\", так как появится циклическая связь (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3961,6 +4046,11 @@ msgstr[0] "Не удалось обновить событие"
 msgstr[1] "Не удалось обновить события"
 msgstr[2] "Не удалось обновить события"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "Не удалось обновить события"
@@ -4195,6 +4285,10 @@ msgstr "Не удалось обновить роль пользователя"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Не удалось обновить веб-сценарий"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5376,6 +5470,10 @@ msgstr "Создать правило обнаружения (выберите �
 msgid "Create enabled"
 msgstr "Создать активированным"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Создать график"
@@ -6200,6 +6298,10 @@ msgstr "Удалить панель?"
 msgid "Delete discovery rule?"
 msgstr "Удалить правило обнаружения?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6330,6 +6432,14 @@ msgstr "Удалить выбранные правила обнаружения?
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Удалить выбранные элементы?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6826,6 +6936,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Деактивировать выбранные правила обнаружения?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7724,6 +7842,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "Активировать выбранные правила обнаружения?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7984,11 +8110,49 @@ msgstr "Событие подтверждено"
 msgid "Event correlation"
 msgstr "Корреляция событий"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Правила корреляции событий"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -14130,6 +14294,10 @@ msgstr ""
 msgid "New element"
 msgstr "Новый элемент"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14162,6 +14330,10 @@ msgstr "Новая группа узлов сети"
 msgid "New maintenance period"
 msgstr "Новый период обслуживания"
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr "Новое соответствие способа оповещений"
@@ -14186,6 +14358,10 @@ msgstr ""
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Новая услуга"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -17389,6 +17565,17 @@ msgstr "Решено правилом корреляции \"%1$s\"."
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
 msgstr "Решено правилом корреляции."
+
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

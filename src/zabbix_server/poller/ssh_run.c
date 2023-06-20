@@ -22,7 +22,7 @@
 #include <libssh/libssh.h>
 
 #include "zbxcomms.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxnum.h"
 #include "zbxfile.h"
 

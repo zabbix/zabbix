@@ -117,9 +117,8 @@ class testSystemInformation extends CWebTest {
 		$url = (!$dashboardid) ? 'zabbix.php?action=report.status' : 'zabbix.php?action=dashboard.view&dashboardid='.$dashboardid;
 		// Wait for frontend to get the new config from updated zabbix.conf.php file.
 		sleep((int) ini_get('opcache.revalidate_freq') + 1);
-		$this->page->login()->open($url)->waitUntilReady();
 
-		// Not waiting for page to load to minimise the possibility of difference between the time in report and in constant.
+		$this->page->login()->open($url)->waitUntilReady();
 		$current_time = time();
 
 		if (!$dashboardid) {
@@ -156,7 +155,8 @@ class testSystemInformation extends CWebTest {
 			 */
 			$last_expected = [];
 
-			for ($i = 0; $i <= 10; $i++) {
+			// Negative $i values are considered because current_time may be defined before data in sysinfo widget gets displayed.
+			for ($i = -2; $i <= 6; $i++) {
 				$last_expected[] = convertUnitsS($current_time - $lastaccess_db - $i);
 			}
 

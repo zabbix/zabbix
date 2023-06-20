@@ -20,7 +20,6 @@
 #include "zbxhistory.h"
 #include "history.h"
 
-#include "log.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxstr.h"

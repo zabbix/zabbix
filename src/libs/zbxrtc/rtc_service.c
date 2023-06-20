@@ -23,7 +23,6 @@
 #include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxnix.h"
-#include "log.h"
 #include "zbxdiag.h"
 #include "zbxstr.h"
 #include "zbxnum.h"

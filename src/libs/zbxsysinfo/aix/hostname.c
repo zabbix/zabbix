@@ -24,10 +24,6 @@
 #	include <sys/utsname.h>
 #endif
 
-ZBX_METRIC	parameter_hostname =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
-
 int	system_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	struct utsname	name;

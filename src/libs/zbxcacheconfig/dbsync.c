@@ -20,7 +20,6 @@
 #include "zbxcacheconfig.h"
 #include "dbsync.h"
 
-#include "log.h"
 #include "zbxcrypto.h"
 #include "zbxeval.h"
 #include "zbxnum.h"

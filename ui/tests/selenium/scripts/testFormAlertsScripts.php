@@ -1107,7 +1107,7 @@ class testFormAlertsScripts extends CWebTest {
 			$this->assertEquals($data['fields']['Confirmation text'],
 					$dialog->query('xpath:.//span[@class="confirmation-msg"]')->waitUntilVisible()->one()->getText()
 			);
-			$dialog->query('class:overlay-close-btn')->waitUntilClickable()->one()->click();
+			$dialog->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
 		}
 	}
 
