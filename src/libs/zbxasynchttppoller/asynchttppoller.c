@@ -35,12 +35,12 @@
 #include "zbxtypes.h"
 #include "asynchttppoller.h"
 
-static ZBX_THREAD_LOCAL struct event		*curl_timeout;
-static ZBX_THREAD_LOCAL CURLM			*curl_handle;
+static ZBX_THREAD_LOCAL struct event				*curl_timeout;
+static ZBX_THREAD_LOCAL CURLM					*curl_handle;
 
-static process_httpagent_result_callback_fn	process_httpagent_result;
-static httpagent_action_callback_fn		http_agent_action;
-static ZBX_THREAD_LOCAL void			*http_agent_arg;
+static ZBX_THREAD_LOCAL process_httpagent_result_callback_fn	process_httpagent_result;
+static ZBX_THREAD_LOCAL httpagent_action_callback_fn		http_agent_action;
+static ZBX_THREAD_LOCAL void					*http_agent_arg;
 
 typedef struct
 {
