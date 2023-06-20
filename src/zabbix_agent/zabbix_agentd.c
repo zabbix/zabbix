@@ -31,7 +31,6 @@
 static char	*CONFIG_PID_FILE = NULL;
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-//char	*CONFIG_HOSTNAMES		= NULL;
 ZBX_PROPERTY_DECL_CONST(char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
@@ -39,7 +38,6 @@ char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
-//ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME = NULL;
 ZBX_PROPERTY_DECL_THREAD_LOCAL(char *, zbx_config_hostname, NULL)
 
 ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)

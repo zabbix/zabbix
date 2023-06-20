@@ -45,7 +45,6 @@
 #	include "zbxnix.h"
 #endif
 
-/*extern*/ ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern int			CONFIG_HEARTBEAT_FREQUENCY;
 extern char			*CONFIG_HOST_INTERFACE;
 extern char			*CONFIG_HOST_INTERFACE_ITEM;
@@ -842,7 +841,8 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  *                                                                            *
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
-		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip)
+		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
+		const char *config_hostname)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -855,7 +855,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
 	if (NULL != CONFIG_HOST_METADATA)
 	{
@@ -1471,7 +1471,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_hostname, char **error)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1482,6 +1482,7 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_hostname);
 
 	return FAIL;
 }
@@ -1489,11 +1490,12 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		char **error);
+		const char *config_hostname, char **error);
 #endif
 
 static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, char **error)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1512,7 +1514,7 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
-		process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
+		process_value(addrs, NULL, config_hostname, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
 				NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout, config_source_ip);
 	}
 out:
@@ -1650,10 +1652,11 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					config_tls, config_timeout, &error);
+					config_tls, config_timeout, config_hostname, &error);
 		}
 		else
-			ret = process_common_check(addrs, metric, config_tls, config_timeout, config_source_ip, &error);
+			ret = process_common_check(addrs, metric, config_tls, config_timeout, config_source_ip,
+					config_hostname, &error);
 
 		if (SUCCEED != ret)
 		{
@@ -1682,7 +1685,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 						metric->mtime);
 			}
 #endif
-			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
+			process_value(addrs, NULL, config_hostname, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
 					config_tls, config_timeout, config_source_ip);
 
@@ -1720,7 +1723,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 					}
 #endif
 					/* meta information update */
-					process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, NULL,
+					process_value(addrs, NULL, config_hostname, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
 							NULL, NULL, metric->flags, config_tls, config_timeout,
 							config_source_ip);
@@ -1771,7 +1774,7 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 #endif
 
 static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_hostname)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -1783,7 +1786,7 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_HEARTBEAT_FREQ, CONFIG_HEARTBEAT_FREQUENCY);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
@@ -1838,7 +1841,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_vector_addr_ptr_create(&activechk_args.addrs);
 
 	zbx_addr_copy(&activechk_args.addrs, &(activechks_args_in->addrs));
-	CONFIG_HOSTNAME = zbx_strdup(NULL, activechks_args_in->hostname);
+	const char	*config_hostname = zbx_strdup(NULL, activechks_args_in->hostname);
 
 	zbx_free(args);
 
@@ -1880,7 +1883,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			heartbeat_nextcheck = now + CONFIG_HEARTBEAT_FREQUENCY;
 			send_heartbeat_msg(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
+					config_hostname);
 		}
 
 		if (now >= nextrefresh)
@@ -1889,7 +1893,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					&config_revision_local, activechks_args_in->config_timeout,
-					activechks_args_in->config_source_ip))
+					activechks_args_in->config_source_ip, config_hostname))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -1915,7 +1919,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
-					activechks_args_in->config_hostname);
+					config_hostname);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 			{

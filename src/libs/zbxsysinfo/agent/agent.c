@@ -23,8 +23,6 @@
 
 #include "modbtype.h"
 
-//extern char			*CONFIG_HOSTNAMES;
-//extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern char			*CONFIG_HOST_METADATA;
 extern char			*CONFIG_HOST_METADATA_ITEM;
 
