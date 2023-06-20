@@ -99,9 +99,7 @@ class testPageSearch extends CWebTest {
 			[
 				'host' => 'emoji visible name',
 				'name' => '🙂⭐️',
-				'groups' => [
-					'groupid' => '6'
-				],
+				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
@@ -113,9 +111,7 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				'host' => STRING_128,
-				'groups' => [
-					'groupid' => '6'
-				],
+				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
@@ -128,9 +124,7 @@ class testPageSearch extends CWebTest {
 			[
 				'host' => 'iGnoRe CaSe',
 				'name' => 'ZaBbiX зАБбИкс āēīõšŗ',
-				'groups' => [
-					'groupid' => '6'
-				],
+				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
@@ -142,9 +136,7 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				'host' => $this->search_string.' Host',
-				'groups' => [
-					'groupid' => self::$widgets['hostgroups']['link_id']
-				],
+				'groups' => ['groupid' => self::$widgets['hostgroups']['link_id']],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
@@ -156,9 +148,7 @@ class testPageSearch extends CWebTest {
 			],
 			[
 				'host' => 'Entities Host',
-				'groups' => [
-					'groupid' => '6'
-				],
+				'groups' => ['groupid' => 6],
 				'interfaces' => [
 					'type' => 1,
 					'main' => 1,
@@ -202,22 +192,60 @@ class testPageSearch extends CWebTest {
 		$response = CDataHelper::createTemplates([
 			[
 				'host' => $this->search_string.' Template',
-				'groups' => [
-					'groupid' => self::$widgets['hostgroups']['link_id']
+				'groups' => ['groupid' => self::$widgets['hostgroups']['link_id']]
+			],
+			[
+				'host' => 'Entities Template',
+				'groups' => ['groupid' => 6],
+				'items' => [
+					[
+						'name' => 'Item 1',
+						'key_' => 'key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Item 2',
+						'key_' => 'key[2]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Discovery 1',
+						'key_' => 'lld[1]',
+						'type' => ITEM_TYPE_TRAPPER
+					],
+					[
+						'name' => 'Discovery 2',
+						'key_' => 'lld[2]',
+						'type' => ITEM_TYPE_TRAPPER
+					]
 				]
 			]
 		]);
 		self::$widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
+		$entity_template_id = $response['templateids']['Entities Template'];
+		$entity_template_item_id = $response['itemids']['Entities Template:key[1]'];
 
-		foreach ([1, 2] as $i){
-			CDataHelper::call('application.create', ['name' => 'Application '.$i, 'hostid' => $entity_host_id]);
+		// Link applications, graphs, web scenarios, triggers and screens to a host and a template.
+		foreach ([1, 2] as $i) {
+			foreach ([$entity_host_id => $entity_item_id, $entity_template_id => $entity_template_item_id] as $parent_id => $item_id) {
+				CDataHelper::call('application.create', ['name' => 'Application '.$i, 'hostid' => $parent_id]);
+				CDataHelper::call('graph.create', ['name' => 'Graph '.$i, 'gitems' => [['itemid' => $item_id, 'color' => '00FF00']]]);
+				CDataHelper::call('httptest.create', ['name' => 'Web '.$i, 'hostid' => $parent_id, 'steps' => [
+					['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]
+				]]);
+			}
 			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Host:key[1].last()}>1']);
-			CDataHelper::call('graph.create', ['name' => 'Graph '.$i, 'gitems' => [['itemid' => $entity_item_id, 'color' => '00FF00']]]);
-			CDataHelper::call('httptest.create', ['name' => 'Web '.$i, 'hostid' => $entity_host_id, 'steps' => [
-				['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]
-			]]);
+			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Template:key[1].last()}>1']);
+			CDataHelper::call('templatescreen.create', ['name' => 'Screen '.$i, 'templateid' => $entity_template_id]);
 		}
+
+		// A host group and a template with no linked entities.
 		CDataHelper::call('hostgroup.create', [['name' => 'Empty Hostgroup']]);
+		CDataHelper::call('template.create', ['host' => 'Empty Template B', 'groups' => ['groupid' => 6]]);
 	}
 
 	/**
@@ -496,6 +524,35 @@ class testPageSearch extends CWebTest {
 					'host_groups' => [
 						'Hosts' => ['count' => 1],
 						'Templates' => ['count' => 1]
+					]
+				]
+			],
+			[
+				[
+					'search_string' => 'Empty Template B',
+					'templates' => [
+						'Template' => ['count' => null],
+						'Applications' => ['count' => null],
+						'Items' => ['count' => null],
+						'Triggers' => ['count' => null],
+						'Graphs' => ['count' => null],
+						'Screens' => ['count' => null],
+						'Discovery' => ['count' => null],
+						'Web' => ['count' => null]
+					]
+				]
+			],
+			[
+				[
+					'search_string' => 'Entities Template',
+					'templates' => [
+						'Applications' => ['count' => 2],
+						'Items' => ['count' => 2],
+						'Triggers' => ['count' => 2],
+						'Graphs' => ['count' => 2],
+						'Screens' => ['count' => 2],
+						'Discovery' => ['count' => 2],
+						'Web' => ['count' => 2]
 					]
 				]
 			]
