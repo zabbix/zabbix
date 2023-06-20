@@ -60,11 +60,12 @@ static int	agent_task_process(short event, void *data)
 	ssize_t			received_len;
 	short			want_event = 0;
 	zbx_async_task_state_t	state;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;
 
-	if (ZBX_PROCESS_STATE_IDLE == agent_context->poller_config->state)
+	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
-		zbx_update_selfmon_counter(agent_context->poller_config->info, ZBX_PROCESS_STATE_BUSY);
-		agent_context->poller_config->state = ZBX_PROCESS_STATE_BUSY;
+		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
+		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
 	if (0 == event)
@@ -183,8 +184,8 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 	zbx_free_agent_result(&agent_context->result);
 }
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config,
-		zbx_async_task_clear_cb_t clear_cb)
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, int config_timeout, const char *config_source_ip)
 {
 	zbx_agent_context	*agent_context = zbx_malloc(NULL, sizeof(zbx_agent_context));
 	int			ret = NOTSUPPORTED;
@@ -192,7 +193,8 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, item->host.host,
 			item->interface.addr, item->key, zbx_tcp_connection_type_name(item->host.tls_connect));
 
-	agent_context->poller_config = poller_config;
+	agent_context->arg = arg;
+	agent_context->arg_action = arg_action;
 	agent_context->itemid = item->itemid;
 	agent_context->hostid = item->host.hostid;
 	agent_context->value_type = item->value_type;
@@ -244,10 +246,9 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 			goto out;
 	}
 
-	if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, agent_context->poller_config->config_source_ip,
-			agent_context->interface.addr, agent_context->interface.port,
-			agent_context->poller_config->config_timeout, agent_context->tls_connect,
-			agent_context->tls_arg1))
+	if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, config_source_ip,
+			agent_context->interface.addr, agent_context->interface.port, config_timeout,
+			agent_context->tls_connect, agent_context->tls_arg1))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 		goto out;
@@ -259,8 +260,8 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 	else
 		agent_context->server_name = NULL;
 #endif
-	zbx_async_poller_add_task(poller_config->base, agent_context->s.socket, agent_context,
-			agent_context->poller_config->config_timeout, agent_task_process, clear_cb);
+	zbx_async_poller_add_task(base, agent_context->s.socket, agent_context, config_timeout, agent_task_process,
+			clear_cb);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(SUCCEED));
 

@@ -35,7 +35,8 @@ zbx_zabbix_agent_step_t;
 
 typedef struct
 {
-	zbx_poller_config_t	*poller_config;
+	void			*arg;
+	void			*arg_action;
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	unsigned char		value_type;
@@ -58,8 +59,8 @@ typedef struct
 }
 zbx_agent_context;
 
-int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config,
-		zbx_async_task_clear_cb_t clear_cb);
+int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_task_clear_cb_t clear_cb,
+		void *arg, void *arg_action, struct event_base *base, int config_timeout, const char *config_source_ip);
 void	zbx_async_check_agent_clean(zbx_agent_context *agent_context);
 
 #endif

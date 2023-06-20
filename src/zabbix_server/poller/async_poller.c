@@ -34,10 +34,11 @@ static void	process_agent_result(void *data)
 	zbx_timespec_t		timespec;
 	zbx_interface_status	*interface_status;
 	int			ret;
+	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__,
-			agent_context->host, agent_context->interface.addr, agent_context->key,
-			zbx_tcp_connection_type_name(agent_context->tls_connect));
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host,
+		agent_context->interface.addr, agent_context->key,
+		zbx_tcp_connection_type_name(agent_context->tls_connect));
 
 	zbx_timespec(&timespec);
 
@@ -45,13 +46,13 @@ static void	process_agent_result(void *data)
 	if (SUCCEED != agent_context->ret || ZBX_INTERFACE_AVAILABLE_TRUE != agent_context->interface.available ||
 			0 != agent_context->interface.errors_from)
 	{
-		if (NULL == (interface_status = zbx_hashset_search(&agent_context->poller_config->interfaces,
+		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
 				&agent_context->interface.interfaceid)))
 		{
 			zbx_interface_status	interface_status_local = {.interface = agent_context->interface};
 
 			interface_status_local.interface.addr = NULL;
-			interface_status = zbx_hashset_insert(&agent_context->poller_config->interfaces,
+			interface_status = zbx_hashset_insert(&poller_config->interfaces,
 					&interface_status_local, sizeof(interface_status_local));
 		}
 		else
@@ -80,12 +81,12 @@ static void	process_agent_result(void *data)
 		SET_MSG_RESULT(&agent_context->result, NULL);
 	}
 
-	zbx_vector_uint64_append(&agent_context->poller_config->itemids, agent_context->itemid);
-	zbx_vector_int32_append(&agent_context->poller_config->errcodes, agent_context->ret);
-	zbx_vector_int32_append(&agent_context->poller_config->lastclocks, timespec.sec);
+	zbx_vector_uint64_append(&poller_config->itemids, agent_context->itemid);
+	zbx_vector_int32_append(&poller_config->errcodes, agent_context->ret);
+	zbx_vector_int32_append(&poller_config->lastclocks, timespec.sec);
 
-	agent_context->poller_config->processing--;
-	agent_context->poller_config->processed++;
+	poller_config->processing--;
+	poller_config->processed++;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64, agent_context->itemid);
 	ret = agent_context->ret;
@@ -247,7 +248,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 					poller_config->config_source_ip, poller_config->curl_handle);
 		}
 		else
-			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config, process_agent_result);
+			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
+					poller_config, poller_config, poller_config->base,
+					poller_config->config_timeout, poller_config->config_source_ip);
 
 		if (SUCCEED == errcodes[i])
 			poller_config->processing++;
