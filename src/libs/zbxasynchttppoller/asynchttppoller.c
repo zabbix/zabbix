@@ -244,7 +244,6 @@ CURLM	*zbx_async_httpagent_init(struct event_base *ev,
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETDATA: %s", curl_multi_strerror(merr));
 		exit(EXIT_FAILURE);
 	}
-	
 
 	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout)))
 	{
