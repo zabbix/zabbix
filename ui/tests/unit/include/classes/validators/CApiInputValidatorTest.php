@@ -305,7 +305,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_COND_FORMULA],
 				'A and',
 				'/1/formula',
-				'Invalid parameter "/1/formula": check expression starting from "d".'
+				'Invalid parameter "/1/formula": incorrect syntax near "d".'
 			],
 			[
 				['type' => API_COND_FORMULA],
