@@ -26,8 +26,8 @@ class COverlayDialogElement extends CElement {
 	/**
 	 * @inheritdoc
 	 */
-	public function waitUntilReady() {
-		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
+	public function waitUntilReady($timeout = null) {
+		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent($timeout);
 
 		return $this;
 	}
@@ -97,7 +97,7 @@ class COverlayDialogElement extends CElement {
 	 * Close overlay dialog.
 	 */
 	public function close() {
-		$this->query('class:overlay-close-btn')->one()->click();
+		$this->query('class:btn-overlay-close')->one()->click();
 		$this->ensureNotPresent();
 	}
 

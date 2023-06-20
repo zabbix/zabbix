@@ -50,6 +50,8 @@ abstract class CWidgetField {
 	protected ?array $strict_validation_rules = null;
 	protected array $ex_validation_rules = [];
 
+	private $templateid = null;
+
 	/**
 	 * @param string      $name   Field name in form.
 	 * @param string|null $label  Label for the field in form.
@@ -142,6 +144,23 @@ abstract class CWidgetField {
 	}
 
 	/**
+	 * @return int|string|null
+	 */
+	public function getTemplateId() {
+		return $this->templateid;
+	}
+
+	public function setTemplateId($templateid): self {
+		$this->templateid = $templateid;
+
+		return $this;
+	}
+
+	public function isTemplateDashboard(): bool {
+		return $this->templateid !== null;
+	}
+
+	/**
 	 * @param bool $strict  Widget form submit validation?
 	 *
 	 * @return array  Errors.
@@ -224,16 +243,13 @@ abstract class CWidgetField {
 			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_SERVICE:
 			case ZBX_WIDGET_FIELD_TYPE_SLA:
 			case ZBX_WIDGET_FIELD_TYPE_USER:
 			case ZBX_WIDGET_FIELD_TYPE_ACTION:
 			case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
 				$this->validation_rules = ['type' => API_IDS];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				$this->validation_rules = ['type' => API_ID];
 				break;
 
 			default:

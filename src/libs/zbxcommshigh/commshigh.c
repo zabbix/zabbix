@@ -21,7 +21,8 @@
 
 #include "zbxcommon.h"
 #include "zbxjson.h"
-#include "log.h"
+#include "zbxlog.h"
+#include "zbxtime.h"
 
 #if !defined(_WINDOWS) && !defined(__MINGW32)
 #include "zbxnix.h"
@@ -39,7 +40,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		int timeout, int connect_timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		int loglevel)
 {
-	int	ret, i;
+	int	i, ret = FAIL;
 
 	for (i = 0; i < addrs->values_num; i++)
 	{
@@ -50,7 +51,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 		if (FAIL != (ret = zbx_tcp_connect(s, source_ip, addr->ip, addr->port, connect_timeout, tls_connect,
 				tls_arg1, tls_arg2)))
 		{
-			zbx_socket_timeout_set(s, timeout);
+			zbx_socket_set_deadline(s, timeout);
 			break;
 		}
 
@@ -112,7 +113,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 			{
 				int	now = (int)time(NULL);
 
-				if (LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
+				if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;

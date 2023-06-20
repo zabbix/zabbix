@@ -76,8 +76,9 @@ int	__wrap_zbx_dc_get_data_expected_from(zbx_uint64_t itemid, int *seconds)
 
 void	zbx_mock_test_entry(void **state)
 {
+	time_t				start_evaluate_period, end_evaluate_period;
 	int				start_detect_period, end_detect_period, detect_period_season_shift, err,
-					detect_period, start_evaluate_period, end_evaluate_period, evaluate_seconds = 0,
+					detect_period, evaluate_seconds = 0,
 					evaluate_nvalues = 0;
 	double				deviations_count, result;
 	char				*error = NULL, *evaluate_period = NULL;

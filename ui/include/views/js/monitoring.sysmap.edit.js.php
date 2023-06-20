@@ -32,9 +32,7 @@
 			(new CSelect('urls[#{id}][elementtype]'))
 				->addOptions(CSelect::createOptionsFromArray(sysmap_element_types())),
 			(new CCol(
-				(new CButton(null, _('Remove')))
-					->onClick('$("#url-row-#{id}").remove();')
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Remove')))->onClick('$("#url-row-#{id}").remove();')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('url-row-#{id}')
 	?>
@@ -138,16 +136,12 @@
 			$(this).parentsUntil('ul').next().toggle($(this).val() == <?= MAP_LABEL_TYPE_CUSTOM ?>);
 		});
 
-		$('#clone, #full_clone').click(function() {
+		$('#clone').click(function() {
 			var form = $(this).attr('id');
 
 			$('#form').val(form);
 
-			if (form === 'clone') {
-				$('#sysmapid').remove();
-			}
-
-			$('#delete, #clone, #full_clone, #inaccessible_user').remove();
+			$('#delete, #clone, #inaccessible_user').remove();
 
 			$('#update')
 				.text(<?= json_encode(_('Add')) ?>)

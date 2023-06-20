@@ -20,14 +20,12 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
 #include "zbxdiscovery.h"
 #include "zbxalgo.h"
 #include "zbxcrypto.h"
-#include "zbxlld.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
 #include "zbxcommshigh.h"
@@ -123,6 +121,13 @@ static zbx_history_table_t	areg = {
 		{NULL}
 		}
 };
+
+static zbx_lld_process_agent_result_func_t	lld_process_agent_result_cb = NULL;
+
+void	zbx_init_library_dbwrap(zbx_lld_process_agent_result_func_t lld_process_agent_result_func)
+{
+	lld_process_agent_result_cb = lld_process_agent_result_func;
+}
 
 /******************************************************************************
  *                                                                            *
@@ -1156,8 +1161,11 @@ int	zbx_proxy_get_host_active_availability(struct zbx_json *j)
  *                                                                            *
  * Purpose: processes item value depending on proxy/flags settings            *
  *                                                                            *
- * Parameters: item    - [IN] the item to process                             *
- *             result  - [IN] the item result                                 *
+ * Parameters: item    - [IN] item to process                                 *
+ *             result  - [IN] item result                                     *
+ *             ts      - [IN] value timestamp                                 *
+ *             h_num   - [OUT] number of history entries                      *
+ *             error   - [OUT]                                                *
  *                                                                            *
  * Comments: Values gathered by server are sent to the preprocessing manager, *
  *           while values received from proxy are already preprocessed and    *
@@ -1178,7 +1186,8 @@ static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item->flags))
 		{
-			zbx_lld_process_agent_result(item->itemid, item->host.hostid, result, ts, error);
+			if (NULL != lld_process_agent_result_cb)
+				lld_process_agent_result_cb(item->itemid, item->host.hostid, result, ts, error);
 			*h_num = 0;
 		}
 		else
@@ -2092,7 +2101,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		zbx_client_item_validator_t validator_func, void *validator_args, char **info)
 {
-	int			ret;
+	int			ret = SUCCEED;
 	char			*token = NULL;
 	size_t			token_alloc = 0;
 	struct zbx_json_parse	jp_data;
@@ -2103,11 +2112,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 		goto out;
-	}
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc, NULL))
 	{
@@ -2371,8 +2377,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2385,8 +2392,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	service = services->values[(*processed_num)++];

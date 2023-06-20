@@ -5,6 +5,7 @@ SUBDIRS = \
 	zbxdbhigh \
 	zbxhistory \
 	zbxjson \
+	zbxmodules \
 	zbxpreproc \
 	zbxsysinfo \
 	zbxcommshigh \

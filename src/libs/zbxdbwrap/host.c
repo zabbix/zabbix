@@ -20,7 +20,6 @@
 #include "template.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
 #include "zbxcacheconfig.h"
 #include "zbxserver.h"
 #include "audit/zbxaudit_host.h"
@@ -1389,6 +1388,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids)
 		zbx_vector_str_append(&hk_history, "history_uint");
 		zbx_vector_str_append(&hk_history, "history_log");
 		zbx_vector_str_append(&hk_history, "history_text");
+		zbx_vector_str_append(&hk_history, "history_bin");
 	}
 
 	if (ZBX_HK_MODE_REGULAR == trends_mode)

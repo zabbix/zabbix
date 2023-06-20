@@ -149,7 +149,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_WEEKLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_TO)
 				]);
 				break;
@@ -161,7 +161,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_QUARTERLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_TO)
 				]);
 				break;
@@ -247,11 +247,11 @@ final class CSlaHelper {
 	 *
 	 * @throws Exception
 	 *
-	 * @return CTag
+	 * @return array
 	 */
-	public static function getScheduleTag(array $schedule): CTag {
+	public static function getScheduleCaption(array $schedule): array {
 		if (!$schedule) {
-			return new CSpan(_('24x7'));
+			return [new CSpan(_('24x7'))];
 		}
 
 		$hint = (new CTableInfo())->setHeader(
@@ -262,11 +262,11 @@ final class CSlaHelper {
 			$hint->addRow([getDayOfWeekCaption($weekday), $periods === '' ? '-' : $periods]);
 		}
 
-		return (new CSpan(_('Custom')))
-			->addItem(
-				(new CSpan())
-					->addClass('icon-description')
-					->setHint($hint)
-			);
+		return [
+			new CSpan(_('Custom')),
+			(new CButtonIcon(ZBX_ICON_ALERT_WITH_CONTENT))
+				->setAttribute('data-content', '?')
+				->setHint($hint)
+		];
 	}
 }

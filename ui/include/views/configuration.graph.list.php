@@ -197,7 +197,7 @@ foreach ($data['graphs'] as $graph) {
 	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
-		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+		$name[] = (new CLink($graph['discoveryRule']['name'],
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
@@ -218,7 +218,7 @@ foreach ($data['graphs'] as $graph) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
 	}
 
-	$name[] = new CLink(CHtml::encode($graph['name']), $url);
+	$name[] = new CLink($graph['name'], $url);
 	$info_icons = [];
 	$discover = null;
 
@@ -238,7 +238,7 @@ foreach ($data['graphs'] as $graph) {
 				->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 	}
 	else if (array_key_exists('ts_delete', $graph['graphDiscovery']) && $graph['graphDiscovery']['ts_delete'] > 0) {
-		$info_icons[] = getGraphLifetimeIndicator(time(), $graph['graphDiscovery']['ts_delete']);
+		$info_icons[] = getGraphLifetimeIndicator(time(), (int) $graph['graphDiscovery']['ts_delete']);
 	}
 
 	$graphTable->addRow([
@@ -263,9 +263,14 @@ if (!$this->data['parent_discoveryid']) {
 			->removeId()
 	];
 }
-$buttons['graph.massdelete'] = ['name' => _('Delete'), 'confirm' => $this->data['parent_discoveryid']
-	? _('Delete selected graph prototypes?')
-	: _('Delete selected graphs?'),
+$buttons['graph.massdelete'] = [
+	'name' => _('Delete'),
+	'confirm_singular' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototype?')
+		: _('Delete selected graph?'),
+	'confirm_plural' => $this->data['parent_discoveryid']
+		? _('Delete selected graph prototypes?')
+		: _('Delete selected graphs?'),
 	'csrf_token' => $csrf_token
 ];
 

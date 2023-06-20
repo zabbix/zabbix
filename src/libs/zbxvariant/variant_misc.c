@@ -27,12 +27,12 @@
  * Purpose: converts variant value to type compatible with requested value    *
  *          type                                                              *
  *                                                                            *
- * Parameters: value         - [IN/OUT] the value to convert                  *
- *             value_type    - [IN] the target value type                     *
- *             errmsg        - [OUT] the error message                        *
+ * Parameters: value         - [IN/OUT] value to convert                      *
+ *             value_type    - [IN] target value type                         *
+ *             errmsg        - [OUT]                                          *
  *                                                                            *
- * Return value: SUCCEED - Value conversion was successful.                   *
- *               FAIL    - Otherwise                                          *
+ * Return value: SUCCEED - value conversion was successful                    *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, char **errmsg)
@@ -61,8 +61,10 @@ int	zbx_variant_to_value_type(zbx_variant_t *value, unsigned char value_type, ch
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_BIN:
 			ret = zbx_variant_convert(value, ZBX_VARIANT_STR);
 			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			*errmsg = zbx_dsprintf(NULL, "Unknown value type \"%d\"", value_type);
 			THIS_SHOULD_NEVER_HAPPEN;

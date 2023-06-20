@@ -79,16 +79,6 @@
 			post(url.getUrl(), fields);
 		},
 
-		fullClone() {
-			const url = new Curl('');
-			url.setArgument('full_clone', 1);
-
-			const fields = host_edit.preprocessFormFields(getFormFields(this.form), true);
-			delete fields.sid;
-
-			post(url.getUrl(), fields);
-		},
-
 		delete(hostid, button) {
 			const confirm_text = button.getAttribute('confirm');
 			if (!confirm(confirm_text)) {

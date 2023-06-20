@@ -67,7 +67,7 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		this.footerButtons = jQuery('#action_buttons button:not(.no-chkbxrange)');
+		this.footerButtons = jQuery('#action_buttons button:not(.js-no-chkbxrange)');
 		var thisChkbxRange = this;
 		this.footerButtons.each(function() {
 			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
@@ -377,9 +377,14 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		e = e || window.event;
 
+		const checked_count = Object.keys(this.getSelectedIds()).length;
+
 		var footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
-			confirmText = footerButton.attr('confirm');
+			confirmText = checked_count > 1
+				? footerButton.attr('confirm_plural')
+				: footerButton.attr('confirm_singular');
+
 		if (confirmText && !confirm(confirmText)) {
 			e.preventDefault();
 			e.stopPropagation();

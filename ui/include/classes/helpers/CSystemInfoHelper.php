@@ -272,6 +272,8 @@ class CSystemInfoHelper {
 			}
 		}
 
+		$status['server_version'] = $server_status['server stats']['version'];
+
 		return $status;
 	}
 }

@@ -20,7 +20,6 @@
 #include "active.h"
 
 #include "zbxserver.h"
-#include "log.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"
@@ -31,6 +30,7 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "../scripts/scripts.h"
 
 extern unsigned char	program_type;
 
@@ -348,12 +348,10 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request, const zbx_even
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, buffer);
 
-	zbx_alarm_on(config_timeout);
-	if (SUCCEED != zbx_tcp_send_raw(sock, buffer))
+	if (SUCCEED != zbx_tcp_send_ext(sock, buffer, strlen(buffer), 0, 0, config_timeout))
 		zbx_strlcpy(error, zbx_socket_strerror(), MAX_STRING_LEN);
 	else
 		ret = SUCCEED;
-	zbx_alarm_off();
 
 	zbx_free(buffer);
 out:
@@ -649,6 +647,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	zbx_json_close(&json);
 
+	zbx_remote_commans_prepare_to_send(&json, hostid);
+
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);
 
@@ -730,7 +730,7 @@ error:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() sending [%s]", __func__, json.buffer);
 
-	ret = zbx_tcp_send(sock, json.buffer);
+	ret = zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_json_free(&json);
 out:

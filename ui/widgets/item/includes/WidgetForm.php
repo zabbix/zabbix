@@ -97,7 +97,7 @@ class WidgetForm extends CWidgetForm {
 	public function addFields(): self {
 		return $this
 			->addField(
-				(new CWidgetFieldMultiSelectItem('itemid', _('Item'), $this->templateid))
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 			)
@@ -112,9 +112,6 @@ class WidgetForm extends CWidgetForm {
 						Widget::SHOW_CHANGE_INDICATOR
 					])
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
-			)
-			->addField(
-				new CWidgetFieldCheckBox('adv_conf', _('Advanced configuration'))
 			)
 			->addField(
 				(new CWidgetFieldTextArea('description', _('Description')))
@@ -241,9 +238,9 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
 			)
-			->addField($this->templateid === null
-				? new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
-				: null
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldCheckBox('dynamic', _('Enable host selection'))
 			);
 	}
 }

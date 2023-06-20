@@ -19,14 +19,12 @@
 
 #include "httptest.h"
 
-#include "log.h"
 #include "zbxnix.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
 #include "zbxhttp.h"
 #include "httpmacro.h"
 #include "zbxnum.h"
-#include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
@@ -38,15 +36,15 @@
 #define ZBX_HTTPITEM_TYPE_LASTSTEP	3
 #define ZBX_HTTPITEM_TYPE_LASTERROR	4
 
+#ifdef HAVE_LIBCURL
+
 typedef struct
 {
-	long	rspcode;
-	double	total_time;
-	double	speed_download;
+	long					rspcode;
+	double					total_time;
+	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
 }
 zbx_httpstat_t;
-
-#ifdef HAVE_LIBCURL
 
 typedef struct
 {
@@ -266,7 +264,7 @@ static void	process_step_data(zbx_uint64_t httpstepid, zbx_httpstat_t *stat, zbx
 	size_t		i, num = 0;
 	AGENT_RESULT	value;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_FS_DBL,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rspcode:%ld time:" ZBX_FS_DBL " speed:" ZBX_CURLINFO_SPEED_DOWNLOAD_FMT,
 			__func__, stat->rspcode, stat->total_time, stat->speed_download);
 
 	result = zbx_db_select("select type,itemid from httpstepitem where httpstepid=" ZBX_FS_UI64, httpstepid);
@@ -616,7 +614,8 @@ out:
  * Purpose: process single scenario of http test                              *
  *                                                                            *
  ******************************************************************************/
-static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay)
+static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int *delay,
+		const char *config_source_ip)
 {
 	zbx_db_result_t	result;
 	zbx_db_httpstep	db_httpstep;
@@ -689,7 +688,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 
 	if (SUCCEED != zbx_http_prepare_ssl(easyhandle, httptest->httptest.ssl_cert_file,
 			httptest->httptest.ssl_key_file, httptest->httptest.ssl_key_password,
-			httptest->httptest.verify_peer, httptest->httptest.verify_host, &err_str))
+			httptest->httptest.verify_peer, httptest->httptest.verify_host, config_source_ip, &err_str))
 	{
 		goto clean;
 	}
@@ -905,7 +904,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			}
 
-			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_SPEED_DOWNLOAD,
+			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, ZBX_CURLINFO_SPEED_DOWNLOAD,
 					&stat.speed_download)) && NULL == err_str)
 			{
 				err_str = zbx_strdup(err_str, curl_easy_strerror(err));
@@ -987,6 +986,7 @@ httpstep_error:
 clean:
 	curl_easy_cleanup(easyhandle);
 #else
+	ZBX_UNUSED(config_source_ip);
 	err_str = zbx_strdup(err_str, "cURL library is required for Web monitoring support");
 #endif	/* HAVE_LIBCURL */
 
@@ -1027,14 +1027,16 @@ httptest_error:
  *                                                                            *
  * Purpose: process httptests                                                 *
  *                                                                            *
- * Parameters: now - current timestamp                                        *
+ * Parameters: now              - [IN] current timestamp                      *
+ *             config_source_ip - [IN]                                        *
+ *             nextcheck        - [OUT]                                       *
  *                                                                            *
  * Return value: number of processed httptests                                *
  *                                                                            *
  * Comments: always SUCCEED                                                   *
  *                                                                            *
  ******************************************************************************/
-int	process_httptests(int now, time_t *nextcheck)
+int	process_httptests(int now, const char *config_source_ip, time_t *nextcheck)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -1135,7 +1137,7 @@ int	process_httptests(int now, time_t *nextcheck)
 			/* add httptest variables to the current test macro cache */
 			http_process_variables(&httptest, &httptest.variables, NULL, NULL);
 
-			process_httptest(&host, &httptest, &delay);
+			process_httptest(&host, &httptest, &delay, config_source_ip);
 			zbx_dc_httptest_queue(now, httptestid, delay);
 
 			zbx_free(httptest.httptest.ssl_key_password);

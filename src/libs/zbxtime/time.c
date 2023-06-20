@@ -141,9 +141,14 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	}
 #endif	/* not _WINDOWS */
 
+#if defined(_WINDOWS) || defined(__MINGW32__)
+	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
+			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+#else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
+#endif
 	{
-		ts->ns += ++corr;
+		ts->ns = last_ts.ns + (++corr);
 
 		while (ts->ns >= 1000000000)
 		{
@@ -1156,6 +1161,34 @@ int	zbx_iso8601_utc(const char *str, time_t *time)
 
 		*time = t - offset;
 	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get time deadline                                                 *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_ts_get_deadline(zbx_timespec_t *ts, int sec)
+{
+	zbx_timespec(ts);
+	ts->sec += sec;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if deadline has not been reached                            *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_ts_check_deadline(const zbx_timespec_t *deadline)
+{
+	zbx_timespec_t	ts;
+
+	zbx_timespec(&ts);
+
+	if (0 < zbx_timespec_compare(&ts, deadline))
+		return FAIL;
 
 	return SUCCEED;
 }

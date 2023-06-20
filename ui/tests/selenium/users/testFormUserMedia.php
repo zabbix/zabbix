@@ -406,7 +406,7 @@ class testFormUserMedia extends CWebTest {
 		// Check that disabled media types have popup icon in Type column.
 		$discord_row = $mediatype_table->findRow('Type', 'Discord', true);
 		$type_column = $discord_row->getColumn('Type');
-		$this->assertTrue($type_column->query('xpath:.//a['.CXPathHelper::fromClass('icon-info').']')->one()->isValid());
+		$this->assertTrue($type_column->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid());
 
 		$this->assertEquals('Media type disabled by Administration.', $type_column->query('class:hint-box')->one()->getText());
 

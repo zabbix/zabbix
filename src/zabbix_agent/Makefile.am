@@ -15,19 +15,9 @@ sbin_PROGRAMS = zabbix_agentd
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	cpustat.c \
-	cpustat.h \
-	diskdevices.c \
-	diskdevices.h \
 	listener.c \
 	listener.h \
 	metrics.h \
-	procstat.c \
-	procstat.h \
-	stats.c \
-	stats.h \
-	vmstats.c \
-	vmstats.h \
 	zbxconf.c \
 	zbxconf.h \
 	zbxkstat.c \

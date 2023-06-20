@@ -21,7 +21,6 @@
 #include "alias.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxexpr.h"
 
 static ALIAS	*aliasList = NULL;

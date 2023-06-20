@@ -411,7 +411,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'create_enabled' => true,
 					'hostgroup' => 'Hypervisors',
 					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
-					'template' => 'macOS',
+					'template' => 'macOS by Zabbix agent',
 					'inventory' => 'Manual',
 					'check_form' => true
 				]
@@ -441,7 +441,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Change groups.
 		if (array_key_exists('hostgroup', $data) || array_key_exists('group_prototype', $data)) {
 			if (array_key_exists('hostgroup', $data)) {
-				$this->zbxTestClickXpathWait('//span[@class="subfilter-disable-btn"]');
+				$this->zbxTestClickXpathWait('//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 				$this->zbxTestMultiselectClear('group_links_');
 				$this->zbxTestClickButtonMultiselect('group_links_');
 				$this->zbxTestLaunchOverlayDialog('Host groups');

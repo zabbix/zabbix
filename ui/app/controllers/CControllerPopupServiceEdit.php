@@ -172,10 +172,6 @@ class CControllerPopupServiceEdit extends CController {
 					'tags' => $this->service['tags'] ?: [['tag' => '', 'value' => '']],
 					'problem_tags' => $this->service['problem_tags']
 						?: [['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']],
-					'advanced_configuration' => $this->service['status_rules']
-						|| $this->service['propagation_rule'] != $defaults['propagation_rule']
-						|| $this->service['propagation_value'] != $defaults['propagation_value']
-						|| $this->service['weight'] != $defaults['weight'],
 					'status_rules' => $this->service['status_rules'],
 					'propagation_rule' => $this->service['propagation_rule'],
 					'propagation_value_number' => (
@@ -206,7 +202,6 @@ class CControllerPopupServiceEdit extends CController {
 					'problem_tags' => [
 						['tag' => '', 'operator' => ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, 'value' => '']
 					],
-					'advanced_configuration' => false,
 					'status_rules' => [],
 					'propagation_rule' => $defaults['propagation_rule'],
 					'propagation_value_number' => 1,

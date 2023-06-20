@@ -48,12 +48,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_GeneralLayout() {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals('New media type', $overlay->getTitle());
 
-		$this->page->waitUntilReady();
-		$this->page->assertTitle('Configuration of media types');
-		$this->page->assertHeader('Media types');
-
-		$form = $this->query('id:media-type-form')->asForm()->one();
+		$form = $overlay->asForm();
 		$this->assertEquals(['Media type', 'Message templates', 'Options'], $form->getTabs());
 
 		// Check available media type types.
@@ -102,10 +100,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			'One' => false,
 			'Unlimited' => false
 		];
-		$maxsessions = $concurrent_sessions->query('id:maxsessions')->one();
 
 		foreach ($session_settings as $setting => $visible) {
 			$concurrent_sessions->fill($setting);
+			$maxsessions = $concurrent_sessions->query('xpath:./../../input[@id="maxsessions"]')->one();
 			$this->assertTrue($maxsessions->isVisible($visible));
 
 			if ($visible) {
@@ -115,9 +113,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		// Check that Add and Cancel buttons are present in the form and that they are clickable.
-		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
+		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
+		$overlay->close();
 	}
 
 	public static function getLayoutMediaTypes() {
@@ -196,9 +195,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_MediatypeLayout($data) {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('button:Create media type')->waitUntilClickable()->one()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
 
-		$this->page->waitUntilReady();
-		$form = $this->query('id:media-type-form')->asForm()->one();
+		$form = $overlay->asForm();
 		$form->getField('Type')->fill($data['type']);
 
 		$this->checkTabFields($form, $data);
@@ -307,7 +306,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			case 'Script':
 				$script_params = $form->getField('Script parameters')->asTable();
 				$this->assertEquals(['Value','Action'], $script_params->getHeadersText());
-				$this->assertEquals(['Add'], $script_params->getRows()->asText());
+				$this->assertEquals('Add', $script_params->query('xpath:./tfoot//button')->one()->getText());
 
 				// Click on the add button and check the added row for script parameter.
 				$script_params->query('button:Add')->one()->click();
@@ -340,9 +339,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				);
 
 				// Check Script dialog.
-				$form->getField('Script')->query('xpath:./button')->one()->click();
-				$script_dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-
+				$script_dialog = $form->getField('Script')->edit();
 				$this->assertEquals('JavaScript', $script_dialog->getTitle());
 				$script_input = $script_dialog->query('xpath:.//textarea')->one();
 
@@ -360,7 +357,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				$this->assertEquals(2, $script_dialog->query('button', ['Apply', 'Cancel'])->all()
 						->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 				);
-				$script_dialog->close();
+				$script_dialog->query('button:Cancel')->one()->click();
 
 				// Check that Menu entry fields are enabled only when "Include event menu entry" is set.
 				$this->assertEquals(2, $this->query('id', ['event_menu_name', 'event_menu_url'])->all()
@@ -374,6 +371,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				);
 				break;
 		}
+
+		$overlay->close();
 	}
 
 	/**
@@ -747,18 +746,6 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					'error' => 'Invalid parameter "/1/attempt_interval": value must be one of 0-3600.'
 				]
 			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'mediatype_tab' => [
-						'Name' => 'Trailing and leading spaces in Attempt interval'
-					],
-					'options_tab' => [
-						'Attempt interval' => '   10s   '
-					],
-					'error' => 'Invalid parameter "/1/attempt_interval": a time unit is expected.'
-				]
-			],
 			// Options validation - Concurrent sessions.
 			[
 				[
@@ -889,7 +876,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Name' => 'Script media type with parameters and options',
 						'Type' => 'Script',
 						'Script name' => '좋은 하루 되세요',
-						'Description' => ' I like cheese',
+						'Description' => 'I like cheese',
 						'Enabled' => false
 					],
 					'script_parameters' => [
@@ -952,12 +939,14 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						'Email' => '   zabbix@zabbix.com   ',
 						'SMTP helo' => '  !@#$%%^&*(.com  ',
 						'Authentication' => 'Username and password',
-						'Username' => '   χρήστης  '
+						'Username' => '   χρήστης  ',
+						'Description' => '   test  '
 					],
 					'options_tab' => [
 						'id:maxsessions_type' => 'Custom',
 						'id:maxsessions' => ' 7 ',
-						'Attempts' => ' 2 '
+						'Attempts' => ' 2 ',
+						'Attempt interval' => '   10s   '
 					],
 					'trim' => [
 						'mediatype_tab' => [
@@ -966,11 +955,13 @@ class testFormAdministrationMediaTypes extends CWebTest {
 							'SMTP server port',
 							'Email',
 							'SMTP helo',
-							'Username'
+							'Username',
+							'Description'
 						],
 						'options_tab' => [
 							'id:maxsessions',
-							'Attempts'
+							'Attempts',
+							'Attempt interval'
 						]
 					]
 				]
@@ -1043,8 +1034,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
-		$this->query('id:media-type-form')->asForm()->waitUntilVisible()->one()->submit();
-		$this->page->waitUntilReady();
+		COverlayDialogElement::find()->one()->waitUntilReady()->asForm()->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->assertMessage(TEST_GOOD, 'Media type updated');
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
@@ -1063,12 +1054,15 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		// Clone the media type.
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', $data['media_type'])->WaitUntilClickable()->one()->click();
-		$this->query('button:Clone')->one()->click();
-		$form = $this->query('id:media-type-form')->asForm()->waitUntilVisible()->one();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$this->assertEquals('Media type', $overlay->getTitle());
+		$overlay->query('button:Clone')->one()->click();
+		$form = $overlay->asForm();
+		$this->assertEquals('New media type', $overlay->getTitle());
 		$clone_name = $data['media_type'].' clone';
 		$form->fill(['Name' => $clone_name]);
 		$form->submit();
-		$this->page->waitUntilReady();
+		COverlayDialogElement::ensureNotPresent();
 
 		$this->assertMessage(TEST_GOOD, 'Media type added');
 		$this->assertEquals($old_hash, CDBHelper::getHash($clone_sql.zbx_dbstr($clone_name)));
@@ -1100,8 +1094,8 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	public function testFormAdministrationMediaTypes_Delete() {
 		$this->page->login()->open('zabbix.php?action=mediatype.list');
 		$this->query('link', self::$delete_mediatype)->WaitUntilClickable()->one()->click();
-
-		$this->query('button:Delete')->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Delete')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
@@ -1145,19 +1139,20 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		$locator = ($action === 'create') ? 'button:Create media type' : 'link:'.self::$update_mediatypes['Email'];
 		$this->query($locator)->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 
 		$this->page->waitUntilReady();
 
 		$form = $this->query('id:media-type-form')->asForm()->one();
 
 		if ($action === 'delete') {
-			$form->query('button:Delete')->waitUntilClickable()->one()->click();
+			$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 
 			$this->page->dismissAlert();
 		}
 		else {
 			if ($action === 'clone') {
-				$form->query('button:Clone')->waitUntilClickable()->one()->click();
+				$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 			}
 			elseif ($action === 'update') {
 				unset($new_values['Media type']['Password']);
@@ -1171,7 +1166,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			}
 		}
 
-		$form->query('button:Cancel')->one()->click();
+		$dialog->query('button:Cancel')->one()->click();
 
 		$this->page->waitUntilReady();
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
@@ -1189,7 +1184,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		}
 
 		// Open the corresponding media type form.
-		$this->page->login()->open('zabbix.php?action=mediatype.list');
+		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
 
 		if ($create) {
 			$this->query('button:Create media type')->waitUntilClickable()->one()->click();
@@ -1206,8 +1201,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			}
 		}
 
-		$this->page->waitUntilReady();
-
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:media-type-form')->asForm()->one();
 
 		if ($form->query('button:Change password')->one(false)->isValid() && array_key_exists('Password', $data['mediatype_tab'])) {
@@ -1225,7 +1219,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 			$form->fill($data['options_tab']);
 		}
 
-		$form->submit();
+		$dialog->getFooter()->query('button', $create ? 'Add' : 'Update')->one()->click();
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD) {
@@ -1288,9 +1282,10 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						unset($data['options_tab']['id:maxsessions']);
 					}
 				}
-
 				$form->checkValue($data['options_tab']);
 			}
 		}
+
+		$dialog->close();
 	}
 }

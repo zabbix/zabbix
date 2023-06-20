@@ -87,7 +87,7 @@ ZBX_Notification.prototype.updateRaw = function(raw) {
 ZBX_Notification.prototype.render = function(severity_styles) {
 	var title_prefix = this._raw.resolved ? locale.S_RESOLVED : locale.S_PROBLEM_ON;
 
-	this.node.title_node.innerHTML = title_prefix + ' ' + BBCode.Parse(this._raw.title);
+	this.node.title_node.innerHTML = title_prefix + ' ' + this._raw.title;
 	this.node.indicator.className = 'notif-indic ' + severity_styles[this._raw.resolved ? -1 : this._raw.severity];
 	this.node.snooze_icon.style.opacity = this._raw.snoozed ? 1 : 0;
 };
@@ -104,8 +104,6 @@ ZBX_Notification.prototype.calcDisplayTimeout = function(user_settings) {
 };
 
 /**
- * @depends {BBCode}
- *
  * @return {HTMLElement}  Detached DOM node.
  */
 ZBX_Notification.prototype.makeNode = function() {
@@ -118,14 +116,14 @@ ZBX_Notification.prototype.makeNode = function() {
 
 	this._raw.body.forEach(function(line) {
 		var p = document.createElement('p');
-		p.innerHTML = BBCode.Parse(line);
+		p.innerHTML = line;
 		node.appendChild(p);
 	});
 
 	node.indicator = indicator;
 	node.title_node = title_node;
 	node.snooze_icon = document.createElement('div');
-	node.snooze_icon.className = 'notif-indic-snooze';
+	node.snooze_icon.classList.add('notif-indic-snooze', ZBX_ICON_BELL_OFF);
 	node.snooze_icon.style.opacity = 0;
 
 	node.indicator.appendChild(node.snooze_icon);
