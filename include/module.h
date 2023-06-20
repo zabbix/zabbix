@@ -111,7 +111,8 @@ typedef struct
 	char		*test_param;	/* item test parameters; user parameter items keep command here */
 }
 zbx_metric_t;
-
+/* for backward-compatibility */
+#define ZBX_METRIC	zbx_metric_t
 /* SET RESULT */
 
 #define SET_UI64_RESULT(res, val)		\
@@ -353,7 +354,7 @@ int	zbx_module_api_version(void);
 int	zbx_module_init(void);
 int	zbx_module_uninit(void);
 void	zbx_module_item_timeout(int timeout);
-zbx_metric_t	*zbx_module_item_list(void);
+ZBX_METRIC	*zbx_module_item_list(void);
 ZBX_HISTORY_WRITE_CBS	zbx_module_history_write_cbs(void);
 
 #endif
