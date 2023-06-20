@@ -20,6 +20,7 @@
 #include "checks_agent.h"
 #include "async_agent.h"
 
+#include "zbxcommon.h"
 #include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxsysinfo.h"
@@ -36,6 +37,8 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 	{
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 			return "connect";
+		case ZABBIX_AGENT_STEP_TLS_WAIT:
+			return "tls hanshake";
 		case ZABBIX_AGENT_STEP_SEND:
 			return "send";
 		default:
@@ -61,6 +64,8 @@ static int	agent_task_process(short event, void *data)
 	short			want_event = 0;
 	zbx_async_task_state_t	state;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;
+	int			errnum = 0;
+	socklen_t		optlen = sizeof(int);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
@@ -99,6 +104,19 @@ static int	agent_task_process(short event, void *data)
 	switch (agent_context->step)
 	{
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
+			if (0 == getsockopt(agent_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
+					0 != errnum)
+			{
+				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
+						" failed: Cannot establish connection to [[%s]:%hu]: %s",
+						agent_context->interface.addr, agent_context->interface.port,
+						zbx_strerror(errnum)));
+				agent_context->ret = NETWORK_ERROR;
+				break;
+			}
+			agent_context->step = ZABBIX_AGENT_STEP_TLS_WAIT;
+			ZBX_FALLTHROUGH;
+		case ZABBIX_AGENT_STEP_TLS_WAIT:
 			if (ZBX_TCP_SEC_TLS_CERT == agent_context->tls_connect ||
 					ZBX_TCP_SEC_TLS_PSK == agent_context->tls_connect)
 			{
