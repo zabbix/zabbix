@@ -31,14 +31,14 @@
 static char	*CONFIG_PID_FILE = NULL;
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_hostnames, NULL)
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
 char	*CONFIG_HOST_METADATA		= NULL;
 char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
-ZBX_PROPERTY_DECL_THREAD_LOCAL(char *, zbx_config_hostname, NULL)
+ZBX_PROPERTY_DECL2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
 
 ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)
 ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
@@ -48,7 +48,7 @@ int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
 
-ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
+ZBX_PROPERTY_DECL2(char*, const char *, zbx_config_source_ip, NULL)
 
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 

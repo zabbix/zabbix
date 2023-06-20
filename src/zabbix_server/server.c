@@ -279,7 +279,7 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_source_ip, NULL)
 
 char	*CONFIG_TMPDIR	= NULL;
 static const char	*get_tmpdir(void)
@@ -301,7 +301,7 @@ static const char	*get_fping6_location(void)
 }
 #endif
 
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_alert_scripts_path, NULL)
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_alert_scripts_path, NULL)
 ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
 static int	config_startup_time		= 0;

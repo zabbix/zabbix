@@ -174,7 +174,7 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_source_ip, NULL)
 
 char	*CONFIG_TMPDIR	= NULL;
 static const char	*get_tmpdir(void)
