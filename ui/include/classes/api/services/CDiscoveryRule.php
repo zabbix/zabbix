@@ -1624,10 +1624,14 @@ class CDiscoveryRule extends CItemGeneral {
 			$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
 			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/filter';
 
-			if (count($object['filter']['conditions']) != count($constants)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $subpath.'/conditions', _('incorrect number of conditions'))
-				);
+			$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');
+
+			foreach ($constants as $constant) {
+				if (!in_array($constant, $condition_formulaids)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $subpath.'/formula',
+						_s('missing filter condition for the ID "%1$s"', $constant)
+					));
+				}
 			}
 
 			foreach ($object['filter']['conditions'] as $j => $condition) {
