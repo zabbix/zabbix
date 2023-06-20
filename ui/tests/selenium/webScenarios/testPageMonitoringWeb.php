@@ -267,6 +267,11 @@ class testPageMonitoringWeb extends CWebTest {
 	}
 
 	/**
+	 * Function for checking the context menu of the selected host.
+	 *
+	 * @param array		$popupitems		items of the popup window.
+	 * @param string	$hostname		name of the host.
+	 * @param string	$disabled		disabled host elements.
 	 *
 	 */
 	private function checkHostContextMenu($popupitems, $hostname, $disabled)
@@ -294,7 +299,6 @@ class testPageMonitoringWeb extends CWebTest {
 			$this->page->open('httpconf.php?context=host&filter_set=1&filter_hostids%5B0%5D='.self::$hostid['WebData Host'])->waitUntilReady();
 			$this->query('xpath://input[@id="all_httptests"]')->one()->click();
 			$this->query('button', $status)->one()->click();
-			//$this->query('xpath://button[normalize-space()="'.$status.'"]')->one()->click();
 			$this->page->acceptAlert();
 
 			$this->assertMessage(TEST_GOOD, ($status === 'Disable' ? 'Web scenarios disabled' :'Web scenarios enabled'));
