@@ -1400,6 +1400,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
  *             config_source_ip - [IN]                                        *
+ *             config_hostname  - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
@@ -1413,7 +1414,7 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 		*eventlog_name, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
 		const char *key_source, const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_hostname, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int		ret = FAIL;
 	HANDLE		eventlog_handle = NULL;
@@ -1840,7 +1841,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, config_tls, config_timeout, config_source_ip,
-				metric, lastlogsize_sent, error);
+				config_hostname, metric, lastlogsize_sent, error);
 	}
 out:
 	zbx_free_agent_request(&request);
