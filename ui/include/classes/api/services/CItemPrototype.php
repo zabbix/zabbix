@@ -724,7 +724,7 @@ class CItemPrototype extends CItemGeneral {
 		foreach ($item_prototypes as $i => $item_prototype) {
 			if (!in_array($item_prototype['host_status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
 					|| !array_key_exists('update_discovered_items', $db_item_prototypes[$item_prototype['itemid']])) {
-				unset($item_prototype[$i]);
+				unset($item_prototypes[$i]);
 				continue;
 			}
 		}
