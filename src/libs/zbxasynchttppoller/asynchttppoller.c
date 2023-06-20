@@ -211,13 +211,13 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-void	zbx_async_httpagent_init(struct event_base *ev,
+zbx_asynchttppoller_config *zbx_async_httpagent_create(struct event_base *ev,
 		process_httpagent_result_callback_fn process_httpagent_result_callback,
-		httpagent_action_callback_fn httpagent_action_callback, void *arg,
-		zbx_asynchttppoller_config *asynchttppoller_config)
+		httpagent_action_callback_fn httpagent_action_callback, void *arg)
 {
-	CURLMcode	merr;
-	CURLcode	err;
+	CURLMcode			merr;
+	CURLcode			err;
+	zbx_asynchttppoller_config	*asynchttppoller_config = zbx_malloc(NULL ,sizeof(zbx_asynchttppoller_config));
 
 	asynchttppoller_config->process_httpagent_result = process_httpagent_result_callback;
 	asynchttppoller_config->http_agent_action = httpagent_action_callback;
@@ -270,9 +270,11 @@ void	zbx_async_httpagent_init(struct event_base *ev,
 		zabbix_log(LOG_LEVEL_ERR, "cannot create timer event");
 		exit(EXIT_FAILURE);
 	}
+
+	return asynchttppoller_config;
 }
 
-void	zbx_async_httpagent_destroy(zbx_asynchttppoller_config *asynchttppoller_config)
+void	zbx_async_httpagent_clean(zbx_asynchttppoller_config *asynchttppoller_config)
 {
 	if (NULL != asynchttppoller_config->curl_handle)
 		curl_multi_cleanup(asynchttppoller_config->curl_handle);
