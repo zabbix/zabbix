@@ -49,8 +49,6 @@
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
 
-//extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: separates given string to two parts by given delimiter in string  *

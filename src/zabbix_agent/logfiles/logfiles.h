@@ -73,6 +73,5 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname);
 
-
 struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num);
 #endif

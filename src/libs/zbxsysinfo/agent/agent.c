@@ -55,8 +55,8 @@ static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 		char	*p;
 
 		SET_STR_RESULT(result, NULL != (p = strchr(sysinfo_get_config_hostnames(), ',')) ?
-				zbx_dsprintf(NULL, "%.*s", (int)(p - sysinfo_get_config_hostnames()), sysinfo_get_config_hostnames()) :
-				zbx_strdup(NULL, sysinfo_get_config_hostnames()));
+				zbx_dsprintf(NULL, "%.*s", (int)(p - sysinfo_get_config_hostnames()),
+				sysinfo_get_config_hostnames()) : zbx_strdup(NULL, sysinfo_get_config_hostnames()));
 	}
 	else
 		SET_STR_RESULT(result, zbx_strdup(NULL, sysinfo_get_config_hostname()));

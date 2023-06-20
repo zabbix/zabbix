@@ -300,7 +300,7 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 #define SYSINFO_PROPERTY_DEF(type, varname) \
 type	sysinfo_get_config_##varname(void) \
 { \
-	return get_config_##varname##_cb();  \
+	return get_config_##varname##_cb(); \
 }
 SYSINFO_PROPERTY_DEF(int, timeout)
 SYSINFO_PROPERTY_DEF(int, log_remote_commands)

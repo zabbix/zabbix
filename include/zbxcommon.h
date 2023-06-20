@@ -758,7 +758,7 @@ static type	get_##varname(void) \
 }
 
 #define ZBX_PROPERTY_DECL2(type1, type2, varname, defvalue) \
-static  type1	varname = defvalue; \
+static	type1	varname = defvalue; \
 static	type2	get_##varname(void) \
 { \
 	return varname; \
