@@ -251,7 +251,9 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]),
 						(new CSpan(':'))->addClass('list-numbered-item'),
-						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						(new CCol(
+							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
+						))->addClass(ZBX_STYLE_WORDWRAP),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',
@@ -275,7 +277,9 @@ $steps_tab = (new CFormGrid())->addItem([
 							(new CInput('hidden', 'steps[#{row_index}][post_type]', '#{post_type}'))->removeId()
 						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CSpan(':'))->addClass('list-numbered-item'),
-						(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step'),
+						(new CCol(
+							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
+						))->addClass(ZBX_STYLE_WORDWRAP),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',
