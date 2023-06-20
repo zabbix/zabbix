@@ -243,14 +243,14 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	{
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 		{
-			if (SUCCEED == (errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
-					poller_config->config_source_ip, poller_config->curl_handle)))
-			{
-				poller_config->processing++;
-			}
+			errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
+					poller_config->config_source_ip, poller_config->curl_handle);
 		}
 		else
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], poller_config, process_agent_result);
+
+		if (SUCCEED == errcodes[i])
+			poller_config->processing++;
 	}
 
 	zbx_timespec(&timespec);

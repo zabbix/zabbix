@@ -258,12 +258,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 		agent_context->server_name = agent_context->interface.addr;
 	else
 		agent_context->server_name = NULL;
-#else
-	ZBX_UNUSED(tls_arg1);
-	ZBX_UNUSED(tls_arg2);
 #endif
-
-	poller_config->processing++;
 	zbx_async_poller_add_task(poller_config->base, agent_context->s.socket, agent_context,
 			agent_context->poller_config->config_timeout, agent_task_process, clear_cb);
 
