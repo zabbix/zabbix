@@ -345,7 +345,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	http_agent_poller_destroy(zbx_poller_config_t *poller_config)
+static void	async_poller_destroy(zbx_poller_config_t *poller_config)
 {
 	event_base_free(poller_config->base);
 	zbx_vector_uint64_clear(&poller_config->itemids);
@@ -373,14 +373,15 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	time_t			last_stat_time;
-	zbx_ipc_async_socket_t	rtc;
-	const zbx_thread_info_t	*info = &((zbx_thread_args_t *)args)->info;
-	int			server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int			process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char		process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	unsigned char		poller_type = poller_args_in->poller_type;
-	zbx_poller_config_t	poller_config = {.queued = 0, .processed = 0};
+	time_t				last_stat_time;
+	zbx_ipc_async_socket_t		rtc;
+	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
+	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
+	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
+	unsigned char			poller_type = poller_args_in->poller_type;
+	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
+	zbx_asynchttppoller_config	asynchttppoller_config;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -400,8 +401,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
-		poller_config.curl_handle = zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
-				poller_update_selfmon_counter, &poller_config);
+		zbx_async_httpagent_init(poller_config.base, process_httpagent_result,
+				poller_update_selfmon_counter, &poller_config, &asynchttppoller_config);
+		poller_config.curl_handle = asynchttppoller_config.curl_handle;
 	}
 	else
 	{
@@ -454,8 +456,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	event_base_dispatch(poller_config.base);
 
-	zbx_async_httpagent_destroy();
-	http_agent_poller_destroy(&poller_config);
+	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
+		zbx_async_httpagent_destroy(&asynchttppoller_config);
+
+	async_poller_destroy(&poller_config);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 

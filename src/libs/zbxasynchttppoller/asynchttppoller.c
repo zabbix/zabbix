@@ -35,30 +35,25 @@
 #include "zbxtypes.h"
 #include "asynchttppoller.h"
 
-static ZBX_THREAD_LOCAL struct event				*curl_timeout;
-static ZBX_THREAD_LOCAL CURLM					*curl_handle;
-
-static ZBX_THREAD_LOCAL process_httpagent_result_callback_fn	process_httpagent_result;
-static ZBX_THREAD_LOCAL httpagent_action_callback_fn		http_agent_action;
-static ZBX_THREAD_LOCAL void					*http_agent_arg;
-
 typedef struct
 {
-	struct event *event;
-	curl_socket_t sockfd;
+	struct event			*event;
+	curl_socket_t			sockfd;
+	zbx_asynchttppoller_config	*asynchttppoller_config;
 }
 zbx_curl_context_t;
 
 static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 {
+	zbx_asynchttppoller_config	*asynchttppoller_config = (zbx_asynchttppoller_config *)userp;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() timeout:%ld", __func__, timeout_ms);
 
 	ZBX_UNUSED(multi);
-	ZBX_UNUSED(userp);
 
 	if(0 > timeout_ms)
 	{
-		evtimer_del(curl_timeout);
+		evtimer_del(asynchttppoller_config->curl_timeout);
 	}
 	else
 	{
@@ -69,26 +64,27 @@ static int	start_timeout(CURLM *multi, long timeout_ms, void *userp)
 
 		tv.tv_sec = timeout_ms / 1000;
 		tv.tv_usec = (timeout_ms % 1000) * 1000;
-		evtimer_del(curl_timeout);
-		evtimer_add(curl_timeout, &tv);
+		evtimer_del(asynchttppoller_config->curl_timeout);
+		evtimer_add(asynchttppoller_config->curl_timeout, &tv);
 	}
 
 	return 0;
 }
 
-static void	check_multi_info(void)
+static void	check_multi_info(zbx_asynchttppoller_config *asynchttppoller_config)
 {
 	CURLMsg	*message;
 	int	pending;
 
-	while (NULL != (message = curl_multi_info_read(curl_handle, &pending)))
+	while (NULL != (message = curl_multi_info_read(asynchttppoller_config->curl_handle, &pending)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "pending cURL messages:%d", pending);
 
 		switch (message->msg)
 		{
 			case CURLMSG_DONE:
-				process_httpagent_result(message->easy_handle, message->data.result, http_agent_arg);
+				asynchttppoller_config->process_httpagent_result(message->easy_handle,
+						message->data.result, asynchttppoller_config->http_agent_arg);
 				break;
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%u", message->msg);
@@ -99,26 +95,28 @@ static void	check_multi_info(void)
 
 static void	on_timeout(evutil_socket_t fd, short events, void *arg)
 {
-	int	running_handles;
+	int				running_handles;
+	zbx_asynchttppoller_config	*asynchttppoller_config = (zbx_asynchttppoller_config *)arg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
-	ZBX_UNUSED(arg);
 
-	http_agent_action(http_agent_arg);
-	curl_multi_socket_action(curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
-	check_multi_info();
+	asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
+
+	curl_multi_socket_action(asynchttppoller_config->curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
+	check_multi_info(asynchttppoller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	curl_perform(int fd, short event, void *arg)
 {
-	int			running_handles;
-	int			flags = 0;
-	zbx_curl_context_t	*context;
+	int				running_handles;
+	int				flags = 0;
+	zbx_curl_context_t		*context;
+	zbx_asynchttppoller_config	*asynchttppoller_config;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -129,24 +127,28 @@ static void	curl_perform(int fd, short event, void *arg)
 	if (event & EV_WRITE)
 		flags |= CURL_CSELECT_OUT;
 
-	http_agent_action(http_agent_arg);
 	context = (zbx_curl_context_t *)arg;
-	curl_multi_socket_action(curl_handle, context->sockfd, flags, &running_handles);
+	asynchttppoller_config = context->asynchttppoller_config;
+
+	asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
+	curl_multi_socket_action(asynchttppoller_config->curl_handle, context->sockfd, flags, &running_handles);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "running_handles:%d", running_handles);
 
-	check_multi_info();
+	check_multi_info(asynchttppoller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd, struct event_base *event_base)
+static zbx_curl_context_t	*create_curl_context(curl_socket_t sockfd,
+		zbx_asynchttppoller_config *asynchttppoller_config)
 {
 	zbx_curl_context_t	*context;
 
 	context = (zbx_curl_context_t *) malloc(sizeof(*context));
 	context->sockfd = sockfd;
-	context->event = event_new(event_base, sockfd, 0, curl_perform, context);
+	context->event = event_new(asynchttppoller_config->ev, sockfd, 0, curl_perform, context);
+	context->asynchttppoller_config = asynchttppoller_config;
 
 	return context;
 }
@@ -160,23 +162,23 @@ static void	destroy_curl_context(zbx_curl_context_t *context)
 
 static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
 {
-	zbx_curl_context_t	*curl_context;
-	int			events = 0;
-	struct event_base	*event_base = (struct event_base *)userp;
+	zbx_curl_context_t		*curl_context;
+	int				events = 0;
+	zbx_asynchttppoller_config	*asynchttppoller_config = (zbx_asynchttppoller_config *)userp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() action:%d", __func__, action);
 
 	ZBX_UNUSED(easy);
-	ZBX_UNUSED(userp);
 
 	switch (action)
 	{
 		case CURL_POLL_IN:
 		case CURL_POLL_OUT:
 		case CURL_POLL_INOUT:
-			curl_context = socketp ? (zbx_curl_context_t *)socketp : create_curl_context(s, event_base);
+			curl_context = socketp ? (zbx_curl_context_t *)socketp : create_curl_context(s,
+					asynchttppoller_config);
 
-			curl_multi_assign(curl_handle, s, (void *) curl_context);
+			curl_multi_assign(asynchttppoller_config->curl_handle, s, (void *) curl_context);
 
 			if(action != CURL_POLL_IN)
 				events |= EV_WRITE;
@@ -186,8 +188,8 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 			events |= EV_PERSIST;
 
 			event_del(curl_context->event);
-			event_assign(curl_context->event, event_base, curl_context->sockfd, events, curl_perform,
-					curl_context);
+			event_assign(curl_context->event, asynchttppoller_config->ev, curl_context->sockfd, events,
+					curl_perform, curl_context);
 			event_add(curl_context->event, NULL);
 
 		break;
@@ -196,7 +198,7 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 			{
 				event_del(((zbx_curl_context_t*) socketp)->event);
 				destroy_curl_context((zbx_curl_context_t*) socketp);
-				curl_multi_assign(curl_handle, s, NULL);
+				curl_multi_assign(asynchttppoller_config->curl_handle, s, NULL);
 			}
 			break;
 		default:
@@ -209,16 +211,18 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-CURLM	*zbx_async_httpagent_init(struct event_base *ev,
+void	zbx_async_httpagent_init(struct event_base *ev,
 		process_httpagent_result_callback_fn process_httpagent_result_callback,
-		httpagent_action_callback_fn httpagent_action_callback, void *arg)
+		httpagent_action_callback_fn httpagent_action_callback, void *arg,
+		zbx_asynchttppoller_config *asynchttppoller_config)
 {
 	CURLMcode	merr;
 	CURLcode	err;
 
-	process_httpagent_result = process_httpagent_result_callback;
-	http_agent_action = httpagent_action_callback;
-	http_agent_arg = arg;
+	asynchttppoller_config->process_httpagent_result = process_httpagent_result_callback;
+	asynchttppoller_config->http_agent_action = httpagent_action_callback;
+	asynchttppoller_config->http_agent_arg = arg;
+	asynchttppoller_config->ev = ev;
 
 	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
 	{
@@ -227,45 +231,53 @@ CURLM	*zbx_async_httpagent_init(struct event_base *ev,
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (curl_handle = curl_multi_init()))
+	if (NULL == (asynchttppoller_config->curl_handle = curl_multi_init()))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL multi session");
 		exit(EXIT_FAILURE);
 	}
 
-	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_SOCKETFUNCTION, handle_socket)))
+	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_SOCKETFUNCTION,
+			handle_socket)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETFUNCTION: %s", curl_multi_strerror(merr));
 		exit(EXIT_FAILURE);
 	}
 
-	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_SOCKETDATA, ev)))
+	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_SOCKETDATA,
+			asynchttppoller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETDATA: %s", curl_multi_strerror(merr));
 		exit(EXIT_FAILURE);
 	}
 
-	if (CURLM_OK != (merr = curl_multi_setopt(curl_handle, CURLMOPT_TIMERFUNCTION, start_timeout)))
+	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_TIMERFUNCTION,
+			start_timeout)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERFUNCTION: %s", curl_multi_strerror(merr));
 		exit(EXIT_FAILURE);
 	}
 
-	if (NULL == (curl_timeout = evtimer_new(ev, on_timeout, NULL)))
+	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_TIMERDATA,
+			asynchttppoller_config)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERDATA: %s", curl_multi_strerror(merr));
+		exit(EXIT_FAILURE);
+	}
+
+	if (NULL == (asynchttppoller_config->curl_timeout = evtimer_new(ev, on_timeout, asynchttppoller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create timer event");
 		exit(EXIT_FAILURE);
 	}
-
-	return curl_handle;
 }
 
-void	zbx_async_httpagent_destroy(void)
+void	zbx_async_httpagent_destroy(zbx_asynchttppoller_config *asynchttppoller_config)
 {
-	if (NULL != curl_handle)
-		curl_multi_cleanup(curl_handle);
+	if (NULL != asynchttppoller_config->curl_handle)
+		curl_multi_cleanup(asynchttppoller_config->curl_handle);
 
-	if (NULL != curl_timeout)
-		event_free(curl_timeout);
+	if (NULL != asynchttppoller_config->curl_timeout)
+		event_free(asynchttppoller_config->curl_timeout);
 }
 
