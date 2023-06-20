@@ -1,6 +1,7 @@
 Changes for 7.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-8515] switched Zabbix frontend SVG icons to fonts (ashubin, dfofanovs)
 ..F....... [ZBXNEXT-8413] moved Alerts -> Media types configuration form to modal window (esekace)
 .........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in Kubernetes templates (drasikhov)
 ..F....... [ZBXNEXT-8445] changed Data collection -> Event correlation form to modal window (Ivo)
