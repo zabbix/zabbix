@@ -38,7 +38,6 @@ void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context)
 int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_config_t *poller_config)
 {
 	char			*error = NULL;
-	int			ret;
 	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
 	CURLcode		err;
 	CURLMcode		merr;
@@ -56,12 +55,12 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_pol
 	httpagent_context->item_context.status_codes = item->status_codes;
 	item->status_codes = NULL;
 
-	if (SUCCEED != (ret = zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
+	if (SUCCEED != zbx_http_request_prepare(&httpagent_context->http_context, item->request_method,
 			item->url, item->query_fields, item->headers, httpagent_context->item_context.posts,
 			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
 			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
 			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
-			item->output_format, poller_config->config_source_ip, &error)))
+			item->output_format, poller_config->config_source_ip, &error))
 	{
 		SET_MSG_RESULT(result, error);
 

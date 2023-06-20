@@ -792,8 +792,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 			goto clean;
 	}
 
-	if (SUCCEED != zbx_http_prepare_callbacks(context->easyhandle, &context->header, &context->body, zbx_curl_write_cb,
-			curl_body_cb, context->errbuf, error))
+	if (SUCCEED != zbx_http_prepare_callbacks(context->easyhandle, &context->header, &context->body,
+		zbx_curl_write_cb, curl_body_cb, context->errbuf, error))
 	{
 		goto clean;
 	}
@@ -812,7 +812,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 	}
 
 	if (0 != follow_redirects &&
-			CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_MAXREDIRS, ZBX_CURLOPT_MAXREDIRS)))
+			CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_MAXREDIRS,
+			ZBX_CURLOPT_MAXREDIRS)))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set number of redirects allowed: %s", curl_easy_strerror(err));
 		goto clean;
