@@ -258,7 +258,7 @@ class ZBarGauge extends HTMLElement {
 			},
 
 			update: () => {
-				this._thresholds = {0: this._fill};
+				this._thresholds = {};
 
 				for (const threshold of this.querySelectorAll('threshold')) {
 					if (threshold.hasAttribute('fill') && threshold.hasAttribute('value')) {
