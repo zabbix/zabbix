@@ -2090,7 +2090,9 @@ class CDiscoveryRule extends CItemGeneral {
 			$db_overrides = $db_items !== null
 				? array_column($db_items[$item['itemid']]['overrides'], null, 'step')
 				: [];
-			$db_override_steps = array_column($db_items[$item['itemid']]['overrides'], 'step', 'name');
+			$db_override_steps = $db_items !== null
+				? array_column($db_items[$item['itemid']]['overrides'], 'step', 'name')
+				: [];
 
 			foreach ($item['overrides'] as &$override) {
 				if (array_key_exists($override['step'], $db_overrides)) {
