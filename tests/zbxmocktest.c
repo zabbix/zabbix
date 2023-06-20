@@ -149,8 +149,6 @@ const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
 
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 

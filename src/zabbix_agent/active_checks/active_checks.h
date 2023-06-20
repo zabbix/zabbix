@@ -37,6 +37,8 @@ typedef struct
 	int			config_timeout;
 	const char		*config_source_ip;
 	const char		*config_hostname;
+	const char		*config_host_metadata;
+	const char		*config_host_metadata_item;
 }
 zbx_thread_activechk_args;
 

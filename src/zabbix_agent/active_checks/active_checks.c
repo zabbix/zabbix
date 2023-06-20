@@ -771,23 +771,25 @@ out:
 	return ret;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: process configuration item and set it value to respective parameter  *
- *                                                                               *
- * Parameters: json   - pointer to JSON structure where to put resulting value   *
- *             config - pointer to configuration parameter                       *
- *             length - length of configuration parameter                        *
- *             proto  - configuration parameter prototype                        *
- *                                                                               *
- ********************************************************************************/
-static void	process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
+/*********************************************************************************************
+ *                                                                                           *
+ * Purpose: process configuration item and set it value to respective parameter              *
+ *                                                                                           *
+ * Parameters:           json - [OUT] pointer to JSON structure where to put resulting value *
+ *                     config - [IN] pointer to configuration parameter                      *
+ *                     length - [IN] length of configuration parameter                       *
+ *                      proto - [IN] configuration parameter prototype                       *
+ *  config_host_metadata_item - [IN]                                                         *
+ *                                                                                           *
+ *********************************************************************************************/
+static void	process_config_item(struct zbx_json *json, const char *config, size_t length, const char *proto,
+		const char *config_host_metadata_item)
 {
 	char		**value;
 	AGENT_RESULT	result;
 	const char	*config_name, *config_type;
 
-	if (CONFIG_HOST_METADATA_ITEM == config)
+	if (config_host_metadata_item == config)
 	{
 		config_name = "HostMetadataItem";
 		config_type = "metadata";
@@ -827,7 +829,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
-				" \"%s\" configuration parameter",config_type, config,config_name);
+				" \"%s\" configuration parameter",config_type, config, config_name);
 
 	zbx_free_agent_result(&result);
 }
@@ -842,7 +844,7 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
-		const char *config_hostname)
+		const char *config_hostname, const char *config_host_metadata, const char *config_host_metadata_item)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -857,14 +859,15 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
-	if (NULL != CONFIG_HOST_METADATA)
+	if (NULL != config_host_metadata)
 	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, CONFIG_HOST_METADATA, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, config_host_metadata, ZBX_JSON_TYPE_STRING);
 	}
-	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	else if (NULL != config_host_metadata_item)
 	{
 #define HOST_METADATA_LEN	65535	/* UTF-8 characters, not bytes */
-		process_config_item(&json, CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+		process_config_item(&json, config_host_metadata_item, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA,
+				config_host_metadata_item);
 #undef HOST_METADATA_LEN
 	}
 
@@ -874,7 +877,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	}
 	else if (NULL != CONFIG_HOST_INTERFACE_ITEM)
 	{
-		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
+		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE,
+				config_host_metadata_item);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)
@@ -1893,7 +1897,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					&config_revision_local, activechks_args_in->config_timeout,
-					activechks_args_in->config_source_ip, config_hostname))
+					activechks_args_in->config_source_ip, config_hostname,
+					activechks_args_in->config_host_metadata,
+					activechks_args_in->config_host_metadata_item))
 			{
 				nextrefresh = time(NULL) + 60;
 			}

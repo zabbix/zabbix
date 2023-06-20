@@ -23,9 +23,6 @@
 
 #include "modbtype.h"
 
-extern char			*CONFIG_HOST_METADATA;
-extern char			*CONFIG_HOST_METADATA_ITEM;
-
 static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -73,17 +70,18 @@ static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ZBX_UNUSED(request);
 
-	if (NULL != CONFIG_HOST_METADATA)
+	if (NULL != sysinfo_get_config_host_metadata())
 	{
-		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOST_METADATA));
+		SET_STR_RESULT(result, zbx_strdup(NULL, sysinfo_get_config_host_metadata()));
 	}
-	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	else if (NULL != sysinfo_get_config_host_metadata_item())
 	{
-		if (SUCCEED != zbx_execute_agent_check(CONFIG_HOST_METADATA_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
-				ZBX_PROCESS_WITH_ALIAS, result) || NULL == ZBX_GET_STR_RESULT(result))
+		if (SUCCEED != zbx_execute_agent_check(sysinfo_get_config_host_metadata_item(),
+				ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, result) ||
+				NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
-					CONFIG_HOST_METADATA_ITEM));
+					sysinfo_get_config_host_metadata_item()));
 			ret = SYSINFO_RET_FAIL;
 		}
 	}

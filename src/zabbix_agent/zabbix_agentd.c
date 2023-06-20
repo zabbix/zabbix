@@ -33,8 +33,9 @@ static char	*CONFIG_PID_FILE = NULL;
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
 ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_host_metadata, NULL)
+ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_host_metadata_item, NULL)
+
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
@@ -596,10 +597,10 @@ static void	set_defaults(void)
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", zbx_config_hostnames);
 
-	if (NULL != CONFIG_HOST_METADATA && NULL != CONFIG_HOST_METADATA_ITEM)
+	if (NULL != zbx_config_host_metadata && NULL != zbx_config_host_metadata_item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "both HostMetadata and HostMetadataItem defined, using [%s]",
-				CONFIG_HOST_METADATA);
+				zbx_config_host_metadata);
 	}
 
 	if (NULL != CONFIG_HOST_INTERFACE && NULL != CONFIG_HOST_INTERFACE_ITEM)
@@ -852,9 +853,9 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadata",		&CONFIG_HOST_METADATA,			TYPE_STRING,
+		{"HostMetadata",		&zbx_config_host_metadata,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadataItem",		&CONFIG_HOST_METADATA_ITEM,		TYPE_STRING,
+		{"HostMetadataItem",		&zbx_config_host_metadata_item,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostInterface",		&CONFIG_HOST_INTERFACE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1411,7 +1412,8 @@ int	main(int argc, char **argv)
 	zbx_init_library_common(zbx_log_impl);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames);
+			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
+			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	zbx_init_library_win32(&get_progname);
 #endif

@@ -252,7 +252,7 @@ static int	get_config_forks(unsigned char process_type)
 ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
 
 static int	config_startup_time		= 0;
-static int	config_unavailable_delay	=60;
+static int	config_unavailable_delay	= 60;
 static int	config_housekeeping_frequency = 1;
 static int	config_proxy_local_buffer = 0;
 static int	config_proxy_offline_buffer = 1;
@@ -1159,7 +1159,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_ipcservice(program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, NULL, NULL);
+			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_proxy);

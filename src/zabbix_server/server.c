@@ -204,23 +204,26 @@ static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 static char	*CONFIG_PID_FILE = NULL;
 
-static zbx_export_file_t	*problems_export = NULL;
-static zbx_export_file_t	*get_problems_export(void)
-{
-	return problems_export;
-}
+ZBX_PROPERTY_DECL(zbx_export_file_t *, problems_export, NULL)
+/* static zbx_export_file_t	*problems_export = NULL; */
+/* static zbx_export_file_t	*get_problems_export(void) */
+/* { */
+/* 	return problems_export; */
+/* } */
 
-static zbx_export_file_t	*history_export = NULL;
-static zbx_export_file_t	*get_history_export(void)
-{
-	return history_export;
-}
+ZBX_PROPERTY_DECL(zbx_export_file_t *, history_export, NULL)
+/* static zbx_export_file_t	*history_export = NULL; */
+/* static zbx_export_file_t	*get_history_export(void) */
+/* { */
+/* 	return history_export; */
+/* } */
 
-static zbx_export_file_t	*trends_export = NULL;
-static zbx_export_file_t	*get_trends_export(void)
-{
-	return trends_export;
-}
+ZBX_PROPERTY_DECL(zbx_export_file_t *, trends_export, NULL)
+/* static zbx_export_file_t	*trends_export = NULL; */
+/* static zbx_export_file_t	*get_trends_export(void) */
+/* { */
+/* 	return trends_export; */
+/* } */
 
 unsigned char	program_type = ZBX_PROGRAM_TYPE_SERVER;
 static unsigned char	get_program_type(void)
@@ -1259,7 +1262,7 @@ int	main(int argc, char **argv)
 	zbx_init_library_stats(get_program_type);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
-			get_zbx_config_source_ip, NULL, NULL);
+			get_zbx_config_source_ip, NULL, NULL, NULL, NULL);
 	zbx_init_library_dbhigh(zbx_config_dbhigh);
 	zbx_init_library_preproc(preproc_flush_value_server);
 
