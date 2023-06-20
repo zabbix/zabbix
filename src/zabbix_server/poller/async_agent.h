@@ -43,15 +43,16 @@ typedef struct
 	unsigned char		state;
 	char			*key;
 	char			*key_orig;
-	zbx_dc_host_t		host;
+	char			host[ZBX_HOSTNAME_BUF_LEN];
 	zbx_dc_interface_t	interface;
 	zbx_socket_t		s;
 	zbx_tcp_recv_context_t	tcp_recv_context;
 	zbx_tcp_send_context_t	tcp_send_context;
 	zbx_zabbix_agent_step_t	step;
 	char			*server_name;
-	const char		*tls_arg1;
-	const char		*tls_arg2;
+	char			*tls_arg1;
+	char			*tls_arg2;
+	unsigned char		tls_connect;
 	int			ret;
 	AGENT_RESULT		result;
 }

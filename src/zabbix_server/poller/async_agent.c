@@ -98,12 +98,12 @@ static int	agent_task_process(short event, void *data)
 	switch (agent_context->step)
 	{
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
-			if (ZBX_TCP_SEC_TLS_CERT == agent_context->host.tls_connect ||
-					ZBX_TCP_SEC_TLS_PSK == agent_context->host.tls_connect)
+			if (ZBX_TCP_SEC_TLS_CERT == agent_context->tls_connect ||
+					ZBX_TCP_SEC_TLS_PSK == agent_context->tls_connect)
 			{
 				char	*error = NULL;
 
-				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->host.tls_connect,
+				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->tls_connect,
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &want_event, &error))
 				{
@@ -178,6 +178,8 @@ void	zbx_async_check_agent_clean(zbx_agent_context *agent_context)
 {
 	zbx_free(agent_context->key_orig);
 	zbx_free(agent_context->key);
+	zbx_free(agent_context->tls_arg1);
+	zbx_free(agent_context->tls_arg2);
 	zbx_free_agent_result(&agent_context->result);
 }
 
@@ -196,17 +198,18 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 	agent_context->value_type = item->value_type;
 	agent_context->flags = item->flags;
 	agent_context->state = item->state;
-	agent_context->host = item->host;
 	agent_context->interface = item->interface;
 	agent_context->interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			agent_context->interface.dns_orig : agent_context->interface.ip_orig);
 	agent_context->key = item->key;
 	agent_context->key_orig = zbx_strdup(NULL, item->key_orig);
 	item->key = NULL;
+	agent_context->tls_connect = item->host.tls_connect;
+	zbx_strlcpy(agent_context->host, item->host.host, sizeof(agent_context->host));
 
 	zbx_init_agent_result(&agent_context->result);
 
-	switch (agent_context->host.tls_connect)
+	switch (agent_context->tls_connect)
 	{
 		case ZBX_TCP_SEC_UNENCRYPTED:
 			agent_context->tls_arg1 = NULL;
@@ -214,12 +217,12 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 			break;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		case ZBX_TCP_SEC_TLS_CERT:
-			agent_context->tls_arg1 = agent_context->host.tls_issuer;
-			agent_context->tls_arg2 = agent_context->host.tls_subject;
+			agent_context->tls_arg1 = zbx_strdup(NULL, item->host.tls_issuer);
+			agent_context->tls_arg2 = zbx_strdup(NULL, item->host.tls_subject);
 			break;
 		case ZBX_TCP_SEC_TLS_PSK:
-			agent_context->tls_arg1 = agent_context->host.tls_psk_identity;
-			agent_context->tls_arg2 = agent_context->host.tls_psk;
+			agent_context->tls_arg1 = zbx_strdup(NULL, item->host.tls_psk_identity);
+			agent_context->tls_arg2 = zbx_strdup(NULL, item->host.tls_psk);
 			break;
 #else
 		case ZBX_TCP_SEC_TLS_CERT:
@@ -228,18 +231,23 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_poller_
 					" but support for TLS was not compiled into %s.",
 					get_program_type_string(program_type)));
 			ret = CONFIG_ERROR;
+			agent_context->tls_arg1 = NULL;
+			agent_context->tls_arg2 = NULL;
 			goto out;
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid TLS connection parameters."));
 			ret = CONFIG_ERROR;
+			agent_context->tls_arg1 = NULL;
+			agent_context->tls_arg2 = NULL;
 			goto out;
 	}
 
 	if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, agent_context->poller_config->config_source_ip,
 			agent_context->interface.addr, agent_context->interface.port,
-			agent_context->poller_config->config_timeout, agent_context->host.tls_connect, agent_context->tls_arg1))
+			agent_context->poller_config->config_timeout, agent_context->tls_connect,
+			agent_context->tls_arg1))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 		goto out;

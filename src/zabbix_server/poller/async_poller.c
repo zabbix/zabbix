@@ -36,8 +36,8 @@ static void	process_agent_result(void *data)
 	int			ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__,
-			agent_context->host.host, agent_context->interface.addr, agent_context->key,
-			zbx_tcp_connection_type_name(agent_context->host.tls_connect));
+			agent_context->host, agent_context->interface.addr, agent_context->key,
+			zbx_tcp_connection_type_name(agent_context->tls_connect));
 
 	zbx_timespec(&timespec);
 
@@ -60,7 +60,7 @@ static void	process_agent_result(void *data)
 		zbx_free(interface_status->error);
 		interface_status->errcode = agent_context->ret;
 		interface_status->itemid = agent_context->itemid;
-		zbx_strlcpy(interface_status->host, agent_context->host.host, sizeof(interface_status->host));
+		zbx_strlcpy(interface_status->host, agent_context->host, sizeof(interface_status->host));
 		zbx_free(interface_status->key_orig);
 		interface_status->key_orig = agent_context->key_orig;
 		agent_context->key_orig = NULL;
