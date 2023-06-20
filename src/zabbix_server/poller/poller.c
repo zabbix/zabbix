@@ -445,6 +445,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	char			*port = NULL, error[ZBX_ITEM_ERROR_LEN_MAX];
 	zbx_dc_um_handle_t	*um_handle;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d", __func__, num);
+
 	if (MACRO_EXPAND_YES == expand_macros)
 		um_handle = zbx_dc_open_user_macros();
 
@@ -698,6 +700,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	if (MACRO_EXPAND_YES == expand_macros)
 		zbx_dc_close_user_macros(um_handle);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
