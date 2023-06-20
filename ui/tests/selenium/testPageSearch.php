@@ -153,9 +153,51 @@ class testPageSearch extends CWebTest {
 					'dns' => 'testdnstwo.example.com',
 					'port' => '10050'
 				]
+			],
+			[
+				'host' => 'Entities Host',
+				'groups' => [
+					'groupid' => '6'
+				],
+				'interfaces' => [
+					'type' => 1,
+					'main' => 1,
+					'useip' => 1,
+					'ip' => '127.0.0.1',
+					'dns' => '',
+					'port' => '10050'
+				],
+				'items' => [
+					[
+						'name' => 'Item 1',
+						'key_' => 'key[1]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Item 2',
+						'key_' => 'key[2]',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				],
+				'discoveryrules' => [
+					[
+						'name' => 'Discovery 1',
+						'key_' => 'lld[1]',
+						'type' => ITEM_TYPE_TRAPPER
+					],
+					[
+						'name' => 'Discovery 2',
+						'key_' => 'lld[2]',
+						'type' => ITEM_TYPE_TRAPPER
+					]
+				]
 			]
 		]);
 		self::$widgets['hosts']['link_id'] = $response['hostids'][$this->search_string.' Host'];
+		$entity_host_id = $response['hostids']['Entities Host'];
+		$entity_item_id = $response['itemids']['Entities Host:key[1]'];
 
 		$response = CDataHelper::createTemplates([
 			[
@@ -166,6 +208,16 @@ class testPageSearch extends CWebTest {
 			]
 		]);
 		self::$widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
+
+		foreach ([1, 2] as $i){
+			CDataHelper::call('application.create', ['name' => 'Application '.$i, 'hostid' => $entity_host_id]);
+			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Host:key[1].last()}>1']);
+			CDataHelper::call('graph.create', ['name' => 'Graph '.$i, 'gitems' => [['itemid' => $entity_item_id, 'color' => '00FF00']]]);
+			CDataHelper::call('httptest.create', ['name' => 'Web '.$i, 'hostid' => $entity_host_id, 'steps' => [
+				['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]
+			]]);
+		}
+		CDataHelper::call('hostgroup.create', [['name' => 'Empty Hostgroup']]);
 	}
 
 	/**
@@ -202,10 +254,7 @@ class testPageSearch extends CWebTest {
 	 * Check the layout of the Search result page.
 	 */
 	public function testPageSearch_LayoutPage() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
-		$form->query('id:search')->one()->fill($this->search_string);
-		$form->submit();
+		$this->openSearchResults($this->search_string);
 
 		$this->page->assertHeader('Search: '.$this->search_string);
 		$this->page->assertTitle('Search');
@@ -369,10 +418,7 @@ class testPageSearch extends CWebTest {
 			}
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view');
-		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
-		$form->query('id:search')->one()->fill($data['search_string']);
-		$form->submit();
+		$this->openSearchResults($data['search_string']);
 
 		$this->page->assertHeader('Search: '.$data['search_string']);
 
@@ -392,6 +438,99 @@ class testPageSearch extends CWebTest {
 			$footer_text = $widget->query('xpath:.//ul[@class="dashbrd-widget-foot"]//li')->one()->getText();
 			// Only a maximum of 100 records are displayed at once.
 			$this->assertEquals('Displaying '.(min($expected_count, 100)).' of '.$expected_count.' found', $footer_text);
+		}
+	}
+
+	public static function getEntityData() {
+		return [
+			[
+				[
+					'search_string' => 'Test object Host',
+					'hosts' => [
+						'Host' => ['count' => null],
+						'IP' => ['count' => null],
+						'DNS' => ['count' => null],
+						'Latest data' => ['count' => null],
+						'Problems' => ['count' => null],
+						'Graphs' => ['count' => null, 'column_index' => 5],
+						'Screens' => ['count' => null],
+						'Web' => ['count' => null, 'column_index' => 7],
+						'Applications' => ['count' => null],
+						'Items' => ['count' => null],
+						'Triggers' => ['count' => null],
+						'Graphs_2' => ['count' => null, 'column_index' => 11],
+						'Discovery' => ['count' => null],
+						'Web_2' => ['count' => null, 'column_index' => 13]
+					]
+				]
+			],
+			[
+				[
+					'search_string' => 'Entities Host',
+					'hosts' => [
+						'Applications' => ['count' => 2],
+						'Items' => ['count' => 2],
+						'Triggers' => ['count' => 2],
+						'Graphs' => ['count' => 2, 'column_index' => 11],
+						'Discovery' => ['count' => 2],
+						'Web' => ['count' => 2, 'column_index' => 13]
+					]
+				]
+			],
+			[
+				[
+					'search_string' => 'Empty Hostgroup',
+					'host_groups' => [
+						'Host group' => ['count' => null],
+						'Latest data' => ['count' => null],
+						'Problems' => ['count' => null],
+						'Web' => ['count' => null],
+						'Hosts' => ['count' => null],
+						'Templates' => ['count' => null]
+					]
+				]
+			],
+			[
+				[
+					'search_string' => 'Test object Hostgroup',
+					'host_groups' => [
+						'Hosts' => ['count' => 1],
+						'Templates' => ['count' => 1]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Search for a string and verify linked entity counts.
+	 *
+	 * @dataProvider getEntityData
+	 */
+	public function testPageSearch_VerifyEntityCount($data) {
+		$this->openSearchResults($data['search_string']);
+
+		// For each widget type.
+		foreach (self::$widgets as $widget_params) {
+			// Only check widget if any expected data is set for it.
+			if (isset($data[$widget_params['key']])) {
+				$table_row = $this->query($widget_params['table_selector'])->asTable()->one()->getRow(0);
+
+				// For each expected column.
+				foreach ($data[$widget_params['key']] as $column_name => $column_data) {
+					// Use column index when specified. This is because some column names are not unique.
+					$column = $table_row->getColumn(CTestArrayHelper::get($column_data, 'column_index', $column_name));
+
+					if (isset($column_data['count'])) {
+						$this->assertEquals($column_data['count'], $column->query('tag:sup')->one()->getText());
+						$this->assertFalse($column->isAttributePresent('href'));
+					}
+					else {
+						// The text should not end with a space and a number.
+						$this->assertEquals(0, preg_match('/ [0-9]+$/', $column->getText()));
+					}
+				}
+			}
 		}
 	}
 
@@ -510,5 +649,15 @@ class testPageSearch extends CWebTest {
 		catch (TimeoutException $e) {
 			// All good, the suggestion list is not visible, continue the test.
 		}
+	}
+
+	/**
+	 * Opens Dashboard, enters search string and submits the search form.
+	 */
+	protected function openSearchResults($search_string) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view');
+		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
+		$form->query('id:search')->one()->fill($search_string);
+		$form->submit();
 	}
 }
