@@ -108,7 +108,7 @@ static int	agent_task_process(short event, void *data)
 					0 != errnum)
 			{
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
-						" failed: Cannot establish connection to [[%s]:%hu]: %s",
+						" failed: Cannot establish TCP connection to [[%s]:%hu]: %s",
 						agent_context->interface.addr, agent_context->interface.port,
 						zbx_strerror(errnum)));
 				agent_context->ret = NETWORK_ERROR;
