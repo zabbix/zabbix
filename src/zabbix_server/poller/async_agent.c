@@ -24,7 +24,6 @@
 #include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
-#include "../../libs/zbxcomms/tls.h"
 #include "zbxself.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
@@ -123,7 +122,7 @@ static int	agent_task_process(short event, void *data)
 			{
 				char	*error = NULL;
 
-				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->tls_connect,
+				if (SUCCEED != zbx_socket_tls_connect(&agent_context->s, agent_context->tls_connect,
 						agent_context->tls_arg1, agent_context->tls_arg2,
 						agent_context->server_name, &event_new, &error))
 				{
@@ -265,8 +264,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	}
 
 	if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, config_source_ip,
-			agent_context->interface.addr, agent_context->interface.port, config_timeout,
-			agent_context->tls_connect, agent_context->tls_arg1))
+			agent_context->interface.addr, agent_context->interface.port, config_timeout))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Get value from agent failed: %s", zbx_socket_strerror()));
 		goto out;

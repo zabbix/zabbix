@@ -434,7 +434,7 @@ static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
  *                                                                            *
  ******************************************************************************/
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1)
+		int timeout)
 {
 	int		flags, ret = FAIL;
 	char		service[8];
@@ -443,25 +443,6 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 
 	zbx_socket_clean(s);
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-
-	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
-	{
-		zbx_set_socket_strerror("cannot connect with PSK: PSK not available");
-		return FAIL;
-	}
-#else
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
-	{
-		zbx_set_socket_strerror("support for TLS was not compiled in");
-		return FAIL;
-	}
-#endif
 	s->timeout = timeout;
 
 	if (SUCCEED == zbx_is_ip4(ip))
@@ -550,6 +531,25 @@ out:
 	return ret;
 }
 
+int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, short *event, char **error)
+{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_PSK == tls_connect && '\0' == *tls_arg1)
+	{
+		*error = zbx_strdup(*error, "cannot connect with PSK: PSK not available");
+		return FAIL;
+	}
+#else
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
+	{
+		*error = zbx_strdup(*error, "support for TLS was not compiled in");
+		return FAIL;
+	}
+#endif
+	return zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, event, error);
+}
+
 /*****************************************************************************
  *                                                                            *
  * Purpose: connect the socket of the specified type to external host         *
@@ -577,7 +577,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*server_name = NULL;
 #endif
-	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, tls_connect, tls_arg1))
+	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout))
 		goto out;
 
 	if (SUCCEED != zbx_socket_pollout(s, &error))
@@ -598,10 +598,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
-		if (SUCCEED != zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, NULL, &error))
+		if (SUCCEED != zbx_socket_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, NULL, &error))
 		{
 			zbx_tcp_close(s);
-			zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port, error);
+			zbx_set_socket_strerror("TCP successful, cannot establish TLS to [[%s]:%hu]: %s", ip, port,
+					error);
 			zbx_free(error);
 			goto out;
 		}
