@@ -525,7 +525,6 @@ class CWidgetNavTree extends CWidget {
 			button_add_child.type = 'button';
 			button_add_child.title = t('Add child element');
 			button_add_child.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_PLUS, 'js-add-child');
-			button_add_child.disabled = depth >= this._max_depth;
 			button_add_child.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_child);
 
@@ -533,7 +532,6 @@ class CWidgetNavTree extends CWidget {
 			button_add_maps.type = 'button';
 			button_add_maps.title = t('Add multiple maps');
 			button_add_maps.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COPY, 'js-add-maps');
-			button_add_maps.disabled = depth >= this._max_depth;
 			button_add_maps.setAttribute('data-id', item.id);
 			tools.appendChild(button_add_maps);
 
@@ -686,12 +684,8 @@ class CWidgetNavTree extends CWidget {
 		});
 
 		for (const tree_element of document.querySelectorAll('.tree-list')) {
-			const tools_buttons = tree_element.querySelectorAll('.js-button-add-child, .js-button-add-maps');
-
-			if (tools_buttons.length > 0) {
-				for (const button of tools_buttons) {
-					button.disabled = tree_element.dataset.depth >= this._max_depth;
-				}
+			for (const button of tree_element.querySelectorAll('.js-add-child, .js-add-maps')) {
+				button.disabled = tree_element.dataset.depth >= this._max_depth;
 			}
 		}
 	}
