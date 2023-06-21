@@ -253,7 +253,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						(new CSpan(':'))->addClass('list-numbered-item'),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
-						))->addClass(ZBX_STYLE_WORDWRAP),
+						))->addClass(ZBX_STYLE_WORDBREAK),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',
@@ -279,7 +279,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						(new CSpan(':'))->addClass('list-numbered-item'),
 						(new CCol(
 							(new CLink('#{name}', 'javascript:void(0);'))->addClass('js-edit-step')
-						))->addClass(ZBX_STYLE_WORDWRAP),
+						))->addClass(ZBX_STYLE_WORDBREAK),
 						'#{timeout}',
 						'#{url}',
 						'#{required}',
