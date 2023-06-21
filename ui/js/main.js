@@ -199,18 +199,18 @@ var AudioControl = {
 /**
  * Sets HTML elements to blink.
  * Example of usage:
- *      <span class="blink" data-time-to-blink="60">test 1</span>
- *      <span class="blink" data-time-to-blink="30">test 2</span>
- *      <span class="blink" data-toggle-class="normal">test 3</span>
- *      <span class="blink">test 3</span>
+ *      <span class="js-blink" data-time-to-blink="60">test 1</span>
+ *      <span class="js-blink" data-time-to-blink="30">test 2</span>
+ *      <span class="js-blink" data-toggle-class="normal">test 3</span>
+ *      <span class="js-blink">test 3</span>
  *      <script type="text/javascript">
  *          jQuery(document).ready(function(
  *              jqBlink.blink();
  *          ));
  *      </script>
- * Elements with class 'blink' will blink for 'data-seconds-to-blink' seconds
+ * Elements with class 'js-blink' will blink for 'data-seconds-to-blink' seconds
  * If 'data-seconds-to-blink' is omitted, element will blink forever.
- * For elements with class 'blink' and attribute 'data-toggle-class' class will be toggled.
+ * For elements with class 'js-blink' and attribute 'data-toggle-class' class will be toggled.
  */
 var jqBlink = {
 	shown: true, // are objects currently shown or hidden?
@@ -223,7 +223,7 @@ var jqBlink = {
 		var that = this;
 
 		setInterval(function() {
-			var $collection = jQuery('.blink');
+			var $collection = jQuery('.js-blink');
 
 			$collection.each(function() {
 				var $el = jQuery(this),
@@ -235,14 +235,14 @@ var jqBlink = {
 
 				if (blink) {
 					if (typeof $el.data('toggleClass') !== 'undefined') {
-						$el[that.shown ? 'removeClass' : 'addClass']($el.data('toggleClass'));
+						$el.toggleClass($el.data('toggleClass'));
 					}
 					else {
-						$el.css('visibility', that.shown ? 'visible' : 'hidden');
+						$el.css('opacity', that.shown ? '1' : '0');
 					}
 				}
 				else if (that.shown) {
-					$el.removeClass('blink').removeClass($el.data('toggleClass')).css('visibility', '');
+					$el.removeClass('js-blink').removeClass($el.data('toggleClass')).css('opacity', 1);
 				}
 			});
 
@@ -482,7 +482,7 @@ var hintBox = {
 			addToOverlaysStack(hintboxid, target, 'hintbox');
 
 			var close_link = jQuery('<button>', {
-					'class': 'overlay-close-btn',
+					'class': 'btn-overlay-close',
 					'title': t('S_CLOSE')
 				}
 			)
@@ -699,9 +699,12 @@ function toggleSection(id, profile_idx) {
 	const section = document.getElementById(id);
 	const toggle = section.querySelector('.section-toggle');
 
-	let is_collapsed = section.classList.contains('section-collapsed');
+	let is_collapsed = section.classList.contains(ZBX_STYLE_COLLAPSED);
 
-	section.classList.toggle('section-collapsed', !is_collapsed);
+	section.classList.toggle(ZBX_STYLE_COLLAPSED, !is_collapsed);
+
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_DOWN, !is_collapsed);
+	toggle.classList.toggle(ZBX_ICON_CHEVRON_UP, is_collapsed);
 	toggle.setAttribute('title', is_collapsed ? t('S_COLLAPSE') : t('S_EXPAND'));
 
 	if (profile_idx !== '') {

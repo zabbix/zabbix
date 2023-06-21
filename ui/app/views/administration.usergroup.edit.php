@@ -187,7 +187,6 @@ $new_templategroup_right_table = (new CTable())
 	->addRow(
 		(new CSimpleButton(_('Add')))
 			->onClick('javascript: usergroups.submitNewTemplateGroupRight("usergroup.templategroupright.add");')
-			->addClass(ZBX_STYLE_BTN_LINK)
 	);
 
 $template_permissions_form_grid
@@ -240,9 +239,7 @@ $new_group_right_table = (new CTable())
 			->setLabel(_('Include subgroups'))
 	)
 	->addRow(
-		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButtonLink(_('Add')))->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
 	);
 
 $host_permissions_form_grid
@@ -299,9 +296,7 @@ $new_tag_filter_table = (new CTable())
 			->setLabel(_('Include subgroups'))
 	)
 	->addRow(
-		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CButtonLink(_('Add')))->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
 	);
 
 $tag_filter_form_grid

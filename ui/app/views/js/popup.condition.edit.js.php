@@ -26,9 +26,6 @@ window.condition_popup = new class {
 		if (overlays_stack.stack.includes('operation-condition')) {
 			this.overlay = overlays_stack.getById('operation-condition');
 		}
-		else if (overlays_stack.stack[0] === 'event_corr_condition') {
-			this.overlay = overlays_stack.getById('event_corr_condition');
-		}
 		else if (overlays_stack.stack[0] === 'action-edit') {
 			this.overlay = overlays_stack.getById('action-condition');
 		}
@@ -52,6 +49,7 @@ window.condition_popup = new class {
 			document.querySelector('#condition-type').onchange = function() {
 				reloadPopup(e.target.closest('form'), 'popup.condition.edit');
 			}
+
 			if (document.querySelector('#trigger_context')) {
 				document.querySelector('#trigger_context').onchange = function() {
 					reloadPopup(e.target.closest("form"), 'popup.condition.edit');
@@ -66,11 +64,7 @@ window.condition_popup = new class {
 		const curl = new Curl('zabbix.php');
 		const fields = getFormFields(this.form);
 
-		if (this.overlay == overlays_stack.getById('event_corr_condition')) {
-			curl.setArgument('action', 'popup.condition.event.corr');
-			curl.setArgument('validate', '1');
-		}
-		else if (this.overlay == overlays_stack.getById('operation-condition')) {
+		if (this.overlay == overlays_stack.getById('operation-condition')) {
 			curl.setArgument('action', 'action.operation.condition.check');
 		}
 		else {
@@ -121,6 +115,7 @@ window.condition_popup = new class {
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
+
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
 			.finally(() => {

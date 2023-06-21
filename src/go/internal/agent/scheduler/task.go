@@ -522,5 +522,6 @@ func (t *commandTask) perform(s Scheduler) {
 
 func (t *commandTask) reschedule(now time.Time) (err error) {
 	t.scheduled = time.Unix(now.Unix(), priorityCommandTaskNs)
+
 	return
 }

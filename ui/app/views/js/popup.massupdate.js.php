@@ -306,7 +306,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	obj.querySelectorAll('[name=valuemap_massupdate]').forEach((elem) => elem.addEventListener('click',
 		(event) => toggleVisible(obj, event.currentTarget.value)
 	));
-	obj.querySelectorAll('.element-table-addfrom').forEach(elm => elm.addEventListener('click',
+	obj.querySelectorAll('.js-element-table-addfrom').forEach(elm => elm.addEventListener('click',
 		(event) => openAddfromPopup(event.target)
 	));
 
