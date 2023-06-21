@@ -332,7 +332,6 @@ static void	tls_socket_event(gnutls_session_t session, ssize_t err, short *event
 {
 	ZBX_UNUSED(err);
 	*event = (0 == gnutls_record_get_direction(session) ? POLLIN : POLLOUT);
-
 }
 
 /******************************************************************************
@@ -3069,7 +3068,18 @@ static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t
 			return FAIL;
 	}
 }
-
+static const char	*tls_error_string(int err)
+{
+	switch (err)
+	{
+		case SSL_ERROR_WANT_READ:
+			return "SSL_ERROR_WANT_READ";
+		case SSL_ERROR_WANT_WRITE:
+			return "SSL_ERROR_WANT_WRITE";
+		default:
+			return "unknown error";
+	}
+}
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		const char *server_name, short *event, char **error)
 {
@@ -3216,17 +3226,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		{
 			tls_socket_event(s->tls_ctx->ctx, ssl_err, event);
 
-			switch (ssl_err)
-			{
-				case SSL_ERROR_WANT_READ:
-					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_READ", __func__,
-							zbx_result_string(ret));
-					return FAIL;
-				case SSL_ERROR_WANT_WRITE:
-					zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s SSL_ERROR_WANT_WRITE", __func__,
-							zbx_result_string(ret));
-					return FAIL;
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s", __func__, tls_error_string(ssl_err),
+					zbx_result_string(ret));
+			return FAIL;
 		}
 
 		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, ssl_err))
