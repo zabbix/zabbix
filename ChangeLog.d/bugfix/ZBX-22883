@@ -1,1 +1,0 @@
-...G...... [ZBX-22883] fixed occasional crash of user parameters on Windows when using Zabbix agent 2 with UserParameterDir defined (MVekslers)
