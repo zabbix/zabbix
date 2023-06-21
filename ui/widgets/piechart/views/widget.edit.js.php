@@ -641,7 +641,7 @@ window.widget_piechart_form = new class {
 			}
 		}
 
-		// Displaying options tab.
+		// Displaying options tab changes.
 		this._form.querySelector('#displaying_options').onchange = () => {
 			this._toggleDisplayingOptionsFields();
 		};
