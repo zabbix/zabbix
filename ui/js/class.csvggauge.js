@@ -82,7 +82,7 @@ class CSVGGauge {
 	#svg;
 
 	/**
-	 * SVG group element implementing padding inside of root SVG element.
+	 * SVG group element implementing padding inside of the root SVG element.
 	 *
 	 * @type {SVGGElement}
 	 */
@@ -136,23 +136,23 @@ class CSVGGauge {
 		this.#config = config;
 		this.#padding = padding;
 
-		this.#svg = document.createElementNS(this.constructor.SVG_NS, 'svg');
+		this.#svg = document.createElementNS(CSVGGauge.SVG_NS, 'svg');
 
 		container.appendChild(this.#svg);
 
-		this.#svg.classList.add(this.constructor.ZBX_STYLE_CLASS);
+		this.#svg.classList.add(CSVGGauge.ZBX_STYLE_CLASS);
 
 		if (this.#config.bg_color !== '') {
 			this.#svg.style.backgroundColor = `#${this.#config.bg_color}`;
 		}
 
-		this.#g = document.createElementNS(this.constructor.SVG_NS, 'g');
+		this.#g = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
 		this.#svg.appendChild(this.#g);
 
 		this.#g.setAttribute('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
 
-		this.#g_scalable = document.createElementNS(this.constructor.SVG_NS, 'g');
+		this.#g_scalable = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
 		this.#g.appendChild(this.#g_scalable);
 
@@ -275,14 +275,14 @@ class CSVGGauge {
 	}
 
 	/**
-	 * Create multi-line description element.
+	 * Create multi-line description.
 	 */
 	#createDescription() {
-		const container = document.createElementNS(this.constructor.SVG_NS, 'text');
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
 		this.#g.appendChild(container);
 
-		container.classList.add(this.constructor.ZBX_STYLE_DESCRIPTION);
+		container.classList.add(CSVGGauge.ZBX_STYLE_DESCRIPTION);
 		container.style.fontSize = `${this.#config.description.size}%`;
 
 		if (this.#config.description.is_bold) {
@@ -299,7 +299,7 @@ class CSVGGauge {
 			let line = null;
 
 			if (text !== '') {
-				line = document.createElementNS(this.constructor.SVG_NS, 'tspan');
+				line = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 				container.appendChild(line);
 			}
@@ -314,11 +314,11 @@ class CSVGGauge {
 	 * Create threshold arc, value arc or both whichever required by the widget configuration.
 	 */
 	#createArcs() {
-		const container = document.createElementNS(this.constructor.SVG_NS, 'g');
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
 		this.#g_scalable.appendChild(container);
 
-		container.classList.add(this.constructor.ZBX_STYLE_ARCS);
+		container.classList.add(CSVGGauge.ZBX_STYLE_ARCS);
 
 		if (this.#config.thresholds.arc.show) {
 			const radius = 1;
@@ -348,11 +348,11 @@ class CSVGGauge {
 				const angle_start = (pos_start - 0.5) * this.#config.angle;
 				const angle_end = (pos_end - 0.5) * this.#config.angle;
 
-				const arc = document.createElementNS(this.constructor.SVG_NS, 'path');
+				const arc = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
 				container.appendChild(arc);
 
-				arc.classList.add(this.constructor.ZBX_STYLE_THRESHOLDS_ARC_SECTOR);
+				arc.classList.add(CSVGGauge.ZBX_STYLE_THRESHOLDS_ARC_SECTOR);
 
 				arc.setAttribute('d', this.#defineArc(angle_start, angle_end, radius, size));
 
@@ -364,14 +364,14 @@ class CSVGGauge {
 
 		if (this.#config.value.arc.show) {
 			const radius = this.#config.thresholds.arc.show
-				? Math.max(0, 1 - (this.#config.thresholds.arc.size + this.constructor.ARCS_GAP) / 100)
+				? Math.max(0, 1 - (this.#config.thresholds.arc.size + CSVGGauge.ARCS_GAP) / 100)
 				: 1;
 
 			const size = Math.min(radius, this.#config.value.arc.size / 100);
 
 			const value_arc_sectors = [
-				{pos_start: 0, pos_end: 0, class_name: this.constructor.ZBX_STYLE_VALUE_ARC_SECTOR},
-				{pos_start: 0, pos_end: 1, class_name: this.constructor.ZBX_STYLE_EMPTY_ARC_SECTOR}
+				{pos_start: 0, pos_end: 0, class_name: CSVGGauge.ZBX_STYLE_VALUE_ARC_SECTOR},
+				{pos_start: 0, pos_end: 1, class_name: CSVGGauge.ZBX_STYLE_EMPTY_ARC_SECTOR}
 			];
 
 			const value_arcs = [];
@@ -380,7 +380,7 @@ class CSVGGauge {
 				const angle_start = (pos_start - 0.5) * this.#config.angle;
 				const angle_end = (pos_end - 0.5) * this.#config.angle;
 
-				const arc = document.createElementNS(this.constructor.SVG_NS, 'path');
+				const arc = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
 				container.appendChild(arc);
 
@@ -403,17 +403,17 @@ class CSVGGauge {
 	 * Create and position needle, and point it to the min position.
 	 */
 	#createNeedle() {
-		const radius = this.constructor.NEEDLE_RADIUS / 100;
+		const radius = CSVGGauge.NEEDLE_RADIUS / 100;
 
 		const length = this.#config.thresholds.arc.show
 			? 1 - this.#config.thresholds.arc.size / 2 / 100
 			: 1 - this.#config.value.arc.size / 2 / 100;
 
-		const container = document.createElementNS(this.constructor.SVG_NS, 'path');
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'path');
 
 		this.#g_scalable.appendChild(container);
 
-		container.classList.add(this.constructor.ZBX_STYLE_NEEDLE);
+		container.classList.add(CSVGGauge.ZBX_STYLE_NEEDLE);
 
 		container.setAttribute('d', [
 			'M', radius, 1,
@@ -435,13 +435,10 @@ class CSVGGauge {
 	 * Create and position min/max and threshold labels.
 	 */
 	#createLabels() {
-		const minmax_size = this.#config.minmax.show ? this.#config.minmax.size : this.constructor.MINMAX_SIZE_DEFAULT;
-
+		const minmax_size = this.#config.minmax.show ? this.#config.minmax.size : CSVGGauge.MINMAX_SIZE_DEFAULT;
 		const arcs_height = this.#config.angle === 270 ? 1 + Math.sqrt(2) / 2 : 1;
-
 		const font_size = minmax_size / 100;
-
-		const radius = 1 + font_size * this.constructor.LABEL_GAP / 100;
+		const radius = 1 + font_size * CSVGGauge.LABEL_GAP / 100;
 
 		const labels_data = [...this.#config.thresholds.data];
 
@@ -460,26 +457,25 @@ class CSVGGauge {
 
 		for (const {value, text} of labels_data) {
 			const pos = (value - this.#config.min) / (this.#config.max - this.#config.min);
-
 			const angle = Math.round((pos - 0.5) * this.#config.angle * 100) / 100;
 
-			const container = document.createElementNS(this.constructor.SVG_NS, 'text');
+			const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
 			this.#g_scalable.appendChild(container);
 
-			container.classList.add(this.constructor.ZBX_STYLE_LABEL);
+			container.classList.add(CSVGGauge.ZBX_STYLE_LABEL);
 
 			if (angle < -90) {
-				container.classList.add(this.constructor.ZBX_STYLE_LABEL_QUADRANT_3);
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_3);
 			}
 			else if (angle < 0) {
-				container.classList.add(this.constructor.ZBX_STYLE_LABEL_QUADRANT_2);
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_2);
 			}
 			else if (angle <= 90) {
-				container.classList.add(this.constructor.ZBX_STYLE_LABEL_QUADRANT_1);
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_1);
 			}
 			else {
-				container.classList.add(this.constructor.ZBX_STYLE_LABEL_QUADRANT_4);
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_4);
 			}
 
 			container.textContent = text;
@@ -505,11 +501,11 @@ class CSVGGauge {
 	 * Create and position containers for value and units.
 	 */
 	#createValueAndUnits() {
-		const container = document.createElementNS(this.constructor.SVG_NS, 'text');
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
 		this.#g_scalable.appendChild(container);
 
-		container.classList.add(this.constructor.ZBX_STYLE_VALUE_AND_UNITS);
+		container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS);
 
 		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
 				&& this.#config.angle === 270)
@@ -520,11 +516,9 @@ class CSVGGauge {
 			&& (this.#config.angle === 270 || !this.#config.needle.show);
 
 		const value_font_size = this.#config.value.size / 100;
+		const value_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
-		const value_container = document.createElementNS(this.constructor.SVG_NS, 'tspan');
-
-		value_container.classList.add(this.constructor.ZBX_STYLE_VALUE);
-
+		value_container.classList.add(CSVGGauge.ZBX_STYLE_VALUE);
 		value_container.style.fontSize = `${value_font_size}px`;
 
 		if (this.#config.value.is_bold) {
@@ -539,11 +533,9 @@ class CSVGGauge {
 
 		if (this.#config.units.show) {
 			const units_font_size = this.#config.units.size / 100;
+			const units_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
-			const units_container = document.createElementNS(this.constructor.SVG_NS, 'tspan');
-
-			units_container.classList.add(this.constructor.ZBX_STYLE_UNITS);
-
+			units_container.classList.add(CSVGGauge.ZBX_STYLE_UNITS);
 			units_container.style.fontSize = `${units_font_size}px`;
 
 			if (this.#config.units.is_bold) {
@@ -555,16 +547,15 @@ class CSVGGauge {
 			}
 
 			switch (this.#config.units.position) {
-				case this.constructor.UNITS_POSITION_BEFORE:
-				case this.constructor.UNITS_POSITION_AFTER:
+				case CSVGGauge.UNITS_POSITION_BEFORE:
+				case CSVGGauge.UNITS_POSITION_AFTER:
 					const space_font_size = Math.min(value_font_size, units_font_size);
-
-					const space_container = document.createElementNS(this.constructor.SVG_NS, 'tspan');
+					const space_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 					space_container.style.fontSize = `${space_font_size}px`;
 					space_container.textContent = ' ';
 
-					if (this.#config.units.position === this.constructor.UNITS_POSITION_BEFORE) {
+					if (this.#config.units.position === CSVGGauge.UNITS_POSITION_BEFORE) {
 						container.appendChild(units_container);
 						container.appendChild(space_container);
 						container.appendChild(value_container);
@@ -579,23 +570,23 @@ class CSVGGauge {
 						container.setAttribute('y', `${arcs_height}`);
 					}
 					else {
-						container.setAttribute('y', `${arcs_height + this.constructor.NEEDLE_RADIUS / 100
-							+ Math.max(value_font_size, units_font_size) * this.constructor.LINE_HEIGHT
+						container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100
+							+ Math.max(value_font_size, units_font_size) * CSVGGauge.LINE_HEIGHT
 						}`);
 					}
 
 					break;
 
 				default:
-					const parts = this.#config.units.position === this.constructor.UNITS_POSITION_BELOW
+					const parts = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
 						? [value_container, units_container]
 						: [units_container, value_container];
 
-					const parts_font_size = this.#config.units.position === this.constructor.UNITS_POSITION_BELOW
+					const parts_font_size = this.#config.units.position === CSVGGauge.UNITS_POSITION_BELOW
 						? [value_font_size, units_font_size]
 						: [units_font_size, value_font_size];
 
-					container.classList.add(this.constructor.ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE);
+					container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE);
 
 					container.appendChild(parts[0]);
 					container.appendChild(parts[1]);
@@ -604,14 +595,14 @@ class CSVGGauge {
 
 					if (is_fixed_bottom) {
 						parts[0].setAttribute('y', `${arcs_height - parts_font_size[1]
-							- parts_font_size[0] * ((1 + this.constructor.LINE_HEIGHT) / 2)
+							- parts_font_size[0] * ((1 + CSVGGauge.LINE_HEIGHT) / 2)
 						}`);
 						parts[1].setAttribute('y', `${arcs_height - parts_font_size[1]}`);
 					}
 					else {
-						parts[0].setAttribute('y', `${arcs_height + this.constructor.NEEDLE_RADIUS / 100 * 2}`);
-						parts[1].setAttribute('y', `${arcs_height + this.constructor.NEEDLE_RADIUS / 100 * 2
-							+ parts_font_size[0] * this.constructor.LINE_HEIGHT
+						parts[0].setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2}`);
+						parts[1].setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
+							+ parts_font_size[0] * CSVGGauge.LINE_HEIGHT
 						}`);
 					}
 
@@ -627,8 +618,8 @@ class CSVGGauge {
 				container.setAttribute('y', `${arcs_height}`);
 			}
 			else {
-				container.setAttribute('y', `${arcs_height + this.constructor.NEEDLE_RADIUS / 100
-					+ value_font_size * this.constructor.LINE_HEIGHT
+				container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100
+					+ value_font_size * CSVGGauge.LINE_HEIGHT
 				}`);
 			}
 		}
@@ -704,7 +695,7 @@ class CSVGGauge {
 		this.#width = width - this.#padding.horizontal * 2;
 		this.#height = height - this.#padding.vertical * 2;
 
-		this.#svg.style.fontSize = `${this.#height / this.constructor.LINE_HEIGHT}px`;
+		this.#svg.style.fontSize = `${this.#height / CSVGGauge.LINE_HEIGHT}px`;
 
 		this.#drawDescription();
 
@@ -713,8 +704,7 @@ class CSVGGauge {
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
-		const description_gap = this.#height * this.constructor.DESCRIPTION_GAP / 100;
-
+		const description_gap = this.#height * CSVGGauge.DESCRIPTION_GAP / 100;
 		const description_bbox = this.#elements.description.container.getBBox();
 
 		const max_width = this.#width;
@@ -724,16 +714,14 @@ class CSVGGauge {
 		this.#g_scalable.setAttribute('transform', `translate(0 0) scale(1000)`);
 
 		const box = this.#g_scalable.getBBox();
-
 		const box_width = Math.max(1, -box.x, box.width + box.x) * 2;
 		const box_height = Math.max(arcs_height, box.height);
 
 		const scale = Math.min(max_width / box_width, max_height / box_height);
 
 		const x = max_width / 2;
-
 		const y = (max_height - box.height * scale) / 2 - box.y * scale
-			+ (this.#config.description.position === this.constructor.DESC_V_POSITION_TOP
+			+ (this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
 				? description_bbox.height + description_gap
 				: 0);
 
@@ -769,7 +757,7 @@ class CSVGGauge {
 			offset = 1;
 		}
 
-		container.setAttribute('y', this.#config.description.position === this.constructor.DESC_V_POSITION_TOP
+		container.setAttribute('y', this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
 			? '0'
 			: `${this.#height - lines_data.length * line_height}`
 		);
@@ -784,7 +772,7 @@ class CSVGGauge {
 	 */
 	#animate(from, to, callback) {
 		const start_time = Date.now();
-		const end_time = start_time + this.constructor.ANIMATE_DURATION;
+		const end_time = start_time + CSVGGauge.ANIMATE_DURATION;
 
 		const animate = () => {
 			const time = Date.now();
