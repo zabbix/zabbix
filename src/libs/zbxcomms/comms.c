@@ -1886,7 +1886,7 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 	ssize_t	nbytes;
 
 	if (NULL != events)
-		events = 0;
+		*events = 0;
 
 	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + context->buf_stat_bytes,
 			sizeof(s->buf_stat) - context->buf_stat_bytes, events)))
