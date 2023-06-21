@@ -69,14 +69,21 @@ static void	process_agent_result(void *data)
 
 	if (SUCCEED == agent_context->ret)
 	{
-		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,agent_context->value_type,
-				agent_context->flags, &agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(agent_context->itemid,
+				agent_context->hostid,agent_context->value_type, agent_context->flags,
+				&agent_context->result, &timespec, ITEM_STATE_NORMAL, NULL);
+		}
 	}
 	else
 	{
-		zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid, agent_context->value_type,
-					agent_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
-					agent_context->result.msg);
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(agent_context->itemid, agent_context->hostid,
+					agent_context->value_type, agent_context->flags, NULL, &timespec,
+					ITEM_STATE_NOTSUPPORTED, agent_context->result.msg);
+		}
 		interface_status->error = agent_context->result.msg;
 		SET_MSG_RESULT(&agent_context->result, NULL);
 	}
@@ -125,14 +132,20 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	{
 		SET_TEXT_RESULT(&result, out);
 		out = NULL;
-		zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
-				item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(item_context->itemid, item_context->hostid,item_context->value_type,
+					item_context->flags, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+		}
 	}
 	else
 	{
 		SET_MSG_RESULT(&result, error);
-		zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
-				item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(item_context->itemid, item_context->hostid, item_context->value_type,
+					item_context->flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, result.msg);
+		}
 	}
 
 	zbx_free_agent_result(&result);
@@ -263,8 +276,12 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	{
 		if (NOTSUPPORTED == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{
-			zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
-					items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED, results[i].msg);
+			if (ZBX_IS_RUNNING())
+			{
+				zbx_preprocess_item_value(items[i].itemid, items[i].host.hostid, items[i].value_type,
+						items[i].flags, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+						results[i].msg);
+			}
 
 			zbx_vector_uint64_append(&poller_config->itemids, items[i].itemid);
 			zbx_vector_int32_append(&poller_config->errcodes, errcodes[i]);
@@ -276,9 +293,11 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	zbx_dc_config_clean_items(items, NULL, num);
 exit:
 	zbx_free(items);
-	zbx_preprocessor_flush();
-
-	poller_update_interfaces(poller_config);
+	if (ZBX_IS_RUNNING())
+	{
+		zbx_preprocessor_flush();
+		poller_update_interfaces(poller_config);
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
