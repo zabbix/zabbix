@@ -452,10 +452,10 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/availability'
 				]
 			],
-			// #41 Triggers top 100 report view.
+			// #41 Top 100 triggers report view.
 			[
 				[
-					'url' => 'toptriggers.php',
+					'url' => 'zabbix.php?action=toptriggers.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/reports/triggers_top'
 				]
 			],

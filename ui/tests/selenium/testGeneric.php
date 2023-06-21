@@ -48,13 +48,13 @@ class testGeneric extends CLegacyWebTest {
 			// reports
 			['zabbix.php?action=report.status',					'System information'],
 			['report2.php',										'Availability report'],
-			['toptriggers.php',									'100 busiest triggers'],
-			['toptriggers.php?severities[0]=0&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[1]=1&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[2]=2&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[3]=3&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[4]=4&filter_set=Filter',	'100 busiest triggers'],
-			['toptriggers.php?severities[5]=5&filter_set=Filter',	'100 busiest triggers'],
+			['zabbix.php?action=toptriggers.list',				'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[0]=0&filter_set=Filter',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[1]=1&filter_set=Filter',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[2]=2&filter_set=Filter',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[3]=3&filter_set=Filter',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[4]=4&filter_set=Filter',	'Top 100 triggers'],
+			['zabbix.php?action=toptriggers.list&severities[5]=5&filter_set=Filter',	'Top 100 triggers'],
 
 			// configuration
 			['zabbix.php?action=hostgroup.list',		'Configuration of host groups'],

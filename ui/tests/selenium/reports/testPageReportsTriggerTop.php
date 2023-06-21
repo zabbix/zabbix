@@ -167,9 +167,9 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	}
 
 	public function testPageReportsTriggerTop_FilterLayout() {
-		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestCheckTitle('100 busiest triggers');
-		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestLogin('zabbix.php?action=toptriggers.list');
+		$this->zbxTestCheckTitle('Top 100 triggers');
+		$this->zbxTestCheckHeader('Top 100 triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestTextPresent('Host groups', 'Hosts', 'Severity', 'Filter', 'From', 'Till');
 		$this->zbxTestClickXpathWait('//button[text()="Reset"]');
@@ -346,8 +346,8 @@ class testPageReportsTriggerTop extends CLegacyWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTriggerTop_CheckFilter($data) {
-		$this->zbxTestLogin('toptriggers.php');
-		$this->zbxTestCheckHeader('100 busiest triggers');
+		$this->zbxTestLogin('zabbix.php?action=toptriggers.list');
+		$this->zbxTestCheckHeader('Top 100 triggers');
 		$this->zbxTestExpandFilterTab('Filter');
 		$this->zbxTestClickButtonText('Reset');
 		$this->zbxTestWaitForPageToLoad();

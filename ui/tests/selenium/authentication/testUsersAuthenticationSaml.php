@@ -669,7 +669,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'username' => 'admin-zabbix',
 					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
 					'regular_login' => true,
-					'header' => '100 busiest triggers'
+					'header' => 'Top 100 triggers'
 				]
 			],
 			// #4 Login as zabbix admin with pre-defined login url (has higher priority then the configured url after login).
