@@ -626,7 +626,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 #if !defined(HAVE_IPV6)
-	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
+	err |= (FAIL == check_cfg_feature_str("Fping6Location", zbx_config_fping6_location, "IPv6 support"));
 #endif
 #if !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
