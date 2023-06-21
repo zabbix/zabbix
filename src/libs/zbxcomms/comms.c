@@ -372,23 +372,16 @@ char 	*socket_poll_error(short revents)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: connect to the specified address with an optional timeout value   *
+ * Purpose: wait for socket to become writable and without errors (connected) *
  *                                                                            *
- * Parameters: s       - [IN] socket descriptor                               *
- *             addr    - [IN] the address                                     *
- *             addrlen - [IN] the length of addr structure                    *
- *             error   - [OUT] the error message                              *
+ * Parameters: s     - [IN] socket descriptor                                 *
+ *             error - [OUT] the error message                                *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
- * Comments: Windows connect implementation uses internal timeouts which      *
- *           cannot be changed. Because of that in Windows use nonblocking    *
- *           connect, then wait for connection the specified timeout period   *
- *           and if successful change socket back to blocking mode.           *
- *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_connect_wait(zbx_socket_t *s, char **error)
+static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
 {
 	int		rc;
 	zbx_pollfd_t	pd;
@@ -423,6 +416,25 @@ static int	zbx_socket_connect_wait(zbx_socket_t *s, char **error)
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: initiate connection to the specified address with an optional     *
+ *          timeout                                                           *
+ *                                                                            *
+ * Parameters: s           - [IN] socket descriptor                           *
+ *             type        - [IN] TCP or UDP                                  *
+ *             source_ip   - [IN] source ip address                           *
+ *             ip          - [IN] address                                     *
+ *             port        - [IN] port                                        *
+ *             timeout     - [IN] timeout                                     *
+ *             tls_connect - [IN] TLS mode (certificate, PSK or unencrypted)  *
+ *             tls_arg1    - [IN] TLS argument (issuer or PSK identity)       *
+ *             error       - [OUT] the error message                          *
+ *                                                                            *
+ * Return value: SUCCEED - connection initiated successfully                  *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
 		int timeout, unsigned int tls_connect, const char *tls_arg1)
 {
@@ -539,11 +551,20 @@ out:
 	return ret;
 }
 
-/******************************************************************************
+ /******************************************************************************
  *                                                                            *
  * Purpose: connect the socket of the specified type to external host         *
  *                                                                            *
- * Parameters: s - [OUT] socket descriptor                                    *
+ * Parameters: s           - [IN] socket descriptor                           *
+ *             type        - [IN] TCP or UDP                                  *
+ *             source_ip   - [IN] source ip address                           *
+ *             ip          - [IN] address                                     *
+ *             port        - [IN] port                                        *
+ *             timeout     - [IN] timeout                                     *
+ *             tls_connect - [IN] TLS mode (certificate, PSK or unencrypted)  *
+ *             tls_arg1    - [IN] TLS argument (issuer or PSK identity)       *
+ *             tls_arg2    - [IN] TLS argument (subject or PSK)               *
+ *             error       - [OUT] the error message                          *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
@@ -560,7 +581,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (SUCCEED != zbx_socket_connect(s, type, source_ip, ip, port, timeout, tls_connect, tls_arg1))
 		goto out;
 
-	if (SUCCEED != zbx_socket_connect_wait(s, &error))
+	if (SUCCEED != zbx_socket_pollout(s, &error))
 	{
 		void		(*func_socket_close)(zbx_socket_t *s);
 
