@@ -177,8 +177,12 @@ static unsigned char	get_program_type(void)
 ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_source_ip, NULL)
 ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_tmpdir, NULL)
 ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_fping_location, NULL)
+char	*zbx_config_fping6_location = NULL;
 #ifdef HAVE_IPV6
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_fping6_location, NULL)
+static const char	*get_zbx_config_fping6_location(void)
+{
+	return zbx_config_fping6_location;
+}
 #endif
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
