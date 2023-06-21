@@ -1,0 +1,52 @@
+.svg-gauge {
+	$transition: .5s ease-in-out;
+
+	.svg-gauge-description {
+		text-anchor: middle;
+		dominant-baseline: text-before-edge;
+	}
+
+	.svg-gauge-thresholds-arc-sector,
+	.svg-gauge-empty-arc-sector {
+		fill: $gauge-empty-color;
+	}
+
+	.svg-gauge-value-arc-sector {
+		fill: $gauge-fill-color;
+	}
+
+	.svg-gauge-value-arc-sector,
+	.svg-gauge-empty-arc-sector {
+		transition: fill $transition;
+	}
+
+	.svg-gauge-needle {
+		fill: $gauge-needle-color;
+		stroke: $gauge-needle-color;
+		vector-effect: non-scaling-stroke;
+		transition: fill $transition;
+	}
+
+	.svg-gauge-label {
+		&.svg-gauge-label-quadrant-3,
+		&.svg-gauge-label-quadrant-4 {
+			dominant-baseline: text-before-edge;
+		}
+
+		&.svg-gauge-label-quadrant-2,
+		&.svg-gauge-label-quadrant-3 {
+			text-anchor: end;
+		}
+	}
+
+	.svg-gauge-value-and-units {
+		&.svg-gauge-value-and-units-multi-line {
+			dominant-baseline: text-before-edge;
+		}
+	}
+
+	.svg-gauge-value,
+	.svg-gauge-units {
+		text-anchor: middle;
+	}
+}

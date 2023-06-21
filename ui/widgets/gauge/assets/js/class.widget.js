@@ -66,14 +66,9 @@ class CWidgetGauge extends CWidget {
 			throw new Error('Unexpected server error.');
 		}
 
-		const use_padding_top = this.getViewMode() === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER
-			|| response.config.bg_color !== '';
-
 		const padding = {
-			top: use_padding_top ? this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V : 0,
-			right: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
-			bottom: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
-			left: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
+			vertical: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+			horizontal: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
 		};
 
 		this.gauge = new CSVGGauge(this._body, padding, response.config);
