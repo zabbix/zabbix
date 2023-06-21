@@ -18,21 +18,8 @@
 **/
 
 #include "zbxlog.h"
-#include "zbxalgo.h"
-#include "zbxcommon.h"
-#include "zbxhttp.h"
-#include "zbxcacheconfig.h"
 #include <event.h>
 #include <event2/thread.h>
-#include "zbxserver.h"
-#include "zbx_item_constants.h"
-#include "zbxpreproc.h"
-#include "zbxself.h"
-#include "zbxnix.h"
-#include "zbx_rtc_constants.h"
-#include "zbxrtc.h"
-#include "zbxtime.h"
-#include "zbxtypes.h"
 #include "asynchttppoller.h"
 
 typedef struct
