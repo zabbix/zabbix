@@ -247,8 +247,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 		case ZBX_TCP_SEC_TLS_CERT:
 		case ZBX_TCP_SEC_TLS_PSK:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "A TLS connection is configured to be used with agent"
-					" but support for TLS was not compiled into %s.",
-					get_program_type_string(program_type)));
+					" but support for TLS was not compiled in"));
 			ret = CONFIG_ERROR;
 			agent_context->tls_arg1 = NULL;
 			agent_context->tls_arg2 = NULL;

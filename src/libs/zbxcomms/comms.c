@@ -543,6 +543,14 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
 
 	return zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, event, error);
 #else
+	ZBX_UNUSED(s);
+	ZBX_UNUSED(tls_connect);
+	ZBX_UNUSED(tls_arg1);
+	ZBX_UNUSED(tls_arg2);
+	ZBX_UNUSED(server_name);
+	ZBX_UNUSED(event);
+	ZBX_UNUSED(tls_connect);
+
 	*error = zbx_strdup(*error, "support for TLS was not compiled in");
 	return FAIL;
 #endif
@@ -608,6 +616,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #else
 	ZBX_UNUSED(tls_arg1);
 	ZBX_UNUSED(tls_arg2);
+	ZBX_UNUSED(tls_connect);
 #endif
 
 	ret = SUCCEED;
