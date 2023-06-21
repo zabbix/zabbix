@@ -55,6 +55,7 @@ $this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.csvggraph.js');
+$this->addJsFile('class.csvgpie.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
 $this->addJsFile('class.sortable.js');

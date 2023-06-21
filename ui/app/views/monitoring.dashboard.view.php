@@ -50,6 +50,7 @@ $this->addJsFile('class.coverride.js');
 $this->addJsFile('class.crangecontrol.js');
 $this->addJsFile('colorpicker.js');
 $this->addJsFile('class.csvggraph.js');
+$this->addJsFile('class.csvgpie.js');
 $this->addJsFile('class.cnavtree.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
