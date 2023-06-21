@@ -59,7 +59,6 @@ typedef struct
 	int		port;
 	int		clock;
 	int		status;
-	time_t		write_clock;
 }
 zbx_pdc_discovery_t;
 
@@ -103,7 +102,6 @@ typedef struct
 	int		tls_accepted;
 	int		flags;
 	int		clock;
-	time_t		write_clock;
 }
 zbx_pdc_autoreg_t;
 

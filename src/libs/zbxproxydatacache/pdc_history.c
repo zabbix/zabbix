@@ -616,7 +616,10 @@ int	pdc_history_check_age(zbx_pdc_t *pdc)
 {
 	zbx_pdc_history_t	*row;
 
-	if (SUCCEED != zbx_list_peek(&pdc->history, (void **)&row) || time(NULL) - row->write_clock < pdc->max_age)
+	if (0 == pdc->max_age)
+		return SUCCEED;
+
+	if (SUCCEED != zbx_list_peek(&pdc->history, (void **)&row) || time(NULL) - row->ts.sec < pdc->max_age)
 		return SUCCEED;
 
 	return FAIL;

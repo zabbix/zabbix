@@ -161,8 +161,6 @@ static int	pdc_discovery_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_discovery_t *src, t
 	if (NULL == (row->value = pdc_strdup(src->value)))
 		goto out;
 
-	row->write_clock = now;
-
 	ret = zbx_list_append(&pdc->discovery, row, NULL);
 out:
 	if (SUCCEED != ret)
@@ -366,7 +364,10 @@ int	pdc_discovery_check_age(zbx_pdc_t *pdc)
 {
 	zbx_pdc_discovery_t	*row;
 
-	if (SUCCEED != zbx_list_peek(&pdc->discovery, (void **)&row) || time(NULL) - row->write_clock < pdc->max_age)
+	if (0 == pdc->max_age)
+		return SUCCEED;
+
+	if (SUCCEED != zbx_list_peek(&pdc->discovery, (void **)&row) || time(NULL) - row->clock < pdc->max_age)
 		return SUCCEED;
 
 	return FAIL;

@@ -137,7 +137,6 @@ static int	pdc_autoreg_write_host_mem(zbx_pdc_t *pdc, const char *host, const ch
 	row->tls_accepted = (int)connection_type;
 	row->flags = flags;
 	row->clock = clock;
-	row->write_clock = time(NULL);
 
 	ret = zbx_list_append(&pdc->autoreg, row, NULL);
 out:
@@ -263,7 +262,10 @@ int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
 {
 	zbx_pdc_autoreg_t	*row;
 
-	if (SUCCEED != zbx_list_peek(&pdc->autoreg, (void **)&row) || time(NULL) - row->write_clock < pdc->max_age)
+	if (0 == pdc->max_age)
+		return SUCCEED;
+
+	if (SUCCEED != zbx_list_peek(&pdc->autoreg, (void **)&row) || time(NULL) - row->clock < pdc->max_age)
 		return SUCCEED;
 
 	return FAIL;
