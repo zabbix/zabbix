@@ -411,8 +411,6 @@ static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
 		return FAIL;
 	}
 
-	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
-
 	return SUCCEED;
 }
 
@@ -444,6 +442,7 @@ int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const c
 	void		(*func_socket_close)(zbx_socket_t *s);
 
 	zbx_socket_clean(s);
+	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 
 	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
 	{
