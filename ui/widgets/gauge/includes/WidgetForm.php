@@ -61,7 +61,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_MAX = 100;
 	private const DEFAULT_MINMAX_SHOW = 1;
 	private const DEFAULT_MINMAX_SHOW_UNITS = 0;
-	private const DEFAULT_MINMAX_SIZE_PERCENT = 5;
+	private const DEFAULT_MINMAX_SIZE_PERCENT = 10;
 
 	// Description defaults.
 	private const DEFAULT_DESCRIPTION_SIZE_PERCENT = 15;
@@ -78,7 +78,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_VALUE_BOLD = 0;
 
 	// Value arc defaults.
-	private const DEFAULT_VALUE_ARC_SIZE_PERCENT = 5;
+	private const DEFAULT_VALUE_ARC_SIZE_PERCENT = 20;
 
 	// Unit defaults.
 	private const DEFAULT_UNITS_SHOW = 1;

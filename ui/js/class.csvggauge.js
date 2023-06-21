@@ -48,7 +48,7 @@ class CSVGGauge {
 	static UNITS_POSITION_AFTER = 2;
 	static UNITS_POSITION_BELOW = 3;
 
-	static MINMAX_SIZE_DEFAULT = 5;
+	static MINMAX_SIZE_DEFAULT = 10;
 
 	static ARCS_GAP = 2;
 
@@ -56,7 +56,7 @@ class CSVGGauge {
 
 	static LABEL_GAP = 40;
 
-	static NEEDLE_RADIUS = 5;
+	static NEEDLE_RADIUS = 6.5;
 
 	static ANIMATE_DURATION = 500;
 
@@ -122,6 +122,13 @@ class CSVGGauge {
 	 * @type {number|null}
 	 */
 	#set_size_animation_frame = null;
+
+	/**
+	 * Current needle (and value arc) position in 0..1 range.
+	 *
+	 * @type {number}
+	 */
+	#pos_current = 0;
 
 	/**
 	 * @param {HTMLElement} container           HTML container to append the root SVG element to.
@@ -214,7 +221,7 @@ class CSVGGauge {
 			this.#elements.units.container.textContent = units_text;
 		}
 
-		if ((this.#config.thresholds.arc.show || this.#config.value.arc.show) && this.#config.needle.show) {
+		if (this.#config.value.arc.show || this.#config.needle.show) {
 			let pos_new = 0;
 
 			if (value !== null) {
@@ -237,33 +244,39 @@ class CSVGGauge {
 				threshold_color = color_next;
 			}
 
-			this.#elements.value_arcs.value_arc.style.fill = threshold_color !== '' ? `#${threshold_color}` : '';
+			if (this.#config.value.arc.show) {
+				this.#elements.value_arcs.value_arc.style.fill = threshold_color !== '' ? `#${threshold_color}` : '';
+			}
 
-			if (this.#config.needle.color === '') {
+			if (this.#config.needle.show && this.#config.needle.color === '') {
 				this.#elements.needle.container.style.fill = threshold_color !== '' ? `#${threshold_color}` : '';
 			}
 
-			this.#animate(this.#elements.needle.data.pos, pos_new,
+			this.#animate(this.#pos_current, pos_new,
 				(pos) => {
 					const angle = (pos - 0.5) * this.#config.angle;
 
-					this.#elements.value_arcs.value_arc.setAttribute('d',
-						this.#defineArc(-this.#config.angle / 2, angle, this.#elements.value_arcs.data.radius,
-							this.#elements.value_arcs.data.size
-						)
-					);
+					if (this.#config.value.arc.show) {
+						this.#elements.value_arcs.value_arc.setAttribute('d',
+							this.#defineArc(-this.#config.angle / 2, angle, this.#elements.value_arcs.data.radius,
+								this.#elements.value_arcs.data.size
+							)
+						);
 
-					this.#elements.value_arcs.empty_arc.setAttribute('d',
-						this.#defineArc(angle, this.#config.angle / 2, this.#elements.value_arcs.data.radius,
-							this.#elements.value_arcs.data.size
-						)
-					);
+						this.#elements.value_arcs.empty_arc.setAttribute('d',
+							this.#defineArc(angle, this.#config.angle / 2, this.#elements.value_arcs.data.radius,
+								this.#elements.value_arcs.data.size
+							)
+						);
+					}
 
-					this.#elements.needle.container.setAttribute('transform', `rotate(${angle}, 0, 1)`);
+					if (this.#config.needle.show) {
+						this.#elements.needle.container.setAttribute('transform', `rotate(${angle}, 0, 1)`);
+					}
 				}
 			);
 
-			this.#elements.needle.data.pos = pos_new;
+			this.#pos_current = pos_new;
 		}
 	}
 
