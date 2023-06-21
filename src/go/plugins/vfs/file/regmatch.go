@@ -83,9 +83,9 @@ func (p *Plugin) exportRegmatch(params []string) (result interface{}, err error)
 		return nil, errors.New("Timeout while processing item.")
 	}
 
-	f, e := os.Open(params[0])
-	if e != nil {
-		return nil, e
+	f, err := os.Open(params[0])
+	if err != nil {
+		return nil, err
 	}
 	defer f.Close()
 

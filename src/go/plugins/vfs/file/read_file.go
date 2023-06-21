@@ -38,7 +38,7 @@ func (p *Plugin) find_CR_LF_Szbyte(encoding string) (cr []byte, lf []byte, szbyt
 			strings.EqualFold(encoding, "UTF-16") || strings.EqualFold(encoding, "UTF-16LE") ||
 			strings.EqualFold(encoding, "UTF16") || strings.EqualFold(encoding, "UTF16LE") ||
 			strings.EqualFold(encoding, "UCS-2") || strings.EqualFold(encoding, "UCS-2LE") {
-			cr = []byte("\r\n")
+			cr = []byte("\r\x00")
 			lf = []byte("\n\x00")
 			szbyte = 2
 		} else if strings.EqualFold(encoding, "UNICODEBIG") || strings.EqualFold(encoding, "UNICODEFFFE") ||

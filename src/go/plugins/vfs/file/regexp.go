@@ -80,10 +80,10 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	f, e := os.Open(params[0])
+	f, err := os.Open(params[0])
 
-	if e != nil {
-		return nil, e
+	if err != nil {
+		return nil, err
 	}
 	defer f.Close()
 
@@ -118,5 +118,6 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 			break
 		}
 	}
+
 	return "", nil
 }
