@@ -209,7 +209,7 @@ class testFormTrigger extends CLegacyWebTest {
 					break;
 			}
 		}
-
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('Trigger');
 
 		if (isset($data['templatedHost'])) {
