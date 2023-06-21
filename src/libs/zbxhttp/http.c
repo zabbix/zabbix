@@ -703,7 +703,7 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			break;
 		default:
 			*error = zbx_dsprintf(NULL, "invalid retrieve mode");
-				return FAIL;
+			return FAIL;
 	}
 
 	return SUCCEED;
@@ -755,8 +755,6 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 	CURLcode		err;
 	char			url_buffer[ZBX_ITEM_URL_LEN_MAX], *headers_ptr, *line;
 	int			ret = NOTSUPPORTED, timeout_seconds, found = FAIL;
-
-
 	zbx_curl_cb_t		curl_body_cb;
 	char			application_json[] = {"Content-Type: application/json"};
 	char			application_ndjson[] = {"Content-Type: application/x-ndjson"};
@@ -793,7 +791,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(context->easyhandle, &context->header, &context->body,
-		zbx_curl_write_cb, curl_body_cb, context->errbuf, error))
+			zbx_curl_write_cb, curl_body_cb, context->errbuf, error))
 	{
 		goto clean;
 	}
