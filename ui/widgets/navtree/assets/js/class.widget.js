@@ -135,7 +135,6 @@ class CWidgetNavTree extends CWidget {
 
 			addChild: (e) => {
 				const button = e.target;
-
 				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const parent = button.getAttribute('data-id');
 
@@ -144,7 +143,6 @@ class CWidgetNavTree extends CWidget {
 
 			addMaps: (e) => {
 				const button = e.target;
-
 				const depth = parseInt(button.closest('.tree-list').getAttribute('data-depth'));
 				const id = button.getAttribute('data-id');
 
