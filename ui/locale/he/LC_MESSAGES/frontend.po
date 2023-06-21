@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-02-15 15:01+0000\n"
+"PO-Revision-Date: 2023-06-16 08:23+0000\n"
 "Last-Translator: Yaron <sh.yaron@gmail.com>\n"
 "Language-Team: none\n"
 "Language: he\n"
@@ -431,7 +431,7 @@ msgstr "הוספת מעקף"
 
 #: tests/selenium/modules/clock32/Widget.php:46
 msgid "ALARM CLOCK"
-msgstr ""
+msgstr "שעון מעורר"
 
 #: app/views/administration.user.list.php:115
 msgid "API access"
@@ -573,7 +573,7 @@ msgstr "אירועים מוכרים שנפתרו"
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:103
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "מצב הכרה"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1243,7 +1243,7 @@ msgstr "לאפשר סגירה ידנית"
 
 #: app/views/popup.discovery.check.php:125
 msgid "Allow redirect"
-msgstr ""
+msgstr "לאפשר הפניה"
 
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
@@ -1258,7 +1258,7 @@ msgstr "שיטות מורשות"
 
 #: include/classes/html/widgets/CWidgetFieldGraphDataSetView.php:402
 msgid "Also used as legend label for aggregated data sets."
-msgstr ""
+msgstr "משמש גם כתווית במקרא לקבוצות נתונים מקובצות."
 
 #: include/classes/setup/CSetupWizard.php:882
 msgid "Alternatively, you can install it manually:"
@@ -1579,7 +1579,7 @@ msgstr "ניסיונות"
 #: app/views/popup.ldap.edit.php:265
 #: app/views/popup.mediatypemapping.edit.php:59
 msgid "Attribute"
-msgstr ""
+msgstr "מאפיין"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
@@ -1836,11 +1836,11 @@ msgstr "בסיסית"
 
 #: app/views/connector.edit.php:136
 msgid "Bearer"
-msgstr ""
+msgstr "נושא"
 
 #: app/views/connector.edit.php:156
 msgid "Bearer token"
-msgstr ""
+msgstr "אסימון נושא"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
@@ -1855,12 +1855,12 @@ msgstr "ערך מתחת"
 #: include/views/configuration.item.edit.php:126
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "בינרי"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1397
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "הפריט הבינרי „%1$s” לא יכול לשמש בהקפצה"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1970,7 +1970,7 @@ msgstr "לפי מארח"
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:136
 msgid "By me"
-msgstr ""
+msgstr "על ידי"
 
 #: report2.php:196
 msgid "By trigger template"
@@ -2436,6 +2436,11 @@ msgstr "לא ניתן ליצור תלות על אבטיפוס ההקפצה עצ�
 msgid "Cannot create discovery rule"
 msgstr "לא ניתן ליצור כלל גילוי"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "לא ניתן ליצור מפת סמלים"
@@ -2473,6 +2478,10 @@ msgstr "לא ניתן ליצור קובץ תצורה."
 msgid "Cannot create user role"
 msgstr "לא ניתן ליצור תפקיד משתמש"
 
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
+
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
@@ -2502,8 +2511,8 @@ msgstr "לא ניתן למחוק את תפקיד המשתמש המוקצה „%1
 #: app/controllers/CControllerConnectorDelete.php:68
 msgid "Cannot delete connector"
 msgid_plural "Cannot delete connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק מחבר"
+msgstr[1] "לא ניתן למחוק מחברים"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2536,6 +2545,12 @@ msgstr[1] "לא ניתן למחוק את כללי הגילוי"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "לא ניתן למחוק את כללי הגילוי"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2591,8 +2606,8 @@ msgstr "לא ניתן למחוק קבוצות מארחים"
 #: host_prototypes.php:293
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק אבטיפוס מארח"
+msgstr[1] "לא ניתן למחוק אבטיפוסי מארח"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2638,8 +2653,8 @@ msgstr "לא ניתן למחוק עבודת תחזוקה"
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
 msgid_plural "Cannot delete maintenance periods"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן למחוק תקופת תחזוקה"
+msgstr[1] "לא ניתן למחוק תקופות תחזוקה"
 
 #: app/controllers/CControllerMediatypeDelete.php:69
 msgid "Cannot delete media type"
@@ -2821,8 +2836,8 @@ msgstr[1] "לא ניתן להשבית משימות"
 #: app/controllers/CControllerConnectorDisable.php:77
 msgid "Cannot disable connector"
 msgid_plural "Cannot disable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להשבית מחבר"
+msgstr[1] "לא ניתן להשבית מחברים"
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
@@ -2835,6 +2850,12 @@ msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] "לא ניתן לנטרל את כלל הגילוי"
 msgstr[1] "לא ניתן לנטרל את כללי הגילוי"
+
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
@@ -2858,8 +2879,8 @@ msgstr[1] "לא ניתן לנטרל סוגי מדיה"
 #: app/controllers/CControllerModuleDisable.php:75
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להשבית מודול"
+msgstr[1] "לא ניתן להשבית מודולים"
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2917,8 +2938,8 @@ msgstr[1] "לא ניתן להפעיל משימות"
 #: app/controllers/CControllerConnectorEnable.php:77
 msgid "Cannot enable connector"
 msgid_plural "Cannot enable connectors"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להפעיל מחבר"
+msgstr[1] "לא ניתן להפעיל מחברים"
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
@@ -2931,6 +2952,12 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "לא ניתן להפעיל את כלל הגילוי"
 msgstr[1] "לא ניתן להפעיל את כללי הגילוי"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -2954,8 +2981,8 @@ msgstr[1] "לא ניתן להפעיל סוגי מדיה"
 #: app/controllers/CControllerModuleEnable.php:99
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "לא ניתן להפעיל מודול"
+msgstr[1] "לא ניתן להפעיל מודולים"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3931,6 +3958,11 @@ msgid_plural "Cannot update events"
 msgstr[0] "לא ניתן לעדכן אירוע"
 msgstr[1] "לא ניתן לעדכן אירועים"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "לא ניתן לעדכן אירועים"
@@ -4161,6 +4193,10 @@ msgstr "לא ניתן לעדכן תפקיד משתמש"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "לא ניתן לעדכן תרחישי רשת"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5333,6 +5369,10 @@ msgstr "יצירת כלל גילוי (יש לבחור תבנית תחילה)"
 msgid "Create enabled"
 msgstr "היצירה פעילה"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "יצירת תרשים"
@@ -6156,6 +6196,10 @@ msgstr "למחוק את לוח המחוונים?"
 msgid "Delete discovery rule?"
 msgstr "למחוק את כלל הגילוי?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6173,7 +6217,7 @@ msgstr "למחוק תרשים?"
 
 #: include/views/configuration.item.list.php:318
 msgid "Delete history of selected item?"
-msgstr ""
+msgstr "למחוק את ההיסטוריה של הפריט הנבחר?"
 
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
@@ -6181,7 +6225,7 @@ msgstr "למחוק את ההיסטוריה של הפריטים הנבחרים?"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Delete history of selected web scenario?"
-msgstr ""
+msgstr "למחוק את ההיסטוריה של תרחישי הרשת הנבחרים?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6249,15 +6293,15 @@ msgstr "למחוק את המשימות הנבחרות?"
 
 #: app/views/connector.edit.php:332 app/views/js/connector.list.js.php:129
 msgid "Delete selected connector?"
-msgstr ""
+msgstr "למחוק את המחבר הנבחר?"
 
 #: app/views/js/connector.list.js.php:128
 msgid "Delete selected connectors?"
-msgstr ""
+msgstr "למחוק את המחברים הנבחרים?"
 
 #: app/views/configuration.correlation.list.php:159
 msgid "Delete selected correlation?"
-msgstr ""
+msgstr "למחוק את היחס הנבחר?"
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -6266,7 +6310,7 @@ msgstr "למחוק את היחסים הנבחרים?"
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboard?"
-msgstr ""
+msgstr "למחוק את לוח המחוונים הנבחר?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
@@ -6276,7 +6320,7 @@ msgstr "למחוק את לוחות המחוונים הנבחרים?"
 #: app/views/js/configuration.discovery.list.js.php:124
 #: include/views/configuration.host.discovery.list.php:369
 msgid "Delete selected discovery rule?"
-msgstr ""
+msgstr "למחוק את כלל הגילוי הנבחר?"
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6287,9 +6331,17 @@ msgstr "למחוק את כללי הגילוי הנבחרים?"
 msgid "Delete selected elements?"
 msgstr "למחוק את הפריטים הנבחרים?"
 
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
-msgstr ""
+msgstr "למחוק את אבטיפוס התרשים הנבחר?"
 
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
@@ -6297,7 +6349,7 @@ msgstr "למחוק את אבות הטיפוס של התרשים הנבחר?"
 
 #: include/views/configuration.graph.list.php:270
 msgid "Delete selected graph?"
-msgstr ""
+msgstr "למחוק את התרשים הנבחר?"
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6344,7 +6396,7 @@ msgstr "למחוק את אתמונה הנבחרת?"
 
 #: include/views/configuration.item.prototype.list.php:232
 msgid "Delete selected item prototype?"
-msgstr ""
+msgstr "למחוק את אבטיפוס הפריט הנבחר?"
 
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
@@ -6352,7 +6404,7 @@ msgstr "למחוק את אבות הטיפוס של הפריט הנבחר?"
 
 #: include/views/configuration.item.list.php:361
 msgid "Delete selected item?"
-msgstr ""
+msgstr "למחוק את הפריט הנבחר?"
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6360,7 +6412,7 @@ msgstr "למחוק את הפריטים הנבחרים?"
 
 #: app/views/js/maintenance.list.js.php:88
 msgid "Delete selected maintenance period?"
-msgstr ""
+msgstr "למחוק את תקופת התחזוקה הנבחרת?"
 
 #: include/views/configuration.maintenance.list.php:128
 msgid "Delete selected maintenance periods?"
@@ -6376,7 +6428,7 @@ msgstr "למחוק את המפות הנבחרות?"
 
 #: app/views/administration.mediatype.list.php:217
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "למחוק את סוג המדיה הנבחר?"
 
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
@@ -6392,7 +6444,7 @@ msgstr "למחוק את המתווך הנבחר?"
 
 #: app/views/administration.regex.list.php:83
 msgid "Delete selected regular expression?"
-msgstr ""
+msgstr "למחוק את הביטוי הרגולרי הנבחר?"
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6416,7 +6468,7 @@ msgstr "למחוק את הדוחות המתוזמנים שנבחרו?"
 
 #: app/views/administration.script.list.php:224
 msgid "Delete selected script?"
-msgstr ""
+msgstr "למחוק את הסקריפט הנבחר?"
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6446,7 +6498,7 @@ msgstr "למחוק את קבוצות התבניות הנבחרות?"
 
 #: include/views/configuration.template.list.php:313
 msgid "Delete selected template?"
-msgstr ""
+msgstr "למחוק את התבנית הנבחרת?"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -6464,7 +6516,7 @@ msgstr "למחוק את האסימונים הנבחרים?"
 
 #: include/views/configuration.trigger.prototype.list.php:231
 msgid "Delete selected trigger prototype?"
-msgstr ""
+msgstr "למחוק את אבטיפוס ההקפצה הנבחר?"
 
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
@@ -6472,7 +6524,7 @@ msgstr "למחוק את אבות הטיפוס של ההקפצה הנבחרת?"
 
 #: include/views/configuration.triggers.list.php:393
 msgid "Delete selected trigger?"
-msgstr ""
+msgstr "למחוק את ההקפצה הנבחרת?"
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6488,7 +6540,7 @@ msgstr "למחוק את המשתמשים הנבחרים?"
 
 #: include/views/configuration.httpconf.list.php:248
 msgid "Delete selected web scenario?"
-msgstr ""
+msgstr "למחוק את תרחיש הרשת הנבחר?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6759,11 +6811,11 @@ msgstr "להשבית את המשימות הנבחרות?"
 
 #: app/views/js/connector.list.js.php:114
 msgid "Disable selected connector?"
-msgstr ""
+msgstr "להשבית את המחבר הנבחר?"
 
 #: app/views/js/connector.list.js.php:113
 msgid "Disable selected connectors?"
-msgstr ""
+msgstr "להשבית את המחברים הנבחרים?"
 
 #: app/views/configuration.correlation.list.php:153
 msgid "Disable selected correlation?"
@@ -6782,6 +6834,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "להשבית את כללי הגילוי הנבחרים?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7677,6 +7737,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "להפעיל את כללי הגילוי הנבחרים?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7937,11 +8005,46 @@ msgstr "אירוע הוכר"
 msgid "Event correlation"
 msgstr "יחס בין אירועים"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "כללי יחסים בין אירועים"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -14051,6 +14154,10 @@ msgstr ""
 msgid "New element"
 msgstr "רכיב חדש"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14083,6 +14190,10 @@ msgstr "קבוצת מארחים חדשה"
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr "מיפוי סוגי מדיה חדש"
@@ -14107,6 +14218,10 @@ msgstr ""
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "שירות חדש"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -16437,7 +16552,7 @@ msgstr "תכונות"
 
 #: app/views/connector.edit.php:47
 msgid "Protocol"
-msgstr ""
+msgstr "פרוטוקול"
 
 #: include/classes/vaults/CVaultCyberArk.php:64
 #: include/classes/vaults/CVaultHashiCorp.php:55
@@ -16475,7 +16590,7 @@ msgstr "להקים עכשיו"
 
 #: app/views/administration.user.list.php:304
 msgid "Provision selected LDAP user?"
-msgstr ""
+msgstr "להקים את משתמש ה־LDAP הנבחר?"
 
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
@@ -17308,6 +17423,17 @@ msgstr "נפתר על ידי כלל היחס „%1$s”."
 msgid "Resolved by correlation rule."
 msgstr "נפתר על ידי כלל יחס."
 
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
+
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
@@ -18016,7 +18142,7 @@ msgstr[1] "הסקריפטים נמחקו"
 
 #: app/views/popup.mediatypetest.edit.php:60
 msgid "Script does not have parameters."
-msgstr ""
+msgstr "לסקריפט אין משתנים."
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -22737,7 +22863,7 @@ msgstr "יצרן"
 
 #: include/views/configuration.template.edit.php:93
 msgid "Vendor and version"
-msgstr ""
+msgstr "ספק וגרסה"
 
 #: include/items.inc.php:43
 msgid "Verbose"
@@ -23383,7 +23509,7 @@ msgstr "שילובים מול Zabbix"
 
 #: app/views/connector.edit.php:49
 msgid "Zabbix Streaming Protocol v1.0"
-msgstr ""
+msgstr "פרוטוקול הזרמה של Zabbix בגרסה 1.0"
 
 #: include/classes/helpers/CMenuHelper.php:356
 msgid "Zabbix Technical Support"
@@ -23402,7 +23528,7 @@ msgstr "סוכן Zabbix (פעיל)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
-msgstr ""
+msgstr "גרסת חזית של Zabbix"
 
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
@@ -23465,7 +23591,7 @@ msgstr "שם שרת ה־Zabbix"
 
 #: app/partials/administration.system.info.php:40
 msgid "Zabbix server version"
-msgstr ""
+msgstr "גרסת שרת של Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23664,7 +23790,7 @@ msgstr "כל סוגי המדיה"
 #: include/classes/screens/CScreenDiscovery.php:207
 #: include/discovery.inc.php:84
 msgid "allow redirect"
-msgstr ""
+msgstr "לאפשר הפניה"
 
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"

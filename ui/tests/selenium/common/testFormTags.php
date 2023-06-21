@@ -265,7 +265,7 @@ class testFormTags extends CWebTest {
 
 			case 'web scenario':
 				$sql = 'SELECT * FROM httptest ORDER BY httptestid';
-				$locator = 'name:httpForm';
+				$locator = 'name:webscenario_form';
 				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true)];
 				break;
 
@@ -313,7 +313,7 @@ class testFormTags extends CWebTest {
 			$form->selectTab('Steps');
 			$form->getField('Steps')->query('button:Add')->waitUntilClickable()->one()->click();
 			COverlayDialogElement::find()->one()->waitUntilReady();
-			$overlay_form = $this->query('id:http_step')->asForm()->one();
+			$overlay_form = $this->query('id:webscenario-step-form')->asForm()->one();
 			$overlay_form->fill(['Name' => 'zabbix', 'id:url' => 'http://zabbix.com']);
 			$overlay_form->submit();
 			COverlayDialogElement::ensureNotPresent();
@@ -476,7 +476,7 @@ class testFormTags extends CWebTest {
 
 			case 'web scenario':
 				$sql = 'SELECT * FROM httptest ORDER BY httptestid';
-				$locator = 'name:httpForm';
+				$locator = 'name:webscenario_form';
 				break;
 
 			case 'service':
@@ -665,7 +665,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'web scenario':
-				$form = $this->query('name:httpForm')->asForm()->waitUntilPresent()->one();
+				$form = $this->query('name:webscenario_form')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM httptest WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM httptest WHERE name='.zbx_dbstr($new_name);
@@ -872,7 +872,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'web scenario':
-				$form_selector = 'id:http-form';
+				$form_selector = 'id:webscenario-form';
 				break;
 
 			case 'host prototype':
@@ -1304,7 +1304,7 @@ class testFormTags extends CWebTest {
 			'trigger prototype' => 'name:triggersForm',
 			'item' => 'name:itemForm',
 			'item prototype' => 'name:itemForm',
-			'web scenario' => 'name:httpForm',
+			'web scenario' => 'name:webscenario_form',
 			'service' => 'id:service-form',
 			'host prototype' => 'name:hostPrototypeForm',
 			'template' => 'name:templatesForm'
