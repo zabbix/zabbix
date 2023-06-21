@@ -760,6 +760,8 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
 		config_active_args[forks].config_source_ip = zbx_config_source_ip;
 		config_active_args[forks].config_hostname = zbx_config_hostname;
+		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
+		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
 	}
 
 	return SUCCEED;
