@@ -109,7 +109,7 @@ if (typeof addPopupValues === 'undefined') {
 			// Regenerate the absolute position used for position checks.
 			this.positionAbs = this._convertPositionTo('absolute');
 
-			let prev_offset_top = this.placeholder.offset().top;
+			const prev_offset_top = this.placeholder.offset().top;
 
 			// Set the helper position.
 			if (!this.options.axis || this.options.axis !== 'y') {
@@ -244,7 +244,9 @@ if (typeof addPopupValues === 'undefined') {
 			}
 
 			if (direction_moved) {
-				levels_moved = Math.floor(Math.abs(parent_item.offset().left - this.positionAbs.left) / opt.indent_size);
+				levels_moved = Math.floor(
+					Math.abs(parent_item.offset().left - this.positionAbs.left) / opt.indent_size
+				);
 			}
 
 			$('.highlighted-parent').removeClass('highlighted-parent');
@@ -350,7 +352,7 @@ if (typeof addPopupValues === 'undefined') {
 				const parent_id = this.placeholder.parent().closest('.tree-item').data('id');
 				const item_id = $(this.currentItem[0]).data('id');
 
-				$('[name="navtree.parent.' + item_id + '"]').val(parent_id);
+				$(`[name="navtree.parent.${item_id}"]`).val(parent_id);
 
 				if (this.options.revert) {
 					const self = this;
