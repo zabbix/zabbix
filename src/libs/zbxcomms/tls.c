@@ -3077,6 +3077,9 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 	size_t		error_alloc = 0, error_offset = 0;
 	unsigned char	initialized;
 
+	if (NULL != event)
+		*event = 0;
+
 	if (NULL == s->tls_ctx)
 	{
 		s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(zbx_tls_context_t));

@@ -38,7 +38,7 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 		case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 			return "connect";
 		case ZABBIX_AGENT_STEP_TLS_WAIT:
-			return "tls hanshake";
+			return "tls";
 		case ZABBIX_AGENT_STEP_SEND:
 			return "send";
 		default:
@@ -61,7 +61,7 @@ static int	agent_task_process(short event, void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	ssize_t			received_len;
-	short			want_event = 0;
+	short			event_new;
 	zbx_async_task_state_t	state;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg_action;
 	int			errnum = 0;
@@ -78,8 +78,8 @@ static int	agent_task_process(short event, void *data)
 		/* initialization */
 		agent_context->step = ZABBIX_AGENT_STEP_CONNECT_WAIT;
 
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d", __func__,
-				get_agent_step_string(agent_context->step), event);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+				get_agent_step_string(agent_context->step), event, agent_context->itemid);
 
 		zbx_tcp_send_context_init(agent_context->key, strlen(agent_context->key), 0,
 					ZBX_TCP_PROTOCOL, &agent_context->tcp_send_context);
@@ -88,8 +88,8 @@ static int	agent_task_process(short event, void *data)
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d", __func__,
-				get_agent_step_string(agent_context->step), event);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+				get_agent_step_string(agent_context->step), event, agent_context->itemid);
 	}
 
 
@@ -114,7 +114,12 @@ static int	agent_task_process(short event, void *data)
 				agent_context->ret = NETWORK_ERROR;
 				break;
 			}
+
 			agent_context->step = ZABBIX_AGENT_STEP_TLS_WAIT;
+
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+					get_agent_step_string(agent_context->step), event,
+					agent_context->itemid);
 			ZBX_FALLTHROUGH;
 		case ZABBIX_AGENT_STEP_TLS_WAIT:
 			if (ZBX_TCP_SEC_TLS_CERT == agent_context->tls_connect ||
@@ -124,9 +129,9 @@ static int	agent_task_process(short event, void *data)
 
 				if (SUCCEED != zbx_tls_connect(&agent_context->s, agent_context->tls_connect,
 						agent_context->tls_arg1, agent_context->tls_arg2,
-						agent_context->server_name, &want_event, &error))
+						agent_context->server_name, &event_new, &error))
 				{
-					if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(want_event)))
+					if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 						return state;
 
 					SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent"
@@ -139,14 +144,18 @@ static int	agent_task_process(short event, void *data)
 			}
 
 			agent_context->step = ZABBIX_AGENT_STEP_SEND;
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+					get_agent_step_string(agent_context->step), event,
+					agent_context->itemid);
 			ZBX_FALLTHROUGH;
 		case ZABBIX_AGENT_STEP_SEND:
-			zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", agent_context->key);
+			zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s] itemid:" ZBX_FS_UI64, agent_context->key,
+					agent_context->itemid);
 
 			if (SUCCEED != zbx_tcp_send_context(&agent_context->s, &agent_context->tcp_send_context,
-					&want_event))
+					&event_new))
 			{
-				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(want_event)))
+				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 					return state;
 
 				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
@@ -155,18 +164,15 @@ static int	agent_task_process(short event, void *data)
 				agent_context->ret = NETWORK_ERROR;
 				break;
 			}
-			else
-			{
-				agent_context->step = ZABBIX_AGENT_STEP_RECV;
-				zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context,
-						agent_context->flags);
 
-				return ZBX_ASYNC_TASK_READ;
-			}
-			break;
+			agent_context->step = ZABBIX_AGENT_STEP_RECV;
+			zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context,
+					agent_context->flags);
+
+			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV:
 			if (FAIL != (received_len = zbx_tcp_recv_context(&agent_context->s,
-					&agent_context->tcp_recv_context, agent_context->flags, &want_event)))
+					&agent_context->tcp_recv_context, agent_context->flags, &event_new)))
 			{
 				agent_context->ret = SUCCEED;
 				zbx_agent_handle_response(&agent_context->s, received_len, &agent_context->ret,
@@ -174,16 +180,14 @@ static int	agent_task_process(short event, void *data)
 
 				break;
 			}
-			else
-			{
-				if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(want_event)))
-					return state;
+	
+			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
+				return state;
 
-				SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
-						" during %s: %s", get_agent_step_string(agent_context->step),
-						zbx_socket_strerror()));
-				agent_context->ret = NETWORK_ERROR;
-			}
+			SET_MSG_RESULT(&agent_context->result, zbx_dsprintf(NULL, "Get value from agent failed"
+					" during %s: %s", get_agent_step_string(agent_context->step),
+					zbx_socket_strerror()));
+			agent_context->ret = NETWORK_ERROR;
 			break;
 	}
 stop:

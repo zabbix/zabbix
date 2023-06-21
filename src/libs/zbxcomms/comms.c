@@ -814,6 +814,9 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 	ssize_t	bytes_sent;
 	size_t	send_bytes;
 
+	if (NULL != event)
+		*event = 0;
+
 	if (context->header_len > (size_t)context->written_header)
 	{
 		size_t	data_len;
@@ -1881,6 +1884,9 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events)
 {
 	ssize_t	nbytes;
+
+	if (NULL != events)
+		events = 0;
 
 	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + context->buf_stat_bytes,
 			sizeof(s->buf_stat) - context->buf_stat_bytes, events)))
