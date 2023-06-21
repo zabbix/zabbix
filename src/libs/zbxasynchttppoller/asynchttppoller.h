@@ -19,9 +19,9 @@
 
 #ifndef ZABBIX_ASYNCHTTPPOLLER_H
 #define ZABBIX_ASYNCHTTPPOLLER_H
-#include "zbxalgo.h"
+
 #include "event.h"
-#include "zbxhttp.h"
+#include "zbxsysinc.h"
 
 
 typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err, void *arg);
