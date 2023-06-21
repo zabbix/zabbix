@@ -74,16 +74,15 @@ window.widget_gauge_form = new class {
 		document.getElementById('value_arc_size').disabled = !this._value_arc.checked;
 
 		for (const element of document.querySelectorAll('#minmax_show, #minmax_size, #minmax_show_units')) {
-			element.disabled = this._th_rows_count === 0 || (!this._th_show_arc.checked && !this._value_arc.checked);
+			element.disabled = !this._th_show_arc.checked && !this._value_arc.checked;
 		}
 
 		for (const element of document.querySelectorAll('#minmax_size, #minmax_show_units')) {
-			element.disabled = !this._minmax_show.checked || this._th_rows_count === 0 || (!this._th_show_arc.checked
-				&& !this._value_arc.checked);
+			element.disabled = !this._minmax_show.checked || (!this._th_show_arc.checked && !this._value_arc.checked);
 		}
 
 		document.getElementById('minmax_show_units').disabled = !this._units_show.checked || !this._minmax_show.checked
-			|| this._th_rows_count === 0 || (!this._th_show_arc.checked && !this._value_arc.checked);
+			|| (!this._th_show_arc.checked && !this._value_arc.checked);
 
 		for (const element of
 				document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {
