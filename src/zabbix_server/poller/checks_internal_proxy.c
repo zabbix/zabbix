@@ -54,7 +54,6 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 	{
 		const char	*param2, *param3;
 		int		params_num;
-		zbx_pdc_stats_t	stats;
 		char		*error = NULL;
 
 		params_num = get_rparams_num(request);
@@ -68,34 +67,36 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		param2 = get_rparam(request, 1);
 		param3 = get_rparam(request, 2);
 
-		if (SUCCEED != zbx_pdc_get_stats(&stats, &error))
-		{
-			SET_MSG_RESULT(result, error);
-			return NOTSUPPORTED;
-		}
-
 		if (0 == strcmp(param2, "buffer"))
 		{
+			zbx_pdc_mem_info_t	info;
+
+			if (SUCCEED != zbx_pdc_get_mem_info(&info, &error))
+			{
+				SET_MSG_RESULT(result, error);
+				return NOTSUPPORTED;
+			}
+
 			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "pfree"))
 			{
-				SET_DBL_RESULT(result, (double)(stats.mem_total - stats.mem_used) /
-						(double)stats.mem_total * 100);
+				SET_DBL_RESULT(result, (double)(info.mem_total - info.mem_used) /
+						(double)info.mem_total * 100);
 			}
 			else if (0 == strcmp(param3, "free"))
 			{
-				SET_UI64_RESULT(result, stats.mem_total - stats.mem_used);
+				SET_UI64_RESULT(result, info.mem_total - info.mem_used);
 			}
 			else if (0 == strcmp(param3, "total"))
 			{
-				SET_UI64_RESULT(result, stats.mem_total);
+				SET_UI64_RESULT(result, info.mem_total);
 			}
 			else if (0 == strcmp(param3, "used"))
 			{
-				SET_UI64_RESULT(result, stats.mem_used);
+				SET_UI64_RESULT(result, info.mem_used);
 			}
 			else if (0 == strcmp(param3, "pused"))
 			{
-				SET_DBL_RESULT(result, (double)stats.mem_used / (double)stats.mem_total * 100);
+				SET_DBL_RESULT(result, (double)info.mem_used / (double)info.mem_total * 100);
 			}
 			else
 			{
@@ -105,9 +106,17 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 		else if (0 == strcmp(param2, "state"))
 		{
+			zbx_pdc_state_info_t	info;
+
+			zbx_pdc_get_state_info(&info);
+
 			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "current"))
 			{
-				SET_UI64_RESULT(result, (zbx_uint64_t)stats.state);
+				SET_UI64_RESULT(result, (zbx_uint64_t)info.state);
+			}
+			else if (0 == strcmp(param3, "changes"))
+			{
+				SET_UI64_RESULT(result, (zbx_uint64_t)info.changes_num);
 			}
 			else
 			{

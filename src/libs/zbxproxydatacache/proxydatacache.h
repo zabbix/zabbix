@@ -115,6 +115,7 @@ typedef struct
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;
 	int			offline_buffer;
+	zbx_uint64_t		changes_num;
 	zbx_mutex_t		mutex;
 
 	/* ids of last records uploaded to server */

@@ -141,6 +141,9 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s => %s", __func__, pdc_state_desc[pdc->state], pdc_state_desc[state]);
 
+	if (PDC_DATABASE == pdc->state || PDC_MEMORY == pdc->state)
+		pdc->changes_num++;
+
 	switch (state)
 	{
 		case PDC_DATABASE_ONLY:
@@ -454,6 +457,7 @@ int	zbx_pdc_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 
 	pdc_cache->max_age = age;
 	pdc_cache->offline_buffer = offline_buffer;
+	pdc_cache->changes_num = 0;
 
 	if (SUCCEED != zbx_mutex_create(&pdc_cache->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
 		goto out;
@@ -497,10 +501,10 @@ void	zbx_pdc_flush(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get proxy data cache statistics                                   *
+ * Purpose: get proxy data cache memory information                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_get_stats(zbx_pdc_stats_t *stats, char **error)
+int	zbx_pdc_get_mem_info(zbx_pdc_mem_info_t *info, char **error)
 {
 	if (ZBX_MUTEX_NULL == pdc_cache->mutex)
 	{
@@ -510,11 +514,31 @@ int	zbx_pdc_get_stats(zbx_pdc_stats_t *stats, char **error)
 
 	pdc_lock();
 
-	stats->mem_total = pdc_mem->total_size;
-	stats->mem_used = pdc_mem->total_size - pdc_mem->free_size;
-	stats->state = pdc_cache->state;
+	info->mem_total = pdc_mem->total_size;
+	info->mem_used = pdc_mem->total_size - pdc_mem->free_size;
 
 	pdc_unlock();
 
 	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy data cache state information                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pdc_get_state_info(zbx_pdc_state_info_t *info)
+{
+	if (ZBX_MUTEX_NULL == pdc_cache->mutex)
+	{
+		info->changes_num = 0;
+		info->state = 0;
+	}
+	else
+	{
+		pdc_lock();
+		info->state = (PDC_MEMORY == pdc_dst[pdc_cache->state] ? 1 : 0);
+		info->changes_num = pdc_cache->changes_num;
+		pdc_unlock();
+	}
 }

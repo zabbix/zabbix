@@ -28,16 +28,23 @@ typedef struct
 {
 	zbx_uint64_t	mem_used;
 	zbx_uint64_t	mem_total;
-	int		state;
 }
-zbx_pdc_stats_t;
+zbx_pdc_mem_info_t;
+
+typedef struct
+{
+	int		state;
+	zbx_uint64_t	changes_num;
+}
+zbx_pdc_state_info_t;
 
 int	zbx_pdc_init(zbx_uint64_t size, int age, int offline_buffer, char **error);
 
 void	zbx_pdc_update_state(int more);
 void	zbx_pdc_flush(void);
 
-int	zbx_pdc_get_stats(zbx_pdc_stats_t *stats, char **error);
+int	zbx_pdc_get_mem_info(zbx_pdc_mem_info_t *info, char **error);
+void	zbx_pdc_get_state_info(zbx_pdc_state_info_t *info);
 
 /* discovery */
 
