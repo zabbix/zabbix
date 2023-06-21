@@ -1718,8 +1718,10 @@ form.dashboard-widget-gauge .fields-group.fields-group-minmax .minmax-show {
 form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field:first-child {
   grid-column: 1 / -1; }
 
-div.dashboard-widget-gauge .dashboard-grid-widget-body svg {
-  display: block; }
+div.dashboard-widget-gauge {
+  overflow-x: hidden; }
+  div.dashboard-widget-gauge .dashboard-grid-widget-body svg {
+    display: block; }
 
 .dashboard-widget-inaccessible {
   display: grid;

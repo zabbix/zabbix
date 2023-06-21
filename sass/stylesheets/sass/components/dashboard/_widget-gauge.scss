@@ -91,6 +91,8 @@ form.dashboard-widget-gauge {
 // Widget view.
 
 div.dashboard-widget-gauge {
+	overflow-x: hidden;
+
 	.dashboard-grid-widget-body {
 		svg {
 			display: block;
