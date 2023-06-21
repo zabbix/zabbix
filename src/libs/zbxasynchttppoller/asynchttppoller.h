@@ -23,7 +23,6 @@
 #include "event.h"
 #include "zbxsysinc.h"
 
-
 typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err, void *arg);
 typedef void (*httpagent_action_callback_fn)(void *arg);
 
