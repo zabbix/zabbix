@@ -125,14 +125,24 @@ abstract class CControllerCharts extends CController {
 	 * @return array
 	 */
 	protected function getSimpleGraphs(array $hostids, string $name): array {
-		return API::Item()->get([
-			'output' => ['itemid', 'name'],
+
+		$simple_graphs = API::Item()->get([
+			'output' => ['itemid', 'name', 'value_type'],
 			'hostids' => $hostids,
 			'search' => $name !== '' ? ['name' => $name] : null,
 			// TODO VM: filter by tags
 			'selectTags' => ['tag', 'value'],
 			'preservekeys' => true
 		]);
+
+		foreach ($simple_graphs as $key => $simple_graph) {
+			if (array_key_exists('value_type', $simple_graph) && $simple_graph['value_type'] !== '3'
+					&& $simple_graph['value_type'] !== '0') {
+				unset($simple_graphs[$key]);
+			}
+		}
+
+		return $simple_graphs;
 	}
 
 	/**
