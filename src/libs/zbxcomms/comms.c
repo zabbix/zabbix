@@ -717,25 +717,6 @@ ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 	return offset;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: send data                                                         *
- *                                                                            *
- * Return value: SUCCEED - success                                            *
- *               FAIL - an error occurred                                     *
- *                                                                            *
- * Comments:                                                                  *
- *     RFC 5246 "The Transport Layer Security (TLS) Protocol. Version 1.2"    *
- *     says: "The record layer fragments information blocks into TLSPlaintext *
- *     records carrying data in chunks of 2^14 bytes or less.".               *
- *                                                                            *
- *     This function combines sending of Zabbix protocol header (5 bytes),    *
- *     data length (8 bytes or 16 bytes for large packet) and at least part   *
- *     of the message into one block of up to 16384 bytes for efficiency.     *
- *     The same is applied for sending unencrypted messages.                  *
- *                                                                            *
- ******************************************************************************/
-
 #define ZBX_TCP_HEADER_DATA	"ZBXD"
 #define ZBX_TCP_HEADER_LEN	ZBX_CONST_STRLEN(ZBX_TCP_HEADER_DATA)
 
@@ -828,6 +809,24 @@ void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
 	zbx_free(state->compressed_data);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send data                                                         *
+ *                                                                            *
+ * Return value: SUCCEED - success                                            *
+ *               FAIL - an error occurred                                     *
+ *                                                                            *
+ * Comments:                                                                  *
+ *     RFC 5246 "The Transport Layer Security (TLS) Protocol. Version 1.2"    *
+ *     says: "The record layer fragments information blocks into TLSPlaintext *
+ *     records carrying data in chunks of 2^14 bytes or less.".               *
+ *                                                                            *
+ *     This function combines sending of Zabbix protocol header (5 bytes),    *
+ *     data length (8 bytes or 16 bytes for large packet) and at least part   *
+ *     of the message into one block of up to 16384 bytes for efficiency.     *
+ *     The same is applied for sending unencrypted messages.                  *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event)
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
