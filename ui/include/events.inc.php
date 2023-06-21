@@ -42,13 +42,13 @@ function eventSource($source = null) {
 		return $sources;
 	}
 
-	return array_key_exists($source, $sources) ?  $sources[$source] : _('Unknown');
+	return array_key_exists($source, $sources) ? $sources[$source] : _('Unknown');
 }
 
 /**
  * Returns the names of supported event objects.
  *
- * If the $source parameter is passed, returns the name of the specific object, otherwise - returns an array of all
+ * If the $object parameter is passed, returns the name of the specific object, otherwise - returns an array of all
  * supported objects.
  *
  * @param int $object
@@ -69,12 +69,8 @@ function eventObject($object = null) {
 	if ($object === null) {
 		return $objects;
 	}
-	elseif (isset($objects[$object])) {
-		return $objects[$object];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return array_key_exists($object, $objects) ? $objects[$object] : _('Unknown');
 }
 
 /**
