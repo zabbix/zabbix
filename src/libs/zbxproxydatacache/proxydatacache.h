@@ -114,6 +114,7 @@ typedef struct
 	zbx_pdc_state_t		state;
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;
+	int			offline_buffer;
 	zbx_mutex_t		mutex;
 
 	/* ids of last records uploaded to server */

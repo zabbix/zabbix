@@ -615,6 +615,18 @@ static void	pdc_history_data_free(zbx_pdc_history_data_t *data)
 int	pdc_history_check_age(zbx_pdc_t *pdc)
 {
 	zbx_pdc_history_t	*row;
+	int			now;
+
+	now = (int)time(NULL);
+
+	while (SUCCEED == zbx_list_peek(&pdc->history, (void **)&row))
+	{
+		if (now - row->ts.sec <= pdc->offline_buffer)
+			break;
+
+		zbx_list_pop(&pdc->history, NULL);
+		pdc_list_free_history(&pdc->history, row);
+	}
 
 	if (0 == pdc->max_age)
 		return SUCCEED;

@@ -261,6 +261,18 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
 int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
 {
 	zbx_pdc_autoreg_t	*row;
+	int			now;
+
+	now = (int)time(NULL);
+
+	while (SUCCEED == zbx_list_peek(&pdc->autoreg, (void **)&row))
+	{
+		if (now - row->clock <= pdc->offline_buffer)
+			break;
+
+		zbx_list_pop(&pdc->autoreg, NULL);
+		pdc_list_free_autoreg(&pdc->autoreg, row);
+	}
 
 	if (0 == pdc->max_age)
 		return SUCCEED;

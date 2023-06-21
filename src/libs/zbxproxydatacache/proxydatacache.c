@@ -424,7 +424,7 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
+int	zbx_pdc_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 {
 	int	ret = FAIL;
 
@@ -453,6 +453,7 @@ int	zbx_pdc_init(zbx_uint64_t size, int age, char **error)
 	zbx_list_create_ext(&pdc_cache->autoreg, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
 
 	pdc_cache->max_age = age;
+	pdc_cache->offline_buffer = offline_buffer;
 
 	if (SUCCEED != zbx_mutex_create(&pdc_cache->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
 		goto out;

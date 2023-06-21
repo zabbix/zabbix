@@ -721,10 +721,20 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == config_proxyconfig_frequency)
 		config_proxyconfig_frequency = 10;
 
-	if (0 == config_data_cache_size && 0 != config_data_cache_age)
+	if (0 != config_data_cache_age)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter requires \"DataCacheSize\"");
-		err = 1;
+		if (0 == config_data_cache_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter requires"
+					" \"DataCacheSize\"");
+			err = 1;
+		}
+
+		if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_data_cache_age)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheAge\" configuration parameter");
+			err = 1;
+		}
 	}
 
 	if (0 != config_data_cache_size)
@@ -746,12 +756,6 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter cannot be greater than "
 					"\"ProxyOfflineBuffer\"");
-			err = 1;
-		}
-
-		if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_data_cache_age)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheAge\" configuration parameter");
 			err = 1;
 		}
 	}
@@ -1528,8 +1532,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
-	/* TODO: get parameters from configuration file */
-	if (FAIL == zbx_pdc_init(config_data_cache_size, config_data_cache_age, &error))
+	if (FAIL == zbx_pdc_init(config_data_cache_size, config_data_cache_age,
+			config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy data cache: %s", error);
 		zbx_free(error);
