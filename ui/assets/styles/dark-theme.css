@@ -4,7 +4,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1134,6 +1134,8 @@ footer {
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
+      .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+        line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #737373; }

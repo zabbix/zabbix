@@ -2975,7 +2975,7 @@ tr.cursor-move {
 	table-layout: fixed;
 	@extend %overflow-ellipsis;
 
-	td {
+	td:not(.wordbreak, .wordwrap) {
 		@extend %overflow-ellipsis;
 	}
 
