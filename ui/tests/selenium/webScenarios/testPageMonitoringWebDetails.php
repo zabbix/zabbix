@@ -158,7 +158,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Result - empty',
+					'name' => 'Result - Empty',
 					'expected_totals' => ['Status' => ''],
 					'steps' => [
 						['expected_data' => ['Status' => '']]
@@ -199,7 +199,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 	/**
 	 * Test the display of data in the table.
-	 * Additional complexity comes from the Status column, as the values there are dynamic (not from the DB).
+	 * Additional complexity comes from the Status column, as the displayed values there are calculated on the fly.
 	 *
 	 * @dataProvider getWebScenarioData
 	 */
@@ -227,10 +227,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// Generate data for global web scenario items.
 		foreach ($data['global_item_data'] ?? [] as $data_type => $data_value) {
 			// Gets id of the correct item.
-			$sql = 'SELECT ti.itemid FROM httptestitem ti '.
-				'JOIN items i ON ti.itemid=i.itemid '.
-				'WHERE ti.httptestid='.$httptest_id.' '.
-				'AND ti.type='.$data_type;
+			$sql = 'SELECT ti.itemid FROM httptestitem ti'.
+					' JOIN items i ON ti.itemid=i.itemid'.
+					' WHERE ti.httptestid='.$httptest_id.
+					' AND ti.type='.$data_type;
 			$item_id = CDBHelper::getValue($sql);
 			CDataHelper::addItemData($item_id, $data_value);
 		}
@@ -240,12 +240,12 @@ class testPageMonitoringWebDetails extends CWebTest {
 			// Each step has several item types.
 			foreach ($step['item_data'] ?? [] as $data_type => $data_value) {
 				// Gets id of the correct item.
-				$sql = 'SELECT si.itemid FROM httpstepitem si '.
-						'JOIN httpstep s ON si.httpstepid=s.httpstepid '.
-						'JOIN httptest t ON s.httptestid=t.httptestid '.
-						'WHERE t.httptestid = '.$httptest_id.' '.
-						'AND s.no='.$i.' '.
-						'AND si.type='.$data_type;
+				$sql = 'SELECT si.itemid FROM httpstepitem si'.
+						' JOIN httpstep s ON si.httpstepid=s.httpstepid'.
+						' JOIN httptest t ON s.httptestid=t.httptestid'.
+						' WHERE t.httptestid = '.$httptest_id.
+						' AND s.no='.$i.
+						' AND si.type='.$data_type;
 				$item_id = CDBHelper::getValue($sql);
 				CDataHelper::addItemData($item_id, $data_value);
 			}
@@ -254,7 +254,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->page->login()->open('httpdetails.php?httptestid='.$httptest_id)->waitUntilReady();
 
 		// Assert title.
-		$this->assertEquals('Details of web scenario: '.trim($data['name']), $this->query('id:page-title-general')->one()->getText());
+		$this->page->assertHeader('Details of web scenario: '.trim($data['name']));
 
 		// Assert data table.
 		$expected_rows = [];
