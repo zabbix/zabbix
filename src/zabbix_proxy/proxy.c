@@ -336,7 +336,7 @@ static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
 static zbx_vector_addr_ptr_t	config_server_addrs;
 
 #define ZBX_CONFIG_DATA_CACHE_SIZE_MIN		(ZBX_KIBIBYTE * 128)
-#define ZBX_CONFIG_DATA_CACHE_AGE_DEFAULT	(SEC_PER_MIN * 10)
+#define ZBX_CONFIG_DATA_CACHE_AGE_MIN		(SEC_PER_MIN * 10)
 
 static zbx_uint64_t	config_data_cache_size	= 0;
 static int		config_data_cache_age	= 0;
@@ -737,20 +737,23 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 		if (0 != config_proxy_local_buffer)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheSize\" configuration parameter cannot be used together with "
-					"\"ProxyLocalBuffer\"");
+			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheSize\" configuration parameter cannot be used together"
+					" with \"ProxyLocalBuffer\"");
 			err = 1;
 		}
 
 		if (config_data_cache_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter must be less than "
+			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter cannot be greater than "
 					"\"ProxyOfflineBuffer\"");
 			err = 1;
 		}
 
-		if (0 == config_data_cache_age)
-			config_data_cache_age = ZBX_CONFIG_DATA_CACHE_AGE_DEFAULT;
+		if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_data_cache_age)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheAge\" configuration parameter");
+			err = 1;
+		}
 	}
 
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
@@ -989,7 +992,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 		{"DataCacheSize",			&config_data_cache_size,		TYPE_UINT64,
 			PARM_OPT,	0,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"DataCacheAge",			&config_data_cache_age,		TYPE_INT,
-			PARM_OPT,	SEC_PER_MIN * 10,	SEC_PER_DAY * 10},
+			PARM_OPT,	0,	SEC_PER_DAY * 10},
 		{NULL}
 	};
 
