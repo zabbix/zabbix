@@ -540,14 +540,12 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
 		*error = zbx_strdup(*error, "cannot connect with PSK: PSK not available");
 		return FAIL;
 	}
-#else
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
-	{
-		*error = zbx_strdup(*error, "support for TLS was not compiled in");
-		return FAIL;
-	}
-#endif
+
 	return zbx_tls_connect(s, tls_connect, tls_arg1, tls_arg2, server_name, event, error);
+#else
+	*error = zbx_strdup(*error, "support for TLS was not compiled in");
+	return FAIL;
+#endif
 }
 
 /*****************************************************************************
