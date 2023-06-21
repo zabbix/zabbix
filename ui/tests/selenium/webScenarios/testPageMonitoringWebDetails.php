@@ -73,15 +73,24 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertEquals('Details of web scenario: Layout', $this->query('id:page-title-general')->one()->getText());
 
 		// Assert table column names.
-		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'],
-				$this->query('tag:th')->all()->asText()
-		);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'], $table->getHeadersText());
 
-		// Assert filter.
-		/*$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'State', 'Show details'],
-			$form->getLabels()->asText()
-		);*/
+		// Test graph data filtering.
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$from_from = $form->query('id:from')->one();
+		// Open the filter section if needed.
+		if (!$from_from->isDisplayed()) {
+			$this->query('class:btn-time')->one()->click();
+		}
+
+		$from_from->fill('now-2h');
+		$form->query('id:to')->one()->fill('now-1h');
+		$form->query('id:apply')->one()->click();
+
+		// ToDo: Test that graph image source reflects the filter change.
+
+		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
 	}
 
 	public function getWebScenarioData()
