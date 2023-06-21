@@ -180,7 +180,7 @@ static int	agent_task_process(short event, void *data)
 
 				break;
 			}
-	
+
 			if (ZBX_ASYNC_TASK_STOP != (state = get_task_state_for_event(event_new)))
 				return state;
 
