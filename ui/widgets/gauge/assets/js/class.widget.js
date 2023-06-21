@@ -67,8 +67,8 @@ class CWidgetGauge extends CWidget {
 		}
 
 		const padding = {
-			vertical: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
-			horizontal: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
+			vertical: CWidgetGauge.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+			horizontal: CWidgetGauge.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
 		};
 
 		this.gauge = new CSVGGauge(this._body, padding, response.config);
