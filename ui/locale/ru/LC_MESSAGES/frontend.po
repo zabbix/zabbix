@@ -2507,6 +2507,10 @@ msgstr "Не возможно создать конфигурационный ф
 msgid "Cannot create user role"
 msgstr "Не удалось создать роль пользователя"
 
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
+
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
@@ -4281,6 +4285,10 @@ msgstr "Не удалось обновить роль пользователя"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Не удалось обновить веб-сценарий"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -14350,6 +14358,10 @@ msgstr ""
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Новая услуга"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
