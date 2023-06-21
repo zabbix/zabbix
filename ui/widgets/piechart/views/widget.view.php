@@ -26,10 +26,17 @@
  * @var array $data
  */
 
-$view = (new CWidgetView($data))->addItem('widget created - debugging purposes');
+$view = new CWidgetView($data);
 
 if ($data['info'] !== null) {
 	$view->setVar('info', $data['info']);
 }
+
+if ($data['vars']['sectors'] !== null) {
+	$view->setVar('sectors', $data['vars']['sectors']);
+}
+
+$view->setVar('config', $data['vars']['config']);
+
 
 $view->show();

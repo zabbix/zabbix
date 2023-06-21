@@ -21,46 +21,53 @@
 
 namespace Widgets\PieChart\Actions;
 
-use CControllerDashboardWidgetView,
+use API,
+	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CRangeTimeParser;
+	CRangeTimeParser,
+	CHousekeepingHelper,
+	CMacrosResolverHelper,
+	CParser,
+	CSimpleIntervalParser,
+	Manager;
 
-use Widgets\PieChart\Includes\WidgetForm;
+use Widgets\PieChart\Includes\{
+	CWidgetFieldDataSet,
+	WidgetForm
+};
+
 
 class WidgetView extends CControllerDashboardWidgetView {
-
-	private const PIE_CHART_WIDTH_MIN = 1;
-	private const PIE_CHART_WIDTH_MAX = 65535;
-	private const PIE_CHART_HEIGHT_MIN = 1;
-	private const PIE_CHART_HEIGHT_MAX = 65535;
 
 	protected function init(): void {
 		parent::init();
 
 		$this->addValidationRules([
-			'edit_mode' => 'in 0,1',
 			//'from' => 'string',
 			//'to' => 'string'
 		]);
 	}
 
 	protected function doAction(): void {
-		$edit_mode = $this->getInput('edit_mode', 0);
-		$width = self::PIE_CHART_WIDTH_MAX;
-		$height = self::PIE_CHART_HEIGHT_MAX;
+
+		$data = [
+			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'info' => $this->makeWidgetInfo(),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
 
 		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
 
-		/*if ($dashboard_time) {
-			$from = $this->getInput('from') ?: 'now-1h';
-			$to = $this->getInput('to') ?: 'now';
-		}
-		else {
+//		if ($dashboard_time) {
+//			$from = $this->getInput('from');
+//			$to = $this->getInput('to');
+//		}
+//		else {
 			$from = $this->fields_values['time_from'];
 			$to = $this->fields_values['time_to'];
-		}*/
-		$from = $this->fields_values['time_from'];
-		$to = $this->fields_values['time_to'];
+		//}
 
 		$range_time_parser = new CRangeTimeParser();
 
@@ -70,65 +77,66 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$range_time_parser->parse($to);
 		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$pie_chart_data = [
+		$pie_chart_options = [
 			'data_sets' => array_values($this->fields_values['ds']),
 			'data_source' => $this->fields_values['source'],
 			'dashboard_time' => $dashboard_time,
-			'displaying' => [
-				'draw_type' => $this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT,
-				'width' => $this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT
-					? $this->fields_values['width']
-					: null,
-				'stroke' => $this->fields_values['stroke'],
-				'space' => $this->fields_values['space'],
-				'merge' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON,
-				'merge_percent' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
-					? $this->fields_values['merge_percent']
-					: null,
-				'merge_color' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
-					? $this->fields_values['merge_color']
-					: null,
-				'total_show' => $this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT
-					? $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					: null,
-				'value_size' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					? $this->fields_values['value_size']
-					: null,
-				'decimal_places' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					? $this->fields_values['decimal_places']
-					: null,
-				'units_show' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					? $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
-					: null,
-				'units' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
-					? $this->fields_values['units']
-					: null,
-				'value_bold' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					? $this->fields_values['value_bold'] == PIE_CHART_VALUE_BOLD_ON
-					: null,
-				'value_color' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
-					? $this->fields_values['value_color']
-					: null,
-			],
 			'time_period' => [
 				'time_from' => $time_from,
 				'time_to' => $time_to
 			],
-			'legend' => [
-				'show_legend' => $this->fields_values['legend'] == PIE_CHART_LEGEND_ON,
-				'legend_columns' => $this->fields_values['legend_columns'],
-				'legend_lines' => $this->fields_values['legend_lines']
-			],
 			'templateid' => $this->getInput('templateid', ''),
 		];
 
-		$this->setResponse(new CControllerResponseData([
-			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'info' => $this->makeWidgetInfo(),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		]));
+		$metrics = $this->getData($pie_chart_options);
+
+		if ($metrics['errors']) {
+			error($metrics['errors']);
+		}
+
+		if ($metrics['sectors']) {
+			$data['vars']['sectors'] = [];
+
+			foreach($metrics['sectors'] as $sector) {
+				$sector_data = [
+					'name' => $sector['name'],
+					'items' => $sector['items'],
+					'hosts' => $sector['hosts'],
+					'color' => $sector['options']['color'],
+					'base_unit' => $sector['units'],
+					'value' => $sector['value']
+				];
+
+				$sector_data['type'] = $sector['options']['dataset_aggregation'] == AGGREGATE_NONE
+					? $sector['options']['type']
+					: null;
+
+				$data['vars']['sectors'][] = $sector_data;
+			}
+		}
+
+		$data['vars']['config'] = $this->getConfig();
+
+		//$legend = $this->getLegend($data['vars']['sectors']);
+		//$data['vars']['legend'] = $legend ?? '';
+
+		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private function getData($options): array {
+		$metrics = [];
+		$errors = [];
+
+		self::getItems($metrics, $options['data_sets'], $options['templateid']);
+		self::sortByDataset($metrics);
+		self::getTimePeriod($metrics, $options['time_period']);
+		self::getChartDataSource($metrics, $errors, $options['data_source']);
+		self::getMetricsData($metrics, $options['data_sets']);
+
+		return [
+			'sectors' => $metrics,
+			'errors' => $errors
+		];
 	}
 
 	private function makeWidgetInfo(): array {
@@ -142,5 +150,438 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $info;
+	}
+
+	private static function getItems(array &$metrics, array $data_sets, string $templateid): void {
+		$metrics = [];
+		$max_metrics = 50;
+
+		foreach ($data_sets as $index => $data_set) {
+			if ($data_set['dataset_type'] == CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM) {
+				if (!$data_set['itemids']) {
+					continue;
+				}
+
+				if ($max_metrics == 0) {
+					break;
+				}
+
+				if ($templateid !== '') {
+					$tmp_items = API::Item()->get([
+						'output' => ['key_'],
+						'itemids' => $data_set['itemids'],
+						'webitems' => true
+					]);
+
+					if ($tmp_items) {
+						$items = API::Item()->get([
+							'output' => ['itemid'],
+							'hostids' => [$templateid],
+							'webitems' => true,
+							'filter' => [
+								'key_' => array_column($tmp_items, 'key_')
+							]
+						]);
+						$data_set['itemids'] = $items ? array_column($items, 'itemid') : null;
+					}
+				}
+
+				$items_db = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+					'selectHosts' => ['name'],
+					'webitems' => true,
+					'filter' => [
+						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+					],
+					'itemids' => $data_set['itemids'],
+					'preservekeys' => true,
+					'limit' => $max_metrics
+				]);
+
+				$items = [];
+
+				foreach ($data_set['itemids'] as $itemid) {
+					if (array_key_exists($itemid, $items_db)) {
+						$items[] = $items_db[$itemid];
+					}
+				}
+
+				if (!$items) {
+					continue;
+				}
+
+				unset($data_set['itemids']);
+
+				$colors = $data_set['color'];
+				$types = $data_set['type'];
+
+				foreach ($items as $item) {
+					$data_set['color'] = '#'.array_shift($colors);
+					$data_set['type'] = array_shift($types);
+					$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+					$max_metrics--;
+				}
+			}
+
+			if ($templateid === '') {
+				if (!$data_set['hosts'] || !$data_set['items']) {
+					continue;
+				}
+			}
+			else {
+				if (!$data_set['items']) {
+					continue;
+				}
+			}
+
+			if ($max_metrics == 0) {
+				break;
+			}
+
+			$options = [
+				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
+				'selectHosts' => ['name'],
+				'webitems' => true,
+				'filter' => [
+					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
+				],
+				'search' => [
+					'name' => self::processPattern($data_set['items'])
+				],
+				'searchWildcardsEnabled' => true,
+				'searchByAny' => true,
+				'sortfield' => 'name',
+				'sortorder' => ZBX_SORT_UP,
+				'limit' => $max_metrics
+			];
+
+			if ($templateid === '') {
+				$hosts = API::Host()->get([
+					'output' => [],
+					'search' => [
+						'name' => self::processPattern($data_set['hosts'])
+					],
+					'searchWildcardsEnabled' => true,
+					'searchByAny' => true,
+					'preservekeys' => true
+				]);
+
+				if ($hosts) {
+					$options['hostids'] = array_keys($hosts);
+				}
+			}
+			else {
+				$options['hostids'] = $templateid;
+			}
+
+			$items = null;
+
+			if (array_key_exists('hostids', $options) && $options['hostids']) {
+				$items = API::Item()->get($options);
+			}
+
+			if (!$items) {
+				continue;
+			}
+
+			unset($data_set['itemids'], $data_set['items']);
+
+			$colors = getColorVariations('#' . $data_set['color'], count($items));
+
+			foreach ($items as $item) {
+				$data_set['color'] = array_shift($colors);
+				$metrics[] = $item + ['data_set' => $index, 'options' => $data_set];
+				$max_metrics--;
+			}
+		}
+	}
+
+	private static function sortByDataset(array &$metrics): void {
+		usort($metrics, static function(array $a, array $b): int {
+			return $a['data_set'] <=> $b['data_set'];
+		});
+	}
+
+	private static function getTimePeriod(array &$metrics, array $time_period): void {
+		foreach ($metrics as &$metric) {
+			$metric['time_period'] = $time_period;
+		}
+		unset($metric);
+	}
+
+	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source): void {
+		/**
+		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
+		 * $metric.
+		 */
+		if ($data_source == PIE_CHART_DATA_SOURCE_AUTO) {
+			/**
+			 * First, if global configuration setting "Override item history period" is enabled, override globally
+			 * specified "Data storage period" value to each metric custom history storage duration, converting it
+			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
+			 * later, but now we are just storing the field name 'history' in array $to_resolve.
+			 *
+			 * Do the same with trends.
+			 */
+			$to_resolve = [];
+
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+				foreach ($metrics as &$metric) {
+					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'history';
+			}
+
+			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+				foreach ($metrics as &$metric) {
+					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+				}
+				unset($metric);
+			}
+			else {
+				$to_resolve[] = 'trends';
+			}
+
+			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
+			if ($to_resolve) {
+				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
+				$simple_interval_parser = new CSimpleIntervalParser();
+
+				foreach ($metrics as $num => &$metric) {
+					// Convert its values to seconds.
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
+						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
+								_('invalid history storage period')
+							);
+							unset($metrics[$num]);
+						}
+						else {
+							$metric['history'] = timeUnitToSeconds($metric['history']);
+						}
+					}
+
+					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
+						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
+							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
+								_('invalid trend storage period')
+							);
+							unset($metrics[$num]);
+						}
+						else {
+							$metric['trends'] = timeUnitToSeconds($metric['trends']);
+						}
+					}
+				}
+				unset($metric);
+			}
+
+			foreach ($metrics as &$metric) {
+				/**
+				 * History as a data source is used in 2 cases:
+				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
+				 * 2) if period for requested data is newer than the period of keeping history for particular $metric
+				 *    item.
+				 *
+				 * Use trends otherwise.
+				 */
+				$history = $metric['history'];
+				$trends = $metric['trends'];
+				$time_from = $metric['time_period']['time_from'];
+
+				$metric['source'] = ($trends == 0 || (time() - $history < $time_from))
+					? PIE_CHART_DATA_SOURCE_HISTORY
+					: PIE_CHART_DATA_SOURCE_TRENDS;
+			}
+		}
+		else {
+			foreach ($metrics as &$metric) {
+				$metric['source'] = $data_source;
+			}
+		}
+
+		unset($metric);
+	}
+
+	private static function getMetricsData(array &$metrics, array $data_sets): void {
+		$dataset_metrics = [];
+
+		foreach ($metrics as $metric_num => &$metric) {
+			$dataset_num = $metric['data_set'];
+
+			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
+				$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
+					'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
+			}
+			else {
+				$name = $data_sets[$dataset_num]['data_set_label'] !== ''
+					? $data_sets[$dataset_num]['data_set_label']
+					: _('Data set').' #'.($dataset_num + 1);
+			}
+
+			$item = [
+				'itemid' => $metric['itemid'],
+				'value_type' => $metric['value_type'],
+				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+			];
+
+			if (!array_key_exists($dataset_num, $dataset_metrics)) {
+				$metric = array_merge($metric, [
+					'name' => $name,
+					'items' => [],
+					'value' => null
+				]);
+
+				$aggregate_interval = $metric['time_period']['time_to'] - $metric['time_period']['time_from'];
+
+				if ($aggregate_interval === null || $aggregate_interval < 1
+					|| $aggregate_interval > ZBX_MAX_TIMESHIFT) {
+					continue;
+				}
+
+				$metric['options']['aggregate_interval'] = (int) $aggregate_interval;
+
+				if ($metric['options']['dataset_aggregation'] != AGGREGATE_NONE) {
+					$dataset_metrics[$dataset_num] = $metric_num;
+				}
+
+				$metric['items'][] = $item;
+			}
+			else {
+				$metrics[$dataset_metrics[$dataset_num]]['items'][] = $item;
+				unset($metrics[$metric_num]);
+			}
+		}
+		unset($metric);
+
+		foreach ($metrics as &$metric) {
+			if (!$metric['items']) {
+				continue;
+			}
+
+			$results = Manager::History()->getAggregationByInterval(
+				$metric['items'], $metric['time_period']['time_from'], $metric['time_period']['time_to'],
+				$metric['options']['aggregate_function'], $metric['options']['aggregate_interval']
+			);
+
+			if ($results) {
+				$values = [];
+
+				foreach ($results as $result) {
+					$values[] = $result['data'][0]['value'];
+				}
+
+				if ($metric['options']['dataset_aggregation'] != AGGREGATE_NONE) {
+					switch($metric['options']['dataset_aggregation']) {
+						case AGGREGATE_MAX:
+							$metric['value'] = max($values);
+							break;
+						case AGGREGATE_MIN:
+							$metric['value'] = min($values);
+							break;
+						case AGGREGATE_AVG:
+							$metric['value'] = array_sum($values)/count(array_filter($values));
+							break;
+						case AGGREGATE_COUNT:
+							$metric['value'] = count($values);
+							break;
+						case AGGREGATE_SUM:
+							$metric['value'] = array_sum($values);
+							break;
+					}
+				}
+				else {
+					$metric['value'] = $values[0];
+				}
+			}
+		}
+	}
+
+	/**
+	 * Prepare an array to be used for hosts/items filtering.
+	 *
+	 * @param array  $patterns  Array of strings containing hosts/items patterns.
+	 *
+	 * @return array|mixed  Returns array of patterns.
+	 *                      Returns NULL if array contains '*' (so any possible host/item search matches).
+	 */
+	private static function processPattern(array $patterns): ?array {
+		return in_array('*', $patterns, true) ? null : $patterns;
+	}
+
+	private static function aggr_fnc2str($calc_fnc) {
+		switch ($calc_fnc) {
+			case AGGREGATE_NONE:
+				return _('none');
+			case AGGREGATE_MIN:
+				return _('min');
+			case AGGREGATE_MAX:
+				return _('max');
+			case AGGREGATE_AVG:
+				return _('avg');
+			case AGGREGATE_COUNT:
+				return _('count');
+			case AGGREGATE_SUM:
+				return _('sum');
+			case AGGREGATE_FIRST:
+				return _('first');
+			case AGGREGATE_LAST:
+				return _('last');
+		}
+	}
+
+	private function getConfig(): array {
+		$config = [
+			'draw_type' => $this->fields_values['draw_type'],
+			'stroke' => $this->fields_values['stroke'],
+			'space' => $this->fields_values['space'],
+		];
+
+		$config['merge'] = $this->fields_values['merge'] == PIE_CHART_MERGE_ON
+		? [
+			'merge_sectors' => true,
+			'merge_percent' => $this->fields_values['merge_percent'],
+			'merge_color' => '#'.$this->fields_values['merge_color']
+		]
+		: [
+			'merge_sectors' => false
+		];
+
+
+		if ($this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT) {
+			$config['width'] = $this->fields_values['width'];
+
+			if ($this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON) {
+				$config['total_value'] = [
+					'show' => true,
+					'size' => $this->fields_values['value_size'],
+					'decimal_places' => $this->fields_values['decimal_places'],
+					'is_bold' =>  $this->fields_values['value_bold'] == PIE_CHART_VALUE_BOLD_ON,
+					'color' => '#'.$this->fields_values['value_color']
+				];
+
+				$config['units'] = $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
+					? [
+						'show' => true,
+						'units_value' => $this->fields_values['units']
+					]
+					: [
+						'show' => false
+					];
+			}
+			else {
+				$config['total_value'] = [
+					'show' => false
+				];
+			}
+		}
+
+		return $config;
+	}
+
+	private function getLegend(array $metrics) {
 	}
 }
