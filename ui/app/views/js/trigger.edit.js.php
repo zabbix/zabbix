@@ -552,4 +552,27 @@
 					this.overlay.unsetLoading();
 				});
 		}
+
+		clone() {
+			this.triggerid = 0;
+			const title = <?= json_encode(_('New action')) ?>;
+			const buttons = [
+				{
+					title: <?= json_encode(_('Add')) ?>,
+					class: '',
+					keepOpen: true,
+					isSubmit: true,
+					action: () => this.submit()
+				},
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					class: 'btn-alt',
+					cancel: true,
+					action: () => ''
+				}
+			];
+
+			this.overlay.unsetLoading();
+			this.overlay.setProperties({title, buttons});
+		}
 	}

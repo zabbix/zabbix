@@ -33,7 +33,7 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>							'string',
+			'context' =>							'in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid'
 		];

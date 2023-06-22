@@ -28,7 +28,7 @@ class CControllerTriggerCreate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'comments' =>							'db triggers.comments',
-			'context' =>							'string',
+			'context' =>							'in '.implode(',', ['host', 'template']),
 			'correlation_mode' =>					'db triggers.correlation_mode',
 			'correlation_tag' =>					'db triggers.correlation_tag',
 			'dependencies' =>						'array',

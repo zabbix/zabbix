@@ -35,7 +35,6 @@
 			this.checkbox_object = checkbox_object;
 			this.context = context;
 
-			// TODO this needs to be rewritten to JS
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function() {
@@ -48,17 +47,19 @@
 				new CTagFilterItem(row);
 			});
 
-			$('#filter_state')
-				.on('change', function() {
-					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
-				})
-				.trigger('change');
-
 			this._initActions();
 		},
 
 		_initActions() {
-			// TODO this probably will be reworked
+			document.getElementById('filter_state').addEventListener('change', () => {
+				const filter_state = document.querySelector('input[name=filter_state]:checked').value;
+				const filter_status_fields = document.getElementsByName('filter_status');
+
+				for (let i = 0; i < filter_status_fields.length; i++) {
+					filter_status_fields[i].disabled = filter_state != -1;
+				}
+			})
+
 			document.querySelector('.js-copy').addEventListener('click', () => {
 				const overlay = this.openCopyPopup();
 				const dialogue = overlay.$dialogue[0];

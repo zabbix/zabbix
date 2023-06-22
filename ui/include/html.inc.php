@@ -389,7 +389,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		// triggers
 		$triggers = new CSpan([
 			new CLink(_('Triggers'),
-				(new CUrl('triggers.php'))
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$db_host['hostid']])
 					->setArgument('context', $context)
