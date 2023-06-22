@@ -104,7 +104,7 @@ static void	process_agent_result(void *data)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 }
-
+#ifdef HAVE_LIBCURL
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
 	long			response_code;
@@ -167,6 +167,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+#endif
 
 static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 {
@@ -258,8 +259,14 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	{
 		if (ITEM_TYPE_HTTPAGENT == items[i].type)
 		{
+#ifdef HAVE_LIBCURL
 			errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
 					poller_config->config_source_ip, poller_config->curl_handle);
+#else
+			errcodes[i] = NOTSUPPORTED;
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL,"Support for HTTP agent was not compiled in:"
+					" missing cURL library"));
+#endif
 		}
 		else
 			errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
@@ -381,6 +388,7 @@ static void	async_poller_destroy(zbx_poller_config_t *poller_config)
 	zbx_hashset_destroy(&poller_config->interfaces);
 }
 
+#ifdef HAVE_LIBCURL
 static void	poller_update_selfmon_counter(void *arg)
 {
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
@@ -391,6 +399,7 @@ static void	poller_update_selfmon_counter(void *arg)
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 }
+#endif
 
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
@@ -404,7 +413,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	unsigned char			poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
+#ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
+#endif
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -424,9 +435,11 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
+#ifdef HAVE_LIBCURL
 		asynchttppoller_config = zbx_async_httpagent_create(poller_config.base, process_httpagent_result,
 				poller_update_selfmon_counter, &poller_config);
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
+#endif
 	}
 	else
 	{
@@ -481,8 +494,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
+#ifdef HAVE_LIBCURL
 		zbx_async_httpagent_clean(asynchttppoller_config);
 		zbx_free(asynchttppoller_config);
+#endif
 	}
 
 	async_poller_destroy(&poller_config);

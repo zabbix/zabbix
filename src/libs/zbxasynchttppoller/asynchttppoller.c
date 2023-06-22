@@ -21,7 +21,7 @@
 #include <event.h>
 #include <event2/thread.h>
 #include "asynchttppoller.h"
-
+#ifdef HAVE_LIBCURL
 typedef struct
 {
 	struct event			*event;
@@ -269,4 +269,4 @@ void	zbx_async_httpagent_clean(zbx_asynchttppoller_config *asynchttppoller_confi
 	if (NULL != asynchttppoller_config->curl_timeout)
 		event_free(asynchttppoller_config->curl_timeout);
 }
-
+#endif

@@ -23,6 +23,7 @@
 #include "event.h"
 #include "zbxsysinc.h"
 
+#ifdef HAVE_LIBCURL
 typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err, void *arg);
 typedef void (*httpagent_action_callback_fn)(void *arg);
 
@@ -41,5 +42,5 @@ zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,
 		process_httpagent_result_callback_fn process_httpagent_result_callback,
 		httpagent_action_callback_fn httpagent_action_callback, void *arg);
 void	zbx_async_httpagent_clean(zbx_asynchttppoller_config *asynchttppoller_config);
-
+#endif
 #endif

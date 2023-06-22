@@ -23,6 +23,7 @@
 #include "zbxlog.h"
 #include "zbxsysinfo.h"
 
+#ifdef HAVE_LIBCURL
 static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
 {
 	zbx_http_context_create(&httpagent_context->http_context);
@@ -91,3 +92,4 @@ fail:
 
 	return NOTSUPPORTED;
 }
+#endif

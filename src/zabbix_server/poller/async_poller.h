@@ -42,9 +42,11 @@ typedef struct
 	zbx_vector_uint64_t	itemids;
 	zbx_vector_int32_t	errcodes;
 	zbx_vector_int32_t	lastclocks;
-	CURLM			*curl_handle;
 	struct event_base	*base;
 	zbx_hashset_t		interfaces;
+#ifdef HAVE_LIBCURL
+	CURLM			*curl_handle;
+#endif
 }
 zbx_poller_config_t;
 

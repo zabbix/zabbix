@@ -25,6 +25,7 @@
 #include "async_poller.h"
 #include "zbxhttp.h"
 
+#ifdef HAVE_LIBCURL
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -47,4 +48,5 @@ zbx_httpagent_context;
 int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
 		CURLM *curl_handle);
 void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context);
+#endif
 #endif
