@@ -773,7 +773,6 @@ function convertUnitsRaw(array $options): array {
 				'small_scientific' => $options['small_scientific'],
 				'zero_as_zero' => $options['zero_as_zero']
 			]),
-			'power' => null,
 			'units' => $units,
 			'is_numeric' => true
 		];
