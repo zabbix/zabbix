@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup items
+ * @backup items, httptest
  *
  * @dataSource ExecuteNowAction, DiscoveredHosts
  */
