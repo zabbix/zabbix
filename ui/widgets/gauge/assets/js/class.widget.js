@@ -50,6 +50,17 @@ class CWidgetGauge extends CWidget {
 	}
 
 	setContents(response) {
+		if ('body' in response) {
+			if (this.gauge !== null) {
+				this.gauge.destroy();
+				this.gauge = null;
+			}
+
+			this._body.innerHTML = response.body;
+
+			return;
+		}
+
 		const value_data = {
 			value: response.value,
 			value_text: response.value_text,
@@ -61,6 +72,8 @@ class CWidgetGauge extends CWidget {
 
 			return;
 		}
+
+		this._body.innerHTML = '';
 
 		if (!('config' in response)) {
 			throw new Error('Unexpected server error.');
