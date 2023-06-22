@@ -83,7 +83,7 @@ class WidgetForm extends CWidgetForm {
 	// Unit defaults.
 	private const DEFAULT_UNITS_SHOW = 1;
 	private const DEFAULT_UNITS_SIZE_PERCENT = 25;
-	private const DEFAULT_UNITS_BOLD = 1;
+	private const DEFAULT_UNITS_BOLD = 0;
 
 	// Needle defaults.
 	private const DEFAULT_NEEDLE_SHOW = 0;
