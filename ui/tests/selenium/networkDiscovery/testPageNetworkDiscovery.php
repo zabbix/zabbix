@@ -20,6 +20,11 @@
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
+/**
+ * @backup drules
+ *
+ * @dataSource NetworkDiscovery
+ */
 class testPageNetworkDiscovery extends CLegacyWebTest {
 	public function testPageNetworkDiscovery_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=discovery.list');
