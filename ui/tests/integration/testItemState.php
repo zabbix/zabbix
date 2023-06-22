@@ -267,7 +267,7 @@ class testItemState extends CIntegrationTest {
 		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_agent_result() key:'".$key."'"], $wait);
 
 		// Check item state
-		sleep(1);
+		sleep(2);
 
 		$response = $this->call('item.get', [
 			'itemids' => self::$items[$scenario['name']]['itemid'],
@@ -275,7 +275,7 @@ class testItemState extends CIntegrationTest {
 		]);
 
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.
-				$response['result'][0]['state'].' (expected='.$state.').'
+				$response['result'][0]['state'].' (expected='.$state.').'.file_get_contents()
 		);
 
 		// Verify item checks intervals
