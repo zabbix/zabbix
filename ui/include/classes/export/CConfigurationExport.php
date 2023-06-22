@@ -483,6 +483,8 @@ class CConfigurationExport {
 		// Collect IDs.
 		foreach ($dashboard_pages as $dashboard_page) {
 			foreach ($dashboard_page['widgets'] as $widget) {
+				CArrayHelper::sort($widget['fields'], ['name', 'type', 'value']);
+
 				foreach ($widget['fields'] as $field) {
 					switch ($field['type']) {
 						case ZBX_WIDGET_FIELD_TYPE_HOST:
@@ -1623,8 +1625,8 @@ class CConfigurationExport {
 			$host = reset($graph['hosts']);
 
 			$ids[$id] = [
-				'name' => $graph['name'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'name' => $graph['name']
 			];
 		}
 
@@ -1659,8 +1661,8 @@ class CConfigurationExport {
 			$host = reset($item['hosts']);
 
 			$ids[$id] = [
-				'key' => $item['key_'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'key' => $item['key_']
 			];
 		}
 

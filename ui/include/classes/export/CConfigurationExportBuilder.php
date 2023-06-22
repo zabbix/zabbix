@@ -586,6 +586,7 @@ class CConfigurationExportBuilder {
 		$simple_trigger_prototypes = [];
 
 		foreach ($discoveryRules as $discoveryRule) {
+			CArrayHelper::sort($discoveryRule['parameters'], ['name']);
 			CArrayHelper::sort($discoveryRule['lld_macro_paths'], ['lld_macro']);
 			CArrayHelper::sort($discoveryRule['overrides'], ['step']);
 
@@ -595,6 +596,9 @@ class CConfigurationExportBuilder {
 					unset($discoveryRule['triggerPrototypes'][$i]);
 				}
 			}
+
+			self::formatLLDFilter($discoveryRule);
+			self::formatLLDFilter($discoveryRule['overrides']);
 
 			$data = [
 				'uuid' => $discoveryRule['uuid'],
@@ -612,7 +616,7 @@ class CConfigurationExportBuilder {
 				'password' => $discoveryRule['password'],
 				'publickey' => $discoveryRule['publickey'],
 				'privatekey' => $discoveryRule['privatekey'],
-				'filter' => $this->formatDiscoveryRuleFilterConditions($discoveryRule),
+				'filter' => $discoveryRule['filter'],
 				'lifetime' => $discoveryRule['lifetime'],
 				'description' => $discoveryRule['description'],
 				'item_prototypes' => $this->formatItems($discoveryRule['itemPrototypes'], $simple_trigger_prototypes),
@@ -640,7 +644,7 @@ class CConfigurationExportBuilder {
 				'verify_host' => $discoveryRule['verify_host'],
 				'lld_macro_paths' => $discoveryRule['lld_macro_paths'],
 				'preprocessing' => self::formatPreprocessingSteps($discoveryRule['preprocessing']),
-				'overrides' => $this->formatDiscoveryRuleFilterConditions($discoveryRule['overrides'])
+				'overrides' => $discoveryRule['overrides']
 			];
 
 			if (isset($discoveryRule['interface_ref'])) {
@@ -681,34 +685,19 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format the conditions of a discovery rule filter, override filter.
+	 * Format the LLD filter contained in the given object.
 	 *
-	 * @param array $filters
-	 *
-	 * @return array
+	 * @param array $filter_object
 	 */
-	protected function formatDiscoveryRuleFilterConditions(array $filter_object): array {
+	private static function formatLLDFilter(array &$filter_object): void {
 		if (!$filter_object || !array_key_exists('filter', $filter_object)) {
-			return [];
+			return;
 		}
 
-		switch ($filter_object['filter']['evaltype']) {
-			case CONDITION_EVAL_TYPE_AND_OR:
-				CArrayHelper::sort($filter_object['filter']['conditions'], ['macro']);
-				break;
-
-			case CONDITION_EVAL_TYPE_AND:
-				CArrayHelper::sort($filter_object['filter']['conditions'], ['macro']);
-				break;
-
-			case CONDITION_EVAL_TYPE_EXPRESSION:
-				CArrayHelper::sort($filter_object['filter']['conditions'], ['formulaid']);
-				break;
-		}
-
-		return $filter_object;
+		$filter_object['filter']['conditions'] = CDiscoveryRule::sortFilterConditions(
+			$filter_object['filter']['conditions'],	$filter_object['filter']['evaltype']
+		);
 	}
-
 
 	/**
 	 * Format preprocessing steps.
@@ -744,7 +733,7 @@ class CConfigurationExportBuilder {
 		order_result($httptests, 'name');
 
 		foreach ($httptests as $httptest) {
-			CArrayHelper::sort($httptest['variables'], ['name', 'value']);
+			CArrayHelper::sort($httptest['variables'], ['name']);
 
 			$result[] = [
 				'uuid' => $httptest['uuid'],
@@ -785,7 +774,7 @@ class CConfigurationExportBuilder {
 		order_result($httpsteps, 'no');
 
 		foreach ($httpsteps as $httpstep) {
-			CArrayHelper::sort($httpstep['variables'], ['name', 'value']);
+			CArrayHelper::sort($httpstep['variables'], ['name']);
 
 			$result[] = [
 				'name' => $httpstep['name'],
@@ -1333,7 +1322,7 @@ class CConfigurationExportBuilder {
 	protected function formatWidgets(array $widgets) {
 		$result = [];
 
-		CArrayHelper::sort($widgets, ['name']);
+		CArrayHelper::sort($widgets, ['x', 'y']);
 
 		foreach ($widgets as $widget) {
 			$result[] = [
@@ -1361,8 +1350,6 @@ class CConfigurationExportBuilder {
 	protected function formatWidgetFields(array $fields) {
 		$result = [];
 
-		CArrayHelper::sort($fields, ['name', 'type', 'value']);
-
 		foreach ($fields as $field) {
 			$result[] = [
 				'type' => $field['type'],
@@ -1384,17 +1371,7 @@ class CConfigurationExportBuilder {
 	protected function formatGraphItems(array $graphItems) {
 		$result = [];
 
-		usort($graphItems, static function (array $a, array $b): int {
-			foreach (['host', 'key'] as $field) {
-				$cmp = strnatcasecmp($a['itemid'][$field], $b['itemid'][$field]);
-
-				if ($cmp != 0) {
-					return $cmp;
-				}
-			}
-
-			return strnatcasecmp($a['calc_fnc'], $b['calc_fnc']);
-		});
+		CArrayHelper::sort($graphItems, ['sortorder']);
 
 		foreach ($graphItems as $graphItem) {
 			$result[] = [
