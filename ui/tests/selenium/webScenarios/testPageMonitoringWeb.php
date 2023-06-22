@@ -204,14 +204,14 @@ class testPageMonitoringWeb extends CWebTest {
 		}
 
 		// Check if links to Hosts and to Web scenarios are clickable.
+		$row = $table->getRow(0);
+
 		foreach (['Host', 'Name'] as $field) {
-			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
+			$this->assertTrue($row->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
 		// Check that the correct details of scenario are opened.
-		$first_row_name = $table->getRow(0)->getColumn('Name')->getText();
-
-		$column = $table->getRow(0)->getColumn('Name');
+		$column = $row->getColumn('Name');
 		$first_row_name = $column->getText();
 		$column->query('tag:a')->one()->click();
 
@@ -274,8 +274,7 @@ class testPageMonitoringWeb extends CWebTest {
 	 * @param string	$disabled		disabled host elements.
 	 *
 	 */
-	private function checkHostContextMenu($popupitems, $hostname, $disabled)
-	{
+	private function checkHostContextMenu($popupitems, $hostname, $disabled) {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
 		$this->query('class:list-table')->asTable()->one()->findRow('Host', $hostname)->query('link', $hostname)->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
