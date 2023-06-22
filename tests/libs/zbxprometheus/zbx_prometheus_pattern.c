@@ -23,7 +23,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxprometheus.h"
-#include "log.h"
+#include "zbxlog.h"
 
 void	zbx_mock_test_entry(void **state)
 {

@@ -720,8 +720,11 @@ function parseUrlString(url_string) {
  * @return {jQuery}
  */
 function makeMessageBox(type, messages, title = null, show_close_box = true, show_details = null) {
-	var classes = {good: 'msg-good', bad: 'msg-bad', warning: 'msg-warning'},
-		msg_class = classes[type];
+	const classes = {
+		good: 'msg-good',
+		bad: 'msg-bad',
+		warning: 'msg-warning'
+	};
 
 	if (show_details === null) {
 		show_details = type === 'bad' || type === 'warning';
@@ -734,7 +737,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.append($list),
 		aria_labels = {good: t('Success message'), bad: t('Error message'), warning: t('Warning message')},
 		$msg_box = jQuery('<output>')
-			.addClass(msg_class).attr('role', 'contentinfo')
+			.addClass(classes[type]).attr('role', 'contentinfo')
 			.attr('aria-label', aria_labels[type]),
 		$details_arrow = jQuery('<span>')
 			.attr('id', 'details-arrow')
@@ -748,10 +751,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.attr('aria-expanded', show_details ? 'true' : 'false');
 
 		$link_details.click(function() {
-			showHide(jQuery(this)
-				.siblings('.msg-details')
-				.find('.msg-details-border')
-			);
+			showHide(jQuery(this).siblings('.msg-details'));
 			jQuery('#details-arrow', jQuery(this)).toggleClass('arrow-up arrow-down');
 			jQuery(this).attr('aria-expanded', jQuery(this)
 				.find('.arrow-down')
@@ -767,10 +767,8 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 			.text(title)
 			.appendTo($msg_box);
 
-		$list.addClass('msg-details-border');
-
 		if (!show_details) {
-			$list.hide();
+			$msg_details.hide();
 		}
 	}
 
@@ -787,14 +785,14 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 
 	if (show_close_box) {
 		var $button = jQuery('<button>')
-				.addClass('overlay-close-btn')
-				.attr('type', 'button')
-				.attr('title', t('Close'))
-				.click(function() {
-					jQuery(this)
-						.closest('.' + msg_class)
-						.remove();
-				});
+			.addClass('btn-overlay-close')
+			.attr('type', 'button')
+			.attr('title', t('Close'))
+			.click(function() {
+				jQuery(this)
+					.closest('.' + classes[type])
+					.remove();
+			});
 		$msg_box.append($button);
 	}
 

@@ -17,12 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxdbhigh.h"
 #include "dbupgrade.h"
 
+#include "zbxdbhigh.h"
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 
 /*
  * 7.0 development database patches
@@ -249,26 +248,57 @@ static int	DBpatch_6050022(void)
 
 static int	DBpatch_6050023(void)
 {
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		return SUCCEED;
-
-	if (ZBX_DB_OK > zbx_db_execute(
+	const char	*sql =
 			"update widget_field"
 			" set name='acknowledgement_status'"
 			" where name='unacknowledged'"
-				" and widgetid in ("
-					"select widgetid"
-					" from widget"
-					" where type='problems'"
-				")"))
-	{
-		return FAIL;
-	}
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='problems'"
+				")";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_6050024(void)
+{
+	const char	*sql =
+			"update widget_field"
+			" set name='show_lines'"
+			" where name='count'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_6050025(void)
+{
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
 
 	return SUCCEED;
 }
 
-static int	DBpatch_6050024(void)
+static int	DBpatch_6050026(void)
 {
 	zbx_db_insert_t	db_insert;
 
@@ -315,5 +345,7 @@ DBPATCH_ADD(6050021, 0, 1)
 DBPATCH_ADD(6050022, 0, 1)
 DBPATCH_ADD(6050023, 0, 1)
 DBPATCH_ADD(6050024, 0, 1)
+DBPATCH_ADD(6050025, 0, 1)
+DBPATCH_ADD(6050026, 0, 1)
 
 DBPATCH_END()

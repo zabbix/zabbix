@@ -383,7 +383,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'form' => [
 						'Send to' => ' '
 					],
-					'error' => 'Invalid email address " ".'
+					'error' => 'Incorrect value for field "sendto": cannot be empty.'
 				]
 			],
 			[

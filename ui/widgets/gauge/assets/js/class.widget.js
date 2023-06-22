@@ -121,7 +121,7 @@ class CWidgetGauge extends CWidget {
 			label: t('Download image'),
 			disabled: this.gauge === null,
 			clickCallback: () => {
-				downloadSvgImage(this.gauge.getSVGElement(), 'gauge.png');
+				downloadSvgImage(this.gauge.getSVGElement(), 'image.png');
 			}
 		});
 

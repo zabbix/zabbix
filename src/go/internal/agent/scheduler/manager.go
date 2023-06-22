@@ -34,6 +34,7 @@ import (
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/alias"
 	"zabbix.com/internal/agent/keyaccess"
+	"zabbix.com/internal/agent/resultcache"
 	"zabbix.com/internal/monitor"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
@@ -63,10 +64,19 @@ type Manager struct {
 // updateRequest contains list of metrics monitored by a client and additional client configuration data.
 type updateRequest struct {
 	clientID                   uint64
-	sink                       plugin.ResultWriter
+	sink                       resultcache.Writer
 	firstActiveChecksRefreshed bool
 	requests                   []*plugin.Request
 	expressions                []*glexpr.Expression
+	now                        time.Time
+}
+
+// commandRequest contains list of remote commands
+type commandRequest struct {
+	clientID uint64
+	sink     resultcache.Writer
+	commands []*agent.RemoteCommand
+	now      time.Time
 }
 
 // queryRequest contains status/debug query request.
@@ -81,8 +91,9 @@ type queryRequestUserParams struct {
 }
 
 type Scheduler interface {
-	UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
-		expressions []*glexpr.Expression, requests []*plugin.Request)
+	UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
+		expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time)
+	UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand, now time.Time)
 	FinishTask(task performer)
 	PerformTask(key string, timeout time.Duration, clientID uint64) (result string, err error)
 	Query(command string) (status string)
@@ -143,31 +154,13 @@ func (m *Manager) cleanupClient(c *client, now time.Time) {
 
 // processUpdateRequest processes client update request. It's being used for multiple requests
 // (active checks on a server) and also for direct requets (single passive and internal checks).
-func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
-	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
-
-	// immediately fail direct checks and ignore bulk requests when shutting down
-	if m.shutdownSeconds != shutdownInactive {
-		if update.clientID <= agent.MaxBuiltinClientID {
-			if len(update.requests) == 1 {
-				update.sink.Write(&plugin.Result{
-					Itemid: update.requests[0].Itemid,
-					Error:  errors.New("Cannot obtain item value during shutdown process."),
-					Ts:     now,
-				})
-			} else {
-				log.Warningf("[%d] direct checks can contain only single request while received %d requests",
-					update.clientID, len(update.requests))
-			}
-		}
-		return
-	}
-
+func (m *Manager) processUpdateRequestRun(update *updateRequest) {
 	var c *client
 	var ok bool
 	if c, ok = m.clients[update.clientID]; !ok {
 		if len(update.requests) == 0 {
 			log.Debugf("[%d] skipping empty update for unregistered client", update.clientID)
+
 			return
 		}
 		log.Debugf("[%d] registering new client", update.clientID)
@@ -192,7 +185,7 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 			if !ok {
 				err = fmt.Errorf("Unknown metric %s", key)
 			} else {
-				err = c.addRequest(p, r, update.sink, now, update.firstActiveChecksRefreshed)
+				err = c.addRequest(p, r, update.sink, update.now, update.firstActiveChecksRefreshed)
 			}
 		}
 
@@ -203,8 +196,9 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 					tacc.task().deactivate()
 				}
 			}
-			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: now})
+			update.sink.Write(&plugin.Result{Itemid: r.Itemid, Error: err, Ts: update.now})
 			log.Debugf("[%d] cannot monitor metric \"%s\": %s", update.clientID, r.Key, err.Error())
+
 			continue
 		}
 
@@ -215,7 +209,81 @@ func (m *Manager) processUpdateRequest(update *updateRequest, now time.Time) {
 		}
 	}
 
-	m.cleanupClient(c, now)
+	m.cleanupClient(c, update.now)
+}
+
+func (m *Manager) processUpdateRequestShutdown(update *updateRequest) {
+	if update.clientID <= agent.MaxBuiltinClientID {
+		if len(update.requests) == 1 {
+			update.sink.Write(&plugin.Result{
+				Itemid: update.requests[0].Itemid,
+				Error:  errors.New("Cannot obtain item value during shutdown process."),
+				Ts:     update.now,
+			})
+		} else {
+			log.Warningf("[%d] direct checks can contain only single request while received %d requests",
+				update.clientID, len(update.requests))
+		}
+	}
+}
+
+func (m *Manager) processUpdateRequest(update *updateRequest) {
+	log.Debugf("[%d] processing update request (%d requests)", update.clientID, len(update.requests))
+
+	// immediately fail direct checks and ignore bulk requests when shutting down
+	if m.shutdownSeconds != shutdownInactive {
+		m.processUpdateRequestShutdown(update)
+	} else {
+		m.processUpdateRequestRun(update)
+	}
+}
+
+func (m *Manager) processCommandRequest(update *commandRequest) {
+	log.Debugf("[%d] processing command request (%d commands)", update.clientID, len(update.commands))
+
+	var c *client
+	var ok bool
+	if c, ok = m.clients[update.clientID]; !ok {
+		log.Debugf("[%d] registering new client", update.clientID)
+		c = newClient(update.clientID, update.sink)
+		m.clients[update.clientID] = c
+	}
+
+	for _, rc := range update.commands {
+		var wait string
+		if rc.Wait == 1 {
+			wait = "wait"
+		} else {
+			wait = "nowait"
+		}
+		params := []string{rc.Command, wait}
+
+		if !keyaccess.CheckRules("system.run", params) {
+			log.Debugf("Remote command '%s' is not allowed", rc.Command)
+
+			update.sink.WriteCommand(&resultcache.CommandResult{ID: rc.Id, Error: errors.New("Unsupported item key.")})
+			update.sink.Flush()
+
+			continue
+		}
+
+		if p, ok := m.plugins["system.run"]; ok {
+			c.addCommand(p, rc.Id, params, update.sink, update.now)
+
+			if !p.queued() {
+				heap.Push(&m.pluginQueue, p)
+			} else {
+				m.pluginQueue.Update(p)
+			}
+		} else {
+			log.Warningf("Remote commands cannot be executed, plugin \"system.run\" is unavailable")
+
+			update.sink.WriteCommand(&resultcache.CommandResult{ID: rc.Id, Error: errors.New("Unsupported item key.")})
+			update.sink.Flush()
+
+			break
+		}
+	}
 }
 
 // processQueue processes queued plugins/tasks
@@ -294,8 +362,12 @@ func (m *Manager) processFinishRequest(task performer) {
 			p.enqueueTask(task)
 		}
 	}
-	if !p.queued() && p.hasCapacity() {
-		heap.Push(&m.pluginQueue, p)
+	if !p.queued() {
+		if p.hasCapacity() {
+			heap.Push(&m.pluginQueue, p)
+		}
+	} else {
+		m.pluginQueue.Update(p)
 	}
 }
 
@@ -379,6 +451,8 @@ run:
 					for _, client := range m.clients {
 						if len(client.pluginsInfo) == 0 {
 							delete(m.clients, client.ID())
+						} else {
+							client.commandCleanup()
 						}
 					}
 					cleaned = now
@@ -394,7 +468,10 @@ run:
 			}
 			switch v := u.(type) {
 			case *updateRequest:
-				m.processUpdateRequest(v, time.Now())
+				m.processUpdateRequest(v)
+				m.processQueue(time.Now())
+			case *commandRequest:
+				m.processCommandRequest(v)
 				m.processQueue(time.Now())
 			case performer:
 				m.processFinishRequest(v)
@@ -550,14 +627,24 @@ func (m *Manager) Stop() {
 	m.input <- nil
 }
 
-func (m *Manager) UpdateTasks(clientID uint64, writer plugin.ResultWriter, firstActiveChecksRefreshed bool,
-	expressions []*glexpr.Expression, requests []*plugin.Request) {
-
+func (m *Manager) UpdateTasks(clientID uint64, writer resultcache.Writer, firstActiveChecksRefreshed bool,
+	expressions []*glexpr.Expression, requests []*plugin.Request, now time.Time) {
 	m.input <- &updateRequest{clientID: clientID,
 		sink:                       writer,
 		requests:                   requests,
 		expressions:                expressions,
 		firstActiveChecksRefreshed: firstActiveChecksRefreshed,
+		now:                        now,
+	}
+}
+
+func (m *Manager) UpdateCommands(clientID uint64, writer resultcache.Writer, commands []*agent.RemoteCommand,
+	now time.Time) {
+	m.input <- &commandRequest{
+		clientID: clientID,
+		sink:     writer,
+		commands: commands,
+		now:      now,
 	}
 }
 
@@ -565,6 +652,10 @@ type resultWriter chan *plugin.Result
 
 func (r resultWriter) Write(result *plugin.Result) {
 	r <- result
+}
+
+func (r resultWriter) WriteCommand(cr *resultcache.CommandResult) {
+	log.Errf("remote commands are not supported by single task requets")
 }
 
 func (r resultWriter) Flush() {
@@ -584,7 +675,8 @@ func (m *Manager) PerformTask(key string, timeout time.Duration, clientID uint64
 
 	w := make(resultWriter, 1)
 
-	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}})
+	m.UpdateTasks(clientID, w, false, nil, []*plugin.Request{{Key: key, LastLogsize: &lastLogsize, Mtime: &mtime}},
+		time.Now())
 
 	select {
 	case r := <-w:

@@ -34,6 +34,7 @@ OBJS = \
 	..\..\..\src\libs\zbxip\ip.o \
 	..\..\..\src\libs\zbxip\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\common_log.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxnum\num.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-26 20:11+0000\n"
+"PO-Revision-Date: 2023-06-17 06:31+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2436,6 +2436,11 @@ msgstr "No es pot pas crear dependència del propi prototip de trigger."
 msgid "Cannot create discovery rule"
 msgstr "No es pot pas crear una regla de descobriment"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr "No es pot pas crear la correlació de l'esdeveniment"
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "No es pot pas crear un mapa d'icones"
@@ -2472,6 +2477,10 @@ msgstr "No es pot pas crear el fitxer de configuració."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "No es pot pas crear la funció d'usuari"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2536,6 +2545,12 @@ msgstr[1] "No es poden pas esborrar les regles de descoberta"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "No es poden pas esborrar les regles de descoberta"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] "No es pot pas esborrar la correlació de l'esdeveniment"
+msgstr[1] "No es poden pas esborrar les correlacions dels esdeveniments"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2836,6 +2851,12 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "No es pot desactivar la regla de descobriment"
 msgstr[1] "No es poden desactivar les regles de descobriment"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] "No es pot desactivar la correlació de l'esdeveniment"
+msgstr[1] "No es poden desactivar les correlacions dels esdeveniments"
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2931,6 +2952,12 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "No es pot pas activar la regla de descobriment"
 msgstr[1] "No es poden pas activar les regles de descobriment"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] "No es pot activar la correlació de l'esdeveniment"
+msgstr[1] "No es poden activar les correlacions dels esdeveniments"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3421,6 +3448,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a cau
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb l'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3441,6 +3473,11 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" a causa de l'expressió del trigger \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb el prototip d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3472,6 +3509,41 @@ msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\" 
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè es produiria un enllaç circular (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a l'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops al prototip d'equip \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla d'equip \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" a la plantilla \"%2$s\" perquè seria enllaçada dos cops a la plantilla \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a l'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops al prototip d'equip \"%4$s\"."
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr "No es pot pas enllaçar la plantilla \"%1$s\" amb la plantilla \"%2$s\", perquè la seva plantilla principal \"%3$s\" s'enllaçaria dos cops a la plantilla \"%4$s\"."
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3886,6 +3958,11 @@ msgid_plural "Cannot update events"
 msgstr[0] "No es pot pas actualitzar l'esdeveniment"
 msgstr[1] "No es poden pas actualitzar els esdeveniments"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr "No es pot pas actualitzar la correlació de l'esdeveniment"
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "No es poden pas actualitzar els esdeveniments"
@@ -4116,6 +4193,10 @@ msgstr "No es pot pas actualitzar el rol d'usuari"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "No es pot pas actualitzar l'escenari web"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5288,6 +5369,10 @@ msgstr "Crea una regla de descoberta (tria primer la plantilla)"
 msgid "Create enabled"
 msgstr "Crea habilitat"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr "Crea una correlació desdeveniment"
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Crea un gràfic"
@@ -6111,6 +6196,10 @@ msgstr "Vols esborrar el tauler?"
 msgid "Delete discovery rule?"
 msgstr "Vols esborrar la regla de descobriment?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr "Vols esborrar la correlació de l'esdeveniment?"
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6241,6 +6330,14 @@ msgstr "Vols esborrar les regles de descobriment triades?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Vols esborrar els elements triats?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr "Vols esborrar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr "Vols esborrar les correlacions de l'esdeveniment triades?"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6737,6 +6834,14 @@ msgstr "Voleu desactivar la regla de descoberta triada?"
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Vols desactivar les regles de descobriment triades?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr "Vols desactivar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr "Vols desactivar les correlacions de l'esdeveniment triades?"
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7632,6 +7737,14 @@ msgstr "Voleu activar la regla de descoberta triada?"
 msgid "Enable selected discovery rules?"
 msgstr "Vols activar les regles de descoberta triades?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr "Vols activar la correlació de l'esdeveniment triada?"
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr "Vols activar les correlacions de l'esdeveniment triades?"
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr "Voleu activar el grup triat?"
@@ -7892,11 +8005,46 @@ msgstr "Esdeveniment reconegut"
 msgid "Event correlation"
 msgstr "Correlació d'esdeveniments"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr "La correlació de l'esdeveniment \"%1$s\" ja existeix."
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr "Correlació d'esdeveniment creada"
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] "Correlació d'esdeveniment esborrada"
+msgstr[1] "Correlació d'esdeveniments creades"
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] "Correlació d'esdeveniment desactivada"
+msgstr[1] "Correlacions d'esdeveniment desactivades"
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] "Correlació d'esdeveniment activada"
+msgstr[1] "Correlacions d'esdeveniment activades"
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr "Regla de correlació d'esdeveniments"
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Regles de correlació d'esdeveniments"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr "Correlació d'esdeveniment actualitzada"
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -14006,6 +14154,10 @@ msgstr "Nova regla de descoberta"
 msgid "New element"
 msgstr "Nou element"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr "Nova correlació d'esdeveniment"
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14038,6 +14190,10 @@ msgstr "Nou grup d'equips"
 msgid "New maintenance period"
 msgstr "Nou període de manteniment"
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr "Nou tipus de suport"
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr "Nou mapatge del tipus de suport"
@@ -14062,6 +14218,10 @@ msgstr "Script nou"
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Nou servei"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -17262,6 +17422,17 @@ msgstr "S'ha resolt per la regla de correlació \"%1$s\"."
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
 msgstr "Resolt per regla de correlació."
+
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr "S'ha resolt per la regla de correlació d'esdeveniment \"%1$s\"."
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr "Resolt per regla de correlació d'esdeveniment."
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

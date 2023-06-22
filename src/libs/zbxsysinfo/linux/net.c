@@ -21,7 +21,7 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxnum.h"
 #include "zbxip.h"

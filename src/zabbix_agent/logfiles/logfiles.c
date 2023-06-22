@@ -19,7 +19,6 @@
 
 #include "logfiles.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
@@ -32,6 +31,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxtypes.h"	/* ssize_t */
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
@@ -348,7 +348,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		else
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
-					filename, strerror_from_system(GetLastError()));
+					filename, zbx_strerror_from_system(GetLastError()));
 			return ret;
 		}
 	}
@@ -366,7 +366,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			else
 			{
 				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended information for file"
-						" \"%s\": %s", filename, strerror_from_system(GetLastError()));
+						" \"%s\": %s", filename, zbx_strerror_from_system(GetLastError()));
 				return ret;
 			}
 		}
@@ -406,7 +406,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for file \"%s\": %s", path,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
 	}
@@ -419,7 +419,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for directory \"%s\": %s", utf8,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
 	}
