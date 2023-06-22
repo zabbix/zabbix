@@ -4145,10 +4145,12 @@ form.dashboard-widget-piechart {
     color: #737373; }
 
 div.dashboard-widget-piechart {
+  position: relative;
   overflow-x: hidden; }
   div.dashboard-widget-piechart .pie-chart-legend {
-    position: relative;
-    top: 4px;
+    position: absolute;
+    bottom: 4px;
+    left: 0;
     box-sizing: border-box;
     display: grid;
     grid-template-columns: repeat(var(--columns, 4), auto);
