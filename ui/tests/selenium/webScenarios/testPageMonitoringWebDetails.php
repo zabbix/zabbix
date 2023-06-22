@@ -76,21 +76,23 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'], $table->getHeadersText());
 
-		// Test graph data filtering.
+		// Open filter section if needed.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$from_from = $form->query('id:from')->one();
+		$from_input = $form->query('id:from')->one();
 		// Open the filter section if needed.
-		if (!$from_from->isDisplayed()) {
+		if (!$from_input->isDisplayed()) {
 			$this->query('class:btn-time')->one()->click();
 		}
 
-		$from_from->fill('now-2h');
+		// Set custom time filter.
+		$from_input->fill('now-2h');
 		$form->query('id:to')->one()->fill('now-1h');
 		$form->query('id:apply')->one()->click();
+		$this->assertGraphSrcContains('from=now-2h&to=now-1h');
 
-		// ToDo: Test that graph image source reflects the filter change.
-
+		// Use time filter preset button.
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
+		$this->assertGraphSrcContains('from=now-30d&to=now');
 	}
 
 	public function getWebScenarioData()
@@ -276,5 +278,21 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// The table contains an additional TOTAL row.
 		$expected_rows[] = array_merge(['Step' => 'TOTAL'], $data['expected_totals'] ?? []);
 		$this->assertTableData($expected_rows);
+	}
+
+	/**
+	 * Waits for both graphs to reload after a filter change and asserts that their src strings contain some value.
+	 */
+	protected function assertGraphSrcContains($expected_src) {
+		foreach (['graph_in', 'graph_time'] as $i => $graph_id) {
+			$graph = $this->query('id', $graph_id)->one();
+
+			// Only wait for reload once.
+			if ($i == 0) {
+				$graph->waitUntilReloaded();
+			}
+
+			$this->assertStringContainsString($expected_src, $graph->getAttribute('src'));
+		}
 	}
 }
