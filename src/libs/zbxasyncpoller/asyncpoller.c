@@ -22,7 +22,6 @@
 
 #ifdef HAVE_LIBEVENT
 #	include <event.h>
-#endif
 
 typedef struct
 {
@@ -107,3 +106,4 @@ void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int ti
 	/* call initialization event */
 	async_event(fd, 0, task);
 }
+#endif

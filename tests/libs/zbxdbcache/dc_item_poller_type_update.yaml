@@ -10,14 +10,14 @@ in:
     key: k
     poller: ZBX_NO_POLLER
     flags: 0
-    result: ZBX_POLLER_TYPE_NORMAL
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 2
     access: DIRECT
     type: ITEM_TYPE_ZABBIX
     key: k
     poller: ZBX_NO_POLLER
     flags: ZBX_HOST_UNREACHABLE
-    result: ZBX_POLLER_TYPE_UNREACHABLE
+    result: ZBX_POLLER_TYPE_AGENT
   - ref: 3
     access: DIRECT
     type: ITEM_TYPE_ZABBIX

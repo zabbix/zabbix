@@ -22,6 +22,7 @@
 
 #include "zbxcommon.h"
 #include "event.h"
+#ifdef HAVE_LIBEVENT
 
 typedef enum
 {
@@ -38,4 +39,5 @@ typedef void (*zbx_async_task_clear_cb_t)(void *data);
 
 void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
 		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
+#endif
 #endif
