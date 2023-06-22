@@ -80,20 +80,23 @@
 				});
 			});
 
-			document.getElementById('js-create').addEventListener('click', (e) => this._edit({
-				'hostid': e.target.dataset.hostid,
-				'context': this.context
-			}));
-
-			document.querySelectorAll('.js-trigger-edit').forEach((trigger) => {
-				trigger.addEventListener('click', (e) => {
+			document.addEventListener('click', (e) => {
+				if (e.target.id === 'js-create') {
+					this._edit({'hostid': e.target.dataset.hostid, 'context': this.context})
+				}
+				else if (e.target.classList.contains('js-trigger-edit')) {
 					this._edit({
 						'triggerid': e.target.dataset.triggerid,
 						'hostid': e.target.dataset.hostid,
 						'context': this.context
 					})
-				});
+				}
+				else if (e.target.classList.contains('js-massdelete-trigger')) {
+					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
 			})
+
+
 		},
 
 		_edit(parameters = {}) {
@@ -122,6 +125,68 @@
 
 				location.href = location.href;
 			});
+		},
+
+		_delete(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Delete selected triggers?')) ?>
+				: <?= json_encode(_('Delete selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.delete');
+
+			this._post(target, triggerids, curl);
+		},
+
+		_post(target, triggerids, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+			);
+
+			target.classList.add('is-loading');
+
+			return fetch(url.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify({triggerids: triggerids})
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('trigger', response.keepids ?? []);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('trigger');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
 		},
 
 		editHost(e, hostid) {

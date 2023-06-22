@@ -315,6 +315,7 @@ class CRouter {
 		'trigger.create'							=> ['CControllerTriggerCreate',							'layout.json',			null],
 		'trigger.expression.constructor'			=> ['CControllerTriggerExpressionConstructor',			'layout.json',			'trigger.expression.constructor'],
 		'trigger.edit'								=> ['CControllerTriggerEdit',							'layout.json',			'trigger.edit'],
+		'trigger.delete'							=> ['CControllerTriggerDelete',							'layout.json',			null],
 		'trigger.list'								=> ['CControllerTriggerList',							'layout.htmlpage',		'trigger.list'],
 		'trigger.update'							=> ['CControllerTriggerUpdate',							'layout.json',			null],
 		'user.create'								=> ['CControllerUserCreate',							null,					null],

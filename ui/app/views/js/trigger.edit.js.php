@@ -575,4 +575,18 @@
 			this.overlay.unsetLoading();
 			this.overlay.setProperties({title, buttons});
 		}
+
+		delete() {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.delete');
+			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+			);
+
+			this.#post(curl.getUrl(), {triggerids: [this.triggerid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			});
+		}
 	}

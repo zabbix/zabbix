@@ -193,7 +193,6 @@ $url = (new CUrl('zabbix.php'))
 // create form
 $triggers_form = (new CForm('post', $url))
 	->setName('trigger_form')
-	->addVar('checkbox_hash', $data['checkbox_hash'])
 	->addVar('context', $data['context'], 'form_context');
 
 // create table
@@ -386,13 +385,13 @@ $triggers_form->addItem([
 					)
 			],
 			'trigger.massdelete' => [
-				'name' => _('Delete'),
-				'confirm_singular' => _('Delete selected trigger?'),
-				'confirm_plural' => _('Delete selected triggers?'),
-				'csrf_token' => $csrf_token
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-trigger')
+					->addClass('js-no-chkbxrange')
 			]
 		],
-		$data['checkbox_hash']
+		'trigger'
 	)
 ]);
 
