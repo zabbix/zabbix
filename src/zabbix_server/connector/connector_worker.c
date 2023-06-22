@@ -43,9 +43,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 {
 	zbx_connector_t	connector;
 	int		i;
-	char		*str = NULL, *out = NULL, *error = NULL, *info = NULL;
+	char		*str = NULL, *out = NULL, *error = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
-	int		ret;
 
 	zbx_connector_deserialize_connector_and_data_point(message->data, message->size, &connector,
 			connector_data_points);
@@ -63,6 +62,7 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 #ifdef HAVE_LIBCURL
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200";
 	zbx_http_context_t	context;
+	int			ret;
 
 	zbx_http_context_create(&context);
 
@@ -89,6 +89,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	if (FAIL == ret)
 	{
+		char	*info = NULL;
+
 		if (NULL != out)
 		{
 			struct zbx_json_parse	jp;
