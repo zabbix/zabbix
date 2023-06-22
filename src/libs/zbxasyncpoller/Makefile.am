@@ -6,5 +6,4 @@ libzbxasyncpoller_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 libzbxasyncpoller_a_SOURCES = \
-	asyncpoller.c \
-	asyncpoller.h
+	asyncpoller.c
