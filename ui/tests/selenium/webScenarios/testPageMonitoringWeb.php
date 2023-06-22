@@ -526,8 +526,8 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb2',
 						'testInheritanceWeb3',
 						'testInheritanceWeb4',
-						'Web scenario 1 step',
 						'Web scenario 2 step',
+						'Web scenario 3 step',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
