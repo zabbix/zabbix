@@ -3185,7 +3185,8 @@ form.is-loading {
   display: table-cell;
   vertical-align: top; }
   .cell.expression-cell {
-    line-height: 24px; }
+    line-height: 24px;
+    padding-inline-start: 5px; }
   .cell:last-child .dashboard-widget {
     margin: 0 0 10px; }
 
