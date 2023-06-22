@@ -21,8 +21,8 @@
 #define ZABBIX_ASYNCPOLLER_H
 
 #include "zbxcommon.h"
-#include "event.h"
 #ifdef HAVE_LIBEVENT
+#include "event.h"
 
 typedef enum
 {
