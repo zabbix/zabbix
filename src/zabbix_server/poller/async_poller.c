@@ -14,9 +14,10 @@
 #include "async_httpagent.h"
 #include "async_agent.h"
 #include "zbx_availability_constants.h"
-#include "../../libs/zbxasynchttppoller/asynchttppoller.h"
+#include "asynchttppoller.h"
 
 ZBX_VECTOR_IMPL(int32, int)
+
 typedef struct
 {
 	zbx_dc_interface_t	interface;
@@ -37,8 +38,8 @@ static void	process_agent_result(void *data)
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host,
-		agent_context->interface.addr, agent_context->key,
-		zbx_tcp_connection_type_name(agent_context->tls_connect));
+			agent_context->interface.addr, agent_context->key,
+			zbx_tcp_connection_type_name(agent_context->tls_connect));
 
 	zbx_timespec(&timespec);
 
