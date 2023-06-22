@@ -73,7 +73,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_DECIMAL_PLACES = 2;
 
 	// Value defaults.
-	private const DEFAULT_VALUE_SIZE_PERCENT = 30;
+	private const DEFAULT_VALUE_SIZE_PERCENT = 25;
 	private const DEFAULT_VALUE_ARC_SHOW = 1;
 	private const DEFAULT_VALUE_BOLD = 0;
 
@@ -82,7 +82,7 @@ class WidgetForm extends CWidgetForm {
 
 	// Unit defaults.
 	private const DEFAULT_UNITS_SHOW = 1;
-	private const DEFAULT_UNITS_SIZE_PERCENT = 30;
+	private const DEFAULT_UNITS_SIZE_PERCENT = 25;
 	private const DEFAULT_UNITS_BOLD = 1;
 
 	// Needle defaults.
