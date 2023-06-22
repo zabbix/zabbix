@@ -32,6 +32,7 @@ class CSVGGauge {
 	static ZBX_STYLE_LABEL_QUADRANT_3 =				'svg-gauge-label-quadrant-3';
 	static ZBX_STYLE_LABEL_QUADRANT_4 =				'svg-gauge-label-quadrant-4';
 	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
+	static ZBX_STYLE_VALUE_AND_UNITS_NO_DATA =		'svg-gauge-value-and-units-no-data';
 	static ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE =	'svg-gauge-value-and-units-multi-line';
 	static ZBX_STYLE_VALUE =						'svg-gauge-value';
 	static ZBX_STYLE_UNITS =						'svg-gauge-units';
@@ -215,10 +216,14 @@ class CSVGGauge {
 	 * @param {string}      units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		this.#elements.value.container.textContent = value_text;
+		this.#elements.value_and_units.container.classList.toggle(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_NO_DATA,
+			value === null
+		);
+
+		this.#elements.value_and_units.value.container.textContent = value_text;
 
 		if (this.#config.units.show) {
-			this.#elements.units.container.textContent = units_text;
+			this.#elements.value_and_units.units.container.textContent = units_text;
 		}
 
 		if (this.#config.value.arc.show || this.#config.needle.show) {
@@ -542,7 +547,7 @@ class CSVGGauge {
 			value_container.style.fill = `#${this.#config.value.color}`;
 		}
 
-		this.#elements.value = {container: value_container};
+		this.#elements.value_and_units = {container, value: {container: value_container}};
 
 		if (this.#config.units.show) {
 			const units_font_size = this.#config.units.size / 100;
@@ -622,7 +627,7 @@ class CSVGGauge {
 					break;
 			}
 
-			this.#elements.units = {container: units_container};
+			this.#elements.value_and_units.units = {container: units_container};
 		}
 		else {
 			container.appendChild(value_container);

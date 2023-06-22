@@ -2938,31 +2938,37 @@ section {
   .subfilter-enabled sup {
     color: #737373; }
 
-.svg-gauge .svg-gauge-description {
-  text-anchor: middle;
-  dominant-baseline: text-before-edge; }
-.svg-gauge .svg-gauge-thresholds-arc-sector,
-.svg-gauge .svg-gauge-empty-arc-sector {
-  fill: #ffffff; }
-.svg-gauge .svg-gauge-value-arc-sector {
-  fill: #555555; }
-.svg-gauge .svg-gauge-value-arc-sector,
-.svg-gauge .svg-gauge-empty-arc-sector {
-  transition: fill 0.5s ease-in-out; }
-.svg-gauge .svg-gauge-needle {
-  fill: #000000;
-  stroke: #000000;
-  vector-effect: non-scaling-stroke;
-  transition: fill 0.5s ease-in-out; }
-.svg-gauge .svg-gauge-label.svg-gauge-label-quadrant-3, .svg-gauge .svg-gauge-label.svg-gauge-label-quadrant-4 {
-  dominant-baseline: text-before-edge; }
-.svg-gauge .svg-gauge-label.svg-gauge-label-quadrant-2, .svg-gauge .svg-gauge-label.svg-gauge-label-quadrant-3 {
-  text-anchor: end; }
-.svg-gauge .svg-gauge-value-and-units.svg-gauge-value-and-units-multi-line {
-  dominant-baseline: text-before-edge; }
-.svg-gauge .svg-gauge-value,
-.svg-gauge .svg-gauge-units {
-  text-anchor: middle; }
+.svg-gauge {
+  fill: #000000; }
+  .svg-gauge .svg-gauge-description {
+    text-anchor: middle;
+    dominant-baseline: text-before-edge; }
+  .svg-gauge .svg-gauge-thresholds-arc-sector,
+  .svg-gauge .svg-gauge-empty-arc-sector {
+    fill: #ffffff; }
+  .svg-gauge .svg-gauge-value-arc-sector {
+    fill: #555555; }
+  .svg-gauge .svg-gauge-value-arc-sector,
+  .svg-gauge .svg-gauge-empty-arc-sector {
+    transition: fill 0.5s ease-in-out; }
+  .svg-gauge .svg-gauge-needle {
+    fill: #000000;
+    stroke: #000000;
+    vector-effect: non-scaling-stroke;
+    transition: fill 0.5s ease-in-out; }
+  .svg-gauge .svg-gauge-label-quadrant-3,
+  .svg-gauge .svg-gauge-label-quadrant-4 {
+    dominant-baseline: text-before-edge; }
+  .svg-gauge .svg-gauge-label-quadrant-2,
+  .svg-gauge .svg-gauge-label-quadrant-3 {
+    text-anchor: end; }
+  .svg-gauge .svg-gauge-value-and-units-no-data {
+    fill: #333333; }
+  .svg-gauge .svg-gauge-value-and-units-multi-line {
+    dominant-baseline: text-before-edge; }
+  .svg-gauge .svg-gauge-value,
+  .svg-gauge .svg-gauge-units {
+    text-anchor: middle; }
 
 .svg-graph {
   display: block; }
