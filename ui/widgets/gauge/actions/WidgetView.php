@@ -27,6 +27,7 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CSettingsHelper,
+	CUrl,
 	Manager;
 
 use Zabbix\Core\CWidget;
@@ -67,6 +68,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$data['vars'] = $this->getValueData($item);
+
+		$data['vars']['url'] = $this->getHistoryUrl($item);
 
 		if ($this->hasInput('with_config')) {
 			$data['vars']['config'] = $this->getConfig($item);
@@ -208,6 +211,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show' => false
 			];
 
+		$config['needle'] = $this->fields_values['needle_show'] == 1
+			? [
+				'show' => true,
+				'color' => $this->fields_values['needle_color']
+			]
+			: [
+				'show' => false
+			];
+
 		$config['thresholds'] = [
 			'show_labels' => $this->fields_values['th_show_labels'] == 1,
 			'arc' => $this->fields_values['th_show_arc'] == 1
@@ -220,15 +232,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				],
 			'data' => []
 		];
-
-		$config['needle'] = $this->fields_values['needle_show'] == 1
-			? [
-				'show' => true,
-				'color' => $this->fields_values['needle_color']
-			]
-			: [
-				'show' => false
-			];
 
 		foreach ($this->fields_values['thresholds'] as $threshold) {
 			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold['threshold_value']);
@@ -279,6 +282,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'value_text' => $labels['value'],
 			'units_text' => $labels['units']
 		];
+	}
+
+	private function getHistoryUrl(array $item): string {
+		return (new CUrl('history.php'))
+			->setArgument('action', HISTORY_GRAPH)
+			->setArgument('itemids[]', $item['itemid'])
+			->getUrl();
 	}
 
 	private function makeValueLabels(array $item, $value): array {

@@ -25,6 +25,7 @@ class CWidgetGauge extends CWidget {
 
 	onInitialize() {
 		this.gauge = null;
+		this.gauge_link = document.createElement('a');
 	}
 
 	onResize() {
@@ -38,6 +39,8 @@ class CWidgetGauge extends CWidget {
 			this.gauge.destroy();
 			this.gauge = null;
 		}
+
+		this._body.innerHTML = '';
 
 		super.updateProperties({name, view_mode, fields});
 	}
@@ -61,6 +64,8 @@ class CWidgetGauge extends CWidget {
 			return;
 		}
 
+		this.gauge_link.href = response.url;
+
 		const value_data = {
 			value: response.value,
 			value_text: response.value_text,
@@ -74,17 +79,14 @@ class CWidgetGauge extends CWidget {
 		}
 
 		this._body.innerHTML = '';
-
-		if (!('config' in response)) {
-			throw new Error('Unexpected server error.');
-		}
+		this._body.appendChild(this.gauge_link);
 
 		const padding = {
 			vertical: CWidgetGauge.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
 			horizontal: CWidgetGauge.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
 		};
 
-		this.gauge = new CSVGGauge(this._body, padding, response.config);
+		this.gauge = new CSVGGauge(this.gauge_link, padding, response.config);
 		this.gauge.setSize(super._getContentsSize());
 		this.gauge.setValue(value_data);
 	}
