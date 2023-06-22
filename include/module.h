@@ -111,8 +111,10 @@ typedef struct
 	char		*test_param;	/* item test parameters; user parameter items keep command here */
 }
 zbx_metric_t;
+
 /* for backward-compatibility */
 #define ZBX_METRIC	zbx_metric_t
+
 /* SET RESULT */
 
 #define SET_UI64_RESULT(res, val)		\
