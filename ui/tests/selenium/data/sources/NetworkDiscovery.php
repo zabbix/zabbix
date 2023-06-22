@@ -73,8 +73,7 @@ class NetworkDiscovery {
 						'type' => 10,
 						'ports' => 161,
 						'key_' => '.1.3.6.1.2.1.9.9.9',
-						'snmp_community'=> 'test SNMP community',
-						'uniq' => 1
+						'snmp_community'=> 'test SNMP community'
 					],
 					[
 						// SNMPv3 agent.

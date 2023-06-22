@@ -33,6 +33,8 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	CONST DELETE_RULE = 'Discovery rule to check delete';
 	CONST CANCEL_RULE = 'Discovery rule for cancelling scenario';
+	CONST CLONE_RULE = 'Discovery rule for clone';
+	CONST CHECKS_RULE = 'Discovery rule for changing checks';
 
 	/**
 	 * Name of discovery rule for update scenario.
@@ -553,6 +555,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'Name' => 'All fields',
 						'Discovery by proxy' => 'Active proxy 1',
 						'IP range' => '192.168.251.253-254',
+						'id:concurrency_max_type' => 'One',
 						'Update interval' => 604800,
 						'Enabled' => false
 					],
@@ -567,7 +570,8 @@ class testFormNetworkDiscovery extends CWebTest {
 							'Port range' => 0
 						],
 						[
-							'Check type' => 'ICMP ping'
+							'Check type' => 'ICMP ping',
+							'Allow redirect' => true
 						],
 						[
 							'Check type' => 'IMAP',
@@ -577,7 +581,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'Check type' => 'Zabbix agent',
 							'Port range' => 100,
 							'Key' => 'test'
-						],
+						]
 					]
 				]
 			],
@@ -587,6 +591,8 @@ class testFormNetworkDiscovery extends CWebTest {
 					'fields' => [
 						'Name' => 'SNMP agents checks',
 						'Update interval' => '7d',
+						'id:concurrency_max_type' => 'Custom',
+						'id:concurrency_max' => 999,
 						'Enabled' => true
 					],
 					'radios' => [
@@ -721,13 +727,6 @@ class testFormNetworkDiscovery extends CWebTest {
 					]
 				]
 			]
-
-
-			// Maximum concurrent checks
-
-
-			// ICMP ping - allow redirect
-
 		];
 	}
 
@@ -758,10 +757,12 @@ class testFormNetworkDiscovery extends CWebTest {
 			$old_name = self::$update_rule;
 		}
 		else {
-			$this->page->login()->open('zabbix.php?action=discovery.edit');
+			$this->page->login()->open('zabbix.php?action=discovery.list');
+			$this->query('button:Create discovery rule')->waitUntilClickable()->one()->click();
 		}
 
-		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 
 		if ($update && !CTestArrayHelper::get($data, 'expected')) {
 			$data['fields']['Name'] = !CTestArrayHelper::get($data, 'trim')
@@ -787,11 +788,15 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			foreach ($data['Checks'] as $i => $check) {
 				$add_button->click();
-				$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-				$checks_form = $dialog->asForm();
+				$check_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$checks_form = $check_dialog->asForm();
 
 				if (!CTestArrayHelper::get($check, 'default')) {
 					$checks_form->fill($check);
+				}
+
+				if (array_key_exists('Port range', $check)) {
+					$check['Port range'] = ($check['Port range'] === 0) ? null : $check['Port range'];
 				}
 
 				// Submit Discovery check dialog.
@@ -805,7 +810,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					return;
 				}
 
-				$dialog->ensureNotPresent();
+				$check_dialog->waitUntilNotVisible();
 
 				// Ensure that Discovery check is added to table.
 				if (CTestArrayHelper::get($check, 'default')) {
@@ -840,6 +845,12 @@ class testFormNetworkDiscovery extends CWebTest {
 							$type_text = $check['Check type'].' "'.$check['SNMP OID'].'"';
 							break;
 
+						case 'ICMP ping':
+							$type_text = CTestArrayHelper::get($check, 'Allow redirect')
+								? 'ICMP ping "allow redirect"'
+								: 'ICMP ping';
+							break;
+
 						default:
 							$type_text = $check['Check type'];
 							break;
@@ -847,7 +858,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				}
 
 				$this->assertEquals($type_text,
-					$form->getFieldContainer('Checks')->asTable()->getRow($i)->getColumn('Type')->getText()
+						$form->getFieldContainer('Checks')->asTable()->getRow($i)->getColumn('Type')->getText()
 				);
 			}
 		}
@@ -858,7 +869,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		if (array_key_exists('radios', $data)) {
 			foreach ($data['radios'] as $field => $value) {
 				$form->getFieldContainer($field)->query("xpath:.//label[text()=".
-					CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
+						CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
 			}
 		}
 
@@ -886,7 +897,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			// Check saved fields in form.
 			$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
-				$data['fields']['Name'])->query('tag:a')->waitUntilClickable()->one()->click();
+					$data['fields']['Name'])->query('tag:a')->waitUntilClickable()->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
 
@@ -894,14 +905,14 @@ class testFormNetworkDiscovery extends CWebTest {
 			if (array_key_exists('radios', $data)) {
 				foreach ($data['radios'] as $field => $value) {
 					$this->assertTrue($form->getFieldContainer($field)->query("xpath:.//label[text()=".
-						CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
+							CXPathHelper::escapeQuotes($value)."]/../input[@checked]")->exists()
 					);
 				}
 			}
 
 			// Check that Discovery rule saved in  DB.
 			$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM drules WHERE name='.
-				zbx_dbstr($data['fields']['Name'])
+					zbx_dbstr($data['fields']['Name'])
 			));
 
 			if ($update) {
@@ -912,6 +923,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				self::$update_rule = str_replace('     ', ' ', self::$update_rule);
 			}
 		}
+
+		$dialog->close();
 	}
 
 	public function getChecksData() {
@@ -946,8 +959,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'expected_checks' => [
 						'SNMPv1 agent (200) "new test SNMP OID"',
 						'SNMPv3 agent (9999) "new test SNMP OID _2"',
-						'Telnet (205)',
-						'Add'
+						'Telnet (205)'
 					]
 				]
 			],
@@ -956,7 +968,8 @@ class testFormNetworkDiscovery extends CWebTest {
 				[
 					'Checks' => [
 						[
-							'Check type' => 'ICMP ping'
+							'Check type' => 'ICMP ping',
+							'Allow redirect' => true
 						],
 						[
 							'Check type' => 'POP',
@@ -967,9 +980,8 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'ICMP ping',
-						'POP (2020)',
-						'Add'
+						'ICMP ping "allow redirect"',
+						'POP (2020)'
 					]
 				]
 			],
@@ -986,10 +998,9 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'ICMP ping',
+						'ICMP ping "allow redirect"',
 						'POP (2020)',
-						'SNMPv2 agent (903) "v2 new test SNMP OID"',
-						'Add'
+						'SNMPv2 agent (903) "v2 new test SNMP OID"'
 					]
 				]
 			],
@@ -1015,8 +1026,9 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$this->query('link', self::CHECKS_RULE)->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 		$table = $form->query('id:dcheckList')->asTable()->one();
 
 		if ($data['Checks'] === 'remove all') {
@@ -1026,12 +1038,12 @@ class testFormNetworkDiscovery extends CWebTest {
 			foreach ($data['Checks'] as $i => $check) {
 				if (CTestArrayHelper::get($check, 'add')) {
 					$form->getField('Checks')->query('button:Add')->waitUntilClickable()->one()->click();
-					$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-					$checks_form = $dialog->asForm();
+					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$checks_form = $checks_dialog->asForm();
 					unset ($check['add']);
 					$checks_form->fill($check);
 					$checks_form->submit();
-					$dialog->ensureNotPresent();
+					$checks_dialog->waitUntilNotVisible();
 				}
 				elseif (CTestArrayHelper::get($check, 'remove')) {
 					$row = $table->getRow($i);
@@ -1041,12 +1053,12 @@ class testFormNetworkDiscovery extends CWebTest {
 				}
 				else {
 					$this->query('id:dcheckList')->asTable()->one()->getRow($i)
-						->query('button:Edit')->one()->waitUntilClickable()->click();
-					$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-					$checks_form = $dialog->asForm();
+							->query('button:Edit')->one()->waitUntilClickable()->click();
+					$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$checks_form = $checks_dialog->asForm();
 					$checks_form->fill($check);
 					$checks_form->submit();
-					$dialog->ensureNotPresent();
+					$checks_dialog->waitUntilNotVisible();
 				}
 			}
 
@@ -1062,15 +1074,19 @@ class testFormNetworkDiscovery extends CWebTest {
 				// Compare Checks table with the expected result.
 				$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
 						'Discovery rule for changing checks')->query('tag:a')->waitUntilClickable()->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady();
 				$this->assertTableDataColumn($data['expected_checks'], 'Type', 'id:dcheckList');
 			}
 		}
+
+		$dialog->close();
 	}
 
 	public function testFormNetworkDiscovery_Clone() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
-		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$this->query('link', self::CLONE_RULE)->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 
 		$original_field_values = $form->getFields()->asValues();
 		$original_checks = $this->getTableResult('Type', 'id:dcheckList');
@@ -1079,7 +1095,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			$original_radios[] = $checked_radio->getText();
 		}
 
-		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		$new_name = 'Cloned Discovery Rule';
@@ -1088,7 +1104,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Discovery rule created');
 
 		$this->query('class:list-table')->asTable()->waitUntilVisible()->one()->findRow('Name',
-			$new_name)->query('tag:a')->waitUntilClickable()->one()->click();
+				$new_name)->query('tag:a')->waitUntilClickable()->one()->click();
 		$form->invalidate();
 
 		// Compare form's simple fields.
@@ -1102,7 +1118,9 @@ class testFormNetworkDiscovery extends CWebTest {
 		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
 			$new_radios[] = $checked_radio->getText();
 		}
+
 		$this->assertEquals($original_radios, $new_radios);
+		$dialog->close();
 
 		// Check Discovery rules in DB.
 		foreach(['Discovery rule for clone', $new_name] as $name) {
@@ -1113,10 +1131,11 @@ class testFormNetworkDiscovery extends CWebTest {
 	public function testFormNetworkDiscovery_Delete() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$this->query('link', self::DELETE_RULE)->waitUntilClickable()->one()->click();
-		$form = $this->query('id:discoveryForm')->asForm()->one();
-		$form->query('button:Delete')->waitUntilClickable()->one()->click();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete discovery rule?', $this->page->getAlertText());
 		$this->page->acceptAlert();
+		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Discovery rule deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM drules WHERE name='.zbx_dbstr(self::DELETE_RULE)));
 	}
@@ -1158,11 +1177,11 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
 		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
 		$this->query($selector)->waitUntilClickable()->one()->click();
-
-		$form = $this->query('id:discoveryForm')->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $dialog->asForm();
 
 		if ($data['action'] === 'Delete') {
-			$form->query('button:Delete')->waitUntilClickable()->one()->click();
+			$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 			$this->page->dismissAlert();
 		}
 		else {
@@ -1175,9 +1194,9 @@ class testFormNetworkDiscovery extends CWebTest {
 			]);
 
 			$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
-				->waitUntilClickable()->one()->click();
-			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
-			$checks_form = $dialog->asForm();
+					->waitUntilClickable()->one()->click();
+			$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+			$checks_form = $checks_dialog->asForm();
 			$checks_form->fill([
 				'Check type' => 'SNMPv2 agent',
 				'Port range' => 99,
@@ -1185,7 +1204,7 @@ class testFormNetworkDiscovery extends CWebTest {
 				'SNMP OID' => 'new cancel OID'
 			]);
 			$checks_form->submit();
-			$dialog->ensureNotPresent();
+			$checks_dialog->waitUntilNotVisible();
 
 			$radios = [
 				'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
@@ -1195,15 +1214,15 @@ class testFormNetworkDiscovery extends CWebTest {
 
 			foreach ($radios as $label => $value) {
 				$form->getFieldContainer($label)->query("xpath:.//label[text()=".
-					CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
+						CXPathHelper::escapeQuotes($value)."]/../input")->one()->click();
 			}
 
 			if ($data['action'] === 'Clone') {
-				$form->query('button', $data['action'])->one()->click();
+				$dialog->query('button', $data['action'])->one()->click();
 			}
 		}
 
-		$form->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
 		$this->page->assertHeader('Discovery rules');
 		$this->assertEquals($old_hash, $this->getHash());
 	}
