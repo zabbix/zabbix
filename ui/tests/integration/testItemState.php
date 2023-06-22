@@ -271,11 +271,11 @@ class testItemState extends CIntegrationTest {
 
 		$response = $this->call('item.get', [
 			'itemids' => self::$items[$scenario['name']]['itemid'],
-			'output' => ['extend']
+			//'output' => ['state']
 		]);
-
+		
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.
-				$response['result'][0]['state'].' (expected='.$state.').'.$response['result'][0]['error']
+				$response['result'][0]['state'].' (expected='.$state.').'.var_dump($response)
 		);
 
 		// Verify item checks intervals
