@@ -2892,7 +2892,7 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 	while (GNUTLS_E_SUCCESS != (res = gnutls_handshake(s->tls_ctx->ctx)))
 	{
-		if (SUCCEED == tls_is_nonblocking_error(err))
+		if (SUCCEED == tls_is_nonblocking_error(res))
 		{
 			if (NULL != event)
 			{
