@@ -77,6 +77,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_to' => $time_to
 			],
 			'templateid' => $this->getInput('templateid', ''),
+			'merge_sectors' => [
+				'merge' => $this->fields_values['merge'],
+				'percent' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
+					? $this->fields_values['merge_percent']
+					: null,
+				'color' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
+					? '#'.$this->fields_values['merge_color']
+					: null
+			]
 		];
 
 		$data = [
@@ -113,7 +122,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
 		self::getMetricsData($metrics, $options['data_sets']);
-		self::getSectorsData($metrics, $total_value);
+		self::getSectorsData($metrics, $total_value, $options['merge_sectors']);
 
 		return [
 			'sectors' => $metrics,
@@ -483,27 +492,54 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getSectorsData(array &$metrics, int &$total_value): void {
+	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors): void {
+		$others_value = 0;
+		$below_threshold_count = 0;
+		$to_remove = [];
 
-		foreach($metrics as &$metric) {
-
+		foreach ($metrics as &$metric) {
 			$metric['type'] = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE)
 				? $metric['options']['type']
 				: null;
 
 			$metric = [
 				'name' => $metric['name'],
-				'items' => $metric['items'],
-				'hosts' => $metric['hosts'],
 				'color' => $metric['options']['color'],
 				'units' => $metric['units'],
 				'value' => $metric['value']
 			];
 
 			$total_value += $metric['value'];
+
+			if ($merge_sectors['merge'] == PIE_CHART_MERGE_ON) {
+				if ($metric['value'] < ($total_value * ($merge_sectors['percent']/100))) {
+					$below_threshold_count++;
+					$others_value += $metric['value'];
+					$to_remove[] = &$metric;
+				}
+			}
+
 		}
 
 		unset($metric);
+
+		if ($below_threshold_count >= 2) {
+			$others_metric = [
+				'name' => _('Others'),
+				'color' => $merge_sectors['color'],
+				'units' => '',
+				'value' => $others_value
+			];
+
+			$metrics[] = &$others_metric;
+
+			foreach ($to_remove as $metric) {
+				$index = array_search($metric, $metrics, true);
+				if ($index !== false) {
+					unset($metrics[$index]);
+				}
+			}
+		}
 	}
 
 	/**
@@ -545,17 +581,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'stroke' => $this->fields_values['stroke'],
 			'space' => $this->fields_values['space'],
 		];
-
-		$config['merge'] = $this->fields_values['merge'] == PIE_CHART_MERGE_ON
-		? [
-			'merge_sectors' => true,
-			'merge_percent' => $this->fields_values['merge_percent'],
-			'merge_color' => '#'.$this->fields_values['merge_color']
-		]
-		: [
-			'merge_sectors' => false
-		];
-
 
 		if ($this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT) {
 			$config['width'] = $this->fields_values['width'];
