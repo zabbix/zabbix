@@ -245,14 +245,14 @@ $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 $(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
+$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog\eventlog.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
 $(OUTPUTDIR)\persistent_state.o: $(TOPDIR)\src\zabbix_agent\logfiles\persistent_state.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\logfiles.o: $(TOPDIR)\src\zabbix_agent\logfiles\logfiles.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
-
-$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog.c
-	$(CC) $(CFLAGS) -DUNICODE -c $^ -I$(TOPDIR)\go\win64 -o $@
 
 $(TARGETDIR)\resource.syso: $(TOPDIR)\build\win32\project\resource.rc
 	$(WINDRES) $^ $(RFLAGS) -D _WINDOWS -D ZABBIX_AGENT2 -o $@

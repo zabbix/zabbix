@@ -127,6 +127,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\zabbix_agent\active_checks}.c{..\..\..\src\zabbix_agent\active_checks}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\zabbix_agent\eventlog}.c{..\..\..\src\zabbix_agent\eventlog}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\zabbix_agent\logfiles}.c{..\..\..\src\zabbix_agent\logfiles}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
