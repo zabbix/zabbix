@@ -33,6 +33,8 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	CONST DELETE_RULE = 'Discovery rule to check delete';
 	CONST CANCEL_RULE = 'Discovery rule for cancelling scenario';
+	CONST CLONE_RULE = 'Discovery rule for clone';
+	CONST CHECKS_RULE = 'Discovery rule for changing checks';
 
 	/**
 	 * Name of discovery rule for update scenario.
@@ -232,7 +234,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						['Port range' => '']
 					],
-					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.',
+					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.'
 				]
 			],
 			// #1.
@@ -560,7 +562,7 @@ class testFormNetworkDiscovery extends CWebTest {
 							'Check type' => 'Zabbix agent',
 							'Port range' => 100,
 							'Key' => 'test'
-						],
+						]
 					]
 				]
 			],
@@ -992,7 +994,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 
 		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
+		$this->query('link', self::CHECKS_RULE )->waitUntilClickable()->one()->click();
 		$form = $this->query('id:discoveryForm')->asForm()->one();
 		$table = $form->query('id:dcheckList')->asTable()->one();
 
@@ -1046,7 +1048,7 @@ class testFormNetworkDiscovery extends CWebTest {
 
 	public function testFormNetworkDiscovery_Clone() {
 		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$this->query('link:Discovery rule for changing checks')->waitUntilClickable()->one()->click();
+		$this->query('link', self::CLONE_RULE)->waitUntilClickable()->one()->click();
 		$form = $this->query('id:discoveryForm')->asForm()->one();
 
 		$original_field_values = $form->getFields()->asValues();
