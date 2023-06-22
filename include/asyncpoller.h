@@ -22,7 +22,7 @@
 
 #include "zbxcommon.h"
 #ifdef HAVE_LIBEVENT
-#include "event.h"
+#include <event.h>
 
 typedef enum
 {

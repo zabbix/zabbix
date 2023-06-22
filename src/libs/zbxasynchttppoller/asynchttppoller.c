@@ -19,12 +19,12 @@
 
 #include "zbxlog.h"
 #include "zbxsysinc.h"
-#ifdef HAVE_LIBEVENT
+#include "asynchttppoller.h"
+
+#if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
 #include <event.h>
 #include <event2/thread.h>
-#endif
-#include "asynchttppoller.h"
-#ifdef HAVE_LIBCURL
+
 typedef struct
 {
 	struct event			*event;

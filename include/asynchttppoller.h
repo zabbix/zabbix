@@ -19,11 +19,11 @@
 
 #ifndef ZABBIX_ASYNCHTTPPOLLER_H
 #define ZABBIX_ASYNCHTTPPOLLER_H
-
-#include "event.h"
 #include "zbxsysinc.h"
 
-#ifdef HAVE_LIBCURL
+#if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
+#include <event.h>
+
 typedef void (*process_httpagent_result_callback_fn)(CURL *easy_handle, CURLcode err, void *arg);
 typedef void (*httpagent_action_callback_fn)(void *arg);
 
