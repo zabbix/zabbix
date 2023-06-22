@@ -281,7 +281,7 @@ class testPageSearch extends CWebTest {
 			// Check table links.
 			$table_first_row = $table->getRow(0);
 
-			foreach ($widget_params['columns'] as $i => $column){
+			foreach ($widget_params['columns'] as $i => $column) {
 				// The same column name is sometimes used twice so need to access column by index.
 				$column_element = $table_first_row->getColumn($i);
 
