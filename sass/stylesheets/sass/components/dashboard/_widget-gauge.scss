@@ -94,8 +94,18 @@ div.dashboard-widget-gauge {
 	overflow-x: hidden;
 
 	.dashboard-grid-widget-body {
-		svg {
+		a {
 			display: block;
+
+			&:hover,
+			&:focus,
+			&:active {
+				border: 0;
+			}
+
+			svg {
+				display: block;
+			}
 		}
 	}
 }

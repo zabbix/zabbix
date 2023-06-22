@@ -1720,8 +1720,12 @@ form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field:fi
 
 div.dashboard-widget-gauge {
   overflow-x: hidden; }
-  div.dashboard-widget-gauge .dashboard-grid-widget-body svg {
+  div.dashboard-widget-gauge .dashboard-grid-widget-body a {
     display: block; }
+    div.dashboard-widget-gauge .dashboard-grid-widget-body a:hover, div.dashboard-widget-gauge .dashboard-grid-widget-body a:focus, div.dashboard-widget-gauge .dashboard-grid-widget-body a:active {
+      border: 0; }
+    div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
+      display: block; }
 
 .dashboard-widget-inaccessible {
   display: grid;
