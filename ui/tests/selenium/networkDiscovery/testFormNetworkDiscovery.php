@@ -251,7 +251,7 @@ class testFormNetworkDiscovery extends CWebTest {
 					'Checks' => [
 						['Port range' => '']
 					],
-					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.',
+					'dialog_error' => 'Incorrect value for field "ports": cannot be empty.'
 				]
 			],
 			// #1.
