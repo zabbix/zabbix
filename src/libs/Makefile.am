@@ -172,6 +172,7 @@ endif
 SUBDIRS = \
 	zbxalgo \
 	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
