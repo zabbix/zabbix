@@ -40,7 +40,7 @@ $http_popup_form = (new CForm())
 	->addVar('action', 'popup.httpstep');
 
 // Enable form submitting on Enter.
-$http_popup_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$http_popup_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $http_popup_form_list = (new CFormList())
 	->addRow(
@@ -72,9 +72,7 @@ $http_popup_form_list->addRow(_('Query fields'),
 			->setHeader(['', _('Name'), '', _('Value'), ''])
 			->addRow((new CRow([
 				(new CCol(
-					(new CButton(null, _('Add')))
-						->addClass('element-table-add')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				))->setColSpan(5)
 			])))
 	))
@@ -98,9 +96,7 @@ $http_popup_form_list->addRow(_('Post fields'),
 			->setHeader(['', _('Name'), '', _('Value'), ''])
 			->addRow((new CRow([
 				(new CCol(
-					(new CButton(null, _('Add')))
-						->addClass('element-table-add')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				))->setColSpan(5)
 			])))
 	))
@@ -122,9 +118,7 @@ $http_popup_form_list->addRow(_('Variables'),
 			->setHeader(['', _('Name'), '', _('Value'), ''])
 			->addRow((new CRow([
 				(new CCol(
-					(new CButton(null, _('Add')))
-						->addClass('element-table-add')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				))->setColSpan(5)
 			])))
 	))
@@ -141,9 +135,7 @@ $http_popup_form_list->addRow(_('Headers'),
 			->setHeader(['', _('Name'), '', _('Value'), ''])
 			->addRow((new CRow([
 				(new CCol(
-					(new CButton(null, _('Add')))
-						->addClass('element-table-add')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Add')))->addClass('element-table-add')
 				))->setColSpan(5)
 			])))
 	))

@@ -117,7 +117,8 @@ trait TableTrait {
 			}
 
 			if (!$found) {
-				throw new \Exception('Row "'.implode(', ', $data_row).'" was not found in table.');
+				throw new \Exception('Expected row data "'.implode(', ', $data_row).'" does not match row data in table "'.
+						implode(', ', $table_row).'".');
 			}
 		}
 	}

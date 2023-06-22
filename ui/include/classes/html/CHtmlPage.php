@@ -141,10 +141,7 @@ class CHtmlPage {
 	private function createTopHeader(): CTag {
 		$divs = [
 			(new CTag('nav', true,
-				(new CButton(null, _('Show sidebar')))
-					->setId('sidebar-button-toggle')
-					->addClass('button-toggle')
-					->setAttribute('title', _('Show sidebar'))
+				(new CButtonIcon(ZBX_ICON_MENU, _('Show sidebar')))->setId('sidebar-button-toggle')
 			))
 				->addClass('sidebar-nav-toggle')
 				->setAttribute('role', 'navigation')
@@ -174,9 +171,10 @@ class CHtmlPage {
 		if ($this->doc_url !== '') {
 			$divs[] = (new CDiv(
 				(new CLink(null, $this->doc_url))
+					->addClass(ZBX_STYLE_BTN_ICON)
+					->addClass(ZBX_ICON_HELP)
 					->setTitle(_('Help'))
 					->setTarget('_blank')
-					->addClass(ZBX_STYLE_ICON_DOC_LINK)
 			))->addClass(self::ZBX_STYLE_HEADER_DOC_LINK);
 		}
 

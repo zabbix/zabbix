@@ -222,6 +222,7 @@
 					.on('mousedown', obj, openModal);
 
 				obj.$button = $('<button>', {
+					class: ZBX_ICON_PENCIL,
 					type: 'button',
 					title: obj.options.hint,
 					autofocus: obj.options.autofocus || null

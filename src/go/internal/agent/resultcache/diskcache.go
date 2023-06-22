@@ -95,6 +95,7 @@ func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
 			data.EventTimestamp = &EventTimestamp
 		}
 	}
+
 	return &data, err
 }
 
@@ -116,6 +117,7 @@ func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
 		c.Warningf("unexpected write clock type %T", u)
 		clock = 0
 	}
+
 	return
 }
 
@@ -137,6 +139,7 @@ func (c *DiskCache) getLastID(table string) (id uint64, err error) {
 		c.Warningf("unexpected id type %T", u)
 		id = 0
 	}
+
 	return uint64(v), nil
 }
 
@@ -146,6 +149,7 @@ func (c *DiskCache) updateDataRange() (err error) {
 		return
 	}
 	c.oldestData = clock
+
 	return
 }
 
@@ -155,6 +159,7 @@ func (c *DiskCache) updateCommandRange() (err error) {
 		return
 	}
 	c.oldestCommand = clock
+
 	return
 }
 
@@ -167,6 +172,7 @@ func (c *DiskCache) updateLogRange() (err error) {
 	if c.oldestLog == 0 || time.Now().Unix()-c.oldestLog < c.storagePeriod {
 		atomic.StoreUint32(&c.persistFlag, 0)
 	}
+
 	return
 }
 
@@ -186,12 +192,14 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 		" FROM log_%d"+
 		" ORDER BY id LIMIT ?", c.serverID, c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
+
 		return nil, 0, 0, err
 	}
 
 	for rows.Next() {
 		if result, err = c.resultFetch(rows); err != nil {
 			rows.Close()
+
 			return nil, 0, 0, err
 		}
 		result.persistent = false
@@ -223,6 +231,7 @@ func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId 
 		" FROM command_%d"+
 		" ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from command table: %s", err.Error())
+
 		return nil, 0, err
 	}
 
@@ -237,6 +246,8 @@ func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId 
 			}
 		} else {
 			rows.Close()
+			_ = rows.Err()
+
 			return nil, 0, err
 		}
 		results = append(results, &result)
@@ -291,6 +302,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 
 	if data, err = json.Marshal(&request); err != nil {
 		c.Errf("cannot convert cached history to json: %s", err.Error())
+
 		return
 	}
 
@@ -307,6 +319,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 			c.lastErrors = errs
 		}
 		err = errors.New("history upload failed")
+
 		return
 	}
 
@@ -318,7 +331,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	defer cacheLock.Unlock()
 	if maxDataId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId); err != nil {
-			return fmt.Errorf("cannot delete from data_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from data_%d: %w", c.serverID, err)
 		}
 		if err = c.updateDataRange(); err != nil {
 			return
@@ -326,7 +339,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if maxLogId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId); err != nil {
-			return fmt.Errorf("cannot delete from log_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from log_%d: %w", c.serverID, err)
 		}
 		if err = c.updateLogRange(); err != nil {
 			return
@@ -334,7 +347,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if maxCommandId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM command_%d WHERE id<=?", c.serverID), maxCommandId); err != nil {
-			return fmt.Errorf("cannot delete from command_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from command_%d: %w", c.serverID, err)
 		}
 		if err = c.updateCommandRange(); err != nil {
 			return
@@ -426,7 +439,6 @@ func (c *DiskCache) write(r *plugin.Result) {
 		} else {
 			defer stmt.Close()
 		}
-
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
@@ -612,9 +624,9 @@ func (c *DiskCache) SlotsAvailable() int {
 }
 
 func (c *DiskCache) PersistSlotsAvailable() int {
-
 	if atomic.LoadUint32(&c.persistFlag) == 1 {
 		return 0
 	}
+
 	return int(^uint(0) >> 1) //Max int
 }

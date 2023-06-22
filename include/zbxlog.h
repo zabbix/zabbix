@@ -63,14 +63,14 @@ typedef struct
 	int	log_file_size;
 } zbx_config_log_t;
 
-int	zabbix_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
 void	zbx_log_impl(int level, const char *fmt, va_list args);
-void	zabbix_close_log(void);
+void	zbx_close_log(void);
 
-char	*strerror_from_system(zbx_syserror_t error);
+char	*zbx_strerror_from_system(zbx_syserror_t error);
 
 #ifdef _WINDOWS
-char		*strerror_from_module(zbx_syserror_t error, const wchar_t *module);
+char		*zbx_strerror_from_module(zbx_syserror_t error, const wchar_t *module);
 #endif
 
 int		zbx_redirect_stdio(const char *filename);

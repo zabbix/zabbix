@@ -265,7 +265,7 @@ class testFormTags extends CWebTest {
 
 			case 'web scenario':
 				$sql = 'SELECT * FROM httptest ORDER BY httptestid';
-				$locator = 'name:httpForm';
+				$locator = 'name:webscenario_form';
 				$fields = ['Name' => $data['name'], 'Key' => 'itemtag_'.microtime(true)];
 				break;
 
@@ -299,27 +299,45 @@ class testFormTags extends CWebTest {
 
 		$this->query('button:Create '.$object)->waitUntilClickable()->one()->click();
 
-		$form = ($object === 'host' || $object === 'service' || $object === 'connector')
-			? COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()
-			: $this->query($locator)->waitUntilPresent()->asForm()->one();
+		switch ($object) {
+			case 'host prototype':
+				$form = $this->query($locator)->waitUntilPresent()->asForm(['normalized' => true])->one();
+				$data['name'] = $data['name'].' {#KEY}';
+				$form->fill(['Host name' => $data['name']]);
+				$form->fill(['Host groups' => 'Zabbix servers']);
+				break;
 
-		if ($object === 'host prototype') {
-			$data['name'] = $data['name'].' {#KEY}';
-			$form->fill(['Host name' => $data['name']]);
-			$form->fill(['Host groups' => 'Zabbix servers']);
-		}
-		elseif ($object === 'web scenario') {
-			$form->fill(['Name' => $data['name']]);
-			$form->selectTab('Steps');
-			$form->getField('Steps')->query('button:Add')->waitUntilClickable()->one()->click();
-			COverlayDialogElement::find()->one()->waitUntilReady();
-			$overlay_form = $this->query('id:http_step')->asForm()->one();
-			$overlay_form->fill(['Name' => 'zabbix', 'id:url' => 'http://zabbix.com']);
-			$overlay_form->submit();
-			COverlayDialogElement::ensureNotPresent();
-		}
-		else {
-			$form->fill($fields);
+			case 'template':
+			case 'trigger':
+			case 'trigger prototype':
+				$form = $this->query($locator)->waitUntilPresent()->asForm(['normalized' => true])->one();
+				$form->fill($fields);
+				break;
+
+			case 'web scenario':
+				$form = $this->query($locator)->waitUntilPresent()->asGridForm(['normalized' => true])->one();
+				$form->fill(['Name' => $data['name']]);
+				$form->selectTab('Steps');
+				$form->getField('Steps')->query('button:Add')->waitUntilClickable()->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady();
+				$overlay_form = $this->query('id:webscenario-step-form')->asForm()->one();
+				$overlay_form->fill(['Name' => 'zabbix', 'id:url' => 'http://zabbix.com']);
+				$overlay_form->submit();
+				COverlayDialogElement::ensureNotPresent();
+				break;
+
+			case 'host':
+			case 'service':
+			case 'connector':
+				$form = COverlayDialogElement::find()->asGridForm(['normalized' => true])->one()->waitUntilVisible();
+				$form->fill($fields);
+				break;
+
+			case 'item':
+			case 'item prototype':
+				$form = $this->query($locator)->waitUntilPresent()->asGridForm(['normalized' => true])->one();
+				$form->fill($fields);
+				break;
 		}
 
 		if (!$this->problem_tags && $object !== 'connector') {
@@ -476,7 +494,7 @@ class testFormTags extends CWebTest {
 
 			case 'web scenario':
 				$sql = 'SELECT * FROM httptest ORDER BY httptestid';
-				$locator = 'name:httpForm';
+				$locator = 'name:webscenario_form';
 				break;
 
 			case 'service':
@@ -631,7 +649,7 @@ class testFormTags extends CWebTest {
 		switch ($object) {
 			case 'trigger':
 			case 'trigger prototype':
-				$form = $this->query('name:triggersForm')->asForm()->waitUntilPresent()->one();
+				$form = $this->query('name:triggersForm')->asForm(['normalized' =>true])->waitUntilPresent()->one();
 				$form->fill(['Name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM triggers WHERE description='.zbx_dbstr($new_name);
@@ -645,27 +663,35 @@ class testFormTags extends CWebTest {
 				$sql_new_name = 'SELECT NULL FROM items WHERE name='.zbx_dbstr($new_name);
 				break;
 
-			case 'host':
 			case 'host prototype':
+				$form = $this->query('name:hostPrototypeForm')->asForm(['normalized' => true])->waitUntilPresent()->one();
+				$form->fill(['Host name' => $new_name]);
+
+				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
+				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
+				break;
+
+			case 'host':
 			case 'discovered host':
-				$form_name = ($object === 'host prototype') ? 'name:hostPrototypeForm' : 'name:host-form';
-				$form = $this->query($form_name)->asForm()->waitUntilPresent()->one();
+				$form = $this->query('name:host-form')->asForm()->waitUntilPresent()->one();
+
 				if ($object !== 'discovered host') {
 					$form->fill(['Host name' => $new_name]);
 				}
+
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
 
 			case 'template':
-				$form = $this->query('name:templatesForm')->asForm()->waitUntilPresent()->one();
+				$form = $this->query('name:templatesForm')->asForm(['normalized' => true])->waitUntilPresent()->one();
 				$form->fill(['Template name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM hosts WHERE host='.zbx_dbstr($new_name);
 				break;
 
 			case 'web scenario':
-				$form = $this->query('name:httpForm')->asForm()->waitUntilPresent()->one();
+				$form = $this->query('name:webscenario_form')->asForm()->waitUntilPresent()->one();
 				$form->fill(['Name' => $new_name]);
 				$sql_old_name = 'SELECT NULL FROM httptest WHERE name='.zbx_dbstr($this->clone_name);
 				$sql_new_name = 'SELECT NULL FROM httptest WHERE name='.zbx_dbstr($new_name);
@@ -872,7 +898,7 @@ class testFormTags extends CWebTest {
 				break;
 
 			case 'web scenario':
-				$form_selector = 'id:http-form';
+				$form_selector = 'id:webscenario-form';
 				break;
 
 			case 'host prototype':
@@ -899,7 +925,13 @@ class testFormTags extends CWebTest {
 			? COverlayDialogElement::find()->one()->waitUntilReady()
 			: $this->query('id', ($parent === 'Host') ? 'host-form' : 'templates-form')->asForm()->waitUntilPresent()->one();
 
-		$host_modal->asForm()->fill([$parent.' name' => $new_name]);
+		if ($parent === 'Template') {
+			$host_modal->asForm(['normalized' => true])->fill([$parent.' name' => $new_name]);
+		}
+		else {
+			$host_modal->asGridForm(['normalized' => true])->fill([$parent.' name' => $new_name]);
+		}
+
 		$host_modal->query('button:Clone')->one()->click();
 		$this->query('xpath://div[@class="overlay-dialogue-footer" or contains(@class, "tfoot-buttons")]//button[text()="Add"]')
 				->waitUntilClickable()->one()->click();
@@ -1304,7 +1336,7 @@ class testFormTags extends CWebTest {
 			'trigger prototype' => 'name:triggersForm',
 			'item' => 'name:itemForm',
 			'item prototype' => 'name:itemForm',
-			'web scenario' => 'name:httpForm',
+			'web scenario' => 'name:webscenario_form',
 			'service' => 'id:service-form',
 			'host prototype' => 'name:hostPrototypeForm',
 			'template' => 'name:templatesForm'

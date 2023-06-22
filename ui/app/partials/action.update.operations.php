@@ -65,8 +65,7 @@ foreach ($data['action']['update_operations'] as $operationid => $operation) {
 		$details_column,
 		(new CCol(
 			new CHorList([
-				(new CSimpleButton(_('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Edit')))
 					->addClass('js-edit-operation')
 					->setAttribute('data-operation', json_encode([
 						'operationid' => $i,
@@ -79,9 +78,9 @@ foreach ($data['action']['update_operations'] as $operationid => $operation) {
 					])),
 				[
 					(new CButton('remove', _('Remove')))
-						->setAttribute('data-operationid', $i)
-						->addClass('js-remove')
 						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('js-remove')
+						->setAttribute('data-operationid', $i)
 						->removeId(),
 					new CVar('update_operations['.$i.']', $hidden_data)
 				]
@@ -96,14 +95,13 @@ $operations_table->addItem(
 		(new CTag('tfoot', true))
 			->addItem(
 				(new CCol(
-					(new CSimpleButton(_('Add')))
+					(new CButtonLink(_('Add')))
 						->setAttribute('data-actionid', array_key_exists('actionid', $data) ? $data['actionid'] : 0)
 						->setAttribute('operationtype', ACTION_UPDATE_OPERATION)
 						->setAttribute('data-eventsource', array_key_exists('eventsource', $data)
 							? $data['eventsource']
 							: $operation['eventsource'])
 						->addClass('js-update-operations-create')
-						->addClass(ZBX_STYLE_BTN_LINK)
 				))->setColSpan(4)
 			)
 	);

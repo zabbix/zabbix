@@ -51,7 +51,7 @@ OverlayCollection.prototype.end = function() {
  *
  * @param {string} id  Overlay identifier.
  *
- * @return {object|undefined}  Overlay object.
+ * @return {Overlay|undefined}  Overlay object.
  */
 OverlayCollection.prototype.getById = function(id) {
 	return this.map[id];
