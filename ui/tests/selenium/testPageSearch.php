@@ -231,8 +231,7 @@ class testPageSearch extends CWebTest {
 	/**
 	 * Check the layout of the Search form.
 	 */
-	public function testPageSearch_LayoutForm()
-	{
+	public function testPageSearch_LayoutForm() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
 		$form = $this->query('class:form-search')->waitUntilVisible()->asForm()->one();
 
