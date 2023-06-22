@@ -458,7 +458,7 @@ class CSVGGauge {
 		const font_size = minmax_size / 100;
 		const radius = 1 + font_size * CSVGGauge.LABEL_GAP / 100;
 
-		const labels_data = [...this.#config.thresholds.data];
+		const labels_data = this.#config.thresholds.show_labels ? [...this.#config.thresholds.data] : [];
 
 		if (this.#config.minmax.show) {
 			const do_add_min = labels_data.length === 0 || this.#config.min < labels_data[0].value;
