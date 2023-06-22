@@ -194,4 +194,38 @@ form.dashboard-widget-piechart {
 
 div.dashboard-widget-piechart {
 	overflow-x: hidden;
+
+	.pie-chart-legend {
+		$legend-line-height: 18px;
+
+		position: relative;
+		top: 4px;
+		box-sizing: border-box;
+		display: grid;
+		grid-template-columns: repeat(var(--columns, 4), auto);
+		grid-gap: 0 10px;
+		justify-content: start;
+		max-height: calc(var(--lines) * #{$legend-line-height});
+		margin: 0 10px;
+		overflow: hidden;
+		line-height: $legend-line-height;
+
+		.pie-chart-legend-item {
+			min-width: 100%;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+
+			&::before {
+				position: relative;
+				top: -3px;
+				content: ' ';
+				display: inline-block;
+				width: 10px;
+				height: 4px;
+				margin-right: 4px;
+				background: var(--color);
+			}
+		}
+	}
 }

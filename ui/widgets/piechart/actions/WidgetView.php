@@ -50,16 +50,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	protected function doAction(): void {
 
-		$data = [
-			'name' => $this->getInput('name', $this->widget->getDefaultName()),
-			'info' => $this->makeWidgetInfo(),
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
-
 		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
-
 //		if ($dashboard_time) {
 //			$from = $this->getInput('from');
 //			$to = $this->getInput('to');
@@ -88,37 +79,27 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'templateid' => $this->getInput('templateid', ''),
 		];
 
+		$data = [
+			'name' => $this->getInput('name', $this->widget->getDefaultName()),
+			'info' => $this->makeWidgetInfo(),
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			],
+			'vars' => []
+		];
+
+		$data['vars']['config'] = $this->getConfig();
+
 		$metrics = $this->getData($pie_chart_options);
 
 		if ($metrics['errors']) {
 			error($metrics['errors']);
 		}
 
-		if ($metrics['sectors']) {
-			$data['vars']['sectors'] = [];
-
-			foreach($metrics['sectors'] as $sector) {
-				$sector_data = [
-					'name' => $sector['name'],
-					'items' => $sector['items'],
-					'hosts' => $sector['hosts'],
-					'color' => $sector['options']['color'],
-					'base_unit' => $sector['units'],
-					'value' => $sector['value']
-				];
-
-				$sector_data['type'] = $sector['options']['dataset_aggregation'] == AGGREGATE_NONE
-					? $sector['options']['type']
-					: null;
-
-				$data['vars']['sectors'][] = $sector_data;
-			}
-		}
-
-		$data['vars']['config'] = $this->getConfig();
-
-		//$legend = $this->getLegend($data['vars']['sectors']);
-		//$data['vars']['legend'] = $legend ?? '';
+		$data['vars']['sectors'] = $metrics['sectors'];
+		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
+		sdff($data['vars']['legend']);
+		$data['vars']['total_value'] = $metrics['total_value'];
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
@@ -126,15 +107,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getData($options): array {
 		$metrics = [];
 		$errors = [];
+		$total_value = 0;
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid']);
 		self::sortByDataset($metrics);
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
 		self::getMetricsData($metrics, $options['data_sets']);
+		self::getSectorsData($metrics, $total_value);
 
 		return [
 			'sectors' => $metrics,
+			'total_value' => $total_value,
 			'errors' => $errors
 		];
 	}
@@ -500,6 +484,29 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
+	private static function getSectorsData(array &$metrics, int &$total_value): void {
+
+		foreach($metrics as &$metric) {
+
+			$metric['type'] = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE)
+				? $metric['options']['type']
+				: null;
+
+			$metric = [
+				'name' => $metric['name'],
+				'items' => $metric['items'],
+				'hosts' => $metric['hosts'],
+				'color' => $metric['options']['color'],
+				'units' => $metric['units'],
+				'value' => $metric['value']
+			];
+
+			$total_value += $metric['value'];
+		}
+
+		unset($metric);
+	}
+
 	/**
 	 * Prepare an array to be used for hosts/items filtering.
 	 *
@@ -582,6 +589,25 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $config;
 	}
 
-	private function getLegend(array $metrics) {
+	private function getLegend(array $sectors): array {
+		$legend['data'] = [];
+
+		foreach ($sectors as $sector) {
+			$legend['data'][] = [
+				'name' => $sector['name'],
+				'color' => $sector['color']
+			];
+		}
+
+		if ($this->fields_values['legend'] == PIE_CHART_LEGEND_ON) {
+			$legend['show'] = true;
+			$legend['lines'] = $this->fields_values['legend_lines'];
+			$legend['columns'] = $this->fields_values['legend_columns'];
+		}
+		else {
+			$legend['show'] = false;
+		}
+
+		return $legend;
 	}
 }
