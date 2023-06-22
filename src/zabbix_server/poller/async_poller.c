@@ -37,8 +37,8 @@ static void	process_agent_result(void *data)
 	int			ret;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __func__, agent_context->host,
-			agent_context->interface.addr, agent_context->key,
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' host:'%s' addr:'%s' conn:'%s'", __func__, agent_context->key,
+			agent_context->host, agent_context->interface.addr,
 			zbx_tcp_connection_type_name(agent_context->tls_connect));
 
 	zbx_timespec(&timespec);
