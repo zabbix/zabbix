@@ -275,7 +275,7 @@ class testItemState extends CIntegrationTest {
 		]);
 
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.
-				$response['result'][0]['state'].' (expected='.$state.').'.file_get_contents()
+				$response['result'][0]['state'].' (expected='.$state.').'
 		);
 
 		// Verify item checks intervals
