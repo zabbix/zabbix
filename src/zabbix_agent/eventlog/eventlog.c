@@ -109,9 +109,9 @@ EVT_QUERY_FLAGS;
 
 typedef enum	_EVT_RENDER_FLAGS
 {
-	EvtRenderEventValues = 0,           /* variants */
-	EvtRenderEventXml,                  /* XML */
-	EvtRenderBookmark                   /* bookmark */
+	EvtRenderEventValues = 0,	/* variants */
+	EvtRenderEventXml,		/* XML */
+	EvtRenderBookmark		/* bookmark */
 }
 EVT_RENDER_FLAGS;
 
@@ -258,7 +258,7 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 	return disposition;
 }
 
-/* open event logger and return number of records */
+/* opens event logger and returns number of records */
 static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint64_t *FirstID,
 		zbx_uint64_t *LastID, DWORD *error_code)
 {
@@ -370,7 +370,7 @@ static void	zbx_get_message_files(const wchar_t *szLogName, const wchar_t *szSou
  *                                                                            *
  * Parameters: szFileName - [IN] message file name                            *
  *                                                                            *
- * Return value: andle to loaded library or NULL otherwise                    *
+ * Return value: handle to loaded library or NULL otherwise                   *
  *                                                                            *
  ******************************************************************************/
 static HINSTANCE	zbx_load_message_file(const wchar_t *szFileName)
@@ -472,7 +472,7 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 	}
 }
 
-static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context, zbx_uint64_t *id, char **error)
+static int	get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context, zbx_uint64_t *id, char **error)
 {
 	int		ret = FAIL;
 	DWORD		size_required_next = 0, size_required = 0, size = 0, status = 0, bookmarkedCount = 0;
@@ -526,7 +526,7 @@ out:
 	return ret;
 }
 
-/* open Event Log using API 6 and return number of records */
+/* opens Event Log using API 6 and returns number of records */
 static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *render_context,
 		zbx_uint64_t *FirstID, zbx_uint64_t *LastID, char **error)
 {
@@ -616,7 +616,7 @@ out:
 	return ret;
 }
 
-/* get handles of Event Log */
+/* gets handles of Event Log */
 static int	zbx_get_handle_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *query,
 		char **error)
 {
@@ -653,7 +653,7 @@ out:
 	return ret;
 }
 
-/* initialize Event Logs with Windows API version 6 */
+/* initializes Event Logs with Windows API version 6 */
 static int	initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint64_t *FirstID,
 		zbx_uint64_t *LastID, EVT_HANDLE *render_context, EVT_HANDLE *query, char **error)
 {
@@ -691,7 +691,7 @@ out:
 	return ret;
 }
 
-/* expand the string message from a specific event handler */
+/* expands string message from specific event handler */
 static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
 {
 	wchar_t		*pmessage = NULL;
