@@ -1050,7 +1050,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$form = $this->query('id:discoveryForm')->asForm()->one();
 
 		$original_field_values = $form->getFields()->asValues();
-		$original_checks = $this->getTableResult('Type', 'id:dcheckList');
+		$original_checks = $this->getTableColumnData('Type', 'id:dcheckList');
 
 		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
 			$original_radios[] = $checked_radio->getText();
@@ -1073,7 +1073,7 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->assertEquals($original_field_values, $form->getFields()->asValues());
 
 		// Compare Discovery rule's Checks.
-		$this->assertEquals($original_checks, $this->getTableResult('Type', 'id:dcheckList'));
+		$this->assertEquals($original_checks, $this->getTableColumnData('Type', 'id:dcheckList'));
 
 		// Compare form's radios.
 		foreach ($form->query('xpath:.//input[@checked]/../label')->all() as $checked_radio) {
