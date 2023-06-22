@@ -266,7 +266,7 @@ class testItemState extends CIntegrationTest {
 		// Wait for item to be checked
 		$first_check = $this->getLogLineTimestamp(self::COMPONENT_SERVER, ["In process_agent_result() key:'".$key."'"], $wait);
 
-		// Check item state
+		// Wait for item state to be flushed (once per second in preprocessing manager and in poller)
 		sleep(2);
 
 		$response = $this->call('item.get', [
@@ -275,7 +275,7 @@ class testItemState extends CIntegrationTest {
 		]);
 
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.
-				$response['result'][0]['state'].' (expected='.$state.').'
+				$response['result'][0]['state'].' (expected='.$state.')'
 		);
 
 		// Verify item checks intervals
