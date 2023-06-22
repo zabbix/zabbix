@@ -68,9 +68,11 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 */
 	public function testPageMonitoringWebDetails_Layout() {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
+		// Close Kiosk mode if opened.
+		// $this->query('xpath://button[@title="Normal view"]')->
 
 		// Assert title.
-		$this->assertEquals('Details of web scenario: Layout', $this->query('id:page-title-general')->one()->getText());
+		$this->page->assertHeader('Details of web scenario: Layout');
 
 		// Assert table column names.
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -93,6 +95,14 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// Use time filter preset button.
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
 		$this->assertGraphSrcContains('from=now-30d&to=now');
+
+		// Test Kiosk mode.
+		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		$this->page->waitUntilReady();
+		$this->page->assertHeader('Details of web scenario: Layout');
 	}
 
 	public function getWebScenarioData()
