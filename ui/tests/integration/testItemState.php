@@ -273,7 +273,7 @@ class testItemState extends CIntegrationTest {
 			'itemids' => self::$items[$scenario['name']]['itemid'],
 			//'output' => ['state']
 		]);
-		
+
 		$this->assertEquals($state, $response['result'][0]['state'], 'Unexpected item state='.
 				$response['result'][0]['state'].' (expected='.$state.').'.var_dump($response)
 		);
