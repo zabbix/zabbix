@@ -110,35 +110,26 @@ class WidgetForm extends CWidgetForm {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
 		}
 
-		$prev_treshold = null;
-		$min_treshold = null;
-		$max_treshold = null;
+		$min_threshold = null;
+		$max_threshold = null;
 
 		foreach ($this->getFieldValue('thresholds') as $threshold) {
-			$threshold_value = $number_parser->parse($threshold['threshold_value']) == CParser::PARSE_SUCCESS
-				? $number_parser->calcValue()
-				: null;
-
-			if ($threshold_value !== null) {
-				if ($prev_treshold === null) {
-					$min_treshold = $threshold_value;
-					$max_treshold = $threshold_value;
-				}
-				elseif ($threshold_value > $prev_treshold) {
-					$max_treshold = $threshold_value;
-				}
-				elseif ($threshold_value < $prev_treshold) {
-					$min_treshold = $threshold_value;
-				}
+			if ($number_parser->parse($threshold['threshold_value']) !== CParser::PARSE_SUCCESS) {
+				continue;
 			}
+
+			$threshold_value = $number_parser->calcValue();
+
+			$min_threshold = $min_threshold !== null ? min($min_threshold, $threshold_value) : $threshold_value;
+			$max_threshold = $max_threshold !== null ? max($max_threshold, $threshold_value) : $threshold_value;
 		}
 
-		if ($min_treshold !== null && $min_treshold < $min) {
+		if ($min_threshold !== null && $min_threshold < $min) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Thresholds'),
 				_s('value must be no less than "%1$s"', $min)
 			);
 		}
-		if ($max_treshold !== null && $max_treshold > $max) {
+		if ($max_threshold !== null && $max_threshold > $max) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Thresholds'),
 				_s('value must be no greater than "%1$s"', $max)
 			);
