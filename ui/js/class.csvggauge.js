@@ -235,26 +235,29 @@ class CSVGGauge {
 				pos_new = (value_in_range - this.#config.min) / (this.#config.max - this.#config.min);
 			}
 
-			let threshold_pos_start = 0;
-			let threshold_color = this.#config.empty_color;
+			let current_color = '';
 
-			for (const {color: color_next, value} of this.#config.thresholds.data) {
-				const threshold_pos_end = (value - this.#config.min) / (this.#config.max - this.#config.min);
+			if (this.#config.thresholds.data.length > 0) {
+				let threshold_pos_start = 0;
 
-				if (pos_new >= threshold_pos_start && pos_new < threshold_pos_end) {
-					break;
+				for (const {color: color_next, value} of this.#config.thresholds.data) {
+					const threshold_pos_end = (value - this.#config.min) / (this.#config.max - this.#config.min);
+
+					if (pos_new >= threshold_pos_start && pos_new < threshold_pos_end) {
+						break;
+					}
+
+					threshold_pos_start = threshold_pos_end;
+					current_color = color_next;
 				}
-
-				threshold_pos_start = threshold_pos_end;
-				threshold_color = color_next;
 			}
 
 			if (this.#config.value.arc.show) {
-				this.#elements.value_arcs.value_arc.style.fill = threshold_color !== '' ? `#${threshold_color}` : '';
+				this.#elements.value_arcs.value_arc.style.fill = current_color !== '' ? `#${current_color}` : '';
 			}
 
 			if (this.#config.needle.show && this.#config.needle.color === '') {
-				this.#elements.needle.container.style.fill = threshold_color !== '' ? `#${threshold_color}` : '';
+				this.#elements.needle.container.style.fill = current_color !== '' ? `#${current_color}` : '';
 			}
 
 			this.#animate(this.#pos_current, pos_new,
