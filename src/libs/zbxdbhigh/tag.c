@@ -391,3 +391,34 @@ out:
 
 	return ret;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: mark tags for deletion on exact match of name and value pairs     *
+ *                                                                            *
+ * Parameters: dst - [IN/OUT] vector of existing tags                         *
+ *             del - [IN] vector of tags to be deleted                        *
+ *                                                                            *
+ * Comments: Tag without a value is in fact a tag with empty value.           *
+ *           Tags discovered during LLD should not be removed.                *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *del)
+{
+	int	i, j;
+
+	for (i = 0; i < dst->values_num; i++)
+	{
+		if (ZBX_DB_TAG_AUTOMATIC == dst->values[i]->automatic)
+			continue;
+
+		for (j = 0; j < del->values_num; j++)
+		{
+			if (0 == strcmp(dst->values[i]->tag, del->values[j]->tag) &&
+					0 == strcmp(dst->values[i]->value, del->values[j]->value))
+			{
+				dst->values[i]->flags = ZBX_FLAG_DB_TAG_REMOVE;
+			}
+		}
+	}
+}
