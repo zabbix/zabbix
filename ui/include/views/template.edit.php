@@ -29,8 +29,8 @@ $tabs = new CTabView();
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
-	->setName('templatesForm')
-	->addVar('clear_templates', $data['clear_templates'] ?: []);
+	->setName('template-edit-form')
+	->addItem((new CInput('submit', null))->addStyle('display: none;'));
 
 // Template tab.
 $template_tab = (new CFormGrid())
@@ -109,7 +109,7 @@ $templates_field_items[] = (new CMultiSelect([
 			'srcfld2' => 'host',
 			'dstfrm' => $form->getName(),
 			'dstfld1' => 'add_templates_',
-			'excludeids' => ($data['templateid'] == 0) ? [] : [$data['templateid']],
+			'excludeids' => ($data['templateid'] == null) ? [] : [$data['templateid']],
 			'disableids' => array_column($data['linked_templates'], 'templateid')
 		]
 	]
@@ -120,8 +120,8 @@ $template_tab
 		new CLabel(_('Templates'), 'add_templates__ms'),
 		new CFormField(
 			(count($templates_field_items) > 1)
-			? (new CDiv($templates_field_items))->addClass('linked-templates')
-			: $templates_field_items
+				? (new CDiv($templates_field_items))->addClass('linked-templates')
+				: $templates_field_items
 		)
 	])
 	->addItem([
@@ -151,8 +151,8 @@ $template_tab
 		new CLabel(_('Description')),
 		new CFormField(
 			(new CTextArea('description', $data['description']))
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			->setMaxlength(DB::getFieldLength('hosts', 'description'))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'description'))
 		)
 	]);
 
@@ -167,7 +167,7 @@ if ($data['vendor']) {
 }
 
 // Tags tab.
-$tags =  new CPartial('configuration.tags.tab', [
+$tags = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
@@ -262,8 +262,7 @@ if (!$data['readonly']) {
 							->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					)
 				]
-			]))
-				->addClass('form_row')
+			]))->addClass('form_row')
 		)
 		->addItem(
 			(new CRow([
@@ -273,15 +272,13 @@ if (!$data['readonly']) {
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)->setColSpan(8)
-			]))
-				->addClass('form_row')
+			]))->addClass('form_row')
 		);
 
 	$form
 		->addItem($macro_row_tmpl)
 		->addItem($macro_row_inherited_tmpl);
 }
-
 
 if ($data['templateid']) {
 	$buttons = [
@@ -296,24 +293,7 @@ if ($data['templateid']) {
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'template_edit_popup.clone('.json_encode([
-					'title' => _('New template'),
-					'buttons' => [
-						[
-							'title' => _('Add'),
-							'class' => 'js-add',
-							'keepOpen' => true,
-							'isSubmit' => true,
-							'action' => 'template_edit_popup.submit();'
-						],
-						[
-							'title' => _('Cancel'),
-							'class' => ZBX_STYLE_BTN_ALT,
-							'cancel' => true,
-							'action' => ''
-						]
-					]
-				]).');'
+			'action' => 'template_edit_popup.clone();'
 		],
 		[
 			'title' => _('Delete'),
@@ -357,7 +337,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
-				'template' => $data,
+				'template' => $data
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);
@@ -367,8 +347,7 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_TEMPLATES_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().
-		$this->readJsFile('template.edit.js.php')
+	'script_inline' => getPagePostJs().$this->readJsFile('template.edit.js.php')
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

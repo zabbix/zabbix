@@ -35,6 +35,16 @@ window.template_edit_popup = new class {
 		this.linked_templateids = Object.keys(this.template.linked_templates);
 		this.clone_template = 0;
 
+		if (template.warnings && template.warnings.length > 0) {
+			const message_box = template.warnings.length > 1
+				? makeMessageBox('warning', template.warnings,
+					<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
+				)[0]
+				: makeMessageBox('warning', template.warnings, null, true, false)[0];
+
+			this.form.parentNode.insertBefore(message_box, this.form);
+		}
+
 		this.#initActions();
 	}
 
@@ -56,7 +66,7 @@ window.template_edit_popup = new class {
 				);
 
 				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
-
+				$('#add_templates_').trigger('change');
 			}
 			else if (e.target.classList.contains('unlink-and-clear')) {
 				e.target.closest('tr').remove();
@@ -67,7 +77,7 @@ window.template_edit_popup = new class {
 
 				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
 				this.unlink_clear_templateids[`${e.target.dataset.templateid}`] = e.target.dataset.templateid
-				this.#unlinkAndClearTemplate(e.target, e.target.dataset.templateid)
+				this.#unlinkAndClearTemplate(e.target.dataset.templateid)
 			}
 		});
 
@@ -79,12 +89,15 @@ window.template_edit_popup = new class {
 		template_name.dispatchEvent(new Event('input'));
 	}
 
-	#unlinkAndClearTemplate(button, templateid) {
-		const clear_tmpl = document.createElement('input');
-		clear_tmpl.type = 'hidden';
-		clear_tmpl.name = 'clear_templates[]';
-		clear_tmpl.value = templateid;
-		button.form.appendChild(clear_tmpl);
+	#unlinkAndClearTemplate(templateid) {
+		const clear_template = document.createElement('input');
+
+		clear_template.type = 'hidden';
+		clear_template.name = 'clear_templates[]';
+		clear_template.value = templateid;
+		this.form.appendChild(clear_template);
+
+		$('#add_templates_').trigger('change');
 	}
 
 	#editLinkedTemplate(parameters) {
@@ -118,7 +131,11 @@ window.template_edit_popup = new class {
 					let panel_templateids = panel.data('templateids') || [];
 					const templateids = this.#getAddTemplates();
 
-					if (panel_templateids.xor(templateids).length > 0) {
+					const merged_templateids = panel_templateids.concat(templateids).filter(function(e) {
+						return !(panel_templateids.includes(e) && templateids.includes(e));
+					});
+
+					if (merged_templateids.length > 0) {
 						panel.data('templateids', templateids);
 
 						this.macros_manager.load(
@@ -156,14 +173,16 @@ window.template_edit_popup = new class {
 		}
 	}
 
-	clone({title, buttons}) {
-		this.templateid = null;
-		this.clone_template = 1;
+	clone() {
+		this.overlay.setLoading();
+		const parameters = this.#trimFields(getFormFields(this.form));
+		parameters.clone = 1;
 
-		this.overlay.setProperties({title, buttons});
-		this.overlay.unsetLoading();
-		this.overlay.containFocus();
-		this.overlay.recoverFocus();
+		this.overlay = PopUp('template.edit', parameters, {
+			dialogueid: 'templates-form',
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
+		});
 	}
 
 	delete(clear = false) {
