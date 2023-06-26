@@ -157,7 +157,7 @@ class CDashboard {
 	// Logical state control methods.
 
 	activate() {
-		if (this._dashboard_pages.size == 0) {
+		if (this._dashboard_pages.size === 0) {
 			throw new Error('Cannot activate dashboard without dashboard pages.');
 		}
 
@@ -178,7 +178,7 @@ class CDashboard {
 		if (!this._is_edit_mode) {
 			this._startConfigurationChecker();
 
-			if (this._data.auto_start == 1 && this._dashboard_pages.size > 1) {
+			if (this._data.auto_start === 1 && this._dashboard_pages.size > 1) {
 				this._startSlideshow();
 			}
 		}
@@ -242,7 +242,7 @@ class CDashboard {
 
 		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
 
-		if (timeout_ms == 0) {
+		if (timeout_ms === 0) {
 			timeout_ms = this._data.display_period * 1000;
 		}
 
@@ -294,7 +294,7 @@ class CDashboard {
 
 		let timeout_ms = this._selected_dashboard_page.getDisplayPeriod() * 1000;
 
-		if (timeout_ms == 0) {
+		if (timeout_ms === 0) {
 			timeout_ms = this._data.display_period * 1000;
 		}
 
@@ -431,7 +431,7 @@ class CDashboard {
 	}
 
 	_createBusyCondition() {
-		if (this._busy_conditions.size == 0) {
+		if (this._busy_conditions.size === 0) {
 			this.fire(DASHBOARD_EVENT_BUSY);
 		}
 
@@ -445,7 +445,7 @@ class CDashboard {
 	_deleteBusyCondition(busy_condition) {
 		this._busy_conditions.delete(busy_condition);
 
-		if (this._busy_conditions.size == 0) {
+		if (this._busy_conditions.size === 0) {
 			this.fire(DASHBOARD_EVENT_IDLE);
 		}
 	}
@@ -539,7 +539,7 @@ class CDashboard {
 	}
 
 	deleteDashboardPage(dashboard_page) {
-		if (this._dashboard_pages.size == 1) {
+		if (this._dashboard_pages.size === 1) {
 			throw new Error('Cannot delete the last dashboard page.');
 		}
 
@@ -1037,7 +1037,7 @@ class CDashboard {
 		const url = new URL(location.href);
 
 		if (dashboard_page_index > 0) {
-			url.searchParams.set('page', dashboard_page_index + 1);
+			url.searchParams.set('page', `${dashboard_page_index + 1}`);
 		}
 		else {
 			url.searchParams.delete('page');
@@ -1409,7 +1409,7 @@ class CDashboard {
 
 		if (properties.type === overlay.data.original_properties.type) {
 			properties.name = fields.name;
-			properties.view_mode = fields.show_header == 1
+			properties.view_mode = fields.show_header === '1'
 				? ZBX_WIDGET_VIEW_MODE_NORMAL
 				: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 
@@ -1433,7 +1433,7 @@ class CDashboard {
 		const templateid = this._data.templateid ?? undefined;
 		const type = fields.type;
 		const name = fields.name;
-		const view_mode = fields.show_header == 1
+		const view_mode = fields.show_header === '1'
 			? ZBX_WIDGET_VIEW_MODE_NORMAL
 			: ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
 
@@ -1595,7 +1595,7 @@ class CDashboard {
 		if (this._is_edit_mode) {
 			menu_actions.push({
 				label: t('Delete'),
-				disabled: this._dashboard_pages.size == 1,
+				disabled: this._dashboard_pages.size === 1,
 				clickCallback: () => this.deleteDashboardPage(dashboard_page)
 			});
 		}

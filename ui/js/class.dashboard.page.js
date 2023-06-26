@@ -226,11 +226,11 @@ class CDashboardPage {
 	}
 
 	setDynamicHost(dynamic_hostid) {
-		if (this._dynamic_hostid != dynamic_hostid) {
+		if (this._dynamic_hostid !== dynamic_hostid) {
 			this._dynamic_hostid = dynamic_hostid;
 
 			for (const widget of this._widgets.keys()) {
-				if (widget.supportsDynamicHosts() && this._dynamic_hostid != widget.getDynamicHost()) {
+				if (widget.supportsDynamicHosts() && this._dynamic_hostid !== widget.getDynamicHost()) {
 					widget.setDynamicHost(this._dynamic_hostid);
 				}
 			}
@@ -505,7 +505,7 @@ class CDashboardPage {
 	// Dashboard page view methods.
 
 	findFreePos({width, height}) {
-		const pos = {x: 0, y: 0, width: width, height: height};
+		const pos = {x: 0, y: 0, width, height};
 
 		const max_column = this._max_columns - pos.width;
 		const max_row = this._max_rows - pos.height;
@@ -558,7 +558,7 @@ class CDashboardPage {
 			const value = Math.sqrt(Math.pow(delta_x, 2) + Math.pow(delta_y, 2));
 
 			if (pos_best === null
-					|| (pos_best.width == 1 && pos_variant.width > 1)
+					|| (pos_best.width === 1 && pos_variant.width > 1)
 					|| ((pos_best.width > 1 === pos_variant.width > 1) && value < pos_best_value)) {
 				pos_best = {...pos_variant};
 				pos_best_value = value;
@@ -658,7 +658,7 @@ class CDashboardPage {
 					const progress = (time - start_time) / (end_time - start_time);
 					const smooth_progress = 0.5 + Math.sin(Math.PI * (progress - 0.5)) / 2;
 
-					wrapper.scrollTop = parseFloat(start_scroll + (scroll_to - start_scroll) * smooth_progress);
+					wrapper.scrollTop = start_scroll + (scroll_to - start_scroll) * smooth_progress;
 
 					requestAnimationFrame(animate);
 				}
@@ -674,14 +674,13 @@ class CDashboardPage {
 	}
 
 	_isPosEqual(pos_1, pos_2) {
-		return (pos_1.x == pos_2.x && pos_1.y == pos_2.y && pos_1.width == pos_2.width && pos_1.height == pos_2.height);
+		return pos_1.x === pos_2.x && pos_1.y === pos_2.y && pos_1.width === pos_2.width
+			&& pos_1.height === pos_2.height;
 	}
 
 	_isPosOverlapping(pos_1, pos_2) {
-		return (
-			pos_1.x < (pos_2.x + pos_2.width) && (pos_1.x + pos_1.width) > pos_2.x
-				&& pos_1.y < (pos_2.y + pos_2.height) && (pos_1.y + pos_1.height) > pos_2.y
-		);
+		return pos_1.x < pos_2.x + pos_2.width && pos_1.x + pos_1.width > pos_2.x
+			&& pos_1.y < pos_2.y + pos_2.height && pos_1.y + pos_1.height > pos_2.y;
 	}
 
 	_isPosFree(pos) {
@@ -818,7 +817,7 @@ class CDashboardPage {
 
 				this._widget_placeholder_pos = {};
 
-				if (this._widget_placeholder_clicked_pos.width == 2) {
+				if (this._widget_placeholder_clicked_pos.width === 2) {
 					if (delta_x <= 0) {
 						this._widget_placeholder_clicked_pos.width = 1;
 					}
@@ -956,7 +955,7 @@ class CDashboardPage {
 			},
 
 			mouseDown: (e) => {
-				if (e.button != 0) {
+				if (e.button !== 0) {
 					return;
 				}
 
@@ -986,7 +985,7 @@ class CDashboardPage {
 
 				const new_widget_pos = {...this._widget_placeholder_pos};
 
-				if (new_widget_pos.width == 2 && new_widget_pos.height == this._widget_min_rows) {
+				if (new_widget_pos.width === 2 && new_widget_pos.height === this._widget_min_rows) {
 					delete new_widget_pos.width;
 					delete new_widget_pos.height;
 				}
@@ -1021,7 +1020,7 @@ class CDashboardPage {
 			},
 
 			scroll: (e) => {
-				if (e.target.scrollTop == 0) {
+				if (e.target.scrollTop === 0) {
 					this._resizeGrid(0);
 				}
 			}
@@ -1029,7 +1028,7 @@ class CDashboardPage {
 	}
 
 	resetWidgetPlaceholder() {
-		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode != this._is_edit_mode) {
+		if (this._widget_placeholder_is_active && this._widget_placeholder_is_edit_mode !== this._is_edit_mode) {
 			this._deactivateWidgetPlaceholder();
 		}
 
@@ -1040,7 +1039,7 @@ class CDashboardPage {
 		this._widget_placeholder_pos = null;
 		this._widget_placeholder_clicked_pos = null;
 
-		if (this._is_editable && this._widgets.size == 0) {
+		if (this._is_editable && this._widgets.size === 0) {
 			this._widget_placeholder
 				.setState(WIDGET_PLACEHOLDER_STATE_ADD_NEW)
 				.showAtDefaultPosition();
@@ -1115,8 +1114,8 @@ class CDashboardPage {
 		const getGridPos = ({x, y, width, height}) => {
 			const rect = this._dashboard_grid.getBoundingClientRect();
 
-			const pos_x = parseInt(x / rect.width * this._max_columns + 0.5);
-			const pos_y = parseInt(y / this._cell_height + 0.5);
+			const pos_x = Math.trunc(x / rect.width * this._max_columns + 0.5);
+			const pos_y = Math.trunc(y / this._cell_height + 0.5);
 
 			return {
 				x: Math.max(0, Math.min(this._max_columns - width, pos_x)),
@@ -1268,7 +1267,7 @@ class CDashboardPage {
 
 		this._widget_dragging_events = {
 			mouseDown: (e) => {
-				if (e.button != 0) {
+				if (e.button !== 0) {
 					return;
 				}
 
@@ -1419,7 +1418,7 @@ class CDashboardPage {
 			let resize_steps = [];
 
 			for (const axis of ['x', 'y']) {
-				if (source_pos[axis] != target_pos[axis]) {
+				if (source_pos[axis] !== target_pos[axis]) {
 					const distance = target_pos[axis] - source_pos[axis];
 
 					resize_steps.push({
@@ -1430,7 +1429,7 @@ class CDashboardPage {
 						count: Math.abs(distance)
 					});
 				}
-				else if (source_pos[axes_dim[axis]] != target_pos[axes_dim[axis]]) {
+				else if (source_pos[axes_dim[axis]] !== target_pos[axes_dim[axis]]) {
 					const distance = target_pos[axes_dim[axis]] - source_pos[axes_dim[axis]];
 
 					resize_steps.push({
@@ -1473,7 +1472,7 @@ class CDashboardPage {
 				if (data.pos[axes_dim[axis]] > axes_dim_min[axis] && do_squash) {
 					data.pos[axes_dim[axis]]--;
 
-					if (direction == 1) {
+					if (direction === 1) {
 						data.pos[axis]++;
 					}
 
@@ -1499,7 +1498,7 @@ class CDashboardPage {
 				}
 			}
 
-			if (overlapping_widgets.length == 0) {
+			if (overlapping_widgets.length === 0) {
 				return true;
 			}
 
@@ -1531,7 +1530,7 @@ class CDashboardPage {
 			if (data.pos[axes_dim[axis]] > axes_dim_min[axis]) {
 				data.pos[axes_dim[axis]]--;
 
-				if (direction == -1) {
+				if (direction === -1) {
 					data.pos[axis]++;
 				}
 
@@ -1699,7 +1698,7 @@ class CDashboardPage {
 
 					w.setPos(w_data.pos);
 
-					if (w_data.pos.width != pos.width || w_data.pos.height != pos.height) {
+					if (w_data.pos.width !== pos.width || w_data.pos.height !== pos.height) {
 						w.resize();
 					}
 				}
@@ -1787,7 +1786,7 @@ class CDashboardPage {
 
 		this._widget_resizing_events = {
 			mouseDown: (e) => {
-				if (e.button != 0) {
+				if (e.button !== 0) {
 					return;
 				}
 
@@ -1957,10 +1956,10 @@ class CDashboardPage {
 					this._leaveWidgets({except_widget: widget});
 				}
 
-				if (widget.getPos().y == 0) {
+				if (widget.getPos().y === 0) {
 					const num_lines = widget.getNumHeaderLines();
 
-					if (num_lines != this._events_data.last_num_reserved_header_lines) {
+					if (num_lines !== this._events_data.last_num_reserved_header_lines) {
 						this._events_data.last_num_reserved_header_lines = num_lines;
 
 						this.fire(DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES, {num_lines});
@@ -2010,7 +2009,7 @@ class CDashboardPage {
 					return;
 				}
 
-				if (this._dashboard_grid.clientWidth == this._events_data.dashboard_grid_resize_width) {
+				if (this._dashboard_grid.clientWidth === this._events_data.dashboard_grid_resize_width) {
 					return;
 				}
 
