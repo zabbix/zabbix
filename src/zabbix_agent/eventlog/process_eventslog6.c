@@ -174,19 +174,6 @@ BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DW
 
 extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
-static const wchar_t	*RENDER_ITEMS[] = {
-	L"/Event/System/Provider/@Name",
-	L"/Event/System/Provider/@EventSourceName",
-	L"/Event/System/EventRecordID",
-	L"/Event/System/EventID",
-	L"/Event/System/Level",
-	L"/Event/System/Keywords",
-	L"/Event/System/TimeCreated/@SystemTime",
-	L"/Event/EventData/Data"
-};
-
-#define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
-
 #define	VAR_PROVIDER_NAME(p)			(p[0].StringVal)
 #define	VAR_SOURCE_NAME(p)			(p[1].StringVal)
 #define	VAR_RECORD_NUMBER(p)			(p[2].UInt64Val)
@@ -236,13 +223,11 @@ out:
 	return ret;
 }
 
-
-
 static int	get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context, zbx_uint64_t *id, char **error)
 {
 	int		ret = FAIL;
 	DWORD		size_required_next = 0, size_required = 0, size = 0, status = 0, bookmarkedCount = 0;
-	EVT_VARIANT*	renderedContent = NULL;
+	EVT_VARIANT	*renderedContent = NULL;
 	EVT_HANDLE	event_bookmark = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -296,6 +281,17 @@ out:
 static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *render_context,
 		zbx_uint64_t *FirstID, zbx_uint64_t *LastID, char **error)
 {
+	const wchar_t	*RENDER_ITEMS[] = {
+		L"/Event/System/Provider/@Name",
+		L"/Event/System/Provider/@EventSourceName",
+		L"/Event/System/EventRecordID",
+		L"/Event/System/EventID",
+		L"/Event/System/Level",
+		L"/Event/System/Keywords",
+		L"/Event/System/TimeCreated/@SystemTime",
+		L"/Event/EventData/Data"
+	};
+#define	RENDER_ITEMS_COUNT (sizeof(RENDER_ITEMS) / sizeof(const wchar_t *))
 	EVT_HANDLE	tmp_first_event_query = NULL, tmp_last_event_query = NULL;
 	DWORD		status = 0;
 	int		ret = FAIL;
@@ -317,7 +313,6 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 				zbx_strerror_from_system(GetLastError()));
 		goto out;
 	}
-
 	/* get all eventlog */
 	if (NULL == (tmp_first_event_query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath)))
 	{
@@ -380,6 +375,7 @@ out:
 			__func__, zbx_result_string(ret), *FirstID, *LastID);
 
 	return ret;
+#undef	RENDER_ITEMS_COUNT
 }
 
 /* finalize eventlog6 and free the handles */

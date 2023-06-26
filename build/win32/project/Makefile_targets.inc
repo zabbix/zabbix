@@ -2,7 +2,9 @@ all: $(PREBUILD) $(PROGNAME) $(POSTBUILD)
 
 clean: $(POSTCLEAN)
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
-	del $(OBJS) 2>NUL
+	@<<zbx_del_obj.bat
+	del $(OBJS)
+<<
 	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc 2>NUL
 	del MSG00001.bin $(TARGETNAME).$(TARGETEXT).manifest $(PDBS) $(TARGETNAME).$(TARGETEXT).idb 2>NUL
 

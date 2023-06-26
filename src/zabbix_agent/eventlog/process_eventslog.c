@@ -205,11 +205,11 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
  *             out_eventid   - [OUT] ELR detail                               *
  *                                                                            *
  ******************************************************************************/
-#define MAX_INSERT_STRS 100
 static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGRECORD *pELR, char **out_source,
 		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
 		unsigned long *out_eventid)
 {
+#define MAX_INSERT_STRS 100
 	wchar_t	*pEventMessageFile = NULL, *pParamMessageFile = NULL, *pFile = NULL, *pNextFile = NULL, *pCh,
 			*aInsertStrings[MAX_INSERT_STRS];
 	HINSTANCE	hLib = NULL, hParamLib = NULL;
@@ -297,6 +297,7 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+#undef MAX_INSERT_STRS
 }
 
 /* opens event logger and returns number of records */
@@ -525,7 +526,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	HANDLE		eventlog_handle = NULL;
-	wchar_t	*eventlog_name_w;
+	wchar_t		*eventlog_name_w;
 	zbx_uint64_t	FirstID, LastID, lastlogsize;
 	DWORD		num_bytes_read = 0, required_buf_size, ReadDirection, error_code;
 	BYTE		*pELRs = NULL;
