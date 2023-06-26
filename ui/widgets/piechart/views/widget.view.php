@@ -28,7 +28,7 @@
 
 $view = new CWidgetView($data);
 
-$svgContainer = new CDiv('SVG');
+$svgContainer = new CDiv();
 $svgContainer->addClass('svg-pie-chart');
 
 if ($data['vars']['legend'] && $data['vars']['legend']['show']){

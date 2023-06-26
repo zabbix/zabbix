@@ -85,6 +85,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'color' => $this->fields_values['merge'] == PIE_CHART_MERGE_ON
 					? '#'.$this->fields_values['merge_color']
 					: null
+			],
+			'total_value' => [
+				'total_show' => $this->fields_values['total_show'],
+				'decimal_places' => $this->fields_values['total_show'] == PIE_CHART_SHOW_TOTAL_ON
+					? $this->fields_values['decimal_places']
+					: null
+			],
+			'units' => [
+				'units_show' => $this->fields_values['units_show'],
+				'units_value' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
+					? $this->fields_values['units']
+					: null
 			]
 		];
 
@@ -122,7 +134,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
 		self::getMetricsData($metrics, $options['data_sets']);
-		self::getSectorsData($metrics, $total_value, $options['merge_sectors']);
+		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'], $options['units']);
 
 		return [
 			'sectors' => $metrics,
@@ -181,6 +193,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items_db = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
+					'selectValueMap' => ['mappings'],
 					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -233,6 +246,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options = [
 				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
+				'selectValueMap' => ['mappings'],
 				'webitems' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -417,7 +431,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends',
+				'valuemap' => $metric['valuemap']
 			];
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
@@ -492,54 +507,123 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors): void {
+	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors, array $total_config, array $units_config): void {
+		$set_default_item = true;
+		$raw_total_value = 0;
 		$others_value = 0;
 		$below_threshold_count = 0;
 		$to_remove = [];
 
 		foreach ($metrics as &$metric) {
-			$metric['type'] = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE)
-				? $metric['options']['type']
-				: null;
+			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
+					&& $metric['options']['type'] == PIE_CHART_ITEM_TOTAL);
+
+			foreach ($metric['items'] as $item) {
+				if ($item['itemid'] === $metric['itemid']) {
+					$metric['item'] = $item;
+					break;
+				}
+			}
+
+			unset($metric['items']);
+
+			if ($units_config['units_show'] == PIE_CHART_SHOW_UNITS_ON) {
+				if ($units_config['units_value'] !== '') {
+					$metric['item']['units'] = $units_config['units_value'];
+				}
+				else {
+					$metric['item']['units'] = $metric['units'];
+				}
+			}
+			else {
+				$metric['item']['units'] = '';
+			}
+
+			if ($set_default_item) {
+				$default_item = $metric['item'];
+				$set_default_item = false;
+			}
+
+			$formatted_value = formatHistoryValueRaw($metric['value'], $metric['item'], false, [
+				'decimals' => $total_config['decimal_places'],
+				'decimals_exact' => true,
+				'small_scientific' => false,
+				'zero_as_zero' => false
+			]);
 
 			$metric = [
 				'name' => $metric['name'],
 				'color' => $metric['options']['color'],
-				'units' => $metric['units'],
-				'value' => $metric['value']
+				'value' => $metric['value'],
+				'formatted_value' => $formatted_value,
+				'is_total' => $is_total
 			];
 
-			$total_value += $metric['value'];
+			$raw_total_value += $metric['value'];
+		}
+
+		unset($metric);
+
+		foreach ($metrics as $metric) {
+			if ($metric['is_total']) {
+				$raw_total_value = $metric['value'];
+				break;
+			}
+		}
+
+		foreach ($metrics as &$metric) {
+			if (!$metric['is_total']) {
+				$percentage = ($metric['value'] / $raw_total_value) * 100;
+				$metric['percent_of_total'] = $percentage;
+			}
+			else {
+				$metric['percent_of_total'] = 100;
+			}
 
 			if ($merge_sectors['merge'] == PIE_CHART_MERGE_ON) {
-				if ($metric['value'] < ($total_value * ($merge_sectors['percent']/100))) {
+				if ($metric['percent_of_total'] < $merge_sectors['percent']) {
 					$below_threshold_count++;
 					$others_value += $metric['value'];
 					$to_remove[] = &$metric;
 				}
 			}
-
 		}
 
 		unset($metric);
 
 		if ($below_threshold_count >= 2) {
+			$others_formatted_value = formatHistoryValueRaw($others_value, $default_item, false, [
+				'decimals' => $total_config['decimal_places'],
+				'decimals_exact' => true,
+				'small_scientific' => false,
+				'zero_as_zero' => false
+			]);
+
 			$others_metric = [
 				'name' => _('Others'),
 				'color' => $merge_sectors['color'],
-				'units' => '',
-				'value' => $others_value
+				'value' => $others_value,
+				'formatted_value' => $others_formatted_value,
+				'is_total' => false,
+				'percent_of_total' => ($others_value / $raw_total_value) * 100
 			];
 
 			$metrics[] = &$others_metric;
+		}
 
-			foreach ($to_remove as $metric) {
-				$index = array_search($metric, $metrics, true);
-				if ($index !== false) {
-					unset($metrics[$index]);
-				}
+		foreach ($to_remove as $metric_to_remove) {
+			$index = array_search($metric_to_remove, $metrics, true);
+			if ($index !== false) {
+				unset($metrics[$index]);
 			}
 		}
+
+		$total_value = formatHistoryValueRaw($raw_total_value, $default_item, false, [
+			'decimals' => $total_config['decimal_places'],
+			'decimals_exact' => true,
+			'small_scientific' => false,
+			'zero_as_zero' => false
+		]);
 	}
 
 	/**
@@ -589,19 +673,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$config['total_value'] = [
 					'show' => true,
 					'size' => $this->fields_values['value_size'],
-					'decimal_places' => $this->fields_values['decimal_places'],
 					'is_bold' =>  $this->fields_values['value_bold'] == PIE_CHART_VALUE_BOLD_ON,
-					'color' => '#'.$this->fields_values['value_color']
+					'color' => '#'.$this->fields_values['value_color'],
+					'units_show' => $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
 				];
-
-				$config['units'] = $this->fields_values['units_show'] == PIE_CHART_SHOW_UNITS_ON
-					? [
-						'show' => true,
-						'units_value' => $this->fields_values['units']
-					]
-					: [
-						'show' => false
-					];
 			}
 			else {
 				$config['total_value'] = [
