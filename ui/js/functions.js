@@ -803,12 +803,13 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
  * Download svg graph as .png image.
  *
  * @param {SVGElement} svg
+ * @param {string}     legend_class
  * @param {string}     file_name
  */
-function downloadSvgImage(svg, file_name) {
+function downloadSvgImage(svg, legend_class, file_name) {
 	var $dom_node = jQuery(svg),
 		canvas = document.createElement('canvas'),
-		labels = $dom_node.next('.svg-graph-legend'),
+		labels = $dom_node.next(legend_class),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashboard-grid-widget-contents'),
 		image = new Image,
