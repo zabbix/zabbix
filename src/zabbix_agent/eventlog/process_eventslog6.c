@@ -32,6 +32,7 @@
 
 #include <sddl.h> /* ConvertSidToStringSid */
 
+/* winevt.h contents START */
 typedef struct _EVT_VARIANT
 {
 	union

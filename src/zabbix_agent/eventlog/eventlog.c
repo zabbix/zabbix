@@ -25,22 +25,14 @@
 #include "module.h"
 #include "zbxalgo.h"
 #include "../logfiles/logfiles.h"
-/* #include "cfg.h" */
-/* #include "zbxlog.h" */
 #include "zbxsysinfo.h"
-/* #include "zbxregexp.h" */
-/* #include "zbxstr.h" */
-/* #include "zbx_item_constants.h" */
 #include "zbxcomms.h"
-
 
 #include "winmeta.h"
 
-/* #include <strsafe.h> */
 #include <delayimp.h> /* PDelayLoadInfo */
-/* #include <sddl.h> */
 
-/* Structures from winevt.h file */
+/* winevt.h contents START */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
 /* winevt.h contents END */
 

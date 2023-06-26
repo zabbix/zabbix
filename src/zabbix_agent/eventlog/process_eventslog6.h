@@ -23,9 +23,9 @@
 #include "zbxcomms.h"
 #include "zbxalgo.h"
 
-/* Structures from winevt.h file */
+/* winevt.h contents START */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
-/* Structures from winevt.h file END */
+/* winevt.h contents END */
 
 int	initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint64_t *FirstID,
 		zbx_uint64_t *LastID, EVT_HANDLE *render_context, EVT_HANDLE *query, char **error);
