@@ -222,7 +222,10 @@ class CFilter extends CDiv {
 		}
 
 		return $this->addTab(
-			(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_FILTER_TRIGGER),
+			(new CLink($header, '#'.$anchor))
+				->addClass(ZBX_STYLE_BTN)
+				->addClass(ZBX_ICON_FILTER)
+				->addClass(ZBX_STYLE_FILTER_TRIGGER),
 			(new CDiv($body))
 				->addClass(ZBX_STYLE_FILTER_CONTAINER)
 				->setId($anchor)
@@ -246,9 +249,9 @@ class CFilter extends CDiv {
 
 		if ($visible) {
 			$this->addTab(new CDiv([
-				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_LEFT),
-				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_OUT),
-				(new CSimpleButton())->addClass(ZBX_STYLE_BTN_TIME_RIGHT)
+				(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT))->addClass('js-btn-time-left'),
+				(new CSimpleButton(_('Zoom out')))->addClass(ZBX_STYLE_BTN_TIME_ZOOMOUT),
+				(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT))->addClass('js-btn-time-right')
 			]), null);
 
 			$predefined_ranges = [];
@@ -274,7 +277,10 @@ class CFilter extends CDiv {
 			$anchor = 'tab_'.count($this->tabs);
 
 			$this->addTab(
-				(new CLink($header, '#'.$anchor))->addClass(ZBX_STYLE_BTN_TIME),
+				(new CLink($header, '#'.$anchor))
+					->addClass(ZBX_STYLE_BTN)
+					->addClass(ZBX_ICON_CLOCK)
+					->addClass(ZBX_STYLE_BTN_TIME),
 				(new CDiv([
 					(new CDiv([
 						new CList([

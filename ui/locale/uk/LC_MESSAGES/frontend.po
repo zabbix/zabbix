@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-05-12 19:24+0000\n"
+"PO-Revision-Date: 2023-06-06 12:33+0000\n"
 "Last-Translator: Maksym <maxim@ua.fm>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: uk\n"
@@ -594,7 +594,7 @@ msgstr "Підтверджені ВИРІШЕНІ події"
 #: app/partials/monitoring.problem.filter.php:142
 #: widgets/problems/views/widget.edit.php:103
 msgid "Acknowledgement status"
-msgstr ""
+msgstr "Статус підтвердження"
 
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
@@ -1880,12 +1880,12 @@ msgstr "Нижче значення"
 #: include/views/configuration.item.edit.php:126
 #: include/views/configuration.item.prototype.edit.php:112
 msgid "Binary"
-msgstr ""
+msgstr "Двійковий"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1397
 #, c-format
 msgid "Binary item \"%1$s\" cannot be used in trigger"
-msgstr ""
+msgstr "Двійковий елемент \"%1$s\" не можна використати в тригері"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1995,7 +1995,7 @@ msgstr "По вузлу мережі"
 #: app/partials/monitoring.problem.filter.php:154
 #: widgets/problems/includes/WidgetForm.php:136
 msgid "By me"
-msgstr ""
+msgstr "Мною"
 
 #: report2.php:196
 msgid "By trigger template"
@@ -2465,6 +2465,11 @@ msgstr "Не можливо створити залежність прототи
 msgid "Cannot create discovery rule"
 msgstr "Не вдалося створити правило виявлення"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Не вдалося створити призначення іконок"
@@ -2502,6 +2507,10 @@ msgstr "Не вдалося створити конфігураційний фа
 msgid "Cannot create user role"
 msgstr "Не вдалося створити роль користувача"
 
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
+
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
@@ -2538,12 +2547,11 @@ msgstr[1] "Неможливо видалити конектори"
 msgstr[2] "Неможливо видалити конектори"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
-#, fuzzy
 msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] "Не вдалося видалити кореляцію"
-msgstr[1] "Не вдалося видалити кореляцію"
-msgstr[2] "Не вдалося видалити кореляцію"
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2563,16 +2571,22 @@ msgid "Cannot delete dependency"
 msgstr "Не вдалося видалити залежність"
 
 #: app/controllers/CControllerDiscoveryDelete.php:69 host_discovery.php:416
-#, fuzzy
 msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] "Не вдалося видалити правило виявлення"
-msgstr[1] "Не вдалося видалити правило виявлення"
-msgstr[2] "Не вдалося видалити правило виявлення"
+msgstr[1] "Не вдалося видалити правила виявлення"
+msgstr[2] "Не вдалося видалити правила виявлення"
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "Не вдалося видалити плавила виявлення"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2632,9 +2646,9 @@ msgstr "Неможливо видалити групи хостів"
 #: host_prototypes.php:293
 msgid "Cannot delete host prototype"
 msgid_plural "Cannot delete host prototypes"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Не вдалося видалити прототип вузла мережі"
+msgstr[1] "Не вдалося видалити прототипи вузлів мережі"
+msgstr[2] "Не вдалося видалити прототипи вузлів мережі"
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2896,6 +2910,13 @@ msgstr[0] "Не вдалося дезактивувати правило вия�
 msgstr[1] "Не вдалося дезактивувати правила виявлення"
 msgstr[2] "Не вдалося дезактивувати правила виявлення"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -3005,6 +3026,13 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Не вдалося активувати правило виявлення"
 msgstr[1] "Не вдалося активувати правила виявлення"
 msgstr[2] "Не вдалося активувати правила виявлення"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3504,6 +3532,11 @@ msgstr "Неможливо зв’язати шаблон \"%1$s\" із хост
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Неможливо зв’язати шаблон \"%1$s\" із хостом \"%2$s\" через вираз тригера \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3524,6 +3557,11 @@ msgstr "Неможливо зв’язати шаблон \"%1$s\" із прот
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Неможливо зв’язати шаблон \"%1$s\" із прототипом хосту \"%2$s\" через вираз тригера \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3555,6 +3593,41 @@ msgstr "Неможливо зв’язати шаблон «%1$s» із шабл
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Неможливо пов’язати шаблон «%1$s» із шаблоном «%2$s», оскільки виникне циклічний зв’язок (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3973,6 +4046,11 @@ msgstr[0] "Не вдалося оновити подію"
 msgstr[1] "Не вдалося оновити події"
 msgstr[2] "Не вдалося оновити події"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "Неможливо оновити події"
@@ -4207,6 +4285,10 @@ msgstr "Неможливо оновити роль користувача"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Не вдалося оновити веб сценарій"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5388,6 +5470,10 @@ msgstr "Створити правило виявлення (спочатку в�
 msgid "Create enabled"
 msgstr "Створювати активованим"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Створити графік"
@@ -5420,11 +5506,11 @@ msgstr "Створити прототип вузла мережі"
 
 #: include/views/configuration.host.prototype.list.php:205
 msgid "Create hosts from selected prototype as disabled?"
-msgstr ""
+msgstr "Створити вузли мережі з вибраного прототипу вимкненими?"
 
 #: include/views/configuration.host.prototype.list.php:199
 msgid "Create hosts from selected prototype as enabled?"
-msgstr ""
+msgstr "Створити вузли мережі з вибраного прототипу увімкненими?"
 
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
@@ -5460,11 +5546,11 @@ msgstr "Створити прототип елемента даних"
 
 #: include/views/configuration.item.prototype.list.php:213
 msgid "Create items from selected prototype as disabled?"
-msgstr ""
+msgstr "Створити елементи даних з вибраного прототипу вимкненими?"
 
 #: include/views/configuration.item.prototype.list.php:207
 msgid "Create items from selected prototype as enabled?"
-msgstr ""
+msgstr "Створити елементи даних з вибраного прототипу увімкненими?"
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5533,11 +5619,11 @@ msgstr "Створити прототип тригера"
 
 #: include/views/configuration.trigger.prototype.list.php:212
 msgid "Create triggers from selected prototype as disabled?"
-msgstr ""
+msgstr "Створити тригери з вибраного прототипу вимкненими?"
 
 #: include/views/configuration.trigger.prototype.list.php:206
 msgid "Create triggers from selected prototype as enabled?"
-msgstr ""
+msgstr "Створити тригери з вибраного прототипу увімкненими?"
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6185,7 +6271,7 @@ msgstr "Видалити та очистити"
 
 #: include/views/configuration.template.list.php:320
 msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "Видалити та очистити вибраний шаблон? (Увага: всі приєднані вузли мережі будуть очищені!)"
 
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
@@ -6212,6 +6298,10 @@ msgstr "Видалити панель?"
 msgid "Delete discovery rule?"
 msgstr "Видалити правило виявлення?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6229,7 +6319,7 @@ msgstr "Видалити графік?"
 
 #: include/views/configuration.item.list.php:318
 msgid "Delete history of selected item?"
-msgstr ""
+msgstr "Видалити історію вибраного елемента даних?"
 
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
@@ -6237,7 +6327,7 @@ msgstr "Видалити історію вибраних елементів да
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Delete history of selected web scenario?"
-msgstr ""
+msgstr "Видалити історію вибраного веб-сценарію?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6313,7 +6403,7 @@ msgstr "Видалити вибрані з’єднувачі?"
 
 #: app/views/configuration.correlation.list.php:159
 msgid "Delete selected correlation?"
-msgstr ""
+msgstr "Видалити вибрану кореляцію?"
 
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
@@ -6322,7 +6412,7 @@ msgstr "Видалити вибрані кореляції?"
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboard?"
-msgstr ""
+msgstr "Видалити вибрану панель?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
@@ -6332,7 +6422,7 @@ msgstr "Видалити обрані панелі?"
 #: app/views/js/configuration.discovery.list.js.php:124
 #: include/views/configuration.host.discovery.list.php:369
 msgid "Delete selected discovery rule?"
-msgstr ""
+msgstr "Видалити вибране правило виявлення?"
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6343,9 +6433,17 @@ msgstr "Видалити вибрані правила виявлення?"
 msgid "Delete selected elements?"
 msgstr "Видалити вибрані елементи?"
 
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
-msgstr ""
+msgstr "Видалити вибраний прототип графіку?"
 
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
@@ -6353,7 +6451,7 @@ msgstr "Видалити вибрані прототипи графіків?"
 
 #: include/views/configuration.graph.list.php:270
 msgid "Delete selected graph?"
-msgstr ""
+msgstr "Видалити вибраний графік?"
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6400,7 +6498,7 @@ msgstr "Видалити вибрані картинки?"
 
 #: include/views/configuration.item.prototype.list.php:232
 msgid "Delete selected item prototype?"
-msgstr ""
+msgstr "Видалити вибраний прототип елементу даних?"
 
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
@@ -6408,7 +6506,7 @@ msgstr "Видалити вибрані прототипи елементів д
 
 #: include/views/configuration.item.list.php:361
 msgid "Delete selected item?"
-msgstr ""
+msgstr "Видалити вибраний елемент даних?"
 
 #: include/views/configuration.item.list.php:329
 msgid "Delete selected items?"
@@ -6432,7 +6530,7 @@ msgstr "Видалити вибрані карти?"
 
 #: app/views/administration.mediatype.list.php:217
 msgid "Delete selected media type?"
-msgstr ""
+msgstr "Видалити вибраний метод повідомлення?"
 
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
@@ -6448,7 +6546,7 @@ msgstr "Видалити вибраний проксі?"
 
 #: app/views/administration.regex.list.php:83
 msgid "Delete selected regular expression?"
-msgstr ""
+msgstr "Видалити вибраний регулярний вираз?"
 
 #: app/views/administration.regex.list.php:82
 msgid "Delete selected regular expressions?"
@@ -6472,7 +6570,7 @@ msgstr "Видалити вибрані заплановані звіти?"
 
 #: app/views/administration.script.list.php:224
 msgid "Delete selected script?"
-msgstr ""
+msgstr "Видалити вибраний скрипт?"
 
 #: app/views/administration.script.list.php:203
 msgid "Delete selected scripts?"
@@ -6502,7 +6600,7 @@ msgstr "Видалити вибрані групи шаблонів?"
 
 #: include/views/configuration.template.list.php:313
 msgid "Delete selected template?"
-msgstr ""
+msgstr "Видалити вибраний шаблон?"
 
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
@@ -6520,7 +6618,7 @@ msgstr "Видалити вибрані токени?"
 
 #: include/views/configuration.trigger.prototype.list.php:231
 msgid "Delete selected trigger prototype?"
-msgstr ""
+msgstr "Видалити вибраний прототип тригеру?"
 
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
@@ -6528,7 +6626,7 @@ msgstr "Видалити вибрані прототипи тригерів?"
 
 #: include/views/configuration.triggers.list.php:393
 msgid "Delete selected trigger?"
-msgstr ""
+msgstr "Видалити вибраний тригер?"
 
 #: include/views/configuration.triggers.list.php:359
 msgid "Delete selected triggers?"
@@ -6544,7 +6642,7 @@ msgstr "Видалити вибраних користувачів?"
 
 #: include/views/configuration.httpconf.list.php:248
 msgid "Delete selected web scenario?"
-msgstr ""
+msgstr "Видалити вибраний веб-сценарій?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6756,7 +6854,7 @@ msgstr "Дезактивувати діагностичний режим"
 
 #: app/views/administration.usergroup.list.php:249
 msgid "Disable debug mode in selected group?"
-msgstr ""
+msgstr "Вимкнути діагностичний режим для вибраної групи?"
 
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
@@ -6790,7 +6888,7 @@ msgstr "Вимкнути хости, які мониторяться вибра�
 #: app/views/administration.token.list.php:211
 #: app/views/administration.user.token.list.php:164
 msgid "Disable selected API token?"
-msgstr ""
+msgstr "Вимкнути вибраний API токен?"
 
 #: app/views/administration.token.list.php:199
 #: app/views/administration.user.token.list.php:151
@@ -6823,7 +6921,7 @@ msgstr "Відключити вибрані з’єднувачі?"
 
 #: app/views/configuration.correlation.list.php:153
 msgid "Disable selected correlation?"
-msgstr ""
+msgstr "Вимкнути вибрану кореляцію?"
 
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
@@ -6832,16 +6930,24 @@ msgstr "Дезактивувати вибрані кореляції?"
 #: app/views/js/configuration.discovery.list.js.php:108
 #: include/views/configuration.host.discovery.list.php:348
 msgid "Disable selected discovery rule?"
-msgstr ""
+msgstr "Вимкнути вибране правило виявлення?"
 
 #: app/views/configuration.discovery.list.php:122
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Дезактивувати вибрані правила виявлення?"
 
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
-msgstr ""
+msgstr "Вимкнути вибрану групу?"
 
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
@@ -6849,7 +6955,7 @@ msgstr "Дезактивувати вибрані групи?"
 
 #: app/views/configuration.host.list.php:534
 msgid "Disable selected host?"
-msgstr ""
+msgstr "Вимкнути вибраний вузол мережі?"
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
@@ -6857,7 +6963,7 @@ msgstr "Дезактивувати вибрані вузли мережі?"
 
 #: include/views/configuration.item.list.php:309
 msgid "Disable selected item?"
-msgstr ""
+msgstr "Вимкнути вибраний елемент даних?"
 
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
@@ -6865,7 +6971,7 @@ msgstr "Дезактивувати вибрані елементи даних?"
 
 #: app/views/administration.mediatype.list.php:203
 msgid "Disable selected media type?"
-msgstr ""
+msgstr "Вимкнути вибраний метод повідомленя?"
 
 #: app/views/administration.mediatype.list.php:182
 msgid "Disable selected media types?"
@@ -6881,7 +6987,7 @@ msgstr "Вимкнути вибрані модулі?"
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Disable selected scheduled report?"
-msgstr ""
+msgstr "Вимкнути вибраний запланований звіт?"
 
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
@@ -6889,7 +6995,7 @@ msgstr "Вимкнути вибрані заплановані звіти?"
 
 #: include/views/configuration.triggers.list.php:368
 msgid "Disable selected trigger?"
-msgstr ""
+msgstr "Вимкнути вибраний тригер?"
 
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
@@ -6897,7 +7003,7 @@ msgstr "Дезактивувати вибрані тригери?"
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Disable selected web scenario?"
-msgstr ""
+msgstr "Вимкнути вибраний веб-сценарій?"
 
 #: include/views/configuration.httpconf.list.php:215
 msgid "Disable selected web scenarios?"
@@ -7157,7 +7263,7 @@ msgstr "Правило виявлення створено"
 #: app/controllers/CControllerDiscoveryDelete.php:66 host_discovery.php:416
 msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
-msgstr[0] ""
+msgstr[0] "Правило виявлення видалено"
 msgstr[1] "Правила виявлення видалені"
 msgstr[2] "Правила виявлення видалені"
 
@@ -7640,7 +7746,7 @@ msgstr "Активувати діагностичний режим"
 
 #: app/views/administration.usergroup.list.php:239
 msgid "Enable debug mode in selected group?"
-msgstr ""
+msgstr "Активувати діагностичний режим для вибраної групи?"
 
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
@@ -7687,7 +7793,7 @@ msgstr "Активувати внутрішню очистку"
 #: app/views/administration.token.list.php:205
 #: app/views/administration.user.token.list.php:158
 msgid "Enable selected API token?"
-msgstr ""
+msgstr "Увімкнути вибраний API токен?"
 
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
@@ -7720,7 +7826,7 @@ msgstr "Увімкнути вибрані конектори?"
 
 #: app/views/configuration.correlation.list.php:147
 msgid "Enable selected correlation?"
-msgstr ""
+msgstr "Увімкнути вибрану кореляцію?"
 
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
@@ -7729,16 +7835,24 @@ msgstr "Активувати вибрані кореляції?"
 #: app/views/js/configuration.discovery.list.js.php:92
 #: include/views/configuration.host.discovery.list.php:342
 msgid "Enable selected discovery rule?"
-msgstr ""
+msgstr "Увімкнути вибране правило виявлення?"
 
 #: app/views/configuration.discovery.list.php:121
 #: include/views/configuration.host.discovery.list.php:328
 msgid "Enable selected discovery rules?"
 msgstr "Активувати вибрані правила виявлення?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
-msgstr ""
+msgstr "Увімкнути вибрану групу?"
 
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
@@ -7746,7 +7860,7 @@ msgstr "Активувати вибрані групи?"
 
 #: app/views/configuration.host.list.php:526
 msgid "Enable selected host?"
-msgstr ""
+msgstr "Увімкнути вибраний вузел мережі?"
 
 #: app/views/configuration.host.list.php:500
 #: include/views/configuration.hostgroups.list.php:201
@@ -7755,7 +7869,7 @@ msgstr "Активувати вибрані вузли мережі?"
 
 #: include/views/configuration.item.list.php:303
 msgid "Enable selected item?"
-msgstr ""
+msgstr "Увімкнути вибраний елемент даних?"
 
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
@@ -7763,7 +7877,7 @@ msgstr "Активувати вибрані елементи даних?"
 
 #: app/views/administration.mediatype.list.php:197
 msgid "Enable selected media type?"
-msgstr ""
+msgstr "Увімкнути вибраний метод повідомлення?"
 
 #: app/views/administration.mediatype.list.php:181
 msgid "Enable selected media types?"
@@ -7779,7 +7893,7 @@ msgstr "Увімкнути вибрані модулі?"
 
 #: app/views/reports.scheduledreport.list.php:89
 msgid "Enable selected scheduled report?"
-msgstr ""
+msgstr "Увімкнути вибраний запланований звіт?"
 
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
@@ -7787,7 +7901,7 @@ msgstr "Увімкнути вибрані заплановані звіти?"
 
 #: include/views/configuration.triggers.list.php:362
 msgid "Enable selected trigger?"
-msgstr ""
+msgstr "Увімкнути вибраний тригер?"
 
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
@@ -7795,7 +7909,7 @@ msgstr "Активувати вибрані тригери?"
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Enable selected web scenario?"
-msgstr ""
+msgstr "Увімкнути вибраний веб-сценарій?"
 
 #: include/views/configuration.httpconf.list.php:214
 msgid "Enable selected web scenarios?"
@@ -7939,12 +8053,12 @@ msgstr "Помилка"
 #: app/views/monitoring.widget.slareport.view.php:101
 #: app/views/slareport.list.php:167
 msgid "Error budget"
-msgstr ""
+msgstr "Помилка бюджету"
 
 #: app/views/monitoring.widget.slareport.view.php:101
 msgctxt "compact table header"
 msgid "Error budget"
-msgstr ""
+msgstr "Помилка бюджету"
 
 #: include/db.inc.php:518
 #, c-format
@@ -7996,11 +8110,49 @@ msgstr "Подію підтвержено"
 msgid "Event correlation"
 msgstr "Кореляція подій"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Правила кореляції події"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -8193,7 +8345,7 @@ msgstr "Завершено"
 #: app/partials/scheduledreport.table.html.php:95
 #, c-format
 msgid "Expired on %1$s."
-msgstr ""
+msgstr "Термін дії минув %1$s."
 
 #: app/views/administration.token.list.php:132
 #: app/views/administration.user.token.list.php:93
@@ -8650,7 +8802,7 @@ msgstr "Відсутня формула для правила виявлення
 #: include/classes/api/services/CDiscoveryRule.php:1601
 #, c-format
 msgid "Formula missing for override \"%1$s\"."
-msgstr ""
+msgstr "Відсутня формула для заміни \"%1$s\"."
 
 #: include/locales.inc.php:41
 msgid "French (fr_FR)"
@@ -10397,11 +10549,11 @@ msgstr "Некоректне SNMP community."
 
 #: include/classes/helpers/CVaultHelper.php:137
 msgid "Incorrect Vault API endpoint."
-msgstr ""
+msgstr "Неправильна кінцева точка API Сховища."
 
 #: include/classes/helpers/CVaultHelper.php:61
 msgid "Incorrect Vault token."
-msgstr ""
+msgstr "Неправильний токен Vault."
 
 #: include/classes/validators/CActionCondValidator.php:122
 msgid "Incorrect action condition discovery check."
@@ -10429,15 +10581,15 @@ msgstr "Некоректний тип події в умові дії."
 
 #: include/classes/api/services/CAction.php:2999
 msgid "Incorrect action condition or operation host group. Host group does not exist or you have no access to it."
-msgstr ""
+msgstr "Неправильна умова дії або операції групи вузлів мережі. Групи вузлів мережі не існує або ви не маєте до неї доступу."
 
 #: include/classes/api/services/CAction.php:3059
 msgid "Incorrect action condition or operation host. Host does not exist or you have no access to it."
-msgstr ""
+msgstr "Неправильна умова дії або операції вузла мережі. Вузол мережі не існує або ви не маєте до нього доступу."
 
 #: include/classes/api/services/CAction.php:3197
 msgid "Incorrect action condition or operation template. Template does not exist or you have no access to it."
-msgstr ""
+msgstr "Неправильна умова дії або операції шаблону. Шаблон не існує або ви не маєте до нього доступу."
 
 #: include/classes/validators/CActionCondValidator.php:131
 #, c-format
@@ -10450,7 +10602,7 @@ msgstr "Некоректний проксі в умові дії. Проксі �
 
 #: include/classes/api/services/CAction.php:3401
 msgid "Incorrect action condition service. Service does not exist or you have no access to it."
-msgstr ""
+msgstr "Неправильна умова дії сервісу. Сервіс не існує або ви не маєте до нього доступу."
 
 #: include/classes/validators/CActionCondValidator.php:155
 msgid "Incorrect action condition trigger severity."
@@ -10472,7 +10624,7 @@ msgstr "Некоректні значення кроку ескалації дл
 
 #: include/classes/api/services/CAction.php:2899
 msgid "Incorrect action operation media type. Media type does not exist or you have no access to it."
-msgstr ""
+msgstr "Неправильна дія способу оповіщення. Спосіб оповіщення не існує або ви не маєте до нього доступу."
 
 #: app/controllers/CControllerActionOperationValidate.php:63
 #, c-format
@@ -10481,11 +10633,11 @@ msgstr "Некоректний тип операції дії \"%1$s\" для д
 
 #: include/classes/api/services/CAction.php:3145
 msgid "Incorrect action operation user group. User group does not exist or you have no access to it."
-msgstr ""
+msgstr "Некоректна група користувачів операції дії. Група користувачів не існує або у вас немає доступу до неї."
 
 #: include/classes/api/services/CAction.php:3102
 msgid "Incorrect action operation user. User does not exist or you have no access to it."
-msgstr ""
+msgstr "Некоректна дія операції користувача. Користувача не існує, або ви не маєте до нього доступу."
 
 #: include/classes/api/services/CDRule.php:206
 #: include/classes/api/services/CDRule.php:348
@@ -10551,7 +10703,7 @@ msgstr "Некоректне масове значення для інтерфе
 #: include/classes/api/services/CHost.php:2241
 #, c-format
 msgid "Incorrect characters used for host name \"%1$s\"."
-msgstr ""
+msgstr "Некоректні символи в імені вузла мережі \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1805
 #, c-format
@@ -10560,7 +10712,7 @@ msgstr "Некоректні умови для правила виявлення
 
 #: include/classes/api/services/CUser.php:468
 msgid "Incorrect current password."
-msgstr ""
+msgstr "Неправильний поточний пароль."
 
 #: include/classes/api/services/CDiscoveryRule.php:1811
 #, c-format
@@ -10570,13 +10722,13 @@ msgstr "Некоректний довільний вираз \"%2$s\" для п�
 #: include/classes/api/services/CDiscoveryRule.php:1602
 #, c-format
 msgid "Incorrect custom expression \"%2$s\" for override \"%1$s\": %3$s."
-msgstr ""
+msgstr "Неправильний спеціальний вираз \"%2$s\" для заміни \"%1$s\": %3$s."
 
 #: include/classes/db/MysqlDbBackend.php:69
 #: include/classes/db/PostgresqlDbBackend.php:95
 #, c-format
 msgid "Incorrect default charset for Zabbix database: %1$s."
-msgstr ""
+msgstr "Неправильний набір символів за замовчуванням для бази даних Zabbix: %1$s."
 
 #: include/classes/api/services/CEvent.php:510
 #: include/classes/api/services/CProblem.php:375
@@ -10610,7 +10762,7 @@ msgstr "Некоректні поля для sysmap."
 #: include/classes/setup/CSetupWizard.php:984
 #, c-format
 msgid "Incorrect file path for \"%1$s\": %2$s."
-msgstr ""
+msgstr "Неправильний шлях до файлу для \"%1$s\": %2$s."
 
 #: include/classes/helpers/CUploadFile.php:162
 msgid "Incorrect file upload."
@@ -10629,7 +10781,7 @@ msgstr "Некоректний макрос умови фільтру для п�
 #: include/classes/api/services/CDiscoveryRule.php:1637
 #, c-format
 msgid "Incorrect filter condition macro for override \"%1$s\"."
-msgstr ""
+msgstr "Неправильний макрос умови фільтру для заміни \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:1847
 #, c-format
@@ -10656,18 +10808,18 @@ msgstr "Некоректні вхідні параметри."
 #: include/classes/api/services/CHostInterface.php:801
 #, c-format
 msgid "Incorrect interface DNS parameter \"%1$s\" provided."
-msgstr ""
+msgstr "Для інтерфейсу вказано некоректний параметр DNS \"%1$s\"."
 
 #: include/classes/api/services/CHostInterface.php:846
 #, c-format
 msgid "Incorrect interface port \"%1$s\" provided."
-msgstr ""
+msgstr "Для інтерфейсу вказано некоректний порт \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:2021
 #: include/classes/api/services/CHost.php:2224
 #, c-format
 msgid "Incorrect inventory field \"%1$s\"."
-msgstr ""
+msgstr "Некоректне поле \"%1$s\" інвентарних даних."
 
 #: app/controllers/CControllerActionOperationValidate.php:176
 msgid "Incorrect inventory mode in action operation."
@@ -10723,7 +10875,7 @@ msgstr "Некоректне значення об'єкта."
 #: include/classes/db/OracleDbBackend.php:141
 #, c-format
 msgid "Incorrect parameter \"%1$s\" value: %2$s."
-msgstr ""
+msgstr "Невірне значення: %2$s параметру \"%1$s\"."
 
 #: app/controllers/CControllerPopupDiscoveryCheck.php:58
 #: include/classes/api/services/CDRule.php:496
@@ -10746,7 +10898,7 @@ msgstr "Некоректну відповідь отримано від Zabbix �
 #: app/controllers/CControllerSlaCreateUpdate.php:84
 #, c-format
 msgid "Incorrect schedule: %1$s."
-msgstr ""
+msgstr "Неправильний розклад: %1$s."
 
 #: include/classes/api/services/CEvent.php:491
 #: include/classes/api/services/CProblem.php:356
@@ -10811,7 +10963,7 @@ msgstr "Некоректне значення ID групи користувач
 #: include/classes/api/services/CUser.php:2018
 #: include/classes/validators/CLdapAuthValidator.php:88 index_http.php:79
 msgid "Incorrect user name or password or account is temporarily blocked."
-msgstr ""
+msgstr "Неправильне ім'я користувача чи пароль або обліковий запис тимчасово заблоковано."
 
 #: app/controllers/CControllerActionOperationValidate.php:121
 #: app/controllers/CControllerPopupGeneric.php:478
@@ -10842,7 +10994,7 @@ msgstr "Некоректне значення \"%1$s\" для поля \"%2$s\".
 #: include/validate.inc.php:336
 #, c-format
 msgid "Incorrect value \"%1$s\" for \"%2$s\" field: must be between %3$s and %4$s, and have no more than %5$s digits after the decimal point."
-msgstr ""
+msgstr "Неправильне значення \"%1$s\" для поля \"%2$s\": має бути від %3$s до %4$s і містити не більше %5$s цифр після коми."
 
 #: app/controllers/CControllerAuthenticationUpdate.php:153
 #: include/validate.inc.php:341
@@ -11119,16 +11271,16 @@ msgstr "Некоректне значення для поля \"%1$s\": %2$s."
 
 #: include/classes/helpers/CServiceHelper.php:149
 msgid "Increase by"
-msgstr ""
+msgstr "Збільшити на"
 
 #: app/views/popup.acknowledge.edit.php:90 include/actions.inc.php:1774
 #: include/actions.inc.php:2216 include/html.inc.php:978
 msgid "Indefinitely"
-msgstr ""
+msgstr "Безстроково"
 
 #: app/views/popup.tophosts.column.edit.php:152
 msgid "Indicators"
-msgstr ""
+msgstr "Індикатори"
 
 #: include/locales.inc.php:47
 msgid "Indonesian (id_ID)"
@@ -11136,7 +11288,7 @@ msgstr "Індонезійська (id_ID)"
 
 #: include/func.inc.php:1404 include/func.inc.php:1408
 msgid "Infinity"
-msgstr ""
+msgstr "Нескінченно"
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:172
 #: app/partials/monitoring.latest.view.html.php:82
@@ -11167,7 +11319,7 @@ msgstr "Інфо"
 #: app/views/monitoring.widget.problems.view.php:64
 msgctxt "compact table header"
 msgid "Info"
-msgstr ""
+msgstr "Інфо"
 
 #: include/classes/data/CItemData.php:1443
 msgid "Info about internal disks of hypervisor required for vmware.datastore.perfcounter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
@@ -14142,6 +14294,10 @@ msgstr ""
 msgid "New element"
 msgstr "Новий елемент"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14174,6 +14330,10 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr ""
@@ -14197,6 +14357,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
+msgstr ""
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
 msgstr ""
 
 #: app/views/popup.condition.common.php:120
@@ -17401,6 +17565,17 @@ msgstr "Вирішено правилом кореляції \"%1$s\"."
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
 msgstr "Вирішено правилом кореляції."
+
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

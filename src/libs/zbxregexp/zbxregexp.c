@@ -19,7 +19,6 @@
 
 #include "zbxregexp.h"
 
-#include "log.h"
 #include "zbxstr.h"
 
 #ifdef HAVE_PCRE_H
@@ -305,10 +304,11 @@ static unsigned long int	compute_recursion_limit(void)
 			if (REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP < (rxp_stacklimit = rlim.rlim_cur))
 				rxp_stacklimit = REGEXP_RECURSION_LIMIT * REGEXP_RECURSION_STEP;
 		}
+
+		if (0 == rxp_stacklimit)
 #else
 #	define REGEXP_RECURSION_DEFAULT	2000	/* assume ~1 MB stack and ~500 bytes per recursion */
 #endif
-		if (0 == rxp_stacklimit)
 			rxp_stacklimit = REGEXP_RECURSION_DEFAULT * REGEXP_RECURSION_STEP;
 	}
 

@@ -22,7 +22,6 @@
 
 #include "db_lengths.h"
 #include "zbxtasks.h"
-#include "log.h"
 #include "zbxnum.h"
 #include "zbxcachevalue.h"
 #include "zbxdbwrap.h"

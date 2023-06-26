@@ -37,7 +37,7 @@
 #include "zbxjson.h"
 #include "zbxdb.h"
 #include "zbxalgo.h"
-#include "log.h"
+#include "zbxlog.h"
 
 #define ZBX_HA_POLL_PERIOD	5
 

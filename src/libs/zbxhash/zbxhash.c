@@ -21,13 +21,13 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get a textual representation of md5 sum                           *
+ * Purpose: gets textual representation of md5 sum                            *
  *                                                                            *
  * Parameters:                                                                *
- *          md5 - [IN] buffer with md5 sum                                    *
- *          str - [OUT] preallocated string with a text representation of MD5 *
- *                     sum. String size must be at least                      *
- *                     ZBX_MD5_PRINT_BUF_LEN bytes.                           *
+ *          md5 - [IN]  buffer with md5 sum                                   *
+ *          str - [OUT] Preallocated string with a text representation of MD5 *
+ *                      sum. String size must be at least                     *
+ *                      ZBX_MD5_PRINT_BUF_LEN bytes.                          *
  *                                                                            *
  ******************************************************************************/
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str)

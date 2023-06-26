@@ -59,8 +59,6 @@
 #define ZBX_IPMI_THRESHOLD_STATUS_DISABLED	0
 #define ZBX_IPMI_THRESHOLD_STATUS_ENABLED	1
 
-#include "log.h"
-
 #include <OpenIPMI/ipmiif.h>
 #include <OpenIPMI/ipmi_posix.h>
 #include <OpenIPMI/ipmi_lan.h>

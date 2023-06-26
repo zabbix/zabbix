@@ -28,7 +28,7 @@
 
 #include "cfg.h"
 #include "zbxdbupgrade.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 #include "zbxmodules.h"
@@ -84,6 +84,7 @@
 #include "zbxdbwrap.h"
 #include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
+#include "scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "ipmi/ipmi_manager.h"
@@ -386,7 +387,7 @@ int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -1113,6 +1114,8 @@ static void	zbx_on_exit(int ret)
 		/* free history value cache */
 		zbx_vc_destroy();
 
+		zbx_deinit_remote_commands_cache();
+
 		/* free vmware support */
 		zbx_vmware_destroy();
 
@@ -1126,7 +1129,7 @@ static void	zbx_on_exit(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Server stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 	zbx_locks_destroy();
 
@@ -1173,6 +1176,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
@@ -1501,6 +1505,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			return FAIL;
 		}
+
+		if (SUCCEED != zbx_init_remote_commands_cache(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
+			zbx_free(error);
+			return FAIL;
+		}
 	}
 
 	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
@@ -1614,6 +1625,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;
@@ -1729,13 +1741,13 @@ out:
 
 static int	server_restart_logger(char **error)
 {
-	zabbix_close_log();
+	zbx_close_log();
 	zbx_locks_destroy();
 
 	if (SUCCEED != zbx_locks_create(error))
 		return FAIL;
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1804,6 +1816,7 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_free_selfmon_collector();
 	zbx_free_configuration_cache();
 	zbx_free_database_cache(ZBX_SYNC_NONE, &events_cbs);
+	zbx_deinit_remote_commands_cache();
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
@@ -1901,7 +1914,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);

@@ -2085,14 +2085,14 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 			config_timeout))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy configuration information to sever at \"%s\": %s",
-				sock->peer, zbx_json_strerror());
+				sock->peer, zbx_socket_strerror());
 		goto out;
 	}
 
 	if (FAIL == zbx_tcp_recv_ext(sock, CONFIG_TRAPPER_TIMEOUT, ZBX_TCP_LARGE))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
-				sock->peer, zbx_json_strerror());
+				sock->peer, zbx_socket_strerror());
 		goto out;
 	}
 

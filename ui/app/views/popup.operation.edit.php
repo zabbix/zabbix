@@ -28,8 +28,10 @@ $form = (new CForm())
 	->setId('popup-operation')
 	->setName('popup_operation')
 	->addVar('operation[eventsource]', $data['eventsource'])
-	->addVar('operation[recovery]', $data['recovery'])
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addVar('operation[recovery]', $data['recovery']);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = (new CFormGrid());
 $operation = $data['operation'];
@@ -271,8 +273,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srctbl' => 'hosts',
 									'srcfld1' => 'hostid',
 									'dstfrm' => 'action.edit',
-									'dstfld1' => 'operation_opcommand_hst__hostid',
-									'editable' => '1'
+									'dstfld1' => 'operation_opcommand_hst__hostid'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -291,8 +292,7 @@ if (array_key_exists('opcommand_hst', $operation) && array_key_exists('opcommand
 									'srctbl' => 'host_groups',
 									'srcfld1' => 'groupid',
 									'dstfrm' => 'action.edit',
-									'dstfld1' => 'operation_opcommand_grp__groupid',
-									'editable' => '1'
+									'dstfld1' => 'operation_opcommand_grp__groupid'
 								]
 							]
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
@@ -321,8 +321,7 @@ $form_grid->addItem([
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_opgroup__groupid',
-					'editable' => '1'
+					'dstfld1' => 'operation_opgroup__groupid'
 				]
 			]
 		]))
@@ -348,8 +347,7 @@ $form_grid->addItem([
 					'srctbl' => 'templates',
 					'srcfld1' => 'hostid',
 					'dstfrm' => 'action.edit',
-					'dstfld1' => 'operation_optemplate__templateid',
-					'editable' => '1'
+					'dstfld1' => 'operation_optemplate__templateid'
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -399,10 +397,9 @@ $conditions_table->addItem(
 	(new CTag('tfoot', true))
 		->addItem(
 			(new CCol(
-				(new CSimpleButton(_('Add')))
-					->setAttribute('data-eventsource', $data['eventsource'])
-					->addClass(ZBX_STYLE_BTN_LINK)
+				(new CButtonLink(_('Add')))
 					->addClass('operation-condition-list-footer')
+					->setAttribute('data-eventsource', $data['eventsource'])
 			))->setColSpan(4)
 		)
 );
@@ -421,9 +418,7 @@ if ($data['eventsource'] == EVENT_SOURCE_TRIGGERS && $data['recovery'] == ACTION
 						->addClass('label'),
 					new CCol('#{name}'),
 					(new CCol([
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
-							->addClass('js-remove'),
+						(new CButtonLink(_('Remove')))->addClass('js-remove'),
 						(new CInput('hidden'))
 							->setAttribute('value', '#{conditiontype}')
 							->setName('operation[opconditions][#{row_index}][conditiontype]'),

@@ -22,7 +22,7 @@
 #include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxipcservice.h"
 #include "zbxconnector.h"
 #include "zbxtime.h"

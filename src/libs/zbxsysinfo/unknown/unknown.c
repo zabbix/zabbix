@@ -18,9 +18,15 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../specsysinfo.h"
 
-ZBX_METRIC	parameters_specific[] =
+static zbx_metric_t	parameters_specific[] =
 /*	KEY			FLAG		FUNCTION	TEST PARAMETERS */
 {
 	{NULL}
 };
+
+zbx_metric_t	*get_parameters_specific(void)
+{
+	return parameters_specific;
+}

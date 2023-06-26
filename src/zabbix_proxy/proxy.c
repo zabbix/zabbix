@@ -24,7 +24,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxdbupgrade.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxgetopt.h"
 #include "zbxmutexs.h"
 
@@ -63,6 +63,7 @@
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
+#include "../zabbix_server/scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
 #include "../zabbix_server/ipmi/ipmi_manager.h"
@@ -329,7 +330,7 @@ int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
-static zbx_config_log_t	log_file_cfg = {NULL, NULL, LOG_TYPE_UNDEFINED, 1};
+static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
 
@@ -1026,6 +1027,8 @@ static void	zbx_on_exit(int ret)
 
 	zbx_db_deinit();
 
+	zbx_deinit_remote_commands_cache();
+
 	/* free vmware support */
 	zbx_vmware_destroy();
 
@@ -1037,7 +1040,7 @@ static void	zbx_on_exit(int ret)
 	zabbix_log(LOG_LEVEL_INFORMATION, "Zabbix Proxy stopped. Zabbix %s (revision %s).",
 			ZABBIX_VERSION, ZABBIX_REVISION);
 
-	zabbix_close_log();
+	zbx_close_log();
 
 	zbx_locks_destroy();
 
@@ -1074,6 +1077,7 @@ int	main(int argc, char **argv)
 	/* see description of 'optind' in 'man 3 getopt' */
 	int				zbx_optind = 0;
 
+	zbx_init_library_common(zbx_log_impl);
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 	argv = zbx_setproctitle_init(argc, argv);
@@ -1330,7 +1334,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zabbix_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
 	{
 		zbx_error("cannot open log:%s", error);
 		zbx_free(error);
@@ -1506,6 +1510,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
 		}
+
+		if (SUCCEED != zbx_init_remote_commands_cache(&error))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
+			zbx_free(error);
+			exit(EXIT_FAILURE);
+		}
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/
@@ -1576,6 +1587,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				zbx_thread_start(httppoller_thread, &thread_args, &threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_DISCOVERYMANAGER:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_FIRST;
 				thread_args.args = &discoverer_args;
 				zbx_thread_start(discoverer_thread, &thread_args, &threads[i]);
 				break;

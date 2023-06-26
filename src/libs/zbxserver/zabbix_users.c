@@ -20,7 +20,6 @@
 #include "zabbix_users.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 
 /* group statuses */
 typedef enum
