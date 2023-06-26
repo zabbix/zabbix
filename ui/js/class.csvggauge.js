@@ -83,7 +83,7 @@ class CSVGGauge {
 	#svg;
 
 	/**
-	 * SVG group element implementing padding inside of the root SVG element.
+	 * SVG group element implementing padding inside the root SVG element.
 	 *
 	 * @type {SVGGElement}
 	 */
@@ -441,7 +441,6 @@ class CSVGGauge {
 	 */
 	#createLabels() {
 		const minmax_size = this.#config.minmax.show ? this.#config.minmax.size : CSVGGauge.MINMAX_SIZE_DEFAULT;
-		const arcs_height = this.#config.angle === 270 ? 1 + Math.sqrt(2) / 2 : 1;
 		const font_size = minmax_size / 100;
 		const radius = 1 + font_size * CSVGGauge.LABEL_GAP / 100;
 
@@ -489,6 +488,7 @@ class CSVGGauge {
 			let {x, y} = this.#polarToCartesian(radius, angle);
 
 			if (this.#config.angle === 270) {
+				const arcs_height = 1 + Math.sqrt(2) / 2;
 				const y_max = arcs_height - font_size;
 
 				if (y > y_max) {
