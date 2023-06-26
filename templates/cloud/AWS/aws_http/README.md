@@ -16,13 +16,13 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.  
+Before using the template, you need to create an IAM policy for the Zabbix role in your AWS account with the necessary permissions.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect metrics.
 ```json
 {
     "Version": "2012-10-17",
@@ -34,6 +34,8 @@ Add the following required permissions to your Zabbix IAM policy in order to col
                 "cloudwatch:List*",
                 "ec2:Describe*",
                 "rds:Describe*",
+                "ecs:Describe*",
+                "ecs:List*",
                 "s3:ListAllMyBuckets",
                 "s3:GetBucketLocation"
             ],
@@ -58,6 +60,7 @@ Additional information about metrics and used API methods:
 * [Full metrics list related to RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html)
 * [Full metrics list related to Amazon Aurora](https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.AuroraMySQL.Monitoring.Metrics.html#Aurora.AuroraMySQL.Monitoring.Metrics.instances)
 * [Full metrics list related to S3](https://docs.aws.amazon.com/AmazonS3/latest/userguide/metrics-dimensions.html)
+* [Full metrics list related to ECS](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/cloudwatch-metrics.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
 * [DescribeVolumes API method](https://docs.aws.amazon.com/AWSEC2/latest/APIReference/API_DescribeVolumes.html)
 * [DescribeAlarms API method](https://docs.aws.amazon.com/AmazonCloudWatch/latest/APIReference/API_DescribeAlarms.html)
@@ -73,6 +76,10 @@ Additional information about metrics and used API methods:
 |{$AWS.REGION}|<p>Amazon EC2 region code.</p>|`us-west-1`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ECS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ECS cluster by name.</p>|`.*`|
+|{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ECS cluster by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}|<p>Filter of discoverable ECS cluster by status.</p>|`ACTIVE`|
+|{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}|<p>Filter to exclude discovered ECS cluster by status.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.S3.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable S3 buckets by namespace.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered S3 buckets by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable RDS instances by namespace.</p>|`.*`|
@@ -95,6 +102,12 @@ Additional information about metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |RDS instances discovery|<p>Get RDS instances.</p>|Script|aws.rds.discovery|
+
+### LLD rule ECS Clusters discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|ECS Clusters discovery|<p>Get ECS clusters.</p>|Script|aws.ecs.discovery|
 
 ## Feedback
 
