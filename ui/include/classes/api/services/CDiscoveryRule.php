@@ -976,7 +976,11 @@ class CDiscoveryRule extends CItemGeneral {
 			$itemids[$key] = $item['itemid'];
 
 			// conditions
-			if (isset($item['filter'])) {
+			if (array_key_exists('filter', $item)) {
+				$item['filter']['conditions'] = CDiscoveryRule::sortFilterConditions(
+					$item['filter']['conditions'], $item['filter']['evaltype']
+				);
+
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
@@ -3243,6 +3247,6 @@ class CDiscoveryRule extends CItemGeneral {
 				break;
 		}
 
-		return $conditions;
+		return array_values($conditions);
 	}
 }
