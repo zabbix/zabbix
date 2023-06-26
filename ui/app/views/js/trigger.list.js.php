@@ -60,26 +60,6 @@
 				}
 			})
 
-			document.querySelector('.js-copy').addEventListener('click', () => {
-				const overlay = this.openCopyPopup();
-				const dialogue = overlay.$dialogue[0];
-
-				dialogue.addEventListener('dialogue.submit', (e) => {
-					postMessageOk(e.detail.title);
-
-					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
-					uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
-					chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-					chkbxRange.update(this.checkbox_object);
-
-					if ('messages' in e.detail) {
-						postMessageDetails('success', e.detail.messages);
-					}
-
-					location.href = location.href;
-				});
-			});
-
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'js-create') {
 					this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context})
@@ -90,6 +70,9 @@
 						'hostid': e.target.dataset.hostid,
 						'context': this.context
 					})
+				}
+				else if (e.target.classList.contains('js-copy')) {
+					this.#copy();
 				}
 				else if (e.target.classList.contains('js-massenable-trigger')) {
 					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
@@ -107,7 +90,7 @@
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massupdate-trigger')) {
-					this.#massupdateTrigger(e.target);
+					this.#massupdate(e.target);
 				}
 			})
 		}
@@ -131,6 +114,26 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
 				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+
+		#copy() {
+			const overlay = this.openCopyPopup();
+			const dialogue = overlay.$dialogue[0];
+
+			dialogue.addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+				uncheckTableRows('triggers_' + this.checkbox_hash, [], false);
+				chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+				chkbxRange.update(this.checkbox_object);
 
 				if ('messages' in e.detail) {
 					postMessageDetails('success', e.detail.messages);
@@ -185,7 +188,7 @@
 			this.#post(target, triggerids, curl);
 		}
 
-		#massupdateTrigger(target) {
+		#massupdate(target) {
 			openMassupdatePopup('massupdate.trigger', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
 					<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 				}, {

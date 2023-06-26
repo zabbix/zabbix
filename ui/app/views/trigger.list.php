@@ -77,7 +77,7 @@ $filter_column1 = (new CFormGrid())
 			->setOptions(CSeverityHelper::getSeverities())
 			->setChecked($data['filter_priority'])
 			->setColumns(3)
-			->setVertical(true)
+			->setVertical()
 	]);
 
 if ($data['context'] === 'host') {
@@ -86,7 +86,7 @@ if ($data['context'] === 'host') {
 			->addValue(_('all'), -1)
 			->addValue(_('Normal'), TRIGGER_STATE_NORMAL)
 			->addValue(_('Unknown'), TRIGGER_STATE_UNKNOWN)
-			->setModern(true)
+			->setModern()
 	]);
 }
 
@@ -95,7 +95,7 @@ $filter_column1->addItem([new CLabel(_('Status')),
 		->addValue(_('all'), -1)
 		->addValue(triggerIndicator(TRIGGER_STATUS_ENABLED), TRIGGER_STATUS_ENABLED)
 		->addValue(triggerIndicator(TRIGGER_STATUS_DISABLED), TRIGGER_STATUS_DISABLED)
-		->setModern(true)
+		->setModern()
 ]);
 
 if ($data['context'] === 'host') {
@@ -104,7 +104,7 @@ if ($data['context'] === 'host') {
 			->addValue(_('all'), -1)
 			->addValue(_('Ok'), TRIGGER_VALUE_FALSE)
 			->addValue(_('Problem'), TRIGGER_VALUE_TRUE)
-			->setModern(true)
+			->setModern()
 	]);
 }
 
@@ -125,7 +125,7 @@ $filter_column2 = (new CFormGrid())
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
-			->setModern(true)
+			->setModern()
 	]);
 
 if ($data['context'] === 'host') {
@@ -134,7 +134,7 @@ if ($data['context'] === 'host') {
 			->addValue(_('all'), -1)
 			->addValue(_('Yes'), 1)
 			->addValue(_('No'), 0)
-			->setModern(true)
+			->setModern()
 	]);
 }
 
@@ -143,7 +143,7 @@ $filter_column2->addItem([new CLabel(_('With dependencies')),
 		->addValue(_('all'), -1)
 		->addValue(_('Yes'), 1)
 		->addValue(_('No'), 0)
-		->setModern(true)
+		->setModern()
 ]);
 
 $filter = (new CFilter())
@@ -221,8 +221,6 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'sources' => ['expression', 'recovery_expression'],
 	'context' => $data['context']
 ]);
-
-$csrf_token = CCsrfTokenHelper::get('trigger');
 
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
