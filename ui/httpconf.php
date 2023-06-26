@@ -233,6 +233,25 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 			foreach ($step['variables'] as &$variable) {
 				$variable['name'] = trim($variable['name']);
+				$variable['value'] = trim($variable['value']);
+			}
+			unset($variable);
+
+			foreach ($step['headers'] as &$variable) {
+				$variable['name'] = trim($variable['name']);
+				$variable['value'] = trim($variable['value']);
+			}
+			unset($variable);
+
+			foreach ($step['post_fields'] as &$variable) {
+				$variable['name'] = trim($variable['name']);
+				$variable['value'] = trim($variable['value']);
+			}
+			unset($variable);
+
+			foreach ($step['query_fields'] as &$variable) {
+				$variable['name'] = trim($variable['name']);
+				$variable['value'] = trim($variable['value']);
 			}
 			unset($variable);
 
@@ -279,6 +298,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach ($httpTest['variables'] as &$variable) {
 			$variable['name'] = trim($variable['name']);
+			$variable['value'] = trim($variable['value']);
+		}
+		unset($variable);
+
+		foreach ($httpTest['headers'] as &$variable) {
+			$variable['name'] = trim($variable['name']);
+			$variable['value'] = trim($variable['value']);
 		}
 		unset($variable);
 
