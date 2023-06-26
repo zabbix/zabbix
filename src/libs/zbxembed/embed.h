@@ -40,6 +40,7 @@ struct zbx_es_env
 {
 	duk_context	*ctx;
 	size_t		total_alloc;
+	size_t		max_total_alloc;
 	zbx_timespec_t	start_time;
 
 	char		*error;
