@@ -190,11 +190,15 @@
 
 		.sortable td {
 			padding-bottom: 0;
-			vertical-align: middle;
 			line-height: 24px;
 
 			&.td-drag-icon {
 				line-height: inherit;
+			}
+
+			&.wordbreak,
+			&.wordwrap {
+				line-height: 1.4;
 			}
 		}
 
@@ -260,7 +264,7 @@
 		line-height: 1.4;
 
 		td {
-			padding: 5px 5px 5px 0;
+			padding: 5px 5px 0 0;
 		}
 
 		tfoot {

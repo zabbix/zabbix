@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-12 14:41+0000\n"
+"PO-Revision-Date: 2023-06-21 15:36+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -2468,7 +2468,7 @@ msgstr "Nie można utworzyć zasady wykrywania"
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Nie można utworzyć współzależności zdarzeń"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2506,6 +2506,10 @@ msgstr "Nie można utworzyć pliku konfiguracyjnego."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "Nie można utworzyć funkcji użytkownika"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr "Nie można utworzyć kroku scenariusza sieci www"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2580,9 +2584,9 @@ msgstr "Nie można usunąć reguł wykrywania"
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można usunąć współzależności zdarzeń"
+msgstr[1] "Nie można usunąć współzależności zdarzeń"
+msgstr[2] "Nie można usunąć współzależności zdarzeń"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2909,9 +2913,9 @@ msgstr[2] "Nie można wyłączyć reguł wykrywania"
 #: app/controllers/CControllerCorrelationDisable.php:76
 msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można wyłączyć współzależności zdarzeń"
+msgstr[1] "Nie można wyłączyć współzależności zdarzeń"
+msgstr[2] "Nie można wyłączyć współzależności zdarzeń"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
@@ -3026,9 +3030,9 @@ msgstr[2] "Nie można włączyć reguł wykrywania"
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Nie można włączyć współzależności zdarzeń"
+msgstr[1] "Nie można włączyć współzależności zdarzeń"
+msgstr[2] "Nie można włączyć współzależności zdarzeń"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -4045,7 +4049,7 @@ msgstr[2] "Nie można zaktualizować zdarzeń"
 #: app/controllers/CControllerCorrelationUpdate.php:49
 #: app/controllers/CControllerCorrelationUpdate.php:117
 msgid "Cannot update event correlation"
-msgstr ""
+msgstr "Nie można zaktualizować współzależności zdarzeń"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
@@ -4281,6 +4285,10 @@ msgstr "Nie można zaktualizować roli użytkownika"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Nie można zaktualizować scenariusza sieci www"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr "Nie można zaktualizować kroku scenariusza sieci www"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5464,7 +5472,7 @@ msgstr "Tworzenie włączone"
 
 #: app/views/correlation.list.php:35
 msgid "Create event correlation"
-msgstr ""
+msgstr "Utwórz współzależność zdarzeń"
 
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
@@ -6292,7 +6300,7 @@ msgstr "Usunąć regułę wykrywania?"
 
 #: app/views/correlation.edit.php:330
 msgid "Delete event correlation?"
-msgstr ""
+msgstr "Usunąć współzależność zdarzeń?"
 
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
@@ -6427,11 +6435,11 @@ msgstr "Usunąć wybrane elementy?"
 
 #: app/views/js/correlation.list.js.php:107
 msgid "Delete selected event correlation?"
-msgstr ""
+msgstr "Usunąć wybraną współzależność zdarzeń?"
 
 #: app/views/js/correlation.list.js.php:106
 msgid "Delete selected event correlations?"
-msgstr ""
+msgstr "Usunąć wybrane współzależności zdarzeń?"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6931,11 +6939,11 @@ msgstr "Wyłączyć wybrane reguły wykrywania?"
 
 #: app/views/js/correlation.list.js.php:158
 msgid "Disable selected event correlation?"
-msgstr ""
+msgstr "Wyłączyć wybraną współzależność zdarzeń?"
 
 #: app/views/js/correlation.list.js.php:157
 msgid "Disable selected event correlations?"
-msgstr ""
+msgstr "Wyłączyć wybrane współzależności zdarzeń?"
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7836,11 +7844,11 @@ msgstr "Włączyć wybrane reguły wykrywania?"
 
 #: app/views/js/correlation.list.js.php:132
 msgid "Enable selected event correlation?"
-msgstr ""
+msgstr "Włączyć wybraną współzależność zdarzeń?"
 
 #: app/views/js/correlation.list.js.php:131
 msgid "Enable selected event correlations?"
-msgstr ""
+msgstr "Włączyć wybrane współzależności zdarzeń?"
 
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
@@ -8105,36 +8113,36 @@ msgstr "Korelacja zdarzeń"
 #: include/classes/api/services/CCorrelation.php:536
 #, c-format
 msgid "Event correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "Współzależność zdarzeń \"%1$s\" już istnieje."
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
-msgstr ""
+msgstr "Utworzono współzależność zdarzeń"
 
 #: app/controllers/CControllerCorrelationDelete.php:60
 msgid "Event correlation deleted"
 msgid_plural "Event correlations deleted"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Usunięto współzależność zdarzeń"
+msgstr[1] "Usunięto współzależności zdarzeń"
+msgstr[2] "Usunięto współzależności zdarzeń"
 
 #: app/controllers/CControllerCorrelationDisable.php:68
 msgid "Event correlation disabled"
 msgid_plural "Event correlations disabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Wyłączono współzależność zdarzeń"
+msgstr[1] "Wyłączono współzależności zdarzeń"
+msgstr[2] "Wyłączono współzależności zdarzeń"
 
 #: app/controllers/CControllerCorrelationEnable.php:68
 msgid "Event correlation enabled"
 msgid_plural "Event correlations enabled"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Włączono współzależność zdarzeń"
+msgstr[1] "Włączono współzależności zdarzeń"
+msgstr[2] "Włączono współzależności zdarzeń"
 
 #: include/events.inc.php:201
 msgid "Event correlation rule"
-msgstr ""
+msgstr "Zasada współzależności zdarzeń"
 
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
@@ -8144,7 +8152,7 @@ msgstr "Zasady korelacji zdarzeń"
 
 #: app/controllers/CControllerCorrelationUpdate.php:109
 msgid "Event correlation updated"
-msgstr ""
+msgstr "Zaktualizowano współzależność zdarzeń"
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -14288,7 +14296,7 @@ msgstr "Nowy element"
 
 #: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
 msgid "New event correlation"
-msgstr ""
+msgstr "Nowa współzależność zdarzeń"
 
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
@@ -14324,7 +14332,7 @@ msgstr "Nowy okres utrzymania"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "Nowy typ mediów"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -14350,6 +14358,10 @@ msgstr "Nowy skrypt"
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Nowa usługa"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr "Nowy krok scenariusza sieci www"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -17558,12 +17570,12 @@ msgstr "Rozwiązane przez regułę korelacji."
 #: widgets/problems/includes/WidgetProblems.php:251
 #, c-format
 msgid "Resolved by event correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Rozwiązane przez regułę współzależności zdarzeń \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:1411
 #: widgets/problems/includes/WidgetProblems.php:254
 msgid "Resolved by event correlation rule."
-msgstr ""
+msgstr "Rozwiązane przez regułę współzależności zdarzeń."
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

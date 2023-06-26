@@ -411,7 +411,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
-					'form' => 'name:httpForm',
+					'form' => 'name:webscenario_form',
 					'tabs' => [
 						[
 							'name' => 'Steps',
@@ -674,6 +674,9 @@ class testFormTabIndicators extends CWebTest {
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		}
+		elseif ($data['form'] === 'name:triggersForm') {
+			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
