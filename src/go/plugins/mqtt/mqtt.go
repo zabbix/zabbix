@@ -28,6 +28,7 @@ package mqtt
 
 import (
 	"crypto/rand"
+	"crypto/tls"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -35,12 +36,18 @@ import (
 	"strings"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/tlsconfig"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	mqtt "github.com/eclipse/paho.mqtt.golang"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/watch"
+)
+
+const (
+	pluginName = "MQTT"
 )
 
 type mqttClient struct {
@@ -71,26 +78,8 @@ type Plugin struct {
 
 var impl Plugin
 
-type Options struct {
-	plugin.SystemOptions `conf:"optional"`
-	Timeout              int `conf:"optional,range=1:30"`
-}
-
-func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
-	if err := conf.Unmarshal(options, &p.options); err != nil {
-		p.Warningf("cannot unmarshal configuration options: %s", err)
-	}
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
-	}
-}
-
-func (p *Plugin) Validate(options interface{}) error {
-	var o Options
-	return conf.Unmarshal(options, &o)
-}
-
-func (p *Plugin) createOptions(clientid, username, password string, b broker) *mqtt.ClientOptions {
+func (p *Plugin) createOptions(
+	clientid, username, password string, b broker, details tlsconfig.Details) (*mqtt.ClientOptions, error) {
 	opts := mqtt.NewClientOptions().AddBroker(b.url).SetClientID(clientid).SetCleanSession(true).SetConnectTimeout(
 		time.Duration(impl.options.Timeout) * time.Second)
 	if username != "" {
@@ -125,7 +114,30 @@ func (p *Plugin) createOptions(clientid, username, password string, b broker) *m
 		}
 	}
 
-	return opts
+	t, err := getTlsConfig(details)
+	if err != nil {
+		return nil, err
+	}
+
+	opts.SetTLSConfig(t)
+
+	return opts, nil
+}
+
+func getTlsConfig(d tlsconfig.Details) (*tls.Config, error) {
+	if d.TlsCaFile == "" && d.TlsCertFile == "" && d.TlsKeyFile == "" {
+		return nil, nil
+	}
+
+	return tlsconfig.CreateConfig(
+		tlsconfig.Details{
+			TlsCaFile:   d.TlsCaFile,
+			TlsCertFile: d.TlsCertFile,
+			TlsKeyFile:  d.TlsKeyFile,
+			RawUri:      d.RawUri,
+		},
+		false,
+	)
 }
 
 func newClient(options *mqtt.ClientOptions) (mqtt.Client, error) {
@@ -166,7 +178,7 @@ func (ms *mqttSub) subscribe(mc *mqttClient) error {
 	return nil
 }
 
-//Watch MQTT plugin
+// Watch MQTT plugin
 func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	impl.manager.Lock()
 	impl.manager.Update(ctx.ClientID(), ctx.Output(), requests)
@@ -255,42 +267,68 @@ func (ms *mqttSub) NewFilter(key string) (filter watch.EventFilter, err error) {
 	return &respFilter{ms.wildCard}, nil
 }
 
-func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) {
-	var params []string
-	if _, params, err = itemutil.ParseKey(key); err != nil {
+func (p *Plugin) EventSourceByKey(rawKey string) (es watch.EventSource, err error) {
+	var key string
+	var raw []string
+	if key, raw, err = itemutil.ParseKey(rawKey); err != nil {
 		return
 	}
-	if len(params) > 4 {
-		return nil, fmt.Errorf("Too many parameters.")
-	}
 
-	if len(params) < 2 || "" == params[1] {
-		return nil, errors.New("Invalid second parameter.")
-	}
-
-	topic := params[1]
-	url, err := parseURL(params[0])
+	params, _, hc, err := metrics[key].EvalParams(raw, p.options.Sessions)
 	if err != nil {
 		return nil, err
 	}
 
-	var username, password string
-	if len(params) > 2 {
-		username = params[2]
+	err = metric.SetDefaults(params, hc, p.options.Default)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(params) > 3 {
-		password = params[3]
+	if err != nil {
+		return nil, err
+	}
+
+	topic := params["Topic"]
+	username := params["User"]
+	password := params["Password"]
+	url, err := parseURL(params["URL"])
+	if err != nil {
+		return nil, err
+	}
+
+	if topic == "" {
+		return nil, zbxerr.ErrorTooFewParameters.Wrap(errors.New("second parameter \"Topic\" is required."))
 	}
 
 	broker := broker{url.String(), username, password}
 	var client *mqttClient
 	var ok bool
+
+	opt, err := p.createOptions(getClientID(),
+		username,
+		password,
+		broker,
+		tlsconfig.Details{
+			TlsCaFile:   params["TLSCAFile"],
+			TlsCertFile: params["TLSCertFile"],
+			TlsKeyFile:  params["TLSKeyFile"],
+			RawUri:      url.String(),
+		},
+	)
+
+	if err != nil {
+		return nil, err
+	}
+
 	if client, ok = p.mqttClients[broker]; !ok {
 		impl.Tracef("creating client for [%s]", broker.url)
-
-		client = &mqttClient{nil, broker, make(map[string]*mqttSub), p.createOptions(getClientID(), username, password,
-			broker), false}
+		client = &mqttClient{
+			nil,
+			broker,
+			make(map[string]*mqttSub),
+			opt,
+			false,
+		}
 		p.mqttClients[broker] = client
 	}
 
@@ -320,10 +358,6 @@ func hasWildCards(topic string) bool {
 }
 
 func parseURL(rawUrl string) (out *url.URL, err error) {
-	if len(rawUrl) == 0 {
-		rawUrl = "localhost"
-	}
-
 	if !strings.Contains(rawUrl, "://") {
 		rawUrl = "tcp://" + rawUrl
 	}
@@ -346,11 +380,4 @@ func parseURL(rawUrl string) (out *url.URL, err error) {
 	}
 
 	return
-}
-
-func init() {
-	impl.manager = watch.NewManager(&impl)
-	impl.mqttClients = make(map[broker]*mqttClient)
-
-	plugin.RegisterMetrics(&impl, "MQTT", "mqtt.get", "Subscribe to MQTT topics for published messages.")
 }

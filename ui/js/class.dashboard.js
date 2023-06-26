@@ -105,13 +105,6 @@ class CDashboard extends CBaseComponent {
 
 		this._busy_conditions = new Set();
 
-		this._original_properties = {
-			name: this._data.name,
-			userid: this._data.userid,
-			display_period: this._data.display_period,
-			auto_start: this._data.auto_start
-		};
-
 		this._async_timeout_ms = 50;
 
 		this._unique_id_index = 0;
@@ -161,11 +154,7 @@ class CDashboard extends CBaseComponent {
 
 		this._announceWidgets();
 
-		let dashboard_page = this._getRestorableDashboardPage();
-
-		if (dashboard_page === null) {
-			dashboard_page = this._dashboard_pages.keys().next().value;
-		}
+		const dashboard_page = this._getInitialDashboardPage();
 
 		this._selectDashboardPage(dashboard_page);
 
@@ -341,27 +330,6 @@ class CDashboard extends CBaseComponent {
 	isUnsaved() {
 		if (this._is_unsaved) {
 			return true;
-		}
-
-		for (const [name, value] of Object.entries(this._original_properties)) {
-			if (value != this._data[name]) {
-				return true;
-			}
-		}
-
-		if (!this._is_kiosk_mode) {
-			const dashboard_pages_data = Array.from(this._dashboard_pages.values());
-			const tabs = [...this._tabs.getList().children];
-
-			if (tabs.length != dashboard_pages_data.length) {
-				return true;
-			}
-
-			for (let i = 0; i < dashboard_pages_data.length; i++) {
-				if (dashboard_pages_data[i].tab !== tabs[i]) {
-					return true;
-				}
-			}
 		}
 
 		for (const dashboard_page of this._dashboard_pages.keys()) {
@@ -763,9 +731,11 @@ class CDashboard extends CBaseComponent {
 	}
 
 	_selectDashboardPage(dashboard_page, {is_async = false} = {}) {
-		if (!this._is_edit_mode) {
-			this._storeSelectedDashboardPage(dashboard_page);
+		if (this._data.templateid === null || !this._is_edit_mode) {
+			this._setInitialDashboardPage(dashboard_page);
+		}
 
+		if (!this._is_edit_mode) {
 			if (this._isSlideshowRunning()) {
 				this._keepSteadySlideshow();
 			}
@@ -861,37 +831,51 @@ class CDashboard extends CBaseComponent {
 		}
 	}
 
-	_storeSelectedDashboardPage(dashboard_page) {
-		sessionStorage.setItem('dashboard.selected_dashboard_page', JSON.stringify({
-			dashboardid: this._data.dashboardid,
-			dashboard_pageid: dashboard_page.getDashboardPageId(),
-			is_kiosk_mode: this._is_kiosk_mode
-		}));
+	_setInitialDashboardPage(dashboard_page) {
+		const dashboard_page_index = this.getDashboardPageIndex(dashboard_page);
+
+		const url = new URL(location.href);
+
+		if (dashboard_page_index > 0) {
+			url.searchParams.set('page', dashboard_page_index + 1);
+		}
+		else {
+			url.searchParams.delete('page');
+		}
+
+		history.replaceState(null, null, url);
 	}
 
-	_getRestorableDashboardPage() {
-		let stored_data = sessionStorage.getItem('dashboard.selected_dashboard_page');
+	_getInitialDashboardPage() {
+		const url = new URL(location.href);
 
-		if (stored_data === null) {
-			return null;
-		}
+		if (url.searchParams.has('page')) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+			const dashboard_page_index = parseInt(url.searchParams.get('page')) - 1;
 
-		stored_data = JSON.parse(stored_data);
-
-		if (stored_data.dashboardid !== this._data.dashboardid || stored_data.is_kiosk_mode === this._is_kiosk_mode) {
-			return null;
-		}
-
-		for (const dashboard_page of this._dashboard_pages.keys()) {
-			if (stored_data.dashboard_pageid === dashboard_page.getDashboardPageId()) {
-				return dashboard_page;
+			if (dashboard_page_index in dashboard_pages) {
+				return dashboard_pages[dashboard_page_index];
 			}
 		}
-		return null;
+
+		return this._dashboard_pages.keys().next().value;
 	}
 
 	getSelectedDashboardPage() {
 		return this._selected_dashboard_page;
+	}
+
+	getDashboardPageIndex(dashboard_page) {
+		if (this._is_kiosk_mode) {
+			const dashboard_pages = [...this._dashboard_pages.keys()];
+
+			return dashboard_pages.indexOf(dashboard_page);
+		}
+
+		const tabs = [...this._tabs.getList().children];
+		const data = this._dashboard_pages.get(dashboard_page);
+
+		return tabs.indexOf(data.tab);
 	}
 
 	save() {
@@ -951,6 +935,8 @@ class CDashboard extends CBaseComponent {
 
 		return new Promise((resolve) => resolve(this._promiseApplyProperties(properties)))
 			.then(() => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				this.fire(DASHBOARD_EVENT_APPLY_PROPERTIES);
@@ -1021,6 +1007,8 @@ class CDashboard extends CBaseComponent {
 		return Promise.resolve()
 			.then(() => this._promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 			})
 			.catch((error) => {
@@ -1221,6 +1209,8 @@ class CDashboard extends CBaseComponent {
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then(() => this._promiseDashboardWidgetConfigure({templateid, type, view_mode, fields}))
 			.then((configuration) => {
+				this._is_unsaved = true;
+
 				overlayDialogueDestroy(overlay.dialogueid);
 
 				if (widget !== null && widget.getType() === type) {
@@ -1784,6 +1774,12 @@ class CDashboard extends CBaseComponent {
 				this._updateNavigationButtons();
 			},
 
+			tabsSort: () => {
+				this._setInitialDashboardPage(this._selected_dashboard_page);
+
+				this._is_unsaved = true;
+			},
+
 			tabsClick: (e) => {
 				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
 
@@ -1911,6 +1907,7 @@ class CDashboard extends CBaseComponent {
 
 			this._tabs.on(SORTABLE_EVENT_DRAG_START, this._events.tabsDragStart);
 			this._tabs.on(SORTABLE_EVENT_DRAG_END, this._events.tabsDragEnd);
+			this._tabs.on(SORTABLE_EVENT_SORT, this._events.tabsSort);
 
 			this._containers.navigation_tabs.addEventListener('click', this._events.tabsClick);
 			this._containers.navigation_tabs.addEventListener('keydown', this._events.tabsKeyDown);

@@ -88,11 +88,11 @@ trait TableTrait {
 	 * @throws Exception
 	 */
 	public function assertTableHasData($data = [], $selector = 'class:list-table') {
-		$table_rows = $this->query($selector)->asTable()->one()->index();
+		$table = $this->query($selector)->asTable()->one();
 
 		if (!$data) {
-			// Check that table contain one row with text "No data found."
-			$this->assertEquals(['No data found.'], $rows->asText());
+			// Check that table contains one row with text "No data found."
+			$this->assertEquals(['No data found.'], $table->getRows()->asText());
 
 			return;
 		}
@@ -100,7 +100,7 @@ trait TableTrait {
 		foreach ($data as $data_row) {
 			$found = false;
 
-			foreach ($table_rows as $table_row) {
+			foreach ($table->index() as $table_row) {
 				$match = true;
 
 				foreach ($data_row as $key => $value) {
@@ -117,7 +117,8 @@ trait TableTrait {
 			}
 
 			if (!$found) {
-				throw new \Exception('Row "'.implode(', ', $data_row).'" was not found in table.');
+				throw new \Exception('Expected row data "'.implode(', ', $data_row).'" does not match row data in table "'.
+						implode(', ', $table_row).'".');
 			}
 		}
 	}
@@ -191,9 +192,10 @@ trait TableTrait {
 	 * Get data from chosen column.
 	 *
 	 * @param string $column		Column name, where value should be checked
+	 * @param string $selector		Table selector
 	 */
-	private function getTableResult($column) {
-		$table = $this->query('class:list-table')->asTable()->one();
+	private function getTableColumnData($column, $selector = 'class:list-table') {
+		$table = $this->query($selector)->asTable()->one();
 		$result = [];
 		foreach ($table->getRows() as $row) {
 			$result[] = $row->getColumn($column)->getText();

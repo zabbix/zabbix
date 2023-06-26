@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:14:22Z'
+  date: '2023-05-22T14:20:52Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1405,7 +1405,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Rps
-              description: 'Thr number of HTTP request for the given verb per second.'
+              description: 'The number of HTTP request for the given verb per second.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:
