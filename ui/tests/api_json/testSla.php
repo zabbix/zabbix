@@ -22,8 +22,6 @@
 require_once __DIR__.'/../include/CAPITest.php';
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CTimezoneHelper.php';
-require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';
-
 
 /**
  * @backup sla
@@ -31,10 +29,9 @@ require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';
 class testSla extends CAPITest {
 
 	public static function sla_create_data_invalid(): array {
-		$timezone_list = '"'.implode('", "', array_merge(
-			[ZBX_DEFAULT_TIMEZONE],
-			array_keys(CTimezoneHelper::getList())
-		)).'"';
+		$timezone_list = '"'.implode('", "',
+			array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))
+		).'"';
 
 		return [
 			'Empty array' => [
@@ -2499,7 +2496,7 @@ class testSla extends CAPITest {
 			$db_sla = CDBHelper::getRow(
 				'SELECT s.slaid, s.'.implode(', s.', $required_fields).
 				' FROM sla s'.
-				' WHERE s.slaid='.zbx_dbstr($slaid)
+				' WHERE '.dbConditionId('s.slaid', [$slaid])
 			);
 
 			foreach ($required_fields as $field) {
@@ -2517,10 +2514,9 @@ class testSla extends CAPITest {
 	}
 
 	public static function sla_update_data_invalid(): array {
-		$timezone_list = '"'.implode('", "', array_merge(
-			[ZBX_DEFAULT_TIMEZONE],
-			array_keys(CTimezoneHelper::getList())
-		)).'"';
+		$timezone_list = '"'.implode('", "',
+			array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))
+		).'"';
 
 		return [
 			'Missing slaid' => [
@@ -3007,11 +3003,6 @@ class testSla extends CAPITest {
 	}
 
 	public static function sla_get_data_invalid(): array {
-		$timezone_list = '"'.implode('", "', array_merge(
-			[ZBX_DEFAULT_TIMEZONE],
-			array_keys(CTimezoneHelper::getList())
-		)).'"';
-
 		return [
 			'ID as bool' => [
 				'request' => [
@@ -3308,8 +3299,6 @@ class testSla extends CAPITest {
 					'error' => 'Invalid parameter "/filter/slaid": an array is expected.'
 				]
 			],
-
-
 
 			'Filter name bool'  => [
 				'request' => [
@@ -4628,7 +4617,7 @@ class testSla extends CAPITest {
 
 		foreach ($response['result']['slaids'] as $slaid) {
 			$this->assertEquals(0, CDBHelper::getCount(
-				'SELECT s.slaid FROM sla s WHERE s.slaid='.zbx_dbstr($slaid)
+				'SELECT s.slaid FROM sla s WHERE '.dbConditionId('s.slaid', [$slaid])
 			));
 		}
 	}
@@ -4989,11 +4978,7 @@ class testSla extends CAPITest {
 	public function testServices_GetSli(array $request, array $expected): void {
 		$response = $this->call('sla.getSli', $request, $expected['error']);
 
-		if ($expected['error'] !== null) {
-			return;
-		}
-
-		if (!array_key_exists('result', $expected)) {
+		if ($expected['error'] !== null || !array_key_exists('result', $expected)) {
 			return;
 		}
 
