@@ -91,7 +91,9 @@ class CWidget extends CModule {
 		return [
 			'name' => $this->getDefaultName(),
 			'size' => $this->getDefaultSize(),
-			'js_class' => $this->getJSClass()
+			'js_class' => $this->getJSClass(),
+			'in' => $this->getIn(),
+			'out' => $this->getOut()
 		];
 	}
 
@@ -133,6 +135,14 @@ class CWidget extends CModule {
 
 	public function getJSClass(): string {
 		return $this->manifest['widget']['js_class'];
+	}
+
+	public function getIn(): array {
+		return $this->manifest['widget']['in'];
+	}
+
+	public function getOut(): array {
+		return $this->manifest['widget']['out'];
 	}
 
 	public function getDefaultRefreshRate(): int {
