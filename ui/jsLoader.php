@@ -66,6 +66,7 @@ $available_js = [
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
+	'class.event-hub.js' => '',
 	'class.base-component.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
@@ -407,6 +408,7 @@ if (empty($_GET['files'])) {
 		'common.js',
 		'component.z-bar-gauge.js',
 		'component.z-select.js',
+		'class.event-hub.js',
 		'class.base-component.js',
 		'class.cdebug.js',
 		'class.overlaycollection.js',
