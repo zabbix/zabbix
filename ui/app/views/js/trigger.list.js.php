@@ -91,12 +91,22 @@
 						'context': this.context
 					})
 				}
+				else if (e.target.classList.contains('js-massenable-trigger')) {
+					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-enable-trigger')) {
+					this._enable(e.target, [e.target.dataset.triggerid]);
+				}
+				else if (e.target.classList.contains('js-massdisable-trigger')) {
+					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-disable-trigger')) {
+					this._disable(e.target, [e.target.dataset.triggerid]);
+				}
 				else if (e.target.classList.contains('js-massdelete-trigger')) {
 					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			})
-
-
 		},
 
 		_edit(parameters = {}) {
@@ -125,6 +135,36 @@
 
 				location.href = location.href;
 			});
+		},
+
+		_enable(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Enable selected triggers?')) ?>
+				: <?= json_encode(_('Enable selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.enable');
+
+			this._post(target, triggerids, curl);
+		},
+
+		_disable(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Disable selected triggers?')) ?>
+				: <?= json_encode(_('Disable selected trigger?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.disable');
+
+			this._post(target, triggerids, curl);
 		},
 
 		_delete(target, triggerids) {

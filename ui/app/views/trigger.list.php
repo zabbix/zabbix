@@ -291,20 +291,11 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	}
 
 	// status
-	$status = (new CLink(
-		triggerIndicator($trigger['status'], $trigger['state']),
-		(new CUrl('triggers.php'))
-			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-				? 'trigger.massenable'
-				: 'trigger.massdisable'
-			)
-			->setArgument('g_triggerid[]', $triggerid)
-			->setArgument('context', $data['context'])
-			->getUrl()
-		))
-		->addCsrfToken($csrf_token)
+	$status = (new CLink(triggerIndicator($trigger['status'], $trigger['state'])))
+		->setAttribute('data-triggerid', $triggerid)
 		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']));
+		->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
+		->addClass(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'js-enable-trigger' : 'js-disable-trigger');
 
 	// hosts
 	$hosts = null;
@@ -355,16 +346,16 @@ $triggers_form->addItem([
 	new CActionButtonList('action', 'g_triggerid',
 		[
 			'trigger.massenable' => [
-				'name' => _('Enable'),
-				'confirm_singular' => _('Enable selected trigger?'),
-				'confirm_plural' => _('Enable selected triggers?'),
-				'csrf_token' => $csrf_token
+				'content' => (new CSimpleButton(_('Enable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-trigger')
+					->addClass('js-no-chkbxrange')
 			],
 			'trigger.massdisable' => [
-				'name' => _('Disable'),
-				'confirm_singular' => _('Disable selected trigger?'),
-				'confirm_plural' => _('Disable selected triggers?'),
-				'csrf_token' => $csrf_token
+				'content' => (new CSimpleButton(_('Disable')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-trigger')
+					->addClass('js-no-chkbxrange')
 			],
 			'trigger.masscopyto' => [
 				'content' => (new CSimpleButton(_('Copy')))
