@@ -277,7 +277,7 @@ class testFormHost extends CWebTest {
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
-				->asForm(['normalized' => true])->one();
+				->asGridForm(['normalized' => true])->one();
 		$data = [
 			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
 			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],

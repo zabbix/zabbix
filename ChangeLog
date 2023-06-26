@@ -1,3 +1,10 @@
+Changes for 7.0.0alpha3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0alpha2
 
 New features:
@@ -13,6 +20,7 @@ New features:
 A.F.I..... [ZBXNEXT-2299] implemented problem/event filtering by performed update actions and user; reworked problem filter to support filtering by acknowledgement status and current user (miks)
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 ...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
 ...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
 A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
@@ -103,6 +111,7 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.4rc1
 
 New features:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 .........T [ZBXNEXT-8497] removed unnecessary JavaScript preprocessing in discovery rules in Kubernetes templates (drasikhov)
 .........T [ZBXNEXT-8465] updated JavaScript scripts in Kubernetes templates (egordymov)
 ........S. [ZBXNEXT-8467] updated max supported TimescaleDB version to 2.11 (mprihodko)
@@ -165,6 +174,7 @@ Changes for 6.4.3
 Changes for 6.4.3rc1
 
 New features:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
 .........T [ZBXNEXT-8199] added Google cloud platform template (igorbach)
 ...G...... [ZBXNEXT-8330] updated plugin support with defaults support for Zabbix agent 2 (esneiders)
 .........T [ZBXNEXT-8286] updated Linux, Windows, Mikrotik, Cisco and TP-LINK by SNMP templates to utilize the new SNMP LLD method (knaglis)
@@ -231,7 +241,6 @@ New features:
 Bug fixes:
 .......PS. [ZBX-22718] fixed memory leak in json objects and identical keys (wiper)
 .......PS. [ZBX-22719] fixed replace() function in expressions (wiper)
-..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
 ..F.....S. [ZBX-22727] fixed crash in expression parser (wiper)
 
 --------------------------------------------------------------------------------
@@ -241,6 +250,7 @@ New features:
 .........T [ZBXNEXT-8394] created separate proxy compatibility triggers in Zabbix health templates, removed unnecessary dependencies (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
 ..F....... [ZBX-22376] fixed warning alert when deleting host or template groups on standalone pages (epulke)
 .......PS. [ZBX-22615] fixed master item error handling when processing dependent items (wiper)
 ..F....... [ZBX-22595] fixed template items' context menu (dpetra)
@@ -407,6 +417,9 @@ A.F.....S. [ZBXNEXT-8087] reverted removal of template nesting (Sasha)
 .......PS. [ZBXNEXT-8105] fixed build when cURL library version is less than 7.61.0 (vso)
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 ...G...... [ZBX-22384] fixed Zabbix agent 2 build on macOS (vso)
 ..F....... [ZBX-22375] prevented copying of discovered items when full cloning the host; fixed inability to full clone the host with an item which depends on a web scenario item (vmaksimovs)
 .........T [ZBX-22271] removed module templates (aiantsen)
@@ -751,6 +764,9 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 ........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 ..F....... [ZBX-22320] fixed success message when disabling hosts in host groups (epulke)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
@@ -1378,6 +1394,7 @@ New features:
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 ...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
 ...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
 A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
@@ -1432,6 +1449,8 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for Jenkins template (egordymov)
 .........T [ZBX-21910] fixed JavaScript in Kubernetes nodes template (egordymov)
@@ -1607,6 +1626,9 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 ........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
 ........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
@@ -3974,6 +3996,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.36rc1
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 ...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
 ...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
 .......PS. [ZBX-22148] fixed the crash when updating a webhook to JavaScript that cannot be compiled (vso)
@@ -3994,6 +4017,7 @@ New features:
 ...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
 ...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
@@ -4065,6 +4089,8 @@ Bug fixes:
 Changes for 5.0.32rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
@@ -6789,6 +6815,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.47rc1
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.46
