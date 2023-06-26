@@ -62,8 +62,6 @@ int	zbx_fork(void)
  *                                                                            *
  * Parameters: pid - [OUT]                                                    *
  *                                                                            *
- * Return value: same as system fork() function                               *
- *                                                                            *
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
  ******************************************************************************/
@@ -231,7 +229,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Waits until the threads are in the signalled state.               *
+ * Purpose: Kills and waits until the threads are in the signalled state.     *
  *                                                                            *
  * Parameters: threads       - [IN] handles to threads or processes           *
  *             threads_flags - [IN] thread priority flags                     *
@@ -241,7 +239,7 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
  *                                  FAIL                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
