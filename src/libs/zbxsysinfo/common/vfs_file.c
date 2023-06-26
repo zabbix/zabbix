@@ -34,6 +34,7 @@
 #include "sddl.h"
 #include "zbxwin32.h"
 #include "zbxlog.h"
+#include <sddl.h> /* ConvertSidToStringSid */
 #endif
 
 #define ZBX_MAX_DB_FILE_SIZE	64 * ZBX_KIBIBYTE	/* files larger than 64 KB cannot be stored in the database */

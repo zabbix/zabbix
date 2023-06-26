@@ -28,6 +28,7 @@
 #	include "messages.h"
 #	include "zbxwinservice.h"
 #	include "zbxsysinfo.h"
+#	include <strsafe.h> /* StringCchPrintf */
 static HANDLE		system_log_handle = INVALID_HANDLE_VALUE;
 #endif
 

@@ -54,6 +54,8 @@ OBJS = \
 	$(OUTPUTDIR)\sysinfo_dir.o \
 	$(OUTPUTDIR)\sysinfo_alias.o \
 	$(OUTPUTDIR)\eventlog.o \
+	$(OUTPUTDIR)\process_eventslog.o \
+	$(OUTPUTDIR)\process_eventslog6.o \
 	$(OUTPUTDIR)\symbols.o \
 	$(OUTPUTDIR)\win32_file.o \
 	$(TARGETDIR)\resource.syso
@@ -243,6 +245,15 @@ $(OUTPUTDIR)\zbxregexp.o: $(TOPDIR)\src\libs\zbxregexp\zbxregexp.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\active_checks.o: $(TOPDIR)\src\zabbix_agent\active_checks\active_checks.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog\eventlog.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\process_eventslog.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog.c
+	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
+
+$(OUTPUTDIR)\process_eventslog6.o: $(TOPDIR)\src\zabbix_agent\eventlog\process_eventslog6.c
 	$(CC) $(CFLAGS) -DUNICODE -c $^ -o $@
 
 $(OUTPUTDIR)\eventlog.o: $(TOPDIR)\src\zabbix_agent\eventlog\eventlog.c
