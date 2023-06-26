@@ -19,14 +19,22 @@
 
 #include "zbxthreads.h"
 
-#include "log.h"
-
 #if defined(_WINDOWS) || defined(__MINGW32__)
+#include "zbxwin32.h"
+#include "zbxlog.h"
+
 static ZBX_THREAD_ENTRY(zbx_win_thread_entry, args)
 {
-	zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
+	__try
+	{
+		zbx_thread_args_t	*thread_args = (zbx_thread_args_t *)args;
 
-	return thread_args->entry(thread_args);
+		return thread_args->entry(thread_args);
+	}
+	__except(zbx_win_seh_handler(GetExceptionInformation()))
+	{
+		zbx_thread_exit(EXIT_SUCCESS);
+	}
 }
 
 void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
@@ -104,7 +112,7 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
 	if (0 == (*thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", zbx_strerror_from_system(GetLastError()));
 		*thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
 	}
 #else
@@ -145,19 +153,19 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 	if (WAIT_OBJECT_0 != WaitForSingleObject(thread, INFINITE))
 	{
-		zbx_error("Error on thread waiting. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread waiting. [%s]", zbx_strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
 	if (0 == GetExitCodeThread(thread, &dwstatus))
 	{
-		zbx_error("Error on thread exit code receiving. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread exit code receiving. [%s]", zbx_strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 
 	if (0 == CloseHandle(thread))
 	{
-		zbx_error("Error on thread closing. [%s]", strerror_from_system(GetLastError()));
+		zbx_error("Error on thread closing. [%s]", zbx_strerror_from_system(GetLastError()));
 		return ZBX_THREAD_ERROR;
 	}
 	status = dwstatus;
@@ -284,3 +292,24 @@ long int	zbx_get_thread_id(void)
 	return (long int)getpid();
 #endif
 }
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+void	zbx_pthread_init_attr(pthread_attr_t *attr)
+{
+	if (0 != pthread_attr_init(attr))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize thread attributes: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+#ifdef HAVE_STACKSIZE
+	if (0 != pthread_attr_setstacksize(attr, HAVE_STACKSIZE * ZBX_KIBIBYTE))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set thread stack size: %s", zbx_strerror(errno));
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+#endif
+}
+#endif

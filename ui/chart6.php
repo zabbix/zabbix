@@ -100,14 +100,18 @@ CArrayHelper::sort($dbGraph['gitems'], [
 	['field' => 'sortorder', 'order' => ZBX_SORT_UP]
 ]);
 
+$db_items = API::Item()->get([
+	'output' => ['value_type'],
+	'itemids' => array_column($dbGraph['gitems'], 'itemid'),
+	'webitems' => true,
+	'preservekeys' => true
+]);
+
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	$graph->addItem(
-		$gItem['itemid'],
-		$gItem['calc_fnc'],
-		$gItem['color'],
-		$gItem['type']
-	);
+	if ($db_items[$gItem['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
+		$graph->addItem($gItem['itemid'], $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
+	}
 }
 
 $hostName = '';

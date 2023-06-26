@@ -180,6 +180,11 @@ class CConfigurationImport {
 		$iconmaps_refs = [];
 		$images_refs = [];
 		$maps_refs = [];
+		$services_refs = [];
+		$slas_refs = [];
+		$users_refs = [];
+		$actions_refs = [];
+		$media_types_refs = [];
 		$template_dashboards_refs = [];
 		$template_macros_refs = [];
 		$host_macros_refs = [];
@@ -552,6 +557,42 @@ class CConfigurationImport {
 										$graphs_refs[$value['host']][$value['name']] = [];
 									}
 									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_MAP:
+									if (!array_key_exists($value['name'], $maps_refs)) {
+										$maps_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+									if (!array_key_exists($value['name'], $services_refs)) {
+										$services_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_SLA:
+									if (!array_key_exists($value['name'], $slas_refs)) {
+										$slas_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_USER:
+									if (!array_key_exists($value['username'], $users_refs)) {
+										$users_refs[$value['username']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_ACTION:
+									if (!array_key_exists($value['name'], $actions_refs)) {
+										$actions_refs[$value['name']] = [];
+									}
+									break;
+
+								case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+									if (!array_key_exists($value['name'], $media_types_refs)) {
+										$media_types_refs[$value['name']] = [];
+									}
+									break;
 							}
 						}
 					}
@@ -590,6 +631,11 @@ class CConfigurationImport {
 		$this->referencer->addIconmaps($iconmaps_refs);
 		$this->referencer->addImages($images_refs);
 		$this->referencer->addMaps($maps_refs);
+		$this->referencer->addServices($services_refs);
+		$this->referencer->addSlas($slas_refs);
+		$this->referencer->addUsers($users_refs);
+		$this->referencer->addActions($actions_refs);
+		$this->referencer->addMediaTypes($media_types_refs);
 		$this->referencer->addTemplateDashboards($template_dashboards_refs);
 		$this->referencer->addTemplateMacros($template_macros_refs);
 		$this->referencer->addHostMacros($host_macros_refs);

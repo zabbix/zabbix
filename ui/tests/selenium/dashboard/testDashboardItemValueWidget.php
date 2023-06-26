@@ -296,7 +296,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			// Check advanced fields when Advanced configuration is true.
 			if ($advanced_config){
 				// Check hintbox.
-				$form->query('class:icon-help-hint')->one()->click();
+				$form->getLabel('Description')->query('class:zi-help-filled-small')->one()->click();
 				$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 				// Assert text.
@@ -307,7 +307,7 @@ class testDashboardItemValueWidget extends CWebTest {
 						"\nUser macros", $hint->one()->getText());
 
 				// Close the hint-box.
-				$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
 
 				// Check default values with Advanced configuration = true.
@@ -693,7 +693,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => [
-							'values' => 'Available memory',
+							'values' => 'Linux: Available memory',
 							'context' => [
 								'values' => 'ЗАББИКС Сервер',
 								'context' => 'Zabbix servers'
@@ -1029,6 +1029,13 @@ class testDashboardItemValueWidget extends CWebTest {
 
 			// Check new widget form fields and values in frontend.
 			$saved_form = $dashboard->getWidget($header)->edit();
+
+			// Open "Advanced configuration" block if it was filled with data.
+			if (CTestArrayHelper::get($data, 'fields.Advanced configuration', false)) {
+				// After form submit "Advanced configuration" is closed.
+				$saved_form->checkValue(['Advanced configuration' => false]);
+				$saved_form->fill(['Advanced configuration' => true]);
+			}
 			$this->assertEquals($values, $saved_form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues());
 
 			// As form is quite complex, show_header field should be checked separately.
@@ -1168,7 +1175,7 @@ class testDashboardItemValueWidget extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 
 		if (!$cancel) {
-			$dashboard->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
+			$dashboard->waitUntilReady()->getWidget(!$save_dashboard ? 'Widget to cancel' : self::$old_name)->waitUntilReady();
 		}
 
 		if ($save_dashboard) {
@@ -1262,7 +1269,7 @@ class testDashboardItemValueWidget extends CWebTest {
 	 */
 	public function testDashboardItemValueWidget_ThresholdWarningMessage($data) {
 		$warning = 'id:item-value-thresholds-warning';
-		$info = 'class:icon-info';
+		$info = 'class:zi-i-warning';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -1278,7 +1285,7 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertTrue($form->query($warning)->one()->isVisible());
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->query($info)->one()->isVisible());
+			$this->assertTrue($form->getLabel('Thresholds')->query($info)->one()->isVisible());
 
 			// Check hint-box.
 			$form->query($warning)->one()->click();
@@ -1286,14 +1293,14 @@ class testDashboardItemValueWidget extends CWebTest {
 			$this->assertEquals('This setting applies only to numeric data.', $hint->getText());
 
 			// Close the hint-box.
-			$hint->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click()->waitUntilNotVisible();
+			$hint->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotVisible();
 		}
 		else {
 			// Check that warning item is not displayed.
 			$this->assertFalse($form->query($warning)->one()->isVisible());
 
 			// Check that info icon is not displayed.
-			$this->assertFalse($form->query($info)->one()->isVisible());
+			$this->assertFalse($form->getLabel('Thresholds')->query($info)->one()->isVisible());
 		}
 	}
 

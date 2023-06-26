@@ -32,11 +32,10 @@ $expression_form = (new CForm())
 	->addVar('context', $data['context'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('function', $data['function'])
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addVar('function', $data['function']);
+
+// Enable form submitting on Enter.
+$expression_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);
@@ -53,7 +52,14 @@ $popup_options = [
 	'dstfrm' => $expression_form->getName(),
 	'dstfld1' => 'itemid',
 	'dstfld2' => 'item_description',
-	'writeonly' => '1'
+	'writeonly' => '1',
+	'value_types' => [
+		ITEM_VALUE_TYPE_FLOAT,
+		ITEM_VALUE_TYPE_STR,
+		ITEM_VALUE_TYPE_LOG,
+		ITEM_VALUE_TYPE_UINT64,
+		ITEM_VALUE_TYPE_TEXT
+	]
 ];
 
 if ($data['context'] === 'host') {
@@ -95,7 +101,14 @@ if ($data['item_required']) {
 				'dstfrm' => $expression_form->getName(),
 				'dstfld1' => 'itemid',
 				'dstfld2' => 'item_description',
-				'parent_discoveryid' => $data['parent_discoveryid']
+				'parent_discoveryid' => $data['parent_discoveryid'],
+				'value_types' => [
+					ITEM_VALUE_TYPE_FLOAT,
+					ITEM_VALUE_TYPE_STR,
+					ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_UINT64,
+					ITEM_VALUE_TYPE_TEXT
+				]
 			]).');')
 			->removeId();
 	}

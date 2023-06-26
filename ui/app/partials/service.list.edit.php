@@ -114,23 +114,17 @@ foreach ($data['services'] as $serviceid => $service) {
 		zbx_date2str(DATE_FORMAT, $service['created_at']),
 		$data['tags'][$serviceid],
 		(new CCol([
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_ADD)
+			(new CButtonIcon(ZBX_ICON_PLUS, _('Add child service')))
 				->addClass('js-add-child-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Add child service'))
 				->setEnabled(!$service['readonly'] && $service['problem_tags'] == 0),
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_EDIT)
+			(new CButtonIcon(ZBX_ICON_PENCIL, _('Edit')))
 				->addClass('js-edit-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Edit'))
 				->setEnabled(!$service['readonly']),
-			(new CButton(null))
-				->addClass(ZBX_STYLE_BTN_REMOVE)
+			(new CButtonIcon(ZBX_ICON_REMOVE_SMALL, _('Delete')))
 				->addClass('js-delete-service')
 				->setAttribute('data-serviceid', $serviceid)
-				->setTitle(_('Delete'))
 				->setEnabled(!$service['readonly'])
 		]))->addClass(ZBX_STYLE_LIST_TABLE_ACTIONS)
 	])));
@@ -141,13 +135,13 @@ $action_buttons = new CActionButtonList('action', 'serviceids', [
 		'content' => (new CSimpleButton(_('Mass update')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massupdate-service')
-			->addClass('no-chkbxrange')
+			->addClass('js-no-chkbxrange')
 	],
 	'service.massdelete' => [
 		'content' => (new CSimpleButton(_('Delete')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-service')
-			->addClass('no-chkbxrange')
+			->addClass('js-no-chkbxrange')
 	]
 ], $path !== null ? 'service_'.implode('_', $path) : 'service');
 

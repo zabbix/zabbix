@@ -123,6 +123,7 @@ share/man/man8/zabbix_agent2.8
 share/man/man8/zabbix_web_service.8
 src/libs/zbxcunit/cu_modules.h
 src/libs/zbxdbschema/dbschema.c
+src/modules/dummy/dummy.so
 src/zabbix_agent/zabbix_agent
 src/zabbix_agent/zabbix_agentd
 src/zabbix_get/zabbix_get
@@ -192,6 +193,8 @@ tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
 tests/libs/zbxhistory/zbx_history_get_values
+tests/libs/zbxicmpping/get_interval_option
+tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue
 tests/libs/zbxjson/zbx_json_decodevalue_dyn
 tests/libs/zbxjson/zbx_json_open_path
@@ -212,6 +215,7 @@ tests/libs/zbxserver/valuemaps
 tests/libs/zbxsysinfo/check_key_access_rules
 tests/libs/zbxsysinfo/zbx_execute_agent_check
 tests/libs/zbxsysinfo/zbx_execute_agent_check_http
+tests/libs/zbxsysinfo/check_get_fqdn
 tests/libs/zbxsysinfo/common/system_localtime
 tests/libs/zbxsysinfo/common/vfs_file_exists
 tests/libs/zbxsysinfo/common/web_page_get
@@ -250,6 +254,9 @@ tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rule_status
 tests/zabbix_server/service/service_get_status
 tests/zabbix_server/trapper/zbx_trapper_preproc_test_run
+tests/libs/zbxmodules/server_module_load
+tests/libs/zbxmodules/proxy_module_load
+tests/libs/zbxmodules/agent_module_load
 ui/.buildpath
 ui/.htpasswd
 ui/.idea

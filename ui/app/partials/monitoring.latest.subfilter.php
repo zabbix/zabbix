@@ -29,8 +29,8 @@ $subfilters = $data['subfilters'];
 
 $subfilter_options = [];
 
-foreach (['hostids', 'tagnames', 'data'] as $key) {
-	if (($key === 'hostids' || $key === 'tagnames') && count($subfilters[$key]) == 0) {
+foreach (['hostids', 'tagnames', 'state', 'data'] as $key) {
+	if (($key === 'hostids' || $key === 'tagnames' || $key === 'state') && count($subfilters[$key]) == 0) {
 		$subfilter_options[$key] = null;
 
 		continue;
@@ -39,10 +39,16 @@ foreach (['hostids', 'tagnames', 'data'] as $key) {
 	$subfilter_options[$key] = [];
 
 	// Remove non-selected filter fields with 0 occurrences (for hosts and tag names).
-	if ($key === 'hostids' || $key === 'tagnames') {
+	if ($key === 'hostids' || $key === 'tagnames' || $key === 'state') {
 		$subfilters[$key] = array_filter($subfilters[$key], function ($field) {
 			return $field['selected'] || $field['count'] > 0;
 		});
+	}
+
+	if ($key === 'state' && count($subfilters[$key]) <= 1) {
+		$subfilter_options[$key] = null;
+
+		continue;
 	}
 
 	$subfilter_used = (bool) array_filter($subfilters[$key], function ($field) {
@@ -166,7 +172,8 @@ if (count($subfilters['tags']) > 0) {
 	if (!$tags_expanded && count($subfilter_options['tags']) > CControllerLatest::SUBFILTERS_TAG_VALUE_ROWS) {
 		$subfilter_options['tags'][] = (new CButton('expand_tag_values'))
 			->setAttribute('data-name', 'tags')
-			->addClass(ZBX_STYLE_ICON_WIZARD_ACTION);
+			->addClass(ZBX_STYLE_BTN_ICON)
+			->addClass(ZBX_ICON_MORE);
 	}
 }
 else {
@@ -204,6 +211,14 @@ else {
 			? [[
 				new CTag('h3', true, _('Tag values')),
 				$subfilter_options['tags']
+			]]
+			: null
+	)
+	->addRow(
+		$subfilter_options['state'] !== null
+			? [[
+				new CTag('h3', true, _('State')),
+				$subfilter_options['state']
 			]]
 			: null
 	)

@@ -25,10 +25,10 @@
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxregexp.h"
-#include "log.h"
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif
 
 /******************************************************************************
@@ -102,8 +102,8 @@ static int	compare_descriptors(const void *file_a, const void *file_b)
 {
 	const zbx_file_descriptor_t	*fa, *fb;
 
-	fa = *((zbx_file_descriptor_t **)file_a);
-	fb = *((zbx_file_descriptor_t **)file_b);
+	fa = *((zbx_file_descriptor_t * const *)file_a);
+	fb = *((zbx_file_descriptor_t * const *)file_b);
 
 	return (fa->st_ino != fb->st_ino || fa->st_dev != fb->st_dev);
 }
@@ -436,7 +436,7 @@ static BOOL	has_timed_out(HANDLE timeout_event)
 			return FALSE;
 		case WAIT_FAILED:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned WAIT_FAILED: %s",
-					strerror_from_system(GetLastError()));
+					zbx_strerror_from_system(GetLastError()));
 			return TRUE;
 		default:
 			zabbix_log(LOG_LEVEL_CRIT, "WaitForSingleObject() returned 0x%x", (unsigned int)rc);
@@ -454,14 +454,14 @@ static int	get_file_info_by_handle(wchar_t *wpath, BY_HANDLE_FILE_INFORMATION *l
 
 	if (INVALID_HANDLE_VALUE == file_handle)
 	{
-		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		*error = zbx_strdup(NULL, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 
 	if (0 == GetFileInformationByHandle(file_handle, link_info))
 	{
 		CloseHandle(file_handle);
-		*error = zbx_strdup(NULL, strerror_from_system(GetLastError()));
+		*error = zbx_strdup(NULL, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 

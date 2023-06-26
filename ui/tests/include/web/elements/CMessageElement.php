@@ -78,7 +78,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		if ($this->getAttribute('class') === 'msg-bad msg-global'){
+		if ($this->getAttribute('class') === 'msg-global msg-bad'){
 			return strtok($this->getText(), "\n");
 		}
 		else {
@@ -118,7 +118,7 @@ class CMessageElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('xpath:.//button[contains(@class, "overlay-close-btn")]')->one()->click();
-		return $this->waitUntilNotPresent();
+		$this->query('xpath:.//button[contains(@class, "btn-overlay-close")]')->one()->click();
+		return $this->waitUntilNotVisible();
 	}
 }

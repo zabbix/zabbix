@@ -23,8 +23,8 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 
-#include "stats.h"
-#include "diskdevices.h"
+#include "../common/stats.h"
+#include "../common/diskdevices.h"
 
 #define ZBX_DEV_PFX		"/dev/"
 #define ZBX_DEV_READ		0

@@ -27,9 +27,7 @@
 <script type="text/x-jquery-tmpl" id="iconMapRowTPL">
 <?=
 	(new CRow([
-		(new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+		(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 		(new CSpan('#0:'))->addClass('rowNum'),
 		(new CSelect('iconmap[mappings][#{iconmappingid}][inventory_link]'))
 			->addOptions(CSelect::createOptionsFromArray($data['inventory_list']))
@@ -108,12 +106,6 @@
 
 					td.width(td.width());
 				});
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 4) + 'px');
-				}
 
 				return ui;
 			},

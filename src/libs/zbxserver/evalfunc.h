@@ -22,6 +22,8 @@
 
 #include "zbxtypes.h"
 #include "zbxcacheconfig.h"
+#include "zbxhistory.h"
+#include "zbxserver.h"
 
 int	zbx_evaluatable_for_notsupported(const char *fn);
 int	zbx_evaluate_RATE(zbx_variant_t *value, zbx_dc_item_t *item, const char *parameters, const zbx_timespec_t *ts,
@@ -32,4 +34,6 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 
 int	zbx_is_trigger_function(const char *name, size_t len);
 
+int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_eval_count_pattern_data_t *pdata,
+		zbx_vector_history_record_t *records, int limit, int *count, char **error);
 #endif

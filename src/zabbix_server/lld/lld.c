@@ -20,7 +20,6 @@
 #include "lld.h"
 #include "zbxserver.h"
 
-#include "log.h"
 #include "zbxregexp.h"
 #include "audit/zbxaudit.h"
 #include "zbxnum.h"
@@ -225,7 +224,6 @@ static int	filter_condition_match(const struct zbx_json_parse *jp_row, const zbx
 				case ZBX_REGEXP_NO_MATCH:
 					*result = (ZBX_CONDITION_OPERATOR_NOT_REGEXP == condition->op ? 1 : 0);
 					break;
-					break;
 				default:
 					*err_msg = zbx_strdcatf(*err_msg,
 						"Cannot accurately apply filter: invalid regular expression \"%s\".\n",
@@ -377,7 +375,7 @@ out:
 static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **err_msg)
 {
-	int			i, ret = FAIL, res, error_num = 0;
+	int			i, ret, res, error_num = 0;
 	char			*expression = NULL, id[ZBX_MAX_UINT64_LEN + 2], *p, error[256], value[16],
 				*errmsg = NULL;
 	double			result;
@@ -397,7 +395,7 @@ static int	filter_evaluate_expression(const zbx_lld_filter_t *filter, const stru
 	{
 		const lld_condition_t	*condition = (lld_condition_t *)filter->conditions.values[i];
 
-		if (SUCCEED == (ret = filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg)))
+		if (SUCCEED == filter_condition_match(jp_row, lld_macro_paths, condition, &res, &errmsg))
 		{
 			zbx_snprintf(value, sizeof(value), "%d", res);
 		}

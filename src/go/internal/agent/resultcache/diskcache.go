@@ -53,6 +53,7 @@ type DiskCache struct {
 	storagePeriod int64
 	oldestLog     int64
 	oldestData    int64
+	oldestCommand int64
 	serverID      int
 	database      *sql.DB
 	persistFlag   uint32
@@ -94,6 +95,7 @@ func (c *DiskCache) resultFetch(rows *sql.Rows) (d *AgentData, err error) {
 			data.EventTimestamp = &EventTimestamp
 		}
 	}
+
 	return &data, err
 }
 
@@ -115,6 +117,7 @@ func (c *DiskCache) getOldestWriteClock(table string) (clock int64, err error) {
 		c.Warningf("unexpected write clock type %T", u)
 		clock = 0
 	}
+
 	return
 }
 
@@ -136,6 +139,7 @@ func (c *DiskCache) getLastID(table string) (id uint64, err error) {
 		c.Warningf("unexpected id type %T", u)
 		id = 0
 	}
+
 	return uint64(v), nil
 }
 
@@ -145,6 +149,17 @@ func (c *DiskCache) updateDataRange() (err error) {
 		return
 	}
 	c.oldestData = clock
+
+	return
+}
+
+func (c *DiskCache) updateCommandRange() (err error) {
+	clock, err := c.getOldestWriteClock(tableName("command", c.serverID))
+	if err != nil {
+		return
+	}
+	c.oldestCommand = clock
+
 	return
 }
 
@@ -157,6 +172,7 @@ func (c *DiskCache) updateLogRange() (err error) {
 	if c.oldestLog == 0 || time.Now().Unix()-c.oldestLog < c.storagePeriod {
 		atomic.StoreUint32(&c.persistFlag, 0)
 	}
+
 	return
 }
 
@@ -176,12 +192,14 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 		" FROM log_%d"+
 		" ORDER BY id LIMIT ?", c.serverID, c.serverID), DataLimit); err != nil {
 		c.Errf("cannot select from data table: %s", err.Error())
+
 		return nil, 0, 0, err
 	}
 
 	for rows.Next() {
 		if result, err = c.resultFetch(rows); err != nil {
 			rows.Close()
+
 			return nil, 0, 0, err
 		}
 		result.persistent = false
@@ -199,9 +217,50 @@ func (c *DiskCache) resultsGet() (results []*AgentData, maxDataId uint64, maxLog
 	return results, maxDataId, maxLogId, nil
 }
 
+func (c *DiskCache) commandResultsGet() (results []*AgentCommands, maxCommandId uint64, err error) {
+	var result AgentCommands
+	var rows *sql.Rows
+	var Value, ErrMsg string
+	var id uint64
+
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
+	if rows, err = c.database.Query(fmt.Sprintf("SELECT "+
+		"id,cmd_id,value,error"+
+		" FROM command_%d"+
+		" ORDER BY id LIMIT ?", c.serverID), DataLimit); err != nil {
+		c.Errf("cannot select from command table: %s", err.Error())
+
+		return nil, 0, err
+	}
+
+	for rows.Next() {
+		err = rows.Scan(&id, &result.Id, &Value, &ErrMsg)
+		if err == nil {
+			if Value != "" {
+				result.Value = &Value
+			}
+			if ErrMsg != "" {
+				result.Error = &ErrMsg
+			}
+		} else {
+			rows.Close()
+			_ = rows.Err()
+
+			return nil, 0, err
+		}
+		results = append(results, &result)
+		maxCommandId = id
+	}
+
+	return results, maxCommandId, nil
+}
+
 func (c *DiskCache) upload(u Uploader) (err error) {
 	var results []*AgentData
-	var maxDataId, maxLogId uint64
+	var cresults []*AgentCommands
+	var maxDataId, maxLogId, maxCommandId uint64
 	var errs []error
 
 	defer func() {
@@ -220,26 +279,34 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 		return
 	}
 
-	if len(results) == 0 {
+	if cresults, maxCommandId, err = c.commandResultsGet(); err != nil {
+		return
+	}
+
+	reqLen := len(results) + len(cresults)
+
+	if reqLen == 0 {
 		return
 	}
 
 	request := AgentDataRequest{
-		Request: "agent data",
-		Data:    results,
-		Session: u.Session(),
-		Host:    u.Hostname(),
-		Version: version.Short(),
+		Request:  "agent data",
+		Data:     results,
+		Commands: cresults,
+		Session:  u.Session(),
+		Host:     u.Hostname(),
+		Version:  version.Short(),
 	}
 
 	var data []byte
 
 	if data, err = json.Marshal(&request); err != nil {
 		c.Errf("cannot convert cached history to json: %s", err.Error())
+
 		return
 	}
 
-	timeout := len(results) * c.timeout
+	timeout := reqLen * c.timeout
 	if timeout > 60 {
 		timeout = 60
 	}
@@ -252,6 +319,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 			c.lastErrors = errs
 		}
 		err = errors.New("history upload failed")
+
 		return
 	}
 
@@ -263,7 +331,7 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	defer cacheLock.Unlock()
 	if maxDataId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM data_%d WHERE id<=?", c.serverID), maxDataId); err != nil {
-			return fmt.Errorf("cannot delete from data_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from data_%d: %w", c.serverID, err)
 		}
 		if err = c.updateDataRange(); err != nil {
 			return
@@ -271,9 +339,17 @@ func (c *DiskCache) upload(u Uploader) (err error) {
 	}
 	if maxLogId != 0 {
 		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM log_%d WHERE id<=?", c.serverID), maxLogId); err != nil {
-			return fmt.Errorf("cannot delete from log_%d: %s", c.serverID, err)
+			return fmt.Errorf("cannot delete from log_%d: %w", c.serverID, err)
 		}
 		if err = c.updateLogRange(); err != nil {
+			return
+		}
+	}
+	if maxCommandId != 0 {
+		if _, err = c.database.Exec(fmt.Sprintf("DELETE FROM command_%d WHERE id<=?", c.serverID), maxCommandId); err != nil {
+			return fmt.Errorf("cannot delete from command_%d: %w", c.serverID, err)
+		}
+		if err = c.updateCommandRange(); err != nil {
 			return
 		}
 	}
@@ -363,7 +439,6 @@ func (c *DiskCache) write(r *plugin.Result) {
 		} else {
 			defer stmt.Close()
 		}
-
 	} else {
 		if c.oldestData == 0 {
 			c.oldestData = clock
@@ -399,6 +474,60 @@ func (c *DiskCache) write(r *plugin.Result) {
 	}
 }
 
+func (c *DiskCache) writeCommand(cr *CommandResult) {
+	var err error
+
+	log.Debugf("cache command(%d) result:%s error:%s", cr.ID, cr.Result, cr.Error)
+	c.lastCommandID++
+
+	var ErrMsg string
+	if cr.Error != nil {
+		ErrMsg = cr.Error.Error()
+	}
+
+	var stmt *sql.Stmt
+
+	now := time.Now().Unix()
+	cacheLock.Lock()
+	defer cacheLock.Unlock()
+
+	if c.oldestCommand == 0 {
+		c.oldestCommand = now
+	}
+
+	if (now - c.oldestCommand) > c.storagePeriod+StorageTolerance {
+		query := fmt.Sprintf("DELETE FROM command_%d WHERE write_clock<?", c.serverID)
+		if _, err = c.database.Exec(query, now-c.storagePeriod); err != nil {
+			c.Errf("cannot delete old commands from command_%d : %s", c.serverID, err)
+		}
+
+		c.oldestCommand, err = c.getOldestWriteClock(tableName("command", c.serverID))
+		if err != nil {
+			c.Errf("cannot query minimum write clock from command_%d : %s", c.serverID, err)
+		}
+	}
+	stmt, err = c.database.Prepare(fmt.Sprintf(
+		"INSERT INTO command_%d"+
+			"(id,write_clock,cmd_id,value,error)"+
+			"VALUES"+
+			"(?,?,?,?,?)", c.serverID))
+	if err != nil {
+		c.Errf("cannot prepare SQL query to insert commands in command_%d : %s", c.serverID, err)
+	} else {
+		defer stmt.Close()
+	}
+
+	if stmt != nil {
+		_, err = stmt.Exec(c.lastCommandID, now, cr.ID, cr.Result, ErrMsg)
+		if err != nil {
+			c.Errf("cannot execute SQL statement : %s", err)
+		}
+	}
+	if err != nil {
+		panic(err)
+	}
+}
+
 func (c *DiskCache) run() {
 	defer log.PanicHook()
 	c.Debugf("starting disk cache")
@@ -413,6 +542,8 @@ func (c *DiskCache) run() {
 			c.flushOutput(v)
 		case *plugin.Result:
 			c.write(v)
+		case *CommandResult:
+			c.writeCommand(v)
 		case *agent.AgentOptions:
 			c.updateOptions(v)
 		}
@@ -472,6 +603,14 @@ func (c *DiskCache) init(options *agent.AgentOptions) {
 	if err = c.updateDataRange(); err != nil {
 		c.Errf("cannot update data clock")
 	}
+
+	c.lastCommandID, err = c.getLastID(tableName("command", c.serverID))
+	if err != nil {
+		c.Errf("cannot obtain last command record ID")
+	}
+	if err = c.updateCommandRange(); err != nil {
+		c.Errf("cannot update command clock")
+	}
 }
 
 func (c *DiskCache) Start() {
@@ -485,9 +624,9 @@ func (c *DiskCache) SlotsAvailable() int {
 }
 
 func (c *DiskCache) PersistSlotsAvailable() int {
-
 	if atomic.LoadUint32(&c.persistFlag) == 1 {
 		return 0
 	}
+
 	return int(^uint(0) >> 1) //Max int
 }

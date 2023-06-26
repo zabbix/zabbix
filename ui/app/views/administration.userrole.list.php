@@ -95,7 +95,7 @@ foreach ($this->data['roles'] as $role) {
 	}
 
 	if (count($role['users']) != $role['user_cnt']) {
-		$users[] = ' &hellip;';
+		$users[] = [' ', HELLIP()];
 	}
 
 	$name = new CLink($role['name'], (new CUrl('zabbix.php'))
@@ -126,8 +126,12 @@ $form->addItem([
 	$table,
 	$this->data['paging'],
 	new CActionButtonList('action', 'roleids', [
-		'userrole.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected roles?'),
-			'csrf_token' => CCsrfTokenHelper::get('userrole')]
+		'userrole.delete' => [
+			'name' => _('Delete'),
+			'confirm_singular' => _('Delete selected role?'),
+			'confirm_plural' => _('Delete selected roles?'),
+			'csrf_token' => CCsrfTokenHelper::get('userrole')
+		]
 	], 'userrole')
 ]);
 

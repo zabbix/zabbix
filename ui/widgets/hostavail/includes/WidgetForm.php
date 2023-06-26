@@ -37,8 +37,9 @@ class WidgetForm extends CWidgetForm {
 
 	public function addFields(): self {
 		return $this
-			->addField(
-				new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
+			->addField($this->isTemplateDashboard()
+				? null
+				: new CWidgetFieldMultiSelectGroup('groupids', _('Host groups'))
 			)
 			->addField(
 				new CWidgetFieldCheckBoxList('interface_type', _('Interface type'), [
@@ -55,7 +56,10 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(STYLE_HORIZONTAL)
 			)
 			->addField(
-				new CWidgetFieldCheckBox('maintenance', _('Show hosts in maintenance'))
+				new CWidgetFieldCheckBox(
+					'maintenance',
+					$this->isTemplateDashboard() ? _('Show data in maintenance') : _('Show hosts in maintenance')
+				)
 			);
 	}
 }

@@ -34,7 +34,7 @@ class CWidgetElement extends CElement {
 	 */
 	public function getRefreshInterval() {
 		$this->getHeader()->hoverMouse();
-		$this->query('xpath:.//button[contains(@class, "btn-widget-action")]')->waitUntilPresent()->one()->click(true);
+		$this->query('xpath:.//button[contains(@class, "js-widget-action")]')->waitUntilPresent()->one()->click(true);
 		$menu = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$aria_label = explode(', ', $menu->getSelected()->getAttribute('aria-label'), 3);
 
@@ -76,7 +76,7 @@ class CWidgetElement extends CElement {
 	 * @return boolean
 	 */
 	public function isEditable() {
-		return $this->query('xpath:.//button[contains(@class, "btn-widget-edit")]')->one()->isPresent();
+		return $this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->one()->isPresent();
 	}
 
 	/**
@@ -87,7 +87,7 @@ class CWidgetElement extends CElement {
 	public function edit() {
 		// Edit can sometimes fail so we have to retry this operation.
 		for ($i = 0; $i < 4; $i++) {
-			$this->query('xpath:.//button[contains(@class, "btn-widget-edit")]')->waitUntilPresent()->one()->click(true);
+			$this->query('xpath:.//button[contains(@class, "js-widget-edit")]')->waitUntilPresent()->one()->click(true);
 
 			try {
 				return $this->query('xpath://div[@data-dialogueid="widget_properties"]//form')->waitUntilVisible()->asForm()->one();

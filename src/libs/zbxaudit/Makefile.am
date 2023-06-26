@@ -13,3 +13,6 @@ libzbxaudit_a_SOURCES = \
 	audit_ha.c \
 	audit_proxy.c \
 	audit_settings.c
+
+libzbxaudit_a_CFLAGS = \
+	$(TLS_CFLAGS)

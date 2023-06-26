@@ -193,12 +193,12 @@ final class CModuleManager {
 	/**
 	 * Get initialized widget modules.
 	 */
-	public function getWidgets(bool $for_template_dashboard_only = false): array {
+	public function getWidgets(): array {
 		$widgets = [];
 
 		/** @var CWidget $widget */
 		foreach ($this->modules as $widget) {
-			if (!($widget instanceof CWidget) || ($for_template_dashboard_only && !$widget->hasTemplateSupport())) {
+			if (!($widget instanceof CWidget)) {
 				continue;
 			}
 			$widgets[$widget->getId()] = $widget;
@@ -207,11 +207,11 @@ final class CModuleManager {
 		return $widgets;
 	}
 
-	public function getWidgetsDefaults(bool $for_template_dashboard_only = false): array {
+	public function getWidgetsDefaults(): array {
 		$widget_defaults = [];
 
 		/** @var CWidget $widget */
-		foreach (APP::ModuleManager()->getWidgets($for_template_dashboard_only) as $widget) {
+		foreach (APP::ModuleManager()->getWidgets() as $widget) {
 			$widget_defaults[$widget->getId()] = $widget->getDefaults();
 		}
 
@@ -452,7 +452,6 @@ final class CModuleManager {
 				'js_class' => CWidget::DEFAULT_JS_CLASS,
 				'size' => CWidget::DEFAULT_SIZE,
 				'refresh_rate' => CWidget::DEFAULT_REFRESH_RATE,
-				'template_support' => false,
 				'use_time_selector' => false
 			];
 		}

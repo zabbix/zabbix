@@ -1,15 +1,15 @@
 module zabbix.com
 
-go 1.18
+go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20230328072810-77ed282adaf3
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.0
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
 	github.com/chromedp/chromedp v0.8.7
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
-	github.com/eclipse/paho.mqtt.golang v1.4.1
+	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.6

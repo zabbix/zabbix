@@ -43,6 +43,7 @@ $this->addJsFile('class.widget.js');
 $this->addJsFile('class.widget.inaccessible.js');
 $this->addJsFile('class.widget.iterator.js');
 $this->addJsFile('class.widget.paste-placeholder.js');
+$this->addJsFile('class.form.fieldset.collapsible.js');
 $this->addJsFile('class.calendar.js');
 $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.coverride.js');
@@ -106,8 +107,9 @@ $html_page = (new CHtmlPage())
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
-						(new CButton('', '&nbsp;'))
+						(new CSimpleButton())
 							->addClass(ZBX_STYLE_BTN_ACTION)
+							->addClass(ZBX_ICON_MENU)
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
 							->setEnabled($data['dashboard']['can_edit_dashboards']
@@ -124,18 +126,20 @@ $html_page = (new CHtmlPage())
 			))->setAttribute('aria-label', _('Content controls')))
 			->addItem((new CListItem(
 				(new CTag('nav', true, new CList([
-					(new CButton('dashboard-config'))->addClass(ZBX_STYLE_BTN_DASHBOARD_CONF),
+					(new CButton('dashboard-config'))
+						->addClass(ZBX_STYLE_BTN_ICON)
+						->addClass(ZBX_ICON_COG_FILLED),
 					(new CList())
 						->addClass(ZBX_STYLE_BTN_SPLIT)
 						->addItem(
-							(new CButton('dashboard-add-widget',
-								[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
-							))->addClass(ZBX_STYLE_BTN_ALT)
+							(new CButton('dashboard-add-widget', _('Add')))
+								->addClass(ZBX_STYLE_BTN_ALT)
+								->addClass(ZBX_ICON_PLUS_SMALL)
 						)
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add'))
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
+								->addClass(ZBX_ICON_CHEVRON_DOWN_SMALL)
 						),
 					(new CButton('dashboard-save', _('Save changes'))),
 					(new CLink(_('Cancel'), '#'))->setId('dashboard-cancel'),
@@ -146,16 +150,18 @@ $html_page = (new CHtmlPage())
 			))->addStyle('display: none'))
 	)
 	->setKioskModeControls(
-		(count($data['dashboard']['pages']) > 1)
+		count($data['dashboard']['pages']) > 1
 			? (new CList())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_PAUSE)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
@@ -168,7 +174,8 @@ $html_page = (new CHtmlPage())
 						)
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
 						->setTitle(_('Next page'))
 				)
@@ -218,20 +225,18 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 				(new CDiv())
 					->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
-						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-							->addClass('btn-iterator-page-previous')
+						(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 							->setEnabled(false),
-						(new CSimpleButton())
-							->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-							->addClass('btn-iterator-page-next')
+						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
 							->setEnabled(false),
 						(new CSimpleButton([
 							(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
 							(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
 						]))
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 							->addClass(ZBX_STYLE_BTN_ALT)
-							->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
 							->addClass(
 								($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 									? 'slideshow-state-started'

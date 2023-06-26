@@ -885,6 +885,13 @@ in:
   path: $[?(@.id==1)].value.first() 
 out:
   return: SUCCEED
+---
+test case: Query $[ ?(  '  ' *'' )]
+in:
+  data: '{"a":1, "b":2, "a":3}'
+  path: $[ ?(  '  ' *'' )]
+out:
+  return: FAIL
 ...
 
 

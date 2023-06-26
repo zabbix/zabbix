@@ -17,6 +17,34 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+const ZBX_STYLE_COLLAPSED = 'collapsed';
+
+const ZBX_STYLE_BTN_ICON = 'btn-icon';
+
+const ZBX_ICON_BELL = 'zi-bell';
+const ZBX_ICON_BELL_OFF = 'zi-bell-off';
+const ZBX_ICON_CHECK = 'zi-check';
+const ZBX_ICON_CHEVRON_DOWN = 'zi-chevron-down';
+const ZBX_ICON_CHEVRON_LEFT = 'zi-chevron-left';
+const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
+const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
+const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
+const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_EYE_OFF = 'zi-eye-off';
+const ZBX_ICON_FILTER = 'zi-filter';
+const ZBX_ICON_HELP_SMALL = 'zi-help-small';
+const ZBX_ICON_HOME = 'zi-home';
+const ZBX_ICON_LOCK = 'zi-lock';
+const ZBX_ICON_MORE = 'zi-more';
+const ZBX_ICON_PAUSE = 'zi-pause';
+const ZBX_ICON_PENCIL = 'zi-pencil';
+const ZBX_ICON_PLAY = 'zi-play';
+const ZBX_ICON_PLUS = 'zi-plus';
+const ZBX_ICON_REMOVE_SMALL = 'zi-remove-small';
+const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
+const ZBX_ICON_SPEAKER = 'zi-speaker';
+const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
+const ZBX_ICON_TEXT = 'zi-text';
 
 const KEY_ARROW_DOWN = 40;
 const KEY_ARROW_LEFT = 37;
@@ -340,7 +368,9 @@ function PopUp(action, parameters, {
 	trigger_element = document.activeElement,
 	prevent_navigation = false
 } = {}) {
-	var overlay = overlays_stack.getById(dialogueid);
+	hintBox.deleteAll();
+
+	let overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
@@ -406,6 +436,19 @@ function PopUp(action, parameters, {
 					script_inline: resp.script_inline,
 					data: resp.data || null
 				});
+
+				for (const grid of overlay.$dialogue.$body[0].querySelectorAll('form .form-grid')) {
+					new ResizeObserver(() => {
+						for (const label of grid.querySelectorAll(':scope > label')) {
+							const rect = label.getBoundingClientRect();
+
+							if (rect.width > 0) {
+								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								break;
+							}
+						}
+					}).observe(grid);
+				}
 			}
 
 			overlay.recoverFocus();
@@ -901,6 +944,17 @@ function showHideVisible(obj) {
 }
 
 /**
+ * Check if element is visible.
+ *
+ * @param {object} element
+ *
+ * @return {boolean}
+ */
+function isVisible(element) {
+	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
+}
+
+/**
  * Switch element classes and return final class.
  *
  * @param object|string obj			object or object id
@@ -1068,7 +1122,7 @@ function visibilityStatusChanges(value, objectid, replace_to) {
 		}
 		else if (!value) {
 			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
+			new_obj.classList.add('visibility-box-caption');
 			new_obj.setAttribute('id', obj.id);
 			new_obj.innerHTML = replace_to;
 			new_obj.originalObject = obj;
@@ -1109,3 +1163,28 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 		sessionStorage.removeItem(key);
 	}
 }
+
+// Fix jQuery ui.sortable vertical positioning bug.
+$.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
+	_getParentOffset: function () {
+		this.offsetParent = this.helper.offsetParent();
+
+		const pos = this.offsetParent.offset();
+
+		if (this.scrollParent[0] !== this.document[0]
+				&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
+			pos.left += this.scrollParent.scrollLeft();
+			pos.top += this.scrollParent.scrollTop();
+		}
+
+		if ((this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() === 'html' && $.ui.ie)
+				|| this.offsetParent[0] === this.document[0].body) {
+			pos = {top: 0, left: 0};
+		}
+
+		return {
+			top: pos.top + (parseInt(this.offsetParent.css('borderTopWidth'), 10) || 0),
+			left: pos.left + (parseInt(this.offsetParent.css('borderLeftWidth'), 10) || 0)
+		};
+	}
+}));

@@ -506,7 +506,11 @@ elseif (hasRequest('action') && getRequest('action') === 'trigger.massdelete' &&
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 	}
 
-	show_messages($result, _('Triggers deleted'), _('Cannot delete triggers'));
+	$triggers_count = count(getRequest('g_triggerid'));
+	$messageSuccess = _n('Trigger deleted', 'Triggers deleted', $triggers_count);
+	$messageFailed = _n('Cannot delete trigger', 'Cannot delete triggers', $triggers_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
