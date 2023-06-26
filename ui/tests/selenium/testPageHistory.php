@@ -66,6 +66,7 @@ class testPageHistory extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestClickWait('plaintext');
+		$this->page->waitUntilReady();
 		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
 	}
 }

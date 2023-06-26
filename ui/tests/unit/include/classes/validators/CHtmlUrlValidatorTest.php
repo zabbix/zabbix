@@ -83,6 +83,8 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['http://{{{$USER_URL_MACRO}',								[],															true],
 			['http://{$MACRO{$MACRO}}',									[],															true],
 			['{$MACRO{',												[],															true],
+			["h\tt\rt\nps://zabbix.com",								[],															true], // CR, LF and TAB characters are ingored by browsers.
+			['ht tps://zabbix.com',										[],															true], // URL with spaces in schema is treated as a path.
 			// Inventory macros are going to be considered as "path".
 			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
 			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
@@ -108,6 +110,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['http:///',												[],															false], // url_parse() returns false.
 			['http:',													[],															false], // Scheme with no host.
 			['http://?',												[],															false], // url_parse() returns false.
+			["ja\tva\rsc\nript:alert(1)",								[],															false], // Invalid scheme. CR, LF and TAB characters are ingored by browsers.
 			['javascript:alert(]',										[],															false], // Invalid scheme.
 			['protocol://{$INVALID!MACRO}',								[],															false], // Invalid scheme. Also macro is not valid, but that's secondary.
 			['',														[],															false], // Cannot be empty.
