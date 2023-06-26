@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -411,7 +411,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 					'create_enabled' => true,
 					'hostgroup' => 'Hypervisors',
 					'group_prototype' => 'Clone group prototype {#CLONE_GROUP_PROTO}',
-					'template' => 'macOS',
+					'template' => 'macOS by Zabbix agent',
 					'inventory' => 'Manual',
 					'check_form' => true
 				]

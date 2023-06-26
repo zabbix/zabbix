@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ foreach($data['regexs'] as $regexid => $regex) {
 	foreach($regex['expressions'] as $expression) {
 		$expressions[] = (new CTable())->addRow([
 			new CCol($numb++),
-			new CCol(' &raquo; '),
+			new CCol([' ', RARR(), ' ']),
 			new CCol($expression['expression']),
 			new CCol(' ['.CRegexHelper::expression_type2str($expression['expression_type']).']')
 		]);

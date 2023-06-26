@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -295,16 +295,6 @@
 				data.to = this.global_timerange.to;
 			}
 
-			// Close all opened hint boxes, otherwise their contents will not be updated after autorefresh.
-			for (let i = overlays_stack.length - 1; i >= 0; i--) {
-				const hintbox = overlays_stack.getById(overlays_stack.stack[i]);
-
-				if (hintbox.type === 'hintbox') {
-					hintBox.hideHint(hintbox.element, true);
-					removeFromOverlaysStack(overlays_stack.stack[i]);
-				}
-			}
-
 			Object.entries(data).forEach(([key, value]) => {
 				if (['filter_show_counter', 'filter_custom_time', 'action'].indexOf(key) !== -1) {
 					return;
@@ -361,7 +351,7 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -369,24 +359,6 @@
 
 		events: {
 			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					const title = data.success.title;
-					let messages = [];
-
-					if ('messages' in data.success) {
-						messages = data.success.messages;
-					}
-
-					addMessage(makeMessageBox('good', messages, title));
-				}
-
-				view.refreshResults();
-				view.refreshCounters();
-			},
-
-			hostDelete(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

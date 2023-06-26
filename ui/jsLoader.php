@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,7 +73,6 @@ $available_js = [
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
-	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
@@ -445,7 +444,6 @@ if (empty($_GET['files'])) {
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',
-		'class.bbcode.js',
 		'class.csuggest.js',
 		'class.scrollable.js',
 		'class.sidebar.js',

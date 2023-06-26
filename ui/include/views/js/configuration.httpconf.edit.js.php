@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,7 +72,7 @@
 				->setAttribute('placeholder', _('name'))
 				->setAttribute('data-type', 'name')
 				->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-			'&rArr;',
+			RARR(),
 			(new CTextBox(null, '#{value}'))
 				->setAttribute('placeholder', _('value'))
 				->setAttribute('data-type', 'value')

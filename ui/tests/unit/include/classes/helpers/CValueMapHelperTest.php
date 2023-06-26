@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -198,6 +198,11 @@ class CValueMapHelperTest extends TestCase {
 				'any should match', ITEM_VALUE_TYPE_STR,
 				['type' => VALUEMAP_MAPPING_TYPE_DEFAULT, 'value' => '', 'newvalue' => 'ok'],
 				true
+			],
+			[
+				'1', ITEM_VALUE_TYPE_UINT64,
+				['type' => VALUEMAP_MAPPING_TYPE_EQUAL, 'value' => '1K', 'newvalue' => 'A'],
+				false
 			]
 		];
 	}

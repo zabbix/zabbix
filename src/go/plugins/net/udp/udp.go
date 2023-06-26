@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,7 @@ const (
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              time.Duration `conf:"optional,range=1:30"`
+	Timeout              int `conf:"optional,range=1:30"`
 }
 
 // Plugin -
@@ -138,13 +138,13 @@ func (p *Plugin) udpExpect(service string, address string) (result int) {
 	var conn net.Conn
 	var err error
 
-	if conn, err = net.DialTimeout("udp", address, time.Second*p.options.Timeout); err != nil {
+	if conn, err = net.DialTimeout("udp", address, time.Second*time.Duration(p.options.Timeout)); err != nil {
 		log.Debugf("UDP expect network error: cannot connect to [%s]: %s", address, err.Error())
 		return
 	}
 	defer conn.Close()
 
-	if err = conn.SetDeadline(time.Now().Add(time.Second * p.options.Timeout)); err != nil {
+	if err = conn.SetDeadline(time.Now().Add(time.Second * time.Duration(p.options.Timeout))); err != nil {
 		return
 	}
 
@@ -250,7 +250,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Warningf("cannot unmarshal configuration options: %s", err)
 	}
 	if p.options.Timeout == 0 {
-		p.options.Timeout = time.Duration(global.Timeout)
+		p.options.Timeout = global.Timeout
 	}
 }
 

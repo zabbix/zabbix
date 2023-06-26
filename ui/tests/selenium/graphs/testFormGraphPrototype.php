@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,8 +39,8 @@ class testFormGraphPrototype extends testFormGraphs {
 		// Create item on given host.
 		$items = CDataHelper::call('item.create', [
 			'hostid' => self::HOSTID,
-			'name' => 'item_graph_ptototype_test',
-			'key_' => 'item_graph_ptototype_test',
+			'name' => 'item_graph_prototype_test',
+			'key_' => 'item_graph_prototype_test',
 			'type' => ITEM_TYPE_TRAPPER,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT
 		]);
@@ -167,7 +167,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							'prototype' => true,
 							'item' => 'testFormItemPrototype1'
 						]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			[

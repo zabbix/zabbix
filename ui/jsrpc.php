@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -415,6 +415,10 @@ switch ($data['method']) {
 					'limit' => $limit
 				]);
 
+				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {
+					$users[] = ['userid' => '0', 'username' => 'System', 'name' => '', 'surname' => ''];
+				}
+
 				if ($users) {
 					CArrayHelper::sort($users, [
 						['field' => 'username', 'order' => ZBX_SORT_UP]
@@ -454,10 +458,16 @@ switch ($data['method']) {
 				break;
 
 			case 'drules':
+				$filter = [];
+
+				if (array_key_exists('enabled_only', $data) && $data['enabled_only']) {
+					$filter['status'] = DRULE_STATUS_ACTIVE;
+				}
+
 				$drules = API::DRule()->get([
 					'output' => ['druleid', 'name'],
 					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
-					'filter' => ['status' => DRULE_STATUS_ACTIVE],
+					'filter' => $filter,
 					'limit' => $limit
 				]);
 
@@ -620,6 +630,26 @@ switch ($data['method']) {
 					}
 
 					$result = CArrayHelper::renameObjectsKeys($slas, ['slaid' => 'id']);
+				}
+				break;
+
+			case 'sysmaps':
+				$sysmaps = API::Map()->get([
+					'output' => ['sysmapid', 'name'],
+					'search' => array_key_exists('search', $data) ? ['name' => $data['search']] : null,
+					'limit' => $limit
+				]);
+
+				if ($sysmaps) {
+					CArrayHelper::sort($sysmaps, [
+						['field' => 'name', 'order' => ZBX_SORT_UP]
+					]);
+
+					if (array_key_exists('limit', $data)) {
+						$sysmaps = array_slice($sysmaps, 0, $data['limit']);
+					}
+
+					$result = CArrayHelper::renameObjectsKeys($sysmaps, ['sysmapid' => 'id']);
 				}
 				break;
 		}

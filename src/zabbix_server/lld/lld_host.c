@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -835,6 +835,9 @@ static zbx_lld_host_t	*lld_host_make(zbx_vector_ptr_t *hosts, const char *host_p
 		host = (zbx_lld_host_t *)hosts->values[i];
 
 		if (0 != (host->flags & ZBX_FLAG_LLD_HOST_DISCOVERED))
+			continue;
+
+		if (0 == host->hostid)
 			continue;
 
 		buffer = zbx_strdup(buffer, host->host_proto);
@@ -2413,8 +2416,8 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "version=%d", (int)snmp->version);
 		d = ",";
 
-		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid,
-						snmp->version_orig, snmp->version);
+		zbx_audit_host_update_json_update_interface_version(hostid, interfaceid, snmp->version_orig,
+				snmp->version);
 	}
 
 	if (0 != (snmp->flags & ZBX_FLAG_LLD_INTERFACE_SNMP_UPDATE_BULK))
@@ -3882,11 +3885,11 @@ static int	lld_if_update_compare(const void *d1, const void *d2)
 	return u1->diff_num - u2->diff_num;
 }
 
-static zbx_uint64_t	popcount64(zbx_uint64_t mask)
+static int	zbx_popcount64(zbx_uint64_t mask)
 {
 	mask -= (mask >> 1) & __UINT64_C(0x5555555555555555);
 	mask = (mask & __UINT64_C(0x3333333333333333)) + (mask >> 2 & __UINT64_C(0x3333333333333333));
-	return ((mask + (mask >> 4)) & __UINT64_C(0xf0f0f0f0f0f0f0f)) * __UINT64_C(0x101010101010101) >> 56;
+	return (int)(((mask + (mask >> 4)) & __UINT64_C(0xf0f0f0f0f0f0f0f)) * __UINT64_C(0x101010101010101) >> 56);
 }
 
 static void	lld_interfaces_link(const zbx_lld_interface_t *ifold, zbx_lld_interface_t *ifnew, zbx_uint64_t flags)
@@ -3985,7 +3988,7 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_ptr_t *host
 			update->ifnew = ifnew;
 			update->ifold = interfaces->values[j];
 			update->flags = lld_interface_compare(update->ifold, update->ifnew);
-			update->diff_num = popcount64(update->flags);
+			update->diff_num = zbx_popcount64(update->flags);
 
 			zbx_vector_if_update_append(&updates, update);
 		}
@@ -4551,10 +4554,13 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_ptr_t *lld_rows,
 
 		if (0 != hosts.values_num)
 			lld_hosts_get_tags(&hosts);
+
 		lld_proto_tags_get(parent_hostid, &tags);
 
 		lld_simple_groups_get(parent_hostid, &groupids);
+
 		lld_group_prototypes_get(parent_hostid, &group_prototypes);
+
 		lld_groups_get(parent_hostid, &groups);
 
 		lld_hostmacros_get(parent_hostid, &masterhostmacros, &hostmacros);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -525,7 +525,7 @@ class testPageReportsAudit extends CWebTest {
 				}
 
 				// Get all results from column and remove existing values.
-				$table_value = $this->getTableResult($column);
+				$table_value = $this->getTableColumnData($column);
 
 				foreach ($values as $value) {
 					$this->assertTrue(in_array($value, $table_value));

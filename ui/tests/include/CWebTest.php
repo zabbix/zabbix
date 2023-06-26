@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,13 +107,13 @@ class CWebTest extends CTest {
 	/**
 	 * @inheritdoc
 	 */
-	protected function tearDown(): void {
+	protected function assertPostConditions(): void {
 		// Check for JS errors.
 		$errors = [];
 		if (self::$shared_page !== null) {
-				foreach (self::$shared_page->getBrowserLog() as $log) {
-					$errors[] = $log['message'];
-				}
+			foreach (self::$shared_page->getBrowserLog() as $log) {
+				$errors[] = $log['message'];
+			}
 		}
 
 		if ($errors) {
@@ -135,8 +135,13 @@ class CWebTest extends CTest {
 				$this->fail('Test case errors.');
 			}
 		}
+	}
 
-		if ($this->hasFailed() || $this->getStatus() === null || $errors) {
+	/**
+	 * @inheritdoc
+	 */
+	protected function tearDown() : void {
+		if ($this->hasFailed() || $this->getStatus() === null) {
 			$this->captureScreenshot();
 		}
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -354,6 +354,7 @@ class testUserRolesPermissions extends CWebTest {
 			if ($action_status === false) {
 				$this->page->open('zabbix.php?action=problem.view')->waitUntilReady();
 				$row->getColumn('Ack')->query('link:No')->waitUntilCLickable()->one()->click();
+				COverlayDialogElement::find()->waitUntilReady()->one();
 
 				if ($data['activityid'] === 'message') {
 					$dialog->query('id:message')->one()->fill('test_text');

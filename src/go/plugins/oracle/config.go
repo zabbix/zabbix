@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,6 +53,9 @@ type PluginOptions struct {
 
 	// CustomQueriesPath is a full pathname of a directory containing *.sql files with custom queries.
 	CustomQueriesPath string `conf:"optional"`
+
+	// Default stores default connection parameter values from configuration file
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

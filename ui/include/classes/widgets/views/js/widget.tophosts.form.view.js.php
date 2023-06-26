@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,12 +46,6 @@ window.widget_tophosts_form = new class {
 				for (let td of ui.find('>td')) {
 					let $td = $(td);
 					$td.attr('width', $td.width())
-				}
-
-				// when dragging element on safari, it jumps out of the table
-				if (SF) {
-					// move back draggable element to proper position
-					ui.css('left', (ui.offset().left - 2) + 'px');
 				}
 
 				return ui;

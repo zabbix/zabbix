@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -183,21 +183,21 @@ if (count($data['dashboard']['pages']) > 1
 	$widget
 		->addItem($dashboard)
 		->show();
-
-	(new CScriptTag('
-		view.init('.json_encode([
-			'host' => $data['host'],
-			'dashboard' => $data['dashboard'],
-			'widget_defaults' => $data['widget_defaults'],
-			'time_period' => $data['time_period'],
-			'web_layout_mode' => $web_layout_mode
-		]).');
-	'))
-		->setOnDocumentReady()
-		->show();
 }
 else {
 	$widget
 		->addItem(new CTableInfo())
 		->show();
 }
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'host' => $data['host'],
+		'dashboard' => $data['dashboard'],
+		'widget_defaults' => $data['widget_defaults'],
+		'time_period' => $data['time_period'],
+		'web_layout_mode' => $web_layout_mode
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

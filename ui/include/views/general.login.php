@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ global $ZBX_SERVER_NAME;
 				->setTarget('_blank')
 				->addClass(ZBX_STYLE_GREY)
 				->addClass(ZBX_STYLE_LINK_ALT),
-			CBrandHelper::isRebranded() ? null : '&nbsp;&nbsp;•&nbsp;&nbsp;',
+			CBrandHelper::isRebranded() ? null : [NBSP(), NBSP(), BULLET(), NBSP(), NBSP()],
 			CBrandHelper::isRebranded()
 				? null
 				: (new CLink(_('Support'), getSupportUrl(CWebUser::getLang())))

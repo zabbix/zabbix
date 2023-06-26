@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ abstract class CValidatorTest extends TestCase {
 		$validator = $this->createValidator($params);
 		$result = $validator->validate($value);
 
-		$this->assertEquals(true, $result);
+		$this->assertSame(true, $result);
 		$this->assertNull($validator->getError());
 	}
 

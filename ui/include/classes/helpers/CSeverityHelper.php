@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CSeverityHelper {
 	public static function makeSeverityCell(int $severity, $text = null, bool $force_normal = false,
 			bool $return_as_div = false) {
 		if ($text === null) {
-			$text = CHtml::encode(self::getName($severity));
+			$text = self::getName($severity);
 		}
 
 		if ($force_normal) {

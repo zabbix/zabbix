@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 #include "duktape.h"
 
 #define ZBX_ES_LOG_MEMORY_LIMIT	(ZBX_MEBIBYTE * 8)
+#define ZBX_ES_LOG_MSG_LIMIT	8000
 
 /* this macro can be used in time intensive C functions to check for script timeout execution */
 #define ZBX_ES_CHECK_TIMEOUT(ctx, env) \
@@ -39,6 +40,7 @@ struct zbx_es_env
 {
 	duk_context	*ctx;
 	size_t		total_alloc;
+	size_t		max_total_alloc;
 	zbx_timespec_t	start_time;
 
 	char		*error;
@@ -48,6 +50,9 @@ struct zbx_es_env
 	struct zbx_json	*json;
 
 	jmp_buf		loc;
+
+	int		http_req_objects;
+	int		logged_msgs;
 };
 
 zbx_es_env_t	*zbx_es_get_env(duk_context *ctx);

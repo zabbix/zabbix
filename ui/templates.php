@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,6 +141,41 @@ if (hasRequest('unlink') || hasRequest('unlink_and_clear')) {
 }
 elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clone'))) {
 	$_REQUEST['form'] = hasRequest('clone') ? 'clone' : 'full_clone';
+	$warnings = [];
+
+	// Reset macro type and value.
+	foreach ($macros as &$macro) {
+		if (array_key_exists('allow_revert', $macro) && array_key_exists('value', $macro)) {
+			$macro['deny_revert'] = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	$secret_macro_reset = false;
+
+	foreach ($macros as &$macro) {
+		if ($macro['type'] == ZBX_MACRO_TYPE_SECRET && !array_key_exists('value', $macro)) {
+			$macro = [
+				'type' => ZBX_MACRO_TYPE_TEXT,
+				'value' => ''
+			] + $macro;
+
+			$secret_macro_reset = true;
+
+			unset($macro['allow_revert']);
+		}
+	}
+	unset($macro);
+
+	if ($secret_macro_reset) {
+		$warnings[] = _('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.');
+	}
+
+	$macros = array_map(function($macro) {
+		return array_diff_key($macro, array_flip(['hostmacroid']));
+	}, $macros);
 
 	$groups = getRequest('groups', []);
 	$groupids = [];
@@ -160,6 +195,10 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 			'preservekeys' => true
 		]);
 
+		if (count($groupids) != count($groups_allowed)) {
+			$warnings[] = _("The template being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new template.");
+		}
+
 		foreach ($groups as $idx => $group) {
 			if (!is_array($group) && !array_key_exists($group, $groups_allowed)) {
 				unset($groups[$idx]);
@@ -169,20 +208,13 @@ elseif (hasRequest('templateid') && (hasRequest('clone') || hasRequest('full_clo
 		$_REQUEST['groups'] = $groups;
 	}
 
-	if ($macros && in_array(ZBX_MACRO_TYPE_SECRET, array_column($macros, 'type'))) {
-		// Reset macro type and value.
-		$macros = array_map(function($value) {
-			return ($value['type'] == ZBX_MACRO_TYPE_SECRET)
-				? ['value' => '', 'type' => ZBX_MACRO_TYPE_TEXT] + $value
-				: $value;
-		}, $macros);
+	if ($warnings) {
+		if (count($warnings) > 1) {
+			CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
+		}
 
-		warning(_('The cloned template contains user defined macros with type "Secret text". The value and type of these macros were reset.'));
+		array_map('CMessageHelper::addWarning', $warnings);
 	}
-
-	$macros = array_map(function($macro) {
-		return array_diff_key($macro, array_flip(['hostmacroid']));
-	}, $macros);
 
 	if (hasRequest('clone')) {
 		unset($_REQUEST['templateid']);
@@ -578,7 +610,8 @@ if (hasRequest('form')) {
 			$data['macros'] = $data['dbTemplate']['macros'];
 
 			foreach ($data['macros'] as &$macro) {
-				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET) {
+				if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+						&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
 					$macro['allow_revert'] = true;
 				}
 			}

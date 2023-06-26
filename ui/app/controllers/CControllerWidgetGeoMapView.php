@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,7 +259,9 @@ class CControllerWidgetGeoMapView extends CControllerWidget {
 			$config = [
 				'tile_url' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_TILE_URL),
 				'max_zoom' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_MAX_ZOOM),
-				'attribution' => CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION)
+				'attribution' => htmlspecialchars(CSettingsHelper::get(CSettingsHelper::GEOMAPS_ATTRIBUTION),
+					ENT_NOQUOTES, 'UTF-8'
+				)
 			];
 		}
 		else {

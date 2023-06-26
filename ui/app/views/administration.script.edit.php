@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ $form_list
 	->addRow(new CLabel(_('Confirmation text'), 'confirmation'), [
 		(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		SPACE,
+		NBSP(),
 		(new CButton('testConfirmation', _('Test confirmation')))
 			->addClass(ZBX_STYLE_BTN_GREY)
 			->setId('test-confirmation')

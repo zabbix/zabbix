@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -337,7 +337,9 @@ function PopUp(action, parameters, {
 	dialogue_class = '',
 	trigger_element = document.activeElement
 } = {}) {
-	var overlay = overlays_stack.getById(dialogueid);
+	hintBox.deleteAll();
+
+	let overlay = overlays_stack.getById(dialogueid);
 
 	if (!overlay) {
 		overlay = overlayDialogue({
@@ -870,6 +872,17 @@ function showHideVisible(obj) {
 }
 
 /**
+ * Check if element is visible.
+ *
+ * @param {object} element
+ *
+ * @return {boolean}
+ */
+function isVisible(element) {
+	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
+}
+
+/**
  * Switch element classes and return final class.
  *
  * @param object|string obj			object or object id
@@ -926,25 +939,6 @@ function basename(path, suffix) {
  */
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
-}
-
-/**
- * Function converts unix timestamp to human readable time in format 'Y-m-d H:i:s'.
- *
- * @param {type} time   Unix timestamp to convert.
- *
- * @returns {string}
- */
-function time2str(time) {
-	var dt = new Date(time * 1000),
-		Y = dt.getFullYear(),
-		m = appendZero(dt.getMonth()+1),
-		d = appendZero(dt.getDate()),
-		H = appendZero(dt.getHours()),
-		i = appendZero(dt.getMinutes()),
-		s = appendZero(dt.getSeconds());
-
-	return Y + '-' + m + '-' + d + ' ' + H + ':' + i + ':' + s;
 }
 
 /**
@@ -1056,7 +1050,6 @@ function visibilityStatusChanges(value, objectid, replace_to) {
 		}
 		else if (!value) {
 			const new_obj = document.createElement('span');
-			new_obj.setAttribute('name', obj.name);
 			new_obj.setAttribute('id', obj.id);
 			new_obj.innerHTML = replace_to;
 			new_obj.originalObject = obj;
@@ -1096,3 +1089,28 @@ function uncheckTableRows(page, keepids = []) {
 		sessionStorage.removeItem(key);
 	}
 }
+
+// Fix jQuery ui.sortable vertical positioning bug.
+$.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
+	_getParentOffset: function () {
+		this.offsetParent = this.helper.offsetParent();
+
+		const pos = this.offsetParent.offset();
+
+		if (this.scrollParent[0] !== this.document[0]
+				&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
+			pos.left += this.scrollParent.scrollLeft();
+			pos.top += this.scrollParent.scrollTop();
+		}
+
+		if ((this.offsetParent[0].tagName && this.offsetParent[0].tagName.toLowerCase() === 'html' && $.ui.ie)
+				|| this.offsetParent[0] === this.document[0].body) {
+			pos = {top: 0, left: 0};
+		}
+
+		return {
+			top: pos.top + (parseInt(this.offsetParent.css('borderTopWidth'), 10) || 0),
+			left: pos.left + (parseInt(this.offsetParent.css('borderLeftWidth'), 10) || 0)
+		};
+	}
+}));

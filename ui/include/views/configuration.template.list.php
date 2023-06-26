@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,7 +139,7 @@ foreach ($data['templates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linked_templates_output[] = ' &hellip;';
+			$linked_templates_output[] = [' ', HELLIP()];
 
 			break;
 		}
@@ -168,7 +168,7 @@ foreach ($data['templates'] as $template) {
 		$i++;
 
 		if ($i > $data['config']['max_in_table']) {
-			$linked_to_output[] = ' &hellip;';
+			$linked_to_output[] = [' ', HELLIP()];
 
 			break;
 		}

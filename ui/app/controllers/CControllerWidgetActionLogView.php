@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,19 +66,30 @@ class CControllerWidgetActionLogView extends CControllerWidget {
 	 *
 	 * @return array
 	 */
-	private function getAlerts($sortfield, $sortorder, $show_lines)	{
-		$alerts = API::Alert()->get([
-			'output' => ['clock', 'sendto', 'subject', 'message', 'status', 'retries', 'error', 'userid', 'actionid',
-				'mediatypeid', 'alerttype'
-			],
-			'selectMediatypes' => ['name', 'maxattempts'],
-			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
-			'limit' => $show_lines
-		]);
+	private function getAlerts($sortfield, $sortorder, $show_lines) {
+		$alerts = [];
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+
+		foreach (eventSourceObjects() as $eventsource) {
+			$alerts = array_merge($alerts, API::Alert()->get([
+				'output' => ['actionid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject', 'message', 'status',
+					'retries', 'error', 'alerttype'
+				],
+				'selectMediatypes' => ['name', 'maxattempts'],
+				'eventsource' => $eventsource['source'],
+				'eventobject' => $eventsource['object'],
+				'sortfield' => 'alertid',
+				'sortorder' => ZBX_SORT_DOWN,
+				'limit' => $search_limit
+			]));
+		}
+
+		CArrayHelper::sort($alerts, [['field' => $sortfield, 'order' => $sortorder]]);
+		$alerts = array_slice($alerts, 0, $show_lines, true);
 
 		foreach ($alerts as &$alert) {
 			$alert['description'] = '';
+
 			if ($alert['mediatypeid'] != 0 && array_key_exists(0, $alert['mediatypes'])) {
 				$alert['description'] = $alert['mediatypes'][0]['name'];
 				$alert['maxattempts'] = $alert['mediatypes'][0]['maxattempts'];

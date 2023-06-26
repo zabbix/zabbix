@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class testZBX6648 extends CLegacyWebTest {
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				$host = COverlayDialogElement::find()->one()->query('class:multiselect-control')->asMultiselect()->one();
+				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')->asMultiselect()->one();
 				$host->fill([
 					'values' => $zbx_data['host'],
 					'context' => $zbx_data['hostgroup']

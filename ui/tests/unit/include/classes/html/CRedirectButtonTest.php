@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class CRedirectButtonTest extends CTagTest {
 			// parameter encoding
 			[
 				['caption', 'url"&"'],
-				'<button type="button" data-url="url&quot;&&quot;">caption</button>'
+				'<button type="button" data-url="url&quot;&amp;&quot;">caption</button>'
 			]
 		];
 	}

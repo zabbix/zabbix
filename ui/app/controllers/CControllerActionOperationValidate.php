@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,19 +184,7 @@ class CControllerActionOperationValidate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!$this->getInput('actionid', '0')) {
-				return true;
-			}
-
-			return (bool) API::Action()->get([
-				'output' => [],
-				'actionids' => $this->getInput('actionid'),
-				'editable' => true
-			]);
-		}
-
-		return false;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
 	}
 
 	protected function doAction() {

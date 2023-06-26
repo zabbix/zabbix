@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,9 @@ $form = (new CForm())
 	->setName('dcheck_form')
 	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1);
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
@@ -123,10 +126,7 @@ $form_list = (new CFormList())
 		'row_dcheck_snmpv3_privpassphrase'
 	);
 
-$form->addItem([
-	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
-]);
+$form->addItem($form_list);
 
 $output = [
 	'header' => $data['title'],

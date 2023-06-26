@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,6 +39,9 @@ $token_form = (new CForm())
 	->addVar('action_dst', ($data['tokenid'] == 0) ? 'token.view' : 'token.list')
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid']);
+
+// Enable form submitting on Enter.
+$token_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $token_from_list = (new CFormList())
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),

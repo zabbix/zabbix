@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -97,10 +97,13 @@ $form = (new CForm())
 	->addVar('add', '1')
 	->addVar('media', $options['media'])
 	->addVar('dstfrm', $options['dstfrm'])
-	->setId('media_form')
-	->addItem([
+	->setId('media_form');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+$form->addItem([
 		$media_form,
-		(new CInput('submit', 'submit'))->addStyle('display: none;'),
 		(new CTag('script'))
 			->addItem((new CRow([
 				(new CCol((new CTextBox('sendto_emails[#{rowNum}]', ''))

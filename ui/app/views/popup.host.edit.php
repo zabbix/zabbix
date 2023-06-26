@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ $output = [
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-			'warning' => $data['warning']
+			'warnings' => $data['warnings']
 		]).');',
 	'buttons' => $buttons
 ];

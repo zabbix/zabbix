@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,8 @@ class CItem extends CItemGeneral {
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
 	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
+
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
 
 	/**
 	 * Define a set of supported pre-processing rules.
@@ -474,14 +476,8 @@ class CItem extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		parent::checkInput($items);
+
 		self::validateInventoryLinks($items);
-
-		foreach ($items as &$item) {
-			$item['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
-			unset($item['itemid']);
-		}
-		unset($item);
-
 		$this->validateDependentItems($items);
 
 		foreach ($items as &$item) {

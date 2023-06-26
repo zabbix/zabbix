@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ function sdii($msg = 'SDII', $for = '', $showInvisible = true) {
 function vdp($var, $msg = null) {
 	echo 'DEBUG DUMP: ';
 	if (isset($msg)) {
-		echo '"'.$msg.'"'.SPACE;
+		echo '"'.$msg.'"&nbsp;';
 	}
 	var_dump($var);
 	echo BR();

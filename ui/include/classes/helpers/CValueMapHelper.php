@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ class CValueMapHelper {
 		switch ($mapping['type']) {
 			case VALUEMAP_MAPPING_TYPE_EQUAL:
 				$result = $match_numeric
-					? (floatval($value) == floatval($mapping['value']))
+					? (is_numeric($mapping['value']) && floatval($value) == floatval($mapping['value']))
 					: ($value === $mapping['value']);
 
 				break;

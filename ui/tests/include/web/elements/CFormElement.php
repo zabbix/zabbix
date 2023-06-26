@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -249,7 +249,7 @@ class CFormElement extends CElement {
 	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $key => $label) {
+		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 
 			if ($element->isValid()) {
@@ -565,16 +565,6 @@ class CFormElement extends CElement {
 	}
 
 	/**
-	 * Get the mandatory labels marked with an asterisk.
-	 *
-	 * @return array
-	 */
-	public function getRequiredLabels() {
-		return $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
-				->filter(CElementFilter::VISIBLE)->asText();
-	}
-
-	/**
 	 * Check if field is marked as required in form.
 	 *
 	 * @param string $label    field label text
@@ -583,6 +573,18 @@ class CFormElement extends CElement {
 	 */
 	public function isRequired($label) {
 		return $this->getLabel($label)->hasClass($this->required_label);
+	}
+
+	/**
+	 * Get the mandatory labels marked with an asterisk.
+	 *
+	 * @return array
+	 */
+	public function getRequiredLabels() {
+		$labels = $this->getLabels(CElementFilter::CLASSES_PRESENT, [$this->required_label])
+				->filter(CElementFilter::VISIBLE)->asText();
+
+		return array_values($labels);
 	}
 
 	/**

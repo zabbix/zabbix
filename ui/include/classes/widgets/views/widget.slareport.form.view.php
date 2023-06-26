@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,14 +38,12 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 $scripts = [$this->readJsFile('../../../include/classes/widgets/views/js/widget.slareport.form.view.js.php')];
 
 // SLA.
-$field_slaid = CWidgetHelper::getSla($fields['slaid'], $data['captions']['ms']['slas']['slaid'],
-	$form->getName()
-);
+$field_slaid = CWidgetHelper::getSla($fields['slaid'], $data['captions']['slas']['slaid'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['slaid']), $field_slaid);
 $scripts[] = $field_slaid->getPostJS();
 
 // Services.
-$field_serviceid = CWidgetHelper::getService($fields['serviceid'], $data['captions']['ms']['services']['serviceid'],
+$field_serviceid = CWidgetHelper::getService($fields['serviceid'], $data['captions']['services']['serviceid'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['serviceid']), $field_serviceid);

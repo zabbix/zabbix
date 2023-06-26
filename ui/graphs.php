@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -297,7 +297,7 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 		'discover' => getRequest('discover', DB::getDefault('graphs', 'discover'))
 	]);
 
-	show_messages($result, _('Graph updated'), _('Cannot update graph'));
+	show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');

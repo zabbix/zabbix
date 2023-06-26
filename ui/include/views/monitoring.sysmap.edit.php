@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,7 @@ $icon_mapping_link = (new CLink(_('show icon mappings'), (new CUrl('zabbix.php')
 	))
 	->setTarget('_blank');
 $map_tab->addRow(new CLabel(_('Automatic icon mapping'), $icon_mapping->getFocusableElementId()),
-	[$icon_mapping, SPACE, $icon_mapping_link]
+	[$icon_mapping, NBSP(), $icon_mapping_link]
 );
 
 // Append multiple checkboxes to form list.

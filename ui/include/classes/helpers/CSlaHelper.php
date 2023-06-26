@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_WEEKLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_WEEKLY_TO)
 				]);
 				break;
@@ -150,7 +150,7 @@ final class CSlaHelper {
 			case ZBX_SLA_PERIOD_QUARTERLY:
 				$tag->addItem([
 					$datetime_from->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_FROM),
-					' &#8211; ',
+					[' ', NDASH(), ' '],
 					$datetime_to->format(ZBX_SLA_PERIOD_DATE_FORMAT_QUARTERLY_TO)
 				]);
 				break;

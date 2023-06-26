@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CSvgGraphPoints extends CSvgGroup {
 
 	public function toString($destroy = true) {
 		$this->setAttribute('data-set', 'points')
-			->setAttribute('data-metric', CHtml::encode($this->item_name))
+			->setAttribute('data-metric', $this->item_name)
 			->setAttribute('data-color', $this->options['color'])
 			->addItem(
 				(new CSvgCircle(-10, -10, $this->options['pointsize'] + 4))

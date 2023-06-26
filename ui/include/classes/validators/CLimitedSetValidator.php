@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CLimitedSetValidator extends CValidator {
 	 *
 	 * @var string
 	 */
-	public $messageInvalid;
+	public $messageInvalid = null;
 
 	/**
 	 * Checks if the given value belongs to some set.
@@ -44,7 +44,9 @@ class CLimitedSetValidator extends CValidator {
 	 */
 	public function validate($value) {
 		if (!is_string($value) && !is_int($value)) {
-			$this->error($this->messageInvalid, $this->stringify($value));
+			if ($this->messageInvalid !== null) {
+				$this->error($this->messageInvalid, $this->stringify($value));
+			}
 
 			return false;
 		}
@@ -52,7 +54,9 @@ class CLimitedSetValidator extends CValidator {
 		$values = array_flip($this->values);
 
 		if (!isset($values[$value])) {
-			$this->error($this->messageInvalid, $value);
+			if ($this->messageInvalid !== null) {
+				$this->error($this->messageInvalid, $value);
+			}
 
 			return false;
 		}

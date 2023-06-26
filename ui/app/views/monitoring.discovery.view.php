@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,8 @@ $widget = (new CWidget())
 								'srctbl' => 'drules',
 								'srcfld1' => 'druleid',
 								'dstfrm' => 'zbx_filter',
-								'dstfld1' => 'filter_druleids_'
+								'dstfld1' => 'filter_druleids_',
+								'enabled_only' => 1
 							]
 						]
 					]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)

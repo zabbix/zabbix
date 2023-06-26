@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,6 +51,9 @@ type PluginOptions struct {
 	// Timeout is the maximum time in seconds for waiting when a request has to be done.
 	// Default value equals to the global timeout.
 	Timeout int `conf:"optional,range=1:30"`
+
+	// Default stores default connection parameter values from configuration file
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.

@@ -117,6 +117,26 @@ db data:
   - [1484035210, 0, 'value 10.0']
   - [1484035210, 500000000, 'value 10.5']
 ---
+test case: Test count based request spanning over a day
+in:
+    itemid: 28243
+    value type: ITEM_VALUE_TYPE_STR
+    seconds: 0
+    count: 3
+    end: 2017-02-19 12:15:00.000000000 +02:00
+out:
+  values:
+  - value: value 02-19 11:30:00
+    ts: 2017-02-19 11:30:00.000000000 +02:00
+  - value: value 02-18 11:30:00
+    ts: 2017-02-18 11:30:00.000000000 +02:00
+db data:
+  history_str: 
+  - [1487496600, 0, 'value 02-19 11:30:00']
+  history_str (2): []
+  history_str (3):
+  - [1487410200, 0, 'value 02-18 11:30:00']
+---
 test case: Test count based request over short period
 in:
     itemid: 28243
@@ -347,6 +367,8 @@ db data:
   history_str (3): []
   history_str (4): []
   history_str (5): []
+  history_str (6): []
+  history_str (7): []
 ---
 test case: Test time based request on empty data
 in:

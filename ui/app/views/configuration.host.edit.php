@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -54,11 +54,19 @@ $data += [
 		]
 ];
 
-if ($data['warning']) {
-	CMessageHelper::addWarning($data['warning']);
-	show_messages();
+if ($data['warnings']) {
+	foreach ($data['warnings'] as $msg) {
+		CMessageHelper::addWarning($msg);
+	}
 
-	$data['warning'] = null;
+	if (count($data['warnings']) > 1) {
+		show_messages(null, _('Cloned host parameter values have been modified.'));
+	}
+	else {
+		show_messages();
+	}
+
+	$data['warnings'] = null;
 }
 
 (new CWidget())

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,10 @@
 $form = (new CForm())
 	->setId('scheduledreport-form')
 	->setName('scheduledreport-form')
-	->addVar('action', 'popup.scheduledreport.create')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->addVar('action', 'popup.scheduledreport.create');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form->addItem(new CPartial('scheduledreport.formgrid.html', [
 	'source' => 'popup',

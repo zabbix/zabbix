@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ $table = (new CTableInfo())
 		($data['sortfield'] === 'host') ? [_('Host'), $sort_div] : _('Host'),
 		[
 			($data['sortfield'] === 'name') ? [_('Problem'), $sort_div] : _('Problem'),
-			' &bullet; ',
+			' ', BULLET(), ' ',
 			($data['sortfield'] === 'severity') ? [_('Severity'), $sort_div] : _('Severity')
 		],
 		($show_opdata == OPERATIONAL_DATA_SHOW_SEPARATELY) ? _('Operational data') : null,

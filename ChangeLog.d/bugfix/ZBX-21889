@@ -1,1 +1,0 @@
-..F....... [ZBX-21889] fixed warnings being shown even after overrides are enabled for trends or history tables with compressed chunks (jfreibergs)

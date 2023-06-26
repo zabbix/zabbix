@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -378,8 +378,8 @@ class CProfiler {
 		$callStackString = '';
 
 		if ($functions) {
-			$callStackString .= pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' &rarr; '.
-				implode(' &rarr; ', $functions);
+			$callStackString .= pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' → '.
+				implode(' → ', $functions);
 		}
 
 		if ($callWithFile) {

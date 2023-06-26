@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,10 @@ $expression_form = (new CForm())
 	->addVar('dstfld1', $data['dstfld1'])
 	->addItem((new CVar('hostid', $data['hostid']))->removeId())
 	->addVar('groupid', $data['groupid'])
-	->addVar('function', $data['function'])
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addVar('function', $data['function']);
+
+// Enable form submitting on Enter.
+$expression_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['parent_discoveryid'] !== '') {
 	$expression_form->addVar('parent_discoveryid', $data['parent_discoveryid']);

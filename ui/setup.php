@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -157,7 +157,7 @@ $setup_wizard = (new CSetupWizard())->cleanItems();
 
 // page title
 (new CPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))))
-	->addCssFile('assets/styles/'.CHtml::encode($default_theme).'.css')
+	->addCssFile('assets/styles/'.$default_theme.'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

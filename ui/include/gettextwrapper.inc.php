@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -245,11 +245,6 @@ function setupLocale(string $language, ?string &$error = ''): bool {
 
 	if (!$locale_set && strtolower($language) !== 'en_gb') {
 		setlocale(LC_ALL, $numeric_locales);
-
-		$language = htmlspecialchars($language, ENT_QUOTES, 'UTF-8');
-		$locale_variants = array_map(function ($locale) {
-			return htmlspecialchars($locale, ENT_QUOTES, 'UTF-8');
-		}, $locale_variants);
 
 		$error = 'Locale for language "'.$language.'" is not found on the web server. Tried to set: '.
 			implode(', ', $locale_variants).'. Unable to translate Zabbix interface.';

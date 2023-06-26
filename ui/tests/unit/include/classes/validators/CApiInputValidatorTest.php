@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1510,6 +1510,60 @@ class CApiInputValidatorTest extends TestCase {
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'host' => ['type' => API_ANY],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'host' => 'Zabbix server',
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				[
+					'name' => 'Zabbix server'
+				]
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
+					'uuid' => ['type' => API_STRING_UTF8, 'in' => '', 'unset' => true],
+					'name' => ['type' => API_STRING_UTF8]
+				]],
+				[
+					'uuid' => '56079badd056419383cc26e6a4fcc7e0',
+					'name' => 'Zabbix server'
+				],
+				'/',
+				'Invalid parameter "/uuid": value must be empty.'
+			],
+			[
+				['type' => API_OBJECT, 'fields' => [
 					'host' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 					'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 				]],
@@ -1797,10 +1851,40 @@ class CApiInputValidatorTest extends TestCase {
 				'Invalid parameter "/": cannot be empty.'
 			],
 			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[],
+				'/',
+				[]
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				'object',
+				'/',
+				'Invalid parameter "/": an array is expected.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[]],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[['field1' => 'value1']],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
+				['type' => API_OBJECTS, 'length' => 0],
+				[[], [], []],
+				'/',
+				'Invalid parameter "/": should be empty.'
+			],
+			[
 				['type' => API_OBJECTS, 'length' => 2, 'fields' => []],
 				[[], [], []],
 				'/',
-				'Invalid parameter "/": value is too long.'
+				'Invalid parameter "/": maximum number of array elements is 2.'
 			],
 			[
 				['type' => API_OBJECTS, 'length' => 3, 'fields' => []],

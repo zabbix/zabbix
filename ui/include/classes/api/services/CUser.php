@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -274,8 +274,8 @@ class CUser extends CApiService {
 		}
 		unset($user);
 
-		self::updateUsersGroups($users, __FUNCTION__);
-		self::updateMedias($users, __FUNCTION__);
+		self::updateGroups($users);
+		self::updateMedias($users);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_USER, $users);
 
@@ -391,29 +391,20 @@ class CUser extends CApiService {
 	public function update(array $users) {
 		$this->validateUpdate($users, $db_users);
 
+		self::updateForce($users, $db_users);
+
+		return ['userids' => array_column($users, 'userid')];
+	}
+
+	/**
+	 * @param array $users
+	 * @param array $db_users
+	 */
+	public static function updateForce(array $users, array $db_users): void {
 		$upd_users = [];
 
 		foreach ($users as $user) {
-			$db_user = $db_users[$user['userid']];
-
-			$upd_user = [];
-
-			// strings
-			$field_names = ['username', 'name', 'surname', 'autologout', 'passwd', 'refresh', 'url', 'lang', 'theme',
-				'timezone'
-			];
-			foreach ($field_names as $field_name) {
-				if (array_key_exists($field_name, $user) && $user[$field_name] !== $db_user[$field_name]) {
-					$upd_user[$field_name] = $user[$field_name];
-				}
-			}
-
-			// integers
-			foreach (['autologin', 'rows_per_page', 'roleid'] as $field_name) {
-				if (array_key_exists($field_name, $user) && $user[$field_name] != $db_user[$field_name]) {
-					$upd_user[$field_name] = $user[$field_name];
-				}
-			}
+			$upd_user = DB::getUpdatedValues('users', $user, $db_users[$user['userid']]);
 
 			if ($upd_user) {
 				$upd_users[] = [
@@ -427,12 +418,10 @@ class CUser extends CApiService {
 			DB::update('users', $upd_users);
 		}
 
-		self::updateUsersGroups($users, 'update', $db_users);
-		self::updateMedias($users, 'update', $db_users);
+		self::updateGroups($users, $db_users);
+		self::updateMedias($users, $db_users);
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
-
-		return ['userids' => array_column($users, 'userid')];
 	}
 
 	/**
@@ -632,10 +621,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Add the existing medias and user groups to $db_users whether these are affected by the update.
-	 *
-	 * @static
-	 *
 	 * @param array $users
 	 * @param array $db_users
 	 */
@@ -1017,51 +1002,46 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "users_groups" and populate users.usrgrps by "id" property.
-	 *
-	 * @static
-	 *
 	 * @param array      $users
-	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private static function updateUsersGroups(array &$users, string $method, array $db_users = null): void {
-		$ins_users_groups = [];
-		$del_ids = [];
+	private static function updateGroups(array &$users, array $db_users = null): void {
+		$ins_groups = [];
+		$del_groupids = [];
 
 		foreach ($users as &$user) {
 			if (!array_key_exists('usrgrps', $user)) {
 				continue;
 			}
 
-			$db_usrgrps = ($method === 'update')
+			$db_groups = $db_users !== null
 				? array_column($db_users[$user['userid']]['usrgrps'], null, 'usrgrpid')
 				: [];
 
-			foreach ($user['usrgrps'] as &$usrgrp) {
-				if (array_key_exists($usrgrp['usrgrpid'], $db_usrgrps)) {
-					$usrgrp['id'] = $db_usrgrps[$usrgrp['usrgrpid']]['id'];
-					unset($db_usrgrps[$usrgrp['usrgrpid']]);
+			foreach ($user['usrgrps'] as &$group) {
+				if (array_key_exists($group['usrgrpid'], $db_groups)) {
+					$group['id'] = $db_groups[$group['usrgrpid']]['id'];
+					unset($db_groups[$group['usrgrpid']]);
 				}
 				else {
-					$ins_users_groups[] = [
+					$ins_groups[] = [
 						'userid' => $user['userid'],
-						'usrgrpid' => $usrgrp['usrgrpid']
+						'usrgrpid' => $group['usrgrpid']
 					];
 				}
 			}
-			unset($usrgrp);
+			unset($group);
 
-			$del_ids = array_merge($del_ids, array_column($db_usrgrps, 'id'));
+			$del_groupids = array_merge($del_groupids, array_column($db_groups, 'id'));
 		}
 		unset($user);
 
-		if ($del_ids) {
-			DB::delete('users_groups', ['id' => $del_ids]);
+		if ($del_groupids) {
+			DB::delete('users_groups', ['id' => $del_groupids]);
 		}
 
-		if ($ins_users_groups) {
-			$ids = DB::insertBatch('users_groups', $ins_users_groups);
+		if ($ins_groups) {
+			$groupids = DB::insert('users_groups', $ins_groups);
 		}
 
 		foreach ($users as &$user) {
@@ -1069,12 +1049,12 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			foreach ($user['usrgrps'] as &$usrgrp) {
-				if (!array_key_exists('id', $usrgrp)) {
-					$usrgrp['id'] = array_shift($ids);
+			foreach ($user['usrgrps'] as &$group) {
+				if (!array_key_exists('id', $group)) {
+					$group['id'] = array_shift($groupids);
 				}
 			}
-			unset($usrgrp);
+			unset($group);
 		}
 		unset($user);
 	}
@@ -1090,7 +1070,7 @@ class CUser extends CApiService {
 	 *
 	 * @return int
 	 */
-	private static function getSimilarMedia(array $medias, $mediatypeid, $sendto) {
+	private static function findMediaIndex(array $medias, $mediatypeid, $sendto) {
 		foreach ($medias as $index => $media) {
 			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
 				return $index;
@@ -1101,16 +1081,10 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Update table "media" and populate users.medias by "mediaid" property. Also this function converts "sendto" to the
-	 * string.
-	 *
-	 * @static
-	 *
 	 * @param array      $users
-	 * @param string     $method
 	 * @param null|array $db_users
 	 */
-	private static function updateMedias(array &$users, string $method, array $db_users = null): void {
+	private static function updateMedias(array &$users, array $db_users = null): void {
 		$ins_medias = [];
 		$upd_medias = [];
 		$del_mediaids = [];
@@ -1120,16 +1094,15 @@ class CUser extends CApiService {
 				continue;
 			}
 
-			$db_medias = ($method === 'update') ? $db_users[$user['userid']]['medias'] : [];
+			$db_medias = $db_users !== null ? $db_users[$user['userid']]['medias'] : [];
 
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);
 
-				$index = self::getSimilarMedia($db_medias, $media['mediatypeid'], $media['sendto']);
+				$index = self::findMediaIndex($db_medias, $media['mediatypeid'], $media['sendto']);
 
 				if ($index != -1) {
 					$db_media = $db_medias[$index];
-
 					$upd_media = DB::getUpdatedValues('media', $media, $db_media);
 
 					if ($upd_media) {
@@ -1658,32 +1631,154 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Check if session id is authenticated.
+	 * Checks if user is authenticated by session ID or by API token.
 	 *
 	 * @param array  $session
-	 * @param string $session[]['sessionid']  (required) session id to be checked
-	 * @param bool   $session[]['extend']     (optional) extend session (update lastaccess time)
+	 * @param string $session[]['sessionid']  Session ID to be checked.
+	 * @param string $session[]['token']      API token to be checked.
+	 * @param bool   $session[]['extend']     Optional. Used with 'sessionid' to extend the user session which updates
+	 *                                        'lastaccess' time.
+	 *
+	 * @throws APIException
 	 *
 	 * @return array
 	 */
 	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('sessions', 'sessionid')],
-			'extend' =>	['type' => API_BOOLEAN, 'default' => true]
+			'sessionid' => ['type' => API_STRING_UTF8],
+			'extend' => ['type' => API_MULTIPLE, 'rules' => [
+				['if' => function (array $data): bool {
+					return !array_key_exists('token', $data);
+				}, 'type' => API_BOOLEAN, 'default' => true],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'token' => ['type' => API_STRING_UTF8]
 		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$sessionid = $session['sessionid'];
+		$sessionid = array_key_exists('sessionid', $session) ? $session['sessionid'] : null;
+		$token = array_key_exists('token', $session) ? $session['token'] : null;
 
-		// access DB only once per page load
-		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
-			return self::$userData;
+		if (($token === null && $sessionid === null) || ($token !== null && $sessionid !== null)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session ID or token is expected.'));
 		}
 
 		$time = time();
 
+		// Access DB only once per page load.
+		if (self::$userData !== null && self::$userData['sessionid'] === $sessionid) {
+			return self::$userData;
+		}
+
+		if ($token !== null) {
+			$db_token = self::tokenAuthentication($token, $time);
+			$userid = $db_token['userid'];
+		}
+		else {
+			$db_session = self::sessionidAuthentication($sessionid);
+			$userid = $db_session['userid'];
+		}
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
+			],
+			'userids' => $userid
+		]);
+
+		$db_user = $db_users[0];
+
+		$permissions = $this->getUserGroupsPermissions($userid);
+
+		$db_user = $this->addExtraFields($db_user, $permissions);
+		$this->setTimezone($db_user['timezone']);
+
+		if ($token !== null) {
+			// Check permissions.
+			if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			DB::update('token', [
+				'values' => ['lastaccess' => $time],
+				'where' => ['tokenid' => $db_token['tokenid']]
+			]);
+		}
+		else {
+			$db_user['sessionid'] = $sessionid;
+			$autologout = timeUnitToSeconds($db_user['autologout']);
+
+			// Check system permissions.
+			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
+					|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
+				DB::delete('sessions', [
+					'status' => ZBX_SESSION_PASSIVE,
+					'userid' => $db_user['userid']
+				]);
+				DB::update('sessions', [
+					'values' => ['status' => ZBX_SESSION_PASSIVE],
+					'where' => ['sessionid' => $sessionid]
+				]);
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
+			}
+
+			if ($session['extend'] && $time != $db_session['lastaccess']) {
+				DB::update('sessions', [
+					'values' => ['lastaccess' => $time],
+					'where' => ['sessionid' => $sessionid]
+				]);
+			}
+		}
+
+		self::$userData = $db_user;
+
+		return $db_user;
+	}
+
+	/**
+	 * Authenticates user based on API token.
+	 *
+	 * @param string $auth_token API token.
+	 * @param int    $time       Current time unix timestamp.
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	private static function tokenAuthentication(string $auth_token, int $time): array {
+		$db_tokens = DB::select('token', [
+			'output' => ['userid', 'expires_at', 'tokenid'],
+			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+		]);
+
+		if (!$db_tokens) {
+			usleep(10000);
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$db_token = $db_tokens[0];
+
+		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
+		}
+
+		return $db_token;
+	}
+
+	/**
+	 * Authenticates user based on session ID.
+	 *
+	 * @param string $sessionid Session ID.
+	 *
+	 * @throws APIException
+	 *
+	 * @return array
+	 */
+	private static function sessionidAuthentication(string $sessionid): array {
 		$db_sessions = DB::select('sessions', [
 			'output' => ['userid', 'lastaccess'],
 			'sessionids' => $sessionid,
@@ -1694,55 +1789,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
 		}
 
-		$db_session = $db_sessions[0];
-
-		$db_users = DB::select('users', [
-			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid'
-			],
-			'userids' => $db_session['userid']
-		]);
-
-		// If user not exists.
-		if (!$db_users) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
-
-		$db_user = $db_users[0];
-		$db_user['sessionid'] = $sessionid;
-
-		$permissions = $this->getUserGroupsPermissions($db_user['userid']);
-
-		$db_user = $this->addExtraFields($db_user, $permissions);
-		$this->setTimezone($db_user['timezone']);
-
-		$autologout = timeUnitToSeconds($db_user['autologout']);
-
-		// Check system permissions.
-		if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-				|| $permissions['users_status'] == GROUP_STATUS_DISABLED) {
-			DB::delete('sessions', [
-				'status' => ZBX_SESSION_PASSIVE,
-				'userid' => $db_user['userid']
-			]);
-			DB::update('sessions', [
-				'values' => ['status' => ZBX_SESSION_PASSIVE],
-				'where' => ['sessionid' => $sessionid]
-			]);
-
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Session terminated, re-login, please.'));
-		}
-
-		if ($session['extend'] && $time != $db_session['lastaccess']) {
-			DB::update('sessions', [
-				'values' => ['lastaccess' => $time],
-				'where' => ['sessionid' => $sessionid]
-			]);
-		}
-
-		self::$userData = $db_user;
-
-		return $db_user;
+		return $db_sessions[0];
 	}
 
 	/**

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,8 +149,6 @@ abstract class CControllerPopupItemTest extends CController {
 			'support_lld_macros' => true
 		],
 		'http_proxy' => [
-			'host' => ['{HOSTNAME}', '{HOST.HOST}', '{HOST.NAME}'],
-			'interface' => ['{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}', '{HOST.CONN}', '{HOST.PORT}'],
 			'item' => ['{ITEM.ID}', '{ITEM.KEY.ORIG}', '{ITEM.KEY}'],
 			'support_user_macros' => true,
 			'support_lld_macros' => true

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,6 @@
 
 
 class CTextArea extends CTag {
-
-	/**
-	 * The "&" symbol in the textarea should be encoded.
-	 *
-	 * @var int
-	 */
-	protected $encStrategy = self::ENC_ALL;
 
 	/**
 	 * Init textarea.

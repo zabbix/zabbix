@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ class CSystemInfoHelper {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
-			'status' => static::getServerStatus($ZBX_SERVER, (int) $ZBX_SERVER_PORT),
+			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
 			'failover_delay' => 0,
 			'float_double_precision' => $DB['DOUBLE_IEEE754']

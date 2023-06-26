@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1232,7 +1232,8 @@ func NewClient(nc net.Conn, cfg *Config, timeout time.Duration, shiftDeadline bo
 		return
 	}
 
-	log.Debugf("connection established using %s", c)
+	// explicit conversion needed to avoid nested calls to logging
+	log.Debugf("connection established using %s", c.String())
 
 	return c, nil
 }
@@ -1352,7 +1353,7 @@ func NewServer(nc net.Conn, cfg *Config, b []byte, timeout time.Duration, shiftD
 		return
 	}
 
-	log.Debugf("connection established using %s", s)
+	log.Debugf("connection established using %s", s.String())
 
 	return s, nil
 }

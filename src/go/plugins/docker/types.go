@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -321,6 +321,11 @@ type MemoryStats struct {
 	PrivateWorkingSet uint64            `json:"privateworkingset"`
 }
 
+// PIDsStats holds pid information.
+type PIDsStats struct {
+	Current uint64 `json:"current"`
+}
+
 // NetworkStats aggregates the network stats of one container
 type NetworkStats struct {
 	RxBytes    uint64 `json:"rx_bytes"`
@@ -340,6 +345,7 @@ type Stats struct {
 	CPUStats    CPUStats    `json:"cpu_stats"`
 	PreCPUStats CPUStats    `json:"precpu_stats"`
 	MemoryStats MemoryStats `json:"memory_stats"`
+	PIDsStats   PIDsStats   `json:"pids_stats"`
 }
 
 // ContainerStats struct

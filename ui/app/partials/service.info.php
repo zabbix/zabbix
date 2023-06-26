@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ if (array_key_exists('slas', $data)) {
 	}
 
 	if ($data['slas_count'] > count($data['slas'])) {
-		$slas[] = (new CDiv('&hellip;'))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
+		$slas[] = (new CDiv(HELLIP()))->addClass(ZBX_STYLE_SERVICE_INFO_VALUE_SLA);
 	}
 }
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env perl
 #
 # Zabbix
-# Copyright (C) 2001-2022 Zabbix SIA
+# Copyright (C) 2001-2023 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License version 2 as
@@ -46,7 +46,7 @@ my %c = (
 
 $c{"before"} = "/*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ $c{"before"} = "/*
 #include \"dbschema.h\"
 #include \"common.h\"
 
-const ZBX_TABLE\ttables[] = {
+ZBX_TABLE\ttables[] = {
 
 #if defined(HAVE_ORACLE)
 #	define ZBX_TYPE_SHORTTEXT_LEN	2048

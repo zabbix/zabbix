@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 	private function getTextOfElements($xpath) {
 		$result = [];
 
-		foreach ($this->webDriver->findElements(WebDriverBy::xpath($xpath)) as $element) {
+		foreach ($this->query('xpath', $xpath)->all() as $element) {
 			$result[] = $element->getText();
 		}
 
@@ -93,16 +93,13 @@ class testPageGraphPrototypes extends CLegacyWebTest {
 		$types = ['Normal', 'Stacked', 'Pie', 'Exploded'];
 		foreach ($graphs as $graph) {
 			// Check the graph names and get graph row in table.
-			$element = $this->webDriver->findElement(WebDriverBy::xpath('//table[@class="list-table"]/tbody'
-					.'//a[text()="'.$graph['name'].'"]/../..')
-			);
+			$element = $this->query('xpath://table[@class="list-table"]/tbody//a[text()="'.$graph['name'].'"]/../..')->one();
 			// Check width value.
-			$this->assertEquals($graph['width'], $element->findElement(WebDriverBy::xpath('./td[3]'))->getText());
+			$this->assertEquals($graph['width'], $element->query('xpath:./td[3]')->one()->getText());
 			// Check height value.
-			$this->assertEquals($graph['height'], $element->findElement(WebDriverBy::xpath('./td[4]'))->getText());
+			$this->assertEquals($graph['height'], $element->query('xpath:./td[4]')->one()->getText());
 			// Check graph type value.
-			$this->assertEquals($types[$graph['graphtype']],
-					$element->findElement(WebDriverBy::xpath('./td[5]'))->getText()
+			$this->assertEquals($types[$graph['graphtype']], $element->query('xpath:./td[5]')->one()->getText()
 			);
 		}
 

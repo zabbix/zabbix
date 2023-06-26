@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -246,7 +246,7 @@ $item_tab
 					(new CTextBox('query_fields[name][#{index}]', '#{name}', $readonly))
 						->setAttribute('placeholder', _('name'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-					'&rArr;',
+					RARR(),
 					(new CTextBox('query_fields[value][#{index}]', '#{value}', $readonly))
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
@@ -396,7 +396,7 @@ $item_tab
 						(new CTextBox('headers[name][#{index}]', '#{name}', $readonly))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						'&rArr;',
+						RARR(),
 						(new CTextBox('headers[value][#{index}]', '#{value}', $readonly, 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),

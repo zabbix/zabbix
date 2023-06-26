@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ else {
 
 	$groupurl = (new CUrl('zabbix.php'))
 		->setArgument('action', 'problem.view')
-		->setArgument('filter_name', '')
+		->setArgument('filter_set', '1')
 		->setArgument('show', TRIGGERS_OPTION_RECENT_PROBLEM)
 		->setArgument('hostids',
 			array_key_exists('hostids', $data['filter']) ? $data['filter']['hostids'] : null

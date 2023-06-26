@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,6 +332,15 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 		*error = zbx_dsprintf(NULL, "Cannot specify headers: %s", curl_easy_strerror(err));
 		goto clean;
 	}
+
+#if LIBCURL_VERSION_NUM >= 0x071304
+	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	{
+		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		goto clean;
+	}
+#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{

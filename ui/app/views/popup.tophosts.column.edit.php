@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,12 +29,9 @@ $form = (new CForm())
 	->setName('tophosts_column')
 	->addStyle('display: none;')
 	->addVar('action', $data['action'])
-	->addVar('update', 1)
-	->addItem(
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	);
+	->addVar('update', 1);
+
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_grid = new CFormGrid();
 
@@ -116,7 +113,7 @@ $form_grid->addItem([
 ]);
 
 $numeric_only_warning = new CSpan([
-	'&nbsp;',
+	NBSP(),
 	makeWarningIcon(_('With this setting only numeric items will be displayed in this column.'))
 ]);
 

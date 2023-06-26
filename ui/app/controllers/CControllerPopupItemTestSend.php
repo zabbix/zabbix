@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -195,6 +195,35 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					elseif ($tokens && $tokens[0]['sign'] !== '-') {
 						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
 							_('should be less than current time')
+						));
+					}
+				}
+			}
+
+			if ($this->item_type == ITEM_TYPE_CALCULATED) {
+				$expression_parser = new CExpressionParser([
+					'usermacros' => true,
+					'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+					'calculated' => true,
+					'host_macro' => true,
+					'empty_host' => true
+				]);
+
+				if ($expression_parser->parse($this->getInput('params_f')) != CParser::PARSE_SUCCESS) {
+					error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+						$expression_parser->getError()
+					));
+				}
+				else {
+					$expression_validator = new CExpressionValidator([
+						'usermacros' => true,
+						'lldmacros' => ($this->getInput('test_type') == self::ZBX_TEST_TYPE_ITEM_PROTOTYPE),
+						'calculated' => true
+					]);
+
+					if (!$expression_validator->validate($expression_parser->getResult()->getTokens())) {
+						error(_s('Incorrect value for field "%1$s": %2$s.', _('Formula'),
+							$expression_validator->getError()
 						));
 					}
 				}

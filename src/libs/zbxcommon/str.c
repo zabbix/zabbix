@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 #endif
 
 static const char	copyright_message[] =
-	"Copyright (C) 2022 Zabbix SIA\n"
+	"Copyright (C) 2023 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <https://www.gnu.org/licenses/>.\n"
 	"This is free software: you are free to change and redistribute it according to\n"
 	"the license. There is NO WARRANTY, to the extent permitted by law.";
@@ -326,7 +326,7 @@ void	zbx_chrcpy_alloc(char **str, size_t *alloc_len, size_t *offset, char c)
 	zbx_strncpy_alloc(str, alloc_len, offset, &c, 1);
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int option)
 {
 	size_t		size;
 	const char	*src;
@@ -337,6 +337,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				size++;
 		}
@@ -365,6 +368,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				*dst++ = '\\';
 				break;
@@ -2957,7 +2963,13 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 	if ('"' == *ptr)	/* quoted parameter */
 	{
 		for (ptr++; '"' != *ptr || '\\' == *(ptr - 1); ptr++)
-			;
+		{
+			if ('\0' == *ptr)
+			{
+				*length = ptr - expr - *param_pos;
+				goto out;
+			}
+		}
 
 		*length = ++ptr - expr - *param_pos;
 
@@ -2972,7 +2984,7 @@ void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *lengt
 
 		*length = ptr - expr - *param_pos;
 	}
-
+out:
 	*sep_pos = ptr - expr;
 }
 
@@ -3446,11 +3458,10 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *                                                                            *
  * Purpose: parses expression macro token                                     *
  *                                                                            *
- * Parameters: expression        - [IN] the expression                        *
- *             macro             - [IN] the beginning of the token            *
- *             simple_macro_find - [IN] pass simple macro flag to             *
- *                                      zbx_token_find()                      *
- *             token             - [OUT] the token data                       *
+ * Parameters: expression    - [IN] the expression                            *
+ *             macro         - [IN] the beginning of the token                *
+ *             token_search - [IN] specify if references will be searched     *
+ *             token         - [OUT] the token data                           *
  *                                                                            *
  * Return value: SUCCEED - the expression macro was parsed successfully       *
  *               FAIL    - macro does not point at valid expression macro     *
@@ -3463,17 +3474,13 @@ static int	token_parse_lld_macro(const char *expression, const char *macro, zbx_
  *           contain user macro contexts and item keys with string arguments. *
  *                                                                            *
  ******************************************************************************/
-static int	token_parse_expression_macro(const char *expression, const char *macro, int simple_macro_find,
+static int	token_parse_expression_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token)
 {
 	const char			*ptr;
 	size_t				offset;
 	zbx_token_expression_macro_t	*data;
 	int				quoted = 0;
-	zbx_token_search_t		token_search = ZBX_TOKEN_SEARCH_BASIC;
-
-	if (0 != simple_macro_find)
-		token_search |= ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
 
 	for (ptr = macro + 2; '\0' != *ptr ; ptr++)
 	{
@@ -3500,6 +3507,7 @@ static int	token_parse_expression_macro(const char *expression, const char *macr
 			if ('?' == ptr[1])
 				continue;
 
+			token_search &= ~ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
 			if (SUCCEED == zbx_token_find(ptr, 0, &tmp, token_search))
 			{
 				switch (tmp.type)
@@ -3971,11 +3979,10 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *                                                                            *
  * Purpose: parses token with nested macros                                   *
  *                                                                            *
- * Parameters: expression        - [IN] the expression                        *
- *             macro             - [IN] the beginning of the token            *
- *             simple_macro_find - [IN] pass simple macro flag to             *
- *                                      zbx_token_find()                      *
- *             token             - [OUT] the token data                       *
+ * Parameters: expression   - [IN] the expression                             *
+ *             macro        - [IN] the beginning of the token                 *
+ *             token_search - [IN] specify if references will be searched     *
+ *             token        - [OUT] the token data                            *
  *                                                                            *
  * Return value: SUCCEED - the token was parsed successfully                  *
  *               FAIL    - macro does not point at valid function or simple   *
@@ -3993,7 +4000,7 @@ static int	token_parse_simple_macro(const char *expression, const char *macro, z
  *           filled with macro specific data.                                 *
  *                                                                            *
  ******************************************************************************/
-static int	token_parse_nested_macro(const char *expression, const char *macro, int simple_macro_find,
+static int	token_parse_nested_macro(const char *expression, const char *macro, zbx_token_search_t token_search,
 		zbx_token_t *token)
 {
 	const char	*ptr;
@@ -4016,22 +4023,15 @@ static int	token_parse_nested_macro(const char *expression, const char *macro, i
 	}
 	else if ('?' == macro[2])
 	{
-		zbx_token_t		expr_token;
-		zbx_token_search_t	token_search;
+		zbx_token_t	expr_token;
 
-		token_search = ZBX_TOKEN_SEARCH_EXPRESSION_MACRO;
-
-		if (0 != simple_macro_find)
-			token_search |= ZBX_TOKEN_SEARCH_SIMPLE_MACRO;
-
-		if (SUCCEED != zbx_token_find(macro, 1, &expr_token, token_search) ||
-				ZBX_TOKEN_EXPRESSION_MACRO != expr_token.type ||
-				1 != expr_token.loc.l)
-		{
+		if (0 == (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
 			return FAIL;
-		}
 
-		ptr = macro + expr_token.loc.r;
+		if (SUCCEED != token_parse_expression_macro(expression, macro + 1, token_search, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
 	}
 	else
 	{
@@ -4056,7 +4056,7 @@ static int	token_parse_nested_macro(const char *expression, const char *macro, i
 		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
 				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
 	}
-	else if (0 != simple_macro_find && '#' != macro[2] && ':' == ptr[1])
+	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
 		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
 
 	return FAIL;
@@ -4159,13 +4159,10 @@ int	zbx_token_find(const char *expression, int pos, zbx_token_t *token, zbx_toke
 				break;
 			case '?':
 				if (0 != (token_search & ZBX_TOKEN_SEARCH_EXPRESSION_MACRO))
-					ret = token_parse_expression_macro(expression, ptr,
-							0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) ? 1 : 0,
-							token);
+					ret = token_parse_expression_macro(expression, ptr, token_search, token);
 				break;
 			case '{':
-				ret = token_parse_nested_macro(expression, ptr,
-						0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) ? 1 : 0, token);
+				ret = token_parse_nested_macro(expression, ptr, token_search, token);
 				break;
 			case '0':
 			case '1':
@@ -4388,6 +4385,25 @@ int	zbx_strmatch_condition(const char *value, const char *pattern, unsigned char
 			break;
 		case CONDITION_OPERATOR_NOT_LIKE:
 			if (NULL == strstr(value, pattern))
+				ret = SUCCEED;
+			break;
+	}
+
+	return ret;
+}
+
+int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned char op)
+{
+	int	ret = FAIL;
+
+	switch (op)
+	{
+		case CONDITION_OPERATOR_EQUAL:
+			if (value == pattern)
+				ret = SUCCEED;
+			break;
+		case CONDITION_OPERATOR_NOT_EQUAL:
+			if (value != pattern)
 				ret = SUCCEED;
 			break;
 	}
@@ -5707,14 +5723,15 @@ const char	*zbx_print_double(char *buffer, size_t size, double val)
  *                                                                            *
  * Purpose: unquotes valid substring at the specified location                *
  *                                                                            *
- * Parameters: src   - [IN] the source string                                 *
- *             left  - [IN] the left substring position 9start)               *
- *             right - [IN] the right substirng position (end)                *
+ * Parameters: src    - [IN] source string                                    *
+ *             left   - [IN] left substring position start)                   *
+ *             right  - [IN] right substring position (end)                   *
+ *             option - [IN] whether to unquote baskslash or not              *
  *                                                                            *
  * Return value: The unquoted and copied substring.                           *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+char	*zbx_substr_unquote_opt(const char *src, size_t left, size_t right, int option)
 {
 	char	*str, *ptr;
 
@@ -5732,6 +5749,8 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 				{
 					case '\\':
 						*ptr++ = '\\';
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+							continue;
 						break;
 					case '"':
 						*ptr++ = '"';
@@ -5740,6 +5759,12 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 						THIS_SHOULD_NEVER_HAPPEN;
 						*ptr = '\0';
 						return str;
+					default:
+						if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+						{
+							*ptr++ = '\\';
+							*ptr++ = *src;
+						}
 				}
 			}
 			else
@@ -5756,6 +5781,22 @@ char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
 	}
 
 	return str;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquotes valid substring at the specified location                *
+ *                                                                            *
+ * Parameters: src   - [IN] source string                                     *
+ *             left  - [IN] left substring position start)                    *
+ *             right - [IN] right substring position (end)                    *
+ *                                                                            *
+ * Return value: The unquoted and copied substring.                           *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_substr_unquote(const char *src, size_t left, size_t right)
+{
+	return zbx_substr_unquote_opt(src, left, right, ZBX_STRQUOTE_DEFAULT);
 }
 
 /******************************************************************************

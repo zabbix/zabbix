@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
  */
 
 $pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']', CWebUser::getLang()))
-	->addCssFile('assets/styles/'.CHtml::encode($data['theme']).'.css')
+	->addCssFile('assets/styles/'.$data['theme'].'.css')
 	->display();
 
 $buttons = array_key_exists('buttons', $data)

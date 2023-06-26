@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -205,27 +205,16 @@ function createFontSelect(string $name): CSelect {
 							->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 						'triggerSelectRow'
 					)
-					->addRow((new CLabel(_('Map'), 'elementName'))->setAsteriskMark(), [
-						(new CTextBox('elementName'))
-							->setReadonly(true)
-							->setId('elementNameMap')
+					->addRow((new CLabel(_('Map'), 'elementNameMap_ms'))->setAsteriskMark(),
+						(new CMultiSelect([
+							'name' => 'elementNameMap',
+							'object_name' => 'sysmaps',
+							'multiple' => false
+						]))
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 							->setAriaRequired(),
-						(new CVar('elements[0][sysmapid]', 0, 'sysmapid')),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						(new CButton(null, _('Select')))
-							->addClass(ZBX_STYLE_BTN_GREY)
-							->onClick(
-								'return PopUp("popup.generic", jQuery.extend('.json_encode([
-									'srctbl' => 'sysmaps',
-									'srcfld1' => 'sysmapid',
-									'srcfld2' => 'name',
-									'dstfrm' => 'selementForm',
-									'dstfld1' => 'sysmapid',
-									'dstfld2' => 'elementNameMap'
-								]).', {excludeids: [#{sysmapid}]}), {dialogue_class: "modal-popup-generic"});'
-							)
-					], 'mapSelectRow')
+						'mapSelectRow'
+					)
 					->addRow(_('Tags'),
 						(new CDiv([
 							(new CTable())
@@ -907,13 +896,10 @@ function createFontSelect(string $name): CSelect {
 <script type="text/x-jquery-tmpl" id="selementFormTriggers">
 	<?= (new CRow([
 			(new CCol([
-				(new CDiv())
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('top: 0px;'),
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
 				(new CSpan())->addClass('ui-icon ui-icon-arrowthick-2-n-s move '.ZBX_STYLE_TD_DRAG_ICON)
 			]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CCol([(new CDiv('#{name}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)]))
-				->addStyle('padding: 0 5px;')
 				->addClass('#{class_name}'),
 			(new CCol([
 				(new CVar('element_id[#{triggerid}]', '#{triggerid}')),

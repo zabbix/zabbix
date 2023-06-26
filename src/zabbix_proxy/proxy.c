@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1070,6 +1070,16 @@ static void	zbx_check_db(void)
 	zbx_free(db_version_info.friendly_current_version);
 }
 
+#ifdef HAVE_ORACLE
+static void	zbx_check_db_tables(void)
+{
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_db_table_prepare("items", NULL);
+	zbx_db_table_prepare("item_preproc", NULL);
+	DBclose();
+}
+#endif
+
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
 	zbx_socket_t	listen_sock;
@@ -1262,7 +1272,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	if (SUCCEED != DBcheck_version())
 		exit(EXIT_FAILURE);
-
+#ifdef HAVE_ORACLE
+	zbx_check_db_tables();
+#endif
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_HEARTBEAT_FORKS + CONFIG_DATASENDER_FORKS
 			+ CONFIG_POLLER_FORKS + CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS
 			+ CONFIG_PINGER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_HTTPPOLLER_FORKS

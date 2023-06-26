@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ $widget = (new CWidget())
 							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
 						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add', ZWSPACE()))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),

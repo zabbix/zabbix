@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,13 +92,10 @@ class CWidgetField {
 			case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 			case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+			case ZBX_WIDGET_FIELD_TYPE_MAP:
 			case ZBX_WIDGET_FIELD_TYPE_SERVICE:
 			case ZBX_WIDGET_FIELD_TYPE_SLA:
 				$this->validation_rules = ['type' => API_IDS];
-				break;
-
-			case ZBX_WIDGET_FIELD_TYPE_MAP:
-				$this->validation_rules = ['type' => API_ID];
 				break;
 
 			default:

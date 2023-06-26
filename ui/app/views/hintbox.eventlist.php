@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,13 +41,11 @@ if (array_key_exists('problems', $data)) {
 	if ($data['trigger']['url'] !== '') {
 		$trigger_url = CHtmlUrlValidator::validate($data['trigger']['url'], ['allow_user_macro' => false])
 			? $data['trigger']['url']
-			: 'javascript: alert(\''._s('Provided URL "%1$s" is invalid.',
-				json_encode($data['trigger']['url'])).
-			'\');';
+			: 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $data['trigger']['url'])).');';
 
 		$div->addItem(
 			(new CDiv())
-				->addItem(new CLink(CHtml::encode($data['trigger']['url']), $trigger_url))
+				->addItem(new CLink($data['trigger']['url'], $trigger_url))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addStyle('max-width: 500px')
 		);

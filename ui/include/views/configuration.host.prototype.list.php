@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	$name[] = makeHostPrototypeTemplatePrefix($hostPrototype['hostid'], $data['parent_templates'],
 		$data['allowed_ui_conf_templates']
 	);
-	$name[] = new CLink(CHtml::encode($hostPrototype['name']),
+	$name[] = new CLink($hostPrototype['name'],
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])

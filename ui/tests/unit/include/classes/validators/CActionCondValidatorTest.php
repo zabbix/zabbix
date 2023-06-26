@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,10 +133,6 @@ class CActionCondValidatorTest extends CValidatorTest {
 			]],
 			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
-				'value' => 'abc'
-			]],
-			[[], [
-				'conditiontype' => CONDITION_TYPE_DUPTIME,
 				'value' => 'abc'
 			]],
 			[[], [
@@ -386,6 +382,13 @@ class CActionCondValidatorTest extends CValidatorTest {
 				[
 					'conditiontype' => 11 /* CONDITION_TYPE_DUPTIME */,
 					'value' => 2592001 /* SEC_PER_MONTH + 1 */
+				],
+				'Incorrect value for field "value": value must be between "0" and "2592000".'
+			],
+			[[],
+				[
+					'conditiontype' => 11 /* CONDITION_TYPE_DUPTIME */,
+					'value' => 'abc'
 				],
 				'Incorrect value for field "value": value must be between "0" and "2592000".'
 			],

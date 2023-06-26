@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -302,7 +302,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_STOP_YES => CXmlConstantName::LLD_OVERRIDE_STOP_YES
 	];
 
-	private $EVALTPYE = [
+	private $EVALTYPE = [
 		CXmlConstantValue::AND_OR => CXmlConstantName::AND_OR,
 		CXmlConstantValue::XML_AND => CXmlConstantName::XML_AND,
 		CXmlConstantValue::XML_OR => CXmlConstantName::XML_OR,
@@ -547,7 +547,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
@@ -825,7 +825,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -1157,7 +1157,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 							'publickey' =>				['type' => XML_STRING, 'default' => ''],
 							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
 							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
-								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 								'formula' =>				['type' => XML_STRING, 'default' => ''],
 								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
 									'condition' =>				['type' => XML_ARRAY, 'rules' => [
@@ -1433,7 +1433,7 @@ class C50XmlValidator extends CXmlValidatorGeneral {
 									'step' =>					['type' => XML_STRING | XML_REQUIRED],
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
-										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTPYE],
+										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
 										'formula' =>				['type' => XML_STRING, 'default' => ''],
 										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
 											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [

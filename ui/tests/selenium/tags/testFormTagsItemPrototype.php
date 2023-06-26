@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,7 @@ class testFormTagsItemPrototype extends testFormTags {
 		$this->host = 'Host with tags for cloning';
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->host.':trap_discovery');
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=host';
-		$this->executeFullCloning('item prototype', 'Host');
+		$this->executeCloningByParent('item prototype', 'Host');
 	}
 
 	/**
@@ -84,7 +84,7 @@ class testFormTagsItemPrototype extends testFormTags {
 		$discoveryruleid = CDataHelper::get('EntitiesTags.discoveryruleids.'.$this->template.':template_trap_discovery');
 		$this->link = 'disc_prototypes.php?parent_discoveryid='.$discoveryruleid.'&context=template';
 		$this->clone_name = 'Template item prototype with tags for full cloning: {#KEY}';
-		$this->executeFullCloning('item prototype', 'Template');
+		$this->executeCloningByParent('item prototype', 'Template');
 	}
 
 	/**

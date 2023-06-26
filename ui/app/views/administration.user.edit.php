@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -432,7 +432,7 @@ if ($data['action'] === 'user.edit') {
 				if (array_key_exists('grouped', $group_rights) && $group_rights['grouped']) {
 					$group_name = ($groupid == 0)
 						? italic(_('All groups'))
-						: [$group_rights['name'], '&nbsp;', italic('('._('including subgroups').')')];
+						: [$group_rights['name'], NBSP(), italic('('._('including subgroups').')')];
 				}
 				else {
 					$group_name = $group_rights['name'];

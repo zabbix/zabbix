@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -672,12 +672,6 @@
 					for (const td of ui.find('>td')) {
 						const $td = $(td);
 						$td.attr('width', $td.width())
-					}
-
-					// When dragging element on safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
 					}
 
 					return ui;

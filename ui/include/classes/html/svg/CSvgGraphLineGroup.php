@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ class CSvgGraphLineGroup extends CSvgGroup {
 
 	public function toString($destroy = true) {
 		$this->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
-			->setAttribute('data-metric', CHtml::encode($this->metric['name']))
+			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-color', $this->options['color'])
 			->addItem((new CSvgCircle(-10, -10, $this->options['width'] + 4))
 				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE))

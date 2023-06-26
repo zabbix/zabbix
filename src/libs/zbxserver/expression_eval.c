@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2022 Zabbix SIA
+ ** Copyright (C) 2001-2023 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, z
 			return item;
 	}
 
-	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_group_t));
+	item = (zbx_expression_item_t *)zbx_malloc(NULL, sizeof(zbx_expression_item_t));
 	item->itemid = itemid;
 	zbx_vector_ptr_create(&item->tags);
 	zbx_dc_get_item_tags(itemid, &item->tags);
@@ -1002,7 +1002,8 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 						args[i].data.dbl);
 				break;
 			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				zbx_strquote_alloc_opt(&params, &params_alloc, &params_offset, args[i].data.str,
+						ZBX_STRQUOTE_SKIP_BACKSLASH);
 				break;
 			case ZBX_VARIANT_UI64:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,
@@ -1635,11 +1636,15 @@ static int	expression_eval_many(zbx_expression_eval_t *eval, zbx_expression_quer
 
 		zbx_history_record_vector_create(&values);
 
-		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts) &&
-				0 < values.values_num)
+		if (SUCCEED == zbx_vc_get_values(dcitem->itemid, dcitem->value_type, &values, seconds, count, ts))
 		{
-			evaluate_history_func(&values, dcitem->value_type, item_func, &result);
-			zbx_vector_dbl_append(results_vector, result);
+			if (0 < values.values_num)
+			{
+				evaluate_history_func(&values, dcitem->value_type, item_func, &result);
+				zbx_vector_dbl_append(results_vector, result);
+			}
+			else if (ZBX_VALUE_FUNC_COUNT == item_func)
+				zbx_vector_dbl_append(results_vector, 0);
 		}
 
 		zbx_history_record_vector_destroy(&values, dcitem->value_type);

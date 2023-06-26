@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,18 +27,6 @@ class CWidgetProblemsBySv extends CWidget {
 			...this._events,
 
 			acknowledgeCreated: (e, response) => {
-				for (let i = overlays_stack.length - 1; i >= 0; i--) {
-					const overlay = overlays_stack.getById(overlays_stack.stack[i]);
-
-					if (overlay.type === 'hintbox') {
-						const element = overlay.element instanceof jQuery ? overlay.element[0] : overlay.element;
-
-						if (this._content_body.contains(element)) {
-							hintBox.deleteHint(overlay.element);
-						}
-					}
-				}
-
 				clearMessages();
 
 				addMessage(makeMessageBox('good', [], response.message, true, false));

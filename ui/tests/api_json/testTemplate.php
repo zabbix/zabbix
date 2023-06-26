@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -272,7 +272,7 @@ class testTemplate extends CAPITest {
 					['templateid' => $templateids[2]]
 				]
 			]
-		], 'Cannot link template "test-template-double-link-01" to template "test-template-double-link-04", because its parent template "test-template-double-link-01" would be linked twice.');
+		], 'Cannot link template "test-template-double-link-03" to template "test-template-double-link-04", because its parent template "test-template-double-link-01" would be linked twice.');
 	}
 
 	public function testTemplate_CreateTriggerDependency() {

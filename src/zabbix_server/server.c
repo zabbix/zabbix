@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -626,9 +626,6 @@ static void	zbx_set_defaults(void)
 
 	if (0 != CONFIG_REPORTWRITER_FORKS)
 		CONFIG_REPORTMANAGER_FORKS = 1;
-
-	if (NULL == CONFIG_NODE_ADDRESS)
-		CONFIG_NODE_ADDRESS = zbx_strdup(CONFIG_NODE_ADDRESS, "localhost");
 }
 
 /******************************************************************************
@@ -688,8 +685,9 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
-			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address)))
+	if (NULL != CONFIG_NODE_ADDRESS &&
+			(FAIL == parse_serveractive_element(CONFIG_NODE_ADDRESS, &address, &port, 10051) ||
+			(FAIL == is_supported_ip(address) && FAIL == zbx_validate_hostname(address))))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"NodeAddress\" configuration parameter: address \"%s\""
 				" is invalid", CONFIG_NODE_ADDRESS);
@@ -1168,6 +1166,13 @@ static void	zbx_check_db(void)
 			zbx_tsdb_update_dbversion_info(&db_version_info);
 #endif
 
+#ifdef HAVE_ORACLE
+		zbx_json_init(&db_version_info.tables_json, ZBX_JSON_STAT_BUF_LEN);
+
+		zbx_db_table_prepare("items", &db_version_info.tables_json);
+		zbx_db_table_prepare("item_preproc", &db_version_info.tables_json);
+		zbx_json_close(&db_version_info.tables_json);
+#endif
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == result)
@@ -1960,13 +1965,6 @@ void	zbx_on_exit(int ret)
 		zbx_locks_disable();
 #endif
 
-	if (ZBX_NODE_STATUS_ACTIVE == ha_status)
-	{
-		DBconnect(ZBX_DB_CONNECT_EXIT);
-		free_database_cache(ZBX_SYNC_ALL);
-		DBclose();
-	}
-
 	if (SUCCEED != zbx_ha_stop(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot stop HA manager: %s", error);
@@ -1978,6 +1976,11 @@ void	zbx_on_exit(int ret)
 	{
 		free_metrics();
 		zbx_ipc_service_free_env();
+
+		DBconnect(ZBX_DB_CONNECT_EXIT);
+		free_database_cache(ZBX_SYNC_ALL);
+		DBclose();
+
 		free_configuration_cache();
 
 		/* free history value cache */

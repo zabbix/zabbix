@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ foreach ($data['graphs'] as $graph) {
 	$name[] = makeGraphTemplatePrefix($graphid, $data['parent_templates'], $flag, $data['allowed_ui_conf_templates']);
 
 	if ($graph['discoveryRule'] && $data['parent_discoveryid'] === null) {
-		$name[] = (new CLink(CHtml::encode($graph['discoveryRule']['name']),
+		$name[] = (new CLink($graph['discoveryRule']['name'],
 			(new CUrl('host_discovery.php'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $graph['discoveryRule']['itemid'])
@@ -199,7 +199,7 @@ foreach ($data['graphs'] as $graph) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
 	}
 
-	$name[] = new CLink(CHtml::encode($graph['name']), $url);
+	$name[] = new CLink($graph['name'], $url);
 	$info_icons = [];
 	$discover = null;
 

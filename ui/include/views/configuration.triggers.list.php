@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -223,7 +223,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
-			CHtml::encode($trigger['discoveryRule']['name']),
+			$trigger['discoveryRule']['name'],
 			(new CUrl('trigger_prototypes.php'))
 				->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
@@ -234,7 +234,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	}
 
 	$description[] = (new CLink(
-		CHtml::encode($trigger['description']),
+		$trigger['description'],
 		(new CUrl('triggers.php'))
 			->setArgument('form', 'update')
 			->setArgument('triggerid', $triggerid)
@@ -248,9 +248,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dep_trigger = $data['dep_triggers'][$dependency['triggerid']];
 
-			$dep_trigger_desc = CHtml::encode(
-				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description']
-			);
+			$dep_trigger_desc =
+				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
 			$trigger_deps[] = (new CLink($dep_trigger_desc,
 				(new CUrl('triggers.php'))

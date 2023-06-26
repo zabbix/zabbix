@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -113,6 +113,7 @@ class CPage {
 		}
 
 		$this->driver = RemoteWebDriver::create('http://'.$phpunit_driver_address.'/wd/hub', $capabilities);
+		$this->driver->setCommandExecutor(new CommandExecutor($this->driver->getCommandExecutor()));
 
 		$this->driver->manage()->window()->setSize(
 				new WebDriverDimension(self::DEFAULT_PAGE_WIDTH, self::DEFAULT_PAGE_HEIGHT)
@@ -445,9 +446,11 @@ class CPage {
 
 	/**
 	 * Wait until page is ready.
+	 *
+	 * @param integer $timeout    timeout in seconds
 	 */
-	public function waitUntilReady() {
-		return (new CElementQuery(null))->waitUntilReady();
+	public function waitUntilReady($timeout = null) {
+		return (new CElementQuery(null))->waitUntilReady($timeout);
 	}
 
 	/**

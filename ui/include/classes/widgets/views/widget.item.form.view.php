@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,7 @@ $form_list = CWidgetHelper::createFormList($data['dialogue']['name'], $data['dia
 
 $scripts = [];
 
-$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['ms']['items']['itemid'],
-	$form->getName()
-);
+$field_itemid = CWidgetHelper::getItem($fields['itemid'], $data['captions']['items']['itemid'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field_itemid);
 $scripts[] = $field_itemid->getPostJS();
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,12 @@ class CWidgetSvgGraph extends CWidget {
 
 		this._has_contents = false;
 		this._svg_options = {};
+	}
+
+	_doStart() {
+		super._doStart();
+
+		this._content_body.classList.add('dashboard-grid-widget-svggraph');
 	}
 
 	_doActivate() {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,28 +22,25 @@
 class CTag extends CObject {
 
 	/**
-	 * Encodes the '<', '>', '"' and '&' symbols.
-	 */
-	const ENC_ALL = 1;
-
-	/**
-	 * Encodes all symbols in ENC_ALL except for '&'.
-	 */
-	const ENC_NOAMP = 2;
-
-	/**
-	 * The HTML encoding strategy to use for the contents of the tag.
+	 * The list of tag attributes.
 	 *
-	 * @var int
+	 * @var array
 	 */
-	protected $encStrategy = self::ENC_NOAMP;
+	protected $attributes = [];
 
 	/**
-	 * The HTML encoding strategy for the "value", "name" and "id" attributes.
+	 * The name of the tag.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	protected $attrEncStrategy = self::ENC_ALL;
+	protected $tagname = '';
+
+	/**
+	 * The type of tag.
+	 *
+	 * @var bool
+	 */
+	private $paired = false;
 
 	/**
 	 * Hint element for the current CTag.
@@ -52,10 +49,9 @@ class CTag extends CObject {
 	 */
 	protected $hint = null;
 
-	public function __construct($tagname, $paired = false, $body = null) {
+	public function __construct(string $tagname, bool $paired = false, $body = null) {
 		parent::__construct();
 
-		$this->attributes = [];
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
@@ -64,22 +60,16 @@ class CTag extends CObject {
 		}
 	}
 
-	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	protected function startToString() {
-		$res = '<'.$this->tagname;
+		$attributes = '';
+
 		foreach ($this->attributes as $key => $value) {
-			if ($value === null) {
-				continue;
+			if ($value !== null) {
+				$attributes .= ' '.$key.'="'.htmlspecialchars($value, ENT_QUOTES, 'UTF-8').'"';
 			}
-
-			// a special encoding strategy should be used for the "value", "name" and "id" attributes
-			$strategy = in_array($key, ['value', 'name', 'id'], true) ? $this->attrEncStrategy : $this->encStrategy;
-			$value = $this->encode($value, $strategy);
-			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= '>';
 
-		return $res;
+		return '<'.$this->tagname.$attributes.'>';
 	}
 
 	protected function bodyToString() {
@@ -109,9 +99,8 @@ class CTag extends CObject {
 	}
 
 	public function addItem($value) {
-		// the string contents of an HTML tag should be properly encoded
 		if (is_string($value)) {
-			$value = $this->encode($value, $this->getEncStrategy());
+			$value = htmlspecialchars($value, ENT_NOQUOTES, 'UTF-8');
 		}
 
 		parent::addItem($value);
@@ -149,7 +138,7 @@ class CTag extends CObject {
 			$value = unpack_object($value);
 		}
 		elseif (is_array($value)) {
-			$value = CHtml::serialize($value);
+			$value = json_encode($value);
 		}
 		$this->attributes[$name] = $value;
 		return $this;
@@ -270,7 +259,7 @@ class CTag extends CObject {
 			$this->attributes['style'] = '';
 		}
 		if (isset($value)) {
-			$this->attributes['style'] .= htmlspecialchars(strval($value));
+			$this->attributes['style'] .= $value;
 		}
 		else {
 			unset($this->attributes['style']);
@@ -306,40 +295,6 @@ class CTag extends CObject {
 		$this->removeAttribute('id');
 
 		return $this;
-	}
-
-	/**
-	 * Sanitizes a string according to the given strategy before outputting it to the browser.
-	 *
-	 * @param string	$value
-	 * @param int		$strategy
-	 *
-	 * @return string
-	 */
-	protected function encode($value, $strategy = self::ENC_NOAMP) {
-		if ($strategy == self::ENC_NOAMP) {
-			$value = str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], $value);
-		}
-		else {
-			$value = CHtml::encode($value);
-		}
-
-		return $value;
-	}
-
-	/**
-	 * @param int $encStrategy
-	 */
-	public function setEncStrategy($encStrategy) {
-		$this->encStrategy = $encStrategy;
-		return $this;
-	}
-
-	/**
-	 * @return int
-	 */
-	public function getEncStrategy() {
-		return $this->encStrategy;
 	}
 
 	/**

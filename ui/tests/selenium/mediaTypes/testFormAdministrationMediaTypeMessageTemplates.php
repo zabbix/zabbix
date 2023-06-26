@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -847,7 +847,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		}
 		$this->query('id:media-type-form')->asForm()->one()->submit();
 		// Open message template list of the edited media type and check that message template updates took place.
-		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
+		$this->query('link', $data['media_type'])->waitUntilClickable()->one()->click();
 		$media_form = $this->query('id:media-type-form')->asForm()->one();
 		$media_form->selectTab('Message templates');
 		$templates_list->invalidate();

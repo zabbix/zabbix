@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,8 +28,8 @@ $widget_view = include('include/classes/widgets/views/widget.'.$data['dialogue']
 $form = $widget_view['form']
 	->addClass('dashboard-grid-widget-'.$data['dialogue']['type']);
 
-// Submit button is needed to enable submit event on Enter on inputs.
-$form->addItem((new CInput('submit', 'dashboard_widget_config_submit'))->addStyle('display: none;'));
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $output = [
 	'header' => $data['unique_id'] !== null ? _s('Edit widget') : _s('Add widget'),

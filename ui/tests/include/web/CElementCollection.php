@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -305,6 +305,24 @@ class CElementCollection implements Iterator {
 		}
 
 		return $values;
+	}
+
+	/**
+	 * Apply element query to every element of a collection.
+	 *
+	 * @param mixed  $type     selector type (method) or selector
+	 * @param string $locator  locator part of selector
+	 *
+	 * @return CElementCollection
+	 */
+	public function query($type, $locator = null) {
+		$values = [];
+
+		foreach ($this->elements as $element) {
+			$values = array_merge($values, $element->query($type, $locator)->all()->asArray());
+		}
+
+		return new CElementCollection($values);
 	}
 
 	/**

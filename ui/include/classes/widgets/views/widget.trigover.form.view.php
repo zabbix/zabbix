@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,18 +38,14 @@ $scripts = [];
 $form_list->addRow(CWidgetHelper::getLabel($fields['show']), CWidgetHelper::getRadioButtonList($fields['show']));
 
 // Host groups.
-$field_groupids = CWidgetHelper::getGroup($fields['groupids'],
-	$data['captions']['ms']['groups']['groupids'],
+$field_groupids = CWidgetHelper::getGroup($fields['groupids'], $data['captions']['groups']['groupids'],
 	$form->getName()
 );
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['groupids']), $field_groupids);
 $scripts[] = $field_groupids->getPostJS();
 
 // Hosts.
-$field_hostids = CWidgetHelper::getHost($fields['hostids'],
-	$data['captions']['ms']['hosts']['hostids'],
-	$form->getName()
-);
+$field_hostids = CWidgetHelper::getHost($fields['hostids'], $data['captions']['hosts']['hostids'], $form->getName());
 $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['hostids']), $field_hostids);
 $scripts[] = $field_hostids->getPostJS();
 

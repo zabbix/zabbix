@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2021 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,7 @@ class testFormServicesSla extends CWebTest {
 		$form->checkValue($default_values);
 
 		// Check that all locales are present in the dropdown.
-		$this->assertEquals(426, count($form->getField('Time zone')->getOptions()->asText()));
+		$this->assertEquals(427, count($form->getField('Time zone')->getOptions()->asText()));
 
 		// Check that mandatory fields are marked accordingly.
 		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {
@@ -1026,7 +1026,7 @@ class testFormServicesSla extends CWebTest {
 
 					$downtimes_form->submit();
 
-					if ($expected === TEST_GOOD) {
+					if ($expected === TEST_GOOD || !array_key_exists('downtime_error', $data)) {
 						$downtimes_form->waitUntilNotVisible();
 
 						// Make sure that row was added to table.

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,9 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('class.calendar.js');
@@ -65,6 +67,7 @@ $filter_form = (new CFormList())
 					'srcfld1' => 'userid',
 					'srcfld2' => 'fullname',
 					'dstfrm' => 'zbx_filter',
+					'context' => 'audit',
 					'dstfld1' => 'filter_userids_'
 				]
 			]

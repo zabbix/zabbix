@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,6 +69,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			[
 				'name' => 'Dashboard for SLA report widget tests',
 				'private' => 0,
+				'auto_start' => 1,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',

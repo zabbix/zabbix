@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2023 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -90,7 +90,7 @@ foreach ($data['proxies'] as $proxy) {
 
 	foreach ($proxy['hosts'] as $host) {
 		if (++$i > $data['config']['max_in_table']) {
-			$hosts[] = ' &hellip;';
+			$hosts[] = [' ', HELLIP()];
 
 			break;
 		}
