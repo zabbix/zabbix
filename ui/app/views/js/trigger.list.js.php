@@ -29,7 +29,7 @@
 </script>
 
 <script>
-	const view = {
+	const view = new class {
 		init({checkbox_hash, checkbox_object, context}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
@@ -47,10 +47,10 @@
 				new CTagFilterItem(row);
 			});
 
-			this._initActions();
-		},
+			this.#initActions();
+		}
 
-		_initActions() {
+		#initActions() {
 			document.getElementById('filter_state').addEventListener('change', () => {
 				const filter_state = document.querySelector('input[name=filter_state]:checked').value;
 				const filter_status_fields = document.getElementsByName('filter_status');
@@ -82,34 +82,37 @@
 
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'js-create') {
-					this._edit({'hostid': e.target.dataset.hostid, 'context': this.context})
+					this.#edit({'hostid': e.target.dataset.hostid, 'context': this.context})
 				}
 				else if (e.target.classList.contains('js-trigger-edit')) {
-					this._edit({
+					this.#edit({
 						'triggerid': e.target.dataset.triggerid,
 						'hostid': e.target.dataset.hostid,
 						'context': this.context
 					})
 				}
 				else if (e.target.classList.contains('js-massenable-trigger')) {
-					this._enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-enable-trigger')) {
-					this._enable(e.target, [e.target.dataset.triggerid]);
+					this.#enable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-massdisable-trigger')) {
-					this._disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-disable-trigger')) {
-					this._disable(e.target, [e.target.dataset.triggerid]);
+					this.#disable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-massdelete-trigger')) {
-					this._delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
+				else if (e.target.classList.contains('js-massupdate-trigger')) {
+					this.#massupdateTrigger(e.target);
 				}
 			})
-		},
+		}
 
-		_edit(parameters = {}) {
+		#edit(parameters = {}) {
 			const overlay = PopUp('trigger.edit', parameters, {
 				dialogueid: 'trigger-edit',
 				dialogue_class: 'modal-popup-medium',
@@ -135,9 +138,9 @@
 
 				location.href = location.href;
 			});
-		},
+		}
 
-		_enable(target, triggerids) {
+		#enable(target, triggerids) {
 			const confirmation = triggerids.length > 1
 				? <?= json_encode(_('Enable selected triggers?')) ?>
 				: <?= json_encode(_('Enable selected trigger?')) ?>;
@@ -149,10 +152,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.enable');
 
-			this._post(target, triggerids, curl);
-		},
+			this.#post(target, triggerids, curl);
+		}
 
-		_disable(target, triggerids) {
+		#disable(target, triggerids) {
 			const confirmation = triggerids.length > 1
 				? <?= json_encode(_('Disable selected triggers?')) ?>
 				: <?= json_encode(_('Disable selected trigger?')) ?>;
@@ -164,10 +167,10 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.disable');
 
-			this._post(target, triggerids, curl);
-		},
+			this.#post(target, triggerids, curl);
+		}
 
-		_delete(target, triggerids) {
+		#delete(target, triggerids) {
 			const confirmation = triggerids.length > 1
 				? <?= json_encode(_('Delete selected triggers?')) ?>
 				: <?= json_encode(_('Delete selected trigger?')) ?>;
@@ -179,10 +182,20 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.delete');
 
-			this._post(target, triggerids, curl);
-		},
+			this.#post(target, triggerids, curl);
+		}
 
-		_post(target, triggerids, url) {
+		#massupdateTrigger(target) {
+			openMassupdatePopup('massupdate.trigger', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
+					<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+				}, {
+				dialogue_class: 'modal-popup-static',
+				trigger_element: target
+			});
+		}
+
+
+		#post(target, triggerids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			);
@@ -227,14 +240,14 @@
 				.finally(() => {
 					target.classList.remove('is-loading');
 				});
-		},
+		}
 
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};
 
 			this.openHostPopup(host_data);
-		},
+		}
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
@@ -244,13 +257,35 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			['dialogue.create', 'dialogue.update', 'dialogue.delete'].forEach((event_type) => {
+				overlay.$dialogue[0].addEventListener(event_type, (e) => {
+					const data = e.detail;
+
+					if ('success' in data) {
+						postMessageOk(data.success.title);
+
+						if ('messages' in data.success) {
+							postMessageDetails('success', data.success.messages);
+						}
+					}
+
+					if (event_type === 'dialogue.delete') {
+						const curl = new Curl('zabbix.php');
+						curl.setArgument('action', 'host.list');
+
+						location.href = curl.getUrl();
+					}
+					else {
+						location.href = location.href;
+					}
+
+				}, {once: true});
+			});
+
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
-		},
+		}
 
 		openCopyPopup() {
 			const parameters = {
@@ -262,39 +297,6 @@
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
 			});
-		},
-
-		events: {
-			hostSuccess(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			},
-
-			hostDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
-			}
 		}
 	};
 </script>

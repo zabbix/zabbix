@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateTrigger extends CController {
+class CControllerMassupdateTrigger extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -251,7 +251,8 @@ class CControllerPopupMassupdateTrigger extends CController {
 						->setArgument('parent_discoveryid', $this->getInput('parent_discoveryid', 0))
 						->setArgument('context', $this->getInput('context'))
 						->getUrl()
-					: (new CUrl('triggers.php'))
+					: (new CUrl('zabbix.php'))
+						->setArgument('action', 'trigger.list')
 						->setArgument('context', $this->getInput('context'))
 						->getUrl()
 			];

@@ -30,7 +30,7 @@ $form = (new CForm())
 		$data['prototype'] ? 'triggerprototype' : 'trigger'
 	)))->removeId())
 	->setId('massupdate-form')
-	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'popup.massupdate.trigger')
+	->addVar('action', $data['prototype'] ? 'popup.massupdate.triggerprototype' : 'massupdate.trigger')
 	->addVar('ids', $data['ids'])
 	->addVar('update', '1')
 	->addVar('location_url', $data['location_url'])
