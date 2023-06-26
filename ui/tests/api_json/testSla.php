@@ -835,7 +835,7 @@ class testSla extends CAPITest {
 							'tag' => 'tag',
 							'operator' => ZBX_SLA_SERVICE_TAG_OPERATOR_LIKE,
 							'value' => 'value'
-						],
+						]
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1/service_tags/2": value (tag, value)=(tag, value) already exists.'
@@ -1648,7 +1648,7 @@ class testSla extends CAPITest {
 					],
 					'excluded_downtimes' => [
 						[
-							'name' => 'Mail Serever upgrade',
+							'name' => 'Mail Serever upgrade'
 						]
 					]
 				],
@@ -2907,7 +2907,7 @@ class testSla extends CAPITest {
 						[
 							'period_from' => 0,
 							'period_to' => 1
-						],
+						]
 					],
 					'excluded_downtimes' => [
 						[
@@ -2949,7 +2949,7 @@ class testSla extends CAPITest {
 						[
 							'period_from' => 0,
 							'period_to' => 1
-						],
+						]
 					],
 					'excluded_downtimes' => [
 						[
@@ -3505,8 +3505,7 @@ class testSla extends CAPITest {
 					'output' => null
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/output": an array or a character string is expected.',
-
+					'error' => 'Invalid parameter "/output": an array or a character string is expected.'
 				]
 			],
 			'SLA output bool' => [
@@ -3514,8 +3513,7 @@ class testSla extends CAPITest {
 					'output' => true
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/output": an array or a character string is expected.',
-
+					'error' => 'Invalid parameter "/output": an array or a character string is expected.'
 				]
 			],
 			'SLA output empty/string' => [
@@ -3523,8 +3521,7 @@ class testSla extends CAPITest {
 					'output' => ''
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/output": value must be "extend".',
-
+					'error' => 'Invalid parameter "/output": value must be "extend".'
 				]
 			],
 			'SLA output negative int' => [
@@ -3532,8 +3529,7 @@ class testSla extends CAPITest {
 					'output' => -1
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/output": an array or a character string is expected.',
-
+					'error' => 'Invalid parameter "/output": an array or a character string is expected.'
 				]
 			],
 			'SLA output float' => [
@@ -3541,8 +3537,7 @@ class testSla extends CAPITest {
 					'output' => 1.1
 				],
 				'expected' => [
-					'error' => 'Invalid parameter "/output": an array or a character string is expected.',
-
+					'error' => 'Invalid parameter "/output": an array or a character string is expected.'
 				]
 			],
 			'SLA output float' => [
@@ -3552,8 +3547,7 @@ class testSla extends CAPITest {
 				'expected' => [
 					'error' => 'Invalid parameter "/output/1": value must be one of "'.implode('", "', [
 						'slaid', 'name', 'period', 'slo', 'effective_date', 'timezone', 'status', 'description'
-					]).'".',
-
+					]).'".'
 				]
 			],
 			'SLA output multiaray' => [
@@ -3922,7 +3916,7 @@ class testSla extends CAPITest {
 				'expected' => [
 					'error' => 'Invalid parameter "/preservekeys": a boolean is expected.'
 				]
-			],
+			]
 		];
 	}
 
@@ -4536,7 +4530,7 @@ class testSla extends CAPITest {
 				'expected' => [
 					'error' => null
 				]
-			],
+			]
 		];
 	}
 
@@ -4943,7 +4937,7 @@ class testSla extends CAPITest {
 		return [
 			'SLA without services' => [
 				'request' => [
-					'slaid' => 50041,
+					'slaid' => 50041
 				],
 				'expected' => [
 					'error' => null,
@@ -4967,7 +4961,7 @@ class testSla extends CAPITest {
 						'sli' => []
 					]
 				]
-			],
+			]
 		];
 	}
 
