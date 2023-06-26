@@ -235,29 +235,26 @@ class CSVGGauge {
 				pos_new = (value_in_range - this.#config.min) / (this.#config.max - this.#config.min);
 			}
 
-			let current_color = '';
+			let color_new = '';
+			let threshold_pos_start = 0;
 
-			if (this.#config.thresholds.data.length > 0) {
-				let threshold_pos_start = 0;
+			for (const {color: color_next, value} of this.#config.thresholds.data) {
+				const threshold_pos_end = (value - this.#config.min) / (this.#config.max - this.#config.min);
 
-				for (const {color: color_next, value} of this.#config.thresholds.data) {
-					const threshold_pos_end = (value - this.#config.min) / (this.#config.max - this.#config.min);
-
-					if (pos_new >= threshold_pos_start && pos_new < threshold_pos_end) {
-						break;
-					}
-
-					threshold_pos_start = threshold_pos_end;
-					current_color = color_next;
+				if (pos_new >= threshold_pos_start && pos_new < threshold_pos_end) {
+					break;
 				}
+
+				threshold_pos_start = threshold_pos_end;
+				color_new = color_next;
 			}
 
 			if (this.#config.value.arc.show) {
-				this.#elements.value_arcs.value_arc.style.fill = current_color !== '' ? `#${current_color}` : '';
+				this.#elements.value_arcs.value_arc.style.fill = color_new !== '' ? `#${color_new}` : '';
 			}
 
 			if (this.#config.needle.show && this.#config.needle.color === '') {
-				this.#elements.needle.container.style.fill = current_color !== '' ? `#${current_color}` : '';
+				this.#elements.needle.container.style.fill = color_new !== '' ? `#${color_new}` : '';
 			}
 
 			this.#animate(this.#pos_current, pos_new,
@@ -409,11 +406,11 @@ class CSVGGauge {
 
 				arc.setAttribute('d', this.#defineArc(angle_start, angle_end, radius, size));
 
-				if (this.#config.empty_color !== '') {
-					arc.style.fill = `#${this.#config.empty_color}`;
-				}
-
 				value_arcs.push(arc);
+			}
+
+			if (this.#config.empty_color !== '') {
+				value_arcs[1].style.fill = `#${this.#config.empty_color}`;
 			}
 
 			this.#elements.value_arcs = {value_arc: value_arcs[0], empty_arc: value_arcs[1], data: {radius, size}};
