@@ -694,8 +694,6 @@ class CSVGGauge {
 	 * @param {number} height
 	 */
 	#setSizeOnAnimationFrame({width, height}) {
-		console.log('setSizeOnAnimationFrame:', {width, height});
-
 		this.#svg.setAttribute('width', `${width}`);
 		this.#svg.setAttribute('height', `${height}`);
 
