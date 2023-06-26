@@ -353,7 +353,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$form = $this->query('id:triggers-prototype-form')->asForm()->one();
+		$form = $this->query('id:triggers-prototype-form')->asForm(['normalized' => true])->one();
 		$entry_name = $form->getField('Menu entry name');
 
 		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
