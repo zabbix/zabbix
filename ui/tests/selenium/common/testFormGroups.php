@@ -24,8 +24,6 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @backup httptest
- *
  * Base class for Host and Template group form.
  */
 class testFormGroups extends CWebTest {

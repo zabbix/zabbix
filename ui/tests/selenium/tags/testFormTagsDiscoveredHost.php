@@ -23,7 +23,8 @@ require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
  * @dataSource DiscoveredHosts
- * @backup hosts, httptest
+ *
+ * @backup hosts
  */
 class testFormTagsDiscoveredHost extends testFormTags {
 

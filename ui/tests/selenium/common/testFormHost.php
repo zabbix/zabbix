@@ -25,8 +25,6 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
- * @backup httptest
- *
  * Base class for Host form tests.
  */
 class testFormHost extends CWebTest {

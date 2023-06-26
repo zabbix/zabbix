@@ -22,7 +22,7 @@
 require_once dirname(__FILE__).'/../common/testFormGroups.php';
 
 /**
- * @backup hosts, httptest
+ * @backup hosts
  *
  * @onBefore prepareGroupData
  *
