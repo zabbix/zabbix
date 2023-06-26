@@ -25,9 +25,10 @@
  */
 
 $form = (new CForm())
-	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatypetest')))->removeId())
+	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('mediatype')))->removeId())
 	->setName('mediatypetest_form')
-	->addVar('action', 'popup.mediatypetest.send')
+	->setId('mediatype_test_edit')
+	->addVar('action', 'mediatype.test.send')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addItem(getMessages());
 
@@ -49,6 +50,7 @@ switch ($data['type']) {
 						: null,
 					new CFormField(
 						(new CTextBox('parameters['.$parameter['sortorder'].'][value]', $parameter['value']))
+							->setAttribute('autofocus', 'autofocus')
 							->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 					)
 				]);
@@ -79,12 +81,10 @@ switch ($data['type']) {
 			$i++;
 		}
 
-		if (!$i) {
+		if ($i == 0) {
 			$form_grid->addItem([
 				new CLabel(_('Parameters')),
-				new CFormField(
-					(new CDiv(_('Webhook does not have parameters.')))->addClass(ZBX_STYLE_GREY)
-				)
+				new CFormField((new CSpan(_('Webhook does not have parameters.')))->addClass(ZBX_STYLE_GREY))
 			]);
 		}
 
@@ -101,7 +101,6 @@ switch ($data['type']) {
 						(new CLinkAction(_('Open log')))
 							->setId('mediatypetest_log')
 							->addClass(ZBX_STYLE_DISABLED)
-							->onClick('openLogPopup(this)')
 					))
 				])
 			]);
@@ -138,11 +137,16 @@ switch ($data['type']) {
 			]);
 }
 
-$form->addItem($form_grid);
+$form
+	->addItem($form_grid)
+	->addItem(
+		(new CScriptTag('mediatype_test_edit_popup.init('.json_encode([
+		]).');'))->setOnDocumentReady()
+	);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => $this->readJsFile('popup.mediatypetest.edit.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.test.edit.js.php'),
 	'body' => $form->toString(),
 	'buttons' => [
 		[
@@ -150,7 +154,7 @@ $output = [
 			'keepOpen' => true,
 			'isSubmit' => true,
 			'enabled' => $data['enabled'],
-			'action' => 'return mediatypeTestSend(overlay);'
+			'action' => 'mediatype_test_edit_popup.submit();'
 		]
 	]
 ];

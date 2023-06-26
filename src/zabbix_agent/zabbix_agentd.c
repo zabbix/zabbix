@@ -87,7 +87,6 @@ int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
 #	include "zbxmodules.h"
 #endif
 
-#include "stats.h"
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #	include "zbxwin32.h"
@@ -1233,7 +1232,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != init_collector_data(&error))
+	if (SUCCEED != zbx_init_collector_data(&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
@@ -1382,7 +1381,7 @@ void	zbx_free_service_resources(int ret)
 #endif
 	zbx_free_metrics();
 	zbx_alias_list_free();
-	free_collector_data();
+	zbx_free_collector_data();
 	zbx_deinit_modbus();
 #ifdef _WINDOWS
 	free_perf_collector();

@@ -913,11 +913,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
@@ -1266,11 +1266,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
@@ -1813,21 +1813,33 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/mediatypes'
 				]
 			],
-			// #193 Administration -> Media type -> Create form view.
+			// #193 Alerts -> Media type -> Create form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'button:Create media type'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #194 Administration -> Media type -> Edit form view.
+			// #194 Alerts -> Media type -> Edit form view.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'actions' => [
+						[
+							'callback' => 'openFormWithLink',
+							'element' => 'link:Email'
+						]
+					],
 					'doc_link' => '/en/manual/config/notifications/media#common-parameters'
 				]
 			],
-			// #195 Administration -> Media type -> Import view.
+			// #195 Alerts -> Media type -> Import view.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -1840,14 +1852,14 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/xml_export_import/media#importing'
 				]
 			],
-			// #196 Administration -> Scripts list view.
+			// #196 Alerts -> Scripts list view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts'
 				]
 			],
-			// #197 Administration -> Scripts -> Create form view.
+			// #197 Alerts -> Scripts -> Create form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',
@@ -1860,7 +1872,7 @@ class testDocumentationLinks extends CWebTest {
 					'doc_link' => '/en/manual/web_interface/frontend_sections/alerts/scripts#configuring-a-global-script'
 				]
 			],
-			// #198 Administration -> Scripts -> Edit form view.
+			// #198 Alerts -> Scripts -> Edit form view.
 			[
 				[
 					'url' => 'zabbix.php?action=script.list',

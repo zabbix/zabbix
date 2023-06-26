@@ -1980,8 +1980,6 @@ select {
 
 	.table-forms-td-right {
 		td {
-			vertical-align: middle;
-
 			label {
 				display: block;
 			}
@@ -2977,7 +2975,7 @@ tr.cursor-move {
 	table-layout: fixed;
 	@extend %overflow-ellipsis;
 
-	td {
+	td:not(.wordbreak, .wordwrap) {
 		@extend %overflow-ellipsis;
 	}
 
@@ -3923,6 +3921,16 @@ z-select,
 			vertical-align: text-bottom;
 		}
 	}
+
+	.tags-table {
+		width: auto;
+
+		tr:not(.form_row) {
+			td {
+				padding-top: 0;
+			}
+		}
+	}
 }
 
 .import-compare {
@@ -3964,6 +3972,10 @@ z-select,
 	#tagsFormList,
 	#macrosFormList,
 	#valuemap-formlist {
+		.form-field {
+			grid-column-start: 1;
+		}
+
 		.table-forms-td-left {
 			display: none;
 		}
