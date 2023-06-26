@@ -8,6 +8,7 @@ New features:
 .........T [ZBXNEXT-8294] added filters of node labels and annotations for Kubelet discovery in Kubernetes cluster state template (drasikhov)
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 ...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
 ...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
 A......... [ZBX-22941] prevented clearing of the user macro secret values on inherited host prototypes as the result of user macros modifications on the parent host prototype of a template (vmaksimovs)
@@ -62,6 +63,8 @@ A......... [ZBXNEXT-8142] added ability to import configuration files with a UTF
 ...G...... [ZBXNEXT-8354] added pids_stats to docker.container_stats key in Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
+..F....... [ZBX-22720] dropped support for custom geomap HTML attribution text (miks)
 .........T [ZBX-22604] added new replica mismatch metrics to Kubernetes cluster state template, updated triggers (drasikhov)
 .........T [ZBX-22475] fixed regex in preprocessing parameter for Jenkins template (egordymov)
 .........T [ZBX-21910] fixed JavaScript in Kubernetes nodes template (egordymov)
@@ -237,6 +240,9 @@ A......... [ZBXNEXT-8012] implemented API token authentication in user.checkAuth
 A.F....... [ZBXNEXT-8204] added support of PHP 8.2 (Sasha)
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
+.......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out of bounds access with JSONPath on invalid unicode character (vso)
 ........S. [ZBX-22240] fixed selects of history and trends being able to block housekeeping (dgoloscapov)
 ........S. [ZBX-22240] fixed selects of history and trends blocking drop_chunks (dgoloscapov)
 ........S. [ZBX-22078] fixed the crash in calculated items when using tag filter on 32-bit systems (vso)
@@ -2604,6 +2610,7 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 Changes for 5.0.36rc1
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 ...G...... [ZBX-21859] fixed active checks occasionally not being executed on Zabbix agent 2 if checks for a plugin have long and short update intervals (vso)
 ...G...... [ZBX-21892] fixed wrong fs type returned by vfs.fs.get for file systems with identical mount point (asestakovs)
 .......PS. [ZBX-22148] fixed the crash when updating a webhook to JavaScript that cannot be compiled (vso)
@@ -2624,6 +2631,7 @@ New features:
 ...G...... [ZBXNEXT-8330] added default support to plugins for Zabbix agent 2 (esneiders)
 
 Bug fixes:
+.......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
 ...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
@@ -2695,6 +2703,8 @@ Bug fixes:
 Changes for 5.0.32rc1
 
 Bug fixes:
+.......PS. [ZBX-22589] added new limits for JS objects (dgoloscapov)
+.......PS. [ZBX-22588] fixed unauthorised file system access when using cURL (vso)
 ........S. [ZBX-22240] fixed selects of history, trends blocking drop_chunks and housekeeping (dgoloscapov)
 A.F....... [ZBX-21739] fixed discover status not being updated for templated graph prototype (rdetlavs)
 .......PS. [ZBX-22032] added cookie engine to HTTP check (askolmeisters)
@@ -5419,6 +5429,7 @@ A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HT
 Changes for 4.0.47rc1
 
 Bug fixes:
+..F....... [ZBX-22987] fixed inefficient URL schema validation (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 4.0.46
