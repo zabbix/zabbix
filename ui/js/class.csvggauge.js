@@ -118,13 +118,6 @@ class CSVGGauge {
 	#height;
 
 	/**
-	 * Animation frame request number for setSize method.
-	 *
-	 * @type {number|null}
-	 */
-	#set_size_animation_frame = null;
-
-	/**
 	 * Current needle (and value arc) position in 0..1 range.
 	 *
 	 * @type {number}
@@ -197,13 +190,7 @@ class CSVGGauge {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		if (this.#set_size_animation_frame !== null) {
-			cancelAnimationFrame(set_size_animation_frame);
-		}
-
-		this.#set_size_animation_frame = requestAnimationFrame(() => {
-			this.#set_size_animation_frame = null;
-
+		requestAnimationFrame(() => {
 			this.#setSizeOnAnimationFrame({width, height});
 		});
 	}
@@ -707,6 +694,8 @@ class CSVGGauge {
 	 * @param {number} height
 	 */
 	#setSizeOnAnimationFrame({width, height}) {
+		console.log('setSizeOnAnimationFrame:', {width, height});
+
 		this.#svg.setAttribute('width', `${width}`);
 		this.#svg.setAttribute('height', `${height}`);
 
