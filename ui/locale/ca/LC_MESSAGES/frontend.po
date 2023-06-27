@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-17 06:31+0000\n"
+"PO-Revision-Date: 2023-06-20 08:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2480,7 +2480,7 @@ msgstr "No es pot pas crear la funció d'usuari"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "No es pot pas crear la passa d'escenari web"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -4196,7 +4196,7 @@ msgstr "No es pot pas actualitzar l'escenari web"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "No es pot pas actualitzar la passa d'escenari web"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -14221,7 +14221,7 @@ msgstr "Nou servei"
 
 #: app/views/webscenario.step.edit.php:286
 msgid "New step of web scenario"
-msgstr ""
+msgstr "Nova passa d'escenari web"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
