@@ -134,7 +134,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		self::getTimePeriod($metrics, $options['time_period']);
 		self::getChartDataSource($metrics, $errors, $options['data_source']);
 		self::getMetricsData($metrics, $options['data_sets']);
-		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'], $options['units']);
+		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
+				$options['units'], $options['templateid']);
 
 		return [
 			'sectors' => $metrics,
@@ -504,7 +505,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors, array $total_config, array $units_config): void {
+	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors, array $total_config,
+			array $units_config, string $templateid): void {
 		$set_default_item = true;
 		$raw_total_value = 0;
 		$others_value = 0;
@@ -514,6 +516,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($metrics as &$metric) {
 			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
 					&& $metric['options']['type'] == PIE_CHART_ITEM_TOTAL);
+
+			if ($templateid !== '') {
+				$metric = [
+					'name' => $metric['name'],
+					'color' => $metric['options']['color'],
+					'value' => null,
+					'formatted_value' => [
+						'value' => null,
+						'units' => ''
+					],
+					'is_total' => $is_total
+				];
+				continue;
+			}
 
 			foreach ($metric['items'] as $item) {
 				if ($item['itemid'] === $metric['itemid']) {
@@ -569,6 +585,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		foreach ($metrics as &$metric) {
+			if ($templateid != '') {
+				continue;
+			}
+
 			if (!$metric['is_total'] && $raw_total_value > 0) {
 				$percentage = ($metric['value'] / $raw_total_value) * 100;
 				$metric['percent_of_total'] = $percentage;
@@ -615,14 +635,23 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$total_value = convertUnitsRaw([
-			'value' => $raw_total_value,
-			'units' => $default_item['units'] ?? '',
-			'decimals' => $total_config['decimal_places'],
-			'decimals_exact' => true,
-			'small_scientific' => false,
-			'zero_as_zero' => false
-		]);
+		if ($templateid != '' || $raw_total_value == null) {
+			$total_value = [
+				'value' => null,
+				'value_text' => _('No data'),
+				'units' => ''
+			];
+		}
+		else {
+			$total_value = convertUnitsRaw([
+				'value' => $raw_total_value,
+				'units' => $default_item['units'] ?? '',
+				'decimals' => $total_config['decimal_places'],
+				'decimals_exact' => true,
+				'small_scientific' => false,
+				'zero_as_zero' => false
+			]);
+		}
 	}
 
 	/**
