@@ -302,6 +302,12 @@ zabbix_export:
         
             Zammad.setParams(params_zammad);
             Zammad.HTTPProxy = params.HTTPProxy;
+            
+            // Update ticket for trigger-based events from actions.
+            if (params.event_source == '0'
+                && params.event_value == '1' && Number.isInteger(parseInt(Zammad.params.ticket_id))) {
+                params.event_value = '0';
+            }
         
             // Create ticket for non trigger-based events.
             if (params.event_source !== '0'
