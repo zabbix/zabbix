@@ -3,7 +3,9 @@
 noinst_LIBRARIES = libzbxasyncpoller.a
 
 libzbxasyncpoller_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
+
 
 libzbxasyncpoller_a_SOURCES = \
 	asyncpoller.c

@@ -66,7 +66,8 @@ libzbxpoller_a_CFLAGS = \
 	$(SSH2_CFLAGS) \
 	$(SSH_CFLAGS) \
 	$(LIBXML2_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
 
 libzbxpoller_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcacheconfig \
