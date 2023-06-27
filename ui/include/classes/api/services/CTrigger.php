@@ -855,6 +855,10 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 		}
 
+		if (!$options['countOutput'] && $options['expandComment'] !== null) {
+			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
+		}
+
 		return $sqlParts;
 	}
 
