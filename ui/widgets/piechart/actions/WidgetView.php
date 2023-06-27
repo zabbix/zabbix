@@ -121,8 +121,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
 		$data['vars']['total_value'] = $metrics['total_value'];
 
-		sdff('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
-		sdff($data);
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
