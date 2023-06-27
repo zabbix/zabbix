@@ -68,8 +68,13 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 */
 	public function testPageMonitoringWebDetails_Layout() {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
+
 		// Close Kiosk mode if opened.
-		// $this->query('xpath://button[@title="Normal view"]')->
+		$wrapper_class = $this->query('class:wrapper')->one()->getAttribute('class');
+		if (str_contains($wrapper_class, 'layout-kioskmode')) {
+			$this->query('xpath://button[@title="Normal view"]')->one()->click();
+			$this->page->waitUntilReady();
+		}
 
 		// Assert title.
 		$this->page->assertHeader('Details of web scenario: Layout');
@@ -96,13 +101,16 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
 		$this->assertGraphSrcContains('from=now-30d&to=now');
 
-		// Test Kiosk mode.
+		// Test Kiosk mode ON.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
+		$this->assertEquals('wrapper layout-kioskmode', $this->query('class:wrapper')->one()->getAttribute('class'));
 
+		// Test Kiosk mode OFF.
 		$this->query('xpath://button[@title="Normal view"]')->one()->click();
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Details of web scenario: Layout');
+		$this->assertEquals('sidebar', $this->query('tag:aside')->one()->getAttribute('class'));
 	}
 
 	public function getWebScenarioData()
@@ -145,7 +153,9 @@ class testPageMonitoringWebDetails extends CWebTest {
 			[
 				[
 					'name' => 'Result - OK',
-					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 0],
+					'global_item_data' => [
+						HTTPSTEP_ITEM_TYPE_LASTSTEP => 0
+					],
 					'expected_totals' => ['Response time' => '16m 39s 123.46ms', 'Status' => 'OK'],
 					'steps' => [
 						[
@@ -189,7 +199,9 @@ class testPageMonitoringWebDetails extends CWebTest {
 			[
 				[
 					'name' => 'Result - Unknown error',
-					'global_item_data' => [HTTPSTEP_ITEM_TYPE_LASTSTEP => 1],
+					'global_item_data' => [
+						HTTPSTEP_ITEM_TYPE_LASTSTEP => 1
+					],
 					'expected_totals' => ['Status' => 'Unknown error'],
 					'steps' => [
 						['expected_data' => ['Status' => 'OK']],
@@ -235,7 +247,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$api_steps[] = $api_step;
 		}
 
-		// Create the web scenario.
+		// Create the web scenario with API.
 		$response = CDataHelper::call('httptest.create', [
 			[
 				'name' => $data['name'],
@@ -264,7 +276,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 				$sql = 'SELECT si.itemid FROM httpstepitem si'.
 						' JOIN httpstep s ON si.httpstepid=s.httpstepid'.
 						' JOIN httptest t ON s.httptestid=t.httptestid'.
-						' WHERE t.httptestid = '.$httptest_id.
+						' WHERE t.httptestid='.$httptest_id.
 						' AND s.no='.$i.
 						' AND si.type='.$data_type;
 				$item_id = CDBHelper::getValue($sql);
@@ -285,6 +297,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$expected_row = array_merge($expected_row, $step['expected_data'] ?? []);
 			$expected_rows[] = $expected_row;
 		}
+
 		// The table contains an additional TOTAL row.
 		$expected_rows[] = array_merge(['Step' => 'TOTAL'], $data['expected_totals'] ?? []);
 		$this->assertTableData($expected_rows);
