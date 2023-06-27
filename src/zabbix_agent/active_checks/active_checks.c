@@ -395,7 +395,7 @@ static void	add_command(const char *key, zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
+ * Purpose: tests log[] or log.count[] item key if <mode> parameter is set to *
  *          'skip'                                                            *
  *                                                                            *
  * Return value: SUCCEED - <mode> parameter is set to 'skip'                  *
@@ -429,17 +429,17 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Parse list of active checks received from server                  *
+ * Purpose: parses list of active checks received from server                 *
  *                                                                            *
- * Parameters: str                   - NULL terminated string received from   *
- *                                     server                                 *
- *             host                  - address of host                        *
- *             port                  - port number on host                    *
- *             config_revision_local - revision of processed configuration    *
+ * Parameters: str - [IN] NULL terminated string received from server         *
+ *             host - [IN] address of host                                    *
+ *             port - [IN] port number on host                                *
+ *             config_revision_local - [IN/OUT] revision of processed         *
+ *                                              configuration                 *
  *                                                                            *
  * Comments:                                                                  *
- *    String represented as "ZBX_EOF" termination list                        *
- *    With '\n' delimiter between elements.                                   *
+ *    String is represented as "ZBX_EOF" termination list, with '\n'          *
+ *    delimiter between elements.                                             *
  *    Each element represented as:                                            *
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
@@ -773,13 +773,13 @@ out:
 
 /*********************************************************************************************
  *                                                                                           *
- * Purpose: process configuration item and set it value to respective parameter              *
+ * Purpose: processes configuration item and sets its value to respective parameter          *
  *                                                                                           *
- * Parameters:           json - [OUT] pointer to JSON structure where to put resulting value *
- *                     config - [IN] pointer to configuration parameter                      *
- *                     length - [IN] length of configuration parameter                       *
- *                      proto - [IN] configuration parameter prototype                       *
- *  config_host_metadata_item - [IN]                                                         *
+ * Parameters: json - [OUT] pointer to JSON structure where to put resulting value           *
+ *             config - [IN] pointer to configuration parameter                              *
+ *             length - [IN] length of configuration parameter                               *
+ *             proto - [IN] configuration parameter prototype                                *
+ *             config_host_metadata_item - [IN]                                              *
  *                                                                                           *
  *********************************************************************************************/
 static void	process_config_item(struct zbx_json *json, const char *config, size_t length, const char *proto,
@@ -829,14 +829,14 @@ static void	process_config_item(struct zbx_json *json, const char *config, size_
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
-				" \"%s\" configuration parameter",config_type, config, config_name);
+				" \"%s\" configuration parameter", config_type, config, config_name);
 
 	zbx_free_agent_result(&result);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieve from Zabbix server list of active checks                 *
+ * Purpose: retrieves list of active checks from Zabbix server                *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -968,12 +968,12 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether JSON response is SUCCEED                            *
+ * Purpose: checks whether JSON response is SUCCEED                           *
  *                                                                            *
- * Parameters: JSON response from Zabbix trapper                              *
+ * Parameters: response - [IN] JSON response from Zabbix trapper              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
@@ -1073,7 +1073,7 @@ ret:
 	return ret;
 }
 
-static int format_command_results(struct zbx_json *json)
+static int	format_command_results(struct zbx_json *json)
 {
 	int			i;
 	zbx_command_result_t	*result;
@@ -1106,7 +1106,8 @@ static int format_command_results(struct zbx_json *json)
 	return SUCCEED;
 }
 
-static void clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec, int now, int ret)
+static void	clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec, int now,
+		int ret)
 {
 	int			i;
 	active_buffer_element_t	*el;
@@ -1153,15 +1154,14 @@ static void clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_pe
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Send value stored in the buffer to Zabbix server                  *
+ * Purpose: sends value stored in buffer to Zabbix server                     *
  *                                                                            *
  * Parameters:                                                                *
- *   addrs            - [IN] vector with a pair of Zabbix server IP or        *
- *                               Hostname and port number                     *
- *   prep_vec         - [IN/OUT] vector with data for writing into            *
- *                               persistent files                             *
- *   config_tls       - [IN]                                                  *
- *   config_timeout   - [IN]                                                  *
+ *   addrs - [IN] vector with pair of Zabbix server IP or Hostname and port   *
+ *                number                                                      *
+ *   prep_vec - [IN/OUT] vector with data for writing into persistent files   *
+ *   config_tls - [IN]                                                        *
+ *   config_timeout - [IN]                                                    *
  *   config_source_ip - [IN]                                                  *
  *                                                                            *
  * Return value: SUCCEED if:                                                  *
@@ -1252,32 +1252,29 @@ ret:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Buffer new value or send the whole buffer to the server           *
+ * Purpose: buffers new value or sends whole buffer to server                 *
  *                                                                            *
  * Parameters:                                                                *
- *   addrs          - in C agent - vector with a pair of Zabbix server        *
- *                           IP or Hostname and port number. In Agent2 it is  *
- *                           not used (NULL).                                 *
- *   agent2_result  - NULL in C agent. In Agent2 it is used for               *
- *                             passing address of buffer where to store       *
- *                             matching log records. It is here to have the   *
- *                             same function prototype as in Agent2.          *
- *   host           - name of host in Zabbix database                         *
- *   key            - name of metric                                          *
- *   value          - key value or error message why an item became           *
- *                           NOTSUPPORTED                                     *
- *   state          - ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED            *
- *   lastlogsize    - size of read logfile                                    *
- *   mtime          - time of last file modification                          *
- *   timestamp      - timestamp of read value                                 *
- *   source         - name of logged data source                              *
- *   severity       - severity of logged data sources                         *
- *   logeventid     - application-specific identifier for                     *
- *                           the event; used for monitoring of Windows        *
- *                           event logs                                       *
- *   flags            - metric flags                                          *
- *   config_tls       - [IN]                                                  *
- *   config_timeout   - [IN]                                                  *
+ *   addrs - [IN] In C agent - vector with a pair of Zabbix server IP or      *
+ *                Hostname and port number. In Agent2 it is not used (NULL).  *
+ *   agent2_result - [IN] NULL in C agent. In Agent2 it is used for passing   *
+ *                        address of buffer where to store matching log       *
+ *                        records. It is here to have the same function       *
+ *                        prototype as in Agent2.                             *
+ *   host - [IN] name of host in Zabbix database                              *
+ *   key - [IN] name of metric                                                *
+ *   value - [IN] key value or error message why item became NOTSUPPORTED     *
+ *   state - [IN] ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED                *
+ *   lastlogsize - [IN] size of read logfile                                  *
+ *   mtime - [IN] time of last file modification                              *
+ *   timestamp - [IN] timestamp of read value                                 *
+ *   source - [IN] name of logged data source                                 *
+ *   severity - [IN] severity of logged data sources                          *
+ *   logeventid - [IN] application-specific identifier for the event; used    *
+ *                     for monitoring of Windows event logs                   *
+ *   flags - [IN] metric flags                                                *
+ *   config_tls - [IN]                                                        *
+ *   config_timeout - [IN]                                                    *
  *   config_source_ip - [IN]                                                  *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
@@ -1556,15 +1553,14 @@ static void	process_command(zbx_active_command_t *command)
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize an element of preparation vector with available data   *
+ * Purpose: initializes element of preparation vector with available data     *
  *                                                                            *
- * Parameters: lastlogsize   - [IN] lastlogize value to write into persistent *
- *                                  data file                                 *
- *             mtime         - [IN] mtime value to write into persistent data *
- *                                  file                                      *
+ * Parameters: lastlogsize - [IN] lastlogize value to write into persistent   *
+ *                                data file                                   *
+ *             mtime - [IN] mtime value to write into persistent data file    *
  *             prep_vec_elem - [IN/OUT] element of vector to initialize       *
  *                                                                            *
- * Comments: this is a minimal initialization for using before sending status *
+ * Comments: This is a minimal initialization for using before sending status *
  *           updates or meta-data. It initializes only 2 attributes to be     *
  *           usable without any data about log files.                         *
  *                                                                            *
@@ -1747,7 +1743,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update active check and send buffer schedule by the specified     *
+ * Purpose: updates active check and sends buffer schedule by the specified   *
  *          time delta                                                        *
  *                                                                            *
  * Parameters: delta - [IN] time delta in seconds                             *
