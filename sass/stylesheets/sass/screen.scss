@@ -2544,7 +2544,7 @@ $icon-widget-btn: (
 	color: $font-color;
 	-webkit-text-fill-color: $font-color;
 	background-color: $form-disabled-bg-color;
-	border-color: $form-border-color;
+	border-color: $form-disabled-border-color;
 }
 
 %form-disabled {

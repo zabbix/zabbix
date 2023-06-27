@@ -3374,7 +3374,8 @@ form.is-loading {
     .multiselect .disabled .subfilter-enabled,
     .multiselect .disabled .subfilter-disable-btn {
       background-color: #383838;
-      color: #b5b5b5; }
+      color: #b5b5b5;
+      -webkit-text-fill-color: #b5b5b5; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -4202,7 +4203,7 @@ z-select[readonly] .focusable,
   color: #ffffff;
   -webkit-text-fill-color: #ffffff;
   background-color: #000000;
-  border-color: #666666; }
+  border-color: #5a5a5a; }
 
 .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] .focusable,
 .z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
