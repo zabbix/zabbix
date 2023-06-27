@@ -73,16 +73,16 @@ if ($data['expression_type'] === 'expression') {
 				new CRow([
 					!$data['readonly']
 						? (new CCheckBox('expr_target_single', $e['id']))
-						->setChecked($i == 0)
-						->removeId()
+							->setChecked($i == 0)
+							->addClass('js-check-target')
+							->removeId()
 						: null,
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['readonly']
-						? (new CCol(
-						(new CButtonLink(_('Remove')))
+						? (new CCol((new CButtonLink(_('Remove')))
 							->addClass('js_remove_expression')
-							->setAttribute('data-id', $e['id'])
-					))->addClass(ZBX_STYLE_NOWRAP)
+							->setAttribute('data-id', $e['id']))
+						)->addClass(ZBX_STYLE_NOWRAP)
 						: null,
 					makeInformationList($info_icons)
 				])
@@ -133,17 +133,16 @@ if ($data['expression_type'] === 'recovery_expression') {
 				new CRow([
 					!$data['readonly']
 						? (new CCheckBox('recovery_expr_target_single', $e['id']))
-						->setChecked($i == 0)
-						->onClick('check_target(this, '.TRIGGER_RECOVERY_EXPRESSION.');')
-						->removeId()
+							->setChecked($i == 0)
+							->addClass('js-check-recovery-target')
+							->removeId()
 						: null,
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['readonly']
-						? (new CCol(
-						(new CButtonLink(_('Remove')))
+						? (new CCol((new CButtonLink(_('Remove')))
 							->setAttribute('data-id', $e['id'])
 							->addClass('js_remove_recovery_expression')
-					))->addClass(ZBX_STYLE_NOWRAP)
+						))->addClass(ZBX_STYLE_NOWRAP)
 						: null,
 					makeInformationList($info_icons)
 				])
@@ -169,10 +168,9 @@ if ($data['expression_formula'] === '' || $data['recovery_expression_formula'] =
 }
 
 $expression_table->addItem(
-	(new CTag('tfoot', true))
-		->addItem(
-			(new CCol($testButton))->setColSpan(4)
-		)
+	(new CTag('tfoot', true))->addItem(
+		(new CCol($testButton))->setColSpan(4)
+	)
 );
 
 $wrapOutline = new CSpan([($data['expression_type'] === 'expression')

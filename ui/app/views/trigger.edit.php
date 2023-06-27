@@ -32,7 +32,7 @@ $url = (new CUrl('zabbix.php'))
 // Create form.
 $trigger_form = (new CForm('post', $url))
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('trigger')))->removeId())
-	->setid('trigger-edit')
+	->setid('trigger-form')
 	->setName('trigger_edit_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('hostid', $data['hostid'])
@@ -150,13 +150,11 @@ $expression_constructor_buttons = [];
 // Append "Add" button.
 $expression_constructor_buttons[] = (new CButton('add_expression', _('Add')))
 	->addStyle('display: none')
-	->setId('add-expression')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
 // Append "And" button.
 $expression_constructor_buttons[] = (new CButton('and_expression', _('And')))
-	->setId('and-expression')
 	->addStyle('display: none')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
@@ -164,7 +162,6 @@ $expression_constructor_buttons[] = (new CButton('and_expression', _('And')))
 // Append "Or" button.
 $expression_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $expression_constructor_buttons[] = (new CButton('or_expression', _('Or')))
-	->setId('or-expression')
 	->addStyle('display: none')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
@@ -172,7 +169,6 @@ $expression_constructor_buttons[] = (new CButton('or_expression', _('Or')))
 // Append "Replace" button.
 $expression_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $expression_constructor_buttons[] = (new CButton('replace_expression', _('Replace')))
-	->setId('replace-expression')
 	->addStyle('display: none')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
@@ -198,10 +194,12 @@ $trigger_form_grid->addItem(
 		->addStyle('display: none')
 );
 
-$input_method_toggle = (new CDiv(new CButtonLink(_('Close expression constructor'))));
+$input_method_toggle = new CDiv((new CButtonLink(_('Close expression constructor')))
+	->setId('close-expression-constructor')
+);
 $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 	->addStyle('display: none')
-	->setId('close-expression-constructor')
+	->setId('close-expression-constructor-field')
 );
 
 $trigger_form_grid->addItem([new CLabel(_('OK event generation')),
@@ -243,27 +241,27 @@ $recovery_constructor_buttons = [];
 
 // Append "Add" button.
 $recovery_constructor_buttons[] = (new CSimpleButton(_('Add')))
-	->setId('add-recovery-expression')
+	->setId('add_expression_recovery')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
 // Append "And" button.
 $recovery_constructor_buttons[] = (new CSimpleButton(_('And')))
-	->setId('and-recovery-expression')
+	->setId('and_expression_recovery')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
 // Append "Or" button.
 $recovery_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $recovery_constructor_buttons[] = (new CSimpleButton(_('Or')))
-	->setId('or-recovery-expression')
+	->setId('or_expression_recovery')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
 // Append "Replace" button.
 $recovery_constructor_buttons[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 $recovery_constructor_buttons[] = (new CSimpleButton(_('Replace')))
-	->setId('replace-recovery-expression')
+	->setId('replace_expression_recovery')
 	->addClass(ZBX_STYLE_BTN_GREY)
 	->setEnabled(!$readonly);
 
@@ -289,11 +287,12 @@ $trigger_form_grid->addItem(
 		->addStyle('display: none')
 );
 
-$input_method_toggle = new CButtonLink(_('Close expression constructor'));
+$input_method_toggle = (new CButtonLink(_('Close expression constructor')))
+	->setId('close-recovery-expression-constructor');
 
 $trigger_form_grid->addItem((new CFormField([null, $input_method_toggle]))
 	->addStyle('display: none')
-	->setId('close-recovery-expression-constructor')
+	->setId('close-recovery-expression-constructor-field')
 );
 
 $trigger_form_grid
@@ -364,7 +363,7 @@ $trigger_form_grid
 // Append tabs to form.
 $triggers_tab = new CTabView();
 $triggers_tab->setSelected(0);
-$triggers_tab->addTab('triggers_tab', _('Trigger'), $trigger_form_grid);
+$triggers_tab->addTab('triggersTab', _('Trigger'), $trigger_form_grid);
 
 // tags
 $triggers_tab->addTab('tags-tab', _('Tags'), new CPartial('configuration.tags.tab', [
@@ -469,7 +468,6 @@ else {
 					'buttons' => [
 						[
 							'title' => _('Add'),
-							'class' => 'js-add',
 							'keepOpen' => true,
 							'isSubmit' => true,
 							'action' => 'trigger_edit_popup.submit();'
@@ -499,7 +497,6 @@ else {
 $trigger_form
 	->addItem($triggers_tab)
 	->addItem((new CScriptTag('trigger_edit_popup.init('.json_encode([
-			'form_name' => $trigger_form->getName(),
 			'triggerid' => $data['triggerid'],
 			'expression_popup_parameters' => $expression_popup_parameters,
 			'recovery_popup_parameters' => $recovery_popup_parameters,

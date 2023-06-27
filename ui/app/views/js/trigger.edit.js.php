@@ -22,14 +22,11 @@
 
 	window.trigger_edit_popup = new class {
 
-		init({form_name, triggerid, expression_popup_parameters, recovery_popup_parameters, readonly,
-				db_dependencies
-		}) {
+		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies}) {
+			this.triggerid = triggerid;
 			this.expression_popup_parameters = expression_popup_parameters;
 			this.recovery_popup_parameters = recovery_popup_parameters;
-			this.form_name = form_name;
 			this.readonly = readonly;
-			this.triggerid = triggerid;
 			this.db_dependencies = db_dependencies;
 			this.overlay = overlays_stack.getById('trigger-edit');
 			this.dialogue = this.overlay.$dialogue[0];
@@ -59,32 +56,19 @@
 				this.description.dispatchEvent(new Event('input'));
 			});
 
-			this.form.querySelector('#close-expression-constructor').addEventListener('click',
-				(e) => this.#toggleExpressionConstructor(e.target.id)
-			);
-
-			this.form.querySelector('#close-recovery-expression-constructor').addEventListener('click',
-				(e) => this.#toggleRecoveryExpressionConstructor(e.target.id)
-			);
-
 			this.form.addEventListener('click', (e) => {
-				if (e.target.id === 'expression-constructor') {
+				if (e.target.id === 'expression-constructor' || e.target.id === 'close-expression-constructor') {
 					this.#toggleExpressionConstructor(e.target.id);
 				}
 				else if (e.target.id === 'insert-expression') {
 					this.#openPopupTriggerExpr();
 				}
-				else if (e.target.id === 'add-expression') {
-					this.#expressionConstructor({'add_expression': '1'});
-				}
-				else if (e.target.id === 'and-expression') {
-					this.#expressionConstructor({'and_expression': '1'});
-				}
-				else if (e.target.id === 'or-expression') {
-					this.#expressionConstructor({'or_expression': '1'});
-				}
-				else if (e.target.id === 'replace-expression') {
-					this.#expressionConstructor({'replace_expression': '1'});
+				else if (e.target.id === 'add_expression' || e.target.id === 'and_expression'
+						|| e.target.id === 'or_expression' || e.target.id === 'replace_expression') {
+					const fields = {};
+					fields[e.target.id] = '1';
+
+					this.#expressionConstructor(fields);
 				}
 				else if (e.target.classList.contains('js_remove_expression')) {
 					this.#expressionConstructor({'remove_expression': e.target.dataset.id});
@@ -104,23 +88,21 @@
 				else if (e.target.name === 'recovery_mode') {
 					this.#changeRecoveryMode();
 				}
-				else if (e.target.id === 'recovery-expression-constructor') {
+				else if (e.target.id === 'recovery-expression-constructor'
+						|| e.target.id === 'close-recovery-expression-constructor'
+				) {
 					this.#toggleRecoveryExpressionConstructor(e.target.id);
 				}
 				else if (e.target.id === 'insert-recovery-expression') {
 					this.#openPopupTriggerExpr(false);
 				}
-				else if (e.target.id === 'add-recovery-expression') {
-					this.#expressionConstructor({'add_expression': '1'}, false);
-				}
-				else if (e.target.id === 'and-recovery-expression') {
-					this.#expressionConstructor({'and_expression': '1'}, false);
-				}
-				else if (e.target.id === 'or-recovery-expression') {
-					this.#expressionConstructor({'or_expression': '1'}, false);
-				}
-				else if (e.target.id === 'replace-recovery-expression') {
-					this.#expressionConstructor({'replace_expression': '1'}, false);
+				else if (e.target.id === 'add_expression_recovery' || e.target.id === 'and_expression_recovery'
+						|| e.target.id === 'or_expression_recovery' || e.target.id === 'replace_expression_recovery') {
+					const fields = {};
+					const parameter = e.target.id.split('_recovery');
+					fields[parameter[0]] = '1';
+
+					this.#expressionConstructor(fields, false);
 				}
 				else if (e.target.classList.contains('js_remove_recovery_expression')) {
 					this.#expressionConstructor({'remove_expression': e.target.dataset.id}, false);
@@ -140,6 +122,12 @@
 				}
 				else if (e.target.classList.contains('js-remove-dependency')) {
 					this.#removeDependency(e.target.dataset.triggerid);
+				}
+				else if (e.target.classList.contains('js-check-target')) {
+					check_target(e.target, <?= json_encode(TRIGGER_EXPRESSION) ?>);
+				}
+				else if (e.target.classList.contains('js-check-recovery-target')) {
+					check_target(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 				}
 			});
 		}
@@ -167,7 +155,6 @@
 
 			PopUp('popup.generic', popup_parameters, {dialogue_class: 'modal-popup-generic'});
 		}
-
 
 		#changeRecoveryMode() {
 			const recovery_mode = this.form.querySelector('input[name=recovery_mode]:checked').value;
@@ -220,23 +207,6 @@
 			}
 		}
 
-		/**
-		 * @see init.js add.popup event
-		 */
-		addPopupValues(data) {
-			let template;
-
-			Object.values(data).forEach((dependency) => {
-				const element = {description: dependency.description, triggerid: dependency.triggerid};
-
-				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
-
-				document
-					.querySelector('#dependency-table tbody')
-					.insertAdjacentHTML('beforeend', template.evaluate(element));
-			})
-		}
-
 		#loadDependencyTable(data) {
 			const dependencies = [];
 
@@ -256,22 +226,12 @@
 			dependency_element.parentNode.removeChild(dependency_element);
 		}
 
-		refresh() {
-			const url = new Curl('');
-			const form = document.getElementsByName(this.form_name)[0];
-			const fields = getFormFields(form);
-
-			post(url.getUrl(), fields);
-		}
-
 		#toggleExpressionConstructor(id) {
 			const elements = [
 				'#insert-macro', '#expression-constructor-buttons', '#expression-table',
-				'#close-expression-constructor'
+				'#close-expression-constructor-field'
 			];
-
 			const expression_constructor = this.form.querySelector('#expression-constructor');
-			const close_expression_constructor = this.form.querySelector('#close-expression-constructor');
 			const insert_expression = this.form.querySelector('#insert-expression');
 
 			if (id === 'expression-constructor') {
@@ -280,8 +240,9 @@
 				});
 
 				expression_constructor.style.display = 'none';
-				close_expression_constructor.style.display = '';
 				this.expression.readOnly = true;
+				this.expression.name = 'expression-full';
+				this.expression_full.name = 'expression';
 				insert_expression.textContent = <?= json_encode(_('Edit')) ?>;
 
 				if (this.expression.value === '') {
@@ -299,7 +260,8 @@
 				});
 
 				expression_constructor.style.display = '';
-				close_expression_constructor.style.display = 'none';
+				this.expression.name = 'expression';
+				this.expression_full.name = 'expression-full';
 				this.expression.readOnly = this.readonly ? true : false;
 				insert_expression.textContent = <?= json_encode(_('Add')) ?>;
 				this.expression.value = this.expression_full.value;
@@ -309,13 +271,13 @@
 		#toggleRecoveryExpressionConstructor(id) {
 			const elements = [
 				'#recovery-constructor-buttons', '#recovery-expression-table',
-				'#close-recovery-expression-constructor'
+				'#close-recovery-expression-constructor-field'
 			];
 
 			const recovery_expression_constructor = this.form.querySelector('#recovery-expression-constructor');
-			const close_recovery_expression_constructor = this.form.querySelector('#close-recovery-expression-constructor');
 			const insert_recovery_expression = this.form.querySelector('#insert-recovery-expression');
 			const recovery_expression = this.form.querySelector('#recovery_expression');
+			const recovery_expression_full = this.form.querySelector('#recovery-expression-full');
 
 			if (id === 'recovery-expression-constructor') {
 				elements.forEach((element) => {
@@ -323,8 +285,9 @@
 				});
 
 				recovery_expression_constructor.style.display = 'none';
-				close_recovery_expression_constructor.style.display = '';
 				recovery_expression.readOnly = true;
+				recovery_expression.name = 'recovery_expression_full';
+				recovery_expression_full.name = 'recovery_expression';
 				insert_recovery_expression.textContent = <?= json_encode(_('Edit')) ?>;
 
 				if (recovery_expression.value === '') {
@@ -342,8 +305,9 @@
 				});
 
 				recovery_expression_constructor.style.display = '';
-				close_recovery_expression_constructor.style.display = 'none';
 				recovery_expression.readOnly = this.readonly ? true : false;
+				recovery_expression.name = 'recovery_expression';
+				recovery_expression_full.name = 'recovery_expression_full';
 				insert_recovery_expression.textContent = <?= json_encode(_('Add')) ?>;
 				recovery_expression.value = this.form.querySelector('#recovery-expression-full').value;
 			}
@@ -463,10 +427,10 @@
 		}
 
 		#showConstructorAddButton(show = true) {
-			const and_button = this.form.querySelector('#and-expression');
-			const or_button = this.form.querySelector('#or-expression');
-			const replace_button = this.form.querySelector('#replace-expression');
-			const add_button = this.form.querySelector('#add-expression');
+			const and_button = this.form.querySelector('#and_expression');
+			const or_button = this.form.querySelector('#or_expression');
+			const replace_button = this.form.querySelector('#replace_expression');
+			const add_button = this.form.querySelector('#add_expression');
 
 			if (show) {
 				and_button.style.display = 'none';
@@ -483,10 +447,10 @@
 		}
 
 		#showRecoveryConstructorAddButton(show = true) {
-			const and_button = this.form.querySelector('#and-recovery-expression');
-			const or_button = this.form.querySelector('#or-recovery-expression');
-			const replace_button = this.form.querySelector('#replace-recovery-expression');
-			const add_button = this.form.querySelector('#add-recovery-expression');
+			const and_button = this.form.querySelector('#and_expression_recovery');
+			const or_button = this.form.querySelector('#or_expression_recovery');
+			const replace_button = this.form.querySelector('#replace_expression_recovery');
+			const add_button = this.form.querySelector('#add_expression_recovery');
 
 			if (show) {
 				and_button.style.display = 'none';
@@ -500,16 +464,6 @@
 				replace_button.style.display = '';
 				add_button.style.display = 'none';
 			}
-		}
-
-		submit() {
-			const fields = getFormFields(this.form);
-			fields.description = fields.description.trim();
-
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', this.triggerid !== 0 ? 'trigger.update' : 'trigger.create');
-
-			this.#post(curl.getUrl(), fields);
 		}
 
 		#post(url, data) {
@@ -553,27 +507,26 @@
 				});
 		}
 
-		clone() {
-			this.triggerid = 0;
-			const title = <?= json_encode(_('New action')) ?>;
-			const buttons = [
-				{
-					title: <?= json_encode(_('Add')) ?>,
-					class: '',
-					keepOpen: true,
-					isSubmit: true,
-					action: () => this.submit()
-				},
-				{
-					title: <?= json_encode(_('Cancel')) ?>,
-					class: 'btn-alt',
-					cancel: true,
-					action: () => ''
-				}
-			];
+		submit() {
+			const fields = getFormFields(this.form);
 
-			this.overlay.unsetLoading();
+			for (let key in fields) {
+				if (typeof fields[key] === 'string' && key !== 'confirmation') {
+					fields[key] = fields[key].trim();
+				}
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', this.triggerid !== 0 ? 'trigger.update' : 'trigger.create');
+
+			this.#post(curl.getUrl(), fields);
+		}
+
+		clone({title, buttons}) {
+			this.triggerid = 0;
+
 			this.overlay.setProperties({title, buttons});
+			this.overlay.unsetLoading();
 		}
 
 		delete() {
@@ -588,5 +541,22 @@
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
 			});
+		}
+
+		/**
+		 * @see init.js add.popup event
+		 */
+		addPopupValues(data) {
+			let template;
+
+			Object.values(data).forEach((dependency) => {
+				const element = {description: dependency.description, triggerid: dependency.triggerid};
+
+				template = new Template(document.getElementById('dependency-row-tmpl').innerHTML)
+
+				document
+					.querySelector('#dependency-table tbody')
+					.insertAdjacentHTML('beforeend', template.evaluate(element));
+			})
 		}
 	}
