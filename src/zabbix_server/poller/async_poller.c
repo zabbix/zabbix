@@ -342,6 +342,8 @@ static void	zbx_interface_status_clean(zbx_interface_status *interface_status)
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		event_callback_fn async_check_items_callback)
 {
+	struct timeval	tv = {1, 0};
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -372,10 +374,8 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 		exit(EXIT_FAILURE);
 	}
 
-	struct timeval	tv = {1, 0};
-
 	evtimer_add(poller_config->async_check_items_timer, &tv);
-	
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 static void	async_poller_stop(zbx_poller_config_t *poller_config)
@@ -456,7 +456,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
-	
+
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
