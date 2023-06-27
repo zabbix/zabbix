@@ -488,7 +488,7 @@ class CPage {
 	 *
 	 * @param array|string $keys   keys to be pressed
 	 */
-	public function pressKey($keys) {
+	public function keyPress($keys) {
 		if (!is_array($keys)) {
 			$keys = [$keys];
 		}

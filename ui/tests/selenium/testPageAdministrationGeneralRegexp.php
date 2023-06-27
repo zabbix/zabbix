@@ -134,7 +134,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
 		// The list of expected regexes to be shown after deletion.
-		$expected_regexps = $this->getTableResult('Name');
+		$expected_regexps = $this->getTableColumnData('Name');
 
 		$regexids = [];
 		foreach ($data['regex_name'] as $regex) {
