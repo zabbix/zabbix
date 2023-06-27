@@ -27,7 +27,7 @@
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
-#include "../../libs/zbxserver/get_host_from_event.h"
+#include "zbxevent.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxnum.h"

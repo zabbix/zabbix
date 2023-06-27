@@ -24,7 +24,7 @@
 
 #include "../scripts/scripts.h"
 #include "audit/zbxaudit.h"
-#include "../../libs/zbxserver/get_host_from_event.h"
+#include "zbxevent.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"

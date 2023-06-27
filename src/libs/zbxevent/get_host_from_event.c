@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "get_host_from_event.h"
+#include "zbxevent.h"
 
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
