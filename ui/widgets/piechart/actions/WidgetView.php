@@ -121,6 +121,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
 		$data['vars']['total_value'] = $metrics['total_value'];
 
+		sdff('BBBBBBBBBBBBBBBBBBBBBBBBBBBBBB');
+		sdff($data);
 		$this->setResponse(new CControllerResponseData($data));
 	}
 
@@ -525,7 +527,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($metric['items']);
 
 			if ($units_config['units_show'] == PIE_CHART_SHOW_UNITS_ON) {
-				if ($units_config['units_value'] !== '') {
+				if ($units_config['units_value'] !== '' && isset($metric['item'])) {
 					$metric['item']['units'] = $units_config['units_value'];
 				}
 				else {
@@ -536,7 +538,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$metric['item']['units'] = '';
 			}
 
-			if ($set_default_item) {
+			if ($set_default_item && isset($metric['item'])) {
 				$default_item = $metric['item'];
 				$set_default_item = false;
 			}
@@ -617,7 +619,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$total_value = convertUnitsRaw([
 			'value' => $raw_total_value,
-			'units' => $default_item['units'],
+			'units' => $default_item['units'] ?? '',
 			'decimals' => $total_config['decimal_places'],
 			'decimals_exact' => true,
 			'small_scientific' => false,
