@@ -868,7 +868,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 	if (SUCCEED == res && 0 != del_tagids.values_num)
 	{
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-		char	*sql = (char *)zbx_malloc(sql, sql_alloc);
+		char	*sql = (char *)zbx_malloc(NULL, sql_alloc);
 
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -1260,7 +1260,7 @@ out:
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
 		zbx_vector_uint64_t *del_optagids)
 {
-	zbx_uint64_t		hostid;
+	zbx_uint64_t		hostid = 0;
 	int			status;
 	char			*hostname = NULL;
 	zbx_vector_db_tag_ptr_t	host_tags;
