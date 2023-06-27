@@ -10673,9 +10673,11 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
- * Parameters: poller_type    - [IN] poller type (ZBX_POLLER_TYPE_...)        *
- *             config_timeout - [IN]                                          *
- *             items          - [OUT] array of items                          *
+ * Parameters: poller_type                  - [IN] poller type                *
+ *             config_timeout               - [IN] timeout                    *
+ *             processing                   - [IN] count of items in progress *
+ *             config_max_concurrent_checks - [IN] max conncurect checks      *
+ *             items                        - [OUT] array of items            *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -10692,7 +10694,7 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		int config_max_concurrent_checks_per_poller, zbx_dc_item_t **items)
+		int config_max_concurrent_checks, zbx_dc_item_t **items)
 {
 	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
@@ -10712,14 +10714,8 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			max_items = ZBX_MAX_PINGER_ITEMS;
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
-			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
-				goto out;
-
-			items_alloc = max_items;
-			*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
-			break;
 		case ZBX_POLLER_TYPE_AGENT:
-			if (0 == (max_items = config_max_concurrent_checks_per_poller - processing))
+			if (0 == (max_items = config_max_concurrent_checks - processing))
 				goto out;
 
 			items_alloc = max_items;
