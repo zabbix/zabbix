@@ -236,8 +236,8 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 {
 	zbx_dc_item_t		*items = NULL;
-	AGENT_RESULT		results[ZBX_MAX_ITEMS];
-	int			errcodes[ZBX_MAX_ITEMS];
+	AGENT_RESULT		*results;
+	int			*errcodes;
 	zbx_timespec_t		timespec;
 	int			i, num;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)arg;
@@ -252,6 +252,9 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	if (0 == num)
 		goto exit;
+
+	results = zbx_malloc(NULL, num * sizeof(AGENT_RESULT));
+	errcodes = zbx_malloc(NULL, num * sizeof(int));
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 
@@ -299,6 +302,8 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 
 	zbx_clean_items(items, num, results);
 	zbx_dc_config_clean_items(items, NULL, num);
+	zbx_free(results);
+	zbx_free(errcodes);
 exit:
 	zbx_free(items);
 	if (ZBX_IS_RUNNING())
