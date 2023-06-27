@@ -54,7 +54,7 @@
 					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()), true);
 				}
 				else if (e.target.classList.contains('js-edit')) {
-					this.#edit({templateid: e.target.dataset.templateid}, e.target.dataset.templateid)
+					this.#edit({templateid: e.target.dataset.templateid})
 				}
 			});
 
@@ -114,7 +114,7 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.#edit({templateid:e.detail.templateid}, e.detail.templateid)
+				this.#edit({templateid:e.detail.templateid})
 			})
 		}
 

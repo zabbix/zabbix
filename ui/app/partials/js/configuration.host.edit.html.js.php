@@ -132,6 +132,60 @@
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
+
+			this.overlay = overlays_stack.getById('host_edit');
+
+			this.form.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-linked-template')) {
+					if (typeof this.overlay !== 'undefined') {
+						this.dialogue = this.overlay.$dialogue[0];
+
+						const confirmation = <?= json_encode(
+							_('Open the linked template configuration form? Any changes you made may not be saved.')
+						) ?>;
+
+						if (window.confirm(confirmation)) {
+							this.dialogue.dispatchEvent(
+								new CustomEvent('edit.linked', {detail: {templateid: e.target.dataset.templateid}})
+							)
+						}
+					}
+				}
+			});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				this.editTemplate({templateid:e.detail.templateid})
+			})
 		},
 
 		/**

@@ -32,7 +32,7 @@ $form = (new CForm())
 	->setName('template-edit-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
 	->addVar('clone', $data['clone'])
-	->addVar('clone_templateid', $data['clone_templateid']);
+	->addVar('clone_templateid', $data['clone_templateid'] ?? null);
 
 // Template tab.
 $template_tab = (new CFormGrid())
@@ -174,7 +174,7 @@ $tags = new CPartial('configuration.tags.tab', [
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'tabs',
-	'tags_tab_id' => 'tags-tab'
+	'tags_tab_id' => 'tags-tab-template'
 ]);
 
 $form->addItem(

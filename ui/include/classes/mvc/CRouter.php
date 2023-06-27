@@ -371,7 +371,6 @@ class CRouter {
 		'report4.php'					=> ['CLegacyAction', null, null],
 		'sysmap.php'					=> ['CLegacyAction', null, null],
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
-		'templates.php' 				=> ['CLegacyAction', null, null],
 		'toptriggers.php'				=> ['CLegacyAction', null, null],
 		'tr_events.php'					=> ['CLegacyAction', null, null],
 		'trigger_prototypes.php'		=> ['CLegacyAction', null, null],

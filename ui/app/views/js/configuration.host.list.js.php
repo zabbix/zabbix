@@ -36,6 +36,46 @@
 			this.applied_filter_groupids = applied_filter_groupids;
 
 			this.initFilter();
+
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-template')) {
+					this.editTemplate({templateid: e.target.dataset.templateid})
+				}
+			});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				this.editTemplate({templateid:e.detail.templateid})
+			})
 		},
 
 		initFilter() {
@@ -80,16 +120,21 @@
 
 		openHostPopup(host_data) {
 			const original_url = location.href;
-			const overlay = PopUp('popup.host.edit', host_data, {
+			this.overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+			this.overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+				this.editTemplate(e.detail);
+			});
+
+			this.overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
+			this.overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			this.overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			this.overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
 		},

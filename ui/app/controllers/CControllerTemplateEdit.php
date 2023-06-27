@@ -109,6 +109,7 @@ class CControllerTemplateEdit extends CController {
 			'groups_ms' => $this->getInput('groups_ms', []),
 			'linked_templates' => $this->getInput('linked_templates', []),
 			'templates' => $this->getInput('templates', []),
+			'add_templates' => [],
 			'original_templates' => $this->getInput('original_templates', []),
 			'macros' => $macros,
 			'tags' => $this->getInput('tags', []),
@@ -155,7 +156,7 @@ class CControllerTemplateEdit extends CController {
 
 		if ($this->hasInput('templateid')) {
 			$dbTemplates = API::Template()->get([
-				'output' => API_OUTPUT_EXTEND,
+				'output' => ['host', 'name', 'description', 'vendor_name', 'vendor_version'],
 				'selectTemplateGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => API_OUTPUT_EXTEND,
@@ -163,6 +164,7 @@ class CControllerTemplateEdit extends CController {
 				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'templateids' => $templateid
 			]);
+
 			$data['dbTemplate'] = reset($dbTemplates);
 
 			$data['vendor'] = array_filter([

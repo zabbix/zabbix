@@ -333,11 +333,9 @@ foreach ($data['hosts'] as $host) {
 		if (array_key_exists($template['templateid'], $data['writable_templates'])
 				&& $data['allowed_ui_conf_templates']) {
 			$caption = [
-				(new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))
+				(new CLink($template['name']))
+					->addClass('js-edit-template')
+					->setAttribute('data-templateid', $template['templateid'])
 					->addClass(ZBX_STYLE_LINK_ALT)
 					->addClass(ZBX_STYLE_GREY)
 			];
@@ -358,11 +356,9 @@ foreach ($data['hosts'] as $host) {
 			foreach ($parent_templates as $parent_template) {
 				if (array_key_exists($parent_template['templateid'], $data['writable_templates'])
 						&& $data['allowed_ui_conf_templates']) {
-					$caption[] = (new CLink($parent_template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $parent_template['templateid'])
-					))
+					$caption[] = (new CLink($parent_template['name']))
+						->addClass('js-edit-template')
+						->setAttribute('data-templateid', $parent_template['templateid'])
 						->addClass(ZBX_STYLE_LINK_ALT)
 						->addClass(ZBX_STYLE_GREY);
 				}

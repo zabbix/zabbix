@@ -42,7 +42,44 @@
 				else if (e.target.classList.contains('js-massdelete-templategroup')) {
 					this.delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
+				else if (e.target.classList.contains('js-edit-template')) {
+					this.editTemplate({templateid: e.target.dataset.templateid})
+				}
 			});
+		},
+
+		editTemplate(parameters) {
+			const overlay = PopUp('template.edit', parameters, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
+				uncheckTableRows('templates');
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				this.editTemplate({templateid:e.detail.templateid})
+			})
 		},
 
 		edit(parameters = {}) {

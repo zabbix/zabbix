@@ -100,13 +100,11 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $data['writable_templates'])) {
-				$caption[] = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))
+				$caption[] = (new CLink($template['name']))
+					->addClass('js-edit-template')
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREY);
+					->addClass(ZBX_STYLE_GREY)
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$caption[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -219,4 +217,8 @@ $itemForm->addItem([
 
 $html_page
 	->addItem($itemForm)
+	->show();
+
+(new CScriptTag('view.init();'))
+	->setOnDocumentReady()
 	->show();

@@ -21,10 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once __DIR__.'/js/configuration.host.prototype.edit.js.php';
-require_once __DIR__.'/js/template.edit.js.php';
 
 $host_prototype = $data['host_prototype'];
 $parent_host = $data['parent_host'];
