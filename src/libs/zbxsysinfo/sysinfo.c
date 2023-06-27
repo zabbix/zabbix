@@ -297,20 +297,20 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 }
 #endif
 
-#define SYSINFO_PROPERTY_DEF(type, varname) \
+#define SYSINFO_GET_CONFIG_VAR(type, varname) \
 type	sysinfo_get_config_##varname(void) \
 { \
 	return get_config_##varname##_cb(); \
 }
-SYSINFO_PROPERTY_DEF(int, timeout)
-SYSINFO_PROPERTY_DEF(int, log_remote_commands)
-SYSINFO_PROPERTY_DEF(int, unsafe_user_parameters)
-SYSINFO_PROPERTY_DEF(const char *, source_ip)
-SYSINFO_PROPERTY_DEF(const char *, hostname)
-SYSINFO_PROPERTY_DEF(const char *, hostnames)
-SYSINFO_PROPERTY_DEF(const char *, host_metadata)
-SYSINFO_PROPERTY_DEF(const char *, host_metadata_item)
-#undef SYSINFO_PROPERTY_DEF
+SYSINFO_GET_CONFIG_VAR(int, timeout)
+SYSINFO_GET_CONFIG_VAR(int, log_remote_commands)
+SYSINFO_GET_CONFIG_VAR(int, unsafe_user_parameters)
+SYSINFO_GET_CONFIG_VAR(const char *, source_ip)
+SYSINFO_GET_CONFIG_VAR(const char *, hostname)
+SYSINFO_GET_CONFIG_VAR(const char *, hostnames)
+SYSINFO_GET_CONFIG_VAR(const char *, host_metadata)
+SYSINFO_GET_CONFIG_VAR(const char *, host_metadata_item)
+#undef SYSINFO_GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
 {
