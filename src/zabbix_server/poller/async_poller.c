@@ -514,6 +514,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		}
 	}
 
+	event_del(rtc_event);
 	async_poller_stop(&poller_config);
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
