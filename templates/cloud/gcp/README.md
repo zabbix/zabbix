@@ -47,6 +47,8 @@ This template has been tested on:
        
 **IMPORTANT!!!**
 
+     Secret authorization token is defined as a plain text in host prototype settings by default due to Zabbix templates export/import limits: therefore, it is highly recommended to change the user macro `{$GCP.AUTH.TOKEN}` value type to `SECRET` for all host prototypes after the template `GCP by HTTP` import.
+
      All the instances/quotas/metrics discovered are related to particular GCP project. 
      To monitor several GCP projects - create their corresponding service accounts/Zabbix hosts.
 

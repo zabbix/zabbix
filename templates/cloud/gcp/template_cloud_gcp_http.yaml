@@ -716,7 +716,7 @@ zabbix_export:
                   value: '{#MSSQL.AUDITED}'
                   description: 'GCP Cloud SQL MSSQL audit enabled definition. Required for metrics filtration.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
+                  value: '{#GCP.AUTH.TOKEN}'
                   description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
@@ -847,7 +847,7 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
                   description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
+                  value: '{#GCP.AUTH.TOKEN}'
                   description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
@@ -974,7 +974,7 @@ zabbix_export:
                   value: '{#CLOUD_SQL.INSTANCE.HIGH.AVAIL}'
                   description: 'GCP Cloud SQL instance high availability definition.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
+                  value: '{#GCP.AUTH.TOKEN}'
                   description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
@@ -1097,7 +1097,7 @@ zabbix_export:
                   value: '{#GCE.MACHINE.TYPE}'
                   description: 'Instance machine type.'
                 - macro: '{$GCP.AUTH.TOKEN}'
-                  type: SECRET_TEXT
+                  value: '{#GCP.AUTH.TOKEN}'
                   description: 'Google Cloud Platform authorization token.'
                 - macro: '{$GCP.PROJECT.ID}'
                   value: '{#GCP.PROJECT.ID}'
