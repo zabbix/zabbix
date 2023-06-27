@@ -27,13 +27,13 @@ typedef struct
 	char			host[ZBX_HOSTNAME_BUF_LEN];
 	char			*key_orig;
 }
-zbx_interface_status;
+zbx_interface_status_t;
 
 static void	process_agent_result(void *data)
 {
 	zbx_agent_context	*agent_context = (zbx_agent_context *)data;
 	zbx_timespec_t		timespec;
-	zbx_interface_status	*interface_status;
+	zbx_interface_status_t	*interface_status;
 	int			ret;
 	zbx_poller_config_t	*poller_config = (zbx_poller_config_t *)agent_context->arg;
 
@@ -50,7 +50,7 @@ static void	process_agent_result(void *data)
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
 				&agent_context->interface.interfaceid)))
 		{
-			zbx_interface_status	interface_status_local = {.interface = agent_context->interface};
+			zbx_interface_status_t	interface_status_local = {.interface = agent_context->interface};
 
 			interface_status_local.interface.addr = NULL;
 			interface_status = zbx_hashset_insert(&poller_config->interfaces,
@@ -172,7 +172,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_interface_status	*interface_status;
+	zbx_interface_status_t	*interface_status;
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
 	zbx_timespec_t		timespec;
@@ -186,7 +186,7 @@ static void	poller_update_interfaces(zbx_poller_config_t *poller_config)
 
 	zbx_hashset_iter_reset(&poller_config->interfaces, &iter);
 
-	while (NULL != (interface_status = (zbx_interface_status *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (interface_status = (zbx_interface_status_t *)zbx_hashset_iter_next(&iter)))
 	{
 		switch (interface_status->errcode)
 		{
@@ -338,7 +338,7 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 		event_active(poller_config->async_check_items_timer, 0, 0);
 }
 
-static void	zbx_interface_status_clean(zbx_interface_status *interface_status)
+static void	zbx_interface_status_clean(zbx_interface_status_t *interface_status)
 {
 	zbx_free(interface_status->key_orig);
 	zbx_free(interface_status->error);
