@@ -30,6 +30,7 @@ use API,
 	CValueMapHelper,
 	Manager;
 
+use CNumberParser;
 use Widgets\Item\Widget;
 
 use Zabbix\Core\CWidget;
@@ -282,8 +283,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$bg_color = $this->fields_values['bg_color'];
 
+		$number_parser_binary = new CNumberParser([
+			'is_binary_size' => true
+		]);
+
 		if ($last_value !== null) {
 			foreach ($this->fields_values['thresholds'] as $threshold) {
+				if (isBinaryUnits($units)) {
+					$threshold['threshold_value'] = $number_parser_binary->calcValue();
+				}
+
 				if ($threshold['threshold_value'] > $last_value) {
 					break;
 				}
