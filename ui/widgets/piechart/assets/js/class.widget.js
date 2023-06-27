@@ -32,6 +32,22 @@ class CWidgetPieChart extends CWidget {
 		}
 	}
 
+	setTimePeriod(time_period) {
+		super.setTimePeriod(time_period);
+
+		if (this._state === WIDGET_STATE_ACTIVE) {
+			this._startUpdating();
+		}
+	}
+
+	getUpdateRequestData() {
+		return {
+			...super.getUpdateRequestData(),
+			from: this._time_period.from,
+			to: this._time_period.to
+		};
+	}
+
 	updateProperties({name, view_mode, fields}) {
 		if (this.pie !== null) {
 			this.pie.destroy();
@@ -41,15 +57,10 @@ class CWidgetPieChart extends CWidget {
 		super.updateProperties({name, view_mode, fields});
 	}
 
-	getUpdateRequestData() {
-		return {
-			...super.getUpdateRequestData(),
-		};
-	}
-
 	setContents(response) {
 		if (this.pie !== null) {
 			this.pie.setValue(response.sectors);
+			this.pie.setLegend(response.legend);
 
 			return;
 		}
@@ -65,7 +76,8 @@ class CWidgetPieChart extends CWidget {
 
 		this.pie = new CSVGPie(this._body, padding, response.config);
 		this.pie.setSize(super._getContentsSize());
-		this.pie.setValue(sectors_data);
+		this.pie.setValue(response.sectors);
+		this.pie.setLegend(response.legend);
 	}
 
 	getActionsContextMenu({can_paste_widget}) {

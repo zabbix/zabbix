@@ -43,22 +43,22 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			//'from' => 'string',
-			//'to' => 'string'
+			'from' => 'string',
+			'to' => 'string'
 		]);
 	}
 
 	protected function doAction(): void {
-
 		$dashboard_time = !WidgetForm::hasOverrideTime($this->fields_values);
-//		if ($dashboard_time) {
-//			$from = $this->getInput('from');
-//			$to = $this->getInput('to');
-//		}
-//		else {
+
+		if ($dashboard_time) {
+			$from = $this->getInput('from');
+			$to = $this->getInput('to');
+		}
+		else {
 			$from = $this->fields_values['time_from'];
 			$to = $this->fields_values['time_to'];
-		//}
+		}
 
 		$range_time_parser = new CRangeTimeParser();
 
