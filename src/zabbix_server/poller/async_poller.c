@@ -383,10 +383,15 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
 static void	async_poller_stop(zbx_poller_config_t *poller_config)
 {
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	evtimer_del(poller_config->async_check_items_timer);
 	event_base_dispatch(poller_config->base);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static void	async_poller_destroy(zbx_poller_config_t *poller_config)
@@ -415,6 +420,13 @@ static void	poller_update_selfmon_counter(void *arg)
 }
 #endif
 
+static void	socket_read_event_cb(evutil_socket_t fd, short what, void *arg)
+{
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(what);
+	ZBX_UNUSED(arg);
+}
+
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
@@ -427,6 +439,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	unsigned char			poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
+	struct event			*rtc_event;
 #ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
 #endif
@@ -443,6 +456,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zbx_rtc_subscribe(process_type, process_num, NULL, 0, poller_args_in->config_comms->config_timeout, &rtc);
 
 	async_poller_init(&poller_config, poller_args_in, async_check_items);
+	rtc_event = event_new(poller_config.base, zbx_ipc_client_get_fd(rtc.client), EV_READ | EV_PERSIST,
+			socket_read_event_cb, NULL);
+	event_add(rtc_event, NULL);
+
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 	poller_config.state = ZBX_PROCESS_STATE_BUSY;
 	poller_config.info = info;

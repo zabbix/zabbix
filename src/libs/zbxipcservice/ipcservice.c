@@ -1713,6 +1713,11 @@ void	zbx_ipc_client_close(zbx_ipc_client_t *client)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+int	zbx_ipc_client_get_fd(zbx_ipc_client_t *client)
+{
+	return client->csocket.fd;
+}
+
 void	zbx_ipc_client_addref(zbx_ipc_client_t *client)
 {
 	client->refcount++;
