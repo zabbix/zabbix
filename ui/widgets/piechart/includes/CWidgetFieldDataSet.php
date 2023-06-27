@@ -141,6 +141,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 
 	public function validate(bool $strict = false): array {
 		$errors = [];
+		$total_item_count = 0;
 
 		$validation_rules = ($strict && $this->strict_validation_rules !== null)
 			? $this->strict_validation_rules
@@ -169,6 +170,12 @@ class CWidgetFieldDataSet extends CWidgetField {
 			foreach ($value as $i => $data) {
 				$validation_rules_by_type = $validation_rules;
 				if ($data['dataset_type'] == self::DATASET_TYPE_SINGLE_ITEM) {
+					foreach($data['type'] as $item_type) {
+						if ($item_type == PIE_CHART_ITEM_TOTAL) {
+							$total_item_count++;
+						}
+					}
+
 					$validation_rules_by_type['fields']['itemids']['flags'] |= API_REQUIRED;
 					$validation_rules_by_type['fields']['color']['type'] = API_COLORS;
 					$validation_rules_by_type['fields']['type']['flags'] |= API_REQUIRED;
@@ -185,6 +192,19 @@ class CWidgetFieldDataSet extends CWidgetField {
 				if (!CApiInputValidator::validate($validation_rules_by_type, $data, $label.'/'.($i+1), $error)) {
 					$errors[] = $error;
 					break;
+				}
+			}
+
+			if ($total_item_count > 1) {
+				$errors[] = _('Cannot add more than one item with type "Total" to the chart.');
+			}
+
+			if ($total_item_count > 0) {
+				foreach ($value as $data) {
+					if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
+						$errors[] = _('Cannot set "Dataset aggregation" when item with type "Total" is added to the chart');
+						break;
+					}
 				}
 			}
 		}
