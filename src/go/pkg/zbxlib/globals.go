@@ -23,15 +23,15 @@ package zbxlib
 /*
 #include "zbxsysinfo.h"
 
-ZBX_PROPERTY_DECL(int, config_timeout, 3)
-ZBX_PROPERTY_DECL2(ZBX_THREAD_LOCAL char *, const char *, config_hostname, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, config_hostnames, NULL)
-ZBX_PROPERTY_DECL(int, config_enable_remote_commands, 1)
-ZBX_PROPERTY_DECL(int, config_log_remote_commands, 0)
-ZBX_PROPERTY_DECL(int, config_unsafe_user_parameters, 0)
-ZBX_PROPERTY_DECL2(char *, const char *, config_source_ip, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, config_host_metadata, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, config_host_metadata_item, NULL)
+ZBX_GET_CONFIG_VAR(int, config_timeout, 3)
+ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, config_hostname, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, config_hostnames, NULL)
+ZBX_GET_CONFIG_VAR(int, config_enable_remote_commands, 1)
+ZBX_GET_CONFIG_VAR(int, config_log_remote_commands, 0)
+ZBX_GET_CONFIG_VAR(int, config_unsafe_user_parameters, 0)
+ZBX_GET_CONFIG_VAR2(char *, const char *, config_source_ip, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, config_host_metadata, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, config_host_metadata_item, NULL)
 
 void	init_globals(void)
 {

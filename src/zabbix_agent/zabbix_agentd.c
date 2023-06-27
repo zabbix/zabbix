@@ -31,25 +31,25 @@
 static char	*CONFIG_PID_FILE = NULL;
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_hostnames, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_host_metadata, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_host_metadata_item, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
 
 char	*CONFIG_HOST_INTERFACE		= NULL;
 char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
 
-ZBX_PROPERTY_DECL2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
+ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
 
-ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 1)
-ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
-ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
+ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_AGENT_PORT;
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 5;
 char	*CONFIG_LISTEN_IP		= NULL;
 
-ZBX_PROPERTY_DECL2(char*, const char *, zbx_config_source_ip, NULL)
+ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
@@ -251,7 +251,7 @@ static const char	*get_progname(void)
 }
 #endif
 
-ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
+ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 

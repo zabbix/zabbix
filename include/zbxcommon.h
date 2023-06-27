@@ -750,14 +750,14 @@ char	*zbx_strerror(int errnum);
 #	endif
 #endif
 
-#define ZBX_PROPERTY_DECL(type, varname, defvalue) \
+#define ZBX_GET_CONFIG_VAR(type, varname, defvalue) \
 static type	varname = defvalue; \
 static type	get_##varname(void) \
 { \
 	return varname; \
 }
 
-#define ZBX_PROPERTY_DECL2(type1, type2, varname, defvalue) \
+#define ZBX_GET_CONFIG_VAR2(type1, type2, varname, defvalue) \
 static	type1	varname = defvalue; \
 static	type2	get_##varname(void) \
 { \

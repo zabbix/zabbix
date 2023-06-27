@@ -174,9 +174,9 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_source_ip, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_tmpdir, NULL)
-ZBX_PROPERTY_DECL2(char *, const char *, zbx_config_fping_location, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_source_ip, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_tmpdir, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
 char	*zbx_config_fping6_location = NULL;
 #ifdef HAVE_IPV6
 static const char	*get_zbx_config_fping6_location(void)
@@ -238,7 +238,7 @@ static int	get_config_forks(unsigned char process_type)
 	return 0;
 }
 
-ZBX_PROPERTY_DECL(int, zbx_config_timeout, 3)
+ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static int	config_startup_time		= 0;
 static int	config_unavailable_delay	= 60;
@@ -275,9 +275,9 @@ int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-ZBX_PROPERTY_DECL(int, zbx_config_enable_remote_commands, 0)
-ZBX_PROPERTY_DECL(int, zbx_config_log_remote_commands, 0)
-ZBX_PROPERTY_DECL(int, zbx_config_unsafe_user_parameters, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
+ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
 static char	*config_server		= NULL;
 int	CONFIG_SERVER_PORT;
