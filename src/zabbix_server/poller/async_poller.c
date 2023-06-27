@@ -365,14 +365,23 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	poller_config->config_unreachable_period = poller_args_in->config_unreachable_period;
 	poller_config->config_max_concurrent_checks_per_poller = poller_args_in->config_max_concurrent_checks_per_poller;
 
-	if (NULL == (poller_config->async_check_items_timer = evtimer_new(poller_config->base,
-			async_check_items_callback, poller_config)))
+	if (NULL == (poller_config->async_check_items_timer = event_new(poller_config->base, -1, EV_PERSIST,
+		async_check_items_callback, poller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create async items timer event");
 		exit(EXIT_FAILURE);
 	}
 
+	struct timeval	tv = {1, 0};
+
+	evtimer_add(poller_config->async_check_items_timer, &tv);
+	
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+static void	async_poller_stop(zbx_poller_config_t *poller_config)
+{
+	evtimer_del(poller_config->async_check_items_timer);
+	event_base_dispatch(poller_config->base);
 }
 
 static void	async_poller_destroy(zbx_poller_config_t *poller_config)
@@ -447,18 +456,11 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
 #endif
 	}
-
+	
 	while (ZBX_IS_RUNNING())
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-
-		if (0 == evtimer_pending(poller_config.async_check_items_timer, NULL))
-		{
-			struct timeval	tv = {1, 0};
-
-			evtimer_add(poller_config.async_check_items_timer, &tv);
-		}
 
 		if (ZBX_PROCESS_STATE_BUSY == poller_config.state)
 		{
@@ -490,7 +492,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		}
 	}
 
-	event_base_dispatch(poller_config.base);
+	async_poller_stop(&poller_config);
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
