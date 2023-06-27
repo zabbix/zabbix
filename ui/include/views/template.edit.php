@@ -30,7 +30,9 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
 	->setName('template-edit-form')
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'))
+	->addVar('clone', $data['clone'])
+	->addVar('clone_templateid', $data['clone_templateid']);
 
 // Template tab.
 $template_tab = (new CFormGrid())

@@ -177,6 +177,7 @@ window.template_edit_popup = new class {
 		this.overlay.setLoading();
 		const parameters = this.#trimFields(getFormFields(this.form));
 		parameters.clone = 1;
+		parameters.clone_templateid = this.templateid;
 
 		this.overlay = PopUp('template.edit', parameters, {
 			dialogueid: 'templates-form',
@@ -214,6 +215,7 @@ window.template_edit_popup = new class {
 
 		if (this.clone_template === 1) {
 			fields.clone = 1;
+			fields.clone_templateid = this.template.clone_templateid
 		}
 
 		this.#trimFields(fields);

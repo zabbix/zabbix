@@ -35,6 +35,7 @@ class CControllerTemplateEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>			'db hosts.hostid',
+			'clone_templateid' =>	'db hosts.hostid',
 			'groupids' =>			'array_db hosts_groups.groupid',
 			'template_name' =>		'db hosts.host',
 			'visiblename' =>		'db hosts.name',
@@ -115,7 +116,8 @@ class CControllerTemplateEdit extends CController {
 			// todo - read from input?
 			'readonly' => false,
 			'show_inherited_macros' => false,
-			'vendor' => []
+			'vendor' => [],
+			'clone' => $this->hasInput('clone')
 		];
 
 		// Add already linked and new templates.
@@ -310,6 +312,7 @@ class CControllerTemplateEdit extends CController {
 
 			$data['macros'] = $macros;
 			$data['warnings'] = $warnings;
+			$data['clone_templateid'] = $this->getInput('clone_templateid');
 		}
 
 		$data['writable_templates'] = API::Template()->get([

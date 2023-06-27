@@ -35,7 +35,9 @@ class CControllerTemplateCreate extends CController {
 			'macros' =>				'array',
 			'valuemaps' =>			'array',
 			'templates' =>			'array_db hosts.hostid',
-			'add_templates' =>		'array_db hosts.hostid'
+			'add_templates' =>		'array_db hosts.hostid',
+			'clone' =>				'in 1',
+			'clone_templateid' =>	'db hosts.hostid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -60,6 +62,7 @@ class CControllerTemplateCreate extends CController {
 
 	protected function doAction(): void {
 		$result = false;
+		$clone = $this->hasInput('clone');
 
 		try {
 			DBstart();
@@ -111,7 +114,6 @@ class CControllerTemplateCreate extends CController {
 			if ($new_groups) {
 				$new_groupid = API::TemplateGroup()->create($new_groups);
 
-				// todo - fix exceptions:
 				if (!$new_groupid) {
 					throw new Exception();
 				}
@@ -147,7 +149,11 @@ class CControllerTemplateCreate extends CController {
 
 			$result = API::Template()->create($template);
 
-			if ($result === false || !$this->createValueMaps($result['templateids'][0])) {
+			$src_templateid = $this->getInput('clone_templateid', 0);
+
+			if ($result === false
+					|| !$this->createValueMaps($result['templateids'][0])
+					|| ($clone && !$this->copyFromCloneSourceTemplate($src_templateid, $result['templateids'][0]))) {
 				throw new Exception();
 			}
 
@@ -192,8 +198,76 @@ class CControllerTemplateCreate extends CController {
 			$valuemaps[$key] = $valuemap + ['hostid' => $templateid];
 		}
 
-		if ($valuemaps && !API::ValueMap()->create($valuemaps)) {
+		return !($valuemaps && !API::ValueMap()->create($valuemaps));
+	}
+
+	/**
+	 * Copy http tests, items, triggers, graphs, discovery rules and template dashboards from source template to target
+	 * template.
+	 *
+	 * @param string $src_templateid  Source templateid.
+	 * @param string $templateid      Target templateid.
+	 *
+	 * @return bool
+	 */
+	private function copyFromCloneSourceTemplate(string $src_templateid, string $templateid): bool {
+		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
+		if (!copyHttpTests($src_templateid, $templateid)) {
 			return false;
+		}
+
+		if (!copyItemsToHosts('templateids', [$src_templateid], true, [$templateid])) {
+			return false;
+		}
+
+		// Copy triggers.
+		if (!copyTriggersToHosts([$templateid], $src_templateid)) {
+			return false;
+		}
+
+		// Copy graphs.
+		$db_graphs = API::Graph()->get([
+			'output' => ['graphid'],
+			'hostids' => $src_templateid,
+			'inherited' => false
+		]);
+
+		foreach ($db_graphs as $db_graph) {
+			copyGraphToHost($db_graph['graphid'], $templateid);
+		}
+
+		// Copy discovery rules.
+		$db_discovery_rules = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
+			'hostids' => $src_templateid,
+			'inherited' => false
+		]);
+
+		if ($db_discovery_rules) {
+			$copy_discovery_rules = API::DiscoveryRule()->copy([
+				'discoveryids' => array_column($db_discovery_rules, 'itemid'),
+				'hostids' => [$templateid]
+			]);
+
+			if (!$copy_discovery_rules) {
+				return false;
+			}
+		}
+
+		// Copy template dashboards.
+		$db_template_dashboards = API::TemplateDashboard()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'templateids' => $src_templateid,
+			'selectPages' => API_OUTPUT_EXTEND,
+			'preservekeys' => true
+		]);
+
+		if ($db_template_dashboards) {
+			$db_template_dashboards = CDashboardHelper::prepareForClone($db_template_dashboards, $templateid);
+
+			if (!API::TemplateDashboard()->create($db_template_dashboards)) {
+				return false;
+			}
 		}
 
 		return true;
