@@ -367,7 +367,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (SUCCEED != get_host_from_event((NULL != recovery_event) ? recovery_event : problem_event,
+		if (SUCCEED != zbx_event_db_get_host((NULL != recovery_event) ? recovery_event : problem_event,
 				&host, error, sizeof(error)))
 		{
 			goto fail;
