@@ -18,30 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @backup items, interface, hosts
+ * @backup items, interface, hosts, dashboard
  *
  * @onBefore prepareSelectedHostdata
  */
 
 class testDashboardGraphWidgetSelectedHosts extends CWebTest {
-
-	use TagTrait;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	/**
 	 * Id of the dashboard with widgets.
@@ -54,337 +42,211 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 * @return array
 	 */
 	public static function prepareSelectedHostdata() {
-		CDataHelper::call('hostgroup.create', [
-			[
-				'name' => 'Host group for Graph widgets selected hosts'
-			]
-		]);
-		$hostgrpid = CDataHelper::getIds('name');
+		$hostgroupid = CDataHelper::call('hostgroup.create',
+				[['name' => 'Host group for Graph widgets selected hosts']])['groupids'][0];
 
-		CDataHelper::call('host.create', [
+		CDataHelper::createHosts([
 			[
 				'host' => 'Host for widget 1',
+				'interfaces' => [],
 				'groups' => [
-					[
-						'groupid' => $hostgrpid['Host group for Graph widgets selected hosts']
-					]
+					'groupid' => $hostgroupid
 				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '192.168.3.217',
-					'dns' => '',
-					'port' => '10050'
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Item for Graph 1_1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 1_2',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 1_3',
+						'key_' => 'trap3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 1_4',
+						'key_' => 'trap4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 1_5',
+						'key_' => 'trap5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
 				]
 			],
 			[
 				'host' => 'Host for widget 2',
+				'interfaces' => [],
 				'groups' => [
-					[
-						'groupid' => $hostgrpid['Host group for Graph widgets selected hosts']
-					]
+					'groupid' => $hostgroupid
 				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '192.168.3.217',
-					'dns' => '',
-					'port' => '10050'
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Item for Graph 2_1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 2_2',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 2_3',
+						'key_' => 'trap3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 2_4',
+						'key_' => 'trap4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 2_5',
+						'key_' => 'trap5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
 				]
 			],
 			[
 				'host' => 'Host for widget 3',
+				'interfaces' => [],
 				'groups' => [
-					[
-						'groupid' => $hostgrpid['Host group for Graph widgets selected hosts']
-					]
+					'groupid' => $hostgroupid
 				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '192.168.3.217',
-					'dns' => '',
-					'port' => '10050'
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Item for Graph 3_1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 3_2',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 3_3',
+						'key_' => 'trap3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 3_4',
+						'key_' => 'trap4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 3_5',
+						'key_' => 'trap5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
 				]
 			],
 			[
 				'host' => 'Host for widget 4',
+				'interfaces' => [],
 				'groups' => [
-					[
-						'groupid' => $hostgrpid['Host group for Graph widgets selected hosts']
-					]
+					'groupid' => $hostgroupid
 				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '192.168.3.217',
-					'dns' => '',
-					'port' => '10050'
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Item for Graph 4_1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 4_2',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 4_3',
+						'key_' => 'trap3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 4_4',
+						'key_' => 'trap4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 4_5',
+						'key_' => 'trap5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
 				]
 			],
 			[
 				'host' => 'Host for widget 5',
+				'interfaces' => [],
 				'groups' => [
-					[
-						'groupid' => $hostgrpid['Host group for Graph widgets selected hosts']
-					]
+					'groupid' => $hostgroupid
 				],
-				'interfaces' => [
-					'type'=> 1,
-					'main' => 1,
-					'useip' => 1,
-					'ip' => '192.168.3.217',
-					'dns' => '',
-					'port' => '10050'
+				'status' => HOST_STATUS_MONITORED,
+				'items' => [
+					[
+						'name' => 'Item for Graph 5_1',
+						'key_' => 'trap1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 5_2',
+						'key_' => 'trap2',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 5_3',
+						'key_' => 'trap3',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 5_4',
+						'key_' => 'trap4',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Item for Graph 5_5',
+						'key_' => 'trap5',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					]
 				]
 			]
 		]);
-		$hostid = CDataHelper::getIds('host');
-
-		// Select one Agent type interface and use it on other hosts, where items require it.
-		$AGENT_INTERFACE_ID_1 = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for widget 1']);
-		$AGENT_INTERFACE_ID_2 = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for widget 2']);
-		$AGENT_INTERFACE_ID_3 = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for widget 3']);
-		$AGENT_INTERFACE_ID_4 = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for widget 4']);
-		$AGENT_INTERFACE_ID_5 = CDBHelper::getValue('SELECT interfaceid FROM interface WHERE hostid='.
-				$hostid['Host for widget 5']);
-
-		CDataHelper::call('item.create', [
-			[
-				'hostid' => $hostid['Host for widget 1'],
-				'name' => 'Item for Graph 1_1',
-				'key_' => 'system.cpu.util[test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_1,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 1'],
-				'name' => 'Item for Graph 1_2',
-				'key_' => 'vfs.file.get[file]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_1,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 1'],
-				'name' => 'Item for Graph 1_3',
-				'key_' => 'agent.ping',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_1,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 1'],
-				'name' => 'Item for Graph 1_4',
-				'key_' => 'agent.variant',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_1,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 1'],
-				'name' => 'Item for Graph 1_5',
-				'key_' => 'kernel.maxfiles',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_1,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 2'],
-				'name' => 'Item for Graph 2_1',
-				'key_' => 'kernel.maxfiles',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_2,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 2'],
-				'name' => 'Item for Graph 2_2',
-				'key_' => 'net.if.in[if,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_2,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 2'],
-				'name' => 'Item for Graph 2_3',
-				'key_' => 'net.tcp.service.perf[service,test,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_2,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 2'],
-				'name' => 'Item for Graph 2_4',
-				'key_' => 'net.tcp.listen[port]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_2,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 2'],
-				'name' => 'Item for Graph 2_5',
-				'key_' => 'modbus.get[endpoint,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_2,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 3'],
-				'name' => 'Item for Graph 3_1',
-				'key_' => 'kernel.maxfiles',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_3,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 3'],
-				'name' => 'Item for Graph 3_2',
-				'key_' => 'net.if.in[if,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_3,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 3'],
-				'name' => 'Item for Graph 3_3',
-				'key_' => 'agent.ping',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_3,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 3'],
-				'name' => 'Item for Graph 3_4',
-				'key_' => 'kernel.maxproc',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_3,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 3'],
-				'name' => 'Item for Graph 3_5',
-				'key_' => 'vfs.file.size[file,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_3,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 4'],
-				'name' => 'Item for Graph 4_1',
-				'key_' => 'vfs.fs.size[fs,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_4,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 4'],
-				'name' => 'Item for Graph 4_2',
-				'key_' => 'zabbix.stats[test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_4,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 4'],
-				'name' => 'Item for Graph 4_3',
-				'key_' => 'agent.ping',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_4,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 4'],
-				'name' => 'Item for Graph 4_4',
-				'key_' => 'service.info[service,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_4,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 4'],
-				'name' => 'Item for Graph 4_5',
-				'key_' => 'system.cpu.util[test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_4,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 5'],
-				'name' => 'Item for Graph 5_1',
-				'key_' => 'agent.ping',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_5,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 5'],
-				'name' => 'Item for Graph 5_2',
-				'key_' => 'vfs.file.time[file,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_5,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 5'],
-				'name' => 'Item for Graph 5_3',
-				'key_' => 'net.if.collisions[if]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_5,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 5'],
-				'name' => 'Item for Graph 5_4',
-				'key_' => 'proc.mem[test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_5,
-				'delay' => '5s'
-			],
-			[
-				'hostid' => $hostid['Host for widget 5'],
-				'name' => 'Item for Graph 5_5',
-				'key_' => 'sensor[device,sensor,test]',
-				'type' => 0,
-				'value_type' => 3,
-				'interfaceid' => $AGENT_INTERFACE_ID_5,
-				'delay' => '5s'
-			]
-		]);
-		$itemid = CDataHelper::getIds('name');
 
 		CDataHelper::call('dashboard.create', [
 			[
@@ -393,12 +255,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 				'auto_start' => 0,
 				'pages' => [
 					[
-						'name' => 'First page',
+						'name' => 'First page'
 					]
 				]
 			]
 		]);
-		self::$dashboardid = CDataHelper::getIds('name');
+		self::$dashboardid = array_values(CDataHelper::getIds('name'))[0];
 	}
 
 	public static function getCheckDependingData() {
@@ -469,15 +331,13 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 *
 	 * @dataProvider getCheckDependingData
 	 */
-
-	public function testDashboardGraphWidgetSelectedHosts_Check($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-				self::$dashboardid['Dashboard for creating Graph widgets']);
+	public function testDashboardGraphWidgetSelectedHosts_CheckItems($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
 		$form->fill(['Type' => 'Graph']);
-		$mergedtext = array();
+		$merged_text = array();
 
 		// Check if array is associative.
 		if (CTestArrayHelper::isAssociative($data['Data set'])) {
@@ -492,7 +352,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					'host' => 'xpath://div[@id="ds_0_hosts_"]/..'
 
 				];
-			} else {
+			}
+			else {
 				$mapping = [
 					'host' => 'xpath://input[@placeholder="host pattern"]'
 				];
@@ -523,11 +384,15 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 					$i = intval($count[0]) - 1;
 				}
 
+				//$word_index = ($count[2] === '20') ? 2 : 0;
+				//$found_matches = intval($count[$word_index]) - 1;
+
 				// In any case, suggestion bar max values are up to 20, so in case, when there's more, either test data should be reduced,
 				// or suggestion bar is broken.
-				if ($i >= '20') {
+				if ($i >= 20) {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
-				} else {
+				}
+				else {
 					for ($x = 0; $x < $i; $x++) {
 						// When data are filled in field, suggestion bar pops, in order to be sure that all expected data are provided,
 						// we go through each of the suggestion, put it in array and then compare to the expected data from data provider.
@@ -537,28 +402,29 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 
 						// Put text from suggestion into previously defined empty array.
 						// Function merges/combines arrays by putting newest value in the end of array.
-						array_push($mergedtext, $newitemtext);
+						array_push($merged_text, $newitemtext);
 					}
-					$this->assertEquals($data['expected'], $mergedtext);
+					$this->assertEquals($data['expected'], $merged_text);
 
 				}
-			} else {
-				$hosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
+			}
+			else {
+				$host_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
 						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
-				$count = str_word_count($hosttext, 1, '1234567890');
+				$count = str_word_count($host_text, 1, '1234567890');
 				$i = intval($count[0]) - 1;
 
 				if ($i >= '20') {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
-				} else {
+				}
+				else {
 					for ($x = 0; $x < $i; $x++) {
 						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-						$newhosttext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
+						$new_host_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
 								->one()->waitUntilTextPresent('widget')->getText();
-						array_push($mergedtext, $newhosttext);
-						//var_dump($mergedtext);
+						array_push($merged_text, $new_host_text);
 					}
-					$this->assertEquals($data['expected'], $mergedtext);
+					$this->assertEquals($data['expected'], $merged_text);
 				}
 			}
 		}
