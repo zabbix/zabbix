@@ -219,6 +219,7 @@ require_once dirname(__FILE__).'/reports/testFormScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testPageScheduledReport.php';
 require_once dirname(__FILE__).'/reports/testScheduledReportPermissions.php';
 require_once dirname(__FILE__).'/testSID.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -270,6 +271,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
+		$suite->addTestSuite('testPageMonitoringWebDetails');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
