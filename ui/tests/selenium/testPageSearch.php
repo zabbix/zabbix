@@ -702,6 +702,7 @@ class testPageSearch extends CWebTest {
 	protected function verifyThatSuggestionsNotShown() {
 		try {
 			$this->query('class:search-suggest')->waitUntilVisible(1);
+			throw new Exception('Suggestions list shown when it should not be.');
 		}
 		catch (TimeoutException $e) {
 			// All good, the suggestion list is not visible, continue the test.
