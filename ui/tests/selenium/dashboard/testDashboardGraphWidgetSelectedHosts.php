@@ -333,92 +333,83 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 */
 	public function testDashboardGraphWidgetSelectedHosts_CheckItems($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one()->edit();
-		$overlay = $dashboard->addWidget();
-		$form = $overlay->asForm();
+		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Graph']);
-		$merged_text = array();
-
-		// Check if array is associative.
-		if (CTestArrayHelper::isAssociative($data['Data set'])) {
-			$data['Data set'] = [$data['Data set']];
-		}
+		$merged_text = [];
 
 		// Change mapping of associative arrays from data set.
-		foreach ($data['Data set'] as $data_set) {
+		foreach ([$data['Data set']] as $data_set) {
 			if (array_key_exists('item', $data_set)) {
-				$mapping = [
-					'item' => 'xpath://input[@placeholder="item pattern"]',
-					'host' => 'xpath://div[@id="ds_0_hosts_"]/..'
-
+				$field_data = [
+					'xpath://div[@id="ds_0_hosts_"]/..' => $data_set['host'],
+					'xpath://input[@placeholder="item pattern"]' => $data_set['item']
 				];
 			}
 			else {
-				$mapping = [
-					'host' => 'xpath://input[@placeholder="host pattern"]'
+				$field_data = [
+					'xpath://input[@placeholder="host pattern"]' => $data_set['host']
 				];
 			}
 
-			// Put new mappings into data set and fill it in the form.
-			foreach ($mapping as $field => $selector) {
-				$data_set = [$selector => $data_set[$field]] + $data_set;
-				unset($data_set[$field]);
-			}
-			$form->fill($data_set);
+			$form->fill($field_data);
 
 			// In case array which is filled contains more than 2 keys.
 			if (count($data_set) >= 2) {
+				var_dump($data_set);
+				var_dump('test1');
 
-				// Get text from html, which from which later count for cycle is used.
-				$itemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
+				// Get text from html, from which later count for cycle is used.
+				$itemtext = $this->query('xpath://div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
 						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
 
 				// Count words in the text which was queried.
 				$count = str_word_count($itemtext, 1, '1234567890');
 
-				// In case data is more than 20, in sentence 3rd word is used as the count for "for cycle" iteration.
-				$i = intval($count[2]) - 1;
+				/**
+				 * In case data is more than 20, in sentence 3rd word is used as the count for "for cycle" iteration,
+				 * in case HTML texts first word contains the number of iterations we use it instead of third.
+				 */
+				$word_index = ($count[2] === '20') ? 2 : 0;
+				$found_matches = intval($count[$word_index]) - 1;
 
-				// In case HTML texts first word contains the number of iterations we use it instead of third.
-				if ($i < 0 ) {
-					$i = intval($count[0]) - 1;
-				}
-
-				//$word_index = ($count[2] === '20') ? 2 : 0;
-				//$found_matches = intval($count[$word_index]) - 1;
-
-				// In any case, suggestion bar max values are up to 20, so in case, when there's more, either test data should be reduced,
-				// or suggestion bar is broken.
-				if ($i >= 20) {
+				/**
+				 * In any case, suggestion bar max values are up to 20, so in case, when there's more, either test data should be reduced,
+				 * or suggestion bar is broken.
+				 */
+				if ($found_matches >= 20) {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
 				}
 				else {
-					for ($x = 0; $x < $i; $x++) {
-						// When data are filled in field, suggestion bar pops, in order to be sure that all expected data are provided,
-						// we go through each of the suggestion, put it in array and then compare to the expected data from data provider.
+					for ($x = 0; $x < $found_matches; $x++) {
+						/**
+						 * When data are filled in field, suggestion bar pops, in order to be sure that all expected data are provided,
+						 * we go through each of the suggestion, put it in array and then compare to the expected data from data provider.
+						 */
 						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-						$newitemtext = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
+						$new_item_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
 								->one()->waitUntilTextPresent('Graph')->getText();
 
-						// Put text from suggestion into previously defined empty array.
-						// Function merges/combines arrays by putting newest value in the end of array.
-						array_push($merged_text, $newitemtext);
+						/**
+						 * Put text from suggestion into previously defined empty array,
+						 * function merges/combines arrays by putting the most new value in the end of array.
+						 */
+						array_push($merged_text, $new_item_text);
 					}
 					$this->assertEquals($data['expected'], $merged_text);
 
 				}
 			}
 			else {
-				$host_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
+				$host_text = $this->query('xpath://div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
 						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
 				$count = str_word_count($host_text, 1, '1234567890');
-				$i = intval($count[0]) - 1;
+				$found_matches = intval($count[0]) - 1;
 
-				if ($i >= '20') {
+				if ($found_matches >= '20') {
 					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
 				}
 				else {
-					for ($x = 0; $x < $i; $x++) {
+					for ($x = 0; $x < $found_matches; $x++) {
 						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
 						$new_host_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
 								->one()->waitUntilTextPresent('widget')->getText();
