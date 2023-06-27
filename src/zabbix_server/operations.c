@@ -690,7 +690,7 @@ static int	is_discovery_or_autoregistration(const zbx_db_event *event)
  *                                                                            *
  * Parameters: op             - [IN] operation type: add or delete            *
  *             optagids       - [IN] operation tag IDs to add or delete       *
- *             host_tags      - [IN/OUT] currently present host tags          *
+ *             host_tags      - [IN/OUT]                                      *
  *                                                                            *
  ******************************************************************************/
 static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64_t *optagids,
@@ -713,6 +713,7 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "optagid", optagids->values, optagids->values_num);
 
 	result = zbx_db_select("%s", sql);
+	zbx_free(sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -746,11 +747,7 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
  ******************************************************************************/
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
 {
-	char			*sql_upd = NULL, *sql_del = NULL, *value_esc;
-	size_t			sql_upd_alloc = 0, sql_upd_offset = 0, sql_del_alloc = 0, sql_del_offset = 0;
-	zbx_uint64_t		hosttagid;
 	int			i, new_tags = 0, res = SUCCEED;
-	zbx_db_insert_t		db_insert_tag;
 	zbx_vector_db_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t	del_tagids;
 
@@ -769,8 +766,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		}
 		else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
 		{
-			zbx_vector_db_tag_ptr_append(&upd_tags, tag);
 			zbx_audit_host_update_json_update_tag_create_entry(hostid, tag->tagid);
+			zbx_vector_db_tag_ptr_append(&upd_tags, tag);
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 			{
@@ -792,7 +789,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 	if (0 != new_tags)
 	{
-		hosttagid = zbx_db_get_maxid_num("host_tag", new_tags);
+		zbx_db_insert_t	db_insert_tag;
+		zbx_uint64_t	hosttagid = zbx_db_get_maxid_num("host_tag", new_tags);
 
 		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
 				NULL);
@@ -817,8 +815,11 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 	if (0 != upd_tags.values_num)
 	{
-		sql_upd = (char *)zbx_malloc(sql_upd, sql_upd_alloc);
-		zbx_db_begin_multiple_update(&sql_upd, &sql_upd_alloc, &sql_upd_offset);
+		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+		char	*value_esc;
+		char	*sql = NULL;
+
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		zbx_vector_db_tag_ptr_sort(&upd_tags, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
@@ -827,13 +828,13 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			char		delim = ' ';
 			zbx_db_tag_t	*tag = upd_tags.values[i];
 
-			zbx_strcpy_alloc(&sql_upd, &sql_upd_alloc, &sql_upd_offset, "update host_tag set");
+			sql = (char *)zbx_malloc(sql, sql_alloc);
+			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update host_tag set");
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
 			{
 				value_esc = zbx_db_dyn_escape_string(tag->tag);
-				zbx_snprintf_alloc(&sql_upd, &sql_upd_alloc, &sql_upd_offset, "%ctag='%s'", delim,
-						value_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ctag='%s'", delim, value_esc);
 				zbx_free(value_esc);
 				delim = ',';
 			}
@@ -841,47 +842,49 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
 			{
 				value_esc = zbx_db_dyn_escape_string(tag->value);
-				zbx_snprintf_alloc(&sql_upd, &sql_upd_alloc, &sql_upd_offset, "%cvalue='%s'", delim,
-						value_esc);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%cvalue='%s'", delim, value_esc);
 				zbx_free(value_esc);
 			}
 
-			zbx_snprintf_alloc(&sql_upd, &sql_upd_alloc, &sql_upd_offset,
-					" where hosttagid=" ZBX_FS_UI64 ";\n", tag->tagid);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hosttagid=" ZBX_FS_UI64 ";\n",
+					tag->tagid);
 
-			if (FAIL == (res = zbx_db_execute_overflowed_sql(&sql_upd, &sql_upd_alloc, &sql_upd_offset)))
+			if (FAIL == (res = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
 				break;
 		}
 
-		if (SUCCEED == res)
+		if (SUCCEED == res && NULL != sql)
 		{
-			zbx_db_end_multiple_update(&sql_upd, &sql_upd_alloc, &sql_upd_offset);
+			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 			/* in ORACLE always present begin..end; */
-			if (16 < sql_upd_offset)
-				zbx_db_execute("%s", sql_upd);
+			if (16 < sql_offset)
+				zbx_db_execute("%s", sql);
 		}
+
+		zbx_free(sql);
 	}
 
 	if (SUCCEED == res && 0 != del_tagids.values_num)
 	{
-		sql_del = (char *)zbx_malloc(sql_del, sql_del_alloc);
-		zbx_db_begin_multiple_update(&sql_del, &sql_del_alloc, &sql_del_offset);
+		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
+		char	*sql = (char *)zbx_malloc(sql, sql_alloc);
 
-		zbx_strcpy_alloc(&sql_del, &sql_del_alloc, &sql_del_offset, "delete from host_tag where");
-		zbx_db_add_condition_alloc(&sql_del, &sql_del_alloc, &sql_del_offset, "hosttagid", del_tagids.values,
+		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
-		zbx_strcpy_alloc(&sql_del, &sql_del_alloc, &sql_del_offset, ";\n");
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		zbx_db_end_multiple_update(&sql_del, &sql_del_alloc, &sql_del_offset);
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		/* in ORACLE always present begin..end; */
-		if (16 < sql_del_offset)
-			zbx_db_execute("%s", sql_del);
-	}
+		if (16 < sql_offset)
+			zbx_db_execute("%s", sql);
 
-	zbx_free(sql_upd);
-	zbx_free(sql_del);
+		zbx_free(sql);
+	}
 
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_tagids);
@@ -1260,9 +1263,9 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 	zbx_uint64_t		hostid;
 	int			status;
 	char			*hostname = NULL;
+	zbx_vector_db_tag_ptr_t	host_tags;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_vector_db_tag_ptr_t	host_tags;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

@@ -321,7 +321,8 @@ static int  DBpatch_6050027(void)
 
 static int	DBpatch_6050028(void)
 {
-	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0,
+			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("optag", 1, &field);
 }
