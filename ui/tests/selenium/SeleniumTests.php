@@ -179,6 +179,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.ph
 require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
 require_once dirname(__FILE__).'/testSID.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -223,6 +224,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMonitoringHosts');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
+		$suite->addTestSuite('testPageMonitoringWebDetails');
 		$suite->addTestSuite('testPageNetworkDiscovery');
 		$suite->addTestSuite('testPageOverview');
 		/*
