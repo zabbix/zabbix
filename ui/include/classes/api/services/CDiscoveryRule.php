@@ -633,22 +633,19 @@ class CDiscoveryRule extends CItemGeneral {
 		// Add LLD macro paths.
 		if ($options['selectLLDMacroPaths'] !== null && $options['selectLLDMacroPaths'] != API_OUTPUT_COUNT) {
 			$lld_macro_paths = API::getApiService()->select('lld_macro_path', [
-				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid', 'lld_macro_pathid']),
+				'output' => $this->outputExtend($options['selectLLDMacroPaths'], ['itemid']),
 				'filter' => ['itemid' => $itemIds]
 			]);
 
-			foreach ($result as &$lld_macro_path) {
-				$lld_macro_path['lld_macro_paths'] = [];
+			foreach ($result as &$lld_rule) {
+				$lld_rule['lld_macro_paths'] = [];
 			}
-			unset($lld_macro_path);
+			unset($lld_rule);
 
 			foreach ($lld_macro_paths as $lld_macro_path) {
 				$itemid = $lld_macro_path['itemid'];
 
-				if (!$this->outputIsRequested('lld_macro_pathid', $options['selectLLDMacroPaths'])) {
-					unset($lld_macro_path['lld_macro_pathid']);
-				}
-				unset($lld_macro_path['itemid']);
+				unset($lld_macro_path['lld_macro_pathid'], $lld_macro_path['itemid']);
 
 				$result[$itemid]['lld_macro_paths'][] = $lld_macro_path;
 			}
