@@ -293,6 +293,13 @@ form {
 	}
 }
 
+.form-submit-hidden {
+	position: absolute;
+	visibility: hidden;
+	min-height: 0;
+	max-height: 0;
+}
+
 // Tables.
 .list-table {
 	width: 100%;
@@ -3098,6 +3105,10 @@ $form-icon-btn: (
 			padding: 0 10px;
 			position: relative;
 			@extend %webkit-scrollbar;
+
+			> form {
+				padding: 2px 0;
+			}
 
 			.table-forms {
 				.table-forms-td-right {

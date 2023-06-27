@@ -2837,6 +2837,12 @@ pre, pre a, pre td, pre span {
 form.is-loading {
   position: relative; }
 
+.form-submit-hidden {
+  position: absolute;
+  visibility: hidden;
+  min-height: 0;
+  max-height: 0; }
+
 .list-table {
   width: 100%;
   background-color: #000000;
@@ -4601,6 +4607,8 @@ z-select[readonly] .focusable,
       margin: 0 -10px 10px;
       padding: 0 10px;
       position: relative; }
+      .overlay-dialogue.modal .overlay-dialogue-body > form {
+        padding: 2px 0; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-td-right {
         padding-right: 8px; }
       .overlay-dialogue.modal .overlay-dialogue-body .table-forms .table-forms-row-with-second-field {
