@@ -1236,6 +1236,7 @@ form {
 		.subfilter-disable-btn {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 		}
 	}
 
