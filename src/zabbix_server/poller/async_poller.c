@@ -14,7 +14,7 @@
 #include "async_httpagent.h"
 #include "async_agent.h"
 #include "zbx_availability_constants.h"
-#include "asynchttppoller.h"
+#include "zbxasynchttppoller.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 

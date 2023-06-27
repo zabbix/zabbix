@@ -19,7 +19,7 @@
 
 #include "zbxlog.h"
 #include "zbxsysinc.h"
-#include "asynchttppoller.h"
+#include "zbxasynchttppoller.h"
 
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
 #include <event.h>

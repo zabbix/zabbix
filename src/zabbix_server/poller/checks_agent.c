@@ -20,7 +20,7 @@
 #include "checks_agent.h"
 
 #include "zbxsysinfo.h"
-#include "asyncpoller.h"
+#include "zbxasyncpoller.h"
 #include "zbx_availability_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
