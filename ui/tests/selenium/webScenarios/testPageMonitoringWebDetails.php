@@ -42,6 +42,16 @@ class testPageMonitoringWebDetails extends CWebTest {
 				'host' => self::HOST_NAME,
 				'groups' => [
 					'groupid' => '6'
+				],
+				'interfaces' => [
+					[
+						'type' => 1,
+						'main' => 1,
+						'useip' => 1,
+						'ip' => '127.1.1.1',
+						'dns' => '',
+						'port' => '10050'
+					]
 				]
 			]
 		]);
