@@ -193,7 +193,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$items_db = API::Item()->get([
 					'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 					'selectHosts' => ['name'],
-					'selectValueMap' => ['mappings'],
 					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -246,7 +245,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$options = [
 				'output' => ['itemid', 'hostid', 'name', 'history', 'trends', 'units', 'value_type'],
 				'selectHosts' => ['name'],
-				'selectValueMap' => ['mappings'],
 				'webitems' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -431,8 +429,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends',
-				'valuemap' => $metric['valuemap']
+				'source' => ($metric['source'] == PIE_CHART_DATA_SOURCE_HISTORY) ? 'history' : 'trends'
 			];
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
@@ -544,9 +541,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$set_default_item = false;
 			}
 
-			$formatted_value = formatHistoryValueRaw($metric['value'], $metric['item'], false, [
-				'decimals' => $total_config['decimal_places'],
-				'decimals_exact' => true,
+			$formatted_value = convertUnitsRaw([
+				'value' => $metric['value'],
+				'units' => $metric['item']['units'],
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
@@ -572,7 +569,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		foreach ($metrics as &$metric) {
-			if (!$metric['is_total']) {
+			if (!$metric['is_total'] && $raw_total_value > 0) {
 				$percentage = ($metric['value'] / $raw_total_value) * 100;
 				$metric['percent_of_total'] = $percentage;
 			}
@@ -592,9 +589,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		unset($metric);
 
 		if ($below_threshold_count >= 2) {
-			$others_formatted_value = formatHistoryValueRaw($others_value, $default_item, false, [
-				'decimals' => $total_config['decimal_places'],
-				'decimals_exact' => true,
+			$others_formatted_value = convertUnitsRaw([
+				'value' => $others_value,
+				'units' => $default_item['units'],
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
@@ -618,7 +615,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$total_value = formatHistoryValueRaw($raw_total_value, $default_item, false, [
+		$total_value = convertUnitsRaw([
+			'value' => $raw_total_value,
+			'units' => $default_item['units'],
 			'decimals' => $total_config['decimal_places'],
 			'decimals_exact' => true,
 			'small_scientific' => false,
