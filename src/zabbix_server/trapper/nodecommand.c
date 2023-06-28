@@ -25,7 +25,6 @@
 #include "../scripts/scripts.h"
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
-#include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 
@@ -387,7 +386,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		goto fail;
 	}
 
-	user_timezone = get_user_timezone(user->userid);
+	user_timezone = zbx_db_get_user_timezone(user->userid);
 
 	/* substitute macros in script body and webhook parameters */
 
@@ -517,7 +516,7 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (FAIL == zbx_get_user_from_json(jp, &user, &result))
 		goto finish;
 
-	if (SUCCEED != check_perm2system(user.userid))
+	if (SUCCEED != zbx_check_user_perm2system(user.userid))
 	{
 		result = zbx_strdup(result, "Permission denied. User is a member of group with disabled access.");
 		goto finish;

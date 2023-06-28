@@ -13,8 +13,6 @@ libzbxserver_a_SOURCES = \
 	expression.h \
 	macrofunc.c \
 	macrofunc.h \
-	zabbix_users.c \
-	zabbix_users.h \
 	calc_checks_eval.c \
 	evaluate_simple.c
 
