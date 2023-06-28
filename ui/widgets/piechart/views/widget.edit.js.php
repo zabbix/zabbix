@@ -362,10 +362,7 @@ window.widget_piechart_form = new class {
 				`$1${cloned_dataset.getAttribute('data-set')}$2`
 			);
 
-			if (input.tagName.toLowerCase() === 'z-select') {
-				cloned_dataset.querySelector(`[name="${cloned_name}"]`).value = input.value;
-			}
-			else if (input.type === 'text') {
+			if (input.tagName.toLowerCase() === 'z-select' || input.type === 'text') {
 				cloned_dataset.querySelector(`[name="${cloned_name}"]`).value = input.value;
 			}
 		}
