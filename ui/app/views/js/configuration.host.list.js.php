@@ -55,8 +55,12 @@
 				uncheckTableRows('templates');
 				postMessageOk(e.detail.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
 				}
 
 				location.href = location.href;
@@ -66,8 +70,12 @@
 				uncheckTableRows('templates');
 				postMessageOk(e.detail.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
 				}
 
 				location.href = location.href;

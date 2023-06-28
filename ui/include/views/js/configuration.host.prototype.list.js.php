@@ -30,12 +30,12 @@
 		init() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
-					this.editTemplate({templateid: e.target.dataset.templateid})
+					this.editLinkedTemplate({templateid: e.target.dataset.templateid})
 				}
 			});
 		},
 
-		editTemplate(parameters) {
+		editLinkedTemplate(parameters) {
 			const overlay = PopUp('template.edit', parameters, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
@@ -46,8 +46,12 @@
 				uncheckTableRows('templates');
 				postMessageOk(e.detail.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
 				}
 
 				location.href = location.href;
@@ -57,8 +61,12 @@
 				uncheckTableRows('templates');
 				postMessageOk(e.detail.title);
 
-				if ('messages' in e.detail) {
-					postMessageDetails('success', e.detail.messages);
+				if ('success' in e.detail) {
+					postMessageOk(e.detail.success.title);
+
+					if ('messages' in e.detail.success) {
+						postMessageDetails('success', e.detail.success.messages);
+					}
 				}
 
 				location.href = location.href;
@@ -92,8 +100,30 @@
 			}, {once: true});
 		},
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const original_url = location.href;
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -120,6 +150,23 @@
 
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			},
+
+			templateDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'template.list');
 
 				location.href = curl.getUrl();
 			}

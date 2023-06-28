@@ -134,6 +134,28 @@
 			}, {once: true});
 		},
 
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const original_url = location.href;
+			const overlay =  PopUp('template.edit', template_data, {
+				dialogueid: 'templates-form',
+				dialogue_class: 'modal-popup-large',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
+		},
+
 		refresh() {
 			const url = new Curl('');
 			const form = document.getElementsByName(this.form_name)[0];
@@ -143,7 +165,7 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -154,7 +176,7 @@
 					}
 				}
 
-				view.refresh();
+				location.href = location.href;
 			},
 
 			hostDelete(e) {
@@ -170,6 +192,23 @@
 
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'host.list');
+
+				location.href = curl.getUrl();
+			},
+
+			templateDelete(e) {
+				const data = e.detail;
+
+				if ('success' in data) {
+					postMessageOk(data.success.title);
+
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
+					}
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'template.list');
 
 				location.href = curl.getUrl();
 			}

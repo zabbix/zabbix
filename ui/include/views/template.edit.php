@@ -31,8 +31,11 @@ $form = (new CForm())
 	->setId('templates-form')
 	->setName('template-edit-form')
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
-	->addVar('clone', $data['clone'])
 	->addVar('clone_templateid', $data['clone_templateid'] ?? null);
+
+if ($data['clone']) {
+	$form->addVar('clone', $data['clone']);
+}
 
 // Template tab.
 $template_tab = (new CFormGrid())

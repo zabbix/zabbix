@@ -33,7 +33,6 @@ window.template_edit_popup = new class {
 		this.templateid = template.templateid;
 		this.template = template;
 		this.linked_templateids = Object.keys(this.template.linked_templates);
-		this.clone_template = 0;
 
 		if (template.warnings && template.warnings.length > 0) {
 			const message_box = template.warnings.length > 1
@@ -202,7 +201,7 @@ window.template_edit_popup = new class {
 		this.#post(curl.getUrl(), data, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.delete', {detail: response}));
 		});
 	}
 
@@ -211,11 +210,6 @@ window.template_edit_popup = new class {
 
 		if (this.templateid !== null) {
 			fields.templateid = this.templateid;
-		}
-
-		if (this.clone_template === 1) {
-			fields.clone = 1;
-			fields.clone_templateid = this.template.clone_templateid
 		}
 
 		this.#trimFields(fields);
@@ -228,7 +222,7 @@ window.template_edit_popup = new class {
 		this.#post(curl.getUrl(), fields, (response) => {
 			overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.success}));
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		});
 	}
 
