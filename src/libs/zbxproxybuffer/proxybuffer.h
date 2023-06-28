@@ -37,7 +37,6 @@
 
 typedef enum
 {
-	PB_DATABASE_ONLY,
 	PB_DATABASE,
 	PB_DATABASE_MEMORY,
 	PB_MEMORY,
@@ -104,6 +103,7 @@ typedef struct
 	zbx_list_t		discovery;
 	zbx_list_t		autoreg;
 
+	int			mode;
 	zbx_pb_state_t		state;
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;
@@ -150,7 +150,7 @@ void	*pb_malloc(size_t size);
 void	pb_free(void *ptr);
 char	*pb_strdup(const char *str);
 
-void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message);
+void	pb_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message);
 
 void	pb_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);

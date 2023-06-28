@@ -338,8 +338,10 @@ static zbx_vector_addr_ptr_t	config_server_addrs;
 #define ZBX_CONFIG_DATA_CACHE_SIZE_MIN		(ZBX_KIBIBYTE * 128)
 #define ZBX_CONFIG_DATA_CACHE_AGE_MIN		(SEC_PER_MIN * 10)
 
-static zbx_uint64_t	config_data_cache_size	= 0;
-static int		config_data_cache_age	= 0;
+static char		*config_proxy_buffer_mode_str = NULL;
+static int		config_proxy_buffer_mode	= 0;
+static zbx_uint64_t	config_proxy_memory_buffer_size	= 0;
+static int		config_proxy_memory_buffer_age	= 0;
 
 /* proxy has no any events processing */
 static const zbx_events_funcs_t	events_cbs = {
@@ -721,41 +723,66 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == config_proxyconfig_frequency)
 		config_proxyconfig_frequency = 10;
 
-	if (0 != config_data_cache_age)
+	if (FAIL == zbx_pb_parse_mode(config_proxy_buffer_mode_str, &config_proxy_buffer_mode))
 	{
-		if (0 == config_data_cache_size)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter requires"
-					" \"DataCacheSize\"");
-			err = 1;
-		}
-
-		if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_data_cache_age)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheAge\" configuration parameter");
-			err = 1;
-		}
+		zabbix_log(LOG_LEVEL_CRIT, "Invalid \"ProxyBufferMode\" configuration parameter value");
+		err = 1;
 	}
 
-	if (0 != config_data_cache_size)
+	if (ZBX_PB_MODE_DISK != config_proxy_buffer_mode)
 	{
-		if (ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_data_cache_size)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"DataCacheSize\" configuration parameter");
-			err = 1;
-		}
-
 		if (0 != config_proxy_local_buffer)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheSize\" configuration parameter cannot be used together"
-					" with \"ProxyLocalBuffer\"");
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyBufferMode\" configuration parameter cannot be"
+					" \"memory\" or \"hybrid\" when \"ProxyLocalBuffer\" parameter is set");
 			err = 1;
 		}
 
-		if (config_data_cache_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
+		if (0 == config_proxy_memory_buffer_size)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"DataCacheAge\" configuration parameter cannot be greater than "
-					"\"ProxyOfflineBuffer\"");
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter must be set when"
+					" \"ProxyBufferMode\" parameter is \"memory\" or \"hybrid\"");
+			err = 1;
+		}
+
+		if (0 != config_proxy_memory_buffer_age)
+		{
+			if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_proxy_memory_buffer_age)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferAge\" configuration"
+						" parameter");
+				err = 1;
+			}
+
+			if (config_proxy_memory_buffer_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter cannot be"
+						" greater than \"ProxyOfflineBuffer\" parameter");
+				err = 1;
+			}
+		}
+
+		if (0 != config_proxy_memory_buffer_size &&
+				ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_proxy_memory_buffer_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferSize\" configuration parameter");
+			err = 1;
+
+		}
+	}
+	else
+	{
+		if (0 != config_proxy_memory_buffer_age)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter can be set only"
+					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
+			err = 1;
+		}
+
+		if (0 != config_proxy_memory_buffer_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter can be set only"
+					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
 			err = 1;
 		}
 	}
@@ -991,12 +1018,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			1000},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
+		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"DataCacheSize",			&config_data_cache_size,		TYPE_UINT64,
+		{"ProxyMemoryBufferSize",	&config_proxy_memory_buffer_size,	TYPE_UINT64,
 			PARM_OPT,	0,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"DataCacheAge",			&config_data_cache_age,		TYPE_INT,
+		{"ProxyMemoryBufferAge",	&config_proxy_memory_buffer_age,	TYPE_INT,
 			PARM_OPT,	0,	SEC_PER_DAY * 10},
+		{"ProxyBufferMode",		&config_proxy_buffer_mode_str,		TYPE_STRING,
+			PARM_OPT,	0,	0},
 		{NULL}
 	};
 
@@ -1534,8 +1563,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
 
-	if (FAIL == zbx_pb_init(config_data_cache_size, config_data_cache_age,
-			config_proxy_offline_buffer * SEC_PER_HOUR, &error))
+	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
+			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy data cache: %s", error);
 		zbx_free(error);

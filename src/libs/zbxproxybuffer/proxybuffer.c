@@ -37,15 +37,15 @@ static zbx_shmem_info_t	*pb_mem = NULL;
 
 ZBX_SHMEM_FUNC_IMPL(__pb, pb_mem)
 
-static void	pb_cache_set_init_state(zbx_pb_t *pb);
+static void	pb_init_state(zbx_pb_t *pb);
 
 /* remap states to incoming data destination - database or memory */
-zbx_pb_state_t	pb_dst[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY, PB_DATABASE};
+zbx_pb_state_t	pb_dst[] = {PB_DATABASE, PB_MEMORY, PB_MEMORY, PB_DATABASE};
 
 /* remap states to outgoing data source - database or memory */
-zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
+zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
 
-const char	*pb_state_desc[] = {"database only", "database", "database->memory", "memory", "memory->database"};
+const char	*pb_state_desc[] = {"database", "database->memory", "memory", "memory->database"};
 
 void	pb_lock(void)
 {
@@ -132,7 +132,7 @@ static int	pb_has_history(const char *table, const char *field)
  * Purpose: set cache state and log the changes                               *
  *                                                                            *
  ******************************************************************************/
-void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
+void	pb_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s => %s", __func__, pb_state_desc[pb->state], pb_state_desc[state]);
 
@@ -141,21 +141,18 @@ void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
 
 	switch (state)
 	{
-		case PB_DATABASE_ONLY:
-			zabbix_log(LOG_LEVEL_DEBUG, "witched proxy data cache to database mode: %s", message);
-			break;
 		case PB_DATABASE:
-			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to database mode: %s", message);
+			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy buffer to database state: %s", message);
 			break;
 		case PB_DATABASE_MEMORY:
-			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to memory mode: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy buffer transition to memory state: %s",
 					message);
 			break;
 		case PB_MEMORY:
-			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to memory mode: %s", message);
+			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy buffer to memory state: %s", message);
 			break;
 		case PB_MEMORY_DATABASE:
-			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to database mode: %s",
+			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy buffer transition to database state: %s",
 					message);
 			break;
 	}
@@ -167,21 +164,27 @@ void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set initial cache working state based on existing history data    *
+ * Purpose: set initial buffer working state based on existing history data   *
  *                                                                            *
  ******************************************************************************/
-static void	pb_cache_set_init_state(zbx_pb_t *pb)
+static void	pb_init_state(zbx_pb_t *pb)
 {
+	if (ZBX_PB_MODE_MEMORY == pb->mode)
+	{
+		pb_set_state(pb, PB_MEMORY, "proxy buffer set to work in memory mode");
+		return;
+	}
+
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	if (SUCCEED == pb_has_history("proxy_history", "history_lastid") ||
 			SUCCEED == pb_has_history("proxy_dhistory", "dhistory_lastid") ||
 			SUCCEED == pb_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
 	{
-		pb_cache_set_state(pb, PB_DATABASE, "unsent database records found");
+		pb_set_state(pb, PB_DATABASE, "unsent database records found");
 	}
 	else
-		pb_cache_set_state(pb, PB_MEMORY, "no unsent database records found");
+		pb_set_state(pb, PB_MEMORY, "no unsent database records found");
 
 	zbx_db_close();
 }
@@ -361,7 +364,7 @@ static void	pb_flush(zbx_pb_t *pb)
 void	pd_fallback_to_database(zbx_pb_t *pb, const char *message)
 {
 	pb_flush(pb);
-	pb_cache_set_state(pb, PB_DATABASE, message);
+	pb_set_state(pb, PB_DATABASE, message);
 }
 
 /******************************************************************************
@@ -372,6 +375,9 @@ void	pd_fallback_to_database(zbx_pb_t *pb, const char *message)
  ******************************************************************************/
 static void pb_update_state(zbx_pb_t *pb, int more)
 {
+	if (ZBX_PB_MODE_HYBRID != pb->mode)
+		return;
+
 	switch (pb->state)
 	{
 	case PB_MEMORY:
@@ -386,12 +392,12 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 			zbx_db_begin();
 			pb_flush_lastids(pb);
 			zbx_db_commit();
-			pb_cache_set_state(pb, PB_DATABASE, "memory records have been uploaded");
+			pb_set_state(pb, PB_DATABASE, "memory records have been uploaded");
 		}
 		break;
 	case PB_DATABASE:
 		if (ZBX_PROXY_DATA_DONE == more)
-			pb_cache_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
+			pb_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
 		break;
 	case PB_DATABASE_MEMORY:
 		if (ZBX_PROXY_DATA_DONE == more && 0 == pb_data->db_handles_num &&
@@ -399,11 +405,8 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 				pb_data->discovery_lastid_db <= pb_data->discovery_lastid_sent &&
 				pb_data->autoreg_lastid_db <= pb_data->autoreg_lastid_sent)
 		{
-			pb_cache_set_state(pb, PB_MEMORY, "database records have been uploaded");
+			pb_set_state(pb, PB_MEMORY, "database records have been uploaded");
 		}
-		break;
-	case PB_DATABASE_ONLY:
-		/* no state switching from database only mode */
 		break;
 	}
 }
@@ -422,26 +425,27 @@ static void pb_update_state(zbx_pb_t *pb, int more)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pb_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
+int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error)
 {
 	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 == size)
+	if (ZBX_PB_MODE_DISK == mode)
 	{
 		pb_data = (zbx_pb_t *)zbx_malloc(NULL, sizeof(zbx_pb_t));
 		memset(pb_data, 0, sizeof(zbx_pb_t));
 
 		pb_data->mutex = ZBX_MUTEX_NULL;
-		pb_cache_set_state(pb_data, PB_DATABASE_ONLY, "proxy data cache has been disabled");
+		pb_data->mode = mode;
+		pb_set_state(pb_data, PB_DATABASE, "proxy buffer set to work in disk mode");
 
 		ret = SUCCEED;
 
 		goto out;
 	}
 
-	if (SUCCEED != zbx_shmem_create(&pb_mem, size, "proxy data cache size", "proxybufferSize", 1, error))
+	if (SUCCEED != zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", 1, error))
 		goto out;
 
 	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
@@ -450,6 +454,7 @@ int	zbx_pb_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 	zbx_list_create_ext(&pb_data->discovery, __pb_shmem_malloc_func, __pb_shmem_free_func);
 	zbx_list_create_ext(&pb_data->autoreg, __pb_shmem_malloc_func, __pb_shmem_free_func);
 
+	pb_data->mode = mode;
 	pb_data->max_age = age;
 	pb_data->offline_buffer = offline_buffer;
 	pb_data->changes_num = 0;
@@ -457,13 +462,32 @@ int	zbx_pb_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
 		goto out;
 
-	pb_cache_set_init_state(pb_data);
+	pb_init_state(pb_data);
 
 	ret = SUCCEED;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pb_data->state);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parse proxy buffer mode configuration string                      *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_pb_parse_mode(const char *str, int *mode)
+{
+	if (NULL == str || '\0' == *str || 0 == strcmp(str, "disk"))
+		*mode = ZBX_PB_MODE_DISK;
+	else if (0 == strcmp(str, "memory"))
+		*mode = ZBX_PB_MODE_DISK;
+	else if (0 == strcmp(str, "hybrid"))
+		*mode = ZBX_PB_MODE_HYBRID;
+	else
+		return FAIL;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -486,7 +510,8 @@ void	zbx_pb_update_state(int more)
 void	zbx_pb_disable(void)
 {
 	pb_lock();
-	pb_data->state = PB_DATABASE_ONLY;
+	pb_data->state = PB_DATABASE;
+	pb_data->mode = ZBX_PB_MODE_DISK;
 	pb_unlock();
 }
 
@@ -498,7 +523,6 @@ void	zbx_pb_disable(void)
 void	zbx_pb_flush(void)
 {
 	pb_flush(pb_data);
-	pb_data->state = PB_DATABASE_ONLY;
 }
 
 /******************************************************************************

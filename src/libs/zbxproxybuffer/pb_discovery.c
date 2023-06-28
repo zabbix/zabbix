@@ -471,7 +471,7 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 			else
 			{
 				/* initiate transition to database cache */
-				pb_cache_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 

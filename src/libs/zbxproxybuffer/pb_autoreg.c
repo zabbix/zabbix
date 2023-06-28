@@ -332,7 +332,7 @@ void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns
 			else
 			{
 				/* initiate transition to database cache */
-				pb_cache_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 	}

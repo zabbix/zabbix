@@ -729,7 +729,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 			else
 			{
 				/* initiate transition to database cache */
-				pb_cache_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
+				pb_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 
