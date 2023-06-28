@@ -36,7 +36,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-#include "zbx_macro_constants.h"
+#include "zbx_expression_constants.h"
 #include "zbxevent.h"
 
 /* The following definitions are used to identify the request field */

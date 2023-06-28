@@ -19,7 +19,7 @@
 
 #include "zbxevent.h"
 
-#include "zbx_macro_constants.h"
+#include "zbx_expression_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbxdbwrap.h"
 
