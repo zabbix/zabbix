@@ -3720,6 +3720,9 @@ div.dashboard-widget-gauge {
     div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
       display: block; }
 
+div.dashboard-widget-gauge .dashboard-grid-widget-body a:link {
+  border: 0; }
+
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px dotted #888888; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {

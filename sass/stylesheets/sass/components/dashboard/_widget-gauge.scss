@@ -109,3 +109,17 @@ div.dashboard-widget-gauge {
 		}
 	}
 }
+
+// Modifications by themes.
+
+@if $theme-name == 'hc-dark' or $theme-name == 'hc-light' {
+	div.dashboard-widget-gauge {
+		.dashboard-grid-widget-body {
+			a {
+				&:link {
+					border: 0;
+				}
+			}
+		}
+	}
+}

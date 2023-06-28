@@ -27,8 +27,9 @@ class CSVGGauge {
 	static ZBX_STYLE_EMPTY_ARC_SECTOR =				'svg-gauge-empty-arc-sector';
 	static ZBX_STYLE_NEEDLE =						'svg-gauge-needle';
 	static ZBX_STYLE_LABEL =						'svg-gauge-label';
-	static ZBX_STYLE_LABEL_TOP_RIGHT =				'svg-gauge-label-top-right';
 	static ZBX_STYLE_LABEL_TOP_LEFT =				'svg-gauge-label-top-left';
+	static ZBX_STYLE_LABEL_TOP_RIGHT =				'svg-gauge-label-top-right';
+	static ZBX_STYLE_LABEL_TOP_CENTER =				'svg-gauge-label-top-center';
 	static ZBX_STYLE_LABEL_BOTTOM_LEFT =			'svg-gauge-label-bottom-left';
 	static ZBX_STYLE_LABEL_BOTTOM_RIGHT =			'svg-gauge-label-bottom-right';
 	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
@@ -497,7 +498,10 @@ class CSVGGauge {
 					: CSVGGauge.ZBX_STYLE_LABEL_BOTTOM_LEFT
 				);
 			}
-			else if (angle < 0) {
+			else if (Math.abs(angle) <= 1) {
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_TOP_CENTER);
+			}
+			else if (angle < 1) {
 				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_TOP_LEFT);
 			}
 			else if (angle <= 90) {
