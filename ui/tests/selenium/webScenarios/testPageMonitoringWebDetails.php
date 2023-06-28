@@ -81,7 +81,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Close Kiosk mode if opened.
 		$wrapper_class = $this->query('class:wrapper')->one()->getAttribute('class');
-		if (str_contains($wrapper_class, 'layout-kioskmode')) {
+		if (strpos($wrapper_class, 'layout-kioskmode') !== false) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
 		}
@@ -251,7 +251,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$api_steps = [];
 		foreach ($data['steps'] as $i => $step){
 			$api_step = [];
-			$api_step['name'] = $step['name'] ?? 'Step '.$i + 1;
+			$api_step['name'] = $step['name'] ?? 'Step '.($i + 1);
 			$api_step['url'] = 'http://example.com';
 			$api_step['no'] = $i;
 			$api_steps[] = $api_step;
@@ -303,7 +303,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$expected_rows = [];
 		foreach ($data['steps'] as $i => $step) {
 			// Whitespace at the beginning and end should not be displayed.
-			$expected_row = ['Step' => trim($step['name'] ?? 'Step '.$i + 1)];
+			$expected_row = ['Step' => trim($step['name'] ?? 'Step '.($i + 1))];
 			$expected_row = array_merge($expected_row, $step['expected_data'] ?? []);
 			$expected_rows[] = $expected_row;
 		}
