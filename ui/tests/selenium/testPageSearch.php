@@ -710,7 +710,7 @@ class testPageSearch extends CWebTest {
 	/**
 	 * Opens Dashboard, enters search string and submits the search form.
 	 *
-	 * @param $search_string Text that will be entered in the search field
+	 * @param string  $search_string    text that will be entered in the search field
 	 */
 	protected function openSearchResults($search_string) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
