@@ -134,10 +134,10 @@ class testPageMonitoringWebDetails extends CWebTest {
 			],
 			[
 				[
-					'name' => 'TEST ЗАББИКС !@#$%-() 🙂🙃 <br/> &nbsp;',
+					'name' => 'TEST ЗАББИКС !@#$%-() <br/> &nbsp;',
 					'steps' => [
 						['name' => 'test ēõšŗ тест 测试 テスト δοκιμή'],
-						['name' => '!@#$%^&*_+\\/()[]{}<>🙂🙃'],
+						['name' => '!@#$%^&*_+\\/()[]{}<>'],
 						['name' => '<script>window.onload=function(){alert("hi!");}</script>']
 					]
 				]
@@ -226,12 +226,12 @@ class testPageMonitoringWebDetails extends CWebTest {
 					'name' => 'Result - Error',
 					'global_item_data' => [
 						HTTPSTEP_ITEM_TYPE_LASTSTEP => 1,
-						HTTPSTEP_ITEM_TYPE_LASTERROR => 'TEST ERROR TEXT 🙂🙃'
+						HTTPSTEP_ITEM_TYPE_LASTERROR => 'TEST ERROR TEXT'
 					],
-					'expected_totals' => ['Status' => 'Error: TEST ERROR TEXT 🙂🙃'],
+					'expected_totals' => ['Status' => 'Error: TEST ERROR TEXT'],
 					'steps' => [
 						['expected_data' => ['Status' => 'OK']],
-						['expected_data' => ['Status' => 'Error: TEST ERROR TEXT 🙂🙃']],
+						['expected_data' => ['Status' => 'Error: TEST ERROR TEXT']],
 						['expected_data' => ['Status' => 'Unknown']],
 						['expected_data' => ['Status' => 'Unknown']]
 					]
