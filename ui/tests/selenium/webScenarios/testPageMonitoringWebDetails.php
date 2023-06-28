@@ -83,10 +83,11 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'], $table->getHeadersText());
 
-		// Open filter section if needed.
+		// Find and set filter section form.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$from_input = $form->query('id:from')->one();
-		// Open the filter section if needed.
+
+		// Open filter section if needed.
 		if (!$from_input->isDisplayed()) {
 			$this->query('class:btn-time')->one()->click();
 		}
