@@ -91,11 +91,6 @@ class CWidgetFieldThresholds extends CWidgetField {
 			}
 		);
 
-		foreach ($thresholds as &$threshold) {
-			unset($threshold['threshold_value']);
-		}
-		unset ($threshold);
-
 		$thresholds = array_values($thresholds);
 
 		$this->setValue($thresholds);
