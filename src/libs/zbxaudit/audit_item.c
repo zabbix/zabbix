@@ -19,39 +19,31 @@
 
 #include "audit/zbxaudit_item.h"
 #include "audit/zbxaudit.h"
+
 #include "audit.h"
 
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
 
-int	zbx_audit_item_helper_only_item(int resource_type)
+int	zbx_audit_item_resource_is_only_item(int resource_type)
 {
-#define ONLY_ITEM (AUDIT_RESOURCE_ITEM == resource_type)
-	return ONLY_ITEM;
-#undef ONLY_ITEM
+	return AUDIT_RESOURCE_ITEM == resource_type;
 }
 
-int	zbx_audit_item_helper_only_item_prototype(int resource_type)
+int	zbx_audit_item_resource_is_only_item_prototype(int resource_type)
 {
-#define ONLY_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-	return ONLY_ITEM_PROTOTYPE;
-#undef ONLT_ITEM_PROTOTYPE
+	return AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type;
 }
 
-int	zbx_audit_item_helper_only_item_and_item_prototype(int resource_type)
+int	zbx_audit_item_resource_is_only_item_and_item_prototype(int resource_type)
 {
-#define ONLY_ITEM_AND_ITEM_PROTOTYPE (AUDIT_RESOURCE_ITEM == resource_type || \
-		AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type)
-	return ONLY_ITEM_AND_ITEM_PROTOTYPE;
-#undef ONLY_ITEM_AND_ITEM_PROTOTYPE
+	return (AUDIT_RESOURCE_ITEM == resource_type || AUDIT_RESOURCE_ITEM_PROTOTYPE == resource_type);
 }
 
-int	zbx_audit_item_helper_only_lld_rule(int resource_type)
+int	zbx_audit_item_resource_is_only_lld_rule(int resource_type)
 {
-#define ONLY_LLD_RULE (AUDIT_RESOURCE_DISCOVERY_RULE == resource_type)
-	return ONLY_LLD_RULE;
-#undef ONLY_LLD_RULE
+	return	AUDIT_RESOURCE_DISCOVERY_RULE == resource_type;
 }
 
 int	zbx_audit_item_flag_to_resource_type(int flag)
@@ -104,8 +96,6 @@ void	zbx_audit_item_create_entry(int audit_action, zbx_uint64_t itemid, const ch
 	}
 }
 
-
-
 #define PREPARE_AUDIT_ITEM_UPDATE(resource, type1, type2)							\
 void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags,				\
 		type1 resource##_old, type1 resource##_new)							\
@@ -114,9 +104,9 @@ void	zbx_audit_item_update_json_update_##resource(zbx_uint64_t itemid, int flags
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	resource_type = zbx_audit_item_flag_to_resource_type(flags);							\
-	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID, IT_OR_ITP_OR_DR(resource), resource##_old,	\
-			resource##_new);									\
+	resource_type = zbx_audit_item_flag_to_resource_type(flags);						\
+	zbx_audit_update_json_update_##type2(itemid, AUDIT_ITEM_ID, ZBX_AUDIT_IT_OR_ITP_OR_DR(resource),	\
+			resource##_old,	resource##_new);							\
 }
 
 PREPARE_AUDIT_ITEM_UPDATE(interfaceid,		zbx_uint64_t,	uint64)
@@ -174,7 +164,7 @@ PREPARE_AUDIT_ITEM_UPDATE(key,			const char*,	string)
 #undef ONLY_ITEM
 #undef ONLY_ITEM_PROTOTYPE
 #undef ONLY_LLD_RULE
-#undef IT_OR_ITP_OR_DR
+#undef ZBX_AUDIT_IT_OR_ITP_OR_DR
 
 /******************************************************************************
  *                                                                            *
@@ -393,7 +383,7 @@ void	zbx_audit_item_update_json_update_item_preproc_##resource(zbx_uint64_t item
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
-	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 														\
 	ITEM_RESOURCE_KEY_RESOLVE_PREPROC(resource,.)								\
 														\
@@ -489,7 +479,7 @@ void	zbx_audit_item_update_json_update_item_tag_##resource(zbx_uint64_t itemid, 
 	char	audit_key_##resource[AUDIT_DETAILS_KEY_LEN];							\
 														\
 	RETURN_IF_AUDIT_OFF();											\
-	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 														\
 	ITEM_RESOURCE_KEY_RESOLVE_TAG(resource,.)								\
 														\
@@ -583,7 +573,7 @@ void	zbx_audit_item_update_json_update_params_##resource(zbx_uint64_t itemid, in
 														\
 	RETURN_IF_AUDIT_OFF();											\
 														\
-	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);							\
+	resource_type = zbx_audit_item_flag_to_resource_type(item_flags);					\
 	ITEM_RESOURCE_KEY_RESOLVE(resource, .)									\
 														\
 	zbx_audit_update_json_update_string(itemid, AUDIT_ITEM_ID, audit_key_##resource, resource##_orig,	\

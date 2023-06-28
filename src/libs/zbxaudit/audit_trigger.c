@@ -19,6 +19,7 @@
 
 #include "audit/zbxaudit_trigger.h"
 #include "audit/zbxaudit.h"
+
 #include "audit.h"
 
 #include "zbxdbhigh.h"
