@@ -123,7 +123,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertEquals('sidebar', $this->query('tag:aside')->one()->getAttribute('class'));
 	}
 
-	public function getWebScenarioData()
+	public function getDataDisplayData()
 	{
 		return [
 			[
@@ -244,7 +244,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	 * Test the display of data in the table.
 	 * Additional complexity comes from the Status column, as the displayed values there are calculated on the fly.
 	 *
-	 * @dataProvider getWebScenarioData
+	 * @dataProvider getDataDisplayData
 	 */
 	public function testPageMonitoringWebDetails_DataDisplay($data) {
 		// Fill in step data so that a web scenario can be created with API.
@@ -315,6 +315,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 	/**
 	 * Waits for both graphs to reload after a filter change and asserts that their src strings contain some value.
+	 *
+	 * @param string  $expected_src    the value that should be contained within the src parameter
 	 */
 	protected function assertGraphSrcContains($expected_src) {
 		foreach (['graph_in', 'graph_time'] as $i => $graph_id) {
