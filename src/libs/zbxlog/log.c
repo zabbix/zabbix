@@ -20,10 +20,10 @@
 #include "zbxlog.h"
 
 #include "zbxmutexs.h"
-#include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
+#include "zbxcommon.h"
 #ifdef _WINDOWS
 #	include "messages.h"
 #	include "zbxwinservice.h"
