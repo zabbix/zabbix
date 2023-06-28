@@ -21,7 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
+
+$this->includeJsFile('configuration.dashboard.list.js.php');
 
 $checkbox_hash = 'dashboard_'.$data['templateid'];
 
