@@ -229,19 +229,38 @@ class testPageSearch extends CWebTest {
 		$template_id = $response['templateids']['Entities Template'];
 		$template_item_id = $response['itemids']['Entities Template:key[1]'];
 
-		// Link applications, graphs, web scenarios, triggers and screens to a host and a template.
-		foreach ([1, 2] as $i) {
-			foreach ([$host_id => $item_id, $template_id => $template_item_id] as $parent_id => $item_id) {
-				CDataHelper::call('application.create', ['name' => 'Application '.$i, 'hostid' => $parent_id]);
-				CDataHelper::call('graph.create', ['name' => 'Graph '.$i, 'gitems' => [['itemid' => $item_id, 'color' => '00FF00']]]);
-				CDataHelper::call('httptest.create', ['name' => 'Web '.$i, 'hostid' => $parent_id, 'steps' => [
-					['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]
-				]]);
-			}
-			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Host:key[1].last()}>1']);
-			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Template:key[1].last()}>1']);
-			CDataHelper::call('templatescreen.create', ['name' => 'Screen '.$i, 'templateid' => $template_id]);
+		foreach ([$host_id => $item_id, $template_id => $template_item_id] as $parent_id => $item_id) {
+			CDataHelper::call('application.create', [
+				['name' => 'Application 1', 'hostid' => $parent_id],
+				['name' => 'Application 2', 'hostid' => $parent_id]
+			]);
+			CDataHelper::call('graph.create', [
+				['name' => 'Graph 1', 'gitems' => [['itemid' => $item_id, 'color' => '00FF00']]],
+				['name' => 'Graph 2', 'gitems' => [['itemid' => $item_id, 'color' => '00FF00']]]
+			]);
+			CDataHelper::call('httptest.create', [
+				[
+					'name' => 'Web 1',
+					'hostid' => $parent_id,
+					'steps' => [['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]]
+				],
+				[
+					'name' => 'Web 2',
+					'hostid' => $parent_id,
+					'steps' => [['name' => 'Step', 'url' => 'http://example.com', 'no' => 1]]
+				]
+			]);
 		}
+		CDataHelper::call('trigger.create', [
+			['description' => 'Trigger 1', 'expression' => '{Entities Host:key[1].last()}>1'],
+			['description' => 'Trigger 2', 'expression' => '{Entities Host:key[1].last()}>1'],
+			['description' => 'Trigger 1', 'expression' => '{Entities Template:key[1].last()}>1'],
+			['description' => 'Trigger 2', 'expression' => '{Entities Template:key[1].last()}>1']
+		]);
+		CDataHelper::call('templatescreen.create', [
+			['name' => 'Screen 1', 'templateid' => $template_id],
+			['name' => 'Screen 2', 'templateid' => $template_id]
+		]);
 
 		// A host group and a template with no linked entities.
 		CDataHelper::call('hostgroup.create', [['name' => 'Empty Hostgroup']]);
@@ -711,6 +730,8 @@ class testPageSearch extends CWebTest {
 
 	/**
 	 * Opens Dashboard, enters search string and submits the search form.
+	 *
+	 * @param $search_string Text that will be entered in the search field
 	 */
 	protected function openSearchResults($search_string) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view');
