@@ -17,27 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "evalfunc_common.h"
+#include "funcparam.h"
+#include "datafunc.h"
 
 #include "zbxtrends.h"
 #include "zbxnum.h"
 #include "zbxexpr.h"
-
-const char	*zbx_type_string(zbx_value_type_t type)
-{
-	switch (type)
-	{
-		case ZBX_VALUE_NONE:
-			return "none";
-		case ZBX_VALUE_SECONDS:
-			return "sec";
-		case ZBX_VALUE_NVALUES:
-			return "num";
-		default:
-			THIS_SHOULD_NEVER_HAPPEN;
-			return "unknown";
-	}
-}
 
 int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value)
 {
@@ -180,6 +165,66 @@ int	get_function_parameter_hist_range(int from, const char *parameters, int Npar
 out:
 	zbx_free(parameter);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get the value of sec|#num trigger function parameter              *
+ *                                                                            *
+ * Parameters: parameters     - [IN] trigger function parameters              *
+ *             Nparam         - [IN] specifies which parameter to extract     *
+ *             value          - [OUT] parameter value (preserved as is if the *
+ *                              parameter is optional and empty)              *
+ *             type           - [OUT] parameter value type (number of seconds *
+ *                              or number of values, preserved as is if the   *
+ *                              parameter is optional and empty)              *
+ *                                                                            *
+ * Return value: SUCCEED - parameter is valid                                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	get_function_parameter_period(const char *parameters, int Nparam, int *value, zbx_value_type_t *type)
+{
+	char	*parameter;
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() parameters:'%s' Nparam:%d", __func__, parameters, Nparam);
+
+	if (NULL == (parameter = zbx_function_get_param_dyn(parameters, Nparam)))
+		goto out;
+
+	if ('\0' != *parameter)
+	{
+		if ('#' == *parameter)
+		{
+			*type = ZBX_VALUE_NVALUES;
+			if (SUCCEED == zbx_is_uint31(parameter + 1, value) && 0 < *value)
+				ret = SUCCEED;
+		}
+		else if ('-' == *parameter)
+		{
+			if (SUCCEED == zbx_is_time_suffix(parameter + 1, value, ZBX_LENGTH_UNLIMITED))
+			{
+				*value = -(*value);
+				*type = ZBX_VALUE_SECONDS;
+				ret = SUCCEED;
+			}
+		}
+		else if (SUCCEED == zbx_is_time_suffix(parameter, value, ZBX_LENGTH_UNLIMITED))
+		{
+			*type = ZBX_VALUE_SECONDS;
+			ret = SUCCEED;
+		}
+	}
+
+	if (SUCCEED == ret)
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() type:%s value:%d", __func__, zbx_type_string(*type), *value);
+
+	zbx_free(parameter);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

@@ -18,7 +18,7 @@
 **/
 
 #include "lld.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxdbwrap.h"
 #include "audit/zbxaudit.h"

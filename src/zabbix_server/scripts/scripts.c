@@ -18,7 +18,7 @@
 **/
 
 #include "scripts.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "../poller/checks_agent.h"
 #include "../ipmi/ipmi.h"

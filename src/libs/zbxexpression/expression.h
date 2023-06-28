@@ -21,25 +21,17 @@
 #define ZABBIX_EXPRESSION_H
 
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
 
-/* DBget_item_value() */
-#define ZBX_REQUEST_HOST_ID			101
-#define ZBX_REQUEST_HOST_HOST			102
-#define ZBX_REQUEST_HOST_NAME			103
-#define ZBX_REQUEST_HOST_DESCRIPTION		104
-#define ZBX_REQUEST_ITEM_ID			105
-#define ZBX_REQUEST_ITEM_NAME			106
-#define ZBX_REQUEST_ITEM_NAME_ORIG		107
-#define ZBX_REQUEST_ITEM_KEY			108
-#define ZBX_REQUEST_ITEM_KEY_ORIG		109
-#define ZBX_REQUEST_ITEM_DESCRIPTION		110
-#define ZBX_REQUEST_ITEM_DESCRIPTION_ORIG	111
-#define ZBX_REQUEST_PROXY_NAME			112
-#define ZBX_REQUEST_PROXY_DESCRIPTION		113
-#define ZBX_REQUEST_ITEM_VALUETYPE		114
-#define	ZBX_REQUEST_ITEM_ERROR			115
+int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
+		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		char *error, size_t maxerrlen);
+int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz,
+		zbx_history_recv_item_t *history_data_item, char **data, int macro_type, char *error, int maxerrlen);
 
-int	DBget_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_functionid, int request);
 int	zbx_expr_macro_index(const char *macro);
 
 #endif

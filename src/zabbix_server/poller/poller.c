@@ -18,7 +18,7 @@
 **/
 
 #include "poller.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "checks_agent.h"
 #include "checks_external.h"

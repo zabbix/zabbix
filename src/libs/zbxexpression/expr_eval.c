@@ -17,12 +17,13 @@
  ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  **/
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
+#include "datafunc.h"
+#include "evalfunc.h"
+#include "expression.h"
 
 #include "zbxcachevalue.h"
-#include "evalfunc.h"
 #include "zbxeval.h"
-#include "expression.h"
 #include "zbxnum.h"
 #include "zbxparam.h"
 #include "zbxsysinfo.h"
@@ -1501,7 +1502,6 @@ static int	expression_eval_bucket_rate(zbx_expression_eval_t *eval, zbx_expressi
 	results = (zbx_vector_var_t *)zbx_malloc(NULL, sizeof(zbx_vector_var_t));
 	zbx_vector_var_create(results);
 
-
 	for (i = 0; i < data->itemids.values_num; i++)
 	{
 		zbx_dc_item_t	*dcitem;
@@ -2136,7 +2136,7 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int req
 		index = (zbx_macro_index_t *)zbx_malloc(NULL, sizeof(zbx_macro_index_t));
 		index->num = func_num;
 		index->macro = NULL;
-		DBget_trigger_value(trigger, &index->macro, func_num, request);
+		expr_db_get_trigger_value(trigger, &index->macro, func_num, request);
 		zbx_vector_ptr_append(indices, index);
 	}
 	else

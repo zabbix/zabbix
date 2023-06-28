@@ -17,23 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_EVALFUNC_COMMON_H
-#define ZABBIX_EVALFUNC_COMMON_H
+#ifndef ZABBIX_MACROFUNC_H
+#define ZABBIX_MACROFUNC_H
 
-#include "zbxtypes.h"
+#include "zbxexpr.h"
 
-typedef enum
-{
-	ZBX_VALUE_NONE,
-	ZBX_VALUE_SECONDS,
-	ZBX_VALUE_NVALUES
-}
-zbx_value_type_t;
+const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 
-const char	*zbx_type_string(zbx_value_type_t type);
-int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value);
-int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value);
-int	get_function_parameter_str(const char *parameters, int Nparam, char **value);
-int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
-		zbx_value_type_t *type, int *timeshift);
 #endif

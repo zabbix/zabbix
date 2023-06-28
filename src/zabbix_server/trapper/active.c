@@ -19,7 +19,7 @@
 
 #include "active.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxcompress.h"
 #include "zbxcrypto.h"

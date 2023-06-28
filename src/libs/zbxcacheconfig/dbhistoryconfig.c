@@ -19,7 +19,7 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "actions.h"
 #include "zbx_item_constants.h"
 #include "zbxdbhigh.h"

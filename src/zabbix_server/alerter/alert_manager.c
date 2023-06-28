@@ -31,7 +31,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxserialize.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"

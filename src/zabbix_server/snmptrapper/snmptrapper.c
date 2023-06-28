@@ -18,7 +18,7 @@
 **/
 
 #include "snmptrapper.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 
 #include "zbxself.h"

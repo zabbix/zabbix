@@ -17,11 +17,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "valuemaps_test.h"
+#ifndef ZABBIX_FUNCPARAM_H
+#define ZABBIX_FUNCPARAM_H
 
-int	evaluate_value_by_map_test(char *value, size_t max_len, zbx_vector_valuemaps_ptr_t *valuemaps,
-		unsigned char value_type)
-{
-	return evaluate_value_by_map(value, max_len, valuemaps, value_type);
-}
+#include "evalfunc.h"
 
+#include "zbxtypes.h"
+
+int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value);
+int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value);
+int	get_function_parameter_str(const char *parameters, int Nparam, char **value);
+int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
+		zbx_value_type_t *type, int *timeshift);
+int	get_function_parameter_period(const char *parameters, int Nparam, int *value, zbx_value_type_t *type);
+#endif

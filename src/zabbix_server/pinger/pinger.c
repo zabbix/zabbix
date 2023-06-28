@@ -18,7 +18,7 @@
 **/
 
 #include "pinger.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"

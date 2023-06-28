@@ -17,11 +17,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZBXSERVER_H
-#define ZABBIX_ZBXSERVER_H
+#ifndef ZABBIX_ZBXEXPRESSION_H
+#define ZABBIX_ZBXEXPRESSION_H
 
 #include "zbxcacheconfig.h"
 #include "zbxvariant.h"
+
+#define ZBX_EXPRESSION_NORMAL		0
+#define ZBX_EXPRESSION_AGGREGATE	1
 
 #define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
 #define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
@@ -55,52 +58,10 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
-/* service supported by discoverer */
-typedef enum
-{
-	SVC_SSH = 0,
-	SVC_LDAP,
-	SVC_SMTP,
-	SVC_FTP,
-	SVC_HTTP,
-	SVC_POP,
-	SVC_NNTP,
-	SVC_IMAP,
-	SVC_TCP,
-	SVC_AGENT,
-	SVC_SNMPv1,
-	SVC_SNMPv2c,
-	SVC_ICMPPING,
-	SVC_SNMPv3,
-	SVC_HTTPS,
-	SVC_TELNET
-}
-zbx_dservice_type_t;
-
-int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
-		const zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
-
-int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, const zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen);
-
-void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
-
-void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
-		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
-void	zbx_prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num);
-
-void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
-		const char *units, unsigned char value_type);
-
-void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
-
-#define ZBX_EXPRESSION_NORMAL		0
-#define ZBX_EXPRESSION_AGGREGATE	1
+/* lld macro context */
+#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
+#define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
+#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
 typedef struct
 {
@@ -126,6 +87,39 @@ typedef struct
 }
 zbx_expression_eval_t;
 
+typedef struct
+{
+	int			op;
+	int			numeric_search;
+	char			*pattern2;
+	zbx_uint64_t		pattern_ui64;
+	zbx_uint64_t		pattern2_ui64;
+	double			pattern_dbl;
+	zbx_vector_expression_t	regexps;
+}
+zbx_eval_count_pattern_data_t;
+
+int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
+		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
+		const zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
+		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
+
+int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
+		const zbx_dc_item_t *dc_item, const zbx_db_alert *alert, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
+		int macro_type, char *error, int maxerrlen);
+
+void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
+
+void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
+
+void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
+		const char *units, unsigned char value_type);
+
+void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
+
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
 void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const zbx_dc_item_t *item);
@@ -139,11 +133,6 @@ int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_
 		zbx_vector_ptr_t *unknown_msgs);
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 double	zbx_evaluate_string_to_double(const char *in);
-
-/* lld macro context */
-#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
-#define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
-#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
@@ -166,18 +155,6 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
 
-typedef struct
-{
-	int			op;
-	int			numeric_search;
-	char			*pattern2;
-	zbx_uint64_t		pattern_ui64;
-	zbx_uint64_t		pattern2_ui64;
-	double			pattern_dbl;
-	zbx_vector_expression_t	regexps;
-}
-zbx_eval_count_pattern_data_t;
-
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);
 
@@ -187,4 +164,5 @@ int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char
 int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
 		zbx_eval_count_pattern_data_t *pdata, char **error);
 void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
+
 #endif

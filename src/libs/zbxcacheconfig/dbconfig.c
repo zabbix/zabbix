@@ -20,7 +20,7 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
@@ -45,6 +45,7 @@
 #include "zbxpreprocbase.h"
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
+#include "zbx_discoverer_constants.h"
 
 int	sync_in_progress = 0;
 

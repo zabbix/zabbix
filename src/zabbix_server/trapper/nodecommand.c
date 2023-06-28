@@ -19,7 +19,7 @@
 
 #include "nodecommand.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"

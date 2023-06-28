@@ -22,7 +22,7 @@
 #include "proxyconfigread/proxyconfig_read.h"
 #include "../trapper/proxydata.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
 #include "zbxnix.h"

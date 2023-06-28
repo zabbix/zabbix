@@ -23,7 +23,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -37,6 +37,7 @@
 #include "zbxtimekeeper.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>

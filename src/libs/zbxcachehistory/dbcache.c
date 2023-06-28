@@ -21,7 +21,7 @@
 #include "zbxcachevalue.h"
 
 #include "zbxmutexs.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "zbxmodules.h"
 #include "module.h"
 #include "zbxexport.h"
@@ -1790,6 +1790,32 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: prepare triggers for evaluation                                   *
+ *                                                                            *
+ * Parameters: triggers     - [IN] array of zbx_dc_trigger_t pointers         *
+ *             triggres_num - [IN] the number of triggers to prepare          *
+ *                                                                            *
+ ******************************************************************************/
+static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
+{
+	int	i;
+
+	for (i = 0; i < triggers_num; i++)
+	{
+		zbx_dc_trigger_t	*tr = triggers[i];
+
+		tr->eval_ctx = zbx_eval_deserialize_dyn(tr->expression_bin, tr->expression, ZBX_EVAL_EXTRACT_ALL);
+
+		if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == tr->recovery_mode)
+		{
+			tr->eval_ctx_r = zbx_eval_deserialize_dyn(tr->recovery_expression_bin, tr->recovery_expression,
+					ZBX_EVAL_EXTRACT_ALL);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process triggers - calculates property changeset and generates    *
  *          events                                                            *
  *                                                                            *
@@ -1889,7 +1915,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 	{
 		zbx_dc_config_history_sync_get_triggers_by_itemids(trigger_info, trigger_order, itemids, timespecs,
 				item_num);
-		zbx_prepare_triggers((zbx_dc_trigger_t **)trigger_order->values, trigger_order->values_num);
+		prepare_triggers((zbx_dc_trigger_t **)trigger_order->values, trigger_order->values_num);
 		zbx_determine_items_in_expressions(trigger_order, itemids, item_num);
 	}
 
@@ -1901,7 +1927,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 
 		if (offset != trigger_order->values_num)
 		{
-			zbx_prepare_triggers((zbx_dc_trigger_t **)trigger_order->values + offset,
+			prepare_triggers((zbx_dc_trigger_t **)trigger_order->values + offset,
 					trigger_order->values_num - offset);
 		}
 	}

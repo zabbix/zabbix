@@ -22,7 +22,7 @@
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 #include "macrofunc.h"
 #include "zbxlog.h"
 #include "zbxexpr.h"

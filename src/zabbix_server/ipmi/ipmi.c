@@ -23,7 +23,7 @@
 
 #ifdef HAVE_OPENIPMI
 
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "zbxipcservice.h"
 #include "ipmi_protocol.h"

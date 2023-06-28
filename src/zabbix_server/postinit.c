@@ -18,7 +18,7 @@
 **/
 
 #include "postinit.h"
-#include "zbxserver.h"
+#include "zbxexpression.h"
 
 #include "db_lengths.h"
 #include "zbxtasks.h"
