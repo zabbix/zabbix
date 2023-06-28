@@ -1,0 +1,27 @@
+{
+  "dependencies": {
+    "svgtofont": "^3.18.0"
+  },
+  "scripts": {
+    "generate": "svgtofont --sources ./svg --output ./dist --fontName zabbix-icons",
+    "cleanup": "rm ./dist/symbol.html ./dist/unicode.html ./dist/*.symbol.svg ./dist/*.eot ./dist/*.scss"
+  },
+  "svgtofont": {
+    "emptyDist": true,
+    "outSVGPath": false,
+    "outSVGReact": false,
+    "classNamePrefix": "zi",
+    "styleTemplates": "./templates/styles/",
+    "css": {
+      "fontSize": "18px"
+    },
+    "svgicons2svgfont": {
+      "fontHeight": 600,
+      "descent": 150,
+      "normalize": true
+    },
+    "website": {
+      "template": "./templates/template.ejs"
+    }
+  }
+}

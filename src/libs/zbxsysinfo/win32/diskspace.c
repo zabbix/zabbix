@@ -78,7 +78,7 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *n
 	{
 		zbx_free(wpath);
 		*error = zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zabbix_log(LOG_LEVEL_DEBUG,"%s failed with error: %s",__func__, *error);
 		return SYSINFO_RET_FAIL;
 	}
@@ -300,7 +300,7 @@ static int	get_mount_paths(zbx_vector_ptr_t *mount_paths, char **error)
 			if (ERROR_MORE_DATA != (last_error = GetLastError()))
 			{
 				*error = zbx_dsprintf(*error, "Cannot obtain a list of filesystems: %s",
-						strerror_from_system(last_error));
+						zbx_strerror_from_system(last_error));
 				goto out;
 			}
 
@@ -319,7 +319,7 @@ static int	get_mount_paths(zbx_vector_ptr_t *mount_paths, char **error)
 	if (ERROR_NO_MORE_FILES != (last_error = GetLastError()))
 	{
 		*error = zbx_dsprintf(*error, "Cannot obtain complete list of filesystems.",
-				strerror_from_system(last_error));
+				zbx_strerror_from_system(last_error));
 		goto out;
 	}
 

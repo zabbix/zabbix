@@ -8,7 +8,7 @@
 		left: 0;
 
 		@if $ui-transitions {
-			transition: left .2s, top .2s;
+			transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
 		}
 	}
 
@@ -17,7 +17,7 @@
 
 		@if $ui-transitions {
 			&:not(.sortable-dragging) {
-				transition: left .2s, top .2s;
+				transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
 			}
 		}
 	}
@@ -25,7 +25,31 @@
 	&.sortable-dragging {
 		.sortable-item {
 			position: absolute;
-			opacity: 0.6;
+
+			&.sortable-dragging {
+				opacity: 0.6;
+			}
 		}
+	}
+}
+
+.drag-icon {
+	@extend .zi-drag-handle;
+	@extend %icon-position;
+	@extend %cursor-drag;
+
+	width: 12px;
+	height: $body-line-height;
+	color: $btn-icon-color;
+
+	&::before {
+		@extend %icons-font;
+
+		font-size: 22px;
+	}
+
+	&.disabled {
+		color: $btn-icon-disabled-color;
+		opacity: 1;
 	}
 }

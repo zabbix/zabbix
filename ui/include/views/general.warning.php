@@ -33,7 +33,7 @@ $page_header
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']
-	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
+	: [(new CSimpleButton(_('Retry')))->onClick('document.location.reload();')];
 
 echo '<body>';
 

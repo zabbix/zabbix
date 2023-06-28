@@ -41,7 +41,7 @@ static int	zbx_is_normal_double(double dbl)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate arithmetic mean (i.e. average)                          *
+ * Purpose: calculates arithmetic mean (i.e. average)                         *
  *                                                                            *
  * Parameters: v - [IN] non-empty vector with input data                      *
  *                                                                            *
@@ -61,14 +61,14 @@ static double	calc_arithmetic_mean(const zbx_vector_dbl_t *v)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'kurtosis'                                      *
+ * Purpose: evaluates function 'kurtosis'                                     *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_kurtosis(zbx_vector_dbl_t *values, double *result, char **error)
@@ -118,10 +118,10 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find median (helper function)                                     *
+ * Purpose: finds median (helper function)                                    *
  *                                                                            *
- * Parameters: v - [IN/OUT] non-empty vector with input data.                 *
- *                 NOTE: it will be modified (sorted in place).               *
+ * Parameters: v - [IN/OUT] non-empty vector with input data                  *
+ *                          NOTE: it will be modified (sorted in place).      *
  *                                                                            *
  * Return value: median                                                       *
  *                                                                            *
@@ -138,16 +138,16 @@ static double	find_median(zbx_vector_dbl_t *v)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate 'median absolute deviation'                             *
+ * Purpose: calculates 'median absolute deviation'                            *
  *                                                                            *
- * Parameters: values - [IN] non-empty vector with input data.                *
+ * Parameters: values - [IN] non-empty vector with input data                 *
  *                            NOTE: its elements will be modified and should  *
  *                            not be used in the caller!                      *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_mad(zbx_vector_dbl_t *values, double *result, char **error)
@@ -183,14 +183,14 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate 'skewness' function                                      *
+ * Purpose: evaluates 'skewness' function                                     *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_skewness(zbx_vector_dbl_t *values, double *result, char **error)
@@ -234,16 +234,16 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'stdevpop' (population standard deviation)      *
+ * Purpose: evaluates function 'stdevpop' (population standard deviation)     *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
- * Comments: the algorithm was taken from "Population standard deviation of   *
+ * Comments: algorithm was taken from "Population standard deviation of       *
  *           grades of eight students" in                                     *
  *           https://en.wikipedia.org/wiki/Standard_deviation                 *
  *                                                                            *
@@ -284,16 +284,16 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'stddevsamp' (sample standard deviation)        *
+ * Purpose: evaluates function 'stddevsamp' (sample standard deviation)       *
  *                                                                            *
  * Parameters: values - [IN] vector with input data with at least 2 elements  *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
- * Comments: the algorithm was taken from "Population standard deviation of   *
+ * Comments: algorithm was taken from "Population standard deviation of       *
  *           grades of eight students" in                                     *
  *           https://en.wikipedia.org/wiki/Standard_deviation                 *
  *                                                                            *
@@ -340,14 +340,14 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate sum of squares                                          *
+ * Purpose: calculates sum of squares                                         *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **error)
@@ -371,16 +371,16 @@ int	zbx_eval_calc_sumofsquares(zbx_vector_dbl_t *values, double *result, char **
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'varpop' (population variance)                  *
+ * Purpose: evaluates function 'varpop' (population variance)                 *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
- * Comments: the algorithm was taken from "Population variance" in            *
+ * Comments: algorithm was taken from "Population variance" in                *
  *           https://en.wikipedia.org/wiki/Variance#Population_variance       *
  *                                                                            *
  ******************************************************************************/
@@ -420,16 +420,16 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'varsamp' (sample variance)                     *
+ * Purpose: evaluates function 'varsamp' (sample variance)                    *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
- * Comments: the algorithm was taken from "Sample variance" in                *
+ * Comments: algorithm was taken from "Sample variance" in                    *
  *           https://en.wikipedia.org/wiki/Variance#Population_variance       *
  *                                                                            *
  ******************************************************************************/
@@ -516,7 +516,7 @@ static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate histogram quantile base on vector, where odd position   *
+ * Purpose: calculates histogram quantile base on vector, where odd position  *
  *          is bucket upper bound ('le') and even position is 'rate' value    *
  *                                                                            *
  * Parameters: q      - [IN] quantile value from 0 till 1                     *
@@ -526,7 +526,7 @@ static void	ensure_histogram_monotonic(zbx_vector_histogram_t *h)
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_histogram_quantile(const double q, const zbx_vector_dbl_t *values, const char *err_fn,
@@ -637,14 +637,14 @@ err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function avg                                             *
+ * Purpose: evaluates function avg                                            *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
@@ -662,14 +662,14 @@ int	zbx_eval_calc_avg(zbx_vector_dbl_t *values, double *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function min                                             *
+ * Purpose: evaluates function min                                            *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
@@ -698,14 +698,14 @@ int	zbx_eval_calc_min(zbx_vector_dbl_t *values, double *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function max                                             *
+ * Purpose: evaluates function max                                            *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
@@ -734,14 +734,14 @@ int	zbx_eval_calc_max(zbx_vector_dbl_t *values, double *result, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function sum                                             *
+ * Purpose: evaluates function sum                                            *
  *                                                                            *
  * Parameters: values - [IN] non-empty vector with input data                 *
  *             result - [OUT] calculated value                                *
  *             error  - [OUT] dynamically allocated error message             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully                             *
- *               FAIL - failed to evaluate function (see 'error')             *
+ *               FAIL    - failed to evaluate function (see 'error')          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_eval_calc_sum(zbx_vector_dbl_t *values, double *result, char **error)

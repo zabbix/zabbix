@@ -47,12 +47,8 @@
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addStyle('max-width: '.ZBX_TEXTAREA_MEDIUM_WIDTH.'px;'),
 			(new CHorList([
-				(new CButton(null, _('Edit')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-action', 'edit'),
-				(new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("removeMessageTemplate('#{message_type}');")
+				(new CButtonLink(_('Edit')))->setAttribute('data-action', 'edit'),
+				(new CButtonLink(_('Remove')))->onClick("removeMessageTemplate('#{message_type}');")
 			]))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->setAttribute('data-message-type', '#{message_type}')

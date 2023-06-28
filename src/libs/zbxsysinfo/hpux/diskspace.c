@@ -247,7 +247,7 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char 			*error;
 	zbx_vector_ptr_t	mntpoints;
 	zbx_mpoint_t		*mntpoint;
-	char 			*mpoint;
+	zbx_fsname_t		fsname;
 	int			ret = SYSINFO_RET_FAIL;
 
 	/* opening the mounted filesystems file */
@@ -262,21 +262,22 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* fill mnttab structure from file */
 	while (NULL != (mt = getmntent(f)))
 	{
-		mpoint = mt->mnt_dir;
-		if (SYSINFO_RET_OK != get_fs_size_stat(mpoint, &total, &not_used, &used, &pfree, &pused, &error))
+		fsname.mpoint = mt->mnt_dir;
+
+		if (SYSINFO_RET_OK != get_fs_size_stat(fsname.mpoint, &total, &not_used, &used, &pfree, &pused, &error))
 		{
 			zbx_free(error);
 			continue;
 		}
-		if (SYSINFO_RET_OK != get_fs_inode_stat(mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused, "pused",
-				&error))
+		if (SYSINFO_RET_OK != get_fs_inode_stat(fsname.mpoint, &itotal, &inot_used, &iused, &ipfree, &ipused,
+				"pused", &error))
 		{
 			zbx_free(error);
 			continue;
 		}
 
 		mntpoint = (zbx_mpoint_t *)zbx_malloc(NULL, sizeof(zbx_mpoint_t));
-		zbx_strlcpy(mntpoint->fsname, mpoint, MAX_STRING_LEN);
+		zbx_strlcpy(mntpoint->fsname, fsname.mpoint, MAX_STRING_LEN);
 		zbx_strlcpy(mntpoint->fstype, mt->mnt_type, MAX_STRING_LEN);
 		mntpoint->bytes.total = total;
 		mntpoint->bytes.used = used;
@@ -307,9 +308,10 @@ static int	vfs_fs_get_local(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		int idx;
 
-		mpoint = mt->mnt_dir;
+		fsname.mpoint = mt->mnt_dir;
+		fsname.type = mt->mnt_type;
 
-		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, mpoint, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+		if (FAIL != (idx = zbx_vector_ptr_search(&mntpoints, &fsname, zbx_fsname_compare)))
 		{
 			mntpoint = (zbx_mpoint_t *)mntpoints.values[idx];
 			zbx_json_addobject(&j, NULL);
