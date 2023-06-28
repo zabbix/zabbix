@@ -186,8 +186,8 @@ class testPageSearch extends CWebTest {
 			]
 		]);
 		self::$widgets['hosts']['link_id'] = $response['hostids'][$this->search_string.' Host'];
-		$entity_host_id = $response['hostids']['Entities Host'];
-		$entity_item_id = $response['itemids']['Entities Host:key[1]'];
+		$host_id = $response['hostids']['Entities Host'];
+		$item_id = $response['itemids']['Entities Host:key[1]'];
 
 		$response = CDataHelper::createTemplates([
 			[
@@ -226,12 +226,12 @@ class testPageSearch extends CWebTest {
 			]
 		]);
 		self::$widgets['templates']['link_id'] = $response['templateids'][$this->search_string.' Template'];
-		$entity_template_id = $response['templateids']['Entities Template'];
-		$entity_template_item_id = $response['itemids']['Entities Template:key[1]'];
+		$template_id = $response['templateids']['Entities Template'];
+		$template_item_id = $response['itemids']['Entities Template:key[1]'];
 
 		// Link applications, graphs, web scenarios, triggers and screens to a host and a template.
 		foreach ([1, 2] as $i) {
-			foreach ([$entity_host_id => $entity_item_id, $entity_template_id => $entity_template_item_id] as $parent_id => $item_id) {
+			foreach ([$host_id => $item_id, $template_id => $template_item_id] as $parent_id => $item_id) {
 				CDataHelper::call('application.create', ['name' => 'Application '.$i, 'hostid' => $parent_id]);
 				CDataHelper::call('graph.create', ['name' => 'Graph '.$i, 'gitems' => [['itemid' => $item_id, 'color' => '00FF00']]]);
 				CDataHelper::call('httptest.create', ['name' => 'Web '.$i, 'hostid' => $parent_id, 'steps' => [
@@ -240,7 +240,7 @@ class testPageSearch extends CWebTest {
 			}
 			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Host:key[1].last()}>1']);
 			CDataHelper::call('trigger.create', ['description' => 'Trigger '.$i, 'expression' => '{Entities Template:key[1].last()}>1']);
-			CDataHelper::call('templatescreen.create', ['name' => 'Screen '.$i, 'templateid' => $entity_template_id]);
+			CDataHelper::call('templatescreen.create', ['name' => 'Screen '.$i, 'templateid' => $template_id]);
 		}
 
 		// A host group and a template with no linked entities.
