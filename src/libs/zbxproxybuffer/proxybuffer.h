@@ -149,6 +149,7 @@ void	pb_unlock(void);
 void	*pb_malloc(size_t size);
 void	pb_free(void *ptr);
 char	*pb_strdup(const char *str);
+int	pb_free_space(zbx_pb_t *pb, int size);
 
 void	pb_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message);
 

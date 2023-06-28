@@ -23,6 +23,7 @@
 #include "zbxproxybuffer.h"
 #include "proxybuffer.h"
 
+void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row);
 void	pb_history_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_history_flush(zbx_pb_t *pb);
 void	pb_history_set_lastid(zbx_uint64_t lastid);

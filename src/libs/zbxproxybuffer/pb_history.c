@@ -36,7 +36,7 @@ struct zbx_pb_history_data
 	zbx_db_insert_t	db_insert;
 };
 
-static void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row)
+void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row)
 {
 	if (NULL != row->value)
 		list->mem_free_func(row->value);

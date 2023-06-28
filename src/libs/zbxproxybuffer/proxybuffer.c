@@ -86,6 +86,91 @@ char	*pb_strdup(const char *str)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: free the required number of bytes in proxy memory buffer          *
+ *                                                                            *
+ * Return value: SUCCEED - the space was freed successfully                   *
+ *               FAIL    - all records were discarded without freeing enough  *
+ *                         space                                              *
+ *                                                                            *
+ * Comments: The space freed by discarding record is estimated and also the   *
+ *           memory might be fragmented. So there is possibility that new     *
+ *           record allocation will still fail. However calling this function *
+ *           in loop would eventually discard all records - so that would     *
+ *           indicate that cache is too small to hold the new record.         *
+ *                                                                            *
+ ******************************************************************************/
+int	pb_free_space(zbx_pb_t *pb, int size)
+{
+	while (0 > size)
+	{
+		zbx_pb_history_t	*hrow;
+		zbx_pb_discovery_t	*drow;
+		zbx_pb_autoreg_t	*arow;
+		int			clock = 0;
+
+		if (SUCCEED == zbx_list_peek(&pb->history, (void **)&hrow))
+			clock = hrow->ts.sec;
+		else
+			hrow = NULL;
+
+		if (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->clock < clock)
+		{
+			clock = drow->clock;
+			hrow = NULL;
+		}
+		else
+			drow = NULL;
+
+		if (SUCCEED == zbx_list_peek(&pb->autoreg, (void **)&arow) && arow->clock < clock)
+		{
+			zbx_list_pop(&pb->autoreg, NULL);
+
+			size -= sizeof(zbx_pb_autoreg_t) + sizeof(zbx_uint64_t) * 2;
+			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(arow->host) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(arow->host_metadata) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(arow->listen_dns) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(arow->listen_ip) + 1 + sizeof(zbx_uint64_t) * 2;
+
+			pb_list_free_autoreg(&pb->autoreg, arow);
+			continue;
+		}
+
+		if (NULL != hrow)
+		{
+			zbx_list_pop(&pb->history, NULL);
+
+			size -= sizeof(zbx_pb_history_t) + sizeof(zbx_uint64_t) * 2;
+			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(hrow->value) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(hrow->source) + 1 + sizeof(zbx_uint64_t) * 2;
+
+			pb_list_free_history(&pb->history, hrow);
+			continue;
+		}
+
+		if (NULL != drow)
+		{
+			zbx_list_pop(&pb->discovery, NULL);
+
+			size -= sizeof(zbx_pb_discovery_t) + sizeof(zbx_uint64_t) * 2;
+			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(drow->dns) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(drow->ip) + 1 + sizeof(zbx_uint64_t) * 2;
+			size -= strlen(drow->value) + 1 + sizeof(zbx_uint64_t) * 2;
+
+			pb_list_free_discovery(&pb->discovery, drow);
+			continue;
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: check if proxy history table has unsent data                      *
  *                                                                            *
  * Return value: SUCCEED - table has unsent data                              *

@@ -24,6 +24,7 @@
 #include "proxybuffer.h"
 #include "zbxtypes.h"
 
+void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row);
 void	pb_discovery_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_discovery_flush(zbx_pb_t *pb);
 void	pb_discovery_set_lastid(zbx_uint64_t lastid);

@@ -88,7 +88,7 @@ static int	pb_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more
  * Purpose: free autoregistration record                                      *
  *                                                                            *
  ******************************************************************************/
-static void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row)
+void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row)
 {
 	if (NULL != row->host)
 		list->mem_free_func(row->host);

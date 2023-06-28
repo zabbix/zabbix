@@ -23,6 +23,7 @@
 #include "zbxproxybuffer.h"
 #include "proxybuffer.h"
 
+void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row);
 void	pb_autoreg_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_autoreg_flush(zbx_pb_t *pb);
 void	pb_autoreg_set_lastid(zbx_uint64_t lastid);

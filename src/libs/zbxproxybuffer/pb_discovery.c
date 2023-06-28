@@ -48,7 +48,7 @@ struct zbx_pb_discovery_data
 	zbx_db_insert_t	db_insert;
 };
 
-static void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row)
+void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row)
 {
 	if (NULL != row->ip)
 		list->mem_free_func(row->ip);
