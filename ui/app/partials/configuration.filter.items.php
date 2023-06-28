@@ -23,7 +23,7 @@
  * @var CView $this
  */
 
-$filter = (new CFilter())->setResetUrl((new CUrl('items.php'))->setArgument('context', $data['context']));
+$filter = (new CFilter())->setResetUrl((new CUrl())->setArgument('action', $data['action']));
 $filter_column_1 = new CFormList();
 $filter_column_2 = new CFormList();
 $filter_column_3 = new CFormList();
@@ -59,7 +59,7 @@ $filter_column_1
 		(new CMultiSelect([
 			'name' => 'filter_groupids[]',
 			'object_name' => $data['context'] === 'host' ? 'hostGroup' : 'templateGroup',
-			'data' => $data['filter_data']['groups'],
+			'data' => $data['filter_data']['ms_hostgroups'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
@@ -77,7 +77,7 @@ $filter_column_1
 		(new CMultiSelect([
 			'name' => 'filter_hostids[]',
 			'object_name' => $data['context'] === 'host' ? 'hosts' : 'templates',
-			'data' => $data['filter_data']['hosts'],
+			'data' => $data['filter_data']['ms_hosts'],
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
@@ -100,19 +100,19 @@ $filter_column_1
 		(new CTextBox('filter_key', $data['filter_data']['filter_key']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
-if ($data['filter_data']['hosts']) {
+if ($data['filter_data']['ms_hosts']) {
 	$filter_column_1->addRow(new CLabel(_('Value mapping'), 'filter_valuemapids__ms'),
 		(new CMultiSelect([
 			'name' => 'filter_valuemapids[]',
 			'object_name' => 'valuemap_names',
-			'data' => array_values(array_column($data['filter_data']['filter_valuemapids'], null, 'name')),
+			'data' => $data['filter_data']['ms_valuemaps'],
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'valuemap_names',
 					'srcfld1' => 'valuemapid',
 					'dstfrm' => 'zbx_filter',
 					'dstfld1' => 'filter_valuemapids_',
-					'hostids' => array_column($data['filter_data']['hosts'], 'id'),
+					'hostids' => array_column($data['filter_data']['ms_hosts'], 'id'),
 					'with_inherited' => true,
 					'context' => $data['context']
 				]
@@ -169,10 +169,16 @@ $filter_column_2
 	);
 
 // Third column.
+$tags = $data['filter_data']['filter_tags'];
+
+if (!$tags) {
+	$tags[] = ['tag' => '', 'operator' => TAG_OPERATOR_LIKE, 'value' => ''];
+}
+
 $filter_column_3->addRow(_('Tags'),
 	CTagFilterFieldHelper::getTagFilterField([
 		'evaltype' => $data['filter_data']['filter_evaltype'],
-		'tags' => $data['filter_data']['filter_tags']
+		'tags' => $tags
 	])
 );
 
@@ -219,29 +225,65 @@ if ($data['context'] === 'host') {
 	);
 }
 
+$subfilters_table = (new CTableInfo())
+	->addRow([
+		new CTag('h4', true, [
+			_('Subfilter'), ' ', (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+		])
+	], ZBX_STYLE_HOVER_NOBG);
+
+foreach ($data['subfilter'] as $subfilter) {
+	$cell = [];
+
+	if (count($subfilter['values']) < 2) {
+		continue;
+	}
+
+	foreach ($subfilter['values'] as $value => $count) {
+		$is_selected = array_key_exists($value, $subfilter['selected']);
+		$prefix = ($subfilter['selected'] && !$is_selected && $count > 0) ? '+' : '';
+		$value_label = $value;
+
+		if (array_key_exists('labels', $subfilter)) {
+			$value_label = $subfilter['labels'][$value];
+		}
+
+		// TODO: cleanup, use existing html object classes, add disabled state when count == 0
+		$cell[] = (new CLabel(''))
+			->removeId()
+			->addItem([
+				(new CSpan($value_label))->addClass(ZBX_STYLE_LINK_ACTION),
+				(new CInput('checkbox', $subfilter['key'].'[]', $value))
+					->removeId()
+					->setAttribute('checked', $is_selected ? 'checked' : null)
+					// TODO: move onclick to .js file
+					->onClick('this.closest("label").classList.toggle("'.ZBX_STYLE_SUBFILTER_ENABLED.'");this.closest("form").submit();return false')
+					->addClass(ZBX_STYLE_DISPLAY_NONE),
+				new CSup($prefix.$count)
+			])
+			->addClass(ZBX_STYLE_SUBFILTER)
+			->addClass($is_selected ? ZBX_STYLE_SUBFILTER_ENABLED : null);
+	}
+
+	if ($cell) {
+		array_unshift($cell, new CTag('h3', true, $subfilter['label']));
+		$subfilters_table->addRow([$cell]);
+	}
+}
+
 $filter
-	->setProfile('web.items.filter')
-	->setActiveTab(CProfile::get('web.items.filter.active', 1))
+	->setProfile($data['filter_data']['filter_profile'])
+	->setActiveTab($data['filter_data']['filter_tab'])
+	->setResetUrl(
+		(new CUrl('zabbix.php'))
+			->setArgument('action', $data['action'])
+			->setArgument('context', $data['context'])
+	)
+	->addVar('action', $data['action'])
 	->addVar('context', $data['context'])
-	->addVar('subfilter_hosts', $data['filter_data']['subfilter_hosts'])
-	->addVar('subfilter_types', $data['filter_data']['subfilter_types'])
-	->addVar('subfilter_value_types', $data['filter_data']['subfilter_value_types'])
-	->addVar('subfilter_status', $data['filter_data']['subfilter_status'])
-	->addVar('subfilter_inherited', $data['filter_data']['subfilter_inherited'])
-	->addVar('subfilter_with_triggers', $data['filter_data']['subfilter_with_triggers'])
-	->addVar('subfilter_history', $data['filter_data']['subfilter_history'])
-	->addVar('subfilter_trends', $data['filter_data']['subfilter_trends'])
-	->addVar('subfilter_interval', $data['filter_data']['subfilter_interval'])
-	->addVar('subfilter_tags', $data['filter_data']['subfilter_tags'])
 	->addFilterTab(_('Filter'),
 		[$filter_column_1, $filter_column_2, $filter_column_3],
-		$data['subfilter']
+		$subfilters_table
 	);
-
-if ($data['context'] === 'host') {
-	$filter
-		->addVar('subfilter_state', $data['filter_data']['subfilter_state'])
-		->addVar('subfilter_discovered', $data['filter_data']['subfilter_discovered']);
-}
 
 $filter->show();

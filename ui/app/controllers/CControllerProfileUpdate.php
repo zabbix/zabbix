@@ -90,6 +90,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
+				case 'web.host.items.filter.active':
 					$ret = true;
 					break;
 

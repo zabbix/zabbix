@@ -451,10 +451,11 @@ foreach ($data['hosts'] as $host) {
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl())
+					->setArgument('action', 'item.list')
+					->setArgument('context', 'host')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$host['hostid']])
-					->setArgument('context', 'host')
 			),
 			CViewHelper::showNum($host['items'])
 		],
