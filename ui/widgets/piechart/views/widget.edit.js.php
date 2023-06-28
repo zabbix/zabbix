@@ -35,7 +35,6 @@ window.widget_piechart_form = new class {
 
 		this._$overlay_body.off('scroll');
 
-
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
@@ -45,18 +44,14 @@ window.widget_piechart_form = new class {
 
 		jQuery(`#${form_tabs_id}`)
 			.on('tabsactivate', () => jQuery.colorpicker('hide'))
-			.on('change', 'input, z-select, .multiselect', (e) => this._onChartConfigChange(e));
+			.on('change', 'input, z-select, .multiselect', () => this.updateForm());
 
-		this._datasetTabInit();
-		this._toggleDisplayingOptionsFields();
-		this._onChartConfigChange();
+		this.datasetTabInit();
+		this.toggleDisplayingOptionsFields();
+		this.updateForm();
 	}
 
-	_onChartConfigChange() {
-		this._updateForm();
-	}
-
-	_updateVariableOrder(obj, row_selector, var_prefix) {
+	updateVariableOrder(obj, row_selector, var_prefix) {
 		for (const k of [10000, 0]) {
 			jQuery(row_selector, obj).each(function(i) {
 				if (var_prefix === 'ds') {
@@ -87,8 +82,8 @@ window.widget_piechart_form = new class {
 		}
 	}
 
-	_datasetTabInit() {
-		this._updateDatasetsLabel();
+	datasetTabInit() {
+		this.updateDatasetsLabel();
 
 		// Initialize vertical accordion.
 		jQuery(this._dataset_wrapper)
@@ -134,7 +129,7 @@ window.widget_piechart_form = new class {
 						message_block.style.display = 'none';
 					}
 
-					widget_piechart_form._initSingleItemSortable(dataset);
+					widget_piechart_form.initSingleItemSortable(dataset);
 				}
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
@@ -157,27 +152,27 @@ window.widget_piechart_form = new class {
 
 		this._dataset_wrapper.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-add')) {
-				this._selectItems();
+				this.selectItems();
 			}
 
 			if (e.target.classList.contains('element-table-remove')) {
-				this._removeSingleItem(e.target);
+				this.removeSingleItem(e.target);
 			}
 
 			if (e.target.classList.contains('js-remove')) {
-				this._removeDataSet(e.target);
+				this.removeDataSet(e.target);
 			}
 		});
 
 		document
 			.getElementById('dataset-add')
 			.addEventListener('click', () => {
-				this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+				this.addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 			});
 
 		document
 			.getElementById('dataset-menu')
-			.addEventListener('click', (e) => this._addDatasetMenu(e));
+			.addEventListener('click', (e) => this.addDatasetMenu(e));
 
 		window.addPopupValues = (list) => {
 			if (!isset('object', list) || list.object !== 'itemid') {
@@ -185,20 +180,20 @@ window.widget_piechart_form = new class {
 			}
 
 			for (let i = 0; i < list.values.length; i++) {
-				this._addSingleItem(list.values[i].itemid, list.values[i].name, list.values[i].type);
+				this.addSingleItem(list.values[i].itemid, list.values[i].name, list.values[i].type);
 			}
 
-			this._updateSingleItemsLinks();
-			this._initSingleItemSortable(this._getOpenedDataset());
+			this.updateSingleItemsLinks();
+			this.initSingleItemSortable(this.getOpenedDataset());
 		}
 
-		this._updateSingleItemsLinks();
-		this._initDataSetSortable();
+		this.updateSingleItemsLinks();
+		this.initDataSetSortable();
 
-		this._initSingleItemSortable(this._getOpenedDataset());
+		this.initSingleItemSortable(this.getOpenedDataset());
 	}
 
-	_toggleDisplayingOptionsFields() {
+	toggleDisplayingOptionsFields() {
 		const draw_type = this._form.querySelector('[name="draw_type"]:checked').value;
 		const doughnut_config_fields = this._form.querySelectorAll('#width_label, #width_range, #show_total_fields');
 		const is_doughnut = draw_type == <?= PIE_CHART_DRAW_DOUGHNUT ?>;
@@ -221,20 +216,20 @@ window.widget_piechart_form = new class {
 		document.getElementById('merge_percent').disabled = !merge.checked;
 		document.getElementById('merge_color').disabled = !merge.checked;
 
-		for (const element of total_value_fields) {
-			element.disabled = !document.getElementById('total_show').checked;
+		for (const field of total_value_fields) {
+			field.disabled = !document.getElementById('total_show').checked;
 		}
 
 		document.getElementById('units').disabled = !document.getElementById('units_show').checked;
 	}
 
-	_updateDatasetsLabel() {
+	updateDatasetsLabel() {
 		for (const dataset of this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
-			this._updateDatasetLabel(dataset);
+			this.updateDatasetLabel(dataset);
 		}
 	}
 
-	_updateDatasetLabel(dataset) {
+	updateDatasetLabel(dataset) {
 		const placeholder_text = <?= json_encode(_('Data set')) ?> + ` #${parseInt(dataset.dataset.set) + 1}`;
 
 		const data_set_label = dataset.querySelector('.js-dataset-label');
@@ -244,20 +239,20 @@ window.widget_piechart_form = new class {
 		data_set_label_input.placeholder = placeholder_text;
 	}
 
-	_addDatasetMenu(e) {
+	addDatasetMenu(e) {
 		const menu = [
 			{
 				items: [
 					{
 						label: <?= json_encode(_('Item pattern')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
+							this.addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_PATTERN_ITEM ?>);
 						}
 					},
 					{
 						label: <?= json_encode(_('Item list')) ?>,
 						clickCallback: () => {
-							this._addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
+							this.addDataset(<?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>);
 						}
 					}
 				]
@@ -266,9 +261,9 @@ window.widget_piechart_form = new class {
 				items: [
 					{
 						label: <?= json_encode(_('Clone')) ?>,
-						disabled: this._getOpenedDataset() === null,
+						disabled: this.getOpenedDataset() === null,
 						clickCallback: () => {
-							this._cloneDataset();
+							this.cloneDataset();
 						}
 					}
 				]
@@ -285,12 +280,12 @@ window.widget_piechart_form = new class {
 		});
 	}
 
-	_addDataset(type) {
+	addDataset(type) {
 		jQuery(this._dataset_wrapper).zbx_vertical_accordion('collapseAll');
 
 		const template = type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>
-			? new Template(jQuery('#dataset-single-item-tmpl').html())
-			: new Template(jQuery('#dataset-pattern-item-tmpl').html());
+			? new Template(document.querySelector('#dataset-single-item-tmpl').innerHTML)
+			: new Template(document.querySelector('#dataset-pattern-item-tmpl').innerHTML);
 
 		const used_colors = [];
 
@@ -307,7 +302,7 @@ window.widget_piechart_form = new class {
 				: colorPalette.getNextColor(used_colors)
 		}));
 
-		const dataset = this._getOpenedDataset();
+		const dataset = this.getOpenedDataset();
 
 		for (const colorpicker of dataset.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			jQuery(colorpicker).colorpicker({appendTo: '.overlay-dialogue-body'});
@@ -321,28 +316,28 @@ window.widget_piechart_form = new class {
 			this._form.scrollHeight - this._$overlay_body.height()
 		));
 
-		this._initDataSetSortable();
-		this._updateForm();
+		this.initDataSetSortable();
+		this.updateForm();
 	}
 
-	_cloneDataset() {
-		const dataset = this._getOpenedDataset();
+	cloneDataset() {
+		const dataset = this.getOpenedDataset();
 
-		this._addDataset(dataset.dataset.type);
+		this.addDataset(dataset.dataset.type);
 
-		const cloned_dataset = this._getOpenedDataset();
+		const cloned_dataset = this.getOpenedDataset();
 
 		if (dataset.dataset.type == <?= CWidgetFieldDataSet::DATASET_TYPE_SINGLE_ITEM ?>) {
 			for (const row of dataset.querySelectorAll('.single-item-table-row')) {
-				this._addSingleItem(
+				this.addSingleItem(
 					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][itemids]`).value,
 					row.querySelector('.table-col-name a').textContent,
-					row.querySelector(`[name^='ds[${dataset.getAttribute('data-set')}][type]`).value
+					row.querySelector(`.table-col-type z-select`).value
 				);
 			}
 
-			this._updateSingleItemsLinks();
-			this._initSingleItemSortable(cloned_dataset);
+			this.updateSingleItemsLinks();
+			this.initSingleItemSortable(cloned_dataset);
 		}
 		else {
 			if (this._templateid === null) {
@@ -369,34 +364,34 @@ window.widget_piechart_form = new class {
 			}
 		}
 
-		this._updateDatasetLabel(cloned_dataset);
+		this.updateDatasetLabel(cloned_dataset);
 	}
 
-	_removeDataSet(obj) {
+	removeDataSet(obj) {
 		obj
 			.closest('.list-accordion-item')
 			.remove();
 
-		this._updateVariableOrder(jQuery(this._dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
-		this._updateDatasetsLabel();
+		this.updateVariableOrder(jQuery(this._dataset_wrapper), '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+		this.updateDatasetsLabel();
 
-		const dataset = this._getOpenedDataset();
+		const dataset = this.getOpenedDataset();
 
 		if (dataset !== null) {
-			this._updateSingleItemsOrder(dataset);
-			this._initSingleItemSortable(dataset);
+			this.updateSingleItemsOrder(dataset);
+			this.initSingleItemSortable(dataset);
 		}
 
-		this._initDataSetSortable();
-		this._updateSingleItemsLinks();
-		this._onChartConfigChange();
+		this.initDataSetSortable();
+		this.updateSingleItemsLinks();
+		this.updateForm();
 	}
 
-	_getOpenedDataset() {
+	getOpenedDataset() {
 		return this._dataset_wrapper.querySelector('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_OPENED ?>[data-set]');
 	}
 
-	_initDataSetSortable() {
+	initDataSetSortable() {
 		const datasets_count = this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
 
 		for (const drag_icon of this._dataset_wrapper.querySelectorAll('.js-main-drag-icon')) {
@@ -410,15 +405,15 @@ window.widget_piechart_form = new class {
 			);
 
 			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
-				this._updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
-				this._updateDatasetsLabel();
+				this.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
+				this.updateDatasetsLabel();
 			});
 		}
 
 		this._sortable_data_set.enableSorting(datasets_count > 1);
 	}
 
-	_selectItems() {
+	selectItems() {
 		if (this._templateid === null) {
 			PopUp('popup.generic', {
 				srctbl: 'items',
@@ -448,8 +443,8 @@ window.widget_piechart_form = new class {
 		}
 	}
 
-	_addSingleItem(itemid, name, type) {
-		const dataset = this._getOpenedDataset();
+	addSingleItem(itemid, name, type) {
+		const dataset = this.getOpenedDataset();
 		const items_table = dataset.querySelector('.single-item-table');
 
 		if (items_table.querySelector(`input[value="${itemid}"]`) !== null) {
@@ -457,7 +452,7 @@ window.widget_piechart_form = new class {
 		}
 
 		const dataset_index = dataset.getAttribute('data-set');
-		const template = new Template(jQuery('#dataset-item-row-tmpl').html());
+		const template = new Template(document.querySelector('#dataset-item-row-tmpl').innerHTML);
 		const item_next_index = items_table.querySelectorAll('.single-item-table-row').length + 1;
 
 		items_table.querySelector('tbody').insertAdjacentHTML('beforeend', template.evaluate({
@@ -481,17 +476,17 @@ window.widget_piechart_form = new class {
 			.colorpicker();
 	}
 
-	_removeSingleItem(element) {
+	removeSingleItem(element) {
 		element.closest('.single-item-table-row').remove();
 
-		const dataset = this._getOpenedDataset();
+		const dataset = this.getOpenedDataset();
 
-		this._updateSingleItemsOrder(dataset);
-		this._updateSingleItemsLinks();
-		this._initSingleItemSortable(dataset);
+		this.updateSingleItemsOrder(dataset);
+		this.updateSingleItemsLinks();
+		this.initSingleItemSortable(dataset);
 	}
 
-	_initSingleItemSortable(dataset) {
+	initSingleItemSortable(dataset) {
 		const item_rows = dataset.querySelectorAll('.single-item-table-row');
 
 		if (item_rows.length < 1) {
@@ -512,8 +507,8 @@ window.widget_piechart_form = new class {
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: () => {
-				this._updateSingleItemsOrder(dataset);
-				this._updateSingleItemsLinks();
+				this.updateSingleItemsOrder(dataset);
+				this.updateSingleItemsLinks();
 			},
 			helper: (e, ui) => {
 				for (const td of ui.find('>td')) {
@@ -538,7 +533,7 @@ window.widget_piechart_form = new class {
 		});
 	}
 
-	_updateSingleItemsLinks() {
+	updateSingleItemsLinks() {
 		for (const dataset of this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>')) {
 			const dataset_index = dataset.getAttribute('data-set');
 			const size = dataset.querySelectorAll('.single-item-table-row').length + 1;
@@ -588,7 +583,7 @@ window.widget_piechart_form = new class {
 		}
 	}
 
-	_updateSingleItemsOrder(dataset) {
+	updateSingleItemsOrder(dataset) {
 		jQuery.colorpicker('destroy', jQuery('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input', dataset));
 
 		const dataset_index = dataset.getAttribute('data-set');
@@ -598,6 +593,7 @@ window.widget_piechart_form = new class {
 
 			row.querySelector('.table-col-no span').textContent = `${row.rowIndex}:`;
 			row.querySelector('.table-col-name a').id = `${prefix}_name`;
+			row.querySelector('.table-col-type z-select').id = `${prefix}_type`
 			row.querySelector('.table-col-action input').id = `${prefix}_input`;
 
 			const colorpicker = row.querySelector('.single-item-table .<?= ZBX_STYLE_COLOR_PICKER ?> input');
@@ -607,15 +603,15 @@ window.widget_piechart_form = new class {
 		}
 	}
 
-	_updateForm() {
+	updateForm() {
 		// Data set tab changes.
-		const dataset = this._getOpenedDataset();
+		const dataset = this.getOpenedDataset();
 		const datasets = this._dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>');
 		let items_type = [];
 		let is_total = false;
 
 		if (dataset !== null) {
-			this._updateDatasetLabel(dataset);
+			this.updateDatasetLabel(dataset);
 		}
 
 		for (let i = 0; i < datasets.length; i++) {
@@ -643,7 +639,7 @@ window.widget_piechart_form = new class {
 
 		// Displaying options tab changes.
 		this._form.querySelector('#displaying_options').onchange = () => {
-			this._toggleDisplayingOptionsFields();
+			this.toggleDisplayingOptionsFields();
 		};
 
 		// Time period tab changes.

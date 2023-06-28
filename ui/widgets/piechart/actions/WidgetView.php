@@ -43,8 +43,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		parent::init();
 
 		$this->addValidationRules([
-			'from' => 'string',
-			'to' => 'string'
+			'from' => 'range_time',
+			'to' => 'range_time'
 		]);
 	}
 
@@ -526,7 +526,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'value' => null,
 						'units' => ''
 					],
-					'is_total' => $is_total
+					'is_total' => $is_total,
+					'percent_of_total' => 0
 				];
 				continue;
 			}
