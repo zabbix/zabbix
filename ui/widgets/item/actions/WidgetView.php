@@ -283,17 +283,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$bg_color = $this->fields_values['bg_color'];
 
-		$number_parser_binary = new CNumberParser([
-			'is_binary_size' => true
-		]);
-
 		if ($last_value !== null) {
-			foreach ($this->fields_values['thresholds'] as $threshold) {
-				if (isBinaryUnits($units)) {
-					$threshold['threshold_value'] = $number_parser_binary->calcValue();
-				}
+			$number_parser = new CNumberParser([
+				'with_size_suffix' => true,
+				'with_time_suffix' => true,
+				'is_binary_size' => isBinaryUnits($units)
+			]);
 
-				if ($threshold['threshold_value'] > $last_value) {
+			foreach ($this->fields_values['thresholds'] as $threshold) {
+				$number_parser->parse($threshold['threshold']);
+				$threshold_value = $number_parser->calcValue();
+
+				if ($threshold_value > $last_value) {
 					break;
 				}
 
