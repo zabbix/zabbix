@@ -483,6 +483,13 @@ void	zbx_pb_update_state(int more)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 }
 
+void	zbx_pb_disable(void)
+{
+	pb_lock();
+	pb_data->state = PB_DATABASE_ONLY;
+	pb_unlock();
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: flush cache to database                                           *

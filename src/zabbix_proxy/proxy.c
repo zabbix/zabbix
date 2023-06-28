@@ -1058,6 +1058,8 @@ static void	zbx_on_exit(int ret)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	zbx_pb_disable();
+
 	if (NULL != threads)
 	{
 		zbx_threads_wait(threads, threads_flags, threads_num, ret); /* wait for all child processes to exit */

@@ -41,6 +41,7 @@ zbx_pb_state_info_t;
 int	zbx_pb_init(zbx_uint64_t size, int age, int offline_buffer, char **error);
 
 void	zbx_pb_update_state(int more);
+void	zbx_pb_disable(void);
 void	zbx_pb_flush(void);
 
 int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error);
