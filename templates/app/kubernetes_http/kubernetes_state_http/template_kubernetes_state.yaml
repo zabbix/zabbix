@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-14T13:15:53Z'
+  date: '2023-06-28T05:11:42Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -2333,9 +2333,10 @@ zabbix_export:
                   value: restarts
               trigger_prototypes:
                 - uuid: 4656457043d04f4a9b829222ad071d22
-                  expression: '(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],#3))>2'
+                  expression: '(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],15m))>1'
                   name: 'Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping'
                   priority: WARNING
+                  description: 'Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.'
                   tags:
                     - tag: scope
                       value: availability
