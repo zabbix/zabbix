@@ -31,7 +31,7 @@
 #include "zbxtime.h"
 #include "../taskmanager/taskmanager.h"
 #include "zbxjson.h"
-#include "zbxproxydatacache.h"
+#include "zbxproxybuffer.h"
 
 #define ZBX_DATASENDER_AVAILABILITY		0x0001
 #define ZBX_DATASENDER_HISTORY			0x0002
@@ -110,15 +110,15 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		if (SUCCEED == zbx_get_interface_availability_data(&j, &availability_ts))
 			flags |= ZBX_DATASENDER_AVAILABILITY;
 
-		history_records = zbx_pdc_history_get_rows(&j, &history_lastid, &more_history);
+		history_records = zbx_pb_history_get_rows(&j, &history_lastid, &more_history);
 		if (0 != history_lastid)
 			flags |= ZBX_DATASENDER_HISTORY;
 
-		discovery_records = zbx_pdc_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
+		discovery_records = zbx_pb_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
 		if (0 != discovery_records)
 			flags |= ZBX_DATASENDER_DISCOVERY;
 
-		areg_records = zbx_pdc_autoreg_get_rows(&j, &areg_lastid, &more_areg);
+		areg_records = zbx_pb_autoreg_get_rows(&j, &areg_lastid, &more_areg);
 		if (0 != areg_records)
 			flags |= ZBX_DATASENDER_AUTOREGISTRATION;
 
@@ -250,19 +250,19 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_db_free_result(result);
 
 					zbx_reset_proxy_history_count(history_maxid - history_lastid);
-					zbx_pdc_set_history_lastid(history_lastid);
+					zbx_pb_set_history_lastid(history_lastid);
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
-					zbx_pdc_discovery_set_lastid(discovery_lastid);
+					zbx_pb_discovery_set_lastid(discovery_lastid);
 
 				if (0 != (flags & ZBX_DATASENDER_AUTOREGISTRATION))
-					zbx_pdc_autoreg_set_lastid(areg_lastid);
+					zbx_pb_autoreg_set_lastid(areg_lastid);
 
 				zbx_db_commit();
 			}
 
-			zbx_pdc_update_state(*more);
+			zbx_pb_update_state(*more);
 		}
 
 		zbx_disconnect_from_server(&sock);

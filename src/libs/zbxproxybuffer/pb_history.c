@@ -17,26 +17,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pdc_history.h"
-#include "zbxproxydatacache.h"
+#include "pb_history.h"
+#include "zbxproxybuffer.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
-#include "proxydatacache.h"
+#include "proxybuffer.h"
 #include "zbxdbhigh.h"
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
 
-static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
+static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid);
 
-struct zbx_pdc_history_data
+struct zbx_pb_history_data
 {
-	zbx_pdc_state_t	state;
+	zbx_pb_state_t	state;
 	zbx_list_t	rows;
 	int		rows_num;
 	zbx_db_insert_t	db_insert;
 };
 
-static void	pdc_list_free_history(zbx_list_t *list, zbx_pdc_history_t *row)
+static void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row)
 {
 	if (NULL != row->value)
 		list->mem_free_func(row->value);
@@ -45,22 +45,22 @@ static void	pdc_list_free_history(zbx_list_t *list, zbx_pdc_history_t *row)
 	list->mem_free_func(row);
 }
 
-static void	pdc_history_free(zbx_pdc_history_t *row)
+static void	pb_history_free(zbx_pb_history_t *row)
 {
 	zbx_free(row->value);
 	zbx_free(row->source);
 	zbx_free(row);
 }
 
-static void	pdc_history_add_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
+static void	pb_history_add_value(zbx_pb_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
 		const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime, int timestamp, int logeventid,
 		int severity, const char *source, time_t now)
 {
-	if (PDC_MEMORY == data->state)
+	if (PB_MEMORY == data->state)
 	{
-		zbx_pdc_history_t	*row;
+		zbx_pb_history_t	*row;
 
-		row = (zbx_pdc_history_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_t));
+		row = (zbx_pb_history_t *)zbx_malloc(NULL, sizeof(zbx_pb_history_t));
 
 		row->id = 0;
 		row->itemid = itemid;
@@ -100,7 +100,7 @@ static void	pdc_history_add_value(zbx_pdc_history_data_t *data, zbx_uint64_t ite
  * Return value: The number of records read.                                  *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_history_get_rows_db(zbx_uint64_t lastid, zbx_vector_pdc_history_ptr_t *rows, int *more)
+static int	pb_history_get_rows_db(zbx_uint64_t lastid, zbx_vector_pb_history_ptr_t *rows, int *more)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -109,7 +109,7 @@ static int	pdc_history_get_rows_db(zbx_uint64_t lastid, zbx_vector_pdc_history_p
 	zbx_uint64_t		id;
 	int			retries = 1, total_retries = 10;
 	struct timespec		t_sleep = { 0, 100000000L }, t_rem;
-	zbx_pdc_history_t	*hist;
+	zbx_pb_history_t	*hist;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
@@ -158,7 +158,7 @@ try_again:
 
 		retries = 1;
 
-		hist = (zbx_pdc_history_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_t));
+		hist = (zbx_pb_history_t *)zbx_malloc(NULL, sizeof(zbx_pb_history_t));
 		hist->id = id;
 		ZBX_STR2UINT64(hist->itemid, row[1]);
 		ZBX_STR2UCHAR(hist->flags, row[12]);
@@ -185,7 +185,7 @@ try_again:
 			}
 		}
 
-		zbx_vector_pdc_history_ptr_append(rows, hist);
+		zbx_vector_pb_history_ptr_append(rows, hist);
 
 		lastid = id;
 	}
@@ -210,18 +210,18 @@ try_again:
  * Return value: The total number of records exported.                        *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vector_pdc_history_ptr_t *rows,
+static int	pb_history_export(struct zbx_json *j, int records_num, const zbx_vector_pb_history_ptr_t *rows,
 		zbx_uint64_t *lastid)
 {
 	int				i, *errcodes;
-	zbx_pdc_history_t		*row;
-	zbx_vector_pdc_history_ptr_t	records;
+	zbx_pb_history_t		*row;
+	zbx_vector_pb_history_ptr_t	records;
 	zbx_vector_uint64_t		itemids;
 	zbx_hashset_t			nodata_itemids;
 	zbx_dc_item_t			*dc_items;
 
-	zbx_vector_pdc_history_ptr_create(&records);
-	zbx_vector_pdc_history_ptr_reserve(&records, (size_t)rows->values_num);
+	zbx_vector_pb_history_ptr_create(&records);
+	zbx_vector_pb_history_ptr_reserve(&records, (size_t)rows->values_num);
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_reserve(&itemids, (size_t)rows->values_num);
 	zbx_hashset_create(&nodata_itemids, (size_t)rows->values_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
@@ -238,7 +238,7 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 			zbx_hashset_insert(&nodata_itemids, &rows->values[i]->itemid, sizeof(rows->values[i]->itemid));
 		}
 
-		zbx_vector_pdc_history_ptr_append(&records, rows->values[i]);
+		zbx_vector_pb_history_ptr_append(&records, rows->values[i]);
 		zbx_vector_uint64_append(&itemids, rows->values[i]->itemid);
 	}
 
@@ -322,32 +322,32 @@ static int	pdc_history_export(struct zbx_json *j, int records_num, const zbx_vec
 
 	zbx_hashset_destroy(&nodata_itemids);
 	zbx_vector_uint64_destroy(&itemids);
-	zbx_vector_pdc_history_ptr_destroy(&records);
+	zbx_vector_pb_history_ptr_destroy(&records);
 
 	return records_num;
 }
 
-static int	pdc_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pb_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int				records_num = 0;
 	zbx_uint64_t			id;
-	zbx_vector_pdc_history_ptr_t	rows;
+	zbx_vector_pb_history_ptr_t	rows;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_pdc_history_ptr_create(&rows);
+	zbx_vector_pb_history_ptr_create(&rows);
 
 	*more = ZBX_PROXY_DATA_MORE;
-	id = pdc_get_lastid("proxy_history", "history_lastid");
+	id = pb_get_lastid("proxy_history", "history_lastid");
 
 	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
 	/*   1) there are no more data to read                                  */
 	/*   2) we have retrieved more than the total maximum number of records */
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset && ZBX_MAX_HRECORDS_TOTAL > records_num &&
-			0 != pdc_history_get_rows_db(id, &rows, more))
+			0 != pb_history_get_rows_db(id, &rows, more))
 	{
-		records_num = pdc_history_export(j, records_num, &rows, lastid);
+		records_num = pb_history_export(j, records_num, &rows, lastid);
 
 		/* got less data than requested - either no more data to read or the history is full of */
 		/* holes. In this case send retrieved data before attempting to read/wait for more data */
@@ -360,8 +360,8 @@ static int	pdc_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
 	if (0 != records_num)
 		zbx_json_close(j);
 
-	zbx_vector_pdc_history_ptr_clear_ext(&rows, pdc_history_free);
-	zbx_vector_pdc_history_ptr_destroy(&rows);
+	zbx_vector_pb_history_ptr_clear_ext(&rows, pb_history_free);
+	zbx_vector_pb_history_ptr_destroy(&rows);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() lastid:" ZBX_FS_UI64 " records_num:%d size:~" ZBX_FS_SIZE_T " more:%d",
 			__func__, *lastid, records_num, j->buffer_offset, *more);
@@ -374,29 +374,29 @@ static int	pdc_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
  * Purpose: get history records from memory cache                             *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_history_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int			records_num = 0;
 	void			*ptr;
 
-	if (SUCCEED == zbx_list_peek(&pdc->history, &ptr))
+	if (SUCCEED == zbx_list_peek(&pb->history, &ptr))
 	{
-		zbx_pdc_history_t		*row;
-		zbx_vector_pdc_history_ptr_t	rows;
+		zbx_pb_history_t		*row;
+		zbx_vector_pb_history_ptr_t	rows;
 		zbx_list_iterator_t		li;
 
-		zbx_vector_pdc_history_ptr_create(&rows);
-		zbx_list_iterator_init(&pdc->history, &li);
+		zbx_vector_pb_history_ptr_create(&rows);
+		zbx_list_iterator_init(&pb->history, &li);
 
 		while (1)
 		{
 			while (SUCCEED == zbx_list_iterator_next(&li) && ZBX_MAX_HRECORDS > rows.values_num)
 			{
 				(void)zbx_list_iterator_peek(&li, (void **)&row);
-				zbx_vector_pdc_history_ptr_append(&rows, row);
+				zbx_vector_pb_history_ptr_append(&rows, row);
 			}
 
-			records_num = pdc_history_export(j, records_num, &rows, lastid);
+			records_num = pb_history_export(j, records_num, &rows, lastid);
 
 			if (ZBX_MAX_HRECORDS != rows.values_num)
 				break;
@@ -407,10 +407,10 @@ static int	pdc_history_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
 				break;
 			}
 
-			zbx_vector_pdc_history_ptr_clear(&rows);
+			zbx_vector_pb_history_ptr_clear(&rows);
 		}
 
-		zbx_vector_pdc_history_ptr_destroy(&rows);
+		zbx_vector_pb_history_ptr_destroy(&rows);
 
 		if (0 != records_num)
 			zbx_json_close(j);
@@ -423,36 +423,36 @@ static int	pdc_history_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
  *                                                                            *
  * Purpose: add history row to memory cache                                   *
  *                                                                            *
- * Parameters: pdc - [IN] proxy data cache                                    *
+ * Parameters: pb  - [IN] proxy data cache                                    *
  *             src - [IN] row to add                                          *
  *                                                                            *
  * Return value: SUCCEED - the row was cached successfully                    *
  *               FAIL    - not enough memory in cache                         *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_history_add_row_mem(zbx_pdc_t *pdc, zbx_pdc_history_t *src)
+static int	pb_history_add_row_mem(zbx_pb_t *pb, zbx_pb_history_t *src)
 {
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 	int			ret = FAIL;
 
-	if (NULL == (row = (zbx_pdc_history_t *)pdc_malloc(sizeof(zbx_pdc_history_t))))
+	if (NULL == (row = (zbx_pb_history_t *)pb_malloc(sizeof(zbx_pb_history_t))))
 		return FAIL;
 
-	memcpy(row, src, sizeof(zbx_pdc_history_t));
+	memcpy(row, src, sizeof(zbx_pb_history_t));
 
-	if (NULL == (row->value = pdc_strdup(src->value)))
+	if (NULL == (row->value = pb_strdup(src->value)))
 	{
 		row->source = NULL;
 		goto out;
 	}
 
-	if (NULL == (row->source = pdc_strdup(src->source)))
+	if (NULL == (row->source = pb_strdup(src->source)))
 		goto out;
 
-	ret = zbx_list_append(&pdc->history, row, NULL);
+	ret = zbx_list_append(&pb->history, row, NULL);
 out:
 	if (SUCCEED != ret)
-		pdc_list_free_history(&pdc->history, row);
+		pb_list_free_history(&pb->history, row);
 
 	return ret;
 }
@@ -462,10 +462,10 @@ out:
  * Purpose: set ids to new history rows                                       *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_history_set_row_ids(zbx_list_t *rows, int rows_num)
+static void	pb_history_set_row_ids(zbx_list_t *rows, int rows_num)
 {
 	zbx_uint64_t		id;
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 	zbx_list_iterator_t	li;
 
 	id = zbx_dc_get_nextid("proxy_history", rows_num);
@@ -480,19 +480,19 @@ static void	pdc_history_set_row_ids(zbx_list_t *rows, int rows_num)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add history rows to memory cache                                *
+ * Purpose: add history rows to memory cache                                  *
  *                                                                            *
- * Parameters: pdc  - [IN] proxy data cache                                   *
+ * Parameters: pb   - [IN] proxy data cache                                   *
  *             rows - [IN] rows to add                                        *
  *                                                                            *
  * Return value: NULL if all rows were added successfully. Otherwise the list *
  *               item of first failed row is returned                         *
  *                                                                            *
  ******************************************************************************/
-static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *rows)
+static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 {
 	zbx_list_iterator_t	li;
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 	int			rows_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -503,7 +503,7 @@ static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *row
 	{
 		(void)zbx_list_iterator_peek(&li, (void **)&row);
 
-		if (SUCCEED != pdc_history_add_row_mem(pdc, row))
+		if (SUCCEED != pb_history_add_row_mem(pb, row))
 			break;
 
 		rows_num++;
@@ -523,10 +523,10 @@ static zbx_list_item_t	*pdc_history_add_rows_mem(zbx_pdc_t *pdc, zbx_list_t *row
  *             lastid - [OUT] last inserted id                                *
  *
  ******************************************************************************/
-static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid)
+static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_uint64_t *lastid)
 {
 	zbx_list_iterator_t	li;
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 	int			rows_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() next:%p", __func__, next);
@@ -557,13 +557,13 @@ static void	pdc_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx
 }
 
 
-void	pdc_history_flush(zbx_pdc_t *pdc)
+void	pb_history_flush(zbx_pb_t *pb)
 {
 	zbx_uint64_t	lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pdc_history_add_rows_db(&pdc->history, NULL, &lastid);
+	pb_history_add_rows_db(&pb->history, NULL, &lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -573,29 +573,29 @@ void	pdc_history_flush(zbx_pdc_t *pdc)
  * Purpose: clear sent history records                                      *
  *                                                                            *
  ******************************************************************************/
-void	pdc_history_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
+void	pb_history_clear(zbx_pb_t *pb, zbx_uint64_t lastid)
 {
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 
-	while (SUCCEED == zbx_list_peek(&pdc->history, (void **)&row))
+	while (SUCCEED == zbx_list_peek(&pb->history, (void **)&row))
 	{
 		if (row->id > lastid)
 			break;
 
-		zbx_list_pop(&pdc->history, NULL);
-		pdc_list_free_history(&pdc->history, row);
+		zbx_list_pop(&pb->history, NULL);
+		pb_list_free_history(&pb->history, row);
 	}
 }
 
-static void	pdc_history_data_free(zbx_pdc_history_data_t *data)
+static void	pb_history_data_free(zbx_pb_history_data_t *data)
 {
 
-	if (PDC_MEMORY == data->state)
+	if (PB_MEMORY == data->state)
 	{
-		zbx_pdc_history_t	*row;
+		zbx_pb_history_t	*row;
 
 		while (SUCCEED == zbx_list_pop(&data->rows, (void **)&row))
-			pdc_list_free_history(&data->rows, row);
+			pb_list_free_history(&data->rows, row);
 
 		zbx_list_destroy(&data->rows);
 	}
@@ -612,26 +612,26 @@ static void	pdc_history_data_free(zbx_pdc_history_data_t *data)
  * Purpose: check if oldest record is within allowed age                      *
  *                                                                            *
  ******************************************************************************/
-int	pdc_history_check_age(zbx_pdc_t *pdc)
+int	pb_history_check_age(zbx_pb_t *pb)
 {
-	zbx_pdc_history_t	*row;
+	zbx_pb_history_t	*row;
 	int			now;
 
 	now = (int)time(NULL);
 
-	while (SUCCEED == zbx_list_peek(&pdc->history, (void **)&row))
+	while (SUCCEED == zbx_list_peek(&pb->history, (void **)&row))
 	{
-		if (now - row->ts.sec <= pdc->offline_buffer)
+		if (now - row->ts.sec <= pb->offline_buffer)
 			break;
 
-		zbx_list_pop(&pdc->history, NULL);
-		pdc_list_free_history(&pdc->history, row);
+		zbx_list_pop(&pb->history, NULL);
+		pb_list_free_history(&pb->history, row);
 	}
 
-	if (0 == pdc->max_age)
+	if (0 == pb->max_age)
 		return SUCCEED;
 
-	if (SUCCEED != zbx_list_peek(&pdc->history, (void **)&row) || time(NULL) - row->ts.sec < pdc->max_age)
+	if (SUCCEED != zbx_list_peek(&pb->history, (void **)&row) || time(NULL) - row->ts.sec < pb->max_age)
 		return SUCCEED;
 
 	return FAIL;
@@ -642,9 +642,9 @@ int	pdc_history_check_age(zbx_pdc_t *pdc)
  * Purpose: write discovery last sent record id to database                   *
  *                                                                            *
  ******************************************************************************/
-void	pdc_history_set_lastid(zbx_uint64_t lastid)
+void	pb_history_set_lastid(zbx_uint64_t lastid)
 {
-	pdc_set_lastid("proxy_history", "history_lastid", lastid);
+	pb_set_lastid("proxy_history", "history_lastid", lastid);
 }
 
 /* public api */
@@ -656,26 +656,26 @@ void	pdc_history_set_lastid(zbx_uint64_t lastid)
  * Return value: The history data cache handle                                *
  *                                                                            *
  ******************************************************************************/
-zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
+zbx_pb_history_data_t	*zbx_pb_history_open(void)
 {
-	zbx_pdc_history_data_t	*data;
+	zbx_pb_history_data_t	*data;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	data = (zbx_pdc_history_data_t *)zbx_malloc(NULL, sizeof(zbx_pdc_history_data_t));
+	data = (zbx_pb_history_data_t *)zbx_malloc(NULL, sizeof(zbx_pb_history_data_t));
 
-	pdc_lock();
-	if (PDC_DATABASE == (data->state = pdc_dst[pdc_cache->state]))
-		pdc_cache->db_handles_num++;
-	pdc_unlock();
+	pb_lock();
+	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
+		pb_data->db_handles_num++;
+	pb_unlock();
 
-	if (PDC_MEMORY == data->state)
+	if (PB_MEMORY == data->state)
 	{
 		zbx_list_create(&data->rows);
 		data->rows_num = 0;
 	}
 
-	if (PDC_DATABASE == pdc_dst[pdc_cache->state])
+	if (PB_DATABASE == pb_dst[pb_data->state])
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
@@ -692,55 +692,55 @@ zbx_pdc_history_data_t	*zbx_pdc_history_open(void)
  * Purpose: flush the cached history data and free the handle                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
+void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 {
 	zbx_uint64_t	lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (PDC_MEMORY == data->state)
+	if (PB_MEMORY == data->state)
 	{
 		zbx_list_item_t	*next = NULL;
 
 		if (0 == data->rows_num)
 			goto out;
 
-		pdc_history_set_row_ids(&data->rows, data->rows_num);
+		pb_history_set_row_ids(&data->rows, data->rows_num);
 
-		pdc_lock();
+		pb_lock();
 
-		if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_history_check_age(pdc_cache))
+		if (PB_MEMORY == pb_data->state && SUCCEED != pb_history_check_age(pb_data))
 		{
-			pdc_fallback_to_database(pdc_cache, "cached records are too old");
+			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
-		else if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+		else if (PB_MEMORY == pb_dst[pb_data->state])
 		{
-			if (NULL == (next = pdc_history_add_rows_mem(pdc_cache, &data->rows)))
+			if (NULL == (next = pb_history_add_rows_mem(pb_data, &data->rows)))
 			{
-				pdc_unlock();
+				pb_unlock();
 				goto out;
 			}
 
-			if (PDC_DATABASE_MEMORY == pdc_cache->state)
+			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pdc_fallback_to_database(pdc_cache, "not enough space to complete transition to memory"
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
 						" mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
+				pb_cache_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 
 		/* not all rows were added to memory cache - flush them to database */
-		pdc_cache->db_handles_num++;
-		pdc_unlock();
+		pb_data->db_handles_num++;
+		pb_unlock();
 
 		do
 		{
 			zbx_db_begin();
-			pdc_history_add_rows_db(&data->rows, next, &lastid);
+			pb_history_add_rows_db(&data->rows, next, &lastid);
 		}
 		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
@@ -758,16 +758,16 @@ void	zbx_pdc_history_close(zbx_pdc_history_data_t *data)
 		lastid = zbx_db_insert_get_lastid(&data->db_insert);
 	}
 
-	pdc_lock();
+	pb_lock();
 
-	if (pdc_cache->history_lastid_db < lastid)
-		pdc_cache->history_lastid_db = lastid;
+	if (pb_data->history_lastid_db < lastid)
+		pb_data->history_lastid_db = lastid;
 
-	pdc_cache->db_handles_num--;
+	pb_data->db_handles_num--;
 
-	pdc_unlock();
+	pb_unlock();
 out:
-	pdc_history_data_free(data);
+	pb_history_data_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -777,10 +777,10 @@ out:
  * Purpose: write normal value into history data cache                        *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_history_write_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
+void	zbx_pb_history_write_value(zbx_pb_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
 		const zbx_timespec_t *ts, int flags, time_t now)
 {
-	pdc_history_add_value(data, itemid, state, value, ts, flags, 0, 0, 0, 0, 0, "", now);
+	pb_history_add_value(data, itemid, state, value, ts, flags, 0, 0, 0, 0, 0, "", now);
 }
 
 /******************************************************************************
@@ -788,11 +788,11 @@ void	zbx_pdc_history_write_value(zbx_pdc_history_data_t *data, zbx_uint64_t item
  * Purpose: write value with metadata into history data cache                 *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
+void	zbx_pb_history_write_meta_value(zbx_pb_history_data_t *data, zbx_uint64_t itemid, int state, const char *value,
 		const zbx_timespec_t *ts, int flags, zbx_uint64_t lastlogsize, int mtime, int timestamp, int logeventid,
 		int severity, const char *source, time_t now)
 {
-	pdc_history_add_value(data, itemid, state, value, ts, flags, lastlogsize, mtime, timestamp, logeventid,
+	pb_history_add_value(data, itemid, state, value, ts, flags, lastlogsize, mtime, timestamp, logeventid,
 			severity, source, now);
 }
 
@@ -801,21 +801,21 @@ void	zbx_pdc_history_write_meta_value(zbx_pdc_history_data_t *data, zbx_uint64_t
  * Purpose: get history data for sending to server                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int	state, ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
 
-	pdc_lock();
+	pb_lock();
 
-	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
-		ret = pdc_history_get_mem(pdc_cache, j, lastid, more);
+	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+		ret = pb_history_get_mem(pb_data, j, lastid, more);
 
-	pdc_unlock();
+	pb_unlock();
 
-	if (PDC_DATABASE == state)
-		ret = pdc_history_get_db(j, lastid, more);
+	if (PB_DATABASE == state)
+		ret = pb_history_get_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);
 
@@ -827,23 +827,23 @@ int	zbx_pdc_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more
  * Purpose: update database lastid/clear memory records                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_set_history_lastid(const zbx_uint64_t lastid)
+void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 {
 	int	state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
-	pdc_lock();
+	pb_lock();
 
-	pdc_cache->history_lastid_sent = lastid;
+	pb_data->history_lastid_sent = lastid;
 
-	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
-		pdc_history_clear(pdc_cache, lastid);
+	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+		pb_history_clear(pb_data, lastid);
 
-	pdc_unlock();
+	pb_unlock();
 
-	if (PDC_DATABASE == state)
-		pdc_history_set_lastid(lastid);
+	if (PB_DATABASE == state)
+		pb_history_set_lastid(lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

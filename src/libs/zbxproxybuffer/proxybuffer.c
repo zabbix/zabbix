@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "proxydatacache.h"
-#include "zbxproxydatacache.h"
-#include "pdc_discovery.h"
-#include "pdc_autoreg.h"
-#include "pdc_history.h"
+#include "proxybuffer.h"
+#include "zbxproxybuffer.h"
+#include "pb_discovery.h"
+#include "pb_autoreg.h"
+#include "pb_history.h"
 
 #include "zbxcommon.h"
 #include "zbxalgo.h"
@@ -29,59 +29,54 @@
 #include "zbxshmem.h"
 #include "zbxdbhigh.h"
 
-ZBX_PTR_VECTOR_IMPL(pdc_history_ptr, zbx_pdc_history_t *)
-ZBX_PTR_VECTOR_IMPL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
+ZBX_PTR_VECTOR_IMPL(pb_history_ptr, zbx_pb_history_t *)
+ZBX_PTR_VECTOR_IMPL(pb_discovery_ptr, zbx_pb_discovery_t *)
 
-zbx_pdc_t		*pdc_cache = NULL;
-static zbx_shmem_info_t	*pdc_mem = NULL;
+zbx_pb_t		*pb_data = NULL;
+static zbx_shmem_info_t	*pb_mem = NULL;
 
-ZBX_SHMEM_FUNC_IMPL(__pdc, pdc_mem)
+ZBX_SHMEM_FUNC_IMPL(__pb, pb_mem)
 
-static void	pdc_cache_set_init_state(zbx_pdc_t *pdc);
+static void	pb_cache_set_init_state(zbx_pb_t *pb);
 
 /* remap states to incoming data destination - database or memory */
-zbx_pdc_state_t	pdc_dst[] = {PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY, PDC_DATABASE};
+zbx_pb_state_t	pb_dst[] = {PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY, PB_DATABASE};
 
 /* remap states to outgoing data source - database or memory */
-zbx_pdc_state_t	pdc_src[] = {PDC_DATABASE, PDC_DATABASE, PDC_DATABASE, PDC_MEMORY, PDC_MEMORY};
+zbx_pb_state_t	pb_src[] = {PB_DATABASE, PB_DATABASE, PB_DATABASE, PB_MEMORY, PB_MEMORY};
 
-const char	*pdc_state_desc[] = {"database only", "database", "database->memory", "memory", "memory->database"};
+const char	*pb_state_desc[] = {"database only", "database", "database->memory", "memory", "memory->database"};
 
-void	pdc_lock(void)
+void	pb_lock(void)
 {
-	if (NULL != pdc_cache->mutex)
-		zbx_mutex_lock(pdc_cache->mutex);
+	if (NULL != pb_data->mutex)
+		zbx_mutex_lock(pb_data->mutex);
 }
 
-void	pdc_unlock(void)
+void	pb_unlock(void)
 {
-	if (NULL != pdc_cache->mutex)
-		zbx_mutex_unlock(pdc_cache->mutex);
+	if (NULL != pb_data->mutex)
+		zbx_mutex_unlock(pb_data->mutex);
 }
 
-void	*pdc_malloc(size_t size)
+void	*pb_malloc(size_t size)
 {
-	return __pdc_shmem_malloc_func(NULL, size);
+	return __pb_shmem_malloc_func(NULL, size);
 }
 
-void	*pdc_realloc(void *ptr, size_t size)
+void	pb_free(void *ptr)
 {
-	return __pdc_shmem_realloc_func(ptr, size);
+	__pb_shmem_free_func(ptr);
 }
 
-void	pdc_free(void *ptr)
-{
-	__pdc_shmem_free_func(ptr);
-}
-
-char	*pdc_strdup(const char *str)
+char	*pb_strdup(const char *str)
 {
 	size_t	len;
 	char	*cpy;
 
 	len = strlen(str) + 1;
 
-	if (NULL == (cpy = (char *)__pdc_shmem_malloc_func(NULL, len)))
+	if (NULL == (cpy = (char *)__pb_shmem_malloc_func(NULL, len)))
 		return NULL;
 
 	memcpy(cpy, str, len);
@@ -97,7 +92,7 @@ char	*pdc_strdup(const char *str)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_has_history(const char *table, const char *field)
+static int	pb_has_history(const char *table, const char *field)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -137,35 +132,35 @@ static int	pdc_has_history(const char *table, const char *field)
  * Purpose: set cache state and log the changes                               *
  *                                                                            *
  ******************************************************************************/
-void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *message)
+void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s => %s", __func__, pdc_state_desc[pdc->state], pdc_state_desc[state]);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() %s => %s", __func__, pb_state_desc[pb->state], pb_state_desc[state]);
 
-	if (PDC_DATABASE == pdc->state || PDC_MEMORY == pdc->state)
-		pdc->changes_num++;
+	if (PB_DATABASE == pb->state || PB_MEMORY == pb->state)
+		pb->changes_num++;
 
 	switch (state)
 	{
-		case PDC_DATABASE_ONLY:
+		case PB_DATABASE_ONLY:
 			zabbix_log(LOG_LEVEL_DEBUG, "witched proxy data cache to database mode: %s", message);
 			break;
-		case PDC_DATABASE:
+		case PB_DATABASE:
 			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to database mode: %s", message);
 			break;
-		case PDC_DATABASE_MEMORY:
+		case PB_DATABASE_MEMORY:
 			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to memory mode: %s",
 					message);
 			break;
-		case PDC_MEMORY:
+		case PB_MEMORY:
 			zabbix_log(LOG_LEVEL_DEBUG, "switched proxy data cache to memory mode: %s", message);
 			break;
-		case PDC_MEMORY_DATABASE:
+		case PB_MEMORY_DATABASE:
 			zabbix_log(LOG_LEVEL_DEBUG, "initiated proxy data cache transition to database mode: %s",
 					message);
 			break;
 	}
 
-	pdc->state = state;
+	pb->state = state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -175,23 +170,23 @@ void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *mess
  * Purpose: set initial cache working state based on existing history data    *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_cache_set_init_state(zbx_pdc_t *pdc)
+static void	pb_cache_set_init_state(zbx_pb_t *pb)
 {
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == pdc_has_history("proxy_history", "history_lastid") ||
-			SUCCEED == pdc_has_history("proxy_dhistory", "dhistory_lastid") ||
-			SUCCEED == pdc_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
+	if (SUCCEED == pb_has_history("proxy_history", "history_lastid") ||
+			SUCCEED == pb_has_history("proxy_dhistory", "dhistory_lastid") ||
+			SUCCEED == pb_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
 	{
-		pdc_cache_set_state(pdc, PDC_DATABASE, "unsent database records found");
+		pb_cache_set_state(pb, PB_DATABASE, "unsent database records found");
 	}
 	else
-		pdc_cache_set_state(pdc, PDC_MEMORY, "no unsent database records found");
+		pb_cache_set_state(pb, PB_MEMORY, "no unsent database records found");
 
 	zbx_db_close();
 }
 
-zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield)
+zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -218,7 +213,7 @@ zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield)
  * Purpose: Get discovery/auto registration data from the database.           *
  *                                                                            *
  ******************************************************************************/
-void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+void	pb_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more)
 {
 	size_t		offset = 0;
@@ -303,7 +298,7 @@ try_again:
 			(zbx_fs_size_t)j->buffer_offset);
 }
 
-void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
+void	pb_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
 	zbx_db_result_t	result;
 
@@ -332,41 +327,41 @@ void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_u
  * Purpose: flush cached lastids to the database                              *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_flush_lastids(zbx_pdc_t *pdc)
+static void	pb_flush_lastids(zbx_pb_t *pb)
 {
-	if (0 != pdc->history_lastid_sent)
-		pdc_history_set_lastid(pdc->history_lastid_sent);
+	if (0 != pb->history_lastid_sent)
+		pb_history_set_lastid(pb->history_lastid_sent);
 
-	if (0 != pdc->discovery_lastid_sent)
-		pdc_discovery_set_lastid(pdc->discovery_lastid_sent);
+	if (0 != pb->discovery_lastid_sent)
+		pb_discovery_set_lastid(pb->discovery_lastid_sent);
 
-	if (0 != pdc->autoreg_lastid_sent)
-		pdc_autoreg_set_lastid(pdc->autoreg_lastid_sent);
+	if (0 != pb->autoreg_lastid_sent)
+		pb_autoreg_set_lastid(pb->autoreg_lastid_sent);
 }
 
-static void	pdc_flush(zbx_pdc_t *pdc)
+static void	pb_flush(zbx_pb_t *pb)
 {
 	do
 	{
 		zbx_db_begin();
 
-		pdc_autoreg_flush(pdc);
-		pdc_discovery_flush(pdc);
-		pdc_history_flush(pdc);
+		pb_autoreg_flush(pb);
+		pb_discovery_flush(pb);
+		pb_history_flush(pb);
 
-		pdc_flush_lastids(pdc);
+		pb_flush_lastids(pb);
 	}
 	while (ZBX_DB_DOWN == zbx_db_commit());
 
-	pdc_history_clear(pdc, UINT64_MAX);
-	pdc_discovery_clear(pdc, UINT64_MAX);
-	pdc_autoreg_clear(pdc, UINT64_MAX);
+	pb_history_clear(pb, UINT64_MAX);
+	pb_discovery_clear(pb, UINT64_MAX);
+	pb_autoreg_clear(pb, UINT64_MAX);
 }
 
-void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message)
+void	pd_fallback_to_database(zbx_pb_t *pb, const char *message)
 {
-	pdc_flush(pdc);
-	pdc_cache_set_state(pdc, PDC_DATABASE, message);
+	pb_flush(pb);
+	pb_cache_set_state(pb, PB_DATABASE, message);
 }
 
 /******************************************************************************
@@ -375,41 +370,41 @@ void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message)
  *          records left and handles pending                                  *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_update_state(zbx_pdc_t *pdc, int more)
+static void pb_update_state(zbx_pb_t *pb, int more)
 {
-	switch (pdc->state)
+	switch (pb->state)
 	{
-		case PDC_MEMORY:
-			/* memory state can switch to database when:        */
-			/*   1) no space left to cache data                 */
-			/*   2) cached data exceeds maximum age             */
-			/* Both cases ar checked when adding data to cache. */
-			break;
-		case PDC_MEMORY_DATABASE:
-			if (ZBX_PROXY_DATA_DONE == more)
-			{
-				zbx_db_begin();
-				pdc_flush_lastids(pdc);
-				zbx_db_commit();
-				pdc_cache_set_state(pdc, PDC_DATABASE, "memory records have been uploaded");
-			}
-			break;
-		case PDC_DATABASE:
-			if (ZBX_PROXY_DATA_DONE == more)
-				pdc_cache_set_state(pdc, PDC_DATABASE_MEMORY, "no more database records to upload");
-			break;
-		case PDC_DATABASE_MEMORY:
-			if (ZBX_PROXY_DATA_DONE == more && 0 == pdc_cache->db_handles_num &&
-					pdc_cache->history_lastid_db <= pdc_cache->history_lastid_sent &&
-					pdc_cache->discovery_lastid_db <= pdc_cache->discovery_lastid_sent &&
-					pdc_cache->autoreg_lastid_db <= pdc_cache->autoreg_lastid_sent)
-			{
-				pdc_cache_set_state(pdc, PDC_MEMORY, "database records have been uploaded");
-			}
-			break;
-		case PDC_DATABASE_ONLY:
-			/* no state switching from database only mode */
-			break;
+	case PB_MEMORY:
+		/* memory state can switch to database when:        */
+		/*   1) no space left to cache data                 */
+		/*   2) cached data exceeds maximum age             */
+		/* Both cases ar checked when adding data to cache. */
+		break;
+	case PB_MEMORY_DATABASE:
+		if (ZBX_PROXY_DATA_DONE == more)
+		{
+			zbx_db_begin();
+			pb_flush_lastids(pb);
+			zbx_db_commit();
+			pb_cache_set_state(pb, PB_DATABASE, "memory records have been uploaded");
+		}
+		break;
+	case PB_DATABASE:
+		if (ZBX_PROXY_DATA_DONE == more)
+			pb_cache_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
+		break;
+	case PB_DATABASE_MEMORY:
+		if (ZBX_PROXY_DATA_DONE == more && 0 == pb_data->db_handles_num &&
+				pb_data->history_lastid_db <= pb_data->history_lastid_sent &&
+				pb_data->discovery_lastid_db <= pb_data->discovery_lastid_sent &&
+				pb_data->autoreg_lastid_db <= pb_data->autoreg_lastid_sent)
+		{
+			pb_cache_set_state(pb, PB_MEMORY, "database records have been uploaded");
+		}
+		break;
+	case PB_DATABASE_ONLY:
+		/* no state switching from database only mode */
+		break;
 	}
 }
 
@@ -427,7 +422,7 @@ static void	pdc_update_state(zbx_pdc_t *pdc, int more)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
+int	zbx_pb_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 {
 	int	ret = FAIL;
 
@@ -435,38 +430,38 @@ int	zbx_pdc_init(zbx_uint64_t size, int age, int offline_buffer, char **error)
 
 	if (0 == size)
 	{
-		pdc_cache = (zbx_pdc_t *)zbx_malloc(NULL, sizeof(zbx_pdc_t));
-		memset(pdc_cache, 0, sizeof(zbx_pdc_t));
+		pb_data = (zbx_pb_t *)zbx_malloc(NULL, sizeof(zbx_pb_t));
+		memset(pb_data, 0, sizeof(zbx_pb_t));
 
-		pdc_cache->mutex = ZBX_MUTEX_NULL;
-		pdc_cache_set_state(pdc_cache, PDC_DATABASE_ONLY, "proxy data cache has been disabled");
+		pb_data->mutex = ZBX_MUTEX_NULL;
+		pb_cache_set_state(pb_data, PB_DATABASE_ONLY, "proxy data cache has been disabled");
 
 		ret = SUCCEED;
 
 		goto out;
 	}
 
-	if (SUCCEED != zbx_shmem_create(&pdc_mem, size, "proxy data cache size", "ProxyDataCacheSize", 1, error))
+	if (SUCCEED != zbx_shmem_create(&pb_mem, size, "proxy data cache size", "proxybufferSize", 1, error))
 		goto out;
 
-	pdc_cache = (zbx_pdc_t *)__pdc_shmem_realloc_func(NULL, sizeof(zbx_pdc_t));
+	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
 
-	zbx_list_create_ext(&pdc_cache->history, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
-	zbx_list_create_ext(&pdc_cache->discovery, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
-	zbx_list_create_ext(&pdc_cache->autoreg, __pdc_shmem_malloc_func, __pdc_shmem_free_func);
+	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
+	zbx_list_create_ext(&pb_data->discovery, __pb_shmem_malloc_func, __pb_shmem_free_func);
+	zbx_list_create_ext(&pb_data->autoreg, __pb_shmem_malloc_func, __pb_shmem_free_func);
 
-	pdc_cache->max_age = age;
-	pdc_cache->offline_buffer = offline_buffer;
-	pdc_cache->changes_num = 0;
+	pb_data->max_age = age;
+	pb_data->offline_buffer = offline_buffer;
+	pb_data->changes_num = 0;
 
-	if (SUCCEED != zbx_mutex_create(&pdc_cache->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
+	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
 		goto out;
 
-	pdc_cache_set_init_state(pdc_cache);
+	pb_cache_set_init_state(pb_data);
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pdc_cache->state);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pb_data->state);
 
 	return ret;
 }
@@ -477,13 +472,13 @@ out:
  *          pending                                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_update_state(int more)
+void	zbx_pb_update_state(int more)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() more:%d", __func__, more);
 
-	pdc_lock();
-	pdc_update_state(pdc_cache, more);
-	pdc_unlock();
+	pb_lock();
+	pb_update_state(pb_data, more);
+	pb_unlock();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 }
@@ -493,10 +488,10 @@ void	zbx_pdc_update_state(int more)
  * Purpose: flush cache to database                                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_flush(void)
+void	zbx_pb_flush(void)
 {
-	pdc_flush(pdc_cache);
-	pdc_cache->state = PDC_DATABASE_ONLY;
+	pb_flush(pb_data);
+	pb_data->state = PB_DATABASE_ONLY;
 }
 
 /******************************************************************************
@@ -504,20 +499,20 @@ void	zbx_pdc_flush(void)
  * Purpose: get proxy data cache memory information                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_get_mem_info(zbx_pdc_mem_info_t *info, char **error)
+int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
 {
-	if (ZBX_MUTEX_NULL == pdc_cache->mutex)
+	if (ZBX_MUTEX_NULL == pb_data->mutex)
 	{
 		*error = zbx_strdup(NULL, "Proxy data cache is disabled.");
 		return FAIL;
 	}
 
-	pdc_lock();
+	pb_lock();
 
-	info->mem_total = pdc_mem->total_size;
-	info->mem_used = pdc_mem->total_size - pdc_mem->free_size;
+	info->mem_total = pb_mem->total_size;
+	info->mem_used = pb_mem->total_size - pb_mem->free_size;
 
-	pdc_unlock();
+	pb_unlock();
 
 	return SUCCEED;
 }
@@ -527,18 +522,18 @@ int	zbx_pdc_get_mem_info(zbx_pdc_mem_info_t *info, char **error)
  * Purpose: get proxy data cache state information                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_get_state_info(zbx_pdc_state_info_t *info)
+void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 {
-	if (ZBX_MUTEX_NULL == pdc_cache->mutex)
+	if (ZBX_MUTEX_NULL == pb_data->mutex)
 	{
 		info->changes_num = 0;
 		info->state = 0;
 	}
 	else
 	{
-		pdc_lock();
-		info->state = (PDC_MEMORY == pdc_dst[pdc_cache->state] ? 1 : 0);
-		info->changes_num = pdc_cache->changes_num;
-		pdc_unlock();
+		pb_lock();
+		info->state = (PB_MEMORY == pb_dst[pb_data->state] ? 1 : 0);
+		info->changes_num = pb_data->changes_num;
+		pb_unlock();
 	}
 }

@@ -18,16 +18,16 @@
 **/
 
 #include "zbxdiscovery.h"
-#include "zbxproxydatacache.h"
+#include "zbxproxybuffer.h"
 
 void	*zbx_discovery_open(void)
 {
-	return zbx_pdc_discovery_open();
+	return zbx_pb_discovery_open();
 }
 
 void	zbx_discovery_close(void *handle)
 {
-	zbx_pdc_discovery_close((zbx_pdc_discovery_data_t *)handle);
+	zbx_pb_discovery_close((zbx_pb_discovery_data_t *)handle);
 }
 
 void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
@@ -36,7 +36,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 	ZBX_UNUSED(dhost);
 	ZBX_UNUSED(add_event_cb);
 
-	zbx_pdc_discovery_write_host((zbx_pdc_discovery_data_t *)handle, druleid, ip, dns, status, (int)now);
+	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now);
 }
 
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
@@ -47,7 +47,7 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 	ZBX_UNUSED(dhost);
 	ZBX_UNUSED(add_event_cb);
 
-	zbx_pdc_discovery_write_service((zbx_pdc_discovery_data_t *)handle, druleid, dcheckid, ip, dns, port, status,
+	zbx_pb_discovery_write_service((zbx_pb_discovery_data_t *)handle, druleid, dcheckid, ip, dns, port, status,
 			value, (int)now);
 }
 

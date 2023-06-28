@@ -24,7 +24,7 @@
 #include "zbxtasks.h"
 #include "zbxmutexs.h"
 #include "zbxdbwrap.h"
-#include "zbxproxydatacache.h"
+#include "zbxproxybuffer.h"
 #include "../taskmanager/taskmanager.h"
 #include "zbxcompress.h"
 #include "zbxcachehistory.h"
@@ -130,9 +130,9 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
 	zbx_get_interface_availability_data(&j, &availability_ts);
-	zbx_pdc_history_get_rows(&j, &history_lastid, &more_history);
-	zbx_pdc_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
-	zbx_pdc_autoreg_get_rows(&j, &areg_lastid, &more_areg);
+	zbx_pb_history_get_rows(&j, &history_lastid, &more_history);
+	zbx_pb_discovery_get_rows(&j, &discovery_lastid, &more_discovery);
+	zbx_pb_autoreg_get_rows(&j, &areg_lastid, &more_areg);
 	zbx_proxy_get_host_active_availability(&j);
 
 	zbx_vector_tm_task_create(&tasks);
@@ -189,16 +189,16 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 			zbx_db_free_result(result);
 
 			zbx_reset_proxy_history_count((int)(history_maxid - history_lastid));
-			zbx_pdc_set_history_lastid(history_lastid);
+			zbx_pb_set_history_lastid(history_lastid);
 		}
 
 		if (0 != discovery_lastid)
-			zbx_pdc_discovery_set_lastid(discovery_lastid);
+			zbx_pb_discovery_set_lastid(discovery_lastid);
 
 		if (0 != areg_lastid)
-			zbx_pdc_autoreg_set_lastid(areg_lastid);
+			zbx_pb_autoreg_set_lastid(areg_lastid);
 
-		zbx_pdc_update_state(more);
+		zbx_pb_update_state(more);
 
 		if (0 != tasks.values_num)
 		{

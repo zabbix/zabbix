@@ -20,7 +20,7 @@
 #include "zbxcommon.h"
 #include "zbxcachehistory.h"
 #include "checks_internal.h"
-#include "zbxproxydatacache.h"
+#include "zbxproxybuffer.h"
 
 /******************************************************************************
  *                                                                            *
@@ -69,9 +69,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		if (0 == strcmp(param2, "buffer"))
 		{
-			zbx_pdc_mem_info_t	info;
+			zbx_pb_mem_info_t	info;
 
-			if (SUCCEED != zbx_pdc_get_mem_info(&info, &error))
+			if (SUCCEED != zbx_pb_get_mem_info(&info, &error))
 			{
 				SET_MSG_RESULT(result, error);
 				return NOTSUPPORTED;
@@ -106,9 +106,9 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 		}
 		else if (0 == strcmp(param2, "state"))
 		{
-			zbx_pdc_state_info_t	info;
+			zbx_pb_state_info_t	info;
 
-			zbx_pdc_get_state_info(&info);
+			zbx_pb_get_state_info(&info);
 
 			if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "current"))
 			{

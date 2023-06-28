@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROXYDATACACHE_H
-#define ZABBIX_PROXYDATACACHE_H
+#ifndef ZABBIX_PROXYBUFFER_H
+#define ZABBIX_PROXYBUFFER_H
 
-#include "zbxproxydatacache.h"
-#include "proxydatacache.h"
+#include "zbxproxybuffer.h"
+#include "proxybuffer.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxdbschema.h"
@@ -37,16 +37,16 @@
 
 typedef enum
 {
-	PDC_DATABASE_ONLY,
-	PDC_DATABASE,
-	PDC_DATABASE_MEMORY,
-	PDC_MEMORY,
-	PDC_MEMORY_DATABASE,
+	PB_DATABASE_ONLY,
+	PB_DATABASE,
+	PB_DATABASE_MEMORY,
+	PB_MEMORY,
+	PB_MEMORY_DATABASE,
 }
-zbx_pdc_state_t;
+zbx_pb_state_t;
 
-extern zbx_pdc_state_t	pdc_dst[];
-extern zbx_pdc_state_t	pdc_src[];
+extern zbx_pb_state_t	pb_dst[];
+extern zbx_pb_state_t	pb_src[];
 
 typedef struct
 {
@@ -60,16 +60,9 @@ typedef struct
 	int		clock;
 	int		status;
 }
-zbx_pdc_discovery_t;
+zbx_pb_discovery_t;
 
-ZBX_PTR_VECTOR_DECL(pdc_discovery_ptr, zbx_pdc_discovery_t *)
-
-typedef union
-{
-	char	*str;
-	size_t	offset;
-}
-zbx_pdc_str_t;
+ZBX_PTR_VECTOR_DECL(pb_discovery_ptr, zbx_pb_discovery_t *)
 
 typedef struct
 {
@@ -87,9 +80,9 @@ typedef struct
 	int		flags;
 	time_t		write_clock;
 }
-zbx_pdc_history_t;
+zbx_pb_history_t;
 
-ZBX_PTR_VECTOR_DECL(pdc_history_ptr, zbx_pdc_history_t *)
+ZBX_PTR_VECTOR_DECL(pb_history_ptr, zbx_pb_history_t *)
 
 typedef struct
 {
@@ -103,7 +96,7 @@ typedef struct
 	int		flags;
 	int		clock;
 }
-zbx_pdc_autoreg_t;
+zbx_pb_autoreg_t;
 
 typedef struct
 {
@@ -111,7 +104,7 @@ typedef struct
 	zbx_list_t		discovery;
 	zbx_list_t		autoreg;
 
-	zbx_pdc_state_t		state;
+	zbx_pb_state_t		state;
 	int			db_handles_num;		/* number of pending database inserts */
 	int			max_age;
 	int			offline_buffer;
@@ -129,11 +122,11 @@ typedef struct
 	zbx_uint64_t		autoreg_lastid_db;
 
 }
-zbx_pdc_t;
+zbx_pb_t;
 
-extern zbx_pdc_t	*pdc_cache;
+extern zbx_pb_t	*pb_data;
 
-zbx_uint64_t	pdc_get_lastid(const char *table_name, const char *lastidfield);
+zbx_uint64_t	pb_get_lastid(const char *table_name, const char *lastidfield);
 
 typedef struct
 {
@@ -151,19 +144,18 @@ typedef struct
 }
 zbx_history_table_t;
 
-void	pdc_lock(void);
-void	pdc_unlock(void);
-void	*pdc_malloc(size_t size);
-void	*pdc_realloc(void *ptr, size_t size);
-void	pdc_free(void *ptr);
-char	*pdc_strdup(const char *str);
+void	pb_lock(void);
+void	pb_unlock(void);
+void	*pb_malloc(size_t size);
+void	pb_free(void *ptr);
+char	*pb_strdup(const char *str);
 
-void	pdc_cache_set_state(zbx_pdc_t *pdc, zbx_pdc_state_t state, const char *message);
+void	pb_cache_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message);
 
-void	pdc_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
+void	pb_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history_table_t *ht,
 		zbx_uint64_t *lastid, zbx_uint64_t *id, int *records_num, int *more);
 
-void	pdc_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
-void	pdc_fallback_to_database(zbx_pdc_t *pdc, const char *message);
+void	pb_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
+void pd_fallback_to_database(zbx_pb_t *pb, const char *message);
 
 #endif

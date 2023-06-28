@@ -17,9 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "pdc_autoreg.h"
-#include "proxydatacache.h"
-#include "zbxproxydatacache.h"
+#include "pb_autoreg.h"
+#include "proxybuffer.h"
+#include "zbxproxybuffer.h"
 #include "zbxdbhigh.h"
 #include "zbxcachehistory.h"
 
@@ -38,7 +38,7 @@ static zbx_history_table_t	areg = {
 		}
 };
 
-static void	pdc_autoreg_write_host_db(zbx_uint64_t id, const char *host, const char *ip, const char *dns,
+static void	pb_autoreg_write_host_db(zbx_uint64_t id, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
 	zbx_db_insert_t	db_insert;
@@ -58,12 +58,12 @@ static void	pdc_autoreg_write_host_db(zbx_uint64_t id, const char *host, const c
  * Purpose: write host data into autoregistraion data cache                   *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pb_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
 	zbx_uint64_t	id;
 
-	id = pdc_get_lastid(areg.table, areg.lastidfield);
+	id = pb_get_lastid(areg.table, areg.lastidfield);
 
 	/* get history data in batches by ZBX_MAX_HRECORDS records and stop if: */
 	/*   1) there are no more data to read                                  */
@@ -71,7 +71,7 @@ static int	pdc_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
 	/*   3) we have gathered more than half of the maximum packet size      */
 	while (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset)
 	{
-		pdc_get_rows_db(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num, more);
+		pb_get_rows_db(j, ZBX_PROTO_TAG_AUTOREGISTRATION, &areg, lastid, &id, &records_num, more);
 
 		if (ZBX_PROXY_DATA_DONE == *more || ZBX_MAX_HRECORDS_TOTAL <= records_num)
 			break;
@@ -88,7 +88,7 @@ static int	pdc_autoreg_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
  * Purpose: free autoregistration record                                      *
  *                                                                            *
  ******************************************************************************/
-static void	pdc_list_free_autoreg(zbx_list_t *list, zbx_pdc_autoreg_t *row)
+static void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row)
 {
 	if (NULL != row->host)
 		list->mem_free_func(row->host);
@@ -110,27 +110,27 @@ static void	pdc_list_free_autoreg(zbx_list_t *list, zbx_pdc_autoreg_t *row)
  * Purpose: write autoregistration record into memory cache                   *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_autoreg_write_host_mem(zbx_pdc_t *pdc, const char *host, const char *ip, const char *dns,
+static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
-	zbx_pdc_autoreg_t	*row;
+	zbx_pb_autoreg_t	*row;
 	int			ret = FAIL;
 
-	if (NULL == (row = (zbx_pdc_autoreg_t *)pdc_malloc(sizeof(zbx_pdc_autoreg_t))))
+	if (NULL == (row = (zbx_pb_autoreg_t *)pb_malloc(sizeof(zbx_pb_autoreg_t))))
 			goto out;
 
-	memset(row, 0, sizeof(zbx_pdc_autoreg_t));
+	memset(row, 0, sizeof(zbx_pb_autoreg_t));
 
-	if (NULL == (row->host = pdc_strdup(host)))
+	if (NULL == (row->host = pb_strdup(host)))
 		goto out;
 
-	if (NULL == (row->listen_ip = pdc_strdup(ip)))
+	if (NULL == (row->listen_ip = pb_strdup(ip)))
 		goto out;
 
-	if (NULL == (row->listen_dns = pdc_strdup(dns)))
+	if (NULL == (row->listen_dns = pb_strdup(dns)))
 		goto out;
 
-	if (NULL == (row->host_metadata = pdc_strdup(host_metadata)))
+	if (NULL == (row->host_metadata = pb_strdup(host_metadata)))
 		goto out;
 
 	row->listen_port = (int)port;
@@ -138,12 +138,12 @@ static int	pdc_autoreg_write_host_mem(zbx_pdc_t *pdc, const char *host, const ch
 	row->flags = flags;
 	row->clock = clock;
 
-	ret = zbx_list_append(&pdc->autoreg, row, NULL);
+	ret = zbx_list_append(&pb->autoreg, row, NULL);
 out:
 	if (SUCCEED == ret)
 		row->id = zbx_dc_get_nextid("proxy_autoreg_host", 1);
 	else if (NULL != row)
-		pdc_list_free_autoreg(&pdc_cache->autoreg, row);
+		pb_list_free_autoreg(&pb_data->autoreg, row);
 
 	return ret;
 }
@@ -153,17 +153,17 @@ out:
  * Purpose: get autoregistration records from memory cache                    *
  *                                                                            *
  ******************************************************************************/
-static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int			records_num = 0;
 	zbx_list_iterator_t	li;
-	zbx_pdc_autoreg_t	*row;
+	zbx_pb_autoreg_t	*row;
 	void			*ptr;
 
-	if (SUCCEED == zbx_list_peek(&pdc->autoreg, &ptr))
+	if (SUCCEED == zbx_list_peek(&pb->autoreg, &ptr))
 	{
 		zbx_json_addarray(j, ZBX_PROTO_TAG_AUTOREGISTRATION);
-		zbx_list_iterator_init(&pdc->autoreg, &li);
+		zbx_list_iterator_init(&pb->autoreg, &li);
 
 		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
@@ -201,17 +201,17 @@ static int	pdc_autoreg_get_mem(zbx_pdc_t *pdc, struct zbx_json *j, zbx_uint64_t 
  * Purpose: clear sent autoregistration records                               *
  *                                                                            *
  ******************************************************************************/
-void	pdc_autoreg_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
+void	pb_autoreg_clear(zbx_pb_t *pb, zbx_uint64_t lastid)
 {
-	zbx_pdc_autoreg_t	*row;
+	zbx_pb_autoreg_t	*row;
 
-	while (SUCCEED == zbx_list_peek(&pdc->autoreg, (void **)&row))
+	while (SUCCEED == zbx_list_peek(&pb->autoreg, (void **)&row))
 	{
 		if (row->id > lastid)
 			break;
 
-		zbx_list_pop(&pdc->autoreg, NULL);
-		pdc_list_free_autoreg(&pdc->autoreg, row);
+		zbx_list_pop(&pb->autoreg, NULL);
+		pb_list_free_autoreg(&pb->autoreg, row);
 	}
 }
 
@@ -220,23 +220,23 @@ void	pdc_autoreg_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid)
  * Purpose: flush cached autoregistration data to database                    *
  *                                                                            *
  ******************************************************************************/
-void	pdc_autoreg_flush(zbx_pdc_t *pdc)
+void	pb_autoreg_flush(zbx_pb_t *pb)
 {
-	zbx_pdc_autoreg_t	*row;
+	zbx_pb_autoreg_t	*row;
 	zbx_db_insert_t		db_insert;
 	void			*ptr;
 	int			rows_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED == zbx_list_peek(&pdc->autoreg, &ptr))
+	if (SUCCEED == zbx_list_peek(&pb->autoreg, &ptr))
 	{
 		zbx_list_iterator_t	li;
 
 		zbx_db_insert_prepare(&db_insert, "proxy_autoreg_host", "id", "host", "listen_ip", "listen_dns",
 				"listen_port", "tls_accepted", "host_metadata", "flags", "clock", NULL);
 
-		zbx_list_iterator_init(&pdc->autoreg, &li);
+		zbx_list_iterator_init(&pb->autoreg, &li);
 
 		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
@@ -258,26 +258,26 @@ void	pdc_autoreg_flush(zbx_pdc_t *pdc)
  * Purpose: check if oldest record is within allowed age                      *
  *                                                                            *
  ******************************************************************************/
-int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
+int	pb_autoreg_check_age(zbx_pb_t *pb)
 {
-	zbx_pdc_autoreg_t	*row;
+	zbx_pb_autoreg_t	*row;
 	int			now;
 
 	now = (int)time(NULL);
 
-	while (SUCCEED == zbx_list_peek(&pdc->autoreg, (void **)&row))
+	while (SUCCEED == zbx_list_peek(&pb->autoreg, (void **)&row))
 	{
-		if (now - row->clock <= pdc->offline_buffer)
+		if (now - row->clock <= pb->offline_buffer)
 			break;
 
-		zbx_list_pop(&pdc->autoreg, NULL);
-		pdc_list_free_autoreg(&pdc->autoreg, row);
+		zbx_list_pop(&pb->autoreg, NULL);
+		pb_list_free_autoreg(&pb->autoreg, row);
 	}
 
-	if (0 == pdc->max_age)
+	if (0 == pb->max_age)
 		return SUCCEED;
 
-	if (SUCCEED != zbx_list_peek(&pdc->autoreg, (void **)&row) || time(NULL) - row->clock < pdc->max_age)
+	if (SUCCEED != zbx_list_peek(&pb->autoreg, (void **)&row) || time(NULL) - row->clock < pb->max_age)
 		return SUCCEED;
 
 	return FAIL;
@@ -288,9 +288,9 @@ int	pdc_autoreg_check_age(zbx_pdc_t *pdc)
  * Purpose: write last sent auto registration record id to database           *
  *                                                                            *
  ******************************************************************************/
-void	pdc_autoreg_set_lastid(zbx_uint64_t lastid)
+void	pb_autoreg_set_lastid(zbx_uint64_t lastid)
 {
-	pdc_set_lastid(areg.table, areg.lastidfield, lastid);
+	pb_set_lastid(areg.table, areg.lastidfield, lastid);
 }
 
 /* public api */
@@ -300,63 +300,63 @@ void	pdc_autoreg_set_lastid(zbx_uint64_t lastid)
  * Purpose: write host data into autoregistration data cache                  *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
+void	zbx_pb_autoreg_write_host(const char *host, const char *ip, const char *dns, unsigned short port,
 		unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
 	zbx_uint64_t	id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	pdc_lock();
+	pb_lock();
 
-	if (PDC_MEMORY == pdc_dst[pdc_cache->state])
+	if (PB_MEMORY == pb_dst[pb_data->state])
 	{
-		if (PDC_MEMORY == pdc_cache->state && SUCCEED != pdc_autoreg_check_age(pdc_cache))
+		if (PB_MEMORY == pb_data->state && SUCCEED != pb_autoreg_check_age(pb_data))
 		{
-			pdc_fallback_to_database(pdc_cache, "cached records are too old");
+			pd_fallback_to_database(pb_data, "cached records are too old");
 		}
 		else
 		{
-			if (FAIL != pdc_autoreg_write_host_mem(pdc_cache, host, ip, dns, port, connection_type,
+			if (FAIL != pb_autoreg_write_host_mem(pb_data, host, ip, dns, port, connection_type,
 					host_metadata, flags, clock))
 			{
-				pdc_unlock();
+				pb_unlock();
 				goto out;
 			}
 
-			if (PDC_DATABASE_MEMORY == pdc_cache->state)
+			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
-				pdc_fallback_to_database(pdc_cache, "not enough space to complete transition to memory"
+				pd_fallback_to_database(pb_data, "not enough space to complete transition to memory"
 						" mode");
 			}
 			else
 			{
 				/* initiate transition to database cache */
-				pdc_cache_set_state(pdc_cache, PDC_MEMORY_DATABASE, "not enough space");
+				pb_cache_set_state(pb_data, PB_MEMORY_DATABASE, "not enough space");
 			}
 		}
 	}
 
-	pdc_cache->db_handles_num++;
-	pdc_unlock();
+	pb_data->db_handles_num++;
+	pb_unlock();
 
 	id = zbx_db_get_maxid("proxy_autoreg_host");
 
 	do
 	{
 		zbx_db_begin();
-		pdc_autoreg_write_host_db(id, host, ip, dns, port, connection_type, host_metadata, flags, clock);
+		pb_autoreg_write_host_db(id, host, ip, dns, port, connection_type, host_metadata, flags, clock);
 	}
 	while (ZBX_DB_DOWN == zbx_db_commit());
 
-	pdc_lock();
+	pb_lock();
 
-	if (pdc_cache->autoreg_lastid_db < id)
-		pdc_cache->autoreg_lastid_db = id;
+	if (pb_data->autoreg_lastid_db < id)
+		pb_data->autoreg_lastid_db = id;
 
-	pdc_cache->db_handles_num--;
+	pb_data->db_handles_num--;
 
-	pdc_unlock();
+	pb_unlock();
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -366,21 +366,21 @@ out:
  * Purpose: get autoregistration rows for sending to server                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
+int	zbx_pb_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int	ret, state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64 ", more:" ZBX_FS_UI64, __func__, *lastid, *more);
 
-	pdc_lock();
+	pb_lock();
 
-	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
-		ret = pdc_autoreg_get_mem(pdc_cache, j, lastid, more);
+	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+		ret = pb_autoreg_get_mem(pb_data, j, lastid, more);
 
-	pdc_unlock();
+	pb_unlock();
 
-	if (PDC_DATABASE == state)
-		ret = pdc_autoreg_get_db(j, lastid, more);
+	if (PB_DATABASE == state)
+		ret = pb_autoreg_get_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);
 
@@ -392,23 +392,23 @@ int	zbx_pdc_autoreg_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more
  * Purpose: update last sent autoregistration record id                       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_pdc_autoreg_set_lastid(const zbx_uint64_t lastid)
+void	zbx_pb_autoreg_set_lastid(const zbx_uint64_t lastid)
 {
 	int	state;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
 
-	pdc_lock();
+	pb_lock();
 
-	pdc_cache->autoreg_lastid_sent = lastid;
+	pb_data->autoreg_lastid_sent = lastid;
 
-	if (PDC_MEMORY == (state = pdc_src[pdc_cache->state]))
-		pdc_autoreg_clear(pdc_cache, lastid);
+	if (PB_MEMORY == (state = pb_src[pb_data->state]))
+		pb_autoreg_clear(pb_data, lastid);
 
-	pdc_unlock();
+	pb_unlock();
 
-	if (PDC_DATABASE == state)
-		pdc_autoreg_set_lastid(lastid);
+	if (PB_DATABASE == state)
+		pb_autoreg_set_lastid(lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

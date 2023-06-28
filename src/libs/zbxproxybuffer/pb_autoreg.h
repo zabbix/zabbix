@@ -17,15 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PDC_HISTORY_H
-#define ZABBIX_PDC_HISTORY_H
+#ifndef ZABBIX_PB_AUTOREG_H
+#define ZABBIX_PB_AUTOREG_H
 
-#include "zbxproxydatacache.h"
-#include "proxydatacache.h"
+#include "zbxproxybuffer.h"
+#include "proxybuffer.h"
 
-void	pdc_history_clear(zbx_pdc_t *pdc, zbx_uint64_t lastid);
-void	pdc_history_flush(zbx_pdc_t *pdc);
-void	pdc_history_set_lastid(zbx_uint64_t lastid);
-int	pdc_history_check_age(zbx_pdc_t *pdc);
+void	pb_autoreg_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
+void	pb_autoreg_flush(zbx_pb_t *pb);
+void	pb_autoreg_set_lastid(zbx_uint64_t lastid);
+int	pb_autoreg_check_age(zbx_pb_t *pb);
 
 #endif
