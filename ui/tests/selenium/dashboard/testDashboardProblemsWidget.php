@@ -463,7 +463,7 @@ class testDashboardProblemsWidget extends CWebTest {
 					]
 				]
 			],
-			// #11 Widget with several groups and hosts in correcponding fields.
+			// #11 Widget with several groups and hosts in corresponding fields.
 			[
 				[
 					'fields' => [
