@@ -29,13 +29,13 @@
 		transition: fill $transition;
 	}
 
-	.svg-gauge-label-quadrant-3,
-	.svg-gauge-label-quadrant-4 {
+	.svg-gauge-label-bottom-left,
+	.svg-gauge-label-bottom-right {
 		dominant-baseline: text-before-edge;
 	}
 
-	.svg-gauge-label-quadrant-2,
-	.svg-gauge-label-quadrant-3 {
+	.svg-gauge-label-top-left,
+	.svg-gauge-label-bottom-left {
 		text-anchor: end;
 	}
 

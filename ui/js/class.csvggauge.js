@@ -27,10 +27,10 @@ class CSVGGauge {
 	static ZBX_STYLE_EMPTY_ARC_SECTOR =				'svg-gauge-empty-arc-sector';
 	static ZBX_STYLE_NEEDLE =						'svg-gauge-needle';
 	static ZBX_STYLE_LABEL =						'svg-gauge-label';
-	static ZBX_STYLE_LABEL_QUADRANT_1 =				'svg-gauge-label-quadrant-1';
-	static ZBX_STYLE_LABEL_QUADRANT_2 =				'svg-gauge-label-quadrant-2';
-	static ZBX_STYLE_LABEL_QUADRANT_3 =				'svg-gauge-label-quadrant-3';
-	static ZBX_STYLE_LABEL_QUADRANT_4 =				'svg-gauge-label-quadrant-4';
+	static ZBX_STYLE_LABEL_TOP_RIGHT =				'svg-gauge-label-top-right';
+	static ZBX_STYLE_LABEL_TOP_LEFT =				'svg-gauge-label-top-left';
+	static ZBX_STYLE_LABEL_BOTTOM_LEFT =			'svg-gauge-label-bottom-left';
+	static ZBX_STYLE_LABEL_BOTTOM_RIGHT =			'svg-gauge-label-bottom-right';
 	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
 	static ZBX_STYLE_VALUE_AND_UNITS_NO_DATA =		'svg-gauge-value-and-units-no-data';
 	static ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE =	'svg-gauge-value-and-units-multi-line';
@@ -469,36 +469,46 @@ class CSVGGauge {
 
 			container.classList.add(CSVGGauge.ZBX_STYLE_LABEL);
 
-			if (angle < -90) {
-				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_3);
-			}
-			else if (angle < 0) {
-				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_2);
-			}
-			else if (angle <= 90) {
-				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_1);
-			}
-			else {
-				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_QUADRANT_4);
-			}
-
 			container.textContent = text;
 			container.style.fontSize = `${font_size}px`;
 
 			let {x, y} = this.#polarToCartesian(radius, angle);
 
-			if (this.#config.angle === 270) {
+			let is_aligned_to_bottom = false;
+
+			if (this.#config.angle === 270 && Math.abs(angle) > 90) {
 				const arcs_height = 1 + Math.sqrt(2) / 2;
-				const y_max = arcs_height - font_size;
+				const y_max = arcs_height - font_size * CSVGGauge.LINE_HEIGHT;
 
 				if (y > y_max) {
 					x = Math.sqrt(radius ** 2 - (y_max - 1) ** 2) * Math.sign(angle);
-					y = y_max;
+					y = arcs_height;
+
+					is_aligned_to_bottom = true;
 				}
 			}
 
 			container.setAttribute('x', `${x}`);
 			container.setAttribute('y', `${y}`);
+
+			if (angle < -90) {
+				container.classList.add(is_aligned_to_bottom
+					? CSVGGauge.ZBX_STYLE_LABEL_TOP_LEFT
+					: CSVGGauge.ZBX_STYLE_LABEL_BOTTOM_LEFT
+				);
+			}
+			else if (angle < 0) {
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_TOP_LEFT);
+			}
+			else if (angle <= 90) {
+				container.classList.add(CSVGGauge.ZBX_STYLE_LABEL_TOP_RIGHT);
+			}
+			else {
+				container.classList.add(is_aligned_to_bottom
+					? CSVGGauge.ZBX_STYLE_LABEL_TOP_RIGHT
+					: CSVGGauge.ZBX_STYLE_LABEL_BOTTOM_RIGHT
+				);
+			}
 		}
 	}
 
