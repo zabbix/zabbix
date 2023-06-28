@@ -335,7 +335,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Graph']);
-		$merged_text = [];
 
 		// Change mapping of associative arrays from data set.
 		foreach ([$data['Data set']] as $data_set) {
@@ -352,72 +351,49 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			}
 
 			$form->fill($field_data);
+			$this->checkSuggestionList($data_set, $data);
+		}
+	}
 
-			// In case array which is filled contains more than 2 keys.
-			if (count($data_set) >= 2) {
-				var_dump($data_set);
-				var_dump('test1');
+	private function checkSuggestionList($data_set, $data){
+		$merged_text = [];
+		/**
+		 * In case created API data under section "Data set" there's more than two or exactly two array keys,
+		 * assign value to the variable $id, which is later used in the query to get text.
+		 */
+		$id = (count($data_set) >= 2) ? 'items' : 'hosts';
+		$get_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
+				->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
 
-				// Get text from html, from which later count for cycle is used.
-				$itemtext = $this->query('xpath://div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
-						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
+		//	Count words in text, accept that numbers are words.
+		$count = str_word_count($get_text, 1, '1234567890');
 
-				// Count words in the text which was queried.
-				$count = str_word_count($itemtext, 1, '1234567890');
+		// Check if third key in string is '20', after that assign index.
+		$word_index = ($count[2] === '20') ? 2 : 0;
 
-				/**
-				 * In case data is more than 20, in sentence 3rd word is used as the count for "for cycle" iteration,
-				 * in case HTML texts first word contains the number of iterations we use it instead of third.
-				 */
-				$word_index = ($count[2] === '20') ? 2 : 0;
-				$found_matches = intval($count[$word_index]) - 1;
+		/**
+		 * Since suggestion window contains maximum 20 matches, and the first one is the one which is written,
+		 * extract it from the found matches.
+		 */
+		$found_matches = intval($count[$word_index]) - 1;
 
-				/**
-				 * In any case, suggestion bar max values are up to 20, so in case, when there's more, either test data should be reduced,
-				 * or suggestion bar is broken.
-				 */
-				if ($found_matches >= 20) {
-					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
-				}
-				else {
-					for ($x = 0; $x < $found_matches; $x++) {
-						/**
-						 * When data are filled in field, suggestion bar pops, in order to be sure that all expected data are provided,
-						 * we go through each of the suggestion, put it in array and then compare to the expected data from data provider.
-						 */
-						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-						$new_item_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_items_"]//div[@aria-live="assertive"]')
-								->one()->waitUntilTextPresent('Graph')->getText();
-
-						/**
-						 * Put text from suggestion into previously defined empty array,
-						 * function merges/combines arrays by putting the most new value in the end of array.
-						 */
-						array_push($merged_text, $new_item_text);
-					}
-					$this->assertEquals($data['expected'], $merged_text);
-
-				}
+		if ($found_matches >= 20) {
+			$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
+		}
+		else {
+			/**
+			 * The cycle uses count of found matches, in each iteration on frontend arrow key down is pressed
+			 * in order to read the text from suggestion window, each text read is pushed into array, which is compared
+			 * with expected data from data provider getCheckDependingData.
+			 */
+			for ($x = 0; $x < $found_matches; $x++) {
+				$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
+				$option = ($id === 'items') ? 'Graph' : 'widget';
+				$suggestion_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
+						->one()->waitUntilTextPresent($option)->getText();
+				array_push($merged_text, $suggestion_text);
 			}
-			else {
-				$host_text = $this->query('xpath://div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
-						->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
-				$count = str_word_count($host_text, 1, '1234567890');
-				$found_matches = intval($count[0]) - 1;
-
-				if ($found_matches >= '20') {
-					$this->fail('Reduce the amount of test data or suggestion window is broken and displays more data than it should.');
-				}
-				else {
-					for ($x = 0; $x < $found_matches; $x++) {
-						$this->page->pressKey(WebDriverKeys::ARROW_DOWN);
-						$new_host_text = $this->query('xpath://div[@class="multiselect-control"]//div[@id="ds_0_hosts_"]//div[@aria-live="assertive"]')
-								->one()->waitUntilTextPresent('widget')->getText();
-						array_push($merged_text, $new_host_text);
-					}
-					$this->assertEquals($data['expected'], $merged_text);
-				}
-			}
+			$this->assertEquals($data['expected'], $merged_text);
 		}
 	}
 }
