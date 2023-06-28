@@ -352,6 +352,12 @@ window.widget_piechart_form = new class {
 		}
 
 		for (const input of dataset.querySelectorAll('[name^=ds]')) {
+			const is_template_input = input.closest('.single-item-table-row') !== null;
+
+			if (is_template_input) {
+				continue;
+			}
+
 			const cloned_name = input.name.replace(/([a-z]+\[)\d+(]\[[a-z_]+])/,
 				`$1${cloned_dataset.getAttribute('data-set')}$2`
 			);
