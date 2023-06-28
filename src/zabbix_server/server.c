@@ -1085,7 +1085,9 @@ static void	zbx_on_exit(int ret)
 
 	if (NULL != threads)
 	{
-		zbx_threads_kill_and_wait(threads, threads_flags, threads_num, ret);	/* wait for all child processes to exit */
+		/* wait for all child processes to exit */
+		zbx_threads_kill_and_wait(threads, threads_flags, threads_num, ret);
+
 		zbx_free(threads);
 		zbx_free(threads_flags);
 	}
