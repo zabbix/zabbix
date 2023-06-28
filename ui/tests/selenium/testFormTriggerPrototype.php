@@ -259,7 +259,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestTextPresent('Trigger prototype');
+		$this->assertEquals('Trigger prototype',
+				$this->query('name:triggersForm')->asForm()->waitUntilVisible()->one()->getSelectedTab()
+		);
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent triggers');

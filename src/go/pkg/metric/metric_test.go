@@ -735,6 +735,15 @@ func Test_setDefaults(t *testing.T) {
 			},
 			map[string]string{"foo": "bar"},
 		},
+		{
+			"default_empty_value",
+			args{
+				map[string]string{"foo": "abc", "bar": "def", "ghj": ""},
+				map[string]string{"foo": "", "bar": "mno"},
+				map[string]bool{"bar": true},
+			},
+			map[string]string{"foo": "abc", "bar": "mno", "ghj": ""},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

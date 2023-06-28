@@ -261,6 +261,7 @@ class testFormScreen extends CLegacyWebTest {
 		$this->assertTrue($message->isGood());
 		$this->assertEquals('Screen updated', $message->getTitle());
 
+		$this->query('class:in-progress')->waitUntilNotPresent();
 		$this->query('link:Change')->waitUntilClickable()->one()->click();
 		// Check that "Dynamic item" checkbox is unselected.
 		$this->assertTrue($form->getField('Dynamic item', true)->isChecked(false));
