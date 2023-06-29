@@ -104,10 +104,8 @@ window.widget_gauge_form = new class {
 	countFilledThresholds() {
 		let count = 0;
 
-		for (const form_row of this._thresholds_table.querySelectorAll('.form_row')) {
-			const threshold = form_row.querySelector('input[name$="[threshold]"').value;
-
-			if (threshold.trim() !== '') {
+		for (const threshold of this._thresholds_table.querySelectorAll('.form_row input[name$="[threshold]"')) {
+			if (threshold.value.trim() !== '') {
 				count++;
 			}
 		}
