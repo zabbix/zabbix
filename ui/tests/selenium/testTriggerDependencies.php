@@ -48,6 +48,7 @@ class testTriggerDependencies extends CLegacyWebTest {
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('bnt1'));
 		$this->zbxTestTextPresent('Template OS FreeBSD: /etc/passwd has been changed on {HOST.NAME}');
 		$this->zbxTestClickWait('update');
+		CMessageElement::find()->waitUntilVisible()->one();
 		$this->zbxTestTextPresent($expected);
 	}
 
