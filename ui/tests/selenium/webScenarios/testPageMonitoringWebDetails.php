@@ -86,7 +86,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		// Assert title.
+		// Assert title and header.
+		$this->page->assertTitle('Details of web scenario');
 		$this->page->assertHeader('Details of web scenario: Layout');
 
 		// Assert table column names.
@@ -297,7 +298,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		$this->page->login()->open('httpdetails.php?httptestid='.$httptest_id)->waitUntilReady();
 
-		// Assert title.
+		// Assert header.
 		$this->page->assertHeader('Details of web scenario: '.trim($data['name']));
 
 		// Assert data table.
