@@ -39,7 +39,7 @@
  *                                                                            *
  ******************************************************************************/
 static int	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths,  char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths,  char *error, size_t max_error_len)
 {
 	int			force_quote, ret;
 	size_t			context_r;
@@ -92,7 +92,7 @@ static int	process_user_macro_token(char **data, zbx_token_t *token, const struc
  *                                                                            *
  ******************************************************************************/
 static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int cur_token_inside_quote)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, int cur_token_inside_quote)
 {
 	char	c, *replace_to = NULL;
 	int	l ,r;
@@ -219,7 +219,7 @@ static void	process_lld_macro_token(char **data, zbx_token_t *token, int flags, 
  *                                                                            *
  ******************************************************************************/
 static int	process_expression_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t error_len)
 {
 	char	*errmsg = NULL, *expression;
 	size_t	right = token->data.expression_macro.expression.r;
@@ -257,7 +257,7 @@ static int	process_expression_macro_token(char **data, zbx_token_t *token, const
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	struct zbx_json		json;
@@ -344,7 +344,7 @@ exit:
  ******************************************************************************/
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int		ret = SUCCEED;
 	size_t		sep_pos;
@@ -440,7 +440,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	substitute_func_macro(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int		ret, offset = 0;
 	char		*exp = NULL;
@@ -498,7 +498,7 @@ static int	substitute_func_macro(char **data, zbx_token_t *token, const struct z
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, int flags, char *error, size_t max_error_len)
 {
 	int		ret = SUCCEED, pos = 0, prev_token_loc_r = -1, cur_token_inside_quote = 0;
 	size_t		i;
@@ -577,7 +577,7 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
  *                                                                            *
  ******************************************************************************/
 static int	substitute_query_filter_lld_macros(char **filter, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	char			*errmsg = NULL, err[128], *new_filter = NULL;
 	int			i, ret = FAIL;
@@ -647,8 +647,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	substitute_item_query_lld_macros(const zbx_eval_context_t *ctx, const zbx_eval_token_t *token,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, char **itemquery,
-		char **error)
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths,
+		char **itemquery, char **error)
 {
 	zbx_item_query_t	query;
 	char			err[128];
@@ -698,7 +698,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error)
 {
 	char			*exp = NULL;
 	int			i, ret = FAIL;

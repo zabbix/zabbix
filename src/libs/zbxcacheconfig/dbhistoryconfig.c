@@ -286,14 +286,13 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t *functionids,
-		size_t functionids_num, zbx_vector_ptr_t *item_tags)
+		size_t functionids_num, zbx_vector_item_tag_t *item_tags)
 {
 	const ZBX_DC_FUNCTION	*dc_function;
-	size_t			i;
 
 	RDLOCK_CACHE_CONFIG_HISTORY;
 
-	for (i = 0; i < functionids_num; i++)
+	for (size_t i = 0; i < functionids_num; i++)
 	{
 		if (NULL == (dc_function = (const ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
 				&functionids[i])))
@@ -319,7 +318,7 @@ void	zbx_dc_config_history_sync_get_item_tags_by_functionids(const zbx_uint64_t 
  *                                                                            *
  ******************************************************************************/
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
-		zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
+		zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
 		int itemids_num)
 {
 	int			i, j, found;
@@ -353,7 +352,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 			if (0 == found)
 			{
 				DCget_trigger(trigger, dc_trigger, ZBX_TRIGGER_GET_ALL);
-				zbx_vector_ptr_append(trigger_order, trigger);
+				zbx_vector_dc_trigger_append(trigger_order, trigger);
 			}
 
 			/* copy latest change timestamp */

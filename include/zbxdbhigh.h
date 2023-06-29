@@ -239,18 +239,6 @@ typedef struct
 }
 zbx_db_trigger;
 
-/* temporary cache of trigger related data */
-typedef struct
-{
-	zbx_uint64_t		serviceid;
-	char			*name;
-	char			*description;
-	zbx_vector_uint64_t	eventids;
-	zbx_vector_ptr_t	events;
-	zbx_vector_tags_t	service_tags;
-}
-zbx_db_service;
-
 typedef struct
 {
 	zbx_uint64_t		eventid;
@@ -279,6 +267,20 @@ typedef struct
 	zbx_uint64_t		flags;
 }
 zbx_db_event;
+
+ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+/* temporary cache of trigger related data */
+typedef struct
+{
+	zbx_uint64_t		serviceid;
+	char			*name;
+	char			*description;
+	zbx_vector_uint64_t	eventids;
+	zbx_vector_db_event_t	events;
+	zbx_vector_tags_t	service_tags;
+}
+zbx_db_service;
 
 /* media types */
 typedef enum

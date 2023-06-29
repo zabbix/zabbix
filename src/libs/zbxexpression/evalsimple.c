@@ -954,7 +954,7 @@ static zbx_variant_t	evaluate_term1(int *unknown_idx)
  *                                                                            *
  ******************************************************************************/
 int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs)
+		zbx_vector_str_t *unknown_msgs)
 {
 	int		unknown_idx = -13;	/* index of message in 'unknown_msgs' vector, set to invalid value */
 						/* to catch errors */

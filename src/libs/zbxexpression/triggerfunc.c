@@ -57,6 +57,9 @@ typedef struct
 }
 zbx_trigger_func_position_t;
 
+ZBX_PTR_VECTOR_DECL(trigger_func_position, zbx_trigger_func_position_t *)
+ZBX_PTR_VECTOR_IMPL(trigger_func_position, zbx_trigger_func_position_t *)
+
 static zbx_hash_t	func_hash_func(const void *data)
 {
 	const zbx_func_t	*func = (const zbx_func_t *)data;
@@ -312,17 +315,14 @@ static void	log_expression(const char *prefix, int index, const zbx_eval_context
 	}
 }
 
-static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_ptr_t *triggers)
+static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_dc_trigger_t *triggers)
 {
-	zbx_dc_trigger_t	*tr;
-	int			i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ifuncs_num:%d tr_num:%d",
 			__func__, ifuncs->num_data, triggers->values_num);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
-		tr = (zbx_dc_trigger_t *)triggers->values[i];
+		zbx_dc_trigger_t	*tr = triggers->values[i];
 
 		if (NULL != tr->new_error)
 			continue;
@@ -350,18 +350,15 @@ static void	zbx_substitute_functions_results(zbx_hashset_t *ifuncs, zbx_vector_p
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_ptr_t *triggers)
+static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *triggers)
 {
-	zbx_dc_trigger_t	*tr;
-	int			i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tr_num:%d", __func__, triggers->values_num);
 
 	zbx_vector_uint64_reserve(functionids, triggers->values_num);
 
-	for (i = 0; i < triggers->values_num; i++)
+	for (int i = 0; i < triggers->values_num; i++)
 	{
-		tr = (zbx_dc_trigger_t *)triggers->values[i];
+		zbx_dc_trigger_t	*tr = triggers->values[i];
 
 		if (NULL != tr->new_error)
 			continue;
@@ -390,7 +387,7 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
  *                                                                            *
  ******************************************************************************/
 static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,
-		zbx_hashset_t *ifuncs, const zbx_vector_ptr_t *triggers)
+		zbx_hashset_t *ifuncs, const zbx_vector_dc_trigger_t *triggers)
 {
 	int			i, j;
 	zbx_dc_trigger_t	*tr;
@@ -417,10 +414,10 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 
 		func_local.itemid = functions[i].itemid;
 
-		if (FAIL != (j = zbx_vector_ptr_bsearch(triggers, &functions[i].triggerid,
+		if (FAIL != (j = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)triggers, &functions[i].triggerid,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
-			tr = (zbx_dc_trigger_t *)triggers->values[j];
+			tr = triggers->values[j];
 			func_local.timespec = tr->timespec;
 		}
 		else
@@ -466,7 +463,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_functions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+static void	substitute_functions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const zbx_history_sync_item_t *history_items, const int *history_errcodes,
 		zbx_history_sync_item_t **items, int **items_err, int *items_num)
 {
@@ -624,7 +621,7 @@ static int	dc_item_compare_by_itemid(const void *d1, const void *d2)
  *                             triggerids                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const zbx_history_sync_item_t *history_items, const int *history_errcodes)
 {
 	zbx_db_event		event;
@@ -650,7 +647,7 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 		char	*error = NULL;
 		int	j, k;
 
-		tr = (zbx_dc_trigger_t *)triggers->values[i];
+		tr = triggers->values[i];
 
 		for (j = 0; j < tr->itemids.values_num; j++)
 		{
@@ -703,7 +700,7 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 	/* calculate new trigger values based on their recovery modes and expression evaluations */
 	for (i = 0; i < triggers->values_num; i++)
 	{
-		tr = (zbx_dc_trigger_t *)triggers->values[i];
+		tr = triggers->values[i];
 
 		if (NULL != tr->new_error)
 			continue;
@@ -758,7 +755,7 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
 	{
 		for (i = 0; i < triggers->values_num; i++)
 		{
-			tr = (zbx_dc_trigger_t *)triggers->values[i];
+			tr = triggers->values[i];
 
 			if (NULL != tr->new_error)
 			{
@@ -782,8 +779,8 @@ void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint6
  *             trigger_order     - [IN] array of triggers                     *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos, zbx_vector_uint64_t *functionids,
-		zbx_vector_ptr_t *trigger_order)
+static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t *triggers_func_pos,
+		zbx_vector_uint64_t *functionids, zbx_vector_dc_trigger_t *trigger_order)
 {
 	zbx_vector_uint64_t	funcids;
 	zbx_dc_trigger_t	*tr;
@@ -798,7 +795,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 	{
 		zbx_trigger_func_position_t	*tr_func_pos;
 
-		tr = (zbx_dc_trigger_t *)trigger_order->values[i];
+		tr = trigger_order->values[i];
 
 		if (NULL != tr->new_error)
 			continue;
@@ -811,7 +808,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
 		tr_func_pos->count = funcids.values_num;
 
 		zbx_vector_uint64_append_array(functionids, funcids.values, funcids.values_num);
-		zbx_vector_ptr_append(triggers_func_pos, tr_func_pos);
+		zbx_vector_trigger_func_position_append(triggers_func_pos, tr_func_pos);
 
 		zbx_vector_uint64_clear(&funcids);
 	}
@@ -831,18 +828,18 @@ static void	zbx_link_triggers_with_functions(zbx_vector_ptr_t *triggers_func_pos
  *             item_num      - [IN] number of items                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num)
+void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, int item_num)
 {
-	zbx_vector_ptr_t	triggers_func_pos;
-	zbx_vector_uint64_t	functionids, itemids_sorted;
-	zbx_dc_function_t	*functions = NULL;
-	int			*errcodes = NULL, t, f;
+	zbx_vector_trigger_func_position_t	triggers_func_pos;
+	zbx_vector_uint64_t			functionids, itemids_sorted;
+	zbx_dc_function_t			*functions = NULL;
+	int					*errcodes = NULL, t, f;
 
 	zbx_vector_uint64_create(&itemids_sorted);
 	zbx_vector_uint64_append_array(&itemids_sorted, itemids, item_num);
 
-	zbx_vector_ptr_create(&triggers_func_pos);
-	zbx_vector_ptr_reserve(&triggers_func_pos, trigger_order->values_num);
+	zbx_vector_trigger_func_position_create(&triggers_func_pos);
+	zbx_vector_trigger_func_position_reserve(&triggers_func_pos, trigger_order->values_num);
 
 	zbx_vector_uint64_create(&functionids);
 	zbx_vector_uint64_reserve(&functionids, item_num);
@@ -857,7 +854,7 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 
 	for (t = 0; t < triggers_func_pos.values_num; t++)
 	{
-		zbx_trigger_func_position_t	*func_pos = (zbx_trigger_func_position_t *)triggers_func_pos.values[t];
+		zbx_trigger_func_position_t	*func_pos = triggers_func_pos.values[t];
 
 		for (f = func_pos->start_index; f < func_pos->start_index + func_pos->count; f++)
 		{
@@ -874,8 +871,9 @@ void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const z
 	zbx_free(errcodes);
 	zbx_free(functions);
 
-	zbx_vector_ptr_clear_ext(&triggers_func_pos, zbx_ptr_free);
-	zbx_vector_ptr_destroy(&triggers_func_pos);
+	zbx_vector_trigger_func_position_clear_ext(&triggers_func_pos,
+			(zbx_trigger_func_position_free_func_t)zbx_ptr_free);
+	zbx_vector_trigger_func_position_destroy(&triggers_func_pos);
 
 	zbx_vector_uint64_clear(&functionids);
 	zbx_vector_uint64_destroy(&functionids);

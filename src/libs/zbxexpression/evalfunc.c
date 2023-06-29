@@ -372,7 +372,7 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 		int			match;
 		zbx_vector_expression_t	regexps;
 
-		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+		valuemap = valuemaps->values[i];
 
 		if (ZBX_VALUEMAP_TYPE_MATCH == valuemap->type)
 		{
@@ -479,7 +479,7 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 
 	for (i = 0; i < valuemaps->values_num; i++)
 	{
-		valuemap = (zbx_valuemaps_t *)valuemaps->values[i];
+		valuemap = valuemaps->values[i];
 
 		if (ZBX_VALUEMAP_TYPE_DEFAULT == valuemap->type)
 			goto map_value;

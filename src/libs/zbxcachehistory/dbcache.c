@@ -1828,7 +1828,7 @@ static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)
  *                              (zbx_clean_func_t)zbx_trigger_diff_free);     *
  *                                                                            *
  ******************************************************************************/
-static void	process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_t add_event_cb,
+static void	process_triggers(zbx_vector_dc_trigger_t *triggers, zbx_add_event_func_t add_event_cb,
 		zbx_vector_ptr_t *trigger_diff)
 {
 	int	i;
@@ -1838,10 +1838,10 @@ static void	process_triggers(zbx_vector_ptr_t *triggers, zbx_add_event_func_t ad
 	if (0 == triggers->values_num)
 		goto out;
 
-	zbx_vector_ptr_sort(triggers, zbx_trigger_topoindex_compare);
+	zbx_vector_dc_trigger_sort(triggers, zbx_trigger_topoindex_compare);
 
 	for (i = 0; i < triggers->values_num; i++)
-		process_trigger((zbx_dc_trigger_t *)triggers->values[i], add_event_cb, trigger_diff);
+		process_trigger(triggers->values[i], add_event_cb, trigger_diff);
 
 	zbx_vector_ptr_sort(trigger_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 out:
@@ -1872,7 +1872,7 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 		const zbx_vector_uint64_t *history_itemids, const zbx_history_sync_item_t *history_items,
 		const int *history_errcodes, const zbx_vector_ptr_t *timers, zbx_add_event_func_t add_event_cb,
 		zbx_vector_ptr_t *trigger_diff, zbx_uint64_t *itemids, zbx_timespec_t *timespecs,
-		zbx_hashset_t *trigger_info, zbx_vector_ptr_t *trigger_order)
+		zbx_hashset_t *trigger_info, zbx_vector_dc_trigger_t *trigger_order)
 {
 	int			i, item_num = 0, timers_num = 0;
 
@@ -1909,13 +1909,13 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 
-	zbx_vector_ptr_reserve(trigger_order, trigger_info->num_slots);
+	zbx_vector_dc_trigger_reserve(trigger_order, trigger_info->num_slots);
 
 	if (0 != item_num)
 	{
 		zbx_dc_config_history_sync_get_triggers_by_itemids(trigger_info, trigger_order, itemids, timespecs,
 				item_num);
-		prepare_triggers((zbx_dc_trigger_t **)trigger_order->values, trigger_order->values_num);
+		prepare_triggers(trigger_order->values, trigger_order->values_num);
 		zbx_determine_items_in_expressions(trigger_order, itemids, item_num);
 	}
 
@@ -1927,19 +1927,18 @@ static void	recalculate_triggers(const zbx_dc_history_t *history, int history_nu
 
 		if (offset != trigger_order->values_num)
 		{
-			prepare_triggers((zbx_dc_trigger_t **)trigger_order->values + offset,
-					trigger_order->values_num - offset);
+			prepare_triggers(trigger_order->values + offset, trigger_order->values_num - offset);
 		}
 	}
 
-	zbx_vector_ptr_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	zbx_vector_dc_trigger_sort(trigger_order, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	zbx_evaluate_expressions(trigger_order, history_itemids, history_items, history_errcodes);
 	process_triggers(trigger_order, add_event_cb, trigger_diff);
 
 	zbx_dc_free_triggers(trigger_order);
 
 	zbx_hashset_clear(trigger_info);
-	zbx_vector_ptr_clear(trigger_order);
+	zbx_vector_dc_trigger_clear(trigger_order);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -3449,8 +3448,8 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	unsigned int			item_retrieve_mode;
 	time_t				sync_start;
 	zbx_vector_uint64_t		triggerids ;
-	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers,
-					trigger_order;
+	zbx_vector_ptr_t		history_items, trigger_diff, item_diff, inventory_values, trigger_timers;
+	zbx_vector_dc_trigger_t		trigger_order;
 	zbx_vector_uint64_pair_t	trends_diff, proxy_subscriptions;
 	zbx_dc_history_t		history[ZBX_HC_SYNC_MAX];
 	zbx_uint64_t			trigger_itemids[ZBX_HC_SYNC_MAX];
@@ -3517,7 +3516,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	zbx_vector_ptr_create(&history_items);
 	zbx_vector_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 
-	zbx_vector_ptr_create(&trigger_order);
+	zbx_vector_dc_trigger_create(&trigger_order);
 	zbx_hashset_create(&trigger_info, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_create(&itemids);
@@ -3847,7 +3846,7 @@ static void	sync_server_history(int *values_num, int *triggers_num,
 	zbx_vector_connector_filter_clear_ext(&connector_filters_history, zbx_connector_filter_free);
 	zbx_vector_connector_filter_destroy(&connector_filters_events);
 	zbx_vector_connector_filter_destroy(&connector_filters_history);
-	zbx_vector_ptr_destroy(&trigger_order);
+	zbx_vector_dc_trigger_destroy(&trigger_order);
 	zbx_hashset_destroy(&trigger_info);
 
 	zbx_vector_uint64_destroy(&itemids);

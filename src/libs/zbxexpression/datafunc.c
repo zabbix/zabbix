@@ -1039,17 +1039,15 @@ int	expr_dc_get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid,
  * Purpose: compose temporary vector containing event data                    *
  *                                                                            *
  ******************************************************************************/
-static void	eventdata_compose(const zbx_vector_ptr_t *events, zbx_vector_eventdata_t *vect_eventdata)
+static void	eventdata_compose(const zbx_vector_db_event_t *events, zbx_vector_eventdata_t *vect_eventdata)
 {
-	int i;
-
-	for (i = 0; i < events->values_num; i++)
+	for (int i = 0; i < events->values_num; i++)
 	{
 		int		ret;
 		zbx_db_event	*event;
 		zbx_eventdata_t	eventdata = {0};
 
-		event = (zbx_db_event *)events->values[i];
+		event = events->values[i];
 
 		if (FAIL == (ret = expr_db_get_trigger_value(&event->trigger, &eventdata.host, 1, ZBX_REQUEST_HOST_HOST)))
 			goto fail;
@@ -1092,10 +1090,10 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 	if (symptom_eventids.values_num > 0)
 	{
 		zbx_vector_eventdata_t	symptoms;
-		zbx_vector_ptr_t	symptom_events;
+		zbx_vector_db_event_t	symptom_events;
 
 		zbx_vector_eventdata_create(&symptoms);
-		zbx_vector_ptr_create(&symptom_events);
+		zbx_vector_db_event_create(&symptom_events);
 
 		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
 		eventdata_compose(&symptom_events, &symptoms);
@@ -1107,8 +1105,8 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 
 		zbx_vector_eventdata_destroy(&symptoms);
 
-		zbx_vector_ptr_clear_ext(&symptom_events, (zbx_clean_func_t)zbx_db_free_event);
-		zbx_vector_ptr_destroy(&symptom_events);
+		zbx_vector_db_event_clear_ext(&symptom_events, zbx_db_free_event);
+		zbx_vector_db_event_destroy(&symptom_events);
 	}
 
 	zbx_vector_uint64_destroy(&symptom_eventids);

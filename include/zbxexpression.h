@@ -63,14 +63,53 @@
 #define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
 #define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO)
 
+/* group - hostids cache */
 typedef struct
 {
-	zbx_eval_context_t	*ctx;
-	zbx_vector_ptr_t	queries;
-	int			mode;
-	int			one_num;
-	int			many_num;
-	zbx_uint64_t		hostid;
+	char			*name;
+	zbx_vector_uint64_t	hostids;
+}
+zbx_expression_group_t;
+
+ZBX_PTR_VECTOR_DECL(expression_group, zbx_expression_group_t *)
+
+/* item - tags cache */
+typedef struct
+{
+	zbx_uint64_t		itemid;
+	zbx_vector_item_tag_t	tags;
+}
+zbx_expression_item_t;
+
+ZBX_PTR_VECTOR_DECL(expression_item, zbx_expression_item_t *)
+
+/* expression item query */
+typedef struct
+{
+	/* query flags, see ZBX_ITEM_QUERY_* defines */
+	zbx_uint32_t		flags;
+
+	/* the item query /host/key?[filter] */
+	zbx_item_query_t	ref;
+
+	/* the query error */
+	char			*error;
+
+	/* the expression item query data, zbx_expression_query_one_t or zbx_expression_query_many_t */
+	void			*data;
+}
+zbx_expression_query_t;
+
+ZBX_PTR_VECTOR_DECL(expression_query, zbx_expression_query_t *)
+
+typedef struct
+{
+	zbx_eval_context_t		*ctx;
+	zbx_vector_expression_query_t	queries;
+	int				mode;
+	int				one_num;
+	int				many_num;
+	zbx_uint64_t			hostid;
 
 	/* cache to resolve one item queries */
 	zbx_host_key_t		*hostkeys;
@@ -78,12 +117,12 @@ typedef struct
 	int			*errcodes_hk;
 
 	/* cache to resolve many item queries */
-	zbx_vector_ptr_t	groups;
-	zbx_vector_ptr_t	itemtags;
-	zbx_vector_ptr_t	dcitem_refs;
-	zbx_dc_item_t		*dcitems;
-	int			*errcodes;
-	int			dcitems_num;
+	zbx_vector_expression_group_t	groups;
+	zbx_vector_expression_item_t	itemtags;
+	zbx_vector_dc_item_t		dcitem_refs;
+	zbx_dc_item_t			*dcitems;
+	int				*errcodes;
+	int				dcitems_num;
 }
 zbx_expression_eval_t;
 
@@ -112,13 +151,13 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
 
-void	zbx_evaluate_expressions(zbx_vector_ptr_t *triggers, const zbx_vector_uint64_t *history_itemids,
+void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vector_uint64_t *history_itemids,
 		const zbx_history_sync_item_t *history_items, const int *history_errcodes);
 
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
-void	zbx_determine_items_in_expressions(zbx_vector_ptr_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
+void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
 
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);
@@ -130,30 +169,30 @@ int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_
 
 /* evaluate simple */
 int	zbx_evaluate(double *value, const char *expression, char *error, size_t max_error_len,
-		zbx_vector_ptr_t *unknown_msgs);
+		zbx_vector_str_t *unknown_msgs);
 int	zbx_evaluate_unknown(const char *expression, double *value, char *error, size_t max_error_len);
 double	zbx_evaluate_string_to_double(const char *in);
 
 int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, int flags, char *error, size_t max_error_len);
 int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
 		char *error, size_t maxerrlen);
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
-		const struct zbx_json_parse *jp_row, const zbx_vector_ptr_t *lld_macro_paths, int macro_type,
+		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,
 		char *error, size_t maxerrlen);
 int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char key_in_param,
 		char **exp, size_t *exp_alloc, size_t *exp_offset, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, size_t max_error_len);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len);
 int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen);
 int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen);
 int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char *error, int maxerrlen);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, int maxerrlen);
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
-		const zbx_vector_ptr_t *lld_macro_paths, char **error);
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error);
 
 void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
 		zbx_vector_dbl_t *values, int *count);

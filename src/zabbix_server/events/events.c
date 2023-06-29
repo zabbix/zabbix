@@ -69,7 +69,7 @@ typedef enum
 }
 zbx_correlation_match_result_t;
 
-static zbx_vector_ptr_t		events;
+static zbx_vector_db_event_t	events;
 static zbx_hashset_t		event_recovery;
 static zbx_hashset_t		correlation_cache;
 static zbx_correlation_rules_t	correlation_rules;
@@ -165,7 +165,7 @@ static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag
 	validate_and_add_tag(event, t);
 }
 
-static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vector_ptr_t *item_tags)
+static void	get_item_tags_by_expression(const zbx_db_trigger *trigger, zbx_vector_item_tag_t *item_tags)
 {
 	zbx_vector_uint64_t	functionids;
 
@@ -210,8 +210,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
 		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error)
 {
-	zbx_vector_ptr_t	item_tags;
-	int			i;
+	zbx_vector_item_tag_t	item_tags;
 	zbx_db_event		*event;
 
 	event = zbx_malloc(NULL, sizeof(zbx_db_event));
@@ -266,20 +265,20 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 
 		if (NULL != trigger_tags)
 		{
-			for (i = 0; i < trigger_tags->values_num; i++)
+			for (int i = 0; i < trigger_tags->values_num; i++)
 				process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
 		}
 
-		zbx_vector_ptr_create(&item_tags);
+		zbx_vector_item_tag_create(&item_tags);
 		get_item_tags_by_expression(&event->trigger, &item_tags);
 
-		for (i = 0; i < item_tags.values_num; i++)
+		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, (const zbx_item_tag_t *)item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i]);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
-		zbx_vector_ptr_destroy(&item_tags);
+		zbx_vector_item_tag_destroy(&item_tags);
 
 		zbx_dc_close_user_macros(um_handle);
 	}
@@ -293,7 +292,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 			event->name = zbx_strdup(NULL, error);
 
 		zbx_vector_tags_create(&event->tags);
-		zbx_vector_ptr_create(&item_tags);
+		zbx_vector_item_tag_create(&item_tags);
 
 		switch (object)
 		{
@@ -303,7 +302,7 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 				event->trigger.expression = zbx_strdup(NULL, trigger_expression);
 				event->trigger.recovery_expression = zbx_strdup(NULL, trigger_recovery_expression);
 
-				for (i = 0; i < trigger_tags->values_num; i++)
+				for (int i = 0; i < trigger_tags->values_num; i++)
 					process_trigger_tag(event, (const zbx_tag_t *)trigger_tags->values[i]);
 
 				get_item_tags_by_expression(&event->trigger, &item_tags);
@@ -312,18 +311,18 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 				zbx_dc_get_item_tags(objectid, &item_tags);
 		}
 
-		for (i = 0; i < item_tags.values_num; i++)
+		for (int i = 0; i < item_tags.values_num; i++)
 		{
-			process_item_tag(event, (const zbx_item_tag_t *)item_tags.values[i]);
+			process_item_tag(event, item_tags.values[i]);
 			zbx_free_item_tag(item_tags.values[i]);
 		}
 
-		zbx_vector_ptr_destroy(&item_tags);
+		zbx_vector_item_tag_destroy(&item_tags);
 
 		zbx_dc_close_user_macros(um_handle);
 	}
 
-	zbx_vector_ptr_append(&events, event);
+	zbx_vector_db_event_append(&events, event);
 
 	return event;
 }
@@ -391,7 +390,7 @@ static int	save_events(void)
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		event = (zbx_db_event *)events.values[i];
+		event = events.values[i];
 
 		if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_CREATE) && 0 == event->eventid)
 			num++;
@@ -406,7 +405,7 @@ static int	save_events(void)
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		event = (zbx_db_event *)events.values[i];
+		event = events.values[i];
 
 		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
@@ -643,7 +642,7 @@ static zbx_db_event	*get_event_by_source_object_id(int source, int object, zbx_u
 
 	for (i = 0; i < events.values_num; i++)
 	{
-		event = (zbx_db_event *)events.values[i];
+		event = events.values[i];
 
 		if (event->source == source && event->object == object && event->objectid == objectid)
 			return event;
@@ -1627,7 +1626,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
 	/* update trigger problem_count for new problem events */
 	for (i = 0; i < events.values_num; i++)
 	{
-		zbx_db_event	*event = (zbx_db_event *)events.values[i];
+		zbx_db_event	*event = events.values[i];
 
 		if (EVENT_SOURCE_TRIGGERS != event->source || EVENT_OBJECT_TRIGGER != event->object)
 			continue;
@@ -1678,7 +1677,7 @@ static void	update_trigger_changes(zbx_vector_ptr_t *trigger_diff)
  ******************************************************************************/
 void	zbx_initialize_events(void)
 {
-	zbx_vector_ptr_create(&events);
+	zbx_vector_db_event_create(&events);
 	zbx_hashset_create(&event_recovery, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&correlation_cache, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -1692,7 +1691,7 @@ void	zbx_initialize_events(void)
  ******************************************************************************/
 void	zbx_uninitialize_events(void)
 {
-	zbx_vector_ptr_destroy(&events);
+	zbx_vector_db_event_destroy(&events);
 	zbx_hashset_destroy(&event_recovery);
 	zbx_hashset_destroy(&correlation_cache);
 
@@ -1740,7 +1739,7 @@ static void	zbx_clean_event(zbx_db_event *event)
  ******************************************************************************/
 void	zbx_clean_events(void)
 {
-	zbx_vector_ptr_clear_ext(&events, (zbx_clean_func_t)zbx_clean_event);
+	zbx_vector_db_event_clear_ext(&events, zbx_clean_event);
 
 	zbx_reset_event_recovery();
 }
@@ -1797,7 +1796,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 		zbx_dc_host_t	*host;
 		zbx_db_event	*event;
 
-		event = (zbx_db_event *)events.values[i];
+		event = events.values[i];
 
 		if (EVENT_SOURCE_TRIGGERS != event->source || 0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
@@ -2126,7 +2125,7 @@ static void	update_event_suppress_data(void)
 	/* prepare trigger problem event vector */
 	for (i = 0; i < events.values_num; i++)
 	{
-		event = (zbx_db_event *)events.values[i];
+		event = events.values[i];
 
 		if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
 			continue;
@@ -2824,7 +2823,7 @@ int	zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *trig
 		eventid = zbx_db_get_maxid_num("events", events.values_num);
 		for (i = 0; i < events.values_num; i++)
 		{
-			zbx_db_event	*event = (zbx_db_event *)events.values[i];
+			zbx_db_event	*event = events.values[i];
 
 			event->eventid = eventid++;
 
