@@ -38,7 +38,7 @@ window.widget_piechart_form = new class {
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
 				appendTo: '.overlay-dialogue-body',
-				use_default: true
+				use_default: !['ds', 'merge_color'].includes(colorpicker.name)
 			});
 		}
 
@@ -47,6 +47,7 @@ window.widget_piechart_form = new class {
 			.on('change', 'input, z-select, .multiselect', () => this.updateForm());
 
 		this.datasetTabInit();
+		this.displayingOptionsTabInit();
 		this.toggleDisplayingOptionsFields();
 		this.updateForm();
 	}
@@ -191,6 +192,23 @@ window.widget_piechart_form = new class {
 		this.initDataSetSortable();
 
 		this.initSingleItemSortable(this.getOpenedDataset());
+	}
+
+	displayingOptionsTabInit() {
+		const used_colors = [];
+
+		for (const color of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
+			if (color.value !== '') {
+				used_colors.push(color.value);
+			}
+		}
+
+		const merge_color_set = (document.getElementById('merge_color').value != '');
+
+		if (!merge_color_set) {
+			const merge_color = colorPalette.getNextColor(used_colors);
+			$.colorpicker('set_color_by_id', 'merge_color', merge_color);
+		}
 	}
 
 	toggleDisplayingOptionsFields() {

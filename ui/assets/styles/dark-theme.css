@@ -4147,6 +4147,10 @@ form.dashboard-widget-piechart {
 div.dashboard-widget-piechart {
   position: relative;
   overflow-x: hidden; }
+  div.dashboard-widget-piechart .svg-pie-chart .svg-pie-total-value {
+    fill: #f2f2f2; }
+  div.dashboard-widget-piechart .svg-pie-chart .svg-pie-total-value-no-data {
+    fill: #737373; }
   div.dashboard-widget-piechart .pie-chart-legend {
     position: absolute;
     bottom: 4px;
