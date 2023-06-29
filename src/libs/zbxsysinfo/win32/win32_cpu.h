@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,21 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+#ifndef ZABBIX_WIN32_CPU_H
+#define ZABBIX_WIN32_CPU_H
 
-class testPageWeb extends CLegacyWebTest {
-	public function testPageWeb_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
-		$this->zbxTestTextPresent(['Group', 'Host']);
-		$this->zbxTestTextPresent(['Host', 'Name', 'Number of steps', 'Last check', 'Status']);
-	}
+int	get_cpu_group_num_win32(void);
+int	get_numa_node_num_win32(void);
 
-// Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckNoRealHostnames();
-	}
-}
+#endif

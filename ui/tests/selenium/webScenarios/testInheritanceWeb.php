@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -105,15 +105,15 @@ class testInheritanceWeb extends CLegacyWebTest {
 		$this->zbxTestInputTypeWait('name', $data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
 
-		$this->zbxTestClick('tab_stepTab');
+		$this->zbxTestClick('tab_steps-tab');
+
 		foreach ($data['addStep'] as $step) {
-			$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[contains(@class, "element-table-add")]');
-			$this->zbxTestLaunchOverlayDialog('Step of web scenario');
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="step_name"]', $step['name']);
-			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
-			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
-			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//a[contains(@href,"javascript:httpconf.steps.open")]'));
+			$this->zbxTestClickXpathWait('//td[@colspan="8"]/button[@class="btn-link js-add-step"]');
+			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$form = $dialog->asForm();
+			$form->fill(['Name' => $step['name'], 'id:url' => $step['url']]);
+			$form->submit();
+			$dialog->ensureNotPresent();
 			$this->zbxTestTextPresent($step['name']);
 		}
 

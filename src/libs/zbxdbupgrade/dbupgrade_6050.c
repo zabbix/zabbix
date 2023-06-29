@@ -291,6 +291,14 @@ static int	DBpatch_6050024(void)
 
 static int	DBpatch_6050025(void)
 {
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050026(void)
+{
 	zbx_db_insert_t	db_insert;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
@@ -337,5 +345,6 @@ DBPATCH_ADD(6050022, 0, 1)
 DBPATCH_ADD(6050023, 0, 1)
 DBPATCH_ADD(6050024, 0, 1)
 DBPATCH_ADD(6050025, 0, 1)
+DBPATCH_ADD(6050026, 0, 1)
 
 DBPATCH_END()

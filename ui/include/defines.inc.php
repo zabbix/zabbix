@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha2');
+define('ZABBIX_VERSION',		'7.0.0alpha3');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050025);
+define('ZABBIX_DB_VERSION',		6050026);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1833,9 +1833,8 @@ define('ITEM_NO_STORAGE_VALUE',	0);
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // Condition popup types.
-define('ZBX_POPUP_CONDITION_TYPE_EVENT_CORR', 0);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION', 1);
-define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 2);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION', 0);
+define('ZBX_POPUP_CONDITION_TYPE_ACTION_OPERATION', 1);
 
 // Tab indicator names.
 define('TAB_INDICATOR_AUTH_HTTP', 'http');

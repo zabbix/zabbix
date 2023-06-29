@@ -21,9 +21,11 @@
 
 #if defined(HAVE_KSTAT_H) && defined(HAVE_VMINFO_T_UPDATES)
 
+#include "stats.h"
+
 #include "zbxmutexs.h"
 #include "zbxlog.h"
-#include "stats.h"
+#include "zbxsysinfo.h"
 #include "zbxstr.h"
 
 extern ZBX_COLLECTOR_DATA	*collector;

@@ -22,7 +22,6 @@
 #include "alias/alias.h"
 
 #include "zbxlog.h"
-#include "zbxthreads.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "zbxnix.h"
 #endif
@@ -33,6 +32,7 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 #include "zbxfile.h"
+#include "zbxthreads.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
@@ -1726,7 +1726,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	if (-1 == pipe(fds))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create data pipe: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create data pipe: %s",
+				zbx_strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1735,7 +1736,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		close(fds[0]);
 		close(fds[1]);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork data process: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork data process: %s",
+				zbx_strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1838,6 +1840,34 @@ out:
 	return ret;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mpoints_free                                                 *
+ *                                                                            *
+ * Purpose: frees previously allocated mount-point structure                  *
+ *                                                                            *
+ * Parameters: mpoint - [IN] pointer to structure from vector                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
+{
+	zbx_free(mpoint);
+}
+
+int	zbx_fsname_compare(const void *fs1, const void *fs2)
+{
+	int			res;
+	const zbx_mpoint_t	*f1 = *((const zbx_mpoint_t * const *)fs1);
+	const zbx_fsname_t	*f2 = *((const zbx_fsname_t * const *)fs2);
+
+	if (0 != (res = strcmp(f1->fsname, f2->mpoint)))
+		return res;
+
+	return strcmp(f1->fstype, f2->type);
+}
 #else
 
 static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
@@ -1901,7 +1931,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	if (NULL == (metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create timeout event for data thread: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1912,7 +1942,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	if (ZBX_THREAD_ERROR == thread)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		CloseHandle(metric_args.timeout_event);
 		return SYSINFO_RET_FAIL;
 	}
@@ -1923,7 +1953,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		/* unexpected error */
 
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot wait for data: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		terminate_thread = TRUE;
 	}
 	else if (WAIT_TIMEOUT == rc)
@@ -1934,7 +1964,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 		if (FALSE == SetEvent(metric_args.timeout_event))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "SetEvent() failed: %s", strerror_from_system(GetLastError()));
+			zabbix_log(LOG_LEVEL_ERR, "SetEvent() failed: %s", zbx_strerror_from_system(GetLastError()));
 			terminate_thread = TRUE;
 		}
 		else
@@ -1944,7 +1974,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			if (WAIT_FAILED == timeout_rc)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Waiting for data failed: %s",
-						strerror_from_system(GetLastError()));
+						zbx_strerror_from_system(GetLastError()));
 				terminate_thread = TRUE;
 			}
 			else if (WAIT_TIMEOUT == timeout_rc)
@@ -1969,7 +1999,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "",
-					strerror_from_system(GetLastError()));
+					zbx_strerror_from_system(GetLastError()));
 		}
 	}
 
@@ -1982,19 +2012,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees previously allocated mount-point structure                  *
- *                                                                            *
- * Parameters: mpoint - [IN] pointer to structure from vector                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
-{
-	zbx_free(mpoint->options);
-	zbx_free(mpoint);
-}
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static void	get_fqdn(char **hostname)
