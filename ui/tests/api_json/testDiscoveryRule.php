@@ -1671,7 +1671,7 @@ class testDiscoveryRule extends CAPITest {
 					]
 				],
 				'expected_error' => 'Invalid parameter "/1": cannot update readonly parameter "preprocessing" of inherited object.'
-			],
+			]
 		];
 	}
 
