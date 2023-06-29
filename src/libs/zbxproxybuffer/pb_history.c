@@ -45,6 +45,23 @@ void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row)
 	list->mem_free_func(row);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: estimate approximate history row size in cache                    *
+ *                                                                            *
+ ******************************************************************************/
+size_t	pb_history_estimate_row_size(const char *value, const char *source)
+{
+	size_t	size = 0;
+
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_pb_history_t));
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_list_item_t));
+	size += zbx_shmem_required_chunk_size(strlen(value) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(source) + 1);
+
+	return size;
+}
+
 static void	pb_history_free(zbx_pb_history_t *row)
 {
 	zbx_free(row->value);
@@ -435,8 +452,11 @@ static int	pb_history_add_row_mem(zbx_pb_t *pb, zbx_pb_history_t *src)
 	zbx_pb_history_t	*row;
 	int			ret = FAIL;
 
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
+			pb_get_free_size(), pb_history_estimate_row_size(src->value, src->source));
+
 	if (NULL == (row = (zbx_pb_history_t *)pb_malloc(sizeof(zbx_pb_history_t))))
-		return FAIL;
+		goto out;
 
 	memcpy(row, src, sizeof(zbx_pb_history_t));
 
@@ -451,8 +471,11 @@ static int	pb_history_add_row_mem(zbx_pb_t *pb, zbx_pb_history_t *src)
 
 	ret = zbx_list_append(&pb->history, row, NULL);
 out:
-	if (SUCCEED != ret)
+	if (SUCCEED != ret && NULL != row)
 		pb_list_free_history(&pb->history, row);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
+			pb_get_free_size());
 
 	return ret;
 }

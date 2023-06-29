@@ -59,6 +59,24 @@ void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row)
 	list->mem_free_func(row);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: estimate approximate discovery row size in cache                  *
+ *                                                                            *
+ ******************************************************************************/
+size_t	pb_discovery_estimate_row_size(const char *value, const char *ip, const char *dns)
+{
+	size_t	size = 0;
+
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_pb_discovery_t));
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_list_item_t));
+	size += zbx_shmem_required_chunk_size(strlen(value) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(ip) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(dns) + 1);
+
+	return size;
+}
+
 static int	pb_get_discovery_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
 	int		records_num = 0;
@@ -139,8 +157,11 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 	zbx_pb_discovery_t	*row;
 	int			ret = FAIL;
 
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
+			pb_get_free_size(), pb_discovery_estimate_row_size(src->value, src->ip, src->dns));
+
 	if (NULL == (row = (zbx_pb_discovery_t *)pb_malloc(sizeof(zbx_pb_discovery_t))))
-		return FAIL;
+		goto out;
 
 	memcpy(row, src, sizeof(zbx_pb_discovery_t));
 
@@ -162,8 +183,11 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 
 	ret = zbx_list_append(&pb->discovery, row, NULL);
 out:
-	if (SUCCEED != ret)
+	if (SUCCEED != ret && NULL != row)
 		pb_list_free_discovery(&pb->discovery, row);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
+			pb_get_free_size());
 
 	return ret;
 }

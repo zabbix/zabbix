@@ -24,6 +24,7 @@
 #include "proxybuffer.h"
 
 void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row);
+size_t	pb_autoreg_estimate_row_size(const char *host, const char *host_metadata, const char *ip, const char *dns);
 void	pb_autoreg_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_autoreg_flush(zbx_pb_t *pb);
 void	pb_autoreg_set_lastid(zbx_uint64_t lastid);

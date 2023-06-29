@@ -107,6 +107,25 @@ void	pb_list_free_autoreg(zbx_list_t *list, zbx_pb_autoreg_t *row)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: estimate approximate autoregistration row size in cache           *
+ *                                                                            *
+ ******************************************************************************/
+size_t	pb_autoreg_estimate_row_size(const char *host, const char *host_metadata, const char *ip, const char *dns)
+{
+	size_t	size = 0;
+
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_pb_autoreg_t));
+	size += zbx_shmem_required_chunk_size(sizeof(zbx_list_item_t));
+	size += zbx_shmem_required_chunk_size(strlen(host) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(host_metadata) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(dns) + 1);
+	size += zbx_shmem_required_chunk_size(strlen(ip) + 1);
+
+	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: write autoregistration record into memory cache                   *
  *                                                                            *
  ******************************************************************************/
@@ -115,6 +134,9 @@ static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char 
 {
 	zbx_pb_autoreg_t	*row;
 	int			ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() free:" ZBX_FS_SIZE_T " request:" ZBX_FS_SIZE_T, __func__,
+			pb_get_free_size(), pb_autoreg_estimate_row_size(host, host_metadata, ip, dns));
 
 	if (NULL == (row = (zbx_pb_autoreg_t *)pb_malloc(sizeof(zbx_pb_autoreg_t))))
 			goto out;
@@ -144,6 +166,9 @@ out:
 		row->id = zbx_dc_get_nextid("proxy_autoreg_host", 1);
 	else if (NULL != row)
 		pb_list_free_autoreg(&pb_data->autoreg, row);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
+			pb_get_free_size());
 
 	return ret;
 }

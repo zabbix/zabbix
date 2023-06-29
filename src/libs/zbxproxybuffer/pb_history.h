@@ -24,6 +24,7 @@
 #include "proxybuffer.h"
 
 void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row);
+size_t	pb_history_estimate_row_size(const char *value, const char *source);
 void	pb_history_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_history_flush(zbx_pb_t *pb);
 void	pb_history_set_lastid(zbx_uint64_t lastid);

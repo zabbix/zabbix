@@ -84,6 +84,11 @@ char	*pb_strdup(const char *str)
 	return cpy;
 }
 
+size_t	pb_get_free_size(void)
+{
+	return (size_t)pb_mem->free_size;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: free the required number of bytes in proxy memory buffer          *
@@ -99,9 +104,11 @@ char	*pb_strdup(const char *str)
  *           indicate that cache is too small to hold the new record.         *
  *                                                                            *
  ******************************************************************************/
-int	pb_free_space(zbx_pb_t *pb, int size)
+int	pb_free_space(zbx_pb_t *pb, size_t size)
 {
-	while (0 > size)
+	ssize_t	size_left = (ssize_t)size;
+
+	while (0 > size_left)
 	{
 		zbx_pb_history_t	*hrow;
 		zbx_pb_discovery_t	*drow;
@@ -124,14 +131,8 @@ int	pb_free_space(zbx_pb_t *pb, int size)
 		if (SUCCEED == zbx_list_peek(&pb->autoreg, (void **)&arow) && arow->clock < clock)
 		{
 			zbx_list_pop(&pb->autoreg, NULL);
-
-			size -= sizeof(zbx_pb_autoreg_t) + sizeof(zbx_uint64_t) * 2;
-			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(arow->host) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(arow->host_metadata) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(arow->listen_dns) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(arow->listen_ip) + 1 + sizeof(zbx_uint64_t) * 2;
-
+			size_left -= pb_autoreg_estimate_row_size(arow->host, arow->host_metadata, arow->listen_dns,
+					arow->listen_ip);
 			pb_list_free_autoreg(&pb->autoreg, arow);
 			continue;
 		}
@@ -139,12 +140,7 @@ int	pb_free_space(zbx_pb_t *pb, int size)
 		if (NULL != hrow)
 		{
 			zbx_list_pop(&pb->history, NULL);
-
-			size -= sizeof(zbx_pb_history_t) + sizeof(zbx_uint64_t) * 2;
-			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(hrow->value) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(hrow->source) + 1 + sizeof(zbx_uint64_t) * 2;
-
+			size_left -= pb_history_estimate_row_size(hrow->value, hrow->source);
 			pb_list_free_history(&pb->history, hrow);
 			continue;
 		}
@@ -152,13 +148,7 @@ int	pb_free_space(zbx_pb_t *pb, int size)
 		if (NULL != drow)
 		{
 			zbx_list_pop(&pb->discovery, NULL);
-
-			size -= sizeof(zbx_pb_discovery_t) + sizeof(zbx_uint64_t) * 2;
-			size -= sizeof(zbx_list_item_t) + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(drow->dns) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(drow->ip) + 1 + sizeof(zbx_uint64_t) * 2;
-			size -= strlen(drow->value) + 1 + sizeof(zbx_uint64_t) * 2;
-
+			size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
 			pb_list_free_discovery(&pb->discovery, drow);
 			continue;
 		}
@@ -566,7 +556,7 @@ int	zbx_pb_parse_mode(const char *str, int *mode)
 	if (NULL == str || '\0' == *str || 0 == strcmp(str, "disk"))
 		*mode = ZBX_PB_MODE_DISK;
 	else if (0 == strcmp(str, "memory"))
-		*mode = ZBX_PB_MODE_DISK;
+		*mode = ZBX_PB_MODE_MEMORY;
 	else if (0 == strcmp(str, "hybrid"))
 		*mode = ZBX_PB_MODE_HYBRID;
 	else
