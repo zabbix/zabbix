@@ -24,17 +24,35 @@
 window.widget_gauge_form = new class {
 
 	init({thresholds_colors}) {
-		const threshold_row_selector = '#' + $thresholds_table.attr('id') + ' .form_row';
-
 		this._form = document.getElementById('widget-dialogue-form');
+
 		this._value_arc = document.getElementById('value_arc');
 		this._units_show = document.getElementById('units_show');
 		this._needle_show = document.getElementById('needle_show');
 		this._minmax_show = document.getElementById('minmax_show');
 		this._th_show_arc = document.getElementById('th_show_arc');
-		this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
 
-		jQuery('#itemid').on('change', () => this.updateWarningIcon());
+		const checkboxes = [
+			this._value_arc,
+			this._units_show,
+			this._needle_show,
+			this._minmax_show,
+			this._th_show_arc
+		];
+
+		for (const checkbox of checkboxes) {
+			checkbox.addEventListener('change', () => this.updateForm());
+		}
+
+		$thresholds_table.on('afterremove.dynamicRows', () => this.updateForm());
+
+		this._thresholds_table = $thresholds_table[0];
+
+		this._thresholds_table.addEventListener('input', (e) => {
+			if (e.target.matches('input[name$="[threshold]"')) {
+				this.updateForm();
+			}
+		});
 
 		for (const colorpicker of this._form.querySelectorAll('.<?= ZBX_STYLE_COLOR_PICKER ?> input')) {
 			$(colorpicker).colorpicker({
@@ -43,34 +61,14 @@ window.widget_gauge_form = new class {
 			});
 		}
 
-		const checkboxes = [
-			this._units_show,
-			this._needle_show,
-			this._minmax_show,
-			this._th_show_arc,
-			this._value_arc
-		];
-
-		for (const checkbox of checkboxes) {
-			checkbox.addEventListener('change', () => this.updateForm());
-		}
-
-		$thresholds_table
-			.on('afteradd.dynamicRows', () => {
-				this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
-				this.updateForm();
-			})
-			.on('afterremove.dynamicRows', () => {
-				this._th_rows_count = document.querySelectorAll(threshold_row_selector).length;
-				this.updateForm();
-			});
-
 		colorPalette.setThemeColors(thresholds_colors);
 
 		this.updateForm();
 	}
 
 	updateForm() {
+		const filled_thresholds_count = this.countFilledThresholds();
+
 		document.getElementById('value_arc_size').disabled = !this._value_arc.checked;
 
 		document.getElementById('minmax_show').disabled = !this._th_show_arc.checked && !this._value_arc.checked;
@@ -87,50 +85,33 @@ window.widget_gauge_form = new class {
 		}
 
 		for (const element of document.querySelectorAll('#th_show_arc, #th_arc_size')) {
-			element.disabled = this._th_rows_count === 0;
+			element.disabled = filled_thresholds_count === 0;
 		}
 
-		document.getElementById('th_arc_size').disabled = this._th_rows_count === 0 || !this._th_show_arc.checked;
+		document.getElementById('th_arc_size').disabled = filled_thresholds_count === 0 || !this._th_show_arc.checked;
 
-		document.getElementById('th_show_labels').disabled = this._th_rows_count === 0 || (!this._th_show_arc.checked
-			&& !this._value_arc.checked);
+		document.getElementById('th_show_labels').disabled = filled_thresholds_count === 0
+			|| (!this._th_show_arc.checked && !this._value_arc.checked);
 
 		for (const element of document.querySelectorAll('#needle_show, #needle_color')) {
 			element.disabled = !this._th_show_arc.checked && !this._value_arc.checked;
 		}
 
-		document.getElementById('needle_color').disabled = !this._needle_show.checked || (!this._th_show_arc.checked
-			&& !this._value_arc.checked);
+		document.getElementById('needle_color').disabled = !this._needle_show.checked
+			|| (!this._th_show_arc.checked && !this._value_arc.checked);
 	}
 
-	updateWarningIcon() {
-		const thresholds_warning = document.getElementById('gauge-thresholds-warning');
-		const ms_item_data = $('#itemid').multiSelect('getData');
+	countFilledThresholds() {
+		let count = 0;
 
-		thresholds_warning.style.display = 'none';
+		for (const form_row of this._thresholds_table.querySelectorAll('.form_row')) {
+			const threshold = form_row.querySelector('input[name$="[threshold]"').value;
 
-		if (ms_item_data.length > 0) {
-			const curl = new Curl('jsrpc.php');
-
-			curl.setArgument('method', 'item_value_type.get');
-			curl.setArgument('type', <?= PAGE_TYPE_TEXT_RETURN_JSON ?>);
-			curl.setArgument('itemid', ms_item_data[0].id);
-
-			fetch(curl.getUrl())
-				.then((response) => response.json())
-				.then((response) => {
-					switch (response.result) {
-						case '<?= ITEM_VALUE_TYPE_FLOAT ?>':
-						case '<?= ITEM_VALUE_TYPE_UINT64 ?>':
-							thresholds_warning.style.display = 'none';
-							break;
-						default:
-							thresholds_warning.style.display = '';
-					}
-				})
-				.catch((exception) => {
-					console.log('Could not get value data type of the item:', exception);
-				});
+			if (threshold.trim() !== '') {
+				count++;
+			}
 		}
+
+		return count;
 	}
 };

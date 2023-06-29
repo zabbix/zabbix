@@ -194,9 +194,6 @@ function getThresholdFieldsGroupView(CWidgetFormView $form, array $fields): CWid
 	$th_arc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['th_arc_size']));
 
 	return (new CWidgetFieldsGroupView(_('Thresholds')))
-		->setFieldHint(
-			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('gauge-thresholds-warning')
-		)
 		->addField(
 			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()
 		)
