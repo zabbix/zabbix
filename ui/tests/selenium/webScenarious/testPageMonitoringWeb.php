@@ -217,13 +217,13 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	public function testPageMonitoringWeb_CheckHostContextMenu() {
 		$popupitems = [
-			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
-			'Ping', 'Traceroute'
+			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Configuration', 'Detect operating system',
+			'Ping', 'Selenium script', 'Traceroute'
 		];
 
 		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Graphs');
-		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Dashboards');
-		$this->checkHostContextMenu($popupitems, 'Simple form test host', 'Dashboards');
+		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Screens');
+		$this->checkHostContextMenu($popupitems, 'Simple form test host', 'Screens');
 	}
 
 	/**
