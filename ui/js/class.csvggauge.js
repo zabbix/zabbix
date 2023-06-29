@@ -618,8 +618,9 @@ class CSVGGauge {
 
 					if (is_aligned_to_bottom) {
 						parts[0].setAttribute('y', `${arcs_height
-							- parts_font_size[0] * (1 + CSVGGauge.CAPITAL_HEIGHT) / 2
-							- parts_font_size[1] * (1 - CSVGGauge.CAPITAL_HEIGHT) / 2
+							- parts_font_size[1] * CSVGGauge.CAPITAL_HEIGHT
+							- parts_font_size[1] * (CSVGGauge.LINE_HEIGHT - CSVGGauge.CAPITAL_HEIGHT) / 2
+							- parts_font_size[0] * (CSVGGauge.LINE_HEIGHT - CSVGGauge.CAPITAL_HEIGHT) / 2
 						}`);
 						parts[1].setAttribute('y', `${arcs_height}`);
 					}
@@ -629,8 +630,9 @@ class CSVGGauge {
 
 						parts[0].setAttribute('y', `${y_top}`);
 						parts[1].setAttribute('y', `${y_top
-							+ parts_font_size[1] * (1 + CSVGGauge.CAPITAL_HEIGHT) / 2
-							+ parts_font_size[0] * (1 - CSVGGauge.CAPITAL_HEIGHT) / 2
+							+ parts_font_size[1] * CSVGGauge.CAPITAL_HEIGHT
+							+ parts_font_size[1] * (CSVGGauge.LINE_HEIGHT - CSVGGauge.CAPITAL_HEIGHT) / 2
+							+ parts_font_size[0] * (CSVGGauge.LINE_HEIGHT - CSVGGauge.CAPITAL_HEIGHT) / 2
 						}`);
 					}
 
