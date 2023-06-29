@@ -270,8 +270,8 @@ const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int 
 		else if (mod_macros[i].macro[len - 1] != str[fm->macro.l + fm_len - 1])
 			continue;
 
-		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l, fm->func_param.l - fm->func.l,
-				','))
+		if (SUCCEED == zbx_str_n_in_list(mod_macros[i].functions, str + fm->func.l,
+				fm->func_param.l - fm->func.l, ','))
 		{
 			return mod_macros[i].macro;
 		}

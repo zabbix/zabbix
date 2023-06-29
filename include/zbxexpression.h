@@ -138,16 +138,17 @@ typedef struct
 }
 zbx_eval_count_pattern_data_t;
 
-int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event, const zbx_db_event *r_event,
-		const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item,
-		const zbx_db_alert *alert, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, const char *tz, char **data, int macro_type, char *error, int maxerrlen);
+int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
+		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
+		const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
 int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
-		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid, const zbx_dc_host_t *dc_host,
-		const zbx_dc_item_t *dc_item, const zbx_db_alert *alert, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, const char *tz, char **data,
-		int macro_type, char *error, int maxerrlen);
+		const zbx_db_event *r_event, const zbx_uint64_t *userid, const zbx_uint64_t *hostid,
+		const zbx_dc_host_t *dc_host, const zbx_dc_item_t *dc_item, const zbx_db_alert *alert,
+		const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm, const zbx_db_service *service,
+		const char *tz, char **data, int macro_type, char *error, int maxerrlen);
 
 void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, char **allowed_peers);
 
@@ -157,7 +158,8 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 		const char *units, unsigned char value_type);
 
-void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, int item_num);
+void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
+		int item_num);
 
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx);
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval);

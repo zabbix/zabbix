@@ -274,8 +274,8 @@ static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expressio
  *          %, \ characters for SQL like operation                            *
  *                                                                            *
  ******************************************************************************/
-static int	replace_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
-		char **param)
+static int	replace_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
+		void *cb_data, char **param)
 {
 	char	*tmp;
 
@@ -465,8 +465,8 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 			if (0 < group->hostids.values_num)
 			{
-				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", group->hostids.values,
-						group->hostids.values_num);
+				zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid",
+						group->hostids.values, group->hostids.values_num);
 			}
 			else
 				zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " 1=0");
@@ -683,8 +683,8 @@ static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expressi
 			eval_data.itemid = itemhosts.values[i].first;
 			eval_data.hostid = itemhosts.values[i].second;
 
-			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, expression_eval_filter, NULL, (void *)&eval_data,
-					&filter_value, &errmsg))
+			if (SUCCEED != zbx_eval_execute_ext(&ctx, NULL, expression_eval_filter, NULL,
+					(void *)&eval_data, &filter_value, &errmsg))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "failed to evaluate item query filter: %s", errmsg);
 				zbx_free(errmsg);
@@ -899,7 +899,8 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
  *                                                                            *
  ******************************************************************************/
 static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query, const char *name,
-		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value, char **error)
+		size_t len, int args_num, zbx_variant_t *args, const zbx_timespec_t *ts, zbx_variant_t *value,
+		char **error)
 {
 	char				func_name[MAX_STRING_LEN], *params = NULL;
 	size_t				params_alloc = 0, params_offset = 0;

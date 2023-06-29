@@ -454,7 +454,8 @@ int	evaluate_value_by_map(char *value, size_t max_len, zbx_vector_valuemaps_ptr_
 					if (NULL == ptr)
 					{
 						min = zbx_evaluate_string_to_double(range_str);
-						found = ZBX_INFINITY != min && SUCCEED == zbx_double_compare(input_value, min);
+						found = ZBX_INFINITY != min &&
+								SUCCEED == zbx_double_compare(input_value, min);
 					}
 					else
 					{
@@ -1198,8 +1199,10 @@ static int	validate_count_pattern(char *operator, char *pattern, unsigned char v
 
 		if (OP_BITAND == pdata->op && NULL != (pdata->pattern2 = strchr(pattern, '/')))
 		{
-			*pdata->pattern2 = '\0';	/* end of the 1st part of the 2nd parameter (number to compare with) */
-			pdata->pattern2++;	/* start of the 2nd part of the 2nd parameter (mask) */
+			/* end of the 1st part of the 2nd parameter (number to compare with) */
+			*pdata->pattern2 = '\0';
+			/* start of the 2nd part of the 2nd parameter (mask) */
+			pdata->pattern2++;
 		}
 
 		if (NULL != pattern && '\0' != *pattern)
@@ -3751,8 +3754,9 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
-static int	evaluate_statistical_func(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts, zbx_statistical_func_t stat_func, int min_values, char **error)
+static int	evaluate_statistical_func(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item,
+		const char *parameters, const zbx_timespec_t *ts, zbx_statistical_func_t stat_func, int min_values,
+		char **error)
 {
 	int				ret = FAIL;
 	zbx_vector_history_record_t	values;

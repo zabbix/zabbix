@@ -828,7 +828,8 @@ static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t 
  *             item_num      - [IN] number of items                           *
  *                                                                            *
  ******************************************************************************/
-void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, int item_num)
+void	zbx_determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids,
+		int item_num)
 {
 	zbx_vector_trigger_func_position_t	triggers_func_pos;
 	zbx_vector_uint64_t			functionids, itemids_sorted;

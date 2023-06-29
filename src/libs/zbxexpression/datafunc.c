@@ -1049,8 +1049,11 @@ static void	eventdata_compose(const zbx_vector_db_event_t *events, zbx_vector_ev
 
 		event = events->values[i];
 
-		if (FAIL == (ret = expr_db_get_trigger_value(&event->trigger, &eventdata.host, 1, ZBX_REQUEST_HOST_HOST)))
+		if (FAIL == (ret = expr_db_get_trigger_value(&event->trigger, &eventdata.host, 1,
+				ZBX_REQUEST_HOST_HOST)))
+		{
 			goto fail;
+		}
 
 		eventdata.nseverity = event->severity;
 		if (FAIL == (ret = zbx_config_get_trigger_severity_name(event->severity, &eventdata.severity)))
