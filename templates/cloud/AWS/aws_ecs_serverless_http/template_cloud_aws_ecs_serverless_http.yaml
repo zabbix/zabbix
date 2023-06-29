@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-26T12:13:23Z'
+  date: '2023-06-29T09:40:19Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -852,7 +852,7 @@ zabbix_export:
           units: '%'
           description: |
             'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-             This metric is collected only for tasks that have a defined memory reservation in their task definition.'
+             This metric is only collected for tasks that have a defined memory reservation in their task definition.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -917,7 +917,7 @@ zabbix_export:
           units: Bps
           description: |
             'The number of bytes received by the resource that is specified by the dimensions that you're using.
-             This metric is available only for containers in tasks using the awsvpc or bridge network modes.'
+             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -938,7 +938,7 @@ zabbix_export:
           units: Bps
           description: |
             'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-             This metric is available only for containers in tasks using the awsvpc or bridge network modes.'
+             This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1152,8 +1152,8 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               description: |
-                "The CPU units used by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is collected only for tasks that have a defined CPU reservation in their task definition."
+                "A number of CPU units used by tasks in the resource that is specified by the dimension set that you're using.
+                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1191,8 +1191,8 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               description: |
-                "The CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
-                 This metric is collected only for tasks that have a defined CPU reservation in their task definition."
+                "A number of CPU units reserved by tasks in the resource that is specified by the dimension set that you're using.
+                 This metric is only collected for tasks that have a defined CPU reservation in their task definition."
               valuemap:
                 name: 'CPU Reserved'
               preprocessing:
@@ -1558,7 +1558,7 @@ zabbix_export:
               units: '%'
               description: |
                 'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is collected only for tasks that have a defined memory reservation in their task definition.'
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1598,7 +1598,7 @@ zabbix_export:
               units: B
               description: |
                 'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using. 
-                This metric is collected only for tasks that have a defined memory reservation in their task definition.'
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1626,7 +1626,7 @@ zabbix_export:
               units: B
               description: |
                 'The memory being used by tasks in the resource that is specified by the dimension set that you're using.
-                This metric is collected only for tasks that have a defined memory reservation in their task definition.'
+                This metric is only collected for tasks that have a defined memory reservation in their task definition.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1654,7 +1654,7 @@ zabbix_export:
               units: Bps
               description: |
                 'The number of bytes received by the resource that is specified by the dimensions that you're using.
-                This metric is available only for containers in tasks using the awsvpc or bridge network modes.'
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1679,7 +1679,7 @@ zabbix_export:
               units: Bps
               description: |
                 'The number of bytes transmitted by the resource that is specified by the dimensions that you're using.
-                This metric is available only for containers in tasks using the awsvpc or bridge network modes.'
+                This metric is only available for containers in tasks using the awsvpc or bridge network modes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1810,7 +1810,7 @@ zabbix_export:
                 - tag: service
                   value: '{#AWS.ECS.SERVICE.NAME}'
           graph_prototypes:
-            - uuid: e50edca150a0469ea8f366e5658a145b
+            - uuid: 0730b08f78fc492691877f468e35d0fe
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: CPU Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1818,7 +1818,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Serverless Cluster by HTTP'
                     key: 'aws.ecs.services.cpu.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 768b07a8951a4bcba12bb29bf3be8f08
+            - uuid: 6ebb55adf65e4aafbc53aa501242d5d7
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Memory Utilization'
               graph_items:
                 - drawtype: GRADIENT_LINE
@@ -1826,7 +1826,7 @@ zabbix_export:
                   item:
                     host: 'AWS ECS Serverless Cluster by HTTP'
                     key: 'aws.ecs.services.memory.utilization["{#AWS.ECS.SERVICE.NAME}"]'
-            - uuid: 86b523ad21bb44d390f9ff52d1603483
+            - uuid: 75bff4d440544f298f35277a5d7ab90d
               name: 'AWS ECS Cluster Service: ["{#AWS.ECS.SERVICE.NAME}"]: Network'
               graph_items:
                 - color: 199C0D
@@ -1862,18 +1862,18 @@ zabbix_export:
           description: 'Access key ID.'
         - macro: '{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
           value: '70'
-          description: 'The warning threshold of the Cluster CPU utilization expressed in %.'
+          description: 'The warning threshold of the cluster CPU utilization expressed in %.'
         - macro: '{$AWS.ECS.CLUSTER.MEMORY.UTIL.WARN}'
           value: '70'
-          description: 'The warning threshold of the Cluster memory utilization expressed in %.'
+          description: 'The warning threshold of the cluster memory utilization expressed in %.'
         - macro: '{$AWS.ECS.CLUSTER.NAME}'
           description: 'ECS cluster name.'
         - macro: '{$AWS.ECS.CLUSTER.SERVICE.CPU.UTIL.WARN}'
           value: '80'
-          description: 'The warning threshold of the Cluster Service CPU utilization expressed in %.'
+          description: 'The warning threshold of the cluster service CPU utilization expressed in %.'
         - macro: '{$AWS.ECS.CLUSTER.SERVICE.MEMORY.UTIL.WARN}'
           value: '80'
-          description: 'The warning threshold of the Cluster Service memory utilization expressed in %.'
+          description: 'The warning threshold of the cluster service memory utilization expressed in %.'
         - macro: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by name.'
@@ -1882,10 +1882,10 @@ zabbix_export:
           description: 'Filter to exclude discovered alarms by name.'
         - macro: '{$AWS.ECS.LLD.FILTER.SERVICE.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable service by name.'
+          description: 'Filter of discoverable services by name.'
         - macro: '{$AWS.ECS.LLD.FILTER.SERVICE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered service by name.'
+          description: 'Filter to exclude discovered services by name.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AWS.REGION}'

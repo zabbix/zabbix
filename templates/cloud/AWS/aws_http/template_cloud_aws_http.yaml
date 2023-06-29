@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-19T13:44:28Z'
+  date: '2023-06-29T09:39:35Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -15,7 +15,7 @@ zabbix_export:
       template: 'AWS by HTTP'
       name: 'AWS by HTTP'
       description: |
-        Get AWS EC2, RDS and S3 instances, AWS ECS Clusters. Don't forget to read the README.md for the correct setup of the template.
+        Get AWS EC2, RDS and S3 instances, AWS ECS clusters. Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -231,7 +231,7 @@ zabbix_export:
             - lld_macro: '{#AWS.EC2.INSTANCE.NAME}'
               path: $.instanceName
         - uuid: 44b68894d68c45ec9a5ea787c975ae16
-          name: 'ECS Clusters discovery'
+          name: 'ECS clusters discovery'
           type: SCRIPT
           key: aws.ecs.discovery
           delay: 12h
@@ -887,16 +887,16 @@ zabbix_export:
           description: 'Filter to exclude discovered EC2 instances by namespace.'
         - macro: '{$AWS.ECS.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable ECS cluster by name.'
+          description: 'Filter of discoverable ECS clusters by name.'
         - macro: '{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ECS cluster by name.'
+          description: 'Filter to exclude discovered ECS clusters by name.'
         - macro: '{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}'
           value: ACTIVE
-          description: 'Filter of discoverable ECS cluster by status.'
+          description: 'Filter of discoverable ECS clusters by status.'
         - macro: '{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered ECS cluster by status.'
+          description: 'Filter to exclude discovered ECS clusters by status.'
         - macro: '{$AWS.PROXY}'
           description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$AWS.RDS.LLD.FILTER.NAME.MATCHES}'

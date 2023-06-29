@@ -46,15 +46,15 @@ Add the following required permissions to your Zabbix IAM policy in order to col
 }
   ```
 
-To gather Request metrics, [enable Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
+To gather Request metrics, enable [Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
-Set macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}, {$AWS.REGION}.
+Set the following macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}, {$AWS.REGION}.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
-Also, see the Macros section for a list of macros used in LLD filters.
+Refer to the Macros section for a list of macros used for LLD filters.
 
-Additional information about metrics and used API methods:
+Additional information about the metrics and used API methods:
 * [Full metrics list related to EBS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/using_cloudwatch_ebs.html)
 * [Full metrics list related to EC2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/viewing_metrics_with_cloudwatch.html)
 * [Full metrics list related to RDS](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-metrics.html)
@@ -76,10 +76,10 @@ Additional information about metrics and used API methods:
 |{$AWS.REGION}|<p>Amazon EC2 region code.</p>|`us-west-1`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ECS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ECS cluster by name.</p>|`.*`|
-|{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ECS cluster by name.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}|<p>Filter of discoverable ECS cluster by status.</p>|`ACTIVE`|
-|{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}|<p>Filter to exclude discovered ECS cluster by status.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ECS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ECS clusters by name.</p>|`.*`|
+|{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}|<p>Filter of discoverable ECS clusters by status.</p>|`ACTIVE`|
+|{$AWS.ECS.LLD.FILTER.STATUS.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by status.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.S3.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable S3 buckets by namespace.</p>|`.*`|
 |{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered S3 buckets by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable RDS instances by namespace.</p>|`.*`|
@@ -103,11 +103,11 @@ Additional information about metrics and used API methods:
 |----|-----------|----|-----------------------|
 |RDS instances discovery|<p>Get RDS instances.</p>|Script|aws.rds.discovery|
 
-### LLD rule ECS Clusters discovery
+### LLD rule ECS clusters discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|ECS Clusters discovery|<p>Get ECS clusters.</p>|Script|aws.ecs.discovery|
+|ECS clusters discovery|<p>Get ECS clusters.</p>|Script|aws.ecs.discovery|
 
 ## Feedback
 
