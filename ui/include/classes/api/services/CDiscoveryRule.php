@@ -2987,7 +2987,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		self::deleteForce($db_items);
 
-		return ['itemids' => $itemids];
+		return ['ruleids' => $itemids];
 	}
 
 	/**
