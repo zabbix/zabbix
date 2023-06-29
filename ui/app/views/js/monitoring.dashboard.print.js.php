@@ -46,7 +46,8 @@
 					userid: null,
 					templateid: null,
 					display_period: dashboard.display_period,
-					auto_start: false
+					auto_start: false,
+					with_dashboard_tabs: false
 				},
 				max_dashboard_pages: <?= DASHBOARD_MAX_PAGES ?>,
 				cell_width: 100 / <?= DASHBOARD_MAX_COLUMNS ?>,

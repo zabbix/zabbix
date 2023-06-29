@@ -67,27 +67,12 @@ $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
 
 $html_page = (new CHtmlPage())
-	->setTitle($data['dashboard']['name'])
+	->setTitle(_('Host dashboards'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::MONITORING_HOST_DASHBOARD_VIEW))
-	->setControls((new CTag('nav', true,
-		(new CList())
-			->addItem(
-				(new CForm('get'))
-					->addVar('action', 'host.dashboard.view')
-					->addVar('hostid', $data['host']['hostid'])
-					->addItem((new CLabel(_('Dashboard'), 'label-dashboard'))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-					->addItem(
-						(new CSelect('dashboardid'))
-							->setId('dashboardid')
-							->setFocusableElementId('label-dashboard')
-							->setValue($data['dashboard']['dashboardid'])
-							->addOptions(CSelect::createOptionsFromArray($data['host_dashboards']))
-							->addClass(ZBX_STYLE_HEADER_Z_SELECT)
-					)
-			)
-			->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
-	))->setAttribute('aria-label', _('Content controls')))
+	->setControls((new CTag('nav', true, (new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))))
+		->setAttribute('aria-label', _('Content controls'))
+	)
 	->setKioskModeControls(
 		(count($data['dashboard']['pages']) > 1)
 			? (new CList())
@@ -119,18 +104,44 @@ $html_page = (new CHtmlPage())
 						->setTitle(_('Next page'))
 				)
 			: null
-	)
-	->setNavigation((new CList())->addItem(new CBreadcrumbs([
-		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
-		(new CSpan())->addItem($data['host']['name']),
-		(new CSpan())
-			->addItem(new CLink($data['dashboard']['name'],
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'host.dashboard.view')
-					->setArgument('hostid', $data['host']['hostid'])
-			))
-			->addClass(ZBX_STYLE_SELECTED)
-	])));
+	);
+
+$navigation = (new CList())->addItem(new CBreadcrumbs([
+	(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
+	(new CSpan())->addItem($data['host']['name'])
+]));
+
+if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
+	$dashboard_tabs = (new CDiv())
+		->addClass(ZBX_STYLE_DASHBOARD_TABS);
+
+	$dashboard_tabs->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION)
+			->addItem(
+				(new CDiv())
+					->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_CONTROLS_LEFT)
+					->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_DASHBOARD)
+					)
+			)
+			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_TABS))
+			->addItem(
+				(new CDiv())
+					->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_CONTROLS_RIGHT)
+					->addItem([
+						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_LIST),
+						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+							->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_DASHBOARD)
+					])
+			)
+	);
+
+	$navigation->addItem($dashboard_tabs);
+}
+
+$html_page->setNavigation($navigation);
 
 if ($data['has_time_selector']) {
 	$html_page->addItem(
@@ -201,7 +212,8 @@ else {
 		'widget_defaults' => $data['widget_defaults'],
 		'configuration_hash' => $data['configuration_hash'],
 		'time_period' => $data['time_period'],
-		'web_layout_mode' => $web_layout_mode
+		'web_layout_mode' => $web_layout_mode,
+		'dashboard_tabs' => $data['host_dashboards']
 	]).');
 '))
 	->setOnDocumentReady()
