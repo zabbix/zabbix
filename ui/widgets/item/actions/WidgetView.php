@@ -25,12 +25,11 @@ use API,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CMacrosResolverHelper,
+	CNumberParser,
 	CSettingsHelper,
 	CUrl,
-	CValueMapHelper,
 	Manager;
 
-use CNumberParser;
 use Widgets\Item\Widget;
 
 use Zabbix\Core\CWidget;
