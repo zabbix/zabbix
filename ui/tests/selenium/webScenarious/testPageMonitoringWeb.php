@@ -241,7 +241,7 @@ class testPageMonitoringWeb extends CWebTest {
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($popupitems));
 		$this->assertTrue($popup->query('xpath://a[@aria-label="Host, ' .
-			$disabled . '" and @class="menu-popup-item disabled"]')->one()->isPresent()
+			$disabled . '" and @class="menu-popup-item-disabled "]')->one()->isPresent()
 		);
 		$popup->close();
 	}
@@ -251,7 +251,7 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	public function testPageMonitoringWeb_CheckDisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$values = $this->getTableResult('Name');
+		$values = $this->getTableColumnData('Name');
 
 		// Turn off/on web services and check table results.
 		foreach (['Disable', 'Enable'] as $status) {
@@ -281,7 +281,7 @@ class testPageMonitoringWeb extends CWebTest {
 		// Directly open API created Web scenario and add one more step.
 		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
 				self::$httptestid['Web scenario 3 step'])->waitUntilReady();
-		$this->query('id:http-form')->asForm()->one()->selectTab('Steps');
+		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
 		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:http_step')->asForm()->one();
@@ -307,11 +307,11 @@ class testPageMonitoringWeb extends CWebTest {
 			if ($column_name === 'Name') {
 				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
 			}
-			$column_values = $this->getTableResult($column_name);
+			$column_values = $this->getTableColumnData($column_name);
 
 			foreach (['asc', 'desc'] as $sorting) {
 				$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
-				$this->assertEquals($expected, $this->getTableResult($column_name));
+				$this->assertEquals($expected, $this->getTableColumnData($column_name));
 				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
 			}
 		}
