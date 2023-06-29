@@ -3271,19 +3271,14 @@ class CDiscoveryRule extends CItemGeneral {
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get([
-			'itemids' => $discoveryid,
-			'output' => ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends', 'status',
-				'value_type', 'trapper_hosts', 'units', 'lastlogsize', 'logtimefmt', 'valuemapid', 'params',
-				'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags',
-				'interfaceid', 'description', 'inventory_link', 'lifetime', 'jmx_endpoint', 'url', 'query_fields',
-				'parameters', 'timeout', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy',
-				'headers', 'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password',
-				'verify_peer', 'verify_host', 'allow_traps', 'master_itemid'
-			],
+			'output' => array_merge(['itemid', 'hostid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+				CItemType::FIELD_NAMES
+			),
 			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'selectLLDMacroPaths' => ['lld_macro', 'path'],
 			'selectPreprocessing' => ['type', 'params', 'error_handler', 'error_handler_params'],
 			'selectOverrides' => ['name', 'step', 'stop', 'filter', 'operations'],
+			'itemids' => $discoveryid,
 			'preservekeys' => true
 		]);
 		$srcDiscovery = reset($srcDiscovery);
