@@ -3203,11 +3203,12 @@ section {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-top-center {
     text-anchor: middle; }
-  .svg-gauge .svg-gauge-value-and-units-no-data {
-    fill: #333333; }
   .svg-gauge .svg-gauge-value,
   .svg-gauge .svg-gauge-units {
     text-anchor: middle; }
+  .svg-gauge .svg-gauge-no-data {
+    text-anchor: middle;
+    fill: #333333; }
 
 .svg-graph {
   display: block; }

@@ -33,9 +33,9 @@ class CSVGGauge {
 	static ZBX_STYLE_LABEL_BOTTOM_LEFT =			'svg-gauge-label-bottom-left';
 	static ZBX_STYLE_LABEL_BOTTOM_RIGHT =			'svg-gauge-label-bottom-right';
 	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
-	static ZBX_STYLE_VALUE_AND_UNITS_NO_DATA =		'svg-gauge-value-and-units-no-data';
 	static ZBX_STYLE_VALUE =						'svg-gauge-value';
 	static ZBX_STYLE_UNITS =						'svg-gauge-units';
+	static ZBX_STYLE_NO_DATA =						'svg-gauge-no-data';
 
 	static SVG_NS = 'http://www.w3.org/2000/svg';
 
@@ -175,6 +175,7 @@ class CSVGGauge {
 		}
 
 		this.#createValueAndUnits();
+		this.#createNoData();
 	}
 
 	/**
@@ -206,14 +207,23 @@ class CSVGGauge {
 	 * @param {string}      units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		this.#elements.value_and_units.container.classList.toggle(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_NO_DATA,
-			value === null
-		);
+		if (value !== null) {
+			this.#elements.value_and_units.value.container.textContent = value_text;
 
-		this.#elements.value_and_units.value.container.textContent = value_text;
+			if (this.#config.units.show) {
+				this.#elements.value_and_units.units.container.textContent = units_text;
+			}
 
-		if (this.#config.units.show) {
-			this.#elements.value_and_units.units.container.textContent = units_text;
+			this.#elements.no_data.container.innerHTML = '&nbsp;';
+		}
+		else {
+			this.#elements.value_and_units.value.container.innerHTML = '&nbsp;';
+
+			if (this.#config.units.show) {
+				this.#elements.value_and_units.units.container.innerHTML = '&nbsp;';
+			}
+
+			this.#elements.no_data.container.textContent = value_text;
 		}
 
 		if (this.#config.value.arc.show || this.#config.needle.show) {
@@ -542,6 +552,7 @@ class CSVGGauge {
 		const value_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 		value_container.classList.add(CSVGGauge.ZBX_STYLE_VALUE);
+		value_container.innerHTML = '&nbsp;';
 		value_container.style.fontSize = `${value_font_size}px`;
 
 		if (this.#config.value.is_bold) {
@@ -559,6 +570,7 @@ class CSVGGauge {
 			const units_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 			units_container.classList.add(CSVGGauge.ZBX_STYLE_UNITS);
+			units_container.innerHTML = '&nbsp;';
 			units_container.style.fontSize = `${units_font_size}px`;
 
 			if (this.#config.units.is_bold) {
@@ -653,6 +665,42 @@ class CSVGGauge {
 				}`);
 			}
 		}
+	}
+
+	#createNoData() {
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
+
+		this.#g_scalable.appendChild(container);
+
+		container.classList.add(CSVGGauge.ZBX_STYLE_NO_DATA);
+		container.innerHTML = '&nbsp;';
+
+		const font_size = this.#config.value.size / 100;
+
+		container.style.fontSize = `${font_size}px`;
+
+		if (this.#config.value.is_bold) {
+			container.style.fontWeight = 'bold';
+		}
+
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
+				&& this.#config.angle === 270)
+			? 1 + Math.sqrt(2) / 2
+			: 1;
+
+		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value.arc.show)
+			&& (this.#config.angle === 270 || !this.#config.needle.show);
+
+		if (is_aligned_to_bottom) {
+			container.setAttribute('y', `${arcs_height}`);
+		}
+		else {
+			container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
+				+ font_size * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100)
+			}`);
+		}
+
+		this.#elements.no_data = {container};
 	}
 
 	/**
