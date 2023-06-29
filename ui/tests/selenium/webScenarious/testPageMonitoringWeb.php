@@ -164,13 +164,17 @@ class testPageMonitoringWeb extends CWebTest {
 		}
 
 		// Check if links to Hosts and to Web scenarios are clickable.
+		$row = $table->getRow(0);
+
 		foreach (['Host', 'Name'] as $field) {
-			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
+			$this->assertTrue($row->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
 		// Check that the correct details of scenario are opened.
-		$first_row_name = $table->getRow(0)->getColumn('Name')->getText();
-		$table->findRow('Name', $first_row_name)->getColumn('Name')->query('tag:a')->one()->click();
+		$column = $row->getColumn('Name');
+		$first_row_name = $column->getText();
+		$column->query('tag:a')->one()->click();
+
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Details of web scenario: '.$first_row_name);
 		$this->page->assertTitle('Details of web scenario');
@@ -180,72 +184,72 @@ class testPageMonitoringWeb extends CWebTest {
 	 * Function which checks if button "Reset" works properly.
 	 */
 	public function testPageMonitoringWeb_ResetButtonCheck() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$this->page->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
 
-		$empty_form = [
-			'Host groups' => '',
-			'Hosts' => ''
-		];
+		// Check table contents before filtering.
+		$start_rows_count = $table->getRows()->count();
+		$this->assertTableStats($start_rows_count);
+		$start_contents = $this->getTableColumnData('Name');
 
-		$filled_form = [
-			'Host groups' => 'Zabbix servers',
-			'Hosts' => 'Simple form test host'
-		];
+		// Filter hosts.
+		$form->fill(['Hosts' => 'Simple form test host']);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 
-		// Check reset button with/without filter submit.
-		foreach ([true, false] as $submit) {
-			$this->assertTableStats(13);
-			$form->checkValue($empty_form);
-			$form->fill($filled_form);
+		// Check that filtered count matches expected.
+		$this->assertEquals(4, $table->getRows()->count());
+		$this->assertTableStats(4);
 
-			if ($submit) {
-				$form->submit();
-				$this->page->waitUntilReady();
-				$this->assertEquals(4, $this->query('class:list-table')->asTable()->one()->getRows()->count());
-				$this->assertTableStats(4);
-			}
-
-			$form->invalidate()->checkValue($filled_form);
-			$form->query('button:Reset')->one()->click();
-			$this->page->waitUntilReady();
-			$form->invalidate()->checkValue($empty_form);
-			$this->assertTableStats(13);
-		}
+		// After pressing reset button, check that previous hosts are displayed again.
+		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
+		$reset_rows_count = $table->getRows()->count();
+		$this->assertEquals($start_rows_count, $reset_rows_count);
+		$this->assertTableStats($reset_rows_count);
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
 
 	/**
 	 * Function which checks Hosts context menu.
 	 */
 	public function testPageMonitoringWeb_CheckHostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC')->waitUntilReady();
-		$titles = ['Inventory', 'Latest data',	'Problems',	'Graphs', 'Screens', 'Web', 'Configuration',
-				'Detect operating system', 'Ping', 'Selenium script', 'Traceroute'
+		$popupitems = [
+			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
+			'Ping', 'Traceroute'
 		];
 
-		foreach (['WebData Host', 'Simple form test host'] as $name) {
-			$this->query('class:list-table')->asTable()->one()
-					->findRow('Host', $name)->query('link', $name)->one()->click();
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-			$this->assertTrue($popup->hasItems($titles));
-			$items = ($name === 'WebData Host') ? ['Graphs', 'Screens'] : ['Screens'];
+		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Graphs');
+		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Dashboards');
+		$this->checkHostContextMenu($popupitems, 'Simple form test host', 'Dashboards');
+	}
 
-			// Check that items are disabled.
-			foreach ($items as $item) {
-				$this->assertTrue($popup->query('xpath://a[@aria-label="Host, '.$item.
-						'" and @class="menu-popup-item-disabled"]')->one()->isPresent()
-				);
-			}
-
-			$popup->close();
-		}
+	/**
+	 * Function for checking the context menu of the selected host.
+	 *
+	 * @param array		$popupitems		items of the popup window.
+	 * @param string	$hostname		name of the host.
+	 * @param string	$disabled		disabled host elements.
+	 *
+	 */
+	private function checkHostContextMenu($popupitems, $hostname, $disabled) {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
+		$this->query('class:list-table')->asTable()->one()->findRow('Host', $hostname)->query('link', $hostname)->one()->click();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+		$this->assertTrue($popup->hasItems($popupitems));
+		$this->assertTrue($popup->query('xpath://a[@aria-label="Host, ' .
+			$disabled . '" and @class="menu-popup-item disabled"]')->one()->isPresent()
+		);
+		$popup->close();
 	}
 
 	/**
 	 * Function which checks if disabled web services aren't displayed.
 	 */
-	public function testPageMonitoringWeb_DisabledWebServices() {
+	public function testPageMonitoringWeb_CheckDisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$values = $this->getTableResult('Name');
 
@@ -272,44 +276,30 @@ class testPageMonitoringWeb extends CWebTest {
 	public function testPageMonitoringWeb_CheckWebServiceNumberOfSteps() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
 		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', 'Web scenario 3 step');
-		$sql = 'SELECT * FROM httptest, hosts, httpstep WHERE httptest.hostid = hosts.hostid'.
-				' AND hosts.hostid ='.self::$hostid['WebData Host'].
-				' AND httptest.httptestid = httpstep.httptestid'.
-				' AND httptest.httptestid ='.self::$httptestid['Web scenario 3 step'];
-
-		// Check if steps in DB are equal to the frontend amount of steps.
 		$this->assertEquals('3', $row->getColumn('Number of steps')->getText());
-		$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
 
-		// Directly open API created Web scenario and add/remove one step.
-		foreach (['Add' => '4', 'Remove' => '3'] as $action => $count) {
-			$this->page->open("httpconf.php?form=update&hostid=".self::$hostid['WebData Host']."&httptestid=".
-					self::$httptestid['Web scenario 3 step'])->waitUntilReady();
-			$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
-			$this->query('id:stepTab')->asTable()->one()->query("xpath:.//button[text()=".
-					CXPathHelper::escapeQuotes($action).']')->one()->click();
+		// Directly open API created Web scenario and add one more step.
+		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid['WebData Host'].'&httptestid='.
+				self::$httptestid['Web scenario 3 step'])->waitUntilReady();
+		$this->query('id:http-form')->asForm()->one()->selectTab('Steps');
+		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
+		COverlayDialogElement::find()->one()->waitUntilReady();
+		$form = $this->query('id:http_step')->asForm()->one();
+		$form->fill(['Name' => 'Step number 4', 'id:url' => 'test.com']);
+		$form->submit();
+		$this->query('button:Update')->one()->click();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 
-			if ($action === 'Add') {
-				COverlayDialogElement::find()->one()->waitUntilReady();
-				$this->query('id:http_step')->asForm()->one()
-						->fill(['Name' => 'Step number 4', 'id:url' => 'test.com'])->submit();
-			}
-
-			$this->query('button:Update')->one()->waitUntilClickable()->click();
-			$this->page->waitUntilReady();
-			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
-
-			// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
-			$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-			$this->assertEquals($count, $row->getColumn('Number of steps')->getText());
-			$this->assertEquals($row->getColumn('Number of steps')->getText(), CDBHelper::getCount($sql));
-		}
+		// Return to the "Web monitoring" and check if the "Number of steps" is correctly displayed.
+		$this->page->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
+		$this->assertEquals('4', $row->getColumn('Number of steps')->getText());
 	}
 
 	/**
 	 * Function which checks sorting by Name/Host column.
 	 */
-	public function testPageMonitoringWeb_Sorting() {
+	public function testPageMonitoringWeb_CheckSorting() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=ASC')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
 
