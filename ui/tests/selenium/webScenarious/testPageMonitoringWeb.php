@@ -241,7 +241,7 @@ class testPageMonitoringWeb extends CWebTest {
 		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
 		$this->assertTrue($popup->hasItems($popupitems));
 		$this->assertTrue($popup->query('xpath://a[@aria-label="Host, ' .
-			$disabled . '" and @class="menu-popup-item-disabled "]')->one()->isPresent()
+			$disabled . '" and @class="menu-popup-item-disabled"]')->one()->isPresent()
 		);
 		$popup->close();
 	}
