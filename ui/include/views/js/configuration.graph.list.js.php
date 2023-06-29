@@ -59,6 +59,18 @@
 			}
 		},
 
+		openCopyPopup() {
+			const parameters = {
+				graphids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'graphs'
+			};
+
+			return PopUp('copy.edit', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
+		},
+
 		editHost(e, hostid) {
 			e.preventDefault();
 			const host_data = {hostid};
@@ -80,6 +92,9 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		editTemplate(e, templateid) {

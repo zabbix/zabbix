@@ -456,3 +456,11 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'form_name' => $form->getName()
+	]).');
+'))
+	->setOnDocumentReady()
+	->show();

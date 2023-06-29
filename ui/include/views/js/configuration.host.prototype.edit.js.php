@@ -44,6 +44,13 @@
 
 <script>
 	const view = {
+
+		form_name: null,
+
+		init({form_name}) {
+			this.form_name = form_name;
+		},
+
 		editHost(e, hostid) {
 			return;
 		},
@@ -70,6 +77,14 @@
 			}, {once: true});
 		},
 
+		refresh() {
+			const url = new Curl('');
+			const form = document.getElementsByName(this.form_name)[0];
+			const fields = getFormFields(form);
+
+			post(url.getUrl(), fields);
+		},
+
 		events: {
 			elementSuccess(e) {
 				const data = e.detail;
@@ -82,7 +97,7 @@
 					}
 				}
 
-				location.href = location.href;
+				view.refresh();
 			},
 
 			templateDelete(e) {

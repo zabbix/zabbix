@@ -43,54 +43,30 @@
 						e.preventDefault();
 						this.editHostGroup({groupid: e.target.closest('a').dataset.groupid});
 					}
-
-					if (e.target.classList.contains('js-edit-template')) {
-						this.editTemplate({templateid: e.target.dataset.templateid})
-					}
 				}
 			});
 		},
 
-		editTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.openTemplatePopup(template_data);
+		},
+
+		openTemplatePopup(template_data) {
+			const original_url = location.href;
+			const overlay =  PopUp('template.edit', template_data, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				history.replaceState({}, '', original_url);
+			}, {once: true});
 		},
 
 		editHost(e, hostid) {
@@ -107,12 +83,15 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', this.original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		editTemplateGroup(parameters = {}) {
@@ -144,7 +123,7 @@
 		},
 
 		events: {
-			hostSuccess(e) {
+			elementSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

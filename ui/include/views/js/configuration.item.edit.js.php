@@ -175,12 +175,15 @@ include __DIR__.'/itemtest.js.php';
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		editTemplate(e, templateid) {
@@ -225,7 +228,7 @@ include __DIR__.'/itemtest.js.php';
 					}
 				}
 
-				location.href = location.href;
+				view.refresh();
 			},
 
 			hostDelete(e) {

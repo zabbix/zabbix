@@ -145,6 +145,8 @@
 						) ?>;
 
 						if (window.confirm(confirmation)) {
+							overlayDialogueDestroy(this.overlay.dialogueid);
+
 							this.dialogue.dispatchEvent(
 								new CustomEvent('edit.linked', {detail: {templateid: e.target.dataset.templateid}})
 							)

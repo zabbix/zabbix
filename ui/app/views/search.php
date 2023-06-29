@@ -287,8 +287,8 @@ if ($data['admin']) {
 
 		$template_cell = ($template['editable'] && $data['allowed_ui_conf_templates'])
 			? [(new CLink($visible_name))
-				->addClass('js-edit-template')
 				->setAttribute('data-templateid', $templateid)
+				->onClick('view.editTemplate(event, this.dataset.templateid);')
 			]
 			: [new CSpan($visible_name)];
 
