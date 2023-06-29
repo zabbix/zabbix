@@ -186,7 +186,7 @@ out:
 	if (SUCCEED != ret && NULL != row)
 		pb_list_free_discovery(&pb->discovery, row);
 
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T, __func__, zbx_result_string(ret),
 			pb_get_free_size());
 
 	return ret;
@@ -229,6 +229,7 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 	zbx_list_iterator_t	li;
 	zbx_pb_discovery_t	*row;
 	int			rows_num = 0;
+	size_t			size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -238,12 +239,28 @@ static zbx_list_item_t	*pb_discovery_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows
 	{
 		(void)zbx_list_iterator_peek(&li, (void **)&row);
 
-		if (SUCCEED != pb_discovery_add_row_mem(pb, row))
-			break;
+		while (SUCCEED != pb_discovery_add_row_mem(pb, row))
+		{
+			if (ZBX_PB_MODE_MEMORY != pb->mode)
+				goto out;
+
+			/* in memory mode keep discarding old records until new */
+			/* one can be written in proxy memory buffer            */
+
+			if (0 == size)
+				size = pb_discovery_estimate_row_size(row->value, row->ip, row->dns);
+
+			if (FAIL == pb_free_space(pb_data, size))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "discovery record with size " ZBX_FS_SIZE_T
+						" is too large for proxy memory buffer, discarding", size);
+				break;
+			}
+		}
 
 		rows_num++;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
 
 	return li.current;

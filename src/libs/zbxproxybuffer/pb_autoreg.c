@@ -126,10 +126,10 @@ size_t	pb_autoreg_estimate_row_size(const char *host, const char *host_metadata,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write autoregistration record into memory cache                   *
+ * Purpose: add auto registration record to memory cache                      *
  *                                                                            *
  ******************************************************************************/
-static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char *ip, const char *dns,
+static int	pb_autoreg_add_row_mem(zbx_pb_t *pb, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock)
 {
 	zbx_pb_autoreg_t	*row;
@@ -171,6 +171,39 @@ out:
 			pb_get_free_size());
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: write auto registration record in memory cache, discarding old    *
+ *          records in memory mode to free space if necessary                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	pb_autoreg_write_host_mem(zbx_pb_t *pb, const char *host, const char *ip, const char *dns,
+		unsigned short port, unsigned int connection_type, const char *host_metadata, int flags, int clock)
+{
+	size_t	size = 0;
+
+	while (FAIL == pb_autoreg_add_row_mem(pb, host, ip, dns, port, connection_type, host_metadata, flags, clock))
+	{
+		if (ZBX_PB_MODE_MEMORY != pb->mode)
+			return FAIL;
+
+		/* in memory mode keep discarding old records until new */
+		/* one can be written in proxy memory buffer            */
+
+		if (0 == size)
+			size = pb_autoreg_estimate_row_size(host, host_metadata, ip, dns);
+
+		if (FAIL == pb_free_space(pb_data, size))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "auto registration record with size " ZBX_FS_SIZE_T
+					" is too large for proxy memory buffer, discarding", size);
+			break;
+		}
+	}
+
+	return SUCCEED;
 }
 
 /******************************************************************************

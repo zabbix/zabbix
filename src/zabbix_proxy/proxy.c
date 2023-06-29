@@ -772,17 +772,20 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 	else
 	{
-		if (0 != config_proxy_memory_buffer_age)
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter can be set only"
-					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
-			err = 1;
-		}
-
 		if (0 != config_proxy_memory_buffer_size)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter can be set only"
 					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
+			err = 1;
+		}
+	}
+
+	if (ZBX_PB_MODE_HYBRID != config_proxy_buffer_mode)
+	{
+		if (0 != config_proxy_memory_buffer_age)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter can be set only"
+					" when \"ProxyBufferMode\" is \"hybrid\"");
 			err = 1;
 		}
 	}

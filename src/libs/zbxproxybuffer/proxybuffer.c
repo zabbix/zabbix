@@ -106,9 +106,13 @@ size_t	pb_get_free_size(void)
  ******************************************************************************/
 int	pb_free_space(zbx_pb_t *pb, size_t size)
 {
+	int	ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() size:" ZBX_FS_SIZE_T, __func__, size);
+
 	ssize_t	size_left = (ssize_t)size;
 
-	while (0 > size_left)
+	while (0 < size_left && SUCCEED == ret)
 	{
 		zbx_pb_history_t	*hrow;
 		zbx_pb_discovery_t	*drow;
@@ -130,6 +134,9 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 		if (SUCCEED == zbx_list_peek(&pb->autoreg, (void **)&arow) && arow->clock < clock)
 		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s() discarding auto registration record from proxy memory buffer,"
+					" id:" ZBX_FS_UI64 " clock:%d", __func__, arow->id, arow->clock);
+
 			zbx_list_pop(&pb->autoreg, NULL);
 			size_left -= pb_autoreg_estimate_row_size(arow->host, arow->host_metadata, arow->listen_dns,
 					arow->listen_ip);
@@ -139,6 +146,9 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 		if (NULL != hrow)
 		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s() discarding history record from proxy memory buffer,"
+					" id:" ZBX_FS_UI64 " clock:%d", __func__, hrow->id, hrow->ts.sec);
+
 			zbx_list_pop(&pb->history, NULL);
 			size_left -= pb_history_estimate_row_size(hrow->value, hrow->source);
 			pb_list_free_history(&pb->history, hrow);
@@ -147,16 +157,21 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 		if (NULL != drow)
 		{
+			zabbix_log(LOG_LEVEL_TRACE, "%s() discarding discovery record from proxy memory buffer,"
+					" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
+
 			zbx_list_pop(&pb->discovery, NULL);
 			size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
 			pb_list_free_discovery(&pb->discovery, drow);
 			continue;
 		}
 
-		return FAIL;
+		ret = FAIL;
 	}
 
-	return SUCCEED;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 /******************************************************************************
@@ -419,17 +434,20 @@ static void	pb_flush_lastids(zbx_pb_t *pb)
 
 static void	pb_flush(zbx_pb_t *pb)
 {
-	do
+	if (ZBX_PB_MODE_HYBRID == pb->mode)
 	{
-		zbx_db_begin();
+		do
+		{
+			zbx_db_begin();
 
-		pb_autoreg_flush(pb);
-		pb_discovery_flush(pb);
-		pb_history_flush(pb);
+			pb_autoreg_flush(pb);
+			pb_discovery_flush(pb);
+			pb_history_flush(pb);
 
-		pb_flush_lastids(pb);
+			pb_flush_lastids(pb);
+		}
+		while (ZBX_DB_DOWN == zbx_db_commit());
 	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
 
 	pb_history_clear(pb, UINT64_MAX);
 	pb_discovery_clear(pb, UINT64_MAX);

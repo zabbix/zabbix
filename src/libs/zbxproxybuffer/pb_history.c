@@ -517,6 +517,7 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 	zbx_list_iterator_t	li;
 	zbx_pb_history_t	*row;
 	int			rows_num = 0;
+	size_t			size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -526,12 +527,28 @@ static zbx_list_item_t	*pb_history_add_rows_mem(zbx_pb_t *pb, zbx_list_t *rows)
 	{
 		(void)zbx_list_iterator_peek(&li, (void **)&row);
 
-		if (SUCCEED != pb_history_add_row_mem(pb, row))
-			break;
+		while (SUCCEED != pb_history_add_row_mem(pb, row))
+		{
+			if (ZBX_PB_MODE_MEMORY != pb->mode)
+				goto out;
+
+			/* in memory mode keep discarding old records until new */
+			/* one can be written in proxy memory buffer            */
+
+			if (0 == size)
+				size = pb_history_estimate_row_size(row->value, row->source);
+
+			if (FAIL == pb_free_space(pb_data, size))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "history record with size " ZBX_FS_SIZE_T
+						" is too large for proxy memory buffer, discarding", size);
+				break;
+			}
+		}
 
 		rows_num++;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d next:%p", __func__, rows_num, li.current);
 
 	return li.current;
@@ -662,7 +679,7 @@ int	pb_history_check_age(zbx_pb_t *pb)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: write discovery last sent record id to database                   *
+ * Purpose: write history last sent record id to database                     *
  *                                                                            *
  ******************************************************************************/
 void	pb_history_set_lastid(zbx_uint64_t lastid)
