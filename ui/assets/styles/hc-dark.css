@@ -3205,8 +3205,6 @@ section {
     text-anchor: middle; }
   .svg-gauge .svg-gauge-value-and-units-no-data {
     fill: #cacaca; }
-  .svg-gauge .svg-gauge-value-and-units-multi-line {
-    dominant-baseline: text-before-edge; }
   .svg-gauge .svg-gauge-value,
   .svg-gauge .svg-gauge-units {
     text-anchor: middle; }

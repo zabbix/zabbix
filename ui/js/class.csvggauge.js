@@ -34,13 +34,13 @@ class CSVGGauge {
 	static ZBX_STYLE_LABEL_BOTTOM_RIGHT =			'svg-gauge-label-bottom-right';
 	static ZBX_STYLE_VALUE_AND_UNITS =				'svg-gauge-value-and-units';
 	static ZBX_STYLE_VALUE_AND_UNITS_NO_DATA =		'svg-gauge-value-and-units-no-data';
-	static ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE =	'svg-gauge-value-and-units-multi-line';
 	static ZBX_STYLE_VALUE =						'svg-gauge-value';
 	static ZBX_STYLE_UNITS =						'svg-gauge-units';
 
 	static SVG_NS = 'http://www.w3.org/2000/svg';
 
 	static LINE_HEIGHT = 1.14;
+	static CAPITAL_HEIGHT = 0.72;
 
 	static DESC_V_POSITION_TOP = 0;
 	static DESC_V_POSITION_BOTTOM = 1;
@@ -59,6 +59,8 @@ class CSVGGauge {
 	static LABEL_GAP = 40;
 
 	static NEEDLE_RADIUS = 6.5;
+
+	static NEEDLE_GAP = 20;
 
 	static ANIMATE_DURATION = 500;
 
@@ -479,10 +481,12 @@ class CSVGGauge {
 
 			if (this.#config.angle === 270 && Math.abs(angle) > 90) {
 				const arcs_height = 1 + Math.sqrt(2) / 2;
-				const y_max = arcs_height - font_size * CSVGGauge.LINE_HEIGHT;
+				const y_max = arcs_height - font_size;
 
 				if (y > y_max) {
-					x = Math.sqrt(radius ** 2 - (y_max - 1) ** 2) * Math.sign(angle);
+					x = Math.sqrt(radius ** 2 - (arcs_height - font_size * CSVGGauge.CAPITAL_HEIGHT - 1) ** 2)
+						* Math.sign(angle);
+
 					y = arcs_height;
 
 					is_aligned_to_bottom = true;
@@ -531,7 +535,7 @@ class CSVGGauge {
 			? 1 + Math.sqrt(2) / 2
 			: 1;
 
-		const is_fixed_bottom = (this.#config.thresholds.arc.show || this.#config.value.arc.show)
+		const is_aligned_to_bottom = (this.#config.thresholds.arc.show || this.#config.value.arc.show)
 			&& (this.#config.angle === 270 || !this.#config.needle.show);
 
 		const value_font_size = this.#config.value.size / 100;
@@ -585,12 +589,14 @@ class CSVGGauge {
 						container.appendChild(units_container);
 					}
 
-					if (is_fixed_bottom) {
+					if (is_aligned_to_bottom) {
 						container.setAttribute('y', `${arcs_height}`);
 					}
 					else {
-						container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100
-							+ Math.max(value_font_size, units_font_size) * CSVGGauge.LINE_HEIGHT
+						const max_font_size = Math.max(value_font_size, units_font_size);
+
+						container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
+							+ max_font_size * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100)
 						}`);
 					}
 
@@ -605,23 +611,26 @@ class CSVGGauge {
 						? [value_font_size, units_font_size]
 						: [units_font_size, value_font_size];
 
-					container.classList.add(CSVGGauge.ZBX_STYLE_VALUE_AND_UNITS_MULTI_LINE);
-
 					container.appendChild(parts[0]);
 					container.appendChild(parts[1]);
 
 					parts[1].setAttribute('x', '0');
 
-					if (is_fixed_bottom) {
-						parts[0].setAttribute('y', `${arcs_height - parts_font_size[1]
-							- parts_font_size[0] * ((1 + CSVGGauge.LINE_HEIGHT) / 2)
+					if (is_aligned_to_bottom) {
+						parts[0].setAttribute('y', `${arcs_height
+							- parts_font_size[0] * (1 + CSVGGauge.CAPITAL_HEIGHT) / 2
+							- parts_font_size[1] * (1 - CSVGGauge.CAPITAL_HEIGHT) / 2
 						}`);
-						parts[1].setAttribute('y', `${arcs_height - parts_font_size[1]}`);
+						parts[1].setAttribute('y', `${arcs_height}`);
 					}
 					else {
-						parts[0].setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2}`);
-						parts[1].setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
-							+ parts_font_size[0] * CSVGGauge.LINE_HEIGHT
+						const y_top = arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
+							+ parts_font_size[0] * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100);
+
+						parts[0].setAttribute('y', `${y_top}`);
+						parts[1].setAttribute('y', `${y_top
+							+ parts_font_size[1] * (1 + CSVGGauge.CAPITAL_HEIGHT) / 2
+							+ parts_font_size[0] * (1 - CSVGGauge.CAPITAL_HEIGHT) / 2
 						}`);
 					}
 
@@ -633,12 +642,12 @@ class CSVGGauge {
 		else {
 			container.appendChild(value_container);
 
-			if (is_fixed_bottom) {
+			if (is_aligned_to_bottom) {
 				container.setAttribute('y', `${arcs_height}`);
 			}
 			else {
-				container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100
-					+ value_font_size * CSVGGauge.LINE_HEIGHT
+				container.setAttribute('y', `${arcs_height + CSVGGauge.NEEDLE_RADIUS / 100 * 2
+					+ value_font_size * (CSVGGauge.CAPITAL_HEIGHT + CSVGGauge.NEEDLE_GAP / 100)
 				}`);
 			}
 		}
