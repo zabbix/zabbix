@@ -22,9 +22,11 @@
 #include "template.h"
 
 #include "zbxcacheconfig.h"
-#include "zbxalgo.h"
+#include "zbxdb.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+#include "zbxalgo.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"

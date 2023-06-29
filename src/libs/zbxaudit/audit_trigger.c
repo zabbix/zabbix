@@ -25,6 +25,7 @@
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 static int	trigger_flag_to_resource_type(int flag)
 {

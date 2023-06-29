@@ -25,6 +25,7 @@
 #include "zbxdbhigh.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxalgo.h"
 
 int	zbx_audit_item_resource_is_only_item(int resource_type)
 {
