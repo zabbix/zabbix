@@ -39,7 +39,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldThresholds
 };
 
-use CNumberParser,
+use API,
+	CNumberParser,
 	CParser;
 
 use Widgets\Gauge\Widget;
@@ -93,20 +94,41 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_TH_SHOW_ARC = 0;
 	private const DEFAULT_TH_ARC_SIZE_PERCENT = 10;
 
+	private bool $is_binary_units = false;
+
+	public function __construct(array $values, ?string $templateid) {
+		parent::__construct($values, $templateid);
+
+		if (array_key_exists('units', $this->values) && $this->values['units'] !== '') {
+			$this->is_binary_units = isBinaryUnits($this->values['units']);
+		}
+		elseif (array_key_exists('itemid', $this->values)) {
+			$items = API::Item()->get([
+				'output' => ['units'],
+				'itemids' => $this->values['itemid'],
+				'webitems' => true
+			]);
+
+			$this->is_binary_units = $items && isBinaryUnits($items[0]['units']);
+		}
+	}
+
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => $this->is_binary_units
+		]);
 
-		$min = $number_parser->parse($this->getFieldValue('min')) == CParser::PARSE_SUCCESS
-			? $number_parser->calcValue()
-			: null;
+		$number_parser->parse($this->getFieldValue('min'));
+		$min = $number_parser->calcValue();
 
-		$max = $number_parser->parse($this->getFieldValue('max')) == CParser::PARSE_SUCCESS
-			? $number_parser->calcValue()
-			: null;
+		$number_parser->parse($this->getFieldValue('max'));
+		$max = $number_parser->calcValue();
 
-		if ($min !== null && $max !== null && $min >= $max) {
+		if ($min >= $max) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Max'), _s('value must be greater than "%1$s"', $min));
 		}
 
@@ -114,14 +136,13 @@ class WidgetForm extends CWidgetForm {
 		$max_threshold = null;
 
 		foreach ($this->getFieldValue('thresholds') as $threshold) {
-			if ($number_parser->parse($threshold['threshold_value']) !== CParser::PARSE_SUCCESS) {
-				continue;
-			}
+			$min_threshold = $min_threshold !== null
+				? min($min_threshold, $threshold['threshold_value'])
+				: $threshold['threshold_value'];
 
-			$threshold_value = $number_parser->calcValue();
-
-			$min_threshold = $min_threshold !== null ? min($min_threshold, $threshold_value) : $threshold_value;
-			$max_threshold = $max_threshold !== null ? max($max_threshold, $threshold_value) : $threshold_value;
+			$max_threshold = $max_threshold !== null
+				? max($max_threshold, $threshold['threshold_value'])
+				: $threshold['threshold_value'];
 		}
 
 		if ($min_threshold !== null && $min_threshold < $min) {
@@ -255,7 +276,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
-				new CWidgetFieldThresholds('thresholds', _('Thresholds'))
+				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('th_show_labels', _('Show labels')))->setDefault(self::DEFAULT_TH_SHOW_LABELS)

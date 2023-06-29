@@ -30,6 +30,8 @@ use API,
 	CUrl,
 	Manager;
 
+use Widgets\Gauge\Includes\WidgetForm;
+
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -59,6 +61,26 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]));
 
 			return;
+		}
+
+		if ($this->hasInput('dynamic_hostid')) {
+			$errors = $this->checkConfigForDynamicItem($item);
+
+			if ($errors) {
+				foreach ($errors as $error) {
+					error($error);
+				}
+
+				$this->setResponse(
+					(new CControllerResponseData(['main_block' => json_encode([
+						'error' => [
+							'messages' => array_column(get_and_clear_messages(), 'message')
+						]
+					], JSON_THROW_ON_ERROR)]))->disableView()
+				);
+
+				return;
+			}
 		}
 
 		if ($this->getInput('name', '') === '') {
@@ -124,6 +146,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $items[0];
 	}
 
+	private function checkConfigForDynamicItem(array $item): array {
+		$form = $this->widget->getForm(['itemid' => $item['itemid']] + $this->getInput('fields', []),
+			$this->hasInput('templateid') ? $this->getInput('templateid') : null
+		);
+
+		return $form->validate();
+	}
+
 	private function getConfig(array $item): array {
 		$config = [
 			'angle' => $this->fields_values['angle'],
@@ -131,9 +161,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'bg_color' => $this->fields_values['bg_color']
 		];
 
+		$item_units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
+			? $this->fields_values['units']
+			: $item['units'];
+
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
-			'with_time_suffix' => true
+			'with_time_suffix' => true,
+			'is_binary_size' => isBinaryUnits($item_units)
 		]);
 
 		$number_parser->parse($this->fields_values['min']);
@@ -234,11 +269,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		foreach ($this->fields_values['thresholds'] as $threshold) {
-			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold['threshold_value']);
+			if ($this->hasInput('dynamic_hostid')) {
+				$number_parser->parse($threshold['threshold']);
+
+				$threshold_value = $number_parser->calcValue();
+			}
+			else {
+				$threshold_value = $threshold['threshold_value'];
+			}
+
+			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold_value);
 
 			$config['thresholds']['data'][] = [
 				'color' => $threshold['color'],
-				'value' => $threshold['threshold_value'],
+				'value' => $threshold_value,
 				'text' => $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '')
 			];
 		}
