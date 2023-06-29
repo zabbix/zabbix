@@ -21,12 +21,10 @@
 
 #include <signal.h>
 
-#include "log.h"
 #include "zbxcomms.h"
 #include "zbxexec.h"
 #include "zbxstr.h"
 #include "zbxip.h"
-#include "zbxthreads.h"
 #include "zbxfile.h"
 
 static const zbx_config_icmpping_t	*config_icmpping;
@@ -470,7 +468,7 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
 
 	if (0 != rdns)
 	{
-		*dnsname_len = zbx_strlen_utf8(tmp);
+		*dnsname_len = SUCCEED == zbx_is_ip(tmp) ? 0 : zbx_strlen_utf8(tmp);
 		*c = ' ';
 
 		if (ZBX_MAX_DNSNAME_LEN < *dnsname_len)
@@ -489,7 +487,8 @@ static int	check_hostip_response(char *resp, ZBX_FPING_HOST *hosts, const int ho
 
 	for (i = 0; i < hosts_count; i++)
 	{
-		if (0 == strcmp(tmp, hosts[i].addr))
+		if ((0 != rdns && SUCCEED == zbx_ip_in_list(tmp, hosts[i].addr)) ||
+				(0 == rdns && 0 == strcmp(tmp, hosts[i].addr)))
 		{
 			*host = &hosts[i];
 			ret = SUCCEED;
@@ -696,9 +695,9 @@ static void	line_process(zbx_fping_resp *resp, zbx_fping_args *args)
  ******************************************************************************/
 static int	fping_output_process(zbx_fping_resp *resp, zbx_fping_args *args)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
 	int	i, ret = NOTSUPPORTED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (NULL == zbx_fgets(resp->linebuf, (int)resp->linebuf_size, resp->input_pipe))
 	{

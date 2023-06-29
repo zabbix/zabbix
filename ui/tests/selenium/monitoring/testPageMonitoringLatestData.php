@@ -608,9 +608,9 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 
 		$this->assertTableData([
-				['Name' => 'Free swap space'],
-				['Name' => 'Free swap space in %'],
-				['Name' => 'Total swap space']
+				['Name' => 'Linux: Free swap space'],
+				['Name' => 'Linux: Free swap space in %'],
+				['Name' => 'Linux: Total swap space']
 			], $this->getTableSelector()
 		);
 	}
@@ -766,7 +766,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data,'description', false)) {
-			$row->query('class:icon-description')->one()->click()->waitUntilReady();
+			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->one();
 
 			// Verify the real description with the expected one.
@@ -799,7 +799,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$form->fill(['Hosts' => 'Available host in maintenance']);
 		$form->submit();
 
-		$this->query('xpath://a['.CXPathHelper::fromClass('icon-maintenance').']')->waitUntilClickable()->one()->click();
+		$this->query('xpath://button['.CXPathHelper::fromClass('zi-wrench-alt-small').']')->waitUntilClickable()->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 		$hint_text = "Maintenance for Host availability widget [Maintenance with data collection]\n".
 				"Maintenance for checking Show hosts in maintenance option in Host availability widget";

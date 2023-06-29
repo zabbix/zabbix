@@ -82,7 +82,7 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function clear() {
-		$query = $this->query('xpath:.//span[@class="subfilter-disable-btn"]');
+		$query = $this->query('xpath:.//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
 		$query->all()->click();
 		$query->waitUntilNotPresent();
 
@@ -115,7 +115,7 @@ class CMultiselectElement extends CElement {
 			return $this->clear();
 		}
 
-		$this->edit($context)->query('link:'.$label)->one()->click()->waitUntilNotPresent();
+		$this->edit($context)->query('link:'.$label)->waitUntilVisible(3)->one()->click()->waitUntilNotPresent();
 
 		return $this;
 	}
@@ -178,7 +178,7 @@ class CMultiselectElement extends CElement {
 	 */
 	public function remove($label) {
 		$query = $this->query('xpath:.//span[@class="subfilter-enabled"][string()='.CXPathHelper::escapeQuotes($label).
-				']/span[@class="subfilter-disable-btn"]'
+				']/span['.CXPathHelper::fromClass('zi-remove-smaller').']'
 		);
 
 		$query->one()->click();

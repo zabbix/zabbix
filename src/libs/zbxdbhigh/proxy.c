@@ -19,7 +19,6 @@
 
 #include "zbxdbhigh.h"
 
-#include "log.h"
 #include "zbxversion.h"
 
 void	zbx_calc_timestamp(const char *line, int *timestamp, const char *format)

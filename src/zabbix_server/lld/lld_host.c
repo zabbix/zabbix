@@ -21,7 +21,6 @@
 #include "zbxserver.h"
 
 #include "../db_lengths.h"
-#include "log.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"

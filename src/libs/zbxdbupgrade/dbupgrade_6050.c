@@ -21,7 +21,6 @@
 
 #include "zbxdbschema.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 
 /*
  * 7.0 development database patches
@@ -246,6 +245,58 @@ static int	DBpatch_6050022(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050023(void)
+{
+	const char	*sql =
+			"update widget_field"
+			" set name='acknowledgement_status'"
+			" where name='unacknowledged'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='problems'"
+				")";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_6050024(void)
+{
+	const char	*sql =
+			"update widget_field"
+			" set name='show_lines'"
+			" where name='count'"
+				" and exists ("
+					"select null"
+					" from widget w"
+					" where widget_field.widgetid=w.widgetid"
+						" and w.type='tophosts'"
+				")";
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		return SUCCEED;
+
+	return FAIL;
+}
+
+static int	DBpatch_6050025(void)
+{
+	if (FAIL == zbx_db_index_exists("problem", "problem_4"))
+		return DBcreate_index("problem", "problem_4", "cause_eventid", 0);
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -275,5 +326,8 @@ DBPATCH_ADD(6050019, 0, 1)
 DBPATCH_ADD(6050020, 0, 1)
 DBPATCH_ADD(6050021, 0, 1)
 DBPATCH_ADD(6050022, 0, 1)
+DBPATCH_ADD(6050023, 0, 1)
+DBPATCH_ADD(6050024, 0, 1)
+DBPATCH_ADD(6050025, 0, 1)
 
 DBPATCH_END()

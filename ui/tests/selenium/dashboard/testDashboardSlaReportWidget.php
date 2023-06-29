@@ -69,6 +69,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			[
 				'name' => 'Dashboard for SLA report widget tests',
 				'private' => 0,
+				'auto_start' => 1,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',
