@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-05-09T19:17:18Z'
+  date: '2023-05-22T14:26:41Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -305,7 +305,7 @@ zabbix_export:
             - tag: component
               value: go-threads
         - uuid: 837c546cb3bc400ab7a62a672792f88b
-          name: 'Kubernetes API: gRPCs messages ressived, rate'
+          name: 'Kubernetes API: gRPCs messages received, rate'
           type: DEPENDENT
           key: kubernetes.api.grpc_client_msg_received.rate
           delay: '0'

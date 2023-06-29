@@ -25,7 +25,6 @@ class CControllerActionOperationGet extends CController {
 		$fields = [
 			'eventsource' =>	'required|in '.implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]),
 			'recovery' =>		'required|in '.implode(',', [ACTION_OPERATION, ACTION_RECOVERY_OPERATION, ACTION_UPDATE_OPERATION]),
-			'actionid' =>		'db actions.actionid',
 			'operation' =>		'array'
 		];
 
@@ -58,19 +57,7 @@ class CControllerActionOperationGet extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN) {
-			if (!$this->getInput('actionid', '0')) {
-				return true;
-			}
-
-			return (bool) API::Action()->get([
-				'output' => [],
-				'actionids' => $this->getInput('actionid'),
-				'editable' => true
-			]);
-		}
-
-		return false;
+		return $this->getUserType() >= USER_TYPE_ZABBIX_ADMIN;
 	}
 
 	protected function doAction(): void {
