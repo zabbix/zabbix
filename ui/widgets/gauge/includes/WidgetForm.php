@@ -136,13 +136,12 @@ class WidgetForm extends CWidgetForm {
 		$max_threshold = null;
 
 		foreach ($this->getFieldValue('thresholds') as $threshold) {
-			$min_threshold = $min_threshold !== null
-				? min($min_threshold, $threshold['threshold_value'])
-				: $threshold['threshold_value'];
+			$number_parser->parse($threshold['threshold']);
 
-			$max_threshold = $max_threshold !== null
-				? max($max_threshold, $threshold['threshold_value'])
-				: $threshold['threshold_value'];
+			$threshold_value = $number_parser->calcValue();
+
+			$min_threshold = $min_threshold !== null ? min($min_threshold, $threshold_value) : $threshold_value;
+			$max_threshold = $max_threshold !== null ? max($max_threshold, $threshold_value) : $threshold_value;
 		}
 
 		if ($min_threshold !== null && $min_threshold < $min) {

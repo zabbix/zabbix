@@ -57,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$units = '';
 		$decimals = null;
 		$last_value = null;
-		$thresholds = $this->fields_values['thresholds'];
+		$is_binary_units = false;
 
 		$options = [
 			'output' => ['value_type'],
@@ -159,20 +159,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 				switch ($value_type) {
 					case ITEM_VALUE_TYPE_FLOAT:
 					case ITEM_VALUE_TYPE_UINT64:
-						if ($is_dynamic
-								&& ($this->fields_values['units_show'] != 1 || $this->fields_values['units'] === '')) {
-							$number_parser = new CNumberParser([
-								'with_size_suffix' => true,
-								'with_time_suffix' => true,
-								'is_binary_size' => isBinaryUnits($item['units'])
-							]);
+						$item_units = $this->fields_values['units_show'] == 1 && $this->fields_values['units'] !== ''
+							? $this->fields_values['units']
+							: $item['units'];
 
-							foreach ($thresholds as &$threshold) {
-								$number_parser->parse($threshold['threshold']);
-								$threshold['threshold_value'] = $number_parser->calcValue();
-							}
-							unset($threshold);
-						}
+						$is_binary_units = isBinaryUnits($item_units);
 
 						if ($this->fields_values['units_show'] == 1) {
 							if ($this->fields_values['units'] !== '') {
@@ -299,8 +290,18 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$bg_color = $this->fields_values['bg_color'];
 
 		if ($last_value !== null) {
-			foreach ($thresholds as $threshold) {
-				if ($threshold['threshold_value'] > $last_value) {
+			$number_parser = new CNumberParser([
+				'with_size_suffix' => true,
+				'with_time_suffix' => true,
+				'is_binary_size' => $is_binary_units
+			]);
+
+			foreach ($this->fields_values['thresholds'] as $threshold) {
+				$number_parser->parse($threshold['threshold']);
+
+				$threshold_value = $number_parser->calcValue();
+
+				if ($threshold_value > $last_value) {
 					break;
 				}
 

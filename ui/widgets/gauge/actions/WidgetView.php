@@ -269,14 +269,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 
 		foreach ($this->fields_values['thresholds'] as $threshold) {
-			if ($this->hasInput('dynamic_hostid')) {
-				$number_parser->parse($threshold['threshold']);
+			$number_parser->parse($threshold['threshold']);
 
-				$threshold_value = $number_parser->calcValue();
-			}
-			else {
-				$threshold_value = $threshold['threshold_value'];
-			}
+			$threshold_value = $number_parser->calcValue();
 
 			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold_value);
 
