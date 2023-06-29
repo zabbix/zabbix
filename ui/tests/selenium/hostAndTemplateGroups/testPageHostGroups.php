@@ -161,11 +161,11 @@ class testPageHostGroups extends testPageGroups {
 			'count' => '1',
 			'host_template' => self::DISCOVERED_HOST
 		];
-		$this->layout($data, $links);
+		$this->checkLayout($data, $links);
 	}
 
 	public function testPageHostGroups_Sort() {
-		$this->coulmnSorting();
+		$this->checkColumnSorting();
 	}
 
 	public static function getHostGroupsFilterData() {
@@ -402,7 +402,7 @@ class testPageHostGroups extends testPageGroups {
 			}
 		}
 
-		$message_title = (count($details) === 1) ? 'Host '.$status.'d' : 'Hosts '.$status.'d';
+		$message_title = 'Host'.(count($details) === 1 ? ' ' : 's ').$status.'d';
 		$this->assertMessage(TEST_GOOD, $message_title, $details);
 	}
 

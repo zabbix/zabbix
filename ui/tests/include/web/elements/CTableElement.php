@@ -108,10 +108,10 @@ class CTableElement extends CElement {
 	/**
 	 * Get sortable table headers.
 	 *
-	 * @return array
+	 * @return CElementCollection
 	 */
 	public function getSortableHeaders() {
-		return $this->getHeaders()->query('tag:a')->asText();
+		return $this->getHeaders()->query('tag:a');
 	}
 
 	/**

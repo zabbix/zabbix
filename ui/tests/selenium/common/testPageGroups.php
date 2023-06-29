@@ -82,23 +82,25 @@ class testPageGroups extends CWebTest {
 	 * @param array $data   data provider
 	 * @param array $links  related links of group to be checked
 	 */
-	public function layout($data, $links) {
+	public function checkLayout($data, $links) {
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$this->page->assertHeader(ucfirst($this->object).' groups');
 		$this->page->assertTitle('Configuration of '.$this->object.' groups');
 
 		// Check filter.
-		$filter = CFilterContainerElement::find()->one();
-		$form = $filter->getFilterForm();
+		$filter = CFilterElement::find()->one();
+		$form = $filter->getForm();
 		$this->assertEquals(['Name'], $form->getLabels()->asText());
 		$this->assertTrue($form->getField('Name')->isAttributePresent(['value' => '', 'maxlength' => '255']));
 
 		// Check displaying and hiding the filter container.
+		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
+			// Leave the page and reopen the previous page to make sure the filter state is still saved..
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 			$this->page->open($this->link)->waitUntilReady();
-			$filter->checkIfExpanded($state);
+			$this->assertTrue($filter->isExpanded($state));
 		}
 
 		// Check buttons.
@@ -118,7 +120,7 @@ class testPageGroups extends CWebTest {
 		$table = $this->getTable();
 		$headers = ($this->object === 'host') ? ['', 'Name', 'Hosts', 'Info'] : ['', 'Name', 'Templates'];
 		$this->assertEquals($headers, $table->getHeadersText());
-		$this->assertEquals(['Name'], $table->getSortableHeaders());
+		$this->assertEquals(['Name'], $table->getSortableHeaders()->asText());
 
 		// Check the displayed number of groups in the table.
 		$names = $this->getGroupNames();
@@ -184,8 +186,7 @@ class testPageGroups extends CWebTest {
 			: 'templates.php?').'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
 		);
 		$this->page->assertHeader(ucfirst($this->object).'s');
-		$filter_form = CFilterContainerElement::find()->one()->getFilterForm();
-		$filter_form->checkValue([ucfirst($this->object).' groups' => $links['name']]);
+		CFilterElement::find()->one()->getForm()->checkValue([ucfirst($this->object).' groups' => $links['name']]);
 		$this->assertTableHasData([
 			[
 				'Name' => array_key_exists('lld', $links)
@@ -239,7 +240,7 @@ class testPageGroups extends CWebTest {
 	/**
 	 * Check ascending and descending groups sorting by column Name.
 	 */
-	public function coulmnSorting() {
+	public function checkColumnSorting() {
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
 
@@ -277,6 +278,10 @@ class testPageGroups extends CWebTest {
 			]
 		];
 	}
+
+	/**
+	 * Check host or template groups filtering by name.
+	 */
 	public function filter($data) {
 		$all = $this->getGroupNames();
 		if (array_key_exists('all', $data)) {
@@ -285,7 +290,7 @@ class testPageGroups extends CWebTest {
 
 		$this->page->login()->open($this->link)->waitUntilReady();
 		$table = $this->getTable();
-		$form = CFilterContainerElement::find()->one()->getFilterForm();
+		$form = CFilterElement::find()->one()->getForm();
 		$form->fill(['Name' => $data['Name']]);
 		$form->submit();
 		$table->waitUntilReloaded();

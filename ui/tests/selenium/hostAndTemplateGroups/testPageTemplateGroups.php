@@ -111,11 +111,11 @@ class testPageTemplateGroups extends testPageGroups {
 			'count' => '1',
 			'host_template' => self::TEMPLATE1_1
 		];
-		$this->layout($data, $links);
+		$this->checkLayout($data, $links);
 	}
 
 	public function testPageTemplateGroups_Sort() {
-		$this->coulmnSorting();
+		$this->checkColumnSorting();
 	}
 
 	public static function getTemplateGroupsFilterData() {
