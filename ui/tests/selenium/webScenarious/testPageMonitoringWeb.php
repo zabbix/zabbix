@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup hosts, httptest
  *
+ * @dataSource DiscoveredHosts, EntitiesTags
+ *
  * @onBefore prepareHostWebData
  */
 class testPageMonitoringWeb extends CWebTest {
@@ -197,17 +199,22 @@ class testPageMonitoringWeb extends CWebTest {
 
 		// Check fields maximum length.
 		foreach(['filter_tags[0][tag]', 'filter_tags[0][value]'] as $field) {
-			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')->one()->getAttribute('maxlength'));
+			$this->assertEquals(255, $form->query('xpath:.//input[@name="'.$field.'"]')
+					->one()->getAttribute('maxlength'));
 		}
 
 		// Check if links to Hosts and to Web scenarios are clickable.
+		$row = $table->getRow(0);
+
 		foreach (['Host', 'Name'] as $field) {
-			$this->assertTrue($table->getRow(0)->getColumn($field)->query('xpath:.//a')->one()->isClickable());
+			$this->assertTrue($row->getColumn($field)->query('xpath:.//a')->one()->isClickable());
 		}
 
-		// Check that the correct details of the scenario are opened.
-		$first_row_name = $table->getRow(0)->getColumn('Name')->getText();
-		$table->findRow('Name', $first_row_name)->getColumn('Name')->query('tag:a')->one()->click();
+		// Check that the correct details of scenario are opened.
+		$column = $row->getColumn('Name');
+		$first_row_name = $column->getText();
+		$column->query('tag:a')->one()->click();
+
 		$this->page->waitUntilReady();
 		$this->page->assertHeader('Details of web scenario: '.$first_row_name);
 		$this->page->assertTitle('Details of web scenario');
@@ -219,68 +226,64 @@ class testPageMonitoringWeb extends CWebTest {
 	public function testPageMonitoringWeb_ResetButtonCheck() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
+		$this->page->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
 
-		$empty_form = [
-			'Host groups' => '',
-			'Hosts' => '',
-			'id:filter_tags_0_tag' => '',
-			'id:filter_tags_0_value' => ''
-		];
+		// Check table contents before filtering.
+		$start_rows_count = $table->getRows()->count();
+		$this->assertTableStats($start_rows_count);
+		$start_contents = $this->getTableColumnData('Name');
 
-		$filled_form = [
-			'Host groups' => 'WebData HostGroup',
-			'Hosts' => 'WebData Host',
-			'id:filter_tags_0_tag' => 'FirstTag',
-			'id:filter_tags_0_value' => 'value 1'
-		];
+		// Filter hosts.
+		$form->fill(['Hosts' => 'Simple form test host']);
+		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 
-		// Check reset button with/without filter submit.
-		foreach ([true, false] as $submit) {
-			$this->assertTableStats(13);
-			$form->checkValue($empty_form);
-			$form->fill($filled_form);
+		// Check that filtered count matches expected.
+		$this->assertEquals(4, $table->getRows()->count());
+		$this->assertTableStats(4);
 
-			if ($submit) {
-				$form->submit();
-				$this->page->waitUntilReady();
-				$this->assertEquals(1, $this->query('class:list-table')->asTable()->one()->getRows()->count());
-				$this->assertTableStats(1);
-			}
-
-			$form->invalidate()->checkValue($filled_form);
-			$form->query('button:Reset')->one()->click();
-			$this->page->waitUntilReady();
-			$form->invalidate()->checkValue($empty_form);
-			$this->assertTableStats(13);
-		}
+		// After pressing reset button, check that previous hosts are displayed again.
+		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
+		$reset_rows_count = $table->getRows()->count();
+		$this->assertEquals($start_rows_count, $reset_rows_count);
+		$this->assertTableStats($reset_rows_count);
+		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
 	}
 
 	/**
 	 * Function which checks Hosts context menu.
 	 */
 	public function testPageMonitoringWeb_CheckHostContextMenu() {
-		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
-
-		$titles = [
+		$popupitems = [
 			'Inventory', 'Latest data',	'Problems',	'Graphs', 'Web', 'Configuration', 'Detect operating system',
 			'Ping', 'Traceroute'
 		];
 
-		foreach (['WebData Host', 'Simple form test host'] as $name) {
-			$this->query('class:list-table')->asTable()->one()
-					->findRow('Host', $name)->query('link', $name)->one()->click();
-			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
-			$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
-			$this->assertTrue($popup->hasItems($titles));
-			$items = ($name === 'WebData Host') ? ['Graphs', 'Dashboards'] : ['Dashboards'];
+		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Graphs');
+		$this->checkHostContextMenu($popupitems, 'WebData Host', 'Dashboards');
+		$this->checkHostContextMenu($popupitems, 'Simple form test host', 'Dashboards');
+	}
 
-			// Check that items are disabled.
-			foreach ($items as $item) {
-				$this->assertFalse($popup->getItem($item)->isEnabled());
-			}
-
-			$popup->close();
-		}
+	/**
+	 * Function for checking the context menu of the selected host.
+	 *
+	 * @param array		$popupitems		items of the popup window.
+	 * @param string	$hostname		name of the host.
+	 * @param string	$disabled		disabled host elements.
+	 *
+	 */
+	private function checkHostContextMenu($popupitems, $hostname, $disabled) {
+		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=hostname&sortorder=DESC');
+		$this->query('class:list-table')->asTable()->one()->findRow('Host', $hostname)->query('link', $hostname)->one()->click();
+		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+		$this->assertEquals(['HOST', 'SCRIPTS'], $popup->getTitles()->asText());
+		$this->assertTrue($popup->hasItems($popupitems));
+		$this->assertTrue($popup->query('xpath://a[@aria-label="Host, ' .
+				$disabled . '" and @class="menu-popup-item disabled"]')->one()->isPresent()
+		);
+		$popup->close();
 	}
 
 	/**
@@ -288,7 +291,7 @@ class testPageMonitoringWeb extends CWebTest {
 	 */
 	public function testPageMonitoringWeb_CheckDisabledWebServices() {
 		$this->page->login()->open('zabbix.php?action=web.view&filter_rst=1&sort=name&sortorder=DESC')->waitUntilReady();
-		$values = $this->getTableResult('Name');
+		$values = $this->getTableColumnData('Name');
 
 		// Turn off/on web services and check table results.
 		foreach (['Disable', 'Enable'] as $status) {
@@ -677,6 +680,43 @@ class testPageMonitoringWeb extends CWebTest {
 					],
 					'expected' => []
 				]
+			],
+			// #19.
+			[
+				[
+					'filter' => [
+						'Host groups' => [
+							'WebData HostGroup',
+							'Zabbix servers'
+						],
+						'Hosts' => [
+							'Host ZBX6663',
+							'WebData Host'
+						]
+					],
+					'expected' => [
+						'Web scenario 1 step',
+						'Web scenario 2 step',
+						'Web scenario 3 step',
+						'Web ZBX6663',
+						'Web ZBX6663 Second'
+					]
+				]
+			],
+			// #20.
+			[
+				[
+					'filter' => [
+						'Host groups' => 'Zabbix servers'
+					],
+					'tag_options' => [
+						'type' => 'And/Or',
+						'tags' => [
+							['name' => 'FirstTag', 'value' => 'value 6', 'operator' => 'Contains']
+						]
+					],
+					'expected' => []
+				]
 			]
 		];
 	}
@@ -742,11 +782,11 @@ class testPageMonitoringWeb extends CWebTest {
 			if ($column_name === 'Name') {
 				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
 			}
-			$column_values = $this->getTableResult($column_name);
+			$column_values = $this->getTableColumnData($column_name);
 
 			foreach (['asc', 'desc'] as $sorting) {
 				$expected = ($sorting === 'asc') ? $column_values : array_reverse($column_values);
-				$this->assertEquals($expected, $this->getTableResult($column_name));
+				$this->assertEquals($expected, $this->getTableColumnData($column_name));
 				$table->query('xpath:.//a[text()="'.$column_name.'"]')->one()->click();
 			}
 		}
