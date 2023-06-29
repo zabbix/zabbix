@@ -48,6 +48,7 @@ window.operation_popup = new class {
 
 	_loadViews() {
 		this._customMessageFields();
+		this.#loadHostTags(this.data.optag);
 		this._removeAllFields();
 		const operation_type = document.getElementById('operation-type-select').getAttribute('value');
 		this._changeView(operation_type);
@@ -67,50 +68,49 @@ window.operation_popup = new class {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
 				this._openConditionsPopup(e.target);
 			}
-			else if (e.target.classList.contains('element-table-remove')) {
-				// Remove tag row both visually and from the data array by index that maches row index.
-				const row = e.target.closest('tr');
-
-				this.data.optag.forEach((element, index) => {
-					if (element.row_index == row.getAttribute('data-id')) {
-						this.data.optag.splice(index, 1);
-					}
-				});
-
-				row.remove();
-
-				this._processTypeOfCalculation();
-			}
 			else if (e.target.classList.contains('js-remove')) {
 				e.target.closest('tr').remove();
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('element-table-add')) {
-				// First gets maximum index of existing tag rows and then adds one more row with incremented index.
+				let row_index = 0;
 				const form_rows = tags_table.querySelectorAll('.form_row');
-				let row_index = -Infinity;
 
-				[...form_rows].forEach((row) => {
-					const id = parseInt(row.getAttribute('data-id'));
+				if (form_rows.length !== 0) {
+					const last_row = form_rows[form_rows.length - 1];
 
-					if (id > row_index) {
-						row_index = id;
-					}
-				});
-
-				row_index++;
-
-				if (row_index == -Infinity) {
-					row_index = 0;
+					row_index = parseInt(last_row.getAttribute('data-id')) + 1;
 				}
 
-				this.data.optag.push({tag: '', value:'', row_index: row_index});
-				e.target.closest('tr').insertAdjacentHTML('beforebegin', template.evaluate({
-					tag: '', value: '', row_index: row_index
-				}));
-
-				jQuery(`#operation_optag_${row_index}_tag, #operation_optag_${row_index}_value`).textareaFlexible();
+				this.#addHostTags([{tag: '', value:'', row_index: row_index}]);
 			}
+			else if (e.target.classList.contains('element-table-remove')) {
+				e.target.closest('tr').remove();
+			}
+		});
+	}
+
+	#loadHostTags(optags) {
+		if (optags.length === 0) {
+			optags.push({tag: '', value:'', row_index: 0});
+		}
+		else {
+			optags.map((optag, index) => {
+				optag.row_index = index;
+			});
+		}
+
+		this.#addHostTags(optags);
+	}
+
+	#addHostTags(optags) {
+		const tags_table = this.form.querySelector('#tags-table');
+		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
+
+		optags.forEach((optag) => {
+			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(optag));
+
+			$(`#operation_optag_${optag.row_index}_tag, #operation_optag_${optag.row_index}_value`).textareaFlexible();
 		});
 	}
 
@@ -212,39 +212,9 @@ window.operation_popup = new class {
 		);
 	}
 
-	/**
-	 * Toggles displaying of host tag fields. If there is no data, add one row of empty tag and value. Add an arbitrary
-	 * index for each tag row is it doesn't have one yet. This is then used to indentify which rows exist when changing
-	 * to and from Add and Remove host tags options. Insert rows before the "Add" button row.
-	 */
 	#hostTagsFields() {
 		this.form.querySelector('#operation-host-tags').style.display = '';
 		this._enableFormFields(['operation-host-tags']);
-
-		const tags_table = this.form.querySelector('#tags-table');
-		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
-		const form_rows = tags_table.querySelectorAll('.form_row');
-
-		if (this.data.optag.length == 0 && form_rows.length == 0) {
-			this.data.optag = [];
-			this.data.optag.push({tag: '', value:'', row_index: 0});
-		}
-		else {
-			this.data.optag.map((row, index) => {
-				if (row.row_index === undefined) {
-					row.row_index = index;
-				}
-			});
-		}
-
-		this.data.optag.forEach((row) => {
-			if (![...form_rows].some((form_row) => row.row_index == form_row.getAttribute('data-id'))) {
-				tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(row));
-
-				jQuery(`#operation_optag_${row.row_index}_tag, #operation_optag_${row.row_index}_value`)
-					.textareaFlexible();
-			}
-		});
 	}
 
 	_templateFields() {
