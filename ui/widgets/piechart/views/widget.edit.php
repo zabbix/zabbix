@@ -61,30 +61,30 @@ $form
 	->show();
 
 function getDatasetTab(CWidgetFormView $form, array $fields): array {
-	$dataset = $form->registerField(new CWidgetFieldDataSetView($fields['ds']));
+	$dataset_field = $form->registerField(new CWidgetFieldDataSetView($fields['ds']));
 
 	return [
-		(new CDiv($dataset->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
-		(new CDiv($dataset->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
+		(new CDiv($dataset_field->getView()))->addClass(ZBX_STYLE_LIST_VERTICAL_ACCORDION),
+		(new CDiv($dataset_field->getFooterView()))->addClass(ZBX_STYLE_LIST_ACCORDION_FOOT)
 	];
 }
 
 function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
-	$source = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
-	$draw_type = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw_type']));
-	$width = $form->registerField(new CWidgetFieldRangeControlView($fields['width']));
-	$stroke = $form->registerField(new CWidgetFieldRangeControlView($fields['stroke']));
-	$space = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
-	$merge = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
-	$merge_percent = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
-	$merge_color = $form->registerField(new CWidgetFieldColorView($fields['merge_color']));
-	$total_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['total_show']));
-	$value_size = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
-	$decimal_places = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_places']));
-	$value_bold = $form->registerField(new CWidgetFieldCheckBoxView($fields['value_bold']));
-	$value_color = $form->registerField(new CWidgetFieldColorView($fields['value_color']));
-	$units_show = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
-	$units = $form->registerField(new CWidgetFieldTextBoxView($fields['units']));
+	$source_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
+	$draw_type_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['draw_type']));
+	$width_field = $form->registerField(new CWidgetFieldRangeControlView($fields['width']));
+	$stroke_field = $form->registerField(new CWidgetFieldRangeControlView($fields['stroke']));
+	$space_field = $form->registerField(new CWidgetFieldRangeControlView($fields['space']));
+	$merge_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['merge']));
+	$merge_percent_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['merge_percent']));
+	$merge_color_field = $form->registerField(new CWidgetFieldColorView($fields['merge_color']));
+	$total_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['total_show']));
+	$value_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['value_size']));
+	$decimal_places_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['decimal_places']));
+	$units_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['units_show']));
+	$units_field = $form->registerField(new CWidgetFieldTextBoxView($fields['units']));
+	$value_bold_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['value_bold']));
+	$value_color_field = $form->registerField(new CWidgetFieldColorView($fields['value_color']));
 
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
@@ -92,32 +92,32 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 		->addItem(
 			(new CFormGrid())
 				->addItem([
-					$source->getLabel(),
-					new CFormField($source->getView())
+					$source_field->getLabel(),
+					new CFormField($source_field->getView())
 				])
 				->addItem([
-					$draw_type->getLabel(),
-					new CFormField($draw_type->getView())
+					$draw_type_field->getLabel(),
+					new CFormField($draw_type_field->getView())
 				])
 				->addItem([
-					$width->getLabel()->setId('width_label'),
-					(new CFormField([$width->getView(), ' %']))->setId('width_range')
+					$width_field->getLabel()->setId('width_label'),
+					(new CFormField([$width_field->getView(), ' %']))->setId('width_range')
 				])
 				->addItem([
-					$stroke->getLabel(),
-					new CFormField($stroke->getView())
+					$stroke_field->getLabel(),
+					new CFormField($stroke_field->getView())
 				])
 				->addItem([
-					$space->getLabel(),
-					new CFormField($space->getView())
+					$space_field->getLabel(),
+					new CFormField($space_field->getView())
 				])
 				->addItem([
-					$merge->getLabel(),
+					$merge_field->getLabel(),
 					(new CFormField([
-						$merge->getView(),
-						($merge_percent->getView())->setWidth(ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH),
+						$merge_field->getView(),
+						($merge_percent_field->getView())->setWidth(ZBX_TEXTAREA_NUMERIC_SMALL_WIDTH),
 						' % ',
-						$merge_color->getView()
+						$merge_color_field->getView()
 					]))
 				])
 
@@ -125,40 +125,40 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 		->addItem(
 			(new CFormGrid())
 				->addItem([
-					$total_show->getLabel(),
-					new CFormField($total_show->getView())
+					$total_show_field->getLabel(),
+					new CFormField($total_show_field->getView())
 				])
 				->addItem([
-					$value_size->getLabel(),
-					(new CFormField([$value_size->getView(), ' %']))
+					$value_size_field->getLabel(),
+					(new CFormField([$value_size_field->getView(), ' %']))
 				])
 				->addItem([
-					$decimal_places->getLabel(),
-					new CFormField($decimal_places->getView())
+					$decimal_places_field->getLabel(),
+					new CFormField($decimal_places_field->getView())
 				])
 				->addItem([
-					$units_show->getView(),
-					(new CFormField(($units->getView())->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)))
+					$units_show_field->getView(),
+					(new CFormField(($units_field->getView())->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)))
 				])
 				->addItem([
-					$value_bold->getLabel(),
-					new CFormField($value_bold->getView())
+					$value_bold_field->getLabel(),
+					new CFormField($value_bold_field->getView())
 				])
 				->addItem([
-					$value_color->getLabel(),
-					new CFormField($value_color->getView())
+					$value_color_field->getLabel(),
+					new CFormField($value_color_field->getView())
 				])->setId('show_total_fields')
 		);
 }
 
 function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$graph_time = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
-	$time_from = $form->registerField(
+	$set_time_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['graph_time']));
+	$time_from_field = $form->registerField(
 		(new CWidgetFieldDatePickerView($fields['time_from']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
 	);
-	$time_to = $form->registerField(
+	$time_to_field = $form->registerField(
 		(new CWidgetFieldDatePickerView($fields['time_to']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
 			->setPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
@@ -166,35 +166,35 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 
 	return (new CFormGrid())
 		->addItem([
-			$graph_time->getLabel(),
-			new CFormField($graph_time->getView())
+			$set_time_field->getLabel(),
+			new CFormField($set_time_field->getView())
 		])
 		->addItem([
-			$time_from->getLabel(),
-			new CFormField($time_from->getView())
+			$time_from_field->getLabel(),
+			new CFormField($time_from_field->getView())
 		])
 		->addItem([
-			$time_to->getLabel(),
-			new CFormField($time_to->getView())
+			$time_to_field->getLabel(),
+			new CFormField($time_to_field->getView())
 		]);
 }
 
 function getLegendTab(CWidgetFormView $form, array $fields): CFormGrid {
-	$legend = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
-	$legend_lines = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
-	$legend_columns = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
+	$show_legend_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
+	$legend_lines_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
+	$legend_columns_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
 	return (new CFormGrid())
 		->addItem([
-			$legend->getLabel(),
-			new CFormField($legend->getView())
+			$show_legend_field->getLabel(),
+			new CFormField($show_legend_field->getView())
 		])
 		->addItem([
-			$legend_lines->getLabel(),
-			new CFormField($legend_lines->getView())
+			$legend_lines_field->getLabel(),
+			new CFormField($legend_lines_field->getView())
 		])
 		->addItem([
-			$legend_columns->getLabel(),
-			new CFormField($legend_columns->getView())
+			$legend_columns_field->getLabel(),
+			new CFormField($legend_columns_field->getView())
 		]);
 }

@@ -50,7 +50,6 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
-		// Test custom time period.
 		if ($this->getFieldValue('graph_time') == PIE_CHART_CUSTOM_TIME_ON) {
 			$errors = array_merge($errors, self::validateTimeSelectorPeriod($this->getFieldValue('time_from'),
 				$this->getFieldValue('time_to')

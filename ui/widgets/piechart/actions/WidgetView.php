@@ -109,8 +109,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'vars' => []
 		];
 
-		$data['vars']['config'] = $this->getConfig();
-
 		$metrics = $this->getData($pie_chart_options);
 
 		if ($metrics['errors']) {
@@ -118,8 +116,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		$data['vars']['sectors'] = $metrics['sectors'];
-		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
 		$data['vars']['total_value'] = $metrics['total_value'];
+		$data['vars']['config'] = $this->getConfig();
+		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
