@@ -61,9 +61,6 @@ window.operation_popup = new class {
 			this._processTypeOfCalculation();
 		}
 
-		const tags_table = this.form.querySelector('#tags-table');
-		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
-
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('operation-condition-list-footer')) {
 				this._openConditionsPopup(e.target);
@@ -73,8 +70,9 @@ window.operation_popup = new class {
 				this._processTypeOfCalculation();
 			}
 			else if (e.target.classList.contains('element-table-add')) {
+				const tags_table = this.form.querySelector('#tags-table');
+				const form_rows = tags_table.querySelectorAll('.form_row')
 				let row_index = 0;
-				const form_rows = tags_table.querySelectorAll('.form_row');
 
 				if (form_rows.length !== 0) {
 					const last_row = form_rows[form_rows.length - 1];
@@ -90,6 +88,11 @@ window.operation_popup = new class {
 		});
 	}
 
+	/**
+	 * Adds empty row if no host tags are initially present and adds a row index for each host tag.
+	 *
+	 * @param {array} optags  Operation host tags.
+	 */
 	#loadHostTags(optags) {
 		if (optags.length === 0) {
 			optags.push({tag: '', value:'', row_index: 0});
@@ -103,6 +106,11 @@ window.operation_popup = new class {
 		this.#addHostTags(optags);
 	}
 
+	/**
+	 * Adds rows for "Add host tags" and "Remove host tags" options based on row template.
+	 *
+	 * @param {array} optags  Operation host tags.
+	 */
 	#addHostTags(optags) {
 		const tags_table = this.form.querySelector('#tags-table');
 		const template = new Template(this.form.querySelector('#operation-host-tags-row-tmpl').innerHTML);
@@ -212,6 +220,9 @@ window.operation_popup = new class {
 		);
 	}
 
+	/**
+	 * Shows or hides the host tags fields.
+	 */
 	#hostTagsFields() {
 		this.form.querySelector('#operation-host-tags').style.display = '';
 		this._enableFormFields(['operation-host-tags']);

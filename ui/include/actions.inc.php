@@ -640,7 +640,7 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 
 					foreach ($operation['optag'] as $tag) {
-						$value = getTagString($tag, TAG_NAME_FULL);
+						$value = getTagString($tag);
 
 						if ($value !== '') {
 							$tags[] = (new CSpan($value))

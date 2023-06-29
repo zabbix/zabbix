@@ -1486,16 +1486,18 @@ class CAction extends CApiService {
 						: [];
 
 					foreach ($operation['optag'] as &$optag) {
+						if (!array_key_exists('value', $optag)) {
+							$optag['value'] = '';
+						}
+
 						$tag_exists = false;
 
-						if ($db_optags) {
-							foreach ($db_optags as $idx => $db_optag) {
-								if ($optag['tag'] === $db_optag['tag'] && $optag['value'] === $db_optag['value']) {
-									$optag['optagid'] = $db_optag['optagid'];
-									unset($db_optags[$idx]);
-									$tag_exists = true;
-									break;
-								}
+						foreach ($db_optags as $idx => $db_optag) {
+							if ($optag['tag'] === $db_optag['tag'] && $optag['value'] === $db_optag['value']) {
+								$optag['optagid'] = $db_optag['optagid'];
+								unset($db_optags[$idx]);
+								$tag_exists = true;
+								break;
 							}
 						}
 
@@ -2518,7 +2520,7 @@ class CAction extends CApiService {
 		];
 
 		$operations = getAllowedOperations($eventsource)[$recovery];
-		asort($operations);
+		sort($operations);
 
 		$operationtype_field = [
 			'operationtype' => ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $operations)]
