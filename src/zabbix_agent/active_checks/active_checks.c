@@ -978,7 +978,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
  ******************************************************************************/
-static int	check_response(char *response)
+static int	check_response(const char *response)
 {
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN];
@@ -1743,8 +1743,8 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates active check and sends buffer schedule by the specified   *
- *          time delta                                                        *
+ * Purpose: updates schedules of active checks and buffer by specified time   *
+ *          delta                                                             *
  *                                                                            *
  * Parameters: delta - [IN] time delta in seconds                             *
  *                                                                            *
