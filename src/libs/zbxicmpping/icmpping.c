@@ -25,7 +25,6 @@
 #include "zbxexec.h"
 #include "zbxstr.h"
 #include "zbxip.h"
-#include "zbxthreads.h"
 #include "zbxfile.h"
 
 static const zbx_config_icmpping_t	*config_icmpping;
