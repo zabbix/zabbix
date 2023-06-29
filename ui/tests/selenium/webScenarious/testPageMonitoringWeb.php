@@ -417,6 +417,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Template web scenario with tags for full cloning',
 						'testFormWeb1',
 						'testFormWeb2',
 						'testFormWeb3',
@@ -427,6 +428,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb4',
 						'Web scenario 1 step',
 						'Web scenario 2 step',
+						'Web scenario for removing tags',
+						'Web scenario with tags for cloning',
+						'Web scenario with tags for updating',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
@@ -442,6 +446,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Template web scenario with tags for full cloning',
 						'testFormWeb1',
 						'testFormWeb2',
 						'testFormWeb3',
@@ -452,6 +457,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb4',
 						'Web scenario 1 step',
 						'Web scenario 2 step',
+						'Web scenario for removing tags',
+						'Web scenario with tags for cloning',
+						'Web scenario with tags for updating',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
@@ -468,6 +476,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Template web scenario with tags for full cloning',
 						'testFormWeb1',
 						'testFormWeb2',
 						'testFormWeb3',
@@ -478,6 +487,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb4',
 						'Web scenario 1 step',
 						'Web scenario 2 step',
+						'Web scenario for removing tags',
+						'Web scenario with tags for cloning',
+						'Web scenario with tags for updating',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
@@ -494,6 +506,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Template web scenario with tags for full cloning',
 						'testFormWeb1',
 						'testFormWeb2',
 						'testFormWeb3',
@@ -504,6 +517,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb4',
 						'Web scenario 1 step',
 						'Web scenario 2 step',
+						'Web scenario for removing tags',
+						'Web scenario with tags for cloning',
+						'Web scenario with tags for updating',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
@@ -519,6 +535,7 @@ class testPageMonitoringWeb extends CWebTest {
 						]
 					],
 					'expected' => [
+						'Template web scenario with tags for full cloning',
 						'testFormWeb1',
 						'testFormWeb2',
 						'testFormWeb3',
@@ -529,6 +546,9 @@ class testPageMonitoringWeb extends CWebTest {
 						'testInheritanceWeb4',
 						'Web scenario 2 step',
 						'Web scenario 3 step',
+						'Web scenario for removing tags',
+						'Web scenario with tags for cloning',
+						'Web scenario with tags for updating',
 						'Web ZBX6663',
 						'Web ZBX6663 Second'
 					]
