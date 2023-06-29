@@ -596,7 +596,13 @@
 			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 
 				if (type === 'variables') {
+					var td_element = document.createElement('td');
+
+					td_element.style.paddingLeft = "5px";
+
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
+					e.new_node.prepend(td_element);
 				}
 
 				if (type === 'variables' || type === 'headers') {
@@ -906,7 +912,13 @@
 
 			if (type === 'variables') {
 				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+					var td_element = document.createElement('td');
+
+					td_element.style.paddingLeft = "5px";
+
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
+					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
+					e.new_node.prepend(td_element);
 				});
 			}
 
