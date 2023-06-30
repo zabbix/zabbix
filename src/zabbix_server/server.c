@@ -2040,6 +2040,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
+			config_history_index_cache_size, &config_trends_cache_size, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	zbx_db_check_character_set();
 	zbx_check_db();
 	zbx_db_save_server_status();
