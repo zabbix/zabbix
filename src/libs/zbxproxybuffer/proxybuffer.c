@@ -176,17 +176,18 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if proxy history table has unsent data                      *
+ * Purpose: check if proxy history table has unsent data and update lastid    *
+ *          if necessary                                                      *
  *                                                                            *
  * Return value: SUCCEED - table has unsent data                              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	pb_has_history(const char *table, const char *field)
+static int	pb_check_unsent_rows(const char *table, const char *field)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid, maxid;
 	int		ret;
 	char		sql[MAX_STRING_LEN];
 
@@ -206,9 +207,28 @@ static int	pb_has_history(const char *table, const char *field)
 	result = zbx_db_select_n(sql, 1);
 
 	if (NULL != (row = zbx_db_fetch(result)))
+	{
 		ret = SUCCEED;
+	}
 	else
+	{
 		ret = FAIL;
+
+		if (0 != lastid)
+		{
+			zbx_db_free_result(result);
+
+			result = zbx_db_select("select max(id) from %s", table);
+
+			if (NULL != (row = zbx_db_fetch(result)))
+				ZBX_DBROW2UINT64(maxid, row[0]);
+			else
+				maxid = 0;
+
+			if (lastid > maxid)
+				pb_set_lastid(table, field, maxid);
+		}
+	}
 
 	zbx_db_free_result(result);
 
@@ -259,20 +279,26 @@ void	pb_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
  ******************************************************************************/
 static void	pb_init_state(zbx_pb_t *pb)
 {
+	int	history_ret, discovery_ret, autoreg_ret;
+
 	if (ZBX_PB_MODE_MEMORY == pb->mode)
 	{
-		pb_set_state(pb, PB_MEMORY, "proxy buffer set to work in memory mode");
+		pb_set_state(pb, PB_MEMORY, "proxy buffer initialized in memory mode");
 		return;
 	}
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	if (SUCCEED == pb_has_history("proxy_history", "history_lastid") ||
-			SUCCEED == pb_has_history("proxy_dhistory", "dhistory_lastid") ||
-			SUCCEED == pb_has_history("proxy_autoreg_host", "autoreg_host_lastid"))
-	{
+	history_ret = pb_check_unsent_rows("proxy_history", "history_lastid");
+	discovery_ret = pb_check_unsent_rows("proxy_dhistory", "dhistory_lastid");
+	autoreg_ret = pb_check_unsent_rows("proxy_autoreg_host", "autoreg_host_lastid");
+
+	zbx_db_close();
+
+	if (ZBX_PB_MODE_DISK == pb->mode)
+		pb_set_state(pb, PB_DATABASE, "proxy buffer initialized in disk mode");
+	else if (SUCCEED == history_ret || SUCCEED == discovery_ret || SUCCEED == autoreg_ret)
 		pb_set_state(pb, PB_DATABASE, "unsent database records found");
-	}
 	else
 		pb_set_state(pb, PB_MEMORY, "no unsent database records found");
 
@@ -393,24 +419,31 @@ try_again:
 
 void	pb_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid)
 {
-	zbx_db_result_t	result;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s.%s:" ZBX_FS_UI64 "]", __func__, table_name, lastidfield, lastid);
 
-	result = zbx_db_select("select 1 from ids where table_name='%s' and field_name='%s'",
-			table_name, lastidfield);
-
-	if (NULL == zbx_db_fetch(result))
+	if (0 == lastid)
 	{
-		zbx_db_execute("insert into ids (table_name,field_name,nextid) values ('%s','%s'," ZBX_FS_UI64 ")",
-				table_name, lastidfield, lastid);
+		zbx_db_execute("delete from ids where table_name='%s' and field_name='%s'", table_name, lastidfield);
 	}
 	else
 	{
-		zbx_db_execute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
-				lastid, table_name, lastidfield);
+		zbx_db_result_t	result;
+
+		result = zbx_db_select("select 1 from ids where table_name='%s' and field_name='%s'",
+				table_name, lastidfield);
+
+		if (NULL == zbx_db_fetch(result))
+		{
+			zbx_db_execute("insert into ids (table_name,field_name,nextid) values ('%s','%s'," ZBX_FS_UI64
+					")", table_name, lastidfield, lastid);
+		}
+		else
+		{
+			zbx_db_execute("update ids set nextid=" ZBX_FS_UI64 " where table_name='%s' and field_name='%s'",
+					lastid, table_name, lastidfield);
+		}
+		zbx_db_free_result(result);
 	}
-	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -462,7 +495,7 @@ void	pd_fallback_to_database(zbx_pb_t *pb, const char *message)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update proxy data cache state after successful upload based on    *
+ * Purpose: update proxy buffer state after successful upload based on        *
  *          records left and handles pending                                  *
  *                                                                            *
  ******************************************************************************/
@@ -508,7 +541,7 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize proxy data cache                                       *
+ * Purpose: initialize proxy  buffer                                          *
  *                                                                            *
  * Return value: size  - [IN] the cache size in bytes                         *
  *               age   - [IN] the maximum allowed data age                    *
@@ -522,26 +555,23 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 {
 	int	ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() mode:%d", __func__, mode);
 
 	if (ZBX_PB_MODE_DISK == mode)
 	{
 		pb_data = (zbx_pb_t *)zbx_malloc(NULL, sizeof(zbx_pb_t));
 		memset(pb_data, 0, sizeof(zbx_pb_t));
-
 		pb_data->mutex = ZBX_MUTEX_NULL;
-		pb_data->mode = mode;
-		pb_set_state(pb_data, PB_DATABASE, "proxy buffer set to work in disk mode");
 
+		pb_init_state(pb_data);
 		ret = SUCCEED;
-
 		goto out;
 	}
 
 	if (SUCCEED != zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", 1, error))
 		goto out;
 
-	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
+	pb_data = (zbx_pb_t *)__pb_shmem_malloc_func(NULL, sizeof(zbx_pb_t));
 	memset(pb_data, 0, sizeof(zbx_pb_t));
 
 	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
@@ -585,7 +615,7 @@ int	zbx_pb_parse_mode(const char *str, int *mode)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update proxy data cache state based on records left and handles   *
+ * Purpose: update proxy buffer state based on records left and handles       *
  *          pending                                                           *
  *                                                                            *
  ******************************************************************************/
@@ -620,14 +650,14 @@ void	zbx_pb_flush(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get proxy data cache memory information                           *
+ * Purpose: get proxy buffer memory information                               *
  *                                                                            *
  ******************************************************************************/
 int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
 {
 	if (ZBX_MUTEX_NULL == pb_data->mutex)
 	{
-		*error = zbx_strdup(NULL, "Proxy data cache is disabled.");
+		*error = zbx_strdup(NULL, "Proxy memory buffer is disabled.");
 		return FAIL;
 	}
 
@@ -643,7 +673,7 @@ int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get proxy data cache state information                            *
+ * Purpose: get proxy buffer state information                                *
  *                                                                            *
  ******************************************************************************/
 void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)

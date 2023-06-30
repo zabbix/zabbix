@@ -145,7 +145,7 @@ void	pb_discovery_flush(zbx_pb_t *pb)
  *                                                                            *
  * Purpose: add discovery row to memory cache                                 *
  *                                                                            *
- * Parameters: pb  - [IN] proxy data cache                                    *
+ * Parameters: pb  - [IN] proxy buffer                                        *
  *             src - [IN] row to add                                          *
  *                                                                            *
  * Return value: SUCCEED - the row was cached successfully                    *
@@ -217,7 +217,7 @@ static void	pb_discovery_set_row_ids(zbx_list_t *rows, int rows_num)
  *                                                                            *
  * Purpose: add discovery rows to memory cache                                *
  *                                                                            *
- * Parameters: pb   - [IN] proxy data cache                                   *
+ * Parameters: pb   - [IN] proxy buffer                                       *
  *             rows - [IN] rows to add                                        *
  *                                                                            *
  * Return value: NULL if all rows were added successfully. Otherwise the list *

@@ -442,7 +442,7 @@ static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
  *                                                                            *
  * Purpose: add history row to memory cache                                   *
  *                                                                            *
- * Parameters: pb  - [IN] proxy data cache                                    *
+ * Parameters: pb  - [IN] proxy buffer                                        *
  *             src - [IN] row to add                                          *
  *                                                                            *
  * Return value: SUCCEED - the row was cached successfully                    *
@@ -509,7 +509,7 @@ static void	pb_history_set_row_ids(zbx_list_t *rows, int rows_num)
  *                                                                            *
  * Purpose: add history rows to memory cache                                  *
  *                                                                            *
- * Parameters: pb   - [IN] proxy data cache                                   *
+ * Parameters: pb   - [IN] proxy buffer                                       *
  *             rows - [IN] rows to add                                        *
  *                                                                            *
  * Return value: NULL if all rows were added successfully. Otherwise the list *
