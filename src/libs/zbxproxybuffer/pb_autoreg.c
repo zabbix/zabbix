@@ -229,7 +229,7 @@ static int	pb_autoreg_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 		{
 			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num >= ZBX_MAX_HRECORDS_TOTAL)
 			{
-				*more = ZBX_PROXY_DATA_DONE;
+				*more = ZBX_PROXY_DATA_MORE;
 				break;
 			}
 
