@@ -289,13 +289,12 @@ static int	DBpatch_6050015(void)
 		}
 		zbx_free(error);
 
-		token_num = 0;
 		zbx_vector_fun_stack_clear(&fun_stack);
 		zbx_vector_ptr_clear(&hist_param_tokens);
 		substitute = zbx_strdup(NULL, ctx.expression);
 
 		/* finding string parameters of history functions */
-		for (int token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
+		for (token_num = ctx.stack.values_num - 1; token_num >= 0; token_num--)
 		{
 			token = &ctx.stack.values[token_num];
 
