@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-26T05:15:38Z'
+  date: '2023-06-30T11:39:21Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -173,7 +173,7 @@ zabbix_export:
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
             The necessary scopes are pre-defined.
-            Returns a signed authorization token with 1 hour lifetime; is required only once, and is used for all the dependent script items.
+            Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.
             Check the template documentation for the details.
             
           timeout: '{$GCP.DATA.TIMEOUT}'
@@ -1636,7 +1636,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -2476,7 +2476,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MSSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -3331,7 +3331,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of active workers associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of active workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.
                 
               preprocessing:
@@ -3353,7 +3353,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of current tasks associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of present tasks associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).
                 
               preprocessing:
@@ -3375,7 +3375,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of workers associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 It includes workers that are not assigned any task.
                 
               preprocessing:
@@ -3397,7 +3397,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of pending I/Os waiting to be completed that are associated with the scheduler with ID [{#SCHEDULER.ID}]. 
+                Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}]. 
                 Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. 
                 The count is incremented when the request is inserted. 
                 This count is decremented when the request is completed. 
@@ -3422,7 +3422,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Data in raw format associated with the scheduler with ID [{#SCHEDULER.ID}].'
+              description: 'Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3441,7 +3441,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'Current number of workers that are associated with the scheduler with ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
+              description: 'Current number of workers that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3461,7 +3461,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of tasks in the pending queue associated with the scheduler with ID [{#SCHEDULER.ID}].
+                Current number of tasks in the pending queue associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
                 These tasks are waiting for a worker to pick them up.
                 
               preprocessing:
@@ -3717,7 +3717,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MSSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MSSQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4021,7 +4021,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL by HTTP'
       description: |
         Get GCP Cloud SQL MySQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -4601,7 +4601,7 @@ zabbix_export:
               name: 'GCP Cloud SQL MySQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -5126,7 +5126,7 @@ zabbix_export:
       name: 'GCP Cloud SQL MySQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL MySQL monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -5581,7 +5581,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL instances monitoring with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -6028,7 +6028,7 @@ zabbix_export:
               name: 'GCP Cloud SQL PostgreSQL: High memory utilization'
               opdata: 'Current utilization: {ITEM.LASTVALUE}'
               priority: HIGH
-              description: 'The RAM utilization is too high. The system might be slow to respond.'
+              description: 'RAM utilization is too high. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
@@ -7101,7 +7101,7 @@ zabbix_export:
       name: 'GCP Cloud SQL PostgreSQL Replica by HTTP'
       description: |
         Get GCP Cloud SQL PostgreSQL  monitoring for read-only replicas with script item usage to perform HTTP requests to Google Cloud Platform Monitoring API.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7495,7 +7495,7 @@ zabbix_export:
       name: 'GCP Compute Engine Instance by HTTP'
       description: |
         Discover GCP Compute Engine instances by HTTP with script item usage.
-        This template will be automatically connected to discovered entities with all required parameters pre-defined.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
         
@@ -7729,7 +7729,7 @@ zabbix_export:
                 arr.push(data);
             }
             return JSON.stringify(arr);
-          description: 'Disk entities and metrics related to particular instance.'
+          description: 'Disk entities and metrics related to a particular instance.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:

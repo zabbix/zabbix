@@ -49,14 +49,14 @@ This template has been tested on:
 
      Secret authorization token is defined as a plain text in host prototype settings by default due to Zabbix templates export/import limits: therefore, it is highly recommended to change the user macro `{$GCP.AUTH.TOKEN}` value type to `SECRET` for all host prototypes after the template `GCP by HTTP` import.
 
-     All the instances/quotas/metrics discovered are related to particular GCP project. 
+     All the instances/quotas/metrics discovered are related to a particular GCP project. 
      To monitor several GCP projects - create their corresponding service accounts/Zabbix hosts.
 
      GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
 
      To avoid a GCP token inconsistency between Zabbix database and Zabbix server configuration cache, don't set Zabbix server configuration parameter CacheUpdateFrequency to a value over 45 minutes and don't set the update interval for the GCP Authorization item to more than 1 hour (maximum CacheUpdateFrequency value).
 
-Additional information about metrics and used API methods.
+Additional information about metrics and used API methods:
 
   [Compute Engine](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute)
   
@@ -104,7 +104,7 @@ Additional information about metrics and used API methods.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
+|GCP: Authorization|<p>Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.</p><p>The necessary scopes are pre-defined.</p><p>Returns a signed authorization token with 1 hour lifetime; it is required only once, and is used for all the dependent script items.</p><p>Check the template documentation for the details.</p>|Script|gcp.authorization|
 |GCP Compute Engine: Instances get|<p>Get GCP Compute Engine instances.</p>|Dependent item|gcp.gce.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP: Authorization errors check|<p>A list of errors from API requests.</p>|Dependent item|gcp.auth.err.check<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li></ul>|
 |GCP Cloud SQL: Instances get|<p>GCP Cloud SQL: Instances get.</p>|Dependent item|gcp.cloudsql.instances.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
@@ -192,7 +192,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -243,7 +243,7 @@ This template will be automatically connected to discovered entities with all re
 |GCP Compute Engine: Integrity: Late boot validation status|<p>The validation status of late boot integrity policy. </p><p>Empty value if integrity monitoring isn't enabled.</p>|Dependent item|gcp.gce.integrity.late_boot_validation_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.late_boot_validation_status`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |GCP Compute Engine: Instance uptime|<p>Elapsed time since the VM was started, in seconds.</p>|Dependent item|gcp.gce.instance.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime_total`</p></li></ul>|
 |GCP Compute Engine: Instance state|<p>GCP Compute Engine instance state.</p>|HTTP agent|gcp.gce.instance.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set value to: `10`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
-|GCP Compute Engine: Disks get|<p>Disk entities and metrics related to particular instance.</p>|Script|gcp.gce.disks.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|GCP Compute Engine: Disks get|<p>Disk entities and metrics related to a particular instance.</p>|Script|gcp.gce.disks.get<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### Triggers
 
@@ -294,7 +294,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -350,7 +350,7 @@ This template will be automatically connected to discovered entities with all re
 |GCP Cloud SQL MySQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.cpu.utilization,5m) >= {$CLOUD_SQL.MYSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL MySQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MySQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MySQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.disk.utilization) >= {$CLOUD_SQL.MYSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL MySQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL MySQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.memory.utilization,5m) >= {$CLOUD_SQL.MYSQL.RAM.UTIL.MAX}`|High||
 |GCP Cloud SQL MySQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MySQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 2`|Info||
 |GCP Cloud SQL MySQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MySQL by HTTP/gcp.cloudsql.mysql.inst.state) = 4`|Info||
@@ -381,7 +381,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -425,7 +425,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -479,7 +479,7 @@ This template will be automatically connected to discovered entities with all re
 |GCP Cloud SQL PostgreSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.cpu.utilization,5m) >= {$CLOUD_SQL.PGSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL PostgreSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL PostgreSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL PostgreSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.disk.utilization) >= {$CLOUD_SQL.PGSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL PostgreSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL PostgreSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.memory.utilization,5m) >= {$CLOUD_SQL.PGSQL.RAM.UTIL.MAX}`|High||
 |GCP Cloud SQL PostgreSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 1`|Warning||
 |GCP Cloud SQL PostgreSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 2`|Info||
 |GCP Cloud SQL PostgreSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL PostgreSQL by HTTP/gcp.cloudsql.pgsql.inst.state) = 4`|Info||
@@ -534,7 +534,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -580,7 +580,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
@@ -653,7 +653,7 @@ This template will be automatically connected to discovered entities with all re
 |GCP Cloud SQL MSSQL: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.cpu.utilization,5m) >= {$CLOUD_SQL.MSSQL.CPU.UTIL.MAX}`|Average||
 |GCP Cloud SQL MSSQL: Disk space is low|<p>High utilization of the storage space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.WARN}`|Warning|**Depends on**:<br><ul><li>GCP Cloud SQL MSSQL: Disk space is critically low</li></ul>|
 |GCP Cloud SQL MSSQL: Disk space is critically low|<p>Critical utilization of the disk space.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.disk.utilization) >= {$CLOUD_SQL.MSSQL.DISK.UTIL.CRIT}`|Average||
-|GCP Cloud SQL MSSQL: High memory utilization|<p>The RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
+|GCP Cloud SQL MSSQL: High memory utilization|<p>RAM utilization is too high. The system might be slow to respond.</p>|`min(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.memory.utilization,5m) >= {$CLOUD_SQL.MSSQL.RAM.UTIL.MAX}`|High||
 |GCP Cloud SQL MSSQL: Instance is in suspended state|<p>The instance is in suspended state. It is not available, for example, due to problems with billing. </p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 1`|Warning||
 |GCP Cloud SQL MSSQL: Instance is stopped by the owner|<p>The instance has been stopped by the owner. It is not currently running, but it's ready to be restarted.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 2`|Info||
 |GCP Cloud SQL MSSQL: Instance is in maintenance|<p>The instance is down for maintenance.</p>|`last(/GCP Cloud SQL MSSQL by HTTP/gcp.cloudsql.mssql.inst.state) = 4`|Info||
@@ -701,13 +701,13 @@ This template will be automatically connected to discovered entities with all re
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with the scheduler with ID [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of active workers associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of current tasks associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os waiting to be completed that are associated with the scheduler with ID [{#SCHEDULER.ID}]. </p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers that are associated with the scheduler with ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
-|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with the scheduler with ID [{#SCHEDULER.ID}].</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Raw data|<p>Data in raw format associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p>|Dependent item|gcp.cloudsql.mssql.scheduler.raw[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.scheduler == "{#SCHEDULER.ID}")].metrics.first()`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Active workers|<p>Current number of active workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>An active worker is never preemptive, must have an associated task, and is either running, runnable, or suspended.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.active_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current tasks|<p>Current number of present tasks associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>This count includes tasks that are waiting for a worker to execute them and tasks that are currently waiting or running (in SUSPENDED or RUNNABLE state).</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Current workers|<p>Current number of workers associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>It includes workers that are not assigned any task.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.current_workers[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.current_workers`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Pending I/O operations|<p>Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}]. </p><p>Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. </p><p>The count is incremented when the request is inserted. </p><p>This count is decremented when the request is completed. </p><p>This number does not indicate the state of the I/Os.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.pending_disk_io[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.pending_disk_io`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Runnable tasks|<p>Current number of workers that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}] and have assigned tasks waiting to be scheduled on the runnable queue.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.runnable_tasks[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.runnable_tasks`</p></li></ul>|
+|GCP Cloud SQL MSSQL: Scheduler [{#SCHEDULER.ID}]: Work queue|<p>Current number of tasks in the pending queue associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].</p><p>These tasks are waiting for a worker to pick them up.</p>|Dependent item|gcp.cloudsql.mssql.scheduler.work_queue[{#SCHEDULER.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.work_queue`</p></li></ul>|
 
 # GCP Cloud SQL MSSQL Replica by HTTP
 
@@ -731,7 +731,7 @@ This template has been tested on:
 
 ## Setup
 
-This template will be automatically connected to discovered entities with all required parameters pre-defined.
+This template will be automatically connected to discovered entities with all their required parameters pre-defined.
 
 ### Macros used
 
