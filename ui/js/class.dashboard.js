@@ -1836,8 +1836,8 @@ class CDashboard {
 
 		this._selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 
-		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);//TODO???
-		// this._updateNavigationButtons(dashboard_page);//TODO???
+		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);
+		// this._updateNavigationButtons(dashboard_page);
 	}
 
 	_updateNavigationButtons(dashboard_page = null) {
