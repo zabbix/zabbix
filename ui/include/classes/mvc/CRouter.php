@@ -147,6 +147,8 @@ class CRouter {
 		'image.update'								=> ['CControllerImageUpdate',							null,					null],
 		'item.clear'								=> ['CControllerItemClear',								'layout.json',			null],
 		'item.list'									=> ['CControllerItemList',								'layout.htmlpage',		'item.list'],
+		'item.enable'								=> ['CControllerItemEnable',							'layout.json',			null],
+		'item.disable'								=> ['CControllerItemDisable',							'layout.json',			null],
 		'item.masscheck_now'						=> ['CControllerItemMassCheckNow',						'layout.json',			null],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
