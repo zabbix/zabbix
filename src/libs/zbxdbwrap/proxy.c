@@ -1726,24 +1726,21 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	/* stop processing current discovery rule and save proxy history until host update is available */
 	if (i == services->values_num)
 	{
+		zbx_db_insert_t	db_insert;
+
+		zbx_db_insert_prepare(&db_insert, "proxy_dhistory", "id", "clock", "druleid", "ip", "port", "value",
+				"status", "dcheckid", "dns", NULL);
+
 		for (i = *processed_num; i < services->values_num; i++)
 		{
-			char	*ip_esc, *dns_esc, *value_esc;
-
-			service = services->values[i];
-
-			ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
-			dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", service->dns);
-			value_esc = zbx_db_dyn_escape_field("proxy_dhistory", "value", service->value);
-
-			zbx_db_execute("insert into proxy_dhistory (clock,druleid,ip,port,value,status,dcheckid,dns)"
-					" values (%d," ZBX_FS_UI64 ",'%s',%d,'%s',%d," ZBX_FS_UI64 ",'%s')",
-					(int)service->itemtime, drule.druleid, ip_esc, service->port,
-					value_esc, service->status, service->dcheckid, dns_esc);
-			zbx_free(value_esc);
-			zbx_free(dns_esc);
-			zbx_free(ip_esc);
+			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), (int)service->itemtime, drule.druleid, ip,
+					service->port, service->value, service->status, service->dcheckid,
+					service->dns);
 		}
+
+		zbx_db_insert_autoincrement(&db_insert, "id");
+		zbx_db_insert_execute(&db_insert);
+		zbx_db_insert_clean(&db_insert);
 
 		goto fail;
 	}
