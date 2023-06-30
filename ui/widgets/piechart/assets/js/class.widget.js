@@ -23,12 +23,12 @@ class CWidgetPieChart extends CWidget {
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H = 10;
 
 	onInitialize() {
-		this.pie = null;
+		this.pie_chart = null;
 	}
 
 	onResize() {
-		if (this._state === WIDGET_STATE_ACTIVE && this.pie !== null) {
-			this.pie.setSize(super._getContentsSize());
+		if (this._state === WIDGET_STATE_ACTIVE && this.pie_chart !== null) {
+			this.pie_chart.setSize(super._getContentsSize());
 		}
 	}
 
@@ -49,35 +49,29 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	updateProperties({name, view_mode, fields}) {
-		if (this.pie !== null) {
-			this.pie.destroy();
-			this.pie = null;
+		if (this.pie_chart !== null) {
+			this.pie_chart.destroy();
+			this.pie_chart = null;
 		}
 
 		super.updateProperties({name, view_mode, fields});
 	}
 
 	setContents(response) {
-		if (this.pie !== null) {
-			this.pie.setValue(response.sectors);
-			this.pie.setLegend(response.legend);
+		if (this.pie_chart !== null) {
+			this.pie_chart.setValue(response.sectors);
 
 			return;
 		}
 
-		const use_padding_top = this.getViewMode() === ZBX_WIDGET_VIEW_MODE_HIDDEN_HEADER;
-
 		const padding = {
-			top: use_padding_top ? this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V : 0,
-			right: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
-			bottom: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
-			left: this.constructor.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H
+			vertical: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V,
+			horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
 		};
 
-		this.pie = new CSVGPie(this._body, padding, response.config);
-		this.pie.setSize(super._getContentsSize());
-		this.pie.setValue(response.sectors);
-		this.pie.setLegend(response.legend);
+		this.pie_chart = new CSVGPie(padding, response.config);
+		this.pie_chart.setSize(super._getContentsSize());
+		this.pie_chart.setValue(response.sectors);
 	}
 
 	getActionsContextMenu({can_paste_widget}) {
@@ -108,9 +102,9 @@ class CWidgetPieChart extends CWidget {
 
 		menu_actions.items.push({
 			label: t('Download image'),
-			disabled: this.pie === null,
+			disabled: this.pie_chart === null,
 			clickCallback: () => {
-				downloadSvgImage(this.pie.getSVGElement(), '.pie-chart-legend', 'piechart.png');
+				downloadSvgImage(this.pie_chart.getSVGElement(), '.pie-chart-legend', 'image.png');
 			}
 		});
 
@@ -118,6 +112,6 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	hasPadding() {
-		return true;
+		return false;
 	}
 }
