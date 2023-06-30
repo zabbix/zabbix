@@ -114,6 +114,9 @@ Changes for 6.4.5rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Item value" and "Top hosts" widget (averza, esekace)
+..F....... [ZBX-22825] fixed Zabbix access to the first page for user with specific page access (dpetra)
+..F....... [ZBX-22711] fixed incorrectly displayed simple graphs with non-numeric items in Host graphs page (kkuzmina)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.4
