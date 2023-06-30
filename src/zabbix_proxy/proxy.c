@@ -173,12 +173,12 @@ static unsigned char	get_program_type(void)
 	return program_type;
 }
 
-ZBX_PROPERTY_DECL_CONST(char*, zbx_config_source_ip, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_source_ip, NULL)
 
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_pid_file, NULL)
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_tmpdir, NULL)
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_fping_location, NULL)
-ZBX_PROPERTY_DECL_CONST(char *, zbx_config_fping6_location, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_tmpdir, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping_location, NULL)
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_fping6_location, NULL)
 
 static int	config_proxymode		= ZBX_PROXYMODE_ACTIVE;
 
