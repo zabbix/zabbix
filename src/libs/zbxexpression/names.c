@@ -18,7 +18,7 @@
 **/
 
 #include "datafunc.h"
-#include "funcparam.h"
+#include "evalfunc.h"
 
 #include "zbx_item_constants.h"
 #include "zbx_trigger_constants.h"

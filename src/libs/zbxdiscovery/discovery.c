@@ -19,7 +19,6 @@
 
 #include "zbxdiscovery.h"
 
-#include "zbxexpression.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxserialize.h"

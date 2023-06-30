@@ -27,6 +27,7 @@
 #include "zbx_macro_constants.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
+#include "zbxvariant.h"
 
 typedef struct
 {

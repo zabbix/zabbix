@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxexpression.h"
 #include "operations.h"
 
 #include "zbx_availability_constants.h"

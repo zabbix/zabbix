@@ -29,7 +29,7 @@
 #include "zbxsysinfo.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
-#include "zbxdbwrap.h"
+#include "zbxtime.h"
 
 #define ZBX_ITEM_QUERY_UNSET		0x0000
 

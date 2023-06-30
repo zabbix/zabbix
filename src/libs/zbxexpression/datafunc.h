@@ -25,6 +25,7 @@
 #include "zbxtypes.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxdbhigh.h"
+#include "zbxtime.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */

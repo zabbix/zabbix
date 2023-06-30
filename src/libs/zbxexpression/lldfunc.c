@@ -22,9 +22,9 @@
 #include "expression.h"
 
 #include "zbxexpr.h"
-#include "zbxalgo.h"
 #include "zbxeval.h"
 #include "zbxxml.h"
+#include "zbxvariant.h"
 
 /******************************************************************************
  *                                                                            *

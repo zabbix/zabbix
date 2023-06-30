@@ -29,6 +29,7 @@
 #include "zbxstr.h"
 #include "zbxexpr.h"
 #include "zbxparam.h"
+#include "zbxvariant.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1

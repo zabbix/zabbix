@@ -26,6 +26,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxhistory.h"
 #include "zbxalgo.h"
+#include "zbxtime.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 
