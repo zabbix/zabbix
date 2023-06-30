@@ -101,7 +101,7 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 				}
 			}
 
-			$response = API::Trigger()->create($dst_triggers);
+			$response = API::TriggerPrototype()->create($dst_triggers);
 
 			if ($response === false) {
 				return false;
