@@ -23,7 +23,7 @@ use Widgets\PieChart\Includes\CWidgetFieldDataSet;
 
 ?>
 
-window.widget_piechart_form = new class {
+window.widget_pie_chart_form = new class {
 
 	init({form_tabs_id, color_palette, templateid}) {
 		colorPalette.setThemeColors(color_palette);
@@ -130,7 +130,7 @@ window.widget_piechart_form = new class {
 						message_block.style.display = 'none';
 					}
 
-					widget_piechart_form.initSingleItemSortable(dataset);
+					widget_pie_chart_form.initSingleItemSortable(dataset);
 				}
 			})
 			.zbx_vertical_accordion({handler: '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM_TOGGLE ?>'});
@@ -571,7 +571,7 @@ window.widget_piechart_form = new class {
 							srctbl: 'items',
 							srcfld1: 'itemid',
 							srcfld2: 'name',
-							dstfrm: widget_piechart_form._form.id,
+							dstfrm: widget_pie_chart_form._form.id,
 							dstfld1: `items_${dataset_index}_${i}_input`,
 							dstfld2: `items_${dataset_index}_${i}_name`,
 							numeric: 1,
@@ -587,7 +587,7 @@ window.widget_piechart_form = new class {
 							srctbl: 'items',
 							srcfld1: 'itemid',
 							srcfld2: 'name',
-							dstfrm: widget_piechart_form._form.id,
+							dstfrm: widget_pie_chart_form._form.id,
 							dstfld1: `items_${dataset_index}_${i}_input`,
 							dstfld2: `items_${dataset_index}_${i}_name`,
 							numeric: 1,
