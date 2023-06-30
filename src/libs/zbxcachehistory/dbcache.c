@@ -119,7 +119,6 @@ typedef struct
 	unsigned char		db_trigger_queue_lock;
 
 	zbx_hc_proxyqueue_t	proxyqueue;
-	int			proxy_history_count;
 }
 ZBX_DC_CACHE;
 
@@ -4672,8 +4671,6 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type, zbx_history
 
 	cache->db_trigger_queue_lock = 1;
 
-	cache->proxy_history_count = 0;
-
 	if (NULL == sql)
 		sql = (char *)zbx_malloc(sql, sql_alloc);
 out:
@@ -4682,49 +4679,6 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: change proxy_history_count by count                               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_change_proxy_history_count(int change_count)
-{
-	LOCK_CACHE;
-
-	cache->proxy_history_count += change_count;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change proxy_history_count by count                               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_reset_proxy_history_count(int reset)
-{
-	LOCK_CACHE;
-
-	cache->proxy_history_count = reset;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get proxy_history_count value                                     *
- *                                                                            *
- ******************************************************************************/
-int	zbx_get_proxy_history_count(void)
-{
-	int	proxy_history_count;
-
-	LOCK_CACHE;
-	proxy_history_count = cache->proxy_history_count;
-	UNLOCK_CACHE;
-
-	return proxy_history_count;
-}
 /******************************************************************************
  *                                                                            *
  * Purpose: writes updates and new data from pool and cache data to database  *

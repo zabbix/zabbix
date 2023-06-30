@@ -471,7 +471,9 @@ static int	pb_history_add_row_mem(zbx_pb_t *pb, zbx_pb_history_t *src)
 
 	ret = zbx_list_append(&pb->history, row, NULL);
 out:
-	if (SUCCEED != ret && NULL != row)
+	if (SUCCEED == ret)
+		pb->history_lastid_mem = row->id;
+	else if (NULL != row)
 		pb_list_free_history(&pb->history, row);
 
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s() ret:%s free:" ZBX_FS_SIZE_T , __func__, zbx_result_string(ret),
@@ -886,4 +888,63 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
 		pb_history_set_lastid(lastid);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return number of unsent history rows                              *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_pb_history_get_unset_num(void)
+{
+	zbx_uint64_t	lastid_sent, lastid, rows_num = 0;
+
+	pb_lock();
+
+	lastid_sent = pb_data->history_lastid_sent;
+	lastid = MAX(pb_data->history_lastid_db, pb_data->history_lastid_mem);
+
+	pb_unlock();
+
+	if (ZBX_PB_MODE_MEMORY != pb_data->mode)
+	{
+		zbx_db_result_t	result;
+		zbx_db_row_t	row;
+
+		if (0 == lastid)
+		{
+			result = zbx_db_select("select max(id) from proxy_history");
+
+			if (NULL != (row = zbx_db_fetch(result)))
+				ZBX_DBROW2UINT64(lastid, row[0]);
+
+			zbx_db_free_result(result);
+		}
+
+		if (0 == lastid_sent)
+		{
+			result = zbx_db_select("select nextid from ids where table_name='proxy_history'"
+					" and field_name='history_lastid'");
+
+			if (NULL != (row = zbx_db_fetch(result)))
+				ZBX_DBROW2UINT64(lastid_sent, row[0]);
+
+			zbx_db_free_result(result);
+		}
+
+		if (0 == lastid_sent)
+		{
+			result = zbx_db_select("select min(id) from proxy_history");
+
+			if (NULL != (row = zbx_db_fetch(result)))
+				ZBX_DBROW2UINT64(lastid_sent, row[0]);
+
+			zbx_db_free_result(result);
+		}
+	}
+
+	if (lastid_sent < lastid)
+		rows_num = lastid - lastid_sent;
+
+	return rows_num;
 }

@@ -235,23 +235,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				}
 
 				if (0 != (flags & ZBX_DATASENDER_HISTORY))
-				{
-					zbx_uint64_t	history_maxid;
-					zbx_db_result_t	result;
-					zbx_db_row_t	row;
-
-					result = zbx_db_select("select max(id) from proxy_history");
-
-					if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
-						history_maxid = history_lastid;
-					else
-						ZBX_STR2UINT64(history_maxid, row[0]);
-
-					zbx_db_free_result(result);
-
-					zbx_reset_proxy_history_count(history_maxid - history_lastid);
 					zbx_pb_set_history_lastid(history_lastid);
-				}
 
 				if (0 != (flags & ZBX_DATASENDER_DISCOVERY))
 					zbx_pb_discovery_set_lastid(discovery_lastid);

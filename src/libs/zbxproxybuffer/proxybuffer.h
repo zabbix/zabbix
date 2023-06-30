@@ -121,6 +121,7 @@ typedef struct
 	zbx_uint64_t		discovery_lastid_db;
 	zbx_uint64_t		autoreg_lastid_db;
 
+	zbx_uint64_t		history_lastid_mem;
 }
 zbx_pb_t;
 

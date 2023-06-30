@@ -99,4 +99,6 @@ int	zbx_pb_history_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 
 void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid);
 
+zbx_uint64_t	zbx_pb_history_get_unset_num(void);
+
 #endif

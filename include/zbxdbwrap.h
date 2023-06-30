@@ -55,7 +55,6 @@ int	zbx_get_interface_availability_data(struct zbx_json *json, int *ts);
 
 int	zbx_proxy_get_host_active_availability(struct zbx_json *j);
 
-int	zbx_proxy_get_history_count(void);
 int	zbx_proxy_get_delay(zbx_uint64_t lastid);
 
 int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,

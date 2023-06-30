@@ -1564,8 +1564,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
-
 	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
 			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
 	{

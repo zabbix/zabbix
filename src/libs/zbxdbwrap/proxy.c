@@ -531,25 +531,6 @@ out:
 	return ret;
 }
 
-static void	proxy_get_lastid(const char *table_name, const char *lastidfield, zbx_uint64_t *lastid)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() field:'%s.%s'", __func__, table_name, lastidfield);
-
-	result = zbx_db_select("select nextid from ids where table_name='%s' and field_name='%s'",
-			table_name, lastidfield);
-
-	if (NULL == (row = zbx_db_fetch(result)))
-		*lastid = 0;
-	else
-		ZBX_STR2UINT64(*lastid, row[0]);
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_UI64,	__func__, *lastid);
-}
-
 int	zbx_proxy_get_delay(const zbx_uint64_t lastid)
 {
 	zbx_db_result_t	result;
@@ -2206,40 +2187,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get the number of values waiting to be sent to the server         *
- *                                                                            *
- * Return value: the number of history values                                 *
- *                                                                            *
- ******************************************************************************/
-int	zbx_proxy_get_history_count(void)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_uint64_t	id;
-	int		count = 0;
-
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
-	proxy_get_lastid("proxy_history", "history_lastid", &id);
-
-	result = zbx_db_select(
-			"select count(*)"
-			" from proxy_history"
-			" where id>" ZBX_FS_UI64,
-			id);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		count = atoi(row[0]);
-
-	zbx_db_free_result(result);
-
-	zbx_db_close();
-
-	return count;
 }
 
 /******************************************************************************

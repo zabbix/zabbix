@@ -48,9 +48,11 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			return NOTSUPPORTED;
 		}
 
-		SET_UI64_RESULT(result, zbx_get_proxy_history_count());
+		SET_UI64_RESULT(result, zbx_pb_history_get_unset_num());
+		return SUCCEED;
 	}
-	if (0 == strcmp(param1, "data_cache"))
+
+	if (0 == strcmp(param1, "proxy_buffer"))
 	{
 		const char	*param2, *param3;
 		int		params_num;

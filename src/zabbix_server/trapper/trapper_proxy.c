@@ -174,23 +174,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		zbx_db_begin();
 
 		if (0 != history_lastid)
-		{
-			zbx_uint64_t	history_maxid;
-			zbx_db_result_t	result;
-			zbx_db_row_t	row;
-
-			result = zbx_db_select("select max(id) from proxy_history");
-
-			if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
-				history_maxid = history_lastid;
-			else
-				ZBX_STR2UINT64(history_maxid, row[0]);
-
-			zbx_db_free_result(result);
-
-			zbx_reset_proxy_history_count((int)(history_maxid - history_lastid));
 			zbx_pb_set_history_lastid(history_lastid);
-		}
 
 		if (0 != discovery_lastid)
 			zbx_pb_discovery_set_lastid(discovery_lastid);

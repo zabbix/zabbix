@@ -542,6 +542,7 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 		goto out;
 
 	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
+	memset(pb_data, 0, sizeof(zbx_pb_t));
 
 	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
 	zbx_list_create_ext(&pb_data->discovery, __pb_shmem_malloc_func, __pb_shmem_free_func);
@@ -550,7 +551,6 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	pb_data->mode = mode;
 	pb_data->max_age = age;
 	pb_data->offline_buffer = offline_buffer;
-	pb_data->changes_num = 0;
 
 	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
 		goto out;

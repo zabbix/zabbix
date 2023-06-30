@@ -69,10 +69,6 @@ void	zbx_free_database_cache(int sync, const zbx_events_funcs_t *events_cbs);
 
 void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_events_funcs_t *events_cbs, int *more);
 
-void	zbx_change_proxy_history_count(int change_count);
-void	zbx_reset_proxy_history_count(int reset);
-int	zbx_get_proxy_history_count(void);
-
 #define ZBX_STATS_HISTORY_COUNTER	0
 #define ZBX_STATS_HISTORY_FLOAT_COUNTER	1
 #define ZBX_STATS_HISTORY_UINT_COUNTER	2
