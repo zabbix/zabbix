@@ -1023,6 +1023,22 @@ class CDashboard {
 		}
 	}
 
+	_doSelectDashboardTab(dashboard_tab) {
+		let darboardid = null;
+
+		for (const [key, val] of this._tabs_dashboard_tabs.entries()) {
+			if (val === dashboard_tab) {
+				darboardid = key;
+			}
+		}
+
+		for (const dashboard of this._data.dashboard_tabs) {
+			if (dashboard.dashboardid === darboardid) {
+				window.location.href = dashboard.link;
+			}
+		}
+	}
+
 	_activatePage(dashboard_page) {
 		dashboard_page.activate();
 		dashboard_page
@@ -1710,14 +1726,12 @@ class CDashboard {
 	addDashboardTab(dashboard_tab) {
 		const tab = document.createElement('li');
 		const tab_contents = document.createElement('div');
-		const tab_contents_name = document.createElement('a');
+		const tab_contents_name = document.createElement('span');
 
 		tab.appendChild(tab_contents);
 		tab_contents.appendChild(tab_contents_name);
 
 		tab_contents_name.textContent = dashboard_tab.name;
-		tab_contents_name.title = dashboard_tab.name;
-		tab_contents_name.href = dashboard_tab.link;
 
 		this._dashboard_tabs.insertItemBefore(tab);
 		this._tabs_dashboard_tabs.set(dashboard_tab.dashboardid, tab);
@@ -1836,8 +1850,10 @@ class CDashboard {
 
 		this._selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
 
+		this._buttons.previous_dashboard.disabled = this._selected_dashboard_tab.previousElementSibling === null;
+		this._buttons.next_dashboard.disabled = this._selected_dashboard_tab.nextElementSibling === null;
+
 		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);
-		// this._updateNavigationButtons(dashboard_page);
 	}
 
 	_updateNavigationButtons(dashboard_page = null) {
@@ -2090,6 +2106,12 @@ class CDashboard {
 				this._is_unsaved = true;
 			},
 
+			dashboardTabsClick: (e) => {
+				const dashboard_tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+
+				this._doSelectDashboardTab(dashboard_tab);
+			},
+
 			tabsClick: (e) => {
 				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
 
@@ -2139,22 +2161,22 @@ class CDashboard {
 			},
 
 			tabsPreviousDashboardClick: () => {
-				const keys = [...this._tabs_dashboard_tabs.keys()];
+				if (this._selected_dashboard_tab.previousElementSibling !== null) {
+					const keys = [...this._tabs_dashboard_tabs.keys()];
+					const previous_darshboardid = keys[keys.indexOf(this._data.dashboardid) - 1];
+					const previous_dashboard_tab = this._tabs_dashboard_tabs.get(previous_darshboardid);
 
-				if (keys[0] !== this._data.dashboardid) {
-					let previous_dashboard_tab = this._tabs_dashboard_tabs
-						.get(keys[keys.indexOf(this._data.dashboardid) - 1]);
-					window.location.href = previous_dashboard_tab.children[0].children[0].getAttribute('href');
+					this._doSelectDashboardTab(previous_dashboard_tab);
 				}
 			},
 
 			tabsNextDashboardClick: () => {
-				const keys = [...this._tabs_dashboard_tabs.keys()];
+				if (this._selected_dashboard_tab.nextElementSibling !== null) {
+					const keys = [...this._tabs_dashboard_tabs.keys()];
+					const next_darshboardid = keys[keys.indexOf(this._data.dashboardid) + 1];
+					const next_dashboard_tab = this._tabs_dashboard_tabs.get(next_darshboardid);
 
-				if (keys[keys.length - 1] !== this._data.dashboardid) {
-					let next_dashboard_tab = this._tabs_dashboard_tabs
-						.get(keys[keys.indexOf(this._data.dashboardid) + 1]);
-					window.location.href = next_dashboard_tab.children[0].children[0].getAttribute('href');
+					this._doSelectDashboardTab(next_dashboard_tab);
 				}
 			},
 
@@ -2272,6 +2294,7 @@ class CDashboard {
 			this._buttons.next_page.addEventListener('click', this._events.tabsNextPageClick);
 
 			if (this._data.with_dashboard_tabs) {
+				this._containers.dashboard_navigation_tabs.addEventListener('click', this._events.dashboardTabsClick);
 				this._buttons.previous_dashboard.addEventListener('click', this._events.tabsPreviousDashboardClick);
 				this._buttons.next_dashboard.addEventListener('click', this._events.tabsNextDashboardClick);
 				this._buttons.dashboard_list.addEventListener('click', this._events.tabsDashboardListClick);

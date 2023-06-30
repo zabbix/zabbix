@@ -94,13 +94,6 @@
 		list-style-type: none;
 		outline: none;
 
-		a {
-			text-decoration: none;
-			outline: none;
-			transition: none;
-			color: $font-color;
-		}
-
 		& > div {
 			display: flex;
 			align-items: center;
@@ -154,10 +147,6 @@
 		border: 1px solid transparent;
 
 		span {
-			color: $font-selected-color;
-		}
-
-		a {
 			color: $font-selected-color;
 		}
 	}

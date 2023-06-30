@@ -1582,12 +1582,6 @@ button {
     margin: 0;
     list-style-type: none;
     outline: none; }
-    .dashboard-tabs-navigation-tabs .sortable-item a,
-    .dashboard-navigation-tabs .sortable-item a {
-      text-decoration: none;
-      outline: none;
-      transition: none;
-      color: #ffffff; }
     .dashboard-tabs-navigation-tabs .sortable-item > div,
     .dashboard-navigation-tabs .sortable-item > div {
       display: flex;
@@ -1629,11 +1623,6 @@ button {
     .dashboard-tabs-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
     .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
-      color: #000000; }
-    .dashboard-tabs-navigation-tabs .sortable > .sortable-item > div.selected-tab a,
-    .dashboard-tabs-navigation-tabs .sortable-list > .sortable-item > div.selected-tab a,
-    .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab a,
-    .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab a {
       color: #000000; }
   .dashboard-tabs-navigation-tabs .btn-dashboard-page-properties:hover, .dashboard-tabs-navigation-tabs .btn-dashboard-page-properties:focus, .dashboard-tabs-navigation-tabs .btn-dashboard-page-properties:active,
   .dashboard-navigation-tabs .btn-dashboard-page-properties:hover,
