@@ -139,10 +139,11 @@ static void	dc_add_proxy_history_meta(zbx_pb_history_data_t *handle, const zbx_d
 				THIS_SHOULD_NEVER_HAPPEN;
 				return;
 		}
+		flags = 0;
 	}
 	else
 	{
-		flags |= ZBX_PROXY_HISTORY_FLAG_NOVALUE;
+		flags = ZBX_PROXY_HISTORY_FLAG_NOVALUE;
 		pvalue = (char *)"";
 	}
 
