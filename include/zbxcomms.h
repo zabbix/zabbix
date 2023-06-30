@@ -201,6 +201,7 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
+	zbx_uint32_t			reserved_payload;
 }
 zbx_socket_t;
 

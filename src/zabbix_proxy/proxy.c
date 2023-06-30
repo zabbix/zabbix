@@ -496,8 +496,8 @@ static void	zbx_set_defaults(void)
 
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result) &&
-				NULL != (value = ZBX_GET_STR_RESULT(&result)))
+		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND, &result,
+				ZBX_CHECK_TIMEOUT_UNDEFINED) && NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
 			assert(*value);
 
@@ -1242,7 +1242,7 @@ int	main(int argc, char **argv)
 
 	zbx_load_config(&t);
 
-	zbx_init_library_dbupgrade(get_program_type);
+	zbx_init_library_dbupgrade(get_program_type, get_zbx_config_timeout);
 	zbx_init_library_dbwrap(NULL);
 	zbx_init_library_icmpping(&config_icmpping);
 	zbx_init_library_ipcservice(program_type);

@@ -248,12 +248,13 @@ static int	get_min_nextcheck(void)
 	return min;
 }
 
-static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime)
+static void	add_check(const char *key, const char *key_orig, int refresh, zbx_uint64_t lastlogsize, int mtime,
+		int timeout)
 {
 	ZBX_ACTIVE_METRIC	*metric;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d",
-			__func__, key, refresh, lastlogsize, mtime);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' refresh:%d lastlogsize:" ZBX_FS_UI64 " mtime:%d timeout:%d",
+			__func__, key, refresh, lastlogsize, mtime, timeout);
 
 	for (int i = 0; i < active_metrics.values_num; i++)
 	{
@@ -268,6 +269,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 			metric->key = zbx_strdup(NULL, key);
 			metric->lastlogsize = lastlogsize;
 			metric->mtime = mtime;
+			metric->timeout = timeout;
 			metric->big_rec = 0;
 			metric->use_ino = 0;
 			metric->error_count = 0;
@@ -328,6 +330,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->state = ITEM_STATE_NORMAL;
 	metric->lastlogsize = lastlogsize;
 	metric->mtime = mtime;
+	metric->timeout = timeout;
 	/* existing log[], log.count[] and eventlog[] data can be skipped */
 	metric->skip_old_data = (0 != metric->lastlogsize ? 0 : 1);
 	metric->big_rec = 0;
@@ -442,7 +445,7 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
  *                                                                              *
  ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
-		zbx_uint32_t *config_revision_local)
+		zbx_uint32_t *config_revision_local, int config_timeout)
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
@@ -452,7 +455,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
 	zbx_vector_str_t	received_metrics;
-	int			delay, mtime, expression_type, case_sensitive, i, j, ret = FAIL;
+	int			delay, mtime, expression_type, case_sensitive, timeout, i, j, ret = FAIL;
 	zbx_uint32_t		config_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -564,7 +567,15 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
+		if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL) ||
+				'\0' == *tmp)
+		{
+			timeout = config_timeout;
+		}
+		else
+			timeout = atoi(tmp);
+
+		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime, timeout);
 
 		/* remember what was received */
 		zbx_vector_str_append(&received_metrics, zbx_strdup(NULL, key_orig));
@@ -800,8 +811,8 @@ static void	process_config_item(struct zbx_json *json, const char *config, size_
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result) &&
-			NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
+	if (SUCCEED == zbx_execute_agent_check(config, ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, &result,
+			ZBX_CHECK_TIMEOUT_UNDEFINED) && NULL != (value = ZBX_GET_STR_RESULT(&result)) && NULL != *value)
 	{
 		if (SUCCEED != zbx_is_utf8(*value))
 		{
@@ -922,7 +933,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 				}
 
 				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local))
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local, config_timeout))
 				{
 						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
 								zbx_json_strerror());
@@ -1519,7 +1530,7 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result)))
+	if (SUCCEED != (ret = zbx_execute_agent_check(metric->key, 0, &result, metric->timeout)))
 	{
 		if (NULL != (pvalue = ZBX_GET_MSG_RESULT(&result)))
 			*error = zbx_strdup(*error, *pvalue);
@@ -1550,7 +1561,7 @@ static void	process_command(zbx_active_command_t *command)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result))
+	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		state = ITEM_STATE_NOTSUPPORTED;
 		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))

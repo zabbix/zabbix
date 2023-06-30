@@ -204,7 +204,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 {
 	AGENT_REQUEST	request;
 	vmfunc_t	vmfunc;
-	int		ret = NOTSUPPORTED;
+	int		timeout_sec, ret = NOTSUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key_orig:'%s' addr:'%s'", __func__, item->key_orig, item->interface.addr);
 
@@ -218,15 +218,39 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 	request.lastlogsize = item->lastlogsize;
 
+	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported timeout value."));
+		goto out;
+	}
+
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{
+		zbx_alarm_on(timeout_sec);
+
 		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 0))
 			ret = SUCCEED;
+
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Check has timed out during execution."));
+			ret = FAIL;
+			goto out;
+		}
 	}
 	else if (0 == strcmp(request.key, "net.tcp.service.perf") || 0 == strcmp(request.key, "net.udp.service.perf"))
 	{
+		zbx_alarm_on(timeout_sec);
+
 		if (SYSINFO_RET_OK == zbx_check_service_default_addr(&request, item->interface.addr, result, 1))
 			ret = SUCCEED;
+
+		if (SUCCEED == zbx_alarm_timed_out())
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Check has timed out during execution."));
+			ret = FAIL;
+			goto out;
+		}
 	}
 	else if (SUCCEED == get_vmware_function(request.key, &vmfunc))
 	{
@@ -257,7 +281,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 	else
 	{
 		/* it will execute item from a loadable module if any */
-		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result))
+		if (SUCCEED == zbx_execute_agent_check(item->key, ZBX_PROCESS_MODULE_COMMAND, result, timeout_sec))
 			ret = SUCCEED;
 	}
 
@@ -266,6 +290,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 
 out:
 	zbx_free_agent_request(&request);
+	zbx_alarm_off();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

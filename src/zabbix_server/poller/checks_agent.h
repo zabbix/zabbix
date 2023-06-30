@@ -24,6 +24,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 
-int	get_value_agent(const zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result);
+int	get_value_agent(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
+
 #endif

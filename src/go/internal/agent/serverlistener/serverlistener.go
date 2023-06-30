@@ -63,7 +63,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
-	go response.handleCheck(data)
+	go response.handleCheck(data, conn.ReservedData())
 
 	return nil
 }

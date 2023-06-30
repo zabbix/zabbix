@@ -347,6 +347,118 @@ out:
 	return ret;
 }
 
+static int	proxyconfig_get_config_table_data(const zbx_dc_proxy_t *proxy, struct zbx_json *j, char **error)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	const zbx_db_table_t		*table;
+	char				*sql = NULL;
+	size_t				sql_alloc =  4 * ZBX_KIBIBYTE, sql_offset = 0;
+	int				ret = FAIL, i, fld = 0;
+	const char			*alias = "t.", *alias_from = " t";
+	zbx_dc_item_type_timeouts_t	timeouts;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	table = zbx_db_get_table("config");
+	zbx_json_addobject(j, table->table);
+
+	sql = (char *)zbx_malloc(NULL, sql_alloc);
+	proxyconfig_get_fields(&sql, &sql_alloc, &sql_offset, table, alias, j);
+
+	zbx_json_addarray(j, ZBX_PROTO_TAG_DATA);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " from %s%s", table->table, alias_from);
+
+	if (NULL == (result = zbx_db_select("%s", sql)))
+	{
+		*error = zbx_dsprintf(*error, "failed to get data from table \"config\"");
+		goto out;
+	}
+
+	zbx_dc_get_proxy_timeouts(proxy->proxyid, &timeouts);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_json_addarray(j, NULL);
+
+		zbx_json_addstring(j, NULL, row[fld++], ZBX_JSON_TYPE_INT);
+
+		for (i = 0; 0 != table->fields[i].name; i++)
+		{
+			if (0 == (table->fields[i].flags & ZBX_PROXY))
+				continue;
+
+			if (0 == strncmp(table->fields[i].name, "timeout_", ZBX_CONST_STRLEN("timeout_")))
+			{
+				char	*item_type_timeout;
+				const char	*type_name;
+
+				type_name = table->fields[i].name + ZBX_CONST_STRLEN("timeout_");
+
+				if (0 == strcmp(type_name, "zabbix_agent"))
+					item_type_timeout = timeouts.agent;
+				else if (0 == strcmp(type_name, "simple_check"))
+					item_type_timeout = timeouts.simple;
+				else if (0 == strcmp(type_name, "snmp_agent"))
+					item_type_timeout = timeouts.snmp;
+				else if (0 == strcmp(type_name, "external_check"))
+					item_type_timeout = timeouts.external;
+				else if (0 == strcmp(type_name, "db_monitor"))
+					item_type_timeout = timeouts.odbc;
+				else if (0 == strcmp(type_name, "ssh_agent"))
+					item_type_timeout = timeouts.ssh;
+				else if (0 == strcmp(type_name, "http_agent"))
+					item_type_timeout = timeouts.http;
+				else if (0 == strcmp(type_name, "telnet_agent"))
+					item_type_timeout = timeouts.telnet;
+				else if (0 == strcmp(type_name, "script"))
+					item_type_timeout = timeouts.script;
+				else
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+					continue;
+				}
+
+				zbx_json_addstring(j, NULL, item_type_timeout, ZBX_JSON_TYPE_STRING);
+
+				continue;
+			}
+
+			switch (table->fields[i].type)
+			{
+				case ZBX_TYPE_INT:
+				case ZBX_TYPE_UINT:
+				case ZBX_TYPE_ID:
+					if (SUCCEED != zbx_db_is_null(row[fld]))
+						zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_INT);
+					else
+						zbx_json_addstring(j, NULL, NULL, ZBX_JSON_TYPE_NULL);
+					break;
+				default:
+					zbx_json_addstring(j, NULL, row[fld], ZBX_JSON_TYPE_STRING);
+					break;
+			}
+
+			fld++;
+		}
+
+		zbx_json_close(j);
+	}
+
+	zbx_json_close(j);
+	zbx_json_close(j);
+
+	ret = SUCCEED;
+out:
+	zbx_free(sql);
+	zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get table data from database                                      *
@@ -1020,7 +1132,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 		}
 
 		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_CONFIG) &&
-				SUCCEED != proxyconfig_get_table_data("config", NULL, NULL, NULL, NULL, j, error))
+				SUCCEED != proxyconfig_get_config_table_data(proxy, j, error))
 		{
 			goto out;
 		}

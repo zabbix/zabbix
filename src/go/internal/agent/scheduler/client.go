@@ -37,9 +37,10 @@ import (
 
 // clientItem represents item monitored by client
 type clientItem struct {
-	itemid uint64
-	delay  string
-	key    string
+	itemid  uint64
+	delay   string
+	key     string
+	timeout int
 }
 
 // pluginInfo is used to track plugin usage by client
@@ -163,7 +164,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 				// create and register new exporter task
 				task = &exporterTask{
 					taskBase: taskBase{plugin: p, active: true, recurring: true},
-					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: r.Timeout},
 					updated:  now,
 					client:   c,
 					output:   sink,
@@ -200,7 +201,7 @@ func (c *client) addRequest(p *pluginAgent, r *plugin.Request, sink plugin.Resul
 			// handle single passive check or internal request
 			task := &directExporterTask{
 				taskBase: taskBase{plugin: p, active: true, recurring: true},
-				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key},
+				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: r.Timeout},
 				expire:   now.Add(time.Duration(agent.Options.Timeout) * time.Second),
 				client:   c,
 				output:   sink,

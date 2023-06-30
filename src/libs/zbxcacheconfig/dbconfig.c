@@ -845,7 +845,10 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"hk_history", "hk_trends_mode", "hk_trends_global", "hk_trends",
 					"default_inventory_mode", "db_extension", "autoreg_tls_accept",
 					"compression_status", "compress_older", "instanceid",
-					"default_timezone", "hk_events_service", "auditlog_enabled"};
+					"default_timezone", "hk_events_service", "auditlog_enabled",
+					"timeout_zabbix_agent","timeout_simple_check","timeout_snmp_agent",
+					"timeout_external_check","timeout_db_monitor","timeout_http_agent",
+					"timeout_ssh_agent","timeout_telnet_agent","timeout_script"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
@@ -1120,6 +1123,60 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (config->config->auditlog_enabled != (value_int = atoi(row[33])))
 	{
 		config->config->auditlog_enabled = value_int;
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.agent || 0 != strcmp(config->config->item_timeouts.agent, row[34]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.agent, row[34]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.simple || 0 != strcmp(config->config->item_timeouts.simple, row[35]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.simple, row[35]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.snmp || 0 != strcmp(config->config->item_timeouts.snmp, row[36]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.snmp, row[36]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.external || 0 != strcmp(config->config->item_timeouts.external, row[37]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.external, row[37]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.odbc || 0 != strcmp(config->config->item_timeouts.odbc, row[38]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.odbc, row[38]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.http || 0 != strcmp(config->config->item_timeouts.http, row[39]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.http, row[39]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.ssh || 0 != strcmp(config->config->item_timeouts.ssh, row[40]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.ssh, row[40]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.telnet || 0 != strcmp(config->config->item_timeouts.telnet, row[41]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.telnet, row[41]);
+		config->revision.config_table = revision;
+	}
+
+	if (NULL == config->config->item_timeouts.script || 0 != strcmp(config->config->item_timeouts.script, row[42]))
+	{
+		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.script, row[42]);
 		config->revision.config_table = revision;
 	}
 
@@ -1434,6 +1491,15 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
 	dc_strpool_release(proxy->version_str);
+	dc_strpool_release(proxy->item_timeouts.agent);
+	dc_strpool_release(proxy->item_timeouts.simple);
+	dc_strpool_release(proxy->item_timeouts.snmp);
+	dc_strpool_release(proxy->item_timeouts.external);
+	dc_strpool_release(proxy->item_timeouts.odbc);
+	dc_strpool_release(proxy->item_timeouts.http);
+	dc_strpool_release(proxy->item_timeouts.ssh);
+	dc_strpool_release(proxy->item_timeouts.telnet);
+	dc_strpool_release(proxy->item_timeouts.script);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	dc_strpool_release(proxy->tls_issuer);
@@ -2480,6 +2546,48 @@ static void	dc_preprocitem_free(ZBX_DC_PREPROCITEM *preprocitem)
 	__config_shmem_free_func(preprocitem);
 }
 
+static const char	*dc_get_global_item_type_timeout(const ZBX_DC_ITEM *item)
+{
+	const char	*global_timeout;
+
+	switch (item->type)
+	{
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			global_timeout = config->config->item_timeouts.agent;
+			break;
+		case ITEM_TYPE_SNMP:
+			global_timeout = config->config->item_timeouts.snmp;
+			break;
+		case ITEM_TYPE_SSH:
+			global_timeout = config->config->item_timeouts.ssh;
+			break;
+		case ITEM_TYPE_TELNET:
+			global_timeout = config->config->item_timeouts.telnet;
+			break;
+		case ITEM_TYPE_EXTERNAL:
+			global_timeout = config->config->item_timeouts.external;
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			global_timeout = config->config->item_timeouts.odbc;
+			break;
+		case ITEM_TYPE_SIMPLE:
+			global_timeout = config->config->item_timeouts.simple;
+			break;
+		case ITEM_TYPE_SCRIPT:
+			global_timeout = config->config->item_timeouts.script;
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			global_timeout = config->config->item_timeouts.http;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			break;
+	}
+
+	return global_timeout;
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids)
 {
@@ -2653,6 +2761,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		item->status = status;
 		item->value_type = value_type;
 		item->interfaceid = interfaceid;
+		
 
 		/* update items_hk index using new data, if not done already */
 
@@ -2677,6 +2786,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				item->delay_ex = NULL;
 			}
 		}
+
+		dc_strpool_replace(found, &item->timeout, row[30]);
 
 		/* numeric items */
 
@@ -2804,6 +2915,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			dc_strpool_replace(found, &dbitem->params, row[11]);
 			dc_strpool_replace(found, &dbitem->username, row[14]);
 			dc_strpool_replace(found, &dbitem->password, row[15]);
+
 		}
 		else if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
 		{
@@ -6701,7 +6813,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 	int			found, update_index_p, ret;
 	zbx_uint64_t		proxyid;
-	unsigned char		mode;
+	unsigned char		mode, custom_timeouts;
 	time_t			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -6716,6 +6828,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		ZBX_STR2UINT64(proxyid, row[0]);
 		ZBX_STR2UCHAR(mode, row[2]);
+		ZBX_STR2UCHAR(custom_timeouts, row[22]);
 
 		proxy = (ZBX_DC_PROXY *)DCfind_id(&config->proxies, proxyid, sizeof(ZBX_DC_PROXY), &found);
 		proxy->revision = revision;
@@ -6747,7 +6860,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 				update_index_p = 1;
 		}
 
-		/* store new information in host structure */
+		/* store new information in proxy structure */
 
 		dc_strpool_replace(found, &proxy->name, row[1]);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -6780,11 +6893,11 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			zbx_hashset_insert(&config->proxies_p, &proxy_p_local, sizeof(zbx_dc_proxy_name_t));
 		}
 
+
 		if (0 == found)
 		{
 			proxy->location = ZBX_LOC_NOWHERE;
 			proxy->revision = revision;
-
 			proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
 			proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
 			proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
@@ -6794,6 +6907,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
 			proxy->nodata_win.values_num = 0;
 			proxy->nodata_win.period_end = 0;
+			memset(&proxy->item_timeouts, 0, sizeof(zbx_config_item_type_timeouts_t));
 
 			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
@@ -6801,9 +6915,21 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
 
+		proxy->custom_timeouts = custom_timeouts;
+
 		dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
 		dc_strpool_replace(found, &proxy->address, row[10]);
 		dc_strpool_replace(found, &proxy->port, row[11]);
+
+		dc_strpool_replace(found, &proxy->item_timeouts.agent, row[13]);
+		dc_strpool_replace(found, &proxy->item_timeouts.simple, row[14]);
+		dc_strpool_replace(found, &proxy->item_timeouts.snmp, row[15]);
+		dc_strpool_replace(found, &proxy->item_timeouts.external, row[16]);
+		dc_strpool_replace(found, &proxy->item_timeouts.odbc, row[17]);
+		dc_strpool_replace(found, &proxy->item_timeouts.http, row[18]);
+		dc_strpool_replace(found, &proxy->item_timeouts.ssh, row[19]);
+		dc_strpool_replace(found, &proxy->item_timeouts.telnet, row[20]);
+		dc_strpool_replace(found, &proxy->item_timeouts.script, row[21]);
 
 		if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
@@ -6837,6 +6963,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
 
 /******************************************************************************
  *                                                                            *
@@ -7195,7 +7322,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	sec = zbx_time();
 	DCsync_interfaces(&if_sync, new_revision);
 	ifsec2 = zbx_time() - sec;
-
+	
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
@@ -7413,12 +7540,12 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				dsec + fsec + expr_sec + action_sec + action_op_sec + action_condition_sec +
 				trigger_tag_sec + correlation_sec + corr_condition_sec + corr_operation_sec +
 				hgroups_sec + itempp_sec + maintenance_sec + item_tag_sec + drules_sec + httptest_sec +
-				connector_sec;
+				connector_sec + proxy_sec;
 		total2 = csec2 + hsec2 + hisec2 + ifsec2 + idsec2 + isec2 + tisec2 + pisec2 + tsec2 + dsec2 + fsec2 +
 				expr_sec2 + action_op_sec2 + action_sec2 + action_condition_sec2 + trigger_tag_sec2 +
 				correlation_sec2 + corr_condition_sec2 + corr_operation_sec2 + hgroups_sec2 +
 				itempp_sec2 + maintenance_sec2 + item_tag_sec2 + update_sec + um_cache_sec +
-				drules_sec2 + httptest_sec2 + connector_sec2;
+				drules_sec2 + httptest_sec2 + connector_sec2 + proxy_sec2;
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() changelog  : sql:" ZBX_FS_DBL " sec (%d records)",
 				__func__, changelog_sec, changelog_num);
@@ -7576,6 +7703,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, connector_sec, connector_sec2, connector_tag_sync.add_num,
 				connector_tag_sync.update_num, connector_tag_sync.remove_num);
+
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxy: sql:" ZBX_FS_DBL " sync:" ZBX_FS_DBL " sec ("
 				ZBX_FS_UI64 "/" ZBX_FS_UI64 "/" ZBX_FS_UI64 ").",
 				__func__, proxy_sec, proxy_sec2, proxy_sync.add_num,
@@ -8897,6 +9025,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 	const ZBX_DC_INTERFACE		*dc_interface;
 	const ZBX_DC_HTTPITEM		*httpitem;
 	const ZBX_DC_SCRIPTITEM		*scriptitem;
+	char				*timeout_global = NULL;
+
 
 	dst_item->type = src_item->type;
 	dst_item->value_type = src_item->value_type;
@@ -8937,6 +9067,9 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 	DCget_interface(&dst_item->interface, dc_interface);
 
+	if (src_item->timeout == NULL || '\0' == *src_item->timeout)
+		timeout_global = dc_get_global_item_type_timeout(src_item);
+
 	switch (src_item->type)
 	{
 		case ITEM_TYPE_SNMP:
@@ -8957,6 +9090,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
 				dst_item->snmp_version = snmp->version;
 				dst_item->snmp_max_repetitions = snmp->max_repetitions;
+
+				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -8971,6 +9106,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->snmpv3_contextname_orig = '\0';
 				dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
 				dst_item->snmp_max_repetitions = 0;
+				dst_item->timeout = NULL;
 			}
 
 			dst_item->snmp_community = NULL;
@@ -9009,12 +9145,15 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				dst_item->params = zbx_strdup(NULL, dbitem->params);
 				zbx_strscpy(dst_item->username_orig, dbitem->username);
 				zbx_strscpy(dst_item->password_orig, dbitem->password);
+
+				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
 				dst_item->params = zbx_strdup(NULL, "");
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
+				dst_item->timeout = NULL;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9030,6 +9169,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->privatekey_orig, sshitem->privatekey);
 				zbx_strscpy(dst_item->password_orig, sshitem->password);
 				dst_item->params = zbx_strdup(NULL, sshitem->params);
+
+				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
@@ -9039,6 +9180,7 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->privatekey_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
+				dst_item->timeout = NULL;
 			}
 			dst_item->username = NULL;
 			dst_item->publickey = NULL;
@@ -9049,7 +9191,14 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
 					&src_item->itemid)))
 			{
-				zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
+				if (NULL == httpitem->timeout || '\0' == *httpitem->timeout)
+				{
+					timeout_global = dc_get_global_item_type_timeout(src_item);
+					zbx_strscpy(dst_item->timeout_orig, timeout_global);
+				}
+				else
+					zbx_strscpy(dst_item->timeout_orig, httpitem->timeout);
+
 				zbx_strscpy(dst_item->url_orig, httpitem->url);
 				zbx_strscpy(dst_item->query_fields_orig, httpitem->query_fields);
 				zbx_strscpy(dst_item->status_codes_orig, httpitem->status_codes);
@@ -9117,7 +9266,14 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-				zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
+				if (NULL == scriptitem->timeout || '\0' == *scriptitem->timeout)
+				{
+					timeout_global = dc_get_global_item_type_timeout(src_item);
+					zbx_strscpy(dst_item->timeout_orig, timeout_global);
+				}
+				else
+					zbx_strscpy(dst_item->timeout_orig, scriptitem->timeout);
+
 				dst_item->params = zbx_strdup(NULL, scriptitem->script);
 
 				for (i = 0; i < scriptitem->params.values_num; i++)
@@ -9147,12 +9303,14 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 				zbx_strscpy(dst_item->username_orig, telnetitem->username);
 				zbx_strscpy(dst_item->password_orig, telnetitem->password);
 				dst_item->params = zbx_strdup(NULL, telnetitem->params);
+				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
 				dst_item->params = zbx_strdup(NULL, "");
+				dst_item->timeout = NULL;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9163,11 +9321,13 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			{
 				zbx_strscpy(dst_item->username_orig, simpleitem->username);
 				zbx_strscpy(dst_item->password_orig, simpleitem->password);
+				zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
 			}
 			else
 			{
 				*dst_item->username_orig = '\0';
 				*dst_item->password_orig = '\0';
+				dst_item->timeout = NULL;
 			}
 			dst_item->username = NULL;
 			dst_item->password = NULL;
@@ -9204,9 +9364,17 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			}
 
 			break;
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			zbx_strscpy(dst_item->timeout_orig, (NULL == timeout_global ? src_item->timeout : timeout_global));
+			dst_item->timeout = NULL;
+
+			break;
 		default:
 			/* nothing to do */;
 	}
+
+	//zbx_free(timeout_global);
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -14703,6 +14871,72 @@ int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char 
 	return ret;
 }
 
+void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts)
+{
+	ZBX_DC_PROXY	*proxy;
+
+	RDLOCK_CACHE;
+
+	if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy_hostid)))
+	{
+		zbx_strscpy(timeouts->agent, proxy->item_timeouts.agent);
+		zbx_strscpy(timeouts->simple, proxy->item_timeouts.simple);
+		zbx_strscpy(timeouts->snmp, proxy->item_timeouts.snmp);
+		zbx_strscpy(timeouts->external, proxy->item_timeouts.external);
+		zbx_strscpy(timeouts->odbc, proxy->item_timeouts.odbc);
+		zbx_strscpy(timeouts->http, proxy->item_timeouts.http);
+		zbx_strscpy(timeouts->ssh, proxy->item_timeouts.ssh);
+		zbx_strscpy(timeouts->telnet, proxy->item_timeouts.telnet);
+		zbx_strscpy(timeouts->script, proxy->item_timeouts.script);
+	}
+
+	UNLOCK_CACHE;
+}
+
+static void	proxy_discovery_add_item_type_timeout(const char *key, struct zbx_json *j, zbx_dc_um_handle_t *um_handle,
+		const char *proxy_timeout, zbx_uint64_t proxyid)
+{
+	char	*tmp;
+	int	value = 0;
+
+	tmp = zbx_strdup(NULL, proxy_timeout);
+
+	(void)zbx_dc_expand_user_macros(um_handle, &tmp, &proxyid, 1, NULL);
+
+	if (SUCCEED == zbx_is_time_suffix(tmp, &value, ZBX_LENGTH_UNLIMITED))
+		zbx_json_adduint64(j, key, value);
+	else
+		zbx_json_addstring(j, key, tmp, ZBX_JSON_TYPE_STRING);
+
+	zbx_free(tmp);
+}
+
+static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_json *json)
+{
+	zbx_dc_um_handle_t			*um_handle;
+	const zbx_config_item_type_timeouts_t	*timeouts;
+
+	um_handle = zbx_dc_open_user_macros();
+
+	timeouts = (0 == proxy->custom_timeouts ? &config->config->item_timeouts : &proxy->item_timeouts);
+
+	zbx_json_addobject(json, "timeouts");
+
+	proxy_discovery_add_item_type_timeout("zabbix_agent", json, um_handle, timeouts->agent, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("simple_check", json, um_handle, timeouts->simple, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("snmp_check", json, um_handle, timeouts->snmp, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("external_check", json, um_handle, timeouts->external, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("db_monitor", json, um_handle, timeouts->odbc, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("http_agent", json, um_handle, timeouts->http, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("ssh_agent", json, um_handle, timeouts->ssh, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("telnet_agent", json, um_handle, timeouts->telnet, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("script", json, um_handle, timeouts->script, proxy->proxyid);
+
+	zbx_dc_close_user_macros(um_handle);
+
+	zbx_json_close(json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get data of all proxies from configuration cache and pack into    *
@@ -14799,6 +15033,8 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
 
 			zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
+
+			proxy_discovery_get_timeouts(dc_proxy, &json);
 		}
 		zbx_json_close(&json);
 	}

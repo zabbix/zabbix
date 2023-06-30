@@ -992,7 +992,7 @@ void	zbx_test_parameter(const char *key)
 
 	zbx_init_agent_result(&result);
 
-	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result))
+	if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED))
 	{
 		char	buffer[ZBX_MAX_DOUBLE_LEN + 1];
 
@@ -1164,7 +1164,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
  *               result - contains item value or error message                    *
  *                                                                                *
  **********************************************************************************/
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout)
 {
 	int		ret = NOTSUPPORTED;
 	zbx_metric_t	*command = NULL;
@@ -1258,6 +1258,9 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 		}
 	}
 
+	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED)
+		zbx_alarm_on(timeout);
+
 	if (SYSINFO_RET_OK != command->function(&request, result))
 	{
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
@@ -1267,6 +1270,14 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 
 		goto notsupported;
 	}
+
+	if (timeout != ZBX_CHECK_TIMEOUT_UNDEFINED && SUCCEED == zbx_alarm_timed_out())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "timed out"));
+		goto notsupported;
+	}
+
+	zbx_alarm_off();
 
 	ret = SUCCEED;
 notsupported:

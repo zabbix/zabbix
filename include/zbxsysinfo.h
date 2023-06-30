@@ -108,7 +108,7 @@ int	zbx_check_key_access_rules(const char *metric);
 int	zbx_check_request_access_rules(AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
-int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result);
+int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
 
 void	zbx_set_user_parameter_dir(const char *path);
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len);
@@ -154,5 +154,7 @@ ZBX_THREAD_ENTRY(collector_thread, args);
 
 int	zbx_init_collector_data(char **error);
 void	zbx_free_collector_data(void);
+
+#define ZBX_CHECK_TIMEOUT_UNDEFINED	0
 
 #endif /* ZABBIX_ZBXSYSINFO_H */

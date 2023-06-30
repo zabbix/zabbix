@@ -22,10 +22,10 @@
 
 #include "zbxsysinfo.h"
 
-int	get_value_telnet(zbx_dc_item_t *item, int timeout, const char *config_source_ip, AGENT_RESULT *result)
+int	get_value_telnet(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
 {
 	AGENT_REQUEST	request;
-	int		ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED, timeout_sec;
 	const char	*port, *encoding, *dns;
 
 	zbx_init_agent_request(&request);
@@ -74,9 +74,15 @@ int	get_value_telnet(zbx_dc_item_t *item, int timeout, const char *config_source
 	else
 		item->interface.port = ZBX_DEFAULT_TELNET_PORT;
 
+	if (SUCCEED != zbx_is_time_suffix(item->timeout, &timeout_sec, ZBX_LENGTH_UNLIMITED))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid timeout was specified."));
+		goto out;
+	}
+
 	encoding = get_rparam(&request, 3);
 
-	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), timeout, config_source_ip);
+	ret = telnet_run(item, result, ZBX_NULL2EMPTY_STR(encoding), timeout_sec, config_source_ip);
 out:
 	zbx_free_agent_request(&request);
 

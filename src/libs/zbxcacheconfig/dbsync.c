@@ -47,8 +47,9 @@
 #define ZBX_DBSYNC_OBJ_CONNECTOR	17
 #define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
 #define ZBX_DBSYNC_OBJ_PROXY		19
+#define ZBX_DBSYNC_OBJ_ITEM_TYPE_TIMEOUT	20
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		19
+#define ZBX_DBSYNC_OBJ_COUNT		20
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -852,7 +853,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	zbx_db_result_t	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	33	/* number of columns in the following zbx_db_select() */
+#define SELECTED_CONFIG_FIELD_COUNT	42	/* number of columns in the following zbx_db_select() */
 
 	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
@@ -863,7 +864,9 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
 				"hk_trends_global,hk_trends,default_inventory_mode,db_extension,autoreg_tls_accept,"
 				"compression_status,compress_older,instanceid,default_timezone,hk_events_service,"
-				"auditlog_enabled"
+				"auditlog_enabled,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
+				"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
+				"timeout_telnet_agent,timeout_script"
 			" from config"
 			" order by configid")))	/* if you change number of columns in zbx_db_select(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */
@@ -4050,12 +4053,15 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select p.proxyid,p.name,p.mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
-				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess"
+				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess,"
+				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
+				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,p.timeout_ssh_agent"
+				",p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts"
 			" from proxy p"
 			" join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 13, NULL);
+	dbsync_prepare(sync, 23, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -4072,3 +4078,31 @@ out:
 	return ret;
 }
 
+int	zbx_dbsync_compare_item_type_timeouts(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select hostid,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
+			"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
+			"timeout_telnet_agent,timeout_script from proxy");
+
+	dbsync_prepare(sync, 10, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_ITEM_TYPE_TIMEOUT)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
