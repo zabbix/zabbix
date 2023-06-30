@@ -40,17 +40,17 @@ static inventory_field_t	inventory_fields[] =
 	{MVAR_PROFILE_DEVICETYPE, 0},	/* deprecated */
 	{MVAR_INVENTORY_TYPE_FULL, 1},
 	{MVAR_INVENTORY_NAME, 2},
-	{MVAR_PROFILE_NAME, 2},	/* deprecated */
+	{MVAR_PROFILE_NAME, 2},		/* deprecated */
 	{MVAR_INVENTORY_ALIAS, 3},
 	{MVAR_INVENTORY_OS, 4},
-	{MVAR_PROFILE_OS, 4},	/* deprecated */
+	{MVAR_PROFILE_OS, 4},		/* deprecated */
 	{MVAR_INVENTORY_OS_FULL, 5},
 	{MVAR_INVENTORY_OS_SHORT, 6},
 	{MVAR_INVENTORY_SERIALNO_A, 7},
 	{MVAR_PROFILE_SERIALNO, 7},	/* deprecated */
 	{MVAR_INVENTORY_SERIALNO_B, 8},
 	{MVAR_INVENTORY_TAG, 9},
-	{MVAR_PROFILE_TAG, 9},	/* deprecated */
+	{MVAR_PROFILE_TAG, 9},		/* deprecated */
 	{MVAR_INVENTORY_ASSET_TAG, 10},
 	{MVAR_INVENTORY_MACADDRESS_A, 11},
 	{MVAR_PROFILE_MACADDRESS, 11},	/* deprecated */
@@ -122,7 +122,7 @@ static inventory_field_t	inventory_fields[] =
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host name by hostid                                       *
+ * Purpose: request host field value by hostid.                               *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -152,7 +152,7 @@ int	expr_db_get_host_value(zbx_uint64_t hostid, char **replace_to, const char *f
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get template trigger ID from which the trigger is inherited       *
+ * Purpose: get template trigger ID from which the trigger is inherited.      *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -183,12 +183,12 @@ int	expr_db_get_templateid_by_triggerid(zbx_uint64_t triggerid, zbx_uint64_t *te
 /******************************************************************************
  *                                                                            *
  * Purpose: get comma-space separated trigger template names in which         *
- *          the trigger is defined                                            *
+ *          the trigger is defined.                                           *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
- * Comments: based on the patch submitted by Hmami Mohamed                    *
+ * Comments: based on the patch submitted by Hmami Mohamed.                   *
  *                                                                            *
  ******************************************************************************/
 int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t *userid, char **replace_to)
@@ -298,7 +298,7 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: get comma-space separated host group names in which the trigger   *
- *          is defined                                                        *
+ *          is defined.                                                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -381,7 +381,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a particular value associated with the interface         *
+ * Purpose: retrieve a particular value associated with the interface.        *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -448,7 +448,7 @@ int	expr_dc_get_host_value(zbx_uint64_t itemid, char **replace_to, int request)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get item key, replace macros in the key                           *
+ * Purpose: get item key, replace macros in the key.                          *
  *                                                                            *
  * Parameters: dc_item    - [IN] item information used in substitution        *
  *             replace_to - [OUT] string with item key with replaced macros   *
@@ -465,7 +465,7 @@ static void	zbx_substitute_macros_in_item_key(zbx_dc_item_t *dc_item, char **rep
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a particular value associated with the item              *
+ * Purpose: retrieve a particular value associated with the item.             *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -602,7 +602,7 @@ int	expr_db_get_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve a particular value associated with the trigger's         *
- *          N_functionid'th function                                          *
+ *          N_functionid'th function.                                         *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -649,7 +649,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a particular attribute of a log value                    *
+ * Purpose: retrieve a particular attribute of a log value.                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -723,7 +723,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve item value by item id                                    *
+ * Purpose: retrieve item value by item id.                                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -777,7 +777,7 @@ int	expr_db_item_get_value(zbx_uint64_t itemid, char **lastvalue, int raw, zbx_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve item value by trigger expression and number of function  *
+ * Purpose: retrieve item value by trigger expression and number of function. *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -802,7 +802,7 @@ int	expr_db_item_value(const zbx_db_trigger *trigger, char **value, int N_functi
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve item lastvalue by trigger expression                     *
- *          and number of function                                            *
+ *          and number of function.                                           *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -823,7 +823,7 @@ int	expr_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve escalation history                                       *
+ * Purpose: retrieve escalation history.                                      *
  *                                                                            *
  ******************************************************************************/
 void	expr_db_get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *event, const zbx_db_event *r_event,
@@ -931,7 +931,7 @@ void	expr_db_get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *e
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request action value by macro                                     *
+ * Purpose: request action value by macro.                                    *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -965,7 +965,7 @@ int	expr_db_get_action_value(const char *macro, zbx_uint64_t actionid, char **re
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host inventory value by macro and trigger                 *
+ * Purpose: request host inventory value by macro and trigger.                *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -994,7 +994,7 @@ int	expr_dc_get_host_inventory(const char *macro, const zbx_db_trigger *trigger,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host inventory value by macro and itemid                  *
+ * Purpose: request host inventory value by macro and itemid.                 *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1015,7 +1015,7 @@ int	expr_dc_get_host_inventory_by_itemid(const char *macro, zbx_uint64_t itemid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host inventory value by macro and hostid                  *
+ * Purpose: request host inventory value by macro and hostid.                 *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -1036,7 +1036,7 @@ int	expr_dc_get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: compose temporary vector containing event data                    *
+ * Purpose: compose temporary vector containing event data.                   *
  *                                                                            *
  ******************************************************************************/
 static void	eventdata_compose(const zbx_vector_db_event_t *events, zbx_vector_eventdata_t *vect_eventdata)
@@ -1117,7 +1117,7 @@ void	expr_db_get_event_symptoms(const zbx_db_event *event, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get root cause of service being in problem state                  *
+ * Purpose: get root cause of service being in problem state.                 *
  *                                                                            *
  ******************************************************************************/
 void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
@@ -1139,7 +1139,7 @@ void	expr_db_get_rootcause(const zbx_db_service *service, char **replace_to)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve a particular attribute of a log value                    *
+ * Purpose: retrieve a particular attribute of a log value.                   *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *

@@ -42,13 +42,13 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: formats full user name from name, surname and alias               *
+ * Purpose: formats full user name from name, surname and alias.              *
  *                                                                            *
- * Parameters: name    - [IN] the user name, can be empty string              *
- *             surname - [IN] the user surname, can be empty string           *
- *             alias   - [IN] the user alias                                  *
+ * Parameters: name    - [IN] user name, can be empty string                  *
+ *             surname - [IN] user surname, can be empty string               *
+ *             alias   - [IN] user alias                                      *
  *                                                                            *
- * Return value: the formatted user fullname                                  *
+ * Return value: the formatted user fullname.                                 *
  *                                                                            *
  ******************************************************************************/
 static char	*format_user_fullname(const char *name, const char *surname, const char *alias)
@@ -130,7 +130,7 @@ static const char	*expr_macros[] = {MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_ITEM_KEY
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request recovery event value by macro                             *
+ * Purpose: request recovery event value by macro.                            *
  *                                                                            *
  ******************************************************************************/
 static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_event, char **replace_to,
@@ -172,7 +172,7 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request current event value by macro                              *
+ * Purpose: request current event value by macro.                             *
  *                                                                            *
  ******************************************************************************/
 static void	get_current_event_value(const char *macro, const zbx_db_event *event, char **replace_to)
@@ -190,7 +190,7 @@ static void	get_current_event_value(const char *macro, const zbx_db_event *event
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if a token contains indexed macro                           *
+ * Purpose: check if a token contains indexed macro.                          *
  *                                                                            *
  ******************************************************************************/
 static int	is_indexed_macro(const char *str, const zbx_token_t *token)
@@ -215,14 +215,14 @@ static int	is_indexed_macro(const char *str, const zbx_token_t *token)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if a macro in string is one of the list and extract index   *
+ * Purpose: check if a macro in string is one of the list and extract index.  *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
  *             strloc       - [IN] part of the string to check                *
  *             macros       - [IN] list of allowed macros (without indices)   *
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
- * Return value: unindexed macro from the allowed list or NULL                *
+ * Return value: unindexed macro from the allowed list or NULL.               *
  *                                                                            *
  * Comments: example: N_functionid is untouched if function returns NULL, for *
  *           a valid unindexed macro N_function is 1.                         *
@@ -266,7 +266,7 @@ static const char	*macro_in_list(const char *str, zbx_strloc_t strloc, const cha
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate result of expression macro                              *
+ * Purpose: calculate result of expression macro.                             *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -329,10 +329,10 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache host identifier referenced by an item or a lld-rule         *
+ * Purpose: cache host identifier referenced by an item or a lld-rule.        *
  *                                                                            *
- * Parameters: hostids - [OUT] the host identifier cache                      *
- *             itemid  - [IN]  the item identifier                            *
+ * Parameters: hostids - [OUT] host identifier cache                          *
+ *             itemid  - [IN]  item identifier                                *
  *                                                                            *
  ******************************************************************************/
 static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
@@ -353,7 +353,7 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve {EVENT.OPDATA} macro                                      *
+ * Purpose: resolve {EVENT.OPDATA} macro.                                     *
  *                                                                            *
  ******************************************************************************/
 static void	resolve_opdata(const zbx_db_event *event, char **replace_to, const char *tz, char *error, int maxerrlen)
@@ -402,7 +402,7 @@ static void	resolve_opdata(const zbx_db_event *event, char **replace_to, const c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: resolve {USER.*} macros                                           *
+ * Purpose: resolve {USER.*} macros.                                          *
  *                                                                            *
  ******************************************************************************/
 static void	resolve_user_macros(zbx_uint64_t userid, const char *m, char **user_username, char **user_name,
@@ -480,7 +480,7 @@ static int	resolve_host_target_macros(const char *m, const zbx_dc_host_t *dc_hos
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request cause event value by macro                                *
+ * Purpose: request cause event value by macro.                               *
  *                                                                            *
  ******************************************************************************/
 static void	get_event_cause_value(const char *macro, char **replace_to, const zbx_db_event *event,
@@ -628,7 +628,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute simple macros in data string with real values          *
+ * Purpose: substitute simple macros in data string with real values.         *
  *                                                                            *
  ******************************************************************************/
 int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_event *event,
@@ -2825,7 +2825,7 @@ replace_key_param_data_t;
 
 /******************************************************************************
  *                                                                            *
- * Comments: auxiliary function for substitute_key_macros()                   *
+ * Comments: auxiliary function for substitute_key_macros().                  *
  *                                                                            *
  ******************************************************************************/
 static int	replace_key_param_cb(const char *data, int key_type, int level, int num, int quoted, void *cb_data,
@@ -2868,7 +2868,7 @@ static int	replace_key_param_cb(const char *data, int key_type, int level, int n
 
 /******************************************************************************
  *                                                                            *
- * Purpose: safely substitutes macros in parameters of an item key and OID    *
+ * Purpose: safely substitutes macros in parameters of an item key and OID.   *
  *                                                                            *
  * Example:  key                     | macro  | result            | return    *
  *          -------------------------+--------+-------------------+---------  *
@@ -2938,7 +2938,7 @@ int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t 
 #ifdef HAVE_LIBXML2
 /******************************************************************************
  *                                                                            *
- * Comments: auxiliary function for substitute_macros_xml()                   *
+ * Comments: auxiliary function for substitute_macros_xml().                  *
  *                                                                            *
  ******************************************************************************/
 static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
@@ -3038,15 +3038,18 @@ static void	substitute_macros_in_xml_elements(const zbx_dc_item_t *item, const s
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute simple or LLD macros in XML text nodes, attributes of  *
- *          a node or in CDATA section, validate XML                          *
+ *          a node or in CDATA section, validate XML.                         *
  *                                                                            *
- * Parameters: data   - [IN/OUT] pointer to a buffer that contains XML        *
- *             item   - [IN] item for simple macro substitution               *
- *             jp_row - [IN] discovery data for LLD macro substitution        *
- *             error  - [OUT] reason for XML parsing failure                  *
- *             maxerrlen - [IN] the size of error buffer                      *
+ * Parameters: data            - [IN/OUT] pointer to a buffer that contains   *
+ *                                    XML                                     *
+ *             item            - [IN] item for simple macro substitution      *
+ *             jp_row          - [IN] discovery data for LLD macro            *
+ *                                    substitution                            *
+ *             lld_macro_paths - [IN] lld macro paths                         *
+ *             error           - [OUT] reason for XML parsing failure         *
+ *             maxerrlen       - [IN] size of error buffer                    *
  *                                                                            *
- * Return value: SUCCEED or FAIL if XML validation has failed                 *
+ * Return value: SUCCEED or FAIL if XML validation has failed.                *
  *                                                                            *
  ******************************************************************************/
 static int	substitute_macros_xml_impl(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
@@ -3099,7 +3102,7 @@ exit:
 /******************************************************************************
  *                                                                            *
  * Purpose: substitute_simple_macros with masked secret macros                *
- *          (default setting)                                                 *
+ *          (default setting).                                                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros(const zbx_uint64_t *actionid, const zbx_db_event *event,
@@ -3120,7 +3123,7 @@ void	zbx_substitute_simple_macros_allowed_hosts(zbx_history_recv_item_t *item, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute_simple_macros with unmasked secret macros              *
+ * Purpose: substitute_simple_macros with unmasked secret macros.             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zbx_db_event *event,
@@ -3145,7 +3148,7 @@ int	zbx_substitute_simple_macros_unmasked(const zbx_uint64_t *actionid, const zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute_macros_xml with masked secret macros                   *
+ * Purpose: substitute_macros_xml with masked secret macros.                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
@@ -3156,7 +3159,7 @@ int	zbx_substitute_macros_xml(char **data, const zbx_dc_item_t *item, const stru
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute_macros_xml with unmasked secret macros                 *
+ * Purpose: substitute_macros_xml with unmasked secret macros.                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, const struct zbx_json_parse *jp_row,
@@ -3176,7 +3179,7 @@ int	zbx_substitute_macros_xml_unmasked(char **data, const zbx_dc_item_t *item, c
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute_key_macros with masked secret macros                   *
+ * Purpose: substitute_key_macros with masked secret macros.                  *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
@@ -3188,7 +3191,7 @@ int	zbx_substitute_key_macros(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute_key_macros with unmasked secret macros                 *
+ * Purpose: substitute_key_macros with unmasked secret macros.                *
  *                                                                            *
  ******************************************************************************/
 int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
@@ -3209,10 +3212,10 @@ int	zbx_substitute_key_macros_unmasked(char **data, zbx_uint64_t *hostid, zbx_dc
 
 /******************************************************************************
  *                                                                            *
- * Purpose: extract index from valid indexed host or item key macro           *
+ * Purpose: extract index from valid indexed host or item key macro.          *
  *                                                                            *
- * Return value: The index or -1 if it was not valid indexed host or item key *
- *               macro                                                        *
+ * Return value: the index or -1 if it was not valid indexed host or item key *
+ *               macro.                                                       *
  *                                                                            *
  ******************************************************************************/
 int	zbx_expr_macro_index(const char *macro)

@@ -45,14 +45,14 @@ static zbx_macro_functions_t	mod_macros[] =
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates regular expression substitution                        *
+ * Purpose: calculates regular expression substitution.                       *
  *                                                                            *
- * Parameters: params - [IN] the function parameters                          *
- *             nparam - [IN] the function parameter count                     *
- *             out    - [IN/OUT] the input/output value                       *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
  *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully.          *
- *               FAIL    - the function calculation failed.                   *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - the function calculation failed                    *
  *                                                                            *
  ******************************************************************************/
 static int	macrofunc_regsub(char **params, size_t nparam, char **out)
@@ -76,14 +76,14 @@ static int	macrofunc_regsub(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates case insensitive regular expression substitution       *
+ * Purpose: calculates case insensitive regular expression substitution.      *
  *                                                                            *
- * Parameters: params - [IN] the function parameters                          *
- *             nparam - [IN] the function parameter count                     *
- *             out    - [IN/OUT] the input/output value                       *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
  *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully.          *
- *               FAIL    - the function calculation failed.                   *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
  *                                                                            *
  ******************************************************************************/
 static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
@@ -107,14 +107,14 @@ static int	macrofunc_iregsub(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: time formatting macro function                                    *
+ * Purpose: time formatting macro function.                                   *
  *                                                                            *
- * Parameters: params - [IN] the function parameters                          *
- *             nparam - [IN] the function parameter count                     *
- *             out    - [IN/OUT] the input/output value                       *
+ * Parameters: params - [IN] function parameters                              *
+ *             nparam - [IN] function parameter count                         *
+ *             out    - [IN/OUT] input/output value                           *
  *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully.          *
- *               FAIL    - the function calculation failed.                   *
+ * Return value: SUCCEED - the function was calculated successfully           *
+ *               FAIL    - the function calculation failed                    *
  *                                                                            *
  ******************************************************************************/
 static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
@@ -196,14 +196,14 @@ static int	macrofunc_fmttime(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: number formatting macro function                                  *
+ * Purpose: number formatting macro function.                                 *
  *                                                                            *
- * Parameters: params - [IN] the function data                                *
+ * Parameters: params - [IN] function data                                    *
  *             nparam - [IN] parameter count                                  *
- *             out    - [IN/OUT] the input/output value                       *
+ *             out    - [IN/OUT] input/output value                           *
  *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully.          *
- *               FAIL    - the function calculation failed.                   *
+ * Return value: SUCCEED - function was calculated successfully               *
+ *               FAIL    - function calculation failed                        *
  *                                                                            *
  ******************************************************************************/
 static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
@@ -236,13 +236,13 @@ static int	macrofunc_fmtnum(char **params, size_t nparam, char **out)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if a macro function one in the list for the macro           *
+ * Purpose: check if a macro function one in the list for the macro.          *
  *                                                                            *
  * Parameters: str          - [IN] string containing potential macro          *
  *             fm           - [IN] function macro to check                    *
  *             N_functionid - [OUT] index of the macro in string (if valid)   *
  *                                                                            *
- * Return value: unindexed macro from the allowed list or NULL                *
+ * Return value: unindexed macro from the allowed list or NULL.               *
  *                                                                            *
  ******************************************************************************/
 const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
@@ -282,14 +282,14 @@ const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates macro function value                                   *
+ * Purpose: calculates macro function value.                                  *
  *                                                                            *
  * Parameters: expression - [IN] expression containing macro function         *
  *             func_macro - [IN] information about macro function token       *
- *             out        - [IN/OUT] the input/output value                   *
+ *             out        - [IN/OUT] input/output value                       *
  *                                                                            *
- * Return value: SUCCEED - the function was calculated successfully.          *
- *               FAIL    - the function calculation failed.                   *
+ * Return value: SUCCEED - the function was calculated successfully           *
+ *               FAIL    - the function calculation failed                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out)

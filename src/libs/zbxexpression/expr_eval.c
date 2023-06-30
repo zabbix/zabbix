@@ -95,7 +95,7 @@ static void	expression_query_free(zbx_expression_query_t *query)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if key parameter is a wildcard '*'                          *
+ * Purpose: check if key parameter is a wildcard '*'.                         *
  *                                                                            *
  ******************************************************************************/
 static int	test_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
@@ -120,11 +120,11 @@ static int	test_key_param_wildcard_cb(const char *data, int key_type, int level,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create expression item query from item query /host/key?[filter]   *
+ * Purpose: create expression item query from item query /host/key?[filter].  *
  *                                                                            *
  * Parameters: itemquery - [IN] the item query                                *
  *                                                                            *
- * Return value: The created expression item query.                           *
+ * Return value: the created expression item query.                           *
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_query_t*	expression_create_query(const char *itemquery)
@@ -180,14 +180,14 @@ static void	expression_group_free(zbx_expression_group_t *group)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get group from cache by name                                      *
+ * Purpose: get group from cache by name.                                     *
  *                                                                            *
- * Parameters: eval - [IN] the evaluation data                                *
- *             name - [IN] the group name                                     *
+ * Parameters: eval - [IN] evaluation data                                    *
+ *             name - [IN] group name                                         *
  *                                                                            *
- * Return value: The cached group.                                            *
+ * Return value: the cached group.                                            *
  *                                                                            *
- * Comments: Cache group if necessary.                                        *
+ * Comments: cache group if necessary.                                        *
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval, const char *name)
@@ -213,14 +213,14 @@ static zbx_expression_group_t	*expression_get_group(zbx_expression_eval_t *eval,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get item from cache by itemid                                     *
+ * Purpose: get item from cache by itemid.                                    *
  *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             itemid  - [IN] the item identifier                             *
+ * Parameters: eval    - [IN] evaluation data                                 *
+ *             itemid  - [IN] item identifier                                 *
  *                                                                            *
- * Return value: The cached item.                                             *
+ * Return value: the cached item.                                             *
  *                                                                            *
- * Comments: Cache item if necessary.                                         *
+ * Comments: cache item if necessary.                                         *
  *                                                                            *
  ******************************************************************************/
 static zbx_expression_item_t	*expression_get_item(zbx_expression_eval_t *eval, zbx_uint64_t itemid)
@@ -253,10 +253,10 @@ static void	expression_item_free(zbx_expression_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize one item query                                         *
+ * Purpose: initialize one item query.                                        *
  *                                                                            *
- * Parameters: eval  - [IN] the evaluation data                               *
- *             query - [IN] the query to initialize                           *
+ * Parameters: eval  - [IN] evaluation data                                   *
+ *             query - [IN] query to initialize                               *
  *                                                                            *
  ******************************************************************************/
 static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expression_query_t *query)
@@ -271,7 +271,7 @@ static void	expression_init_query_one(zbx_expression_eval_t *eval, zbx_expressio
 /******************************************************************************
  *                                                                            *
  * Purpose: replace wildcards '*'in key parameters with % and escape existing *
- *          %, \ characters for SQL like operation                            *
+ *          %, \ characters for SQL like operation.                           *
  *                                                                            *
  ******************************************************************************/
 static int	replace_key_param_wildcard_cb(const char *data, int key_type, int level, int num, int quoted,
@@ -312,10 +312,10 @@ static int	replace_key_param_wildcard_cb(const char *data, int key_type, int lev
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if item key matches the pattern                             *
+ * Purpose: check if item key matches the pattern.                            *
  *                                                                            *
- * Parameters: item_key - [IN] the item key to match                          *
- *             pattern  - [IN] the pattern                                    *
+ * Parameters: item_key - [IN] item key to match                              *
+ *             pattern  - [IN] pattern                                        *
  *                                                                            *
  ******************************************************************************/
 static int	expression_match_item_key(const char *item_key, const AGENT_REQUEST *pattern)
@@ -361,12 +361,12 @@ zbx_expression_eval_many_t;
 /******************************************************************************
  *                                                                            *
  * Purpose: get itemids + hostids of items that might match query based on    *
- *          host, key and filter groups                                       *
+ *          host, key and filter groups.                                      *
  *                                                                            *
- * Parameters: eval            - [IN] the evaluation data                     *
- *             query           - [IN] the expression item query               *
- *             groups          - [IN] the groups in filter template           *
- *             filter_template - [IN] the group filter template with {index}  *
+ * Parameters: eval            - [IN] evaluation data                         *
+ *             query           - [IN] expression item query                   *
+ *             groups          - [IN] groups in filter template               *
+ *             filter_template - [IN] group filter template with {index}      *
  *                                    placeholders referring to a group in    *
  *                                    groups vector                           *
  *             itemhosts       - [out] itemid+hostid pairs matching query     *
@@ -503,10 +503,10 @@ static void	expression_get_item_candidates(zbx_expression_eval_t *eval, const zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the item matches the tag                                 *
+ * Purpose: check if the item matches the tag.                                *
  *                                                                            *
- * Parameters: item - [IN] the item with tags                                 *
- *             tag  - [IN] the tag to match in format <tag name>[:<tag value>]*
+ * Parameters: item - [IN] item with tags                                     *
+ *             tag  - [IN] tag to match in format <tag name>[:<tag value>]    *
  *                                                                            *
  * Return value: SUCCEED - the item matches the specified tag                 *
  *               FAIL    - otherwise                                          *
@@ -545,21 +545,21 @@ static int	expression_item_check_tag(zbx_expression_item_t *item, const char *ta
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate filter function                                          *
+ * Purpose: evaluate filter function.                                         *
  *                                                                            *
- * Parameters: name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: name     - [IN] function name (not zero terminated)            *
+ *             len      - [IN] function name length                           *
+ *             args_num - [IN] number of function arguments                   *
+ *             args     - [IN] an array of function arguments                 *
+ *             data     - [IN] caller data used for function evaluation       *
+ *             ts       - [IN] function execution time                        *
+ *             value    - [OUT] function return value                         *
+ *             error    - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED - the function was evaluated successfully            *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: The group/tag comparisons in filter are converted to function    *
+ * Comments: the group/tag comparisons in filter are converted to function    *
  *           calls that are evaluated by this callback.                       *
  *                                                                            *
  ******************************************************************************/
@@ -618,10 +618,10 @@ static int	expression_eval_filter(const char *name, size_t len, int args_num, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize many item query                                        *
+ * Purpose: initialize many item query.                                       *
  *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             query   - [IN] the query to initialize                         *
+ * Parameters: eval    - [IN] evaluation data                                 *
+ *             query   - [IN] query to initialize                             *
  *                                                                            *
  ******************************************************************************/
 static void	expression_init_query_many(zbx_expression_eval_t *eval, zbx_expression_query_t *query)
@@ -746,9 +746,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache items used in one item queries                              *
+ * Purpose: cache items used in one item queries.                             *
  *                                                                            *
- * Parameters: eval - [IN] the evaluation data                                *
+ * Parameters: eval - [IN] evaluation data                                    *
  *                                                                            *
  ******************************************************************************/
 static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
@@ -778,7 +778,7 @@ static void	expression_cache_dcitems_hk(zbx_expression_eval_t *eval)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: dcitem reference vector lookup functions                          *
+ * Purpose: dcitem reference vector lookup functions.                         *
  *                                                                            *
  ******************************************************************************/
 static	int	compare_dcitems_by_itemid(const void *d1, const void *d2)
@@ -803,9 +803,9 @@ static int	expression_find_dcitem_by_itemid(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: cache items used in many item queries                             *
+ * Purpose: cache items used in many item queries.                            *
  *                                                                            *
- * Parameters: eval - [IN] the evaluation data                                *
+ * Parameters: eval - [IN] evaluation data                                    *
  *                                                                            *
  ******************************************************************************/
 static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
@@ -881,18 +881,17 @@ static void	expression_cache_dcitems(zbx_expression_eval_t *eval)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate historical function for one item query                   *
+ * Purpose: evaluate historical function for one item query.                  *
  *                                                                            *
- * Parameters: eval     - [IN] the evaluation data                            *
- *             query    - [IN] the item query                                 *
- *             name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: eval     - [IN] evaluation data                                *
+ *             query    - [IN] item query                                     *
+ *             name     - [IN] function name (not zero terminated)            *
+ *             len      - [IN] function name length                           *
+ *             args_num - [IN] number of function arguments                   *
+ *             args     - [IN] array of function arguments.                   *
+ *             ts       - [IN] function execution time                        *
+ *             value    - [OUT] function return value                         *
+ *             error    - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1057,12 +1056,12 @@ static int	get_function_by_name(const char *name, size_t len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate minimum value from the history value vector             *
+ * Purpose: calculate minimum value from the history value vector.            *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1089,12 +1088,12 @@ static void	evaluate_history_func_min(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate maximum value from the history value vector             *
+ * Purpose: calculate maximum value from the history value vector.            *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1121,12 +1120,12 @@ static void	evaluate_history_func_max(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate sum of values from the history value vector             *
+ * Purpose: calculate sum of values from the history value vector.            *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1149,12 +1148,12 @@ static void	evaluate_history_func_sum(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate average value of values from the history value vector   *
+ * Purpose: calculate average value of values from the history value vector.  *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1165,12 +1164,12 @@ static void	evaluate_history_func_avg(zbx_vector_history_record_t *values, int v
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate number of values in value vector                        *
+ * Purpose: calculate number of values in value vector.                       *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_count(zbx_vector_history_record_t *values, double *result)
@@ -1180,10 +1179,12 @@ static void	evaluate_history_func_count(zbx_vector_history_record_t *values, dou
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate the last (newest) value in value vector                 *
+ * Purpose: calculate the last (newest) value in value vector.                *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int value_type, double *result)
@@ -1196,10 +1197,10 @@ static void	evaluate_history_func_last(zbx_vector_history_record_t *values, int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert history record to variant and append to variant vector    *
+ * Purpose: convert history record to variant and append to variant vector.   *
  *                                                                            *
  * Parameters: values         - [IN] vector containing history values         *
- *             value_type     - [IN] type of an item                          *
+ *             value_type     - [IN] type of item                             *
  *             result_vector  - [OUT] resulting vector                        *
  *                                                                            *
  ******************************************************************************/
@@ -1236,17 +1237,17 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculate function with values from value vector                  *
+ * Purpose: calculate function with values from value vector.                 *
  *                                                                            *
- * Parameters: values      - [IN] a vector containing history values          *
- *             value_type  - [IN] the type of values. Only float/uint64       *
- *                           values are supported.                            *
- *             func        - [IN] the function to calculate. Only             *
- *                           ZBX_VALUE_FUNC_MIN, ZBX_VALUE_FUNC_AVG,          *
- *                           ZBX_VALUE_FUNC_MAX, ZBX_VALUE_FUNC_SUM,          *
- *                           ZBX_VALUE_FUNC_COUNT, ZBX_VALUE_FUNC_LAST        *
- *                           functions are supported.                         *
- *             result      - [OUT] the resulting value                        *
+ * Parameters: values      - [IN] vector containing history values            *
+ *             value_type  - [IN] type of values. Only float/uint64 values    *
+ *                                are supported.                              *
+ *             func        - [IN] function to calculate. Only                 *
+ *                                ZBX_VALUE_FUNC_MIN, ZBX_VALUE_FUNC_AVG,     *
+ *                                ZBX_VALUE_FUNC_MAX, ZBX_VALUE_FUNC_SUM,     *
+ *                                ZBX_VALUE_FUNC_COUNT, ZBX_VALUE_FUNC_LAST   *
+ *                                functions are supported.                    *
+ *             result      - [OUT] resulting value                            *
  *                                                                            *
  ******************************************************************************/
 static void	evaluate_history_func(zbx_vector_history_record_t *values, int value_type, int func,
@@ -1277,12 +1278,12 @@ static void	evaluate_history_func(zbx_vector_history_record_t *values, int value
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get item from cache by itemid                                     *
+ * Purpose: get item from cache by itemid.                                    *
  *                                                                            *
- * Parameters: eval    - [IN] the evaluation data                             *
- *             itemid  - [IN] the item identifier                             *
+ * Parameters: eval    - [IN] evaluation data                                 *
+ *             itemid  - [IN] item identifier                                 *
  *                                                                            *
- * Return value: The cached item.                                             *
+ * Return value: the cached item.                                             *
  *                                                                            *
  ******************************************************************************/
 static zbx_dc_item_t	*get_dcitem(zbx_vector_dc_item_t *dcitem_refs, zbx_uint64_t itemid)
@@ -1300,13 +1301,13 @@ static zbx_dc_item_t	*get_dcitem(zbx_vector_dc_item_t *dcitem_refs, zbx_uint64_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate functions 'exists_foreach' and 'item_count'              *
- *          for multiple items                                                *
+ * Purpose: evaluate functions 'exists_foreach' and 'item_count' for multiple *
+ *          items.                                                            *
  *                                                                            *
- * Parameters: eval      - [IN] the evaluation data                           *
- *             query     - [IN] the calculated item query                     *
- *             item_func - [IN] the function id                               *
- *             value     - [OUT] the function return value                    *
+ * Parameters: eval      - [IN] evaluation data                               *
+ *             query     - [IN] calculated item query                         *
+ *             item_func - [IN] function id                                   *
+ *             value     - [OUT] function return value                        *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1358,17 +1359,16 @@ static void	expression_eval_exists(zbx_expression_eval_t *eval, zbx_expression_q
 /******************************************************************************
  *                                                                            *
  * Purpose: evaluate functions 'bucket_rate_foreach' for 'histogram_quantile' *
- *          and evaluate functions 'bucket_percentile'                        *
+ *          and evaluate functions 'bucket_percentile'.                       *
  *                                                                            *
- * Parameters: eval      - [IN] the evaluation data                           *
- *             query     - [IN] the calculated item query                     *
- *             args_num  - [IN] the number of function arguments              *
- *             args      - [IN] an array of the function arguments.           *
- *             data      - [IN] the caller data used for function evaluation  *
- *             ts        - [IN] the function execution time                   *
- *             item_func - [IN] the function id                               *
- *             value     - [OUT] the function return value                    *
- *             error     - [OUT] the error message if function failed         *
+ * Parameters: eval      - [IN] evaluation data                               *
+ *             query     - [IN] calculated item query                         *
+ *             args_num  - [IN] number of function arguments                  *
+ *             args      - [IN] array of function arguments                   *
+ *             ts        - [IN] function execution time                       *
+ *             item_func - [IN] function id                                   *
+ *             value     - [OUT] function return value                        *
+ *             error     - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1593,18 +1593,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate historical function for multiple items (aggregate checks)*
+ * Purpose: evaluate historical function for multiple items (aggregate        *
+ *          checks).                                                          *
  *                                                                            *
- * Parameters: eval     - [IN] the evaluation data                            *
- *             query    - [IN] the calculated item query                      *
- *             name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN/OUT] an array of the function arguments.        *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: eval     - [IN] evaluation data                                *
+ *             query    - [IN] calculated item query                          *
+ *             name     - [IN] function name (not zero terminated)            *
+ *             len      - [IN] function name length                           *
+ *             args_num - [IN] number of function arguments                   *
+ *             args     - [IN/OUT] array of function arguments                *
+ *             ts       - [IN] function execution time                        *
+ *             value    - [OUT] function return value                         *
+ *             error    - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1800,16 +1800,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate historical function                                      *
+ * Purpose: evaluate historical function.                                     *
  *                                                                            *
- * Parameters: name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: name     - [IN] function name (not zero terminated)            *
+ *             len      - [IN] function name length                           *
+ *             args_num - [IN] number of function arguments                   *
+ *             args     - [IN] array of function arguments                    *
+ *             data     - [IN] caller data used for function evaluation       *
+ *             ts       - [IN] function execution time                        *
+ *             value    - [OUT] function return value                         *
+ *             error    - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
@@ -1878,21 +1878,21 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate common function                                          *
+ * Purpose: evaluate common function.                                         *
  *                                                                            *
- * Parameters: name     - [IN] the function name (not zero terminated)        *
- *             len      - [IN] the function name length                       *
- *             args_num - [IN] the number of function arguments               *
- *             args     - [IN] an array of the function arguments.            *
- *             data     - [IN] the caller data used for function evaluation   *
- *             ts       - [IN] the function execution time                    *
- *             value    - [OUT] the function return value                     *
- *             error    - [OUT] the error message if function failed          *
+ * Parameters: name     - [IN] function name (not zero terminated)            *
+ *             len      - [IN] function name length                           *
+ *             args_num - [IN] number of function arguments                   *
+ *             args     - [IN] array of function arguments                    *
+ *             data     - [IN] caller data used for function evaluation       *
+ *             ts       - [IN] function execution time                        *
+ *             value    - [OUT] function return value                         *
+ *             error    - [OUT]                                               *
  *                                                                            *
  * Return value: SUCCEED - the function was executed successfully             *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: There are no custom common functions in expressions items, but   *
+ * Comments: there are no custom common functions in expressions items, but   *
  *           it's used to check for /host/key query quoting errors instead.   *
  *                                                                            *
  ******************************************************************************/
@@ -1937,14 +1937,14 @@ static int	expression_eval_common(const char *name, size_t len, int args_num, zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize expression evaluation data                             *
+ * Purpose: initialize expression evaluation data.                            *
  *                                                                            *
- * Parameters: eval     - [IN] the evaluation data                            *
+ * Parameters: eval     - [IN] evaluation data                                *
  *             mode     - [IN] ZBX_EXPRESSION_NORMAL - support only single    *
  *                             item queries                                   *
  *                             ZBX_EXPRESSION_AGGREGATE - support aggregate   *
  *                             item queries                                   *
- *             ctx      - [IN] the parsed expression                          *
+ *             ctx      - [IN] parsed expression                              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_context_t *ctx)
@@ -1990,9 +1990,9 @@ void	zbx_expression_eval_init(zbx_expression_eval_t *eval, int mode, zbx_eval_co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free resources allocated by expression evaluation data            *
+ * Purpose: free resources allocated by expression evaluation data.           *
  *                                                                            *
- * Parameters: eval     - [IN] the evaluation data                            *
+ * Parameters: eval - [IN] evaluation data                                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
@@ -2028,10 +2028,10 @@ void	zbx_expression_eval_clear(zbx_expression_eval_t *eval)
 *                                                                             *
 * Purpose: resolve calculated item formula with an empty(default host) and    *
 *          macro host references, like:                                       *
-*          ( two forward slashes , {HOST.HOST}) to host names                 *
+*          ( two forward slashes , {HOST.HOST}) to host names.                *
 *                                                                             *
-* Parameters: eval - [IN] the evaluation expression                           *
-*             item - [IN] the calculated item which defines the evaluation    *
+* Parameters: eval - [IN] evaluation expression                               *
+*             item - [IN] calculated item which defines the evaluation        *
 *                         expression                                          *
 *                                                                             *
 *******************************************************************************/
@@ -2052,12 +2052,10 @@ void	zbx_expression_eval_resolve_item_hosts(zbx_expression_eval_t *eval, const z
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_expression_eval_resolve_filter_macros                        *
+ * Purpose: resolve calculated item formula macros in filter.                 *
  *                                                                            *
- * Purpose: resolve calculated item formula macros in filter                  *
- *                                                                            *
- * Parameters: eval - [IN] the evaluation data                                *
- *             item - [IN] the calculated item                                *
+ * Parameters: eval - [IN] evaluation data                                    *
+ *             item - [IN] calculated item                                    *
  *                                                                            *
  ******************************************************************************/
 void	zbx_expression_eval_resolve_filter_macros(zbx_expression_eval_t *eval, const zbx_dc_item_t *item)
@@ -2137,10 +2135,10 @@ static int	resolve_expression_query_macro(const zbx_db_trigger *trigger, int req
 * Purpose: resolve expression with an empty host macro (default host),        *
 *          macro host references and item key references, like:               *
 *          (two forward slashes, {HOST.HOST}, {HOST.HOST<N>},                 *
-*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys          *
+*          {ITEM.KEY} and {ITEM.KEY<N>}) to host names and item keys.         *
 *                                                                             *
-* Parameters: eval    - [IN/OUT] the evaluation expression                    *
-*             trigger - [IN] trigger which defines the evaluation expression  *
+* Parameters: eval    - [IN/OUT] evaluation expression                        *
+*             trigger - [IN] trigger which defines evaluation expression      *
 *                                                                             *
 *******************************************************************************/
 void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval, const zbx_db_trigger *trigger)
@@ -2188,15 +2186,15 @@ void	zbx_expression_eval_resolve_trigger_hosts_items(zbx_expression_eval_t *eval
 
 /******************************************************************************
  *                                                                            *
- * Purpose: execute expression containing history functions                   *
+ * Purpose: execute expression containing history functions.                  *
  *                                                                            *
- * Parameters: eval  - [IN] the evaluation data                               *
- *             ts    - [IN] the calculated item                               *
- *             value - [OUT] the expression evaluation result                 *
- *             error - [OUT] the error message                                *
+ * Parameters: eval  - [IN] evaluation data                                   *
+ *             ts    - [IN] calculated item                                   *
+ *             value - [OUT] expression evaluation result                     *
+ *             error - [OUT]                                                  *
  *                                                                            *
- * Return value: SUCCEED - the expression was evaluated successfully.         *
- *               FAIL    - otherwise.                                         *
+ * Return value: SUCCEED - the expression was evaluated successfully          *
+ *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	zbx_expression_eval_execute(zbx_expression_eval_t *eval, const zbx_timespec_t *ts, zbx_variant_t *value,

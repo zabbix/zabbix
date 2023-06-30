@@ -41,10 +41,10 @@ ZBX_PTR_VECTOR_IMPL(valuemaps_ptr, zbx_valuemaps_t *)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Process suffix 'uptime'                                           *
+ * Purpose: process suffix 'uptime'.                                          *
  *                                                                            *
- * Parameters: value - value for adjusting                                    *
- *             max_len - max len of the value                                 *
+ * Parameters: value   - [IN/OUT] value for adjusting                         *
+ *             max_len - [IN] max len of value                                *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_uptime(char *value, size_t max_len)
@@ -85,10 +85,10 @@ static void	add_value_suffix_uptime(char *value, size_t max_len)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Process suffix 's'                                                *
+ * Purpose: process suffix 's'.                                               *
  *                                                                            *
- * Parameters: value - value for adjusting                                    *
- *             max_len - max len of the value                                 *
+ * Parameters: value   - [IN/OUT] value for adjusting                         *
+ *             max_len - [IN] max len of value                                *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_suffix_s(char *value, size_t max_len)
@@ -170,9 +170,9 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose:  check if unit is blacklisted or not                              *
+ * Purpose:  check if unit is blacklisted or not.                             *
  *                                                                            *
- * Parameters: unit - unit to check                                           *
+ * Parameters: unit - [IN] unit to check                                      *
  *                                                                            *
  * Return value: SUCCEED - unit blacklisted                                   *
  *               FAIL - unit is not blacklisted                               *
@@ -193,11 +193,11 @@ static int	is_blacklisted_unit(const char *unit)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add only units to the value                                       *
+ * Purpose: add only units to the value.                                      *
  *                                                                            *
- * Parameters: value - value for adjusting                                    *
- *             max_len - max len of the value                                 *
- *             units - units (bps, b, B, etc)                                 *
+ * Parameters: value   - [IN/OUT] value for adjusting                         *
+ *             max_len - [IN] max len of value                                *
+ *             units   - [IN] units (bps, b, B, etc)                          *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_units_no_kmgt(char *value, size_t max_len, const char *units)
@@ -229,11 +229,11 @@ static void	add_value_units_no_kmgt(char *value, size_t max_len, const char *uni
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add units with K,M,G,T prefix to the value                        *
+ * Purpose: add units with K,M,G,T prefix to the value.                       *
  *                                                                            *
- * Parameters: value - value for adjusting                                    *
- *             max_len - max len of the value                                 *
- *             units - units (bps, b, B, etc)                                 *
+ * Parameters: value   - [IN/OUT] value for adjusting                         *
+ *             max_len - [IN] max len of value                                *
+ *             units   - [IN] units (bps, b, B, etc)                          *
  *                                                                            *
  ******************************************************************************/
 static void	add_value_units_with_kmgt(char *value, size_t max_len, const char *units)
@@ -294,11 +294,15 @@ static void	add_value_units_with_kmgt(char *value, size_t max_len, const char *u
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Add suffix for value                                              *
+ * Purpose: add suffix for value.                                             *
  *                                                                            *
- * Parameters: value - value for replacing                                    *
+ * Parameters: value      - [IN/OUT] value for replacing                      *
+ *             max_len    - [IN] max len of value                             *
+ *             units      - [IN] units (bps, b, B, etc)                       *
+ *             value_type - [IN] type of input value; ITEM_VALUE_TYPE_*       *
  *                                                                            *
- * Return value: SUCCEED - suffix added successfully, value contains new value*
+ * Return value: SUCCEED - suffix added successfully, value contains new      *
+ *                         value                                              *
  *               FAIL - adding failed, value contains old value               *
  *                                                                            *
  ******************************************************************************/
@@ -347,12 +351,12 @@ void	zbx_valuemaps_free(zbx_valuemaps_t *valuemap)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replace value by mapping value                                    *
+ * Purpose: replace value by mapping value.                                   *
  *                                                                            *
- * Parameters: value - value for replacing                                    *
- *             max_len - maximal length of output value                       *
- *             valuemaps - vector of values mapped                            *
- *             value_type - type of input value                               *
+ * Parameters: value      - [IN/OUT] value for replacing                      *
+ *             max_len    - [IN] maximal length of output value               *
+ *             valuemaps  - [IN] vector of values mapped                      *
+ *             value_type - [IN] type of input value; ITEM_VALUE_TYPE_*       *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
@@ -500,12 +504,12 @@ map_value:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replace value by mapping value                                    *
+ * Purpose: replace value by mapping value.                                   *
  *                                                                            *
- * Parameters: value - value for replacing                                    *
- *             max_len - maximal length of output value                       *
- *             valuemapid - index of value map                                *
- *             value_type - type of input value                               *
+ * Parameters: value      - [IN/OUT] value for replacing                      *
+ *             max_len    - [IN] maximal length of output value               *
+ *             valuemapid - [IN] index of value map                           *
+ *             value_type - [IN] type of input value; ITEM_VALUE_TYPE_*       *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains new value   *
  *               FAIL - evaluation failed, value contains old value           *
@@ -558,7 +562,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replace value by value mapping or by units                        *
+ * Purpose: replace value by value mapping or by units.                       *
  *                                                                            *
  * Parameters: value      - [IN/OUT] value for replacing                      *
  *             valuemapid - [IN] identifier of value map                      *
@@ -592,7 +596,7 @@ void	zbx_format_value(char *value, size_t max_len, zbx_uint64_t valuemapid,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if function is to be evaluated for NOTSUPPORTED items       *
+ * Purpose: check if function is to be evaluated for NOTSUPPORTED items.      *
  *                                                                            *
  * Parameters: fn - [IN] function name                                        *
  *                                                                            *
@@ -613,14 +617,14 @@ int	zbx_evaluatable_for_notsupported(const char *fn)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get last Nth value defined by #num:now-timeshift first parameter  *
+ * Purpose: get last Nth value defined by #num:now-timeshift first parameter. *
  *                                                                            *
  * Parameters: item       - [IN] item (performance metric)                    *
- *             parameters - [IN] the parameter string with #sec|num/timeshift *
- *                          in first parameter                                *
- *             ts         - [IN] the starting timestamp                       *
- *             value      - [OUT] the Nth value                               *
- *             error      - [OUT] the error message                           *
+ *             parameters - [IN] parameter string with #sec|num/timeshift in  *
+ *                               first parameter                              *
+ *             ts         - [IN] starting timestamp                           *
+ *             value      - [OUT] Nth value                                   *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - value was found successfully copied                *
  *               FAIL    - otherwise                                          *
@@ -669,13 +673,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'logeventid' for the item                       *
+ * Purpose: evaluate function 'logeventid' for the item.                      *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] regex string for event id matching           *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -766,21 +770,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'logsource' for the item                        *
+ * Purpose: evaluate function 'logsource' for the item.                       *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] ignored                                      *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
 static int	evaluate_LOGSOURCE(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, const char *parameters,
-		const zbx_timespec_t *ts,
-		char **error)
+		const zbx_timespec_t *ts, char **error)
 {
 	char			*pattern = NULL;
 	int			ret = FAIL, nparams;
@@ -859,13 +862,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'logseverity' for the item                      *
+ * Purpose: evaluate function 'logseverity' for the item.                     *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth last value and time shift (optional)     *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -944,8 +947,8 @@ static int	history_record_log_compare(const zbx_history_record_t *d1, const zbx_
 	return 0;
 }
 
-/* specialized versions of zbx_vector_history_record_*_uniq() because */
-/* standard versions do not release memory occupied by duplicate elements */
+/* Specialized versions of zbx_vector_history_record_*_uniq() because */
+/* standard versions do not release memory occupied by duplicate elements. */
 
 static void	zbx_vector_history_record_str_uniq(zbx_vector_history_record_t *vector, zbx_compare_func_t compare_func)
 {
@@ -1409,7 +1412,7 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate functions 'count' and 'find' for the item                *
+ * Purpose: evaluate functions 'count' and 'find' for the item.               *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
@@ -1420,15 +1423,15 @@ int	zbx_execute_count_with_pattern(char *pattern, unsigned char value_type, zbx_
  *                                Becomes mandatory for numeric items if 3rd  *
  *                                parameter is specified and is not "regexp"  *
  *                                or "iregexp". With "bitand" can take one of *
- *                                2 forms:                                    *
- *                                  - value_to_compare_with/mask              *
- *                                  - mask                                    *
- *             ts         - [IN] the function evaluation time                 *
- *             limit      - [IN] the limit of counted values, will return     *
- *                              when the limit is reached                     *
+ *                                two forms:                                  *
+ *                                  - value_to_compare_with/mask,             *
+ *                                  - mask.                                   *
+ *             ts         - [IN] function evaluation time                     *
+ *             limit      - [IN] limit of counted values, will return         *
+ *                               when the limit is reached                    *
  *             unique     - [IN] COUNT_ALL - count all values,                *
  *                               COUNT_UNIQUE - count unique values           *
- *             error      - [OUT] the error message                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1578,14 +1581,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'sum' for the item                              *
+ * Purpose: evaluate function 'sum' for the item.                             *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds/values and time shift      *
  *                               (optional)                                   *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1670,14 +1673,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'avg' for the item                              *
+ * Purpose: evaluate function 'avg' for the item.                             *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds/values and time shift      *
  *                               (optional)                                   *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1769,13 +1772,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'last' for the item                             *
+ * Purpose: evaluate function 'last' for the item.                            *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth last value and time shift (optional)     *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1817,15 +1820,15 @@ static int	evaluate_LAST(zbx_variant_t *value, const zbx_dc_evaluate_item_t *ite
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'min' or 'max' for the item                     *
+ * Purpose: evaluate function 'min' or 'max' for the item.                    *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds/values and time shift      *
  *                               (optional)                                   *
- *             ts         - [IN] the starting timestamp                       *
+ *             ts         - [IN] starting timestamp                           *
  *             min_or_max - [IN] is this evaluate_MIN or evaluate_MAX         *
- *             error      - [OUT] the error message                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -1927,14 +1930,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'percentile' for the item                       *
+ * Purpose: evaluate function 'percentile' for the item.                      *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds/values, time shift (optional),       *
  *                               percentage                                   *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in        *
  *                         'value'                                            *
@@ -2033,12 +2036,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'nodata' for the item                           *
+ * Purpose: evaluate function 'nodata' for the item.                          *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds                            *
- *             error      - [OUT] the error message                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2145,12 +2148,12 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'change' for the item                           *
+ * Purpose: evaluate function 'change' for the item.                          *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2217,13 +2220,13 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'fuzzytime' for the item                        *
+ * Purpose: evaluate function 'fuzzytime' for the item.                       *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds                            *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2299,7 +2302,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate logical bitwise function 'and' for the item              *
+ * Purpose: evaluate logical bitwise function 'and' for the item.             *
  *                                                                            *
  * Parameters: value      - [OUT] dynamic buffer,result                       *
  *             item       - [IN] item (performance metric)                    *
@@ -2308,8 +2311,8 @@ out:
  *                                evaluate_LAST() (see documentation of       *
  *                                trigger function last()),                   *
  *                            (2) mask to bitwise AND with (mandatory),       *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2366,14 +2369,14 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'forecast' for the item                         *
+ * Purpose: evaluate function 'forecast' for the item.                        *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds/values and time shift      *
  *                               (optional)                                   *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
  *               FAIL - failed to evaluate function                           *
@@ -2523,16 +2526,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'timeleft' for the item                         *
+ * Purpose: evaluate function 'timeleft' for the item.                        *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] number of seconds/values and time shift      *
  *                               (optional)                                   *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -2741,18 +2745,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate trend* functions for the item                            *
+ * Purpose: evaluate trend* functions for the item.                           *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             func       - [IN] the trend function to evaluate               *
  *                               (avg, sum, count, delta, max, min)           *
  *             parameters - [IN] function parameters                          *
- *             ts         - [IN] the historical time when function must be    *
+ *             ts         - [IN] historical time when function must be        *
  *                               evaluated                                    *
- *             error      - [OUT] the error message                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -2962,15 +2967,16 @@ static int	validate_params_and_get_data(const zbx_dc_evaluate_item_t *item, cons
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'first' for the item                            *
+ * Purpose: evaluate function 'first' for the item.                           *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] Nth first value and time shift (optional)    *
- *             ts         - [IN] the starting timestamp                       *
- *             error      - [OUT] the error message                           *
+ *             ts         - [IN] starting timestamp                           *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3073,16 +3079,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate functions 'monoinc' and 'monodec' for the item           *
+ * Purpose: evaluate functions 'monoinc' and 'monodec' for the item.          *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] mode, strict or weak monotonicity            *
- *             ts         - [IN] the function execution time                  *
+ *             ts         - [IN] function execution time                      *
  *             gradient   - [IN] check increase or decrease of monotonicity   *
- *             error      - [OUT] the error message if function failed        *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3212,15 +3219,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate functions 'rate' for the item                            *
+ * Purpose: evaluate functions 'rate' for the item.                           *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] seconds, time shift (optional)               *
- *             ts         - [IN] the function execution time                  *
- *             error      - [OUT] the error message if function failed        *
+ *             ts         - [IN] function execution time                      *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3421,15 +3429,16 @@ int	zbx_evaluate_RATE(zbx_variant_t *value, zbx_dc_item_t *item, const char *par
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function 'changecount' for the item                      *
+ * Purpose: evaluate function 'changecount' for the item.                     *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
  *             parameters - [IN] mode, increases, decreases or all changes    *
- *             ts         - [IN] the function execution time                  *
- *             error      - [OUT] the error message if function failed        *
+ *             ts         - [IN] function execution time                      *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3580,17 +3589,18 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate baseline* functions for the item                         *
+ * Purpose: evaluate baseline* functions for the item.                        *
  *                                                                            *
- * Parameters: value      - [OUT] the function result                         *
+ * Parameters: value      - [OUT] function result                             *
  *             item       - [IN] item (performance metric)                    *
- *             func       - [IN] the baseline function to evaluate            *
- *                               (wma, dev)                                   *
+ *             func       - [IN] baseline function to evaluate (wma, dev)     *
  *             parameters - [IN] function parameters                          *
- *             ts         - [IN] the historical time when function must be    *
+ *             ts         - [IN] historical time when function must be        *
  *                               evaluated                                    *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3739,7 +3749,7 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
 
 /******************************************************************************
  *                                                                            *
- * Purpose: common operations for aggregate function calculation              *
+ * Purpose: common operations for aggregate function calculation.             *
  *                                                                            *
  * Parameters: value      - [OUT] result                                      *
  *             item       - [IN] item (performance metric)                    *
@@ -3748,9 +3758,10 @@ static void	history_to_dbl_vector(const zbx_history_record_t *v, int n, unsigned
  *             ts         - [IN] time shift                                   *
  *             stat_func  - [IN] pointer to aggregate function to be called   *
  *             min_values - [IN] minimum data values required                 *
- *             error      - [OUT] the error message in the case of failure    *
+ *             error      - [OUT]                                             *
  *                                                                            *
- * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ * Return value: SUCCEED - evaluated successfully, result is stored in        *
+ *                         'value'                                            *
  *               FAIL - failed to evaluate function                           *
  *                                                                            *
  ******************************************************************************/
@@ -3794,14 +3805,14 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate function                                                 *
+ * Purpose: evaluate function.                                                *
  *                                                                            *
  * Parameters: value     - [OUT] dynamic buffer, result                       *
  *             item      - [IN] item to calculate function for                *
  *             function  - [IN] function (for example, 'max')                 *
- *             parameter - [IN] parameter of the function                     *
- *             ts        - [IN] the starting timestamp                        *
- *             error     - [OUT] the error message                            *
+ *             parameter - [IN] parameter of function                         *
+ *             ts        - [IN] starting timestamp                            *
+ *             error     - [OUT]                                              *
  *                                                                            *
  * Return value: SUCCEED - evaluated successfully, value contains its value   *
  *               FAIL - evaluation failed                                     *
@@ -3971,10 +3982,10 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if the specified function is a trigger function             *
+ * Purpose: check if the specified function is a trigger function.            *
  *                                                                            *
- * Parameters: name - [IN] the function name to check                         *
- *             len  - [IN] the length of function name                        *
+ * Parameters: name - [IN] function name to check                             *
+ *             len  - [IN] length of function name                            *
  *                                                                            *
  * Return value: SUCCEED - the function is a trigger function                 *
  *               FAIL - otherwise                                             *

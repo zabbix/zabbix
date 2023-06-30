@@ -377,7 +377,7 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
 
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare hashset of functions to evaluate                          *
+ * Purpose: prepare hashset of functions to evaluate.                         *
  *                                                                            *
  * Parameters: functionids - [IN] function identifiers                        *
  *             funcs       - [OUT] functions indexed by itemid, name,         *
@@ -453,12 +453,7 @@ static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: substitute expression functions with their values                 *
- *                                                                            *
- * Parameters: triggers - [IN] vector of zbx_dc_trigger_t pointers, sorted by *
- *                             triggerids                                     *
- *             unknown_msgs - vector for storing messages for NOTSUPPORTED    *
- *                            items and failed functions                      *
+ * Purpose: substitute expression functions with their values.                *
  *                                                                            *
  * Comments: example: "({15}>10) or ({123}=1)" => "(26.416>10) or (0=1)"      *
  *                                                                            *
@@ -534,10 +529,7 @@ static int	evaluate_expression(zbx_eval_context_t *ctx, const zbx_timespec_t *ts
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand macros in a trigger expression                             *
- *                                                                            *
- * Parameters: event - The trigger event structure                            *
- *             trigger - The trigger where to expand macros in                *
+ * Purpose: expand macros in a trigger expression.                            *
  *                                                                            *
  ******************************************************************************/
 static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_event *event, char *error,
@@ -615,7 +607,7 @@ static int	dc_item_compare_by_itemid(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: evaluate trigger expressions                                      *
+ * Purpose: evaluate trigger expressions.                                     *
  *                                                                            *
  * Parameters: triggers - [IN] vector of zbx_dc_trigger_t pointers, sorted by *
  *                             triggerids                                     *
@@ -770,11 +762,11 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: triggers links with functions                                     *
+ * Purpose: triggers links with functions.                                    *
  *                                                                            *
  * Parameters: triggers_func_pos - [IN/OUT] pointer to the list of triggers   *
- *                                 with functions position in functionids     *
- *                                 array                                      *
+ *                                          with functions position in        *
+ *                                          functionids array                 *
  *             functionids       - [IN/OUT] array of function IDs             *
  *             trigger_order     - [IN] array of triggers                     *
  *                                                                            *
@@ -821,7 +813,7 @@ static void	zbx_link_triggers_with_functions(zbx_vector_trigger_func_position_t 
 /******************************************************************************
  *                                                                            *
  * Purpose: mark triggers that use one of the items in problem expression     *
- *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag                       *
+ *          with ZBX_DC_TRIGGER_PROBLEM_EXPRESSION flag.                      *
  *                                                                            *
  * Parameters: trigger_order - [IN/OUT] pointer to the list of triggers       *
  *             itemids       - [IN] array of item IDs                         *

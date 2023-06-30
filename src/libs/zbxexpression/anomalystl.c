@@ -27,7 +27,7 @@ ZBX_PTR_VECTOR_IMPL(VV, zbx_vector_history_record_t *)
 
 /*******************************************************************************
  *                                                                             *
- * Purpose: finds how many values in stl remainder are outliers                *
+ * Purpose: finds how many values in stl remainder are outliers.               *
  *                                                                             *
  * Parameters:  remainder        - [IN] stl remainder values vector            *
  *              deviations_count - [IN] how much a value can be away from the  *

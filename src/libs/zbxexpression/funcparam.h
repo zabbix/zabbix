@@ -30,4 +30,5 @@ int	get_function_parameter_str(const char *parameters, int Nparam, char **value)
 int	get_function_parameter_hist_range(int from, const char *parameters, int Nparam, int *value,
 		zbx_value_type_t *type, int *timeshift);
 int	get_function_parameter_period(const char *parameters, int Nparam, int *value, zbx_value_type_t *type);
+
 #endif

@@ -86,16 +86,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the value of sec|num + timeshift trigger function parameter   *
+ * Purpose: get the value of sec|num + timeshift trigger function parameter.  *
  *                                                                            *
- * Parameters: from           - [IN] the function calculation time            *
- *             parameters     - [IN] trigger function parameters              *
- *             Nparam         - [IN] specifies which parameter to extract     *
- *             value          - [OUT] parameter value (preserved as is if the *
- *                              parameter is optional and empty)              *
- *             type           - [OUT] parameter value type (number of seconds *
- *                              or number of values)                          *
- *             timeshift      - [OUT] the timeshift value (0 if absent)       *
+ * Parameters: from       - [IN] function calculation time                    *
+ *             parameters - [IN] trigger function parameters                  *
+ *             Nparam     - [IN] specifies which parameter to extract         *
+ *             value      - [OUT] parameter value (preserved as is if the     *
+ *                                parameter is optional and empty)            *
+ *             type       - [OUT] parameter value type (number of seconds     *
+ *                                or number of values)                        *
+ *             timeshift  - [OUT] timeshift value (0 if absent)               *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
@@ -172,15 +172,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the value of sec|#num trigger function parameter              *
+ * Purpose: get the value of sec|#num trigger function parameter.             *
  *                                                                            *
- * Parameters: parameters     - [IN] trigger function parameters              *
- *             Nparam         - [IN] specifies which parameter to extract     *
- *             value          - [OUT] parameter value (preserved as is if the *
- *                              parameter is optional and empty)              *
- *             type           - [OUT] parameter value type (number of seconds *
- *                              or number of values, preserved as is if the   *
- *                              parameter is optional and empty)              *
+ * Parameters: parameters - [IN] trigger function parameters                  *
+ *             Nparam     - [IN] specifies which parameter to extract         *
+ *             value      - [OUT] parameter value (preserved as is if the     *
+ *                                parameter is optional and empty)            *
+ *             type       - [OUT] parameter value type (number of seconds     *
+ *                                or number of values, preserved as is if the *
+ *                                parameter is optional and empty)            *
  *                                                                            *
  * Return value: SUCCEED - parameter is valid                                 *
  *               FAIL    - otherwise                                          *
