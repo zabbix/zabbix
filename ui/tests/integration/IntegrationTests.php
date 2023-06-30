@@ -44,6 +44,7 @@ require_once dirname(__FILE__).'/testUserParametersReload.php';
 require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
+require_once dirname(__FILE__).'/testDiscoveryRules.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -79,6 +80,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testProxyConfSync');
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
+		$suite->addTestSuite('testDiscoveryRules');
 
 		return $suite;
 	}
