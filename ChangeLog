@@ -3,6 +3,7 @@ Changes for 7.0.0alpha3
 New features:
 
 Bug fixes:
+..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Item value" and "Top hosts" widget (averza, esekace)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.0alpha2
