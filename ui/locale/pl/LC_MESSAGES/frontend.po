@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-19 15:48+0000\n"
+"PO-Revision-Date: 2023-06-21 15:36+0000\n"
 "Last-Translator: Albert <albert.przybylski@aplitt.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -2509,7 +2509,7 @@ msgstr "Nie można utworzyć funkcji użytkownika"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Nie można utworzyć kroku scenariusza sieci www"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -4288,7 +4288,7 @@ msgstr "Nie można zaktualizować scenariusza sieci www"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "Nie można zaktualizować kroku scenariusza sieci www"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -14361,7 +14361,7 @@ msgstr "Nowa usługa"
 
 #: app/views/webscenario.step.edit.php:286
 msgid "New step of web scenario"
-msgstr ""
+msgstr "Nowy krok scenariusza sieci www"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"

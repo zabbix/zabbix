@@ -173,8 +173,6 @@ BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DW
 			PDWORD BufferUsed);
 /* winevt.h contents END */
 
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
-
 #define	VAR_PROVIDER_NAME(p)			(p[0].StringVal)
 #define	VAR_SOURCE_NAME(p)			(p[1].StringVal)
 #define	VAR_RECORD_NUMBER(p)			(p[2].UInt64Val)
@@ -766,6 +764,7 @@ out:
  *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
  *             config_source_ip - [IN]                                        *
+ *             config_hostname  - [IN]                                        *
  *             metric           - [IN/OUT] parameters for Event Log process   *
  *             lastlogsize_sent - [OUT] position of last record sent to       *
  *                                      server                                *
@@ -779,7 +778,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 		zbx_uint64_t FirstID, zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern,
 		const char *key_severity, const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
+		zbx_uint64_t *lastlogsize_sent, char **error)
 {
 #	define EVT_ARRAY_SIZE	100
 
@@ -951,7 +951,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
+				send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
 						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
