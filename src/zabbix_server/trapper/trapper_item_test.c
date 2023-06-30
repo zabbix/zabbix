@@ -349,7 +349,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 		zbx_vector_ptr_create(&add_results);
 
-		zbx_prepare_items(&item, &errcode, 1, &result, MACRO_EXPAND_NO);
+		zbx_prepare_items(&item, &errcode, 1, &result, ZBX_MACRO_EXPAND_NO);
 
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 			dump_item(&item);

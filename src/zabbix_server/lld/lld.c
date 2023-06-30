@@ -140,7 +140,7 @@ static int	lld_filter_condition_add(zbx_vector_ptr_t *conditions, const char *id
 	else
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, item, NULL, NULL, NULL, NULL, NULL,
-				&condition->regexp, MACRO_TYPE_LLD_FILTER, NULL, 0);
+				&condition->regexp, ZBX_MACRO_TYPE_LLD_FILTER, NULL, 0);
 	}
 
 	return SUCCEED;
@@ -1127,7 +1127,7 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 		filter.expression = zbx_strdup(NULL, row[3]);
 		lifetime_str = zbx_strdup(NULL, row[4]);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&lifetime_str, MACRO_TYPE_COMMON, NULL, 0);
+				&lifetime_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(lifetime_str, &lifetime, ZBX_LENGTH_UNLIMITED))
 		{

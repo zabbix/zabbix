@@ -458,7 +458,7 @@ static void	zbx_substitute_macros_in_item_key(zbx_dc_item_t *dc_item, char **rep
 {
 	char	*key = zbx_strdup(NULL, dc_item->key_orig);
 
-	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, MACRO_TYPE_ITEM_KEY, NULL, 0);
+	substitute_key_macros_impl(&key, NULL, dc_item, NULL, NULL, ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0);
 	zbx_free(*replace_to);
 	*replace_to = key;
 }

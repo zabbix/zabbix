@@ -131,7 +131,7 @@ static void	validate_and_add_tag(zbx_db_event* event, zbx_tag_t *tag)
 static void	substitute_trigger_tag_macro(const zbx_db_event* event, char **str)
 {
 	zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL,
-			NULL, NULL, NULL, NULL, str, MACRO_TYPE_TRIGGER_TAG, NULL, 0);
+			NULL, NULL, NULL, NULL, str, ZBX_MACRO_TYPE_TRIGGER_TAG, NULL, 0);
 }
 
 static void	process_trigger_tag(zbx_db_event* event, const zbx_tag_t *tag)
@@ -147,7 +147,7 @@ static void	process_trigger_tag(zbx_db_event* event, const zbx_tag_t *tag)
 static void	substitute_item_tag_macro(const zbx_db_event* event, const zbx_dc_item_t *dc_item, char **str)
 {
 	zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, dc_item, NULL,
-			NULL, NULL, NULL, NULL, str, MACRO_TYPE_ITEM_TAG, NULL, 0);
+			NULL, NULL, NULL, NULL, str, ZBX_MACRO_TYPE_ITEM_TAG, NULL, 0);
 }
 
 static void	process_item_tag(zbx_db_event* event, const zbx_item_tag_t *item_tag)
@@ -256,10 +256,10 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		event->trigger.comments = NULL;
 
 		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->trigger.correlation_tag, MACRO_TYPE_TRIGGER_TAG, err, sizeof(err));
+				&event->trigger.correlation_tag, ZBX_MACRO_TYPE_TRIGGER_TAG, err, sizeof(err));
 
 		zbx_substitute_simple_macros(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&event->name, MACRO_TYPE_EVENT_NAME, err, sizeof(err));
+				&event->name, ZBX_MACRO_TYPE_EVENT_NAME, err, sizeof(err));
 
 		zbx_vector_tags_create(&event->tags);
 

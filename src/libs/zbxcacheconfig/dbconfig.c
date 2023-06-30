@@ -2029,7 +2029,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		{
 			addr = zbx_strdup(NULL, interface->ip);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->ip, addr);
 			zbx_free(addr);
@@ -2039,7 +2039,7 @@ static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
 		{
 			addr = zbx_strdup(NULL, interface->dns);
 			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
+					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
 				dc_strpool_replace(1, &interface->dns, addr);
 			zbx_free(addr);

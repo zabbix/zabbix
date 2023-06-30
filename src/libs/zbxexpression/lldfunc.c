@@ -380,7 +380,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 
 			if (SUCCEED != zbx_parse_host_key(param, &host, &key) ||
 					SUCCEED != substitute_key_macros_impl(&key, NULL, NULL, jp_row, lld_macro_paths,
-							MACRO_TYPE_ITEM_KEY, NULL, 0))
+							ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
 				zbx_snprintf(error, max_error_len, "Invalid first parameter \"%s\"", param);
 				zbx_free(host);
@@ -661,8 +661,8 @@ static int	substitute_item_query_lld_macros(const zbx_eval_context_t *ctx, const
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths, MACRO_TYPE_ITEM_KEY,
-			err, sizeof(err)))
+	if (SUCCEED != zbx_substitute_key_macros(&query.key, NULL, NULL, jp_row, lld_macro_paths,
+			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
 	{
 		*error = zbx_strdup(NULL, err);
 		goto out;

@@ -38,9 +38,9 @@ zbx_uint32_t	zbx_ipmi_serialize_request(unsigned char **data, zbx_uint64_t hosti
 	user = zbx_strdup(NULL, username);
 	pwd = zbx_strdup(NULL, password);
 	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&user, MACRO_TYPE_COMMON, NULL, 0);
+			&user, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			&pwd, MACRO_TYPE_COMMON, NULL, 0);
+			&pwd, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 	username_len = strlen(user) + 1;
 	password_len = strlen(pwd) + 1;
 	sensor_len = strlen(sensor) + 1;

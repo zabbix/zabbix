@@ -105,7 +105,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->trends_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->trends_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -119,7 +119,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 	if (NULL != item->history_period)
 	{
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, MACRO_TYPE_COMMON, NULL, 0);
+				NULL, NULL, &item->history_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -877,7 +877,7 @@ static void	substitute_orig_unmasked(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			data, MACRO_TYPE_COMMON, NULL, 0);
+			data, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 static void	substitute_orig(const char *orig, char **data)
@@ -887,7 +887,7 @@ static void	substitute_orig(const char *orig, char **data)
 
 	*data = zbx_strdup(*data, orig);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
-			MACRO_TYPE_COMMON, NULL, 0);
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,

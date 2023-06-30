@@ -1701,7 +1701,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 	item->key_orig = NULL;
 
 	if (FAIL == (ret = zbx_substitute_key_macros(&item->key, NULL, NULL, jp_row, lld_macro_paths,
-			MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
+			ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in item key parameters %s.\n", err);
 	}
@@ -1754,7 +1754,7 @@ static zbx_lld_item_full_t	*lld_item_make(const zbx_lld_item_prototype_t *item_p
 
 	if (SUCCEED == ret && ITEM_TYPE_SNMP == item_prototype->type &&
 			FAIL == (ret = zbx_substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, lld_macro_paths,
-			MACRO_TYPE_SNMP_OID, err, sizeof(err))))
+			ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err))))
 	{
 		*error = zbx_strdcatf(*error, "Cannot create item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -1921,7 +1921,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 		buffer = zbx_strdup(buffer, item_prototype->key);
 
 		if (SUCCEED == zbx_substitute_key_macros(&buffer, NULL, NULL, jp_row, lld_macro_paths,
-				MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
+				ZBX_MACRO_TYPE_ITEM_KEY, err, sizeof(err)))
 		{
 			item->key_orig = item->key;
 			item->key = buffer;
@@ -2028,7 +2028,7 @@ static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, cons
 	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
 
 	if (ITEM_TYPE_SNMP == item_prototype->type && FAIL == zbx_substitute_key_macros(&buffer, NULL, NULL, jp_row,
-			lld_macro_paths, MACRO_TYPE_SNMP_OID, err, sizeof(err)))
+			lld_macro_paths, ZBX_MACRO_TYPE_SNMP_OID, err, sizeof(err)))
 	{
 		*error = zbx_strdcatf(*error, "Cannot update item, error in SNMP OID key parameters: %s.\n", err);
 	}
@@ -2281,7 +2281,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, zbx_vector_l
 			buffer = zbx_strdup(buffer, item->key_proto);
 
 			if (SUCCEED != zbx_substitute_key_macros(&buffer, NULL, NULL, &lld_row->jp_row, lld_macro_paths,
-					MACRO_TYPE_ITEM_KEY, NULL, 0))
+					ZBX_MACRO_TYPE_ITEM_KEY, NULL, 0))
 			{
 				continue;
 			}

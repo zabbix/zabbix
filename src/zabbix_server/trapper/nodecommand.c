@@ -391,9 +391,9 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	/* substitute macros in script body and webhook parameters */
 
 	if (0 != hostid)	/* script on host */
-		macro_type = MACRO_TYPE_SCRIPT;
+		macro_type = ZBX_MACRO_TYPE_SCRIPT;
 	else
-		macro_type = (NULL != recovery_event) ? MACRO_TYPE_SCRIPT_RECOVERY : MACRO_TYPE_SCRIPT_NORMAL;
+		macro_type = (NULL != recovery_event) ? ZBX_MACRO_TYPE_SCRIPT_RECOVERY : ZBX_MACRO_TYPE_SCRIPT_NORMAL;
 
 	um_handle = zbx_dc_open_user_macros();
 

@@ -559,7 +559,7 @@ static int	expand_normal_trigger_macros(zbx_eval_context_t *ctx, const zbx_db_ev
 			continue;
 
 		if (FAIL == substitute_simple_macros_impl(NULL, event, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, NULL, NULL,&token->value.data.str, MACRO_TYPE_TRIGGER_EXPRESSION, error,
+				NULL, NULL, NULL, NULL,&token->value.data.str, ZBX_MACRO_TYPE_TRIGGER_EXPRESSION, error,
 				(int)maxerrlen))
 		{
 			return FAIL;

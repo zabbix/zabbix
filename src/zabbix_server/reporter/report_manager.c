@@ -1875,8 +1875,8 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		if (0 == strcmp(pair.first, ZBX_REPORT_PARAM_BODY) || 0 == strcmp(pair.first, ZBX_REPORT_PARAM_SUBJECT))
 		{
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-					(char **)&pair.second, MACRO_TYPE_REPORT, NULL, 0);
+			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, (char **)&pair.second, ZBX_MACRO_TYPE_REPORT, NULL, 0);
 		}
 
 		zbx_vector_ptr_pair_append(&params, pair);

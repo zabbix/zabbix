@@ -681,7 +681,7 @@ static int	check_time_period_condition(const zbx_vector_db_event_t *esc_events, 
 
 	period = zbx_strdup(NULL, condition->value);
 	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &period,
-			MACRO_TYPE_COMMON, NULL, 0);
+			ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 	for (i = 0; i < esc_events->values_num; i++)
 	{
@@ -3515,8 +3515,8 @@ void	get_db_actions_info(zbx_vector_uint64_t *actionids, zbx_vector_ptr_t *actio
 		ZBX_STR2UCHAR(action->eventsource, row[3]);
 
 		tmp = zbx_strdup(NULL, row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, &tmp,
-				MACRO_TYPE_COMMON, NULL, 0);
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+				&tmp, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 		if (SUCCEED != zbx_is_time_suffix(tmp, &action->esc_period, ZBX_LENGTH_UNLIMITED))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Invalid default operation step duration \"%s\" for action"
