@@ -123,7 +123,7 @@ class CLldRuleHelper extends CItemGeneralHelper {
 	 * @return array
 	 */
 	private static function getSourceLldRules(array $src_options): array {
-		return API::DiscoveryRule()->get([
+		$src_items = API::DiscoveryRule()->get([
 			'output' => ['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status',
 
 				// Type fields.
@@ -160,5 +160,15 @@ class CLldRuleHelper extends CItemGeneralHelper {
 			'selectHosts' => ['status'],
 			'preservekeys' => true
 		] + $src_options);
+
+		foreach ($src_items as &$src_item) {
+			foreach ($src_item['overrides'] as &$override) {
+				unset($override['filter']['eval_formula']);
+			}
+			unset($override);
+		}
+		unset($src_item);
+
+		return $src_items;
 	}
 }
