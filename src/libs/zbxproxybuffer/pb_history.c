@@ -372,6 +372,8 @@ static int	pb_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more
 			break;
 
 		id = *lastid;
+
+		zbx_vector_pb_history_ptr_clear_ext(&rows, pb_history_free);
 	}
 
 	if (0 != records_num)
