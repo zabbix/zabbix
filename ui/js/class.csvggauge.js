@@ -240,7 +240,6 @@ class CSVGGauge {
 	 * @param {string}      units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		console.log({value, value_text, units_text});
 		this.#elements.value_and_units.value.container.textContent = value !== null ? value_text : '';
 
 		if (this.#config.units.show) {
