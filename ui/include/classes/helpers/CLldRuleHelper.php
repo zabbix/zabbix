@@ -162,8 +162,22 @@ class CLldRuleHelper extends CItemGeneralHelper {
 		] + $src_options);
 
 		foreach ($src_items as &$src_item) {
+			foreach ($src_item['filter']['conditions'] as &$condition) {
+				if ($src_item['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+					unset($condition['formulaid']);
+				}
+			}
+			unset($condition);
+
 			foreach ($src_item['overrides'] as &$override) {
 				unset($override['filter']['eval_formula']);
+
+				foreach ($override['filter']['conditions'] as &$condition) {
+					if ($override['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+						unset($condition['formulaid']);
+					}
+				}
+				unset($condition);
 			}
 			unset($override);
 		}
