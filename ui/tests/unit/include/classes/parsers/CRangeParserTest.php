@@ -362,7 +362,7 @@ class CRangeParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '-2.0K--1.0K',
-					'range' => [strval(ZBX_KIBIBYTE * -2), strval(ZBX_KIBIBYTE * -1)]
+					'range' => ['-2000', '-1000']
 				]
 			],
 			[
@@ -378,7 +378,7 @@ class CRangeParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '.5K-1K',
-					'range' => [strval(ZBX_KIBIBYTE * 0.5), strval(ZBX_KIBIBYTE * 1)]
+					'range' => ['500', '1000']
 				]
 			],
 			[
