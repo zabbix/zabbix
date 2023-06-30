@@ -3180,8 +3180,7 @@ section {
 .svg-gauge {
   fill: #ffffff; }
   .svg-gauge .svg-gauge-description {
-    text-anchor: middle;
-    dominant-baseline: text-before-edge; }
+    text-anchor: middle; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
     fill: #000000; }
@@ -3195,13 +3194,9 @@ section {
     stroke: #ffffff;
     vector-effect: non-scaling-stroke;
     transition: fill 0.5s ease-in-out; }
-  .svg-gauge .svg-gauge-label-bottom-left,
-  .svg-gauge .svg-gauge-label-bottom-right {
-    dominant-baseline: text-before-edge; }
-  .svg-gauge .svg-gauge-label-top-left,
-  .svg-gauge .svg-gauge-label-bottom-left {
+  .svg-gauge .svg-gauge-label-left {
     text-anchor: end; }
-  .svg-gauge .svg-gauge-label-top-center {
+  .svg-gauge .svg-gauge-label-center {
     text-anchor: middle; }
   .svg-gauge .svg-gauge-value,
   .svg-gauge .svg-gauge-units {
