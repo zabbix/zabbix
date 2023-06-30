@@ -123,20 +123,11 @@ class CControllerItemList extends CController {
 	}
 
 	public function doAction() {
-		$subfilter = array_fill_keys([
-			'subfilter_types', 'subfilter_value_types', 'subfilter_status', 'subfilter_state',
-			'subfilter_inherited', 'subfilter_with_triggers', 'subfilter_hosts', 'subfilter_interval',
-			'subfilter_history', 'subfilter_trends', 'subfilter_discovered', 'subfilter_tags'
-		], []);
-
 		if ($this->hasInput('filter_set')) {
 			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
-		}
-		else {
-			$this->getInputs($subfilter, array_keys($subfilter));
 		}
 
 		$page = $this->getInput('page', 1);
@@ -155,6 +146,7 @@ class CControllerItemList extends CController {
 			'config' => [
 				'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
 			],
+			'check_now_types' => checkNowAllowedTypes(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder']
@@ -193,7 +185,9 @@ class CControllerItemList extends CController {
 	}
 
 	/**
-	 * Get subfilter with values sorted by value_labels. Sorted
+	 * Sorts array [values] in ascending order based on entries in [sort] array.
+	 * If [sort] does not have an entry for sorting, the [labels] array value is used.
+	 * If both [sort] and [labels] do not contain a value, the original [values] array is used for sorting.
 	 *
 	 * @param array $subfilters            Array of subfilter data.
 	 * @param array $subfilters[][values]  Associative array, subfilter value as array key and count as value.
@@ -229,7 +223,7 @@ class CControllerItemList extends CController {
 	}
 
 	/**
-	 * Get subfilter with additional value_labels data.
+	 * Get subfilter with additional labels data.
 	 *
 	 * @param array $items       Array of items data without applied subfilter.
 	 * @param array $subfilters  Array of subfiter data.
@@ -239,14 +233,14 @@ class CControllerItemList extends CController {
 	public static function addSubfilterLabels(array $items, array $subfilters): array {
 		// Hosts
 		$hosts = array_reduce(array_column($items, 'hosts'), 'array_merge', []);
-		$data['subfilter_hosts']['labels'] = array_column($hosts, 'host', 'hostid');
+		$subfilters['subfilter_hosts']['labels'] = array_column($hosts, 'host', 'hostid');
 
 		// Types
-		$data['subfilter_types']['labels'] = item_type2str();
-		unset($data['subfilter_types']['labels'][ITEM_TYPE_HTTPTEST]);
+		$subfilters['subfilter_types']['labels'] = item_type2str();
+		unset($subfilters['subfilter_types']['labels'][ITEM_TYPE_HTTPTEST]);
 
 		// Type of information
-		$data['subfilter_value_types']['labels'] = [
+		$subfilters['subfilter_value_types']['labels'] = [
 			ITEM_VALUE_TYPE_UINT64 => _('Numeric (unsigned)'),
 			ITEM_VALUE_TYPE_FLOAT => _('Numeric (float)'),
 			ITEM_VALUE_TYPE_STR => _('Character'),
@@ -256,31 +250,31 @@ class CControllerItemList extends CController {
 		];
 
 		// Status
-		$data['subfilter_status']['labels'] = [
+		$subfilters['subfilter_status']['labels'] = [
 			ITEM_STATUS_DISABLED => _('Disabled'),
 			ITEM_STATUS_ACTIVE => _('Enabled')
 		];
 
 		// State
-		$data['subfilter_state']['labels'] = [
+		$subfilters['subfilter_state']['labels'] = [
 			ITEM_STATE_NORMAL => _('Normal'),
 			ITEM_STATE_NOTSUPPORTED => _('Not supported')
 		];
 
 		// Template
-		$data['subfilter_inherited']['labels'] = [
+		$subfilters['subfilter_inherited']['labels'] = [
 			1 => _('Inherited items'),
 			0 => _('Not inherited items')
 		];
 
 		// With triggers
-		$data['subfilter_with_triggers']['labels'] = [
+		$subfilters['subfilter_with_triggers']['labels'] = [
 			1 => _('With triggers'),
 			0 => _('Without triggers')
 		];
 
 		// Discovery
-		$data['subfilter_discovered']['labels'] = [
+		$subfilters['subfilter_discovered']['labels'] = [
 			1 => _('Discovered'),
 			0 => _('Regular')
 		];
@@ -295,8 +289,8 @@ class CControllerItemList extends CController {
 				$units_value = convertSecondsToTimeUnits($value);
 			}
 
-			$data['subfilter_history']['labels'][$value] = $units_value;
-			$data['subfilter_history']['sort'][$value] = $value;
+			$subfilters['subfilter_history']['labels'][$value] = $units_value;
+			$subfilters['subfilter_history']['sort'][$value] = $value;
 		}
 
 		// Trends
@@ -313,8 +307,8 @@ class CControllerItemList extends CController {
 				$units_value = convertSecondsToTimeUnits($value);
 			}
 
-			$data['subfilter_trends']['labels'][$value] = $units_value;
-			$data['subfilter_trends']['sort'][$value] = $value;
+			$subfilters['subfilter_trends']['labels'][$value] = $units_value;
+			$subfilters['subfilter_trends']['sort'][$value] = $value;
 		}
 
 		// Interval
@@ -340,11 +334,11 @@ class CControllerItemList extends CController {
 				$units_value = convertSecondsToTimeUnits($value);
 			}
 
-			$data['subfilter_interval']['labels'][$value] = $units_value;
-			$data['subfilter_interval']['sort'][$value] = $value;
+			$subfilters['subfilter_interval']['labels'][$value] = $units_value;
+			$subfilters['subfilter_interval']['sort'][$value] = $value;
 		}
 
-		return array_merge_recursive($subfilters, array_intersect_key($data, $subfilters));
+		return $subfilters;
 	}
 
 	/**
@@ -408,40 +402,6 @@ class CControllerItemList extends CController {
 	}
 
 	/**
-	 * Sort results.
-	 *
-	 * @param array $items  Array of items to sort.
-	 * @param array $sort   Array with [sort] field name and [sortorder] order.
-	 *
-	 * @return array
-	 */
-	protected function sortItems(array $items, array $sort): array {
-		// TODO: use subfilters [sort] values to sort array with CArrayHelper::sort instead of multiple functions.
-		switch ($sort['sort']) {
-			case 'delay':
-				orderItemsByDelay($items, $sort['sortorder'], ['usermacros' => true]);
-				break;
-
-			case 'history':
-				orderItemsByHistory($items, $sort['sortorder']);
-				break;
-
-			case 'trends':
-				orderItemsByTrends($items, $sort['sortorder']);
-				break;
-
-			case 'status':
-				orderItemsByStatus($items, $sort['sortorder']);
-				break;
-
-			default:
-				order_result($items, $sort['sort'], $sort['sortorder']);
-		}
-
-		return $items;
-	}
-
-	/**
 	 * Get subfilter schema according filter defined values.
 	 *
 	 * @param array $items
@@ -452,6 +412,7 @@ class CControllerItemList extends CController {
 	protected function getSubfilter(array $items, array $filter): array {
 		$context = $this->getInput('context');
 		$schema = static::getSubfilterSchema();
+		$schema = static::addSubfilterLabels($items, $schema);
 
 		if (count($filter['filter_hostids']) < 2) {
 			unset($schema['subfilter_hosts']);
@@ -497,9 +458,94 @@ class CControllerItemList extends CController {
 			unset($schema['subfilter_interval']);
 		}
 
-		$schema = static::addSubfilterLabels($items, $schema);
+		$selected = array_fill_keys(array_column($schema, 'key'), []);
+
+		if (!$this->hasInput('filter_set') && !$this->hasInput('filter_rst')) {
+			$this->getInputs($selected, array_keys($selected));
+		}
+
+		foreach ($selected as $key => $value) {
+			$schema[$key]['selected'] = array_fill_keys($value, true);
+		}
 
 		return $schema;
+	}
+
+	/**
+	 * Get filter data stored in profile and data required for multiselect initialization in filter form.
+	 *
+	 * @return array
+	 */
+	protected function getFilter(): array {
+		$context = $this->getInput('context');
+		$filter = $this->getProfiles() + [
+			'ms_hostgroups' => [],
+			'ms_hosts' => [],
+			'ms_valuemaps' => []
+		];
+
+		if ($filter['filter_hostids']) {
+			$service = $context === 'host' ? API::Host() : API::Template();
+			$primary_field = $context === 'host' ? 'hostid' : 'templateid';
+			$filter['ms_valuemaps'] = [];
+			$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys($service->get([
+				'output' => [$primary_field, 'name'],
+				'hostids' => $filter['filter_hostids']
+			]), [$primary_field => 'id']);
+
+			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
+				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
+					'output' => ['valuemapid', 'name'],
+					'valuemapids' => $filter['filter_valuemapids']
+				]), ['valuemapid' => 'id']);
+			}
+		}
+
+		if ($filter['filter_groupids']) {
+			$service = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
+			$filter['ms_hostgroups'] = CArrayHelper::renameObjectsKeys($service->get([
+				'output' => ['groupid', 'name'],
+				'groupids' => $filter['filter_groupids']
+			]), ['groupid' => 'id']);
+		}
+
+		$this->getInputs($filter, ['sort', 'sortorder']);
+
+		return $filter;
+	}
+
+	/**
+	 * Sort results by field.
+	 *
+	 * @param array $items  Array of items to sort.
+	 * @param array $sort   Array with [sort] field name and [sortorder] order.
+	 *
+	 * @return array
+	 */
+	protected function sortItems(array $items, array $sort): array {
+		// TODO: use subfilters [sort] values to sort array with CArrayHelper::sort instead of multiple functions.
+		switch ($sort['sort']) {
+			case 'delay':
+				orderItemsByDelay($items, $sort['sortorder'], ['usermacros' => true]);
+				break;
+
+			case 'history':
+				orderItemsByHistory($items, $sort['sortorder']);
+				break;
+
+			case 'trends':
+				orderItemsByTrends($items, $sort['sortorder']);
+				break;
+
+			case 'status':
+				orderItemsByStatus($items, $sort['sortorder']);
+				break;
+
+			default:
+				order_result($items, $sort['sort'], $sort['sortorder']);
+		}
+
+		return $items;
 	}
 
 	/**
@@ -529,7 +575,7 @@ class CControllerItemList extends CController {
 	}
 
 	/**
-	 * Get items for selected filter.
+	 * Get items for selected filter via API.
 	 *
 	 * @param string $context
 	 * @param array  $input
@@ -651,69 +697,52 @@ class CControllerItemList extends CController {
 	/**
 	 * Get items data matched subfilter and subfilters total match count with subfilter available values.
 	 *
-	 * @param array $items  Array of items returned by API.
+	 * @param array $items   Array of items returned by API.
+	 * @param array $schema  Array of arrays with subfilter schema.
 	 *
 	 * @return array
 	 */
 	protected function getItemsAndSubfilter(array $items, array $schema): array {
-		$schema = [];
 		$items_values = $this->getSubfilterColumnsData($items, array_keys($schema));
 		$subfilters_input = [];
 
-		foreach ($schema as $subfilter) {
-			$subfilter['selected'] = array_fill_keys($this->getInput($subfilter['key'], []), true);
+		foreach ($schema as &$subfilter) {
+			$values = array_column($items_values, $subfilter['key']);
+			$values = array_reduce($values, 'array_merge', []);
 
 			if ($subfilter['selected']) {
 				$subfilters_input[$subfilter['key']] = array_keys($subfilter['selected']);
 			}
 
-			$values = array_column($items_values, $subfilter['key']);
-			$values = array_reduce($values, 'array_merge', []);
-
-			if ($subfilter['selected']) {
-				foreach (array_unique($values) as $value) {
-					$subfilter['values'][$value] = count(array_keys($values, $value));
-				}
-			}
-			else {
-				$subfilter['values'] = array_fill_keys($values, 0);
-			}
-
-			$schema[$subfilter['key']] = $subfilter;
+			$subfilter['values'] = array_fill_keys($values, 0);
 		}
-
-		$subfilters_selected = count($subfilters_input);
+		unset($subfilter);
 
 		foreach ($items_values as $item_index => $item_values) {
-			$unmatched = $subfilters_selected;
-			$incremented = [];
+
+			$match_values = $item_values;
+			$discard = [];
 
 			foreach ($subfilters_input as $column => $subfilter_input) {
-				$match_values = array_intersect($item_values[$column], $subfilter_input);
+				$match_values[$column] = array_intersect($match_values[$column], $subfilter_input);
 
-				if ($match_values) {
-					$unmatched--;
-
-					foreach ($match_values as $value) {
-						$incremented[$column][$value] = true;
-					}
+				if (!$match_values[$column]) {
+					$discard[$column] = true;
 				}
 			}
 
-			if ($unmatched > 0) {
-				unset($items[$item_index]);
-
-				continue;
-			}
-
-			foreach ($item_values as $column => $column_values) {
-				if (array_key_exists($column, $incremented)) {
-					$column_values = array_diff($column_values, array_keys($incremented[$column]));
+			foreach ($item_values as $column => $values) {
+				if ($discard && array_diff_key([$column => true], $discard)) {
+					continue;
 				}
 
-				foreach ($column_values as $value) {
+				foreach ($values as $value) {
 					$schema[$column]['values'][$value]++;
 				}
+			}
+
+			if ($discard) {
+				unset($items[$item_index]);
 			}
 		}
 
@@ -781,49 +810,6 @@ class CControllerItemList extends CController {
 
 
 		return $item_subfilter;
-	}
-
-	/**
-	 * Get filter data stored in profile and data required for multiselect initialization in filter form.
-	 *
-	 * @return array
-	 */
-	protected function getFilter(): array {
-		$context = $this->getInput('context');
-		$filter = $this->getProfiles() + [
-			'ms_hostgroups' => [],
-			'ms_hosts' => [],
-			'ms_valuemaps' => []
-		];
-
-		if ($filter['filter_hostids']) {
-			$service = $context === 'host' ? API::Host() : API::Template();
-			$primary_field = $context === 'host' ? 'hostid' : 'templateid';
-			$filter['ms_valuemaps'] = [];
-			$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys($service->get([
-				'output' => [$primary_field, 'name'],
-				'hostids' => $filter['filter_hostids']
-			]), [$primary_field => 'id']);
-
-			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
-				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
-					'output' => ['valuemapid', 'name'],
-					'valuemapids' => $filter['filter_valuemapids']
-				]), ['valuemapid' => 'id']);
-			}
-		}
-
-		if ($filter['filter_groupids']) {
-			$service = $context === 'host' ? API::HostGroup() : API::TemplateGroup();
-			$filter['ms_hostgroups'] = CArrayHelper::renameObjectsKeys($service->get([
-				'output' => ['groupid', 'name'],
-				'groupids' => $filter['filter_groupids']
-			]), ['groupid' => 'id']);
-		}
-
-		$this->getInputs($filter, ['sort', 'sortorder']);
-
-		return $filter;
 	}
 
 	protected function getProfiles(): array {
