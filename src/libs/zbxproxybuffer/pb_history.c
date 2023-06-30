@@ -395,8 +395,10 @@ static int	pb_history_get_db(struct zbx_json *j, zbx_uint64_t *lastid, int *more
  ******************************************************************************/
 static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *lastid, int *more)
 {
-	int			records_num = 0;
-	void			*ptr;
+	int	records_num = 0;
+	void	*ptr;
+
+	*more = ZBX_PROXY_DATA_DONE;
 
 	if (SUCCEED == zbx_list_peek(&pb->history, &ptr))
 	{
@@ -420,9 +422,9 @@ static int	pb_history_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *la
 			if (ZBX_MAX_HRECORDS != rows.values_num)
 				break;
 
-			if (ZBX_DATA_JSON_BATCH_LIMIT > j->buffer_offset && records_num < ZBX_MAX_HRECORDS_TOTAL)
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num >= ZBX_MAX_HRECORDS_TOTAL)
 			{
-				*more = 1;
+				*more = ZBX_PROXY_DATA_MORE;
 				break;
 			}
 

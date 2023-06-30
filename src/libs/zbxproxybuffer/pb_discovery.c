@@ -318,6 +318,8 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 	zbx_pb_discovery_t	*row;
 	void			*ptr;
 
+	*more = ZBX_PROXY_DATA_DONE;
+
 	if (SUCCEED == zbx_list_peek(&pb->discovery, &ptr))
 	{
 		zbx_json_addarray(j, ZBX_PROTO_TAG_DISCOVERY_DATA);
@@ -325,9 +327,9 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 
 		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
-			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num == ZBX_MAX_HRECORDS_TOTAL)
+			if (ZBX_DATA_JSON_BATCH_LIMIT <= j->buffer_offset || records_num >= ZBX_MAX_HRECORDS_TOTAL)
 			{
-				*more = 1;
+				*more = ZBX_PROXY_DATA_MORE;
 				break;
 			}
 
