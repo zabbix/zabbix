@@ -79,8 +79,8 @@ typedef struct
 	ZBX_CPU_UTIL_PCT_AIX	*counters;	/* pointer to 2D array with history data */
 	int			row_num;	/* number of rows (ZBX_MAX_COLLECTOR_HISTORY) */
 	int			column_num;	/* number of columns (number of CPUs) */
-	int			h_latest;	/* the index of the most recent entry in the history data */
-	int			h_count;	/* the number of entries in the history data */
+	int			h_latest;	/* index of the most recent entry in the history data */
+	int			h_count;	/* number of entries in the history data */
 }
 ZBX_CPUS_UTIL_DATA_AIX;
 #endif /* _AIX */
