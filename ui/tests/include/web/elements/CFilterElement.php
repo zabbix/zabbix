@@ -46,6 +46,53 @@ class CFilterElement extends CElement {
 	}
 
 	/**
+	 * Get filter tab.
+	 *
+	 * @param string $name  filter name or tab number
+	 *
+	 * @return CElement
+	 */
+	public function getTab($name = null) {
+		if ($name === null) {
+			return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
+					->one();
+		}
+		else {
+			if ($this->query('xpath:./nav')->one(false)->isValid()) {
+				$tab = $this->query('xpath:.//a[@class="tabfilter-item-link" and text()='.
+						CXPathHelper::escapeQuotes($name).']')->one(false);
+
+				if (!$tab->isValid() && is_numeric($name)) {
+					$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);
+				}
+			}
+			else {
+				$tab = $this->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+			}
+
+			if (!$tab->isValid()) {
+				throw new \Exception('Failed to find tab "'.$name.'"');
+			}
+
+		}
+
+		return $tab;
+	}
+
+	/**
+	 * Get the number of filtered entities in the filter tab.
+	 *
+	 * @param string $name  filter name or tab number
+	 *
+	 * @return string
+	 */
+	public function getTabDataCounter($name = null) {
+		return $this->getTab($name)->isAttributePresent('data-counter')
+			? $this->getTab($name)->getAttribute('data-counter')
+			: false;
+	}
+
+	/**
 	 * Get names of saved filters tabs. If there are no saved filters, return null.
 	 *
 	 * @return array
@@ -91,6 +138,24 @@ class CFilterElement extends CElement {
 	}
 
 	/**
+	 * Check if tab is selected.
+	 *
+	 * @param string $name       filter name or tab number to be checked
+	 * @param boolean $selected  tab selected or not
+	 *
+	 * @return boolean
+	 */
+	public function isTabSelected($name = null, $selected = true) {
+		$tab = $this->getTab($name)->parents('tag:li')->one();
+
+		if ($this->query('xpath:./nav')->one(false)->isValid()) {
+			return $tab->hasClass('selected') === $selected;
+		}
+
+		return $tab->getAttribute('aria-selected') === json_encode($selected);
+	}
+
+	/**
 	 * Select filter tab.
 	 *
 	 * @param string $name  filter name or tab number to be selected
@@ -98,29 +163,14 @@ class CFilterElement extends CElement {
 	 * @return $this
 	 */
 	public function selectTab($name = null) {
-		if ($name === null) {
-			$this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
-					->one()->click(true);
-		}
-		else {
-			if ($this->query('xpath:./nav')->one(false)->isValid()) {
-				$tab = $this->query('xpath:.//a[@class="tabfilter-item-link" and text()='.
-						CXPathHelper::escapeQuotes($name).']')->one(false);
+		$tab = $this->getTab($name);
+		$tab->click(true);
+		$container = $tab->parents('tag:li')->one();
+		$container->waitUntilClassesPresent(['selected']);
 
-				if (!$tab->isValid() && is_numeric($name)) {
-					$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);
-				}
-			}
-			else {
-				$tab = $this->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
-			}
-
-			if (!$tab->isValid()) {
-				throw new \Exception('Failed to select tab "'.$name.'"');
-			}
-
-			$tab->click(true);
-		}
+		$attribute = $this->query('xpath:./nav')->one(false)->isValid() ? 'data-target' : 'aria-controls';
+		$query = $this->query('id', $container->getAttribute($attribute));
+		CElementQuery::waitUntil($query, $this->isExpanded() ? CElementFilter::VISIBLE : CElementFilter::NOT_VISIBLE);
 
 		return $this;
 	}

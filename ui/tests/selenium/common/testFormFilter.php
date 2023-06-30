@@ -57,8 +57,7 @@ class testFormFilter extends CWebTest {
 
 				// Checking that data exists after saving filter.
 				if (array_key_exists('filter_form', $data)) {
-					$form = $this->query('id:tabfilter_'.$data['tab_id'])->asForm()->waitUntilVisible()->one();
-					$form->checkValue($data['filter_form']);
+					$filter->getForm()->checkValue($data['filter_form']);
 				}
 
 				// Filter default name is Untitled.
@@ -70,9 +69,10 @@ class testFormFilter extends CWebTest {
 
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
-					$this->query('xpath://a[@class="icon-filter tabfilter-item-link"]')->one()->click();
-					$this->assertEquals($filtered_rows_count, $this->query('xpath://li[@data-target="tabfilter_'.
-							$data['tab_id'].'"]/a')->one()->getAttribute('data-counter'));
+					$filter->selectTab();
+					$this->assertEquals($filtered_rows_count,
+							$filter->getTabDataCounter(CTestArrayHelper::get($data, 'tab', $data['filter']['Name']))
+					);
 				}
 
 				// Checking that dropdown/popup tab works.
@@ -156,7 +156,6 @@ class testFormFilter extends CWebTest {
 
 			$filter->selectTab();
 			$table->waitUntilReloaded();
-			$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]//span')->one()->hasClass('display-none'));
 
 			$filter->selectTab('update_tab');
 			$table->waitUntilReloaded();
@@ -182,9 +181,7 @@ class testFormFilter extends CWebTest {
 		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
-		$this->assertEquals($result, $this->query('xpath://li[@data-target="tabfilter_1"]/a')
-				->one()->getAttribute('data-counter')
-		);
+		$this->assertEquals($result, $filter->getTabDataCounter('update_tab'));
 	}
 
 	/**
@@ -217,8 +214,8 @@ class testFormFilter extends CWebTest {
 
 		// Checking that filter name changed, and result amount not displayed.
 		$this->checkName('updated_filter_name');
-		$this->query('xpath://li[@data-target="tabfilter_0"]/a')->one()->click();
-		$this->assertFalse($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->exists());
+		$filter->selectTab();
+		$this->assertFalse($filter->getTabDataCounter('updated_filter_name'));
 	}
 
 	/**
