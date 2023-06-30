@@ -23,12 +23,12 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get trigger severity name                                         *
+ * Purpose: get trigger severity name.                                        *
  *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
+ * Parameters: trigger    - [IN] trigger data with priority field;            *
  *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
+ *             replace_to - [OUT] pointer to buffer that will receive         *
+ *                                null-terminated trigger severity string     *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *

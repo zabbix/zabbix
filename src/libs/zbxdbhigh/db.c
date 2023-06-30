@@ -1555,7 +1555,7 @@ zbx_group_status_type_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check user permissions to access system.                          *
+ * Purpose: check user permissions to access system.                          *
  *                                                                            *
  * Parameters: userid - [IN]                                                  *
  *                                                                            *
