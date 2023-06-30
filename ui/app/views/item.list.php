@@ -37,7 +37,7 @@ $filter = new CPartial('item.list.filter', [
 $form = (new CForm())
 	->setId('item-list')
 	->setName('item_list')
-	->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item.list'), 'item-csrf-token')
+	->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item'), 'item-csrf-token')
 	->addVar('context', $data['context'])
 	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null);
 

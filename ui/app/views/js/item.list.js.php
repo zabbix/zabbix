@@ -138,14 +138,15 @@
 			console.error('Not implemented');
 		}
 
-		_confirmWithPost(target, ids, curl) {
+		_confirmWithPost(target, itemids, curl) {
 			const confirm = this.confirm_messages[curl.getArgument('action')];
+			const message = confirm[itemids.length > 1 ? 1 : 0];
 
-			if (confirm && confirm.length && !window.confirm(confirm[ids.length > 1 ? 1 : 0])) {
+			if (message != '' && !window.confirm(message)) {
 				return;
 			}
 
-			this._post(target, ids, curl);
+			this._post(target, {itemids}, curl);
 		}
 
 		_post(target, data, curl) {
@@ -154,7 +155,7 @@
 			const csrf = document.querySelector('#item-csrf-token');
 
 			if (csrf) {
-				curl.setArgument(csrf.getAttribute('name'), csrf.getAttribute('value'));
+				data[csrf.getAttribute('name')] = csrf.getAttribute('value');
 			}
 
 			return fetch(curl.getUrl(), {

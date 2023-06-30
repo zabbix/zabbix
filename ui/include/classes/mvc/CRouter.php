@@ -145,6 +145,7 @@ class CRouter {
 		'image.edit'								=> ['CControllerImageEdit',								'layout.htmlpage',		'administration.image.edit'],
 		'image.list'								=> ['CControllerImageList',								'layout.htmlpage',		'administration.image.list'],
 		'image.update'								=> ['CControllerImageUpdate',							null,					null],
+		'item.clear'								=> ['CControllerItemClear',								'layout.json',			null],
 		'item.list'									=> ['CControllerItemList',								'layout.htmlpage',		'item.list'],
 		'item.masscheck_now'						=> ['CControllerItemMassCheckNow',						'layout.json',			null],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
