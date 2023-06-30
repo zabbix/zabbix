@@ -134,7 +134,7 @@ class CControllerItemList extends CController {
 		$filter = $this->getFilter();
 		$data = [
 			'action' => $this->getAction(),
-			'hostid' => null,
+			'hostid' => 0,
 			'context' => $this->getInput('context'),
 			'filter_data' => $filter,
 			'items' => [],
@@ -142,10 +142,6 @@ class CControllerItemList extends CController {
 			'trigger_parent_templates' => [],
 			'tags' => [],
 			'parent_templates' => [],
-			'checkbox_hash' => crc32(implode('', $filter['filter_hostids'])),
-			'config' => [
-				'compression_status' => CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
-			],
 			'check_now_types' => checkNowAllowedTypes(),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES),
 			'sort' => $filter['sort'],

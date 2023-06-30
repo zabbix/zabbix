@@ -27,7 +27,7 @@
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
-$filter = new CPartial('configuration.filter.items', [
+$filter = new CPartial('item.list.filter', [
 	'action' => $data['action'],
 	'filter_data' => $data['filter_data'],
 	'subfilter' => $data['subfilter'],
@@ -302,17 +302,18 @@ $form->addItem(new CActionButtonList('action', 'itemids', $buttons, 'item'));
 	->addItem($form)
 	->show();
 
+$confirm_messages = [
+	'item.enable' => [_('Enable selected item?'), _('Enable selected items?')],
+	'item.disable' => [_('Disable selected item?'), _('Disable selected items?')],
+	'item.clear' => $data['context'] === 'host' && !CHousekeepingHelper::get(CHousekeepingHelper::COMPRESSION_STATUS)
+		? [_('Delete history of selected item?'), _('Delete history of selected items?')]
+		: [],
+	'item.delete' => [_('Delete selected item?'), _('Delete selected items?')]
+];
+
 (new CScriptTag('
 	view.init('.json_encode([
-		'confirm_clearhistory' => $data['context'] === 'host' && !$data['config']['compression_status'],
-		'confirm_messages' => [
-			'item.enable' => [_('Enable selected item?'), _('Enable selected items?')],
-			'item.disable' => [_('Disable selected item?'), _('Disable selected items?')],
-			'item.clear' => $data['context'] === 'host' && !$data['config']['compression_status']
-				? [_('Delete history of selected item?'), _('Delete history of selected items?')]
-				: [],
-			'item.delete' => [_('Delete selected item?'), _('Delete selected items?')]
-		]
+		'confirm_messages' => $confirm_messages
 	]).');
 '))
 	->setOnDocumentReady()
