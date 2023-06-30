@@ -57,7 +57,7 @@ class CNumberParser extends CParser {
 	 *
 	 * @var string
 	 */
-	private $suffixes;
+	private $suffixes = '';
 
 	/**
 	 * Suffix multiplier table for value calculation.
