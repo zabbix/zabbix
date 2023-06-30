@@ -194,9 +194,43 @@ class CSVGGauge {
 	 * @param {number} height
 	 */
 	setSize({width, height}) {
-		requestAnimationFrame(() => {
-			this.#setSizeOnAnimationFrame({width, height});
-		});
+		this.#svg.setAttribute('width', `${width}`);
+		this.#svg.setAttribute('height', `${height}`);
+
+		this.#width = width - this.#padding.horizontal * 2;
+		this.#height = height - this.#padding.vertical * 2;
+
+		this.#svg.style.fontSize = `${this.#height / CSVGGauge.LINE_HEIGHT}px`;
+
+		this.#drawDescription();
+
+		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
+				&& this.#config.angle === 270)
+			? 1 + Math.sqrt(2) / 2
+			: 1;
+
+		const description_gap = this.#height * CSVGGauge.DESCRIPTION_GAP / 100;
+		const description_bbox = this.#elements.description.container.getBBox();
+
+		const max_width = this.#width;
+		const max_height = Math.max(0, this.#height - description_bbox.height - description_gap);
+
+		// Fix occasional, imprecise calculation of "this.#g_scalable" dimensions.
+		this.#g_scalable.setAttribute('transform', `translate(0 0) scale(1000)`);
+
+		const scalable_bbox = this.#getScalableBBox();
+		const box_width = Math.max(1, -scalable_bbox.x, scalable_bbox.width + scalable_bbox.x) * 2;
+		const box_height = Math.max(arcs_height, scalable_bbox.height);
+
+		const scale = Math.min(max_width / box_width, max_height / box_height);
+
+		const x = max_width / 2;
+		const y = (max_height - scalable_bbox.height * scale) / 2 - scalable_bbox.y * scale
+			+ (this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
+				? description_bbox.height + description_gap
+				: 0);
+
+		this.#g_scalable.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
 	}
 
 	/**
@@ -207,24 +241,13 @@ class CSVGGauge {
 	 * @param {string}      units_text  Text representation of the units of the value.
 	 */
 	setValue({value, value_text, units_text}) {
-		if (value !== null) {
-			this.#elements.value_and_units.value.container.textContent = value_text;
+		this.#elements.value_and_units.value.container.textContent = value !== null ? value_text : '';
 
-			if (this.#config.units.show) {
-				this.#elements.value_and_units.units.container.textContent = units_text;
-			}
-
-			this.#elements.no_data.container.innerHTML = '&nbsp;';
+		if (this.#config.units.show) {
+			this.#elements.value_and_units.units.container.textContent = value !== null ? units_text : '';
 		}
-		else {
-			this.#elements.value_and_units.value.container.innerHTML = '&nbsp;';
 
-			if (this.#config.units.show) {
-				this.#elements.value_and_units.units.container.innerHTML = '&nbsp;';
-			}
-
-			this.#elements.no_data.container.textContent = value_text;
-		}
+		this.#elements.no_data.container.textContent = value === null ? units_text : '';
 
 		if (this.#config.value.arc.show || this.#config.needle.show) {
 			let pos_new = 0;
@@ -552,7 +575,6 @@ class CSVGGauge {
 		const value_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 		value_container.classList.add(CSVGGauge.ZBX_STYLE_VALUE);
-		value_container.innerHTML = '&nbsp;';
 		value_container.style.fontSize = `${value_font_size}px`;
 
 		if (this.#config.value.is_bold) {
@@ -570,7 +592,6 @@ class CSVGGauge {
 			const units_container = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
 
 			units_container.classList.add(CSVGGauge.ZBX_STYLE_UNITS);
-			units_container.innerHTML = '&nbsp;';
 			units_container.style.fontSize = `${units_font_size}px`;
 
 			if (this.#config.units.is_bold) {
@@ -667,13 +688,15 @@ class CSVGGauge {
 		}
 	}
 
+	/**
+	 * Create and position "No data" container.
+	 */
 	#createNoData() {
 		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
 
 		this.#g_scalable.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_NO_DATA);
-		container.innerHTML = '&nbsp;';
 
 		const font_size = this.#config.value.size / 100;
 
@@ -701,6 +724,41 @@ class CSVGGauge {
 		}
 
 		this.#elements.no_data = {container};
+	}
+
+	/**
+	 * Get bounding box of the scalable group.
+	 *
+	 * @returns {SVGRect}
+	 */
+	#getScalableBBox() {
+		const value_text = this.#elements.value_and_units.value.container.textContent;
+
+		const units_text = this.#config.units.show
+			? this.#elements.value_and_units.units.container.textContent
+			: null;
+
+		const no_data_text = this.#elements.no_data.container.textContent;
+
+		this.#elements.value_and_units.value.container.textContent = '-';
+
+		if (this.#config.units.show) {
+			this.#elements.value_and_units.units.container.textContent = '-';
+		}
+
+		this.#elements.no_data.container.textContent = '-';
+
+		const scalable_bbox = this.#g_scalable.getBBox();
+
+		this.#elements.value_and_units.value.container.textContent = value_text;
+
+		if (this.#config.units.show) {
+			this.#elements.value_and_units.units.container.textContent = units_text;
+		}
+
+		this.#elements.no_data.container.textContent = no_data_text;
+
+		return scalable_bbox;
 	}
 
 	/**
@@ -756,54 +814,6 @@ class CSVGGauge {
 	 */
 	#degreesToRadians(degrees) {
 		return (degrees - 90) * Math.PI / 180;
-	}
-
-	/**
-	 * Set size of the root SVG element and re-position the elements.
-	 *
-	 * This method must be called on animation frame to allow correct calculation of element dimensions.
-	 *
-	 * @param {number} width
-	 * @param {number} height
-	 */
-	#setSizeOnAnimationFrame({width, height}) {
-		this.#svg.setAttribute('width', `${width}`);
-		this.#svg.setAttribute('height', `${height}`);
-
-		this.#width = width - this.#padding.horizontal * 2;
-		this.#height = height - this.#padding.vertical * 2;
-
-		this.#svg.style.fontSize = `${this.#height / CSVGGauge.LINE_HEIGHT}px`;
-
-		this.#drawDescription();
-
-		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
-				&& this.#config.angle === 270)
-			? 1 + Math.sqrt(2) / 2
-			: 1;
-
-		const description_gap = this.#height * CSVGGauge.DESCRIPTION_GAP / 100;
-		const description_bbox = this.#elements.description.container.getBBox();
-
-		const max_width = this.#width;
-		const max_height = Math.max(0, this.#height - description_bbox.height - description_gap);
-
-		// Fix occasional, imprecise calculation of "this.#g_scalable" dimensions.
-		this.#g_scalable.setAttribute('transform', `translate(0 0) scale(1000)`);
-
-		const box = this.#g_scalable.getBBox();
-		const box_width = Math.max(1, -box.x, box.width + box.x) * 2;
-		const box_height = Math.max(arcs_height, box.height);
-
-		const scale = Math.min(max_width / box_width, max_height / box_height);
-
-		const x = max_width / 2;
-		const y = (max_height - box.height * scale) / 2 - box.y * scale
-			+ (this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
-				? description_bbox.height + description_gap
-				: 0);
-
-		this.#g_scalable.setAttribute('transform', `translate(${x} ${y}) scale(${scale})`);
 	}
 
 	/**
