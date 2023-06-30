@@ -35,7 +35,7 @@ class CNumberParser extends CParser {
 		'with_size_suffix' => false,
 		'with_time_suffix' => false,
 		'with_year' => false,
-		'is_binary_size' => false
+		'is_binary_size' => true
 	];
 
 	/**
