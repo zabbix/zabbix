@@ -853,7 +853,7 @@ function downloadSvgImage(svg, file_name) {
 		);
 
 	$clone.attr('height', canvas.height + 'px').append($labels_clone);
-	image.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString($clone[0]));
+	image.src = 'data:image/svg+xml;utf8,' + new XMLSerializer().serializeToString($clone[0]);
 }
 
 /**
