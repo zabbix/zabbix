@@ -225,8 +225,6 @@ class CSVGGauge {
 		this.#g_clip_rect.setAttribute('width', `${this.#width}`);
 		this.#g_clip_rect.setAttribute('height', `${this.#height}`);
 
-		this.#svg.style.fontSize = `${this.#height / CSVGGauge.LINE_HEIGHT}px`;
-
 		this.#drawDescription();
 
 		const arcs_height = ((this.#config.thresholds.arc.show || this.#config.value.arc.show)
@@ -349,7 +347,6 @@ class CSVGGauge {
 		this.#g.appendChild(container);
 
 		container.classList.add(CSVGGauge.ZBX_STYLE_DESCRIPTION);
-		container.style.fontSize = `${this.#config.description.size}%`;
 
 		if (this.#config.description.is_bold) {
 			container.style.fontWeight = 'bold';
@@ -749,13 +746,13 @@ class CSVGGauge {
 
 		const no_data_text = this.#elements.no_data.container.textContent;
 
-		this.#elements.value_and_units.value.container.textContent = '-';
+		this.#elements.value_and_units.value.container.innerHTML = '&block;';
 
 		if (this.#config.units.show) {
-			this.#elements.value_and_units.units.container.textContent = '-';
+			this.#elements.value_and_units.units.container.innerHTML = '&block;';
 		}
 
-		this.#elements.no_data.container.textContent = '-';
+		this.#elements.no_data.container.innerHTML = '&block;';
 
 		const scalable_bbox = this.#g_scalable.getBBox();
 
@@ -832,6 +829,9 @@ class CSVGGauge {
 		const {container, lines_data} = this.#elements.description;
 
 		const line_height = this.#height * this.#config.description.size / 100;
+		const font_size = line_height / CSVGGauge.LINE_HEIGHT;
+
+		container.style.fontSize = `${font_size}px`;
 
 		let offset = 0;
 
@@ -855,8 +855,8 @@ class CSVGGauge {
 		}
 
 		container.setAttribute('y', this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
-			? `${line_height * CSVGGauge.TEXT_BASELINE}`
-			: `${this.#height - line_height * (lines_data.length - CSVGGauge.TEXT_BASELINE)}`
+			? `${font_size * CSVGGauge.TEXT_BASELINE + (line_height - font_size) / 2}`
+			: `${this.#height + font_size * (CSVGGauge.TEXT_BASELINE - 1/2) + line_height * (1/2 - lines_data.length)}`
 		);
 	}
 
