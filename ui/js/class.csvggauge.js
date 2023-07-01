@@ -63,6 +63,8 @@ class CSVGGauge {
 
 	static ANIMATE_DURATION = 500;
 
+	static ID_COUNTER = 0;
+
 	/**
 	 * Widget configuration.
 	 *
@@ -90,6 +92,13 @@ class CSVGGauge {
 	 * @type {SVGGElement}
 	 */
 	#g;
+
+	/**
+	 * SVG rect element implementing clipping path of the visible area of the root SVG element.
+	 *
+	 * @type {SVGRectElement}
+	 */
+	#g_clip_rect;
 
 	/**
 	 * SVG group element implementing scaling and fitting of its contents inside the root SVG element.
@@ -149,11 +158,25 @@ class CSVGGauge {
 			this.#svg.style.backgroundColor = `#${this.#config.bg_color}`;
 		}
 
+		const g_clip_path = document.createElementNS(CSVGGauge.SVG_NS, 'clipPath');
+
+		this.#svg.appendChild(g_clip_path);
+
+		g_clip_path.id = CSVGGauge.#getUniqueId();
+
+		this.#g_clip_rect = document.createElementNS(CSVGGauge.SVG_NS, 'rect');
+
+		this.#g_clip_rect.setAttribute('x', '0');
+		this.#g_clip_rect.setAttribute('y', '0');
+
+		g_clip_path.appendChild(this.#g_clip_rect);
+
 		this.#g = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
 		this.#svg.appendChild(this.#g);
 
 		this.#g.setAttribute('transform', `translate(${this.#padding.horizontal} ${this.#padding.vertical})`);
+		this.#g.setAttribute('clip-path', `url(#${g_clip_path.id})`);
 
 		this.#g_scalable = document.createElementNS(CSVGGauge.SVG_NS, 'g');
 
@@ -198,6 +221,9 @@ class CSVGGauge {
 
 		this.#width = width - this.#padding.horizontal * 2;
 		this.#height = height - this.#padding.vertical * 2;
+
+		this.#g_clip_rect.setAttribute('width', `${this.#width}`);
+		this.#g_clip_rect.setAttribute('height', `${this.#height}`);
 
 		this.#svg.style.fontSize = `${this.#height / CSVGGauge.LINE_HEIGHT}px`;
 
@@ -862,5 +888,14 @@ class CSVGGauge {
 		};
 
 		requestAnimationFrame(animate);
+	}
+
+	/**
+	 * Get unique ID.
+	 *
+	 * @returns {string}
+	 */
+	static #getUniqueId() {
+		return `CSVGGauge-${this.ID_COUNTER++}`;
 	}
 }
