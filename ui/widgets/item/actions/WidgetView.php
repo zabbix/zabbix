@@ -57,7 +57,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$units = '';
 		$decimals = null;
 		$last_value = null;
-		$is_binary_units = false;
+		$is_binary_units = true;
 
 		$options = [
 			'output' => ['value_type'],
