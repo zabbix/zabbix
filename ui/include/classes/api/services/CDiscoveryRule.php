@@ -1189,8 +1189,11 @@ class CDiscoveryRule extends CItemGeneral {
 	private static function getFilterValidationRules(string $base_table, string $condition_table): array {
 		$condition_fields = [
 			'macro' =>		['type' => API_LLD_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($condition_table, 'macro')],
-			'operator' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS])],
-			'value' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength($condition_table, 'value')]
+			'operator' =>	['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP, CONDITION_OPERATOR_EXISTS, CONDITION_OPERATOR_NOT_EXISTS]), 'default' => CONDITION_OPERATOR_REGEXP],
+			'value' =>		['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'operator', 'in' => implode(',', [CONDITION_OPERATOR_REGEXP, CONDITION_OPERATOR_NOT_REGEXP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength($condition_table, 'value')],
+								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault($condition_table, 'value')]
+			]]
 		];
 
 		return ['type' => API_OBJECT, 'fields' => [
@@ -2056,7 +2059,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array|null
 	 */
 	private static function getConditionId(string $condition_table, array $condition, array $db_conditions): ?string {
-		$condition += ['operator' => DB::getDefault($condition_table, 'operator')];
+		$condition += [
+			'operator' => DB::getDefault($condition_table, 'operator'),
+			'value' => DB::getDefault($condition_table, 'value')
+		];
 
 		$condition_pk = DB::getPk($condition_table);
 
