@@ -174,7 +174,10 @@ class CItemGeneralHelper {
 				$dst_interface_type = itemTypeInterface($src_items[$src_itemid]['type']);
 
 				if ($dst_interface_type == INTERFACE_TYPE_OPT) {
-					if ($src_items[$src_itemid]['hosts'][0]['status'] != HOST_STATUS_TEMPLATE) {
+					$src_item = $src_items[$src_itemid];
+
+					if (in_array($src_item['hosts'][0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED])
+							&& $src_item['interfaceid'] == 0) {
 						continue;
 					}
 
