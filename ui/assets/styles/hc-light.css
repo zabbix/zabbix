@@ -3193,7 +3193,7 @@ section {
     fill: #000000;
     stroke: #000000;
     vector-effect: non-scaling-stroke;
-    transition: fill 0.5s ease-in-out; }
+    transition: fill 0.5s ease-in-out, stroke 0.5s ease-in-out; }
   .svg-gauge .svg-gauge-label-left {
     text-anchor: end; }
   .svg-gauge .svg-gauge-label-center {

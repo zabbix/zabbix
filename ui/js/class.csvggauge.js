@@ -61,6 +61,8 @@ class CSVGGauge {
 
 	static NEEDLE_GAP = 20;
 
+	static NEEDLE_STROKE_BRIGHTNESS = 0.85;
+
 	static ANIMATE_DURATION = 500;
 
 	static ID_COUNTER = 0;
@@ -301,6 +303,15 @@ class CSVGGauge {
 
 			if (this.#config.needle.show && this.#config.needle.color === '') {
 				this.#elements.needle.container.style.fill = color_new !== '' ? `#${color_new}` : '';
+
+				if (color_new !== '') {
+					const needle_color_new = CSVGGauge.#adjustBrightness(color_new, CSVGGauge.NEEDLE_STROKE_BRIGHTNESS);
+
+					this.#elements.needle.container.style.stroke = `#${needle_color_new}`;
+				}
+				else {
+					this.#elements.needle.container.style.stroke = '';
+				}
 			}
 
 			this.#animate(this.#pos_current, pos_new,
@@ -487,6 +498,7 @@ class CSVGGauge {
 
 		if (this.#config.needle.color !== '') {
 			container.style.fill = `#${this.#config.needle.color}`;
+			container.style.stroke = `#${this.#config.needle.color}`;
 		}
 
 		container.setAttribute('transform', `rotate(${-this.#config.angle / 2}, 0, 1)`);
@@ -888,6 +900,31 @@ class CSVGGauge {
 		};
 
 		requestAnimationFrame(animate);
+	}
+
+	/**
+	 * Adjust color brightness.
+	 *
+	 * @param {string} color       Color consisting of 6 hexadecimal digits.
+	 * @param {number} brightness  Brightness multiplier.
+	 *
+	 * @returns {string}
+	 */
+	static #adjustBrightness(color, brightness) {
+		let color_new = '';
+
+		for (let i = 0; i < 3; i++) {
+			let component = color.slice(i * 2, (i + 1) * 2);
+
+			component = parseInt(component, 16);
+			component = component * brightness;
+			component = Math.min(255, Math.round(component));
+			component = component.toString(16).padStart(2, '0');
+
+			color_new += component;
+		}
+
+		return color_new;
 	}
 
 	/**

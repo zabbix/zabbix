@@ -25,7 +25,7 @@
 		fill: $gauge-needle-color;
 		stroke: $gauge-needle-color;
 		vector-effect: non-scaling-stroke;
-		transition: fill $transition;
+		transition: fill $transition, stroke $transition;
 	}
 
 	.svg-gauge-label-left {
