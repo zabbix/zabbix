@@ -160,12 +160,19 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 		if (NULL != drow)
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "%s() discarding discovery record from proxy memory buffer,"
-					" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
+			zbx_uint64_t	batchid = drow->batchid;
 
-			zbx_list_pop(&pb->discovery, NULL);
-			size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
-			pb_list_free_discovery(&pb->discovery, drow);
+			do
+			{
+				zabbix_log(LOG_LEVEL_TRACE, "%s() discarding discovery record from proxy memory buffer,"
+						" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
+
+				zbx_list_pop(&pb->discovery, NULL);
+				size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
+				pb_list_free_discovery(&pb->discovery, drow);
+			}
+			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->batchid == batchid);
+
 			continue;
 		}
 
