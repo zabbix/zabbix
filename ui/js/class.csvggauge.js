@@ -447,13 +447,17 @@ class CSVGGauge {
 			const size = Math.min(radius, this.#config.value.arc.size / 100);
 
 			const value_arc_sectors = [
-				{pos_start: 0, pos_end: 0, class_name: CSVGGauge.ZBX_STYLE_VALUE_ARC_SECTOR},
-				{pos_start: 0, pos_end: 1, class_name: CSVGGauge.ZBX_STYLE_EMPTY_ARC_SECTOR}
+				{pos_start: 0, pos_end: 0, class_name: CSVGGauge.ZBX_STYLE_VALUE_ARC_SECTOR,
+					color: this.#config.value.arc.color
+				},
+				{pos_start: 0, pos_end: 1, class_name: CSVGGauge.ZBX_STYLE_EMPTY_ARC_SECTOR,
+					color: this.#config.empty_color
+				}
 			];
 
 			const value_arcs = [];
 
-			for (const {pos_start, pos_end, class_name} of value_arc_sectors) {
+			for (const {pos_start, pos_end, class_name, color} of value_arc_sectors) {
 				const angle_start = (pos_start - 0.5) * this.#config.angle;
 				const angle_end = (pos_end - 0.5) * this.#config.angle;
 
@@ -462,18 +466,13 @@ class CSVGGauge {
 				container.appendChild(arc);
 
 				arc.classList.add(class_name);
-
 				arc.setAttribute('d', this.#defineArc(angle_start, angle_end, radius, size));
 
+				if (color !== '') {
+					arc.style.fill = `#${color}`;
+				}
+
 				value_arcs.push(arc);
-			}
-
-			if (this.#config.value.arc.color !== '') {
-				value_arcs[0].style.fill = `#${this.#config.value.arc.color}`;
-			}
-
-			if (this.#config.empty_color !== '') {
-				value_arcs[1].style.fill = `#${this.#config.empty_color}`;
 			}
 
 			this.#elements.value_arcs = {value_arc: value_arcs[0], empty_arc: value_arcs[1], data: {radius, size}};
