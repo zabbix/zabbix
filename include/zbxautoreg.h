@@ -18,7 +18,7 @@
 **/
 
 #ifndef ZABBIX_AUTOREG_H
-#define ZABBIX_AUTORE_H
+#define ZABBIX_AUTOREG_H
 
 #include "zbxdbhigh.h"
 
