@@ -232,6 +232,15 @@ class WidgetForm extends CWidgetForm {
 				))->setDefault(self::DEFAULT_VALUE_ARC_SIZE_PERCENT)
 			)
 			->addField(
+				new CWidgetFieldColor('value_arc_color', _('Value arc'))
+			)
+			->addField(
+				new CWidgetFieldColor('empty_color', _('Arc background'))
+			)
+			->addField(
+				new CWidgetFieldColor('bg_color', _('Widget background'))
+			)
+			->addField(
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(self::DEFAULT_UNITS_SHOW)
 			)
 			->addField(
@@ -278,12 +287,6 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldCheckBox('scale_show_units', _('Show units')))
 					->setDefault(self::DEFAULT_SCALE_SHOW_UNITS)
-			)
-			->addField(
-				new CWidgetFieldColor('empty_color', _('Empty color'))
-			)
-			->addField(
-				new CWidgetFieldColor('bg_color', _('Background color'))
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)

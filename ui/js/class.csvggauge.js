@@ -284,7 +284,8 @@ class CSVGGauge {
 				pos_new = (value_in_range - this.#config.min) / (this.#config.max - this.#config.min);
 			}
 
-			let color_new = '';
+			let arc_color_new = this.#config.value.arc.color;
+			let needle_color_new = '';
 			let threshold_pos_start = 0;
 
 			for (const {color: color_next, value} of this.#config.thresholds.data) {
@@ -295,20 +296,21 @@ class CSVGGauge {
 				}
 
 				threshold_pos_start = threshold_pos_end;
-				color_new = color_next;
+				arc_color_new = color_next;
+				needle_color_new = color_next;
 			}
 
 			if (this.#config.value.arc.show) {
-				this.#elements.value_arcs.value_arc.style.fill = color_new !== '' ? `#${color_new}` : '';
+				this.#elements.value_arcs.value_arc.style.fill = arc_color_new !== '' ? `#${arc_color_new}` : '';
 			}
 
 			if (this.#config.needle.show && this.#config.needle.color === '') {
-				this.#elements.needle.container.style.fill = color_new !== '' ? `#${color_new}` : '';
+				this.#elements.needle.container.style.fill = needle_color_new !== '' ? `#${needle_color_new}` : '';
 
-				if (color_new !== '') {
-					const needle_color_new = CSVGGauge.#adjustBrightness(color_new, CSVGGauge.NEEDLE_STROKE_BRIGHTNESS);
-
-					this.#elements.needle.container.style.stroke = `#${needle_color_new}`;
+				if (needle_color_new !== '') {
+					this.#elements.needle.container.style.stroke = `#${
+						CSVGGauge.#adjustBrightness(needle_color_new, CSVGGauge.NEEDLE_STROKE_BRIGHTNESS)
+					}`;
 				}
 				else {
 					this.#elements.needle.container.style.stroke = '';
@@ -464,6 +466,10 @@ class CSVGGauge {
 				arc.setAttribute('d', this.#defineArc(angle_start, angle_end, radius, size));
 
 				value_arcs.push(arc);
+			}
+
+			if (this.#config.value.arc.color !== '') {
+				value_arcs[0].style.fill = `#${this.#config.value.arc.color}`;
 			}
 
 			if (this.#config.empty_color !== '') {

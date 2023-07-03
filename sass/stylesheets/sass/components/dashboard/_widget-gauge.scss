@@ -2,6 +2,22 @@
 
 form.dashboard-widget-gauge {
 	.fields-group {
+		&.fields-group-colors {
+			display: grid;
+			grid-template-columns: repeat(3, minmax(100px, max-content) 1fr);
+			align-items: center;
+			column-gap: 10px;
+			row-gap: 5px;
+
+			label {
+				text-align: right;
+			}
+
+			.form-field {
+				line-height: 24px;
+			}
+		}
+
 		&.fields-group-description,
 		&.fields-group-value,
 		&.fields-group-needle,

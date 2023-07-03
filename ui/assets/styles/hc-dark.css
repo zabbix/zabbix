@@ -3666,6 +3666,16 @@ div.dashboard-widget-clock .clock-digital {
     color: #cacaca;
     font-weight: bold; }
 
+form.dashboard-widget-gauge .fields-group.fields-group-colors {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(100px, max-content) 1fr);
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors label {
+    text-align: right; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .form-field {
+    line-height: 24px; }
 form.dashboard-widget-gauge .fields-group.fields-group-description, form.dashboard-widget-gauge .fields-group.fields-group-value, form.dashboard-widget-gauge .fields-group.fields-group-needle, form.dashboard-widget-gauge .fields-group.fields-group-scale, form.dashboard-widget-gauge .fields-group.fields-group-thresholds {
   display: grid;
   grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);

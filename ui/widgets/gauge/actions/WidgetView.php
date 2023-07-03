@@ -229,7 +229,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'arc' => $this->fields_values['value_arc'] == 1
 				? [
 					'show' => true,
-					'size' => $this->fields_values['value_arc_size']
+					'size' => $this->fields_values['value_arc_size'],
+					'color' => $this->fields_values['value_arc_color']
 				]
 				: [
 					'show' => false

@@ -34,16 +34,17 @@ $form
 			->setPopupParameter('value_types', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 	)
 	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['angle'])
-	)
-	->addField(
 		new CWidgetFieldNumericBoxView($data['fields']['min'])
 	)
 	->addField(
 		new CWidgetFieldNumericBoxView($data['fields']['max'])
 	)
+	->addFieldsGroup(
+		getColorsFieldsGroupView($data['fields'])->addRowClass('fields-group-colors')
+	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
+			->addField(new CWidgetFieldRadioButtonListView($data['fields']['angle']))
 			->addFieldsGroup(
 				getDescriptionFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-description')
 			)
@@ -55,12 +56,6 @@ $form
 			)
 			->addFieldsGroup(
 				getScaleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-scale')
-			)
-			->addField(
-				(new CWidgetFieldColorView($data['fields']['empty_color']))->addRowClass('js-row-empty-color')
-			)
-			->addField(
-				(new CWidgetFieldColorView($data['fields']['bg_color']))->addRowClass('js-row-bg-color')
 			)
 			->addFieldsGroup(
 				getThresholdFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-thresholds')
@@ -78,6 +73,14 @@ $form
 		]
 	], JSON_THROW_ON_ERROR).');')
 	->show();
+
+
+function getColorsFieldsGroupView(array $fields): CWidgetFieldsGroupView {
+	return (new CWidgetFieldsGroupView(_('Colors')))
+		->addField(new CWidgetFieldColorView($fields['value_arc_color']))
+		->addField(new CWidgetFieldColorView($fields['empty_color']))
+		->addField(new CWidgetFieldColorView($fields['bg_color']));
+}
 
 function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$desc_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['desc_size']));
