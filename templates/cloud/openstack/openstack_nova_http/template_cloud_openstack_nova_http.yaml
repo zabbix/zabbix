@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-26T13:27:55Z'
+  date: '2023-07-03T08:23:22Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -32,9 +32,6 @@ zabbix_export:
                 - $.availabilityZoneInfo
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get availability zones list'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           url: '{$SERVICE.URL}/os-availability-zone/detail'
           headers:
             - name: X-Auth-Token
@@ -57,9 +54,6 @@ zabbix_export:
                 - $.hypervisors
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get hypervisors list'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           url: '{$SERVICE.URL}/os-hypervisors/detail'
           headers:
             - name: X-Auth-Token
@@ -113,6 +107,10 @@ zabbix_export:
           history: 7d
           params: last(//openstack.nova.limits.instances.max)-last(//openstack.nova.limits.instances.current)
           description: 'Gets the free instances count.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: environment
@@ -161,6 +159,10 @@ zabbix_export:
           units: bytes
           params: last(//openstack.nova.limits.ram.max)-last(//openstack.nova.limits.ram.current)
           description: 'Gets the free RAM.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: environment
@@ -208,6 +210,10 @@ zabbix_export:
           history: 7d
           params: last(//openstack.nova.limits.vcpu.max)-last(//openstack.nova.limits.vcpu.current)
           description: 'Gets the free vCPUs count.'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           tags:
             - tag: component
               value: environment
@@ -242,9 +248,6 @@ zabbix_export:
                 - $.servers
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get servers list'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           url: '{$SERVICE.URL}/servers'
           headers:
             - name: X-Auth-Token
@@ -267,9 +270,6 @@ zabbix_export:
                 - $.services
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get compute services list'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
           url: '{$SERVICE.URL}/os-services'
           headers:
             - name: X-Auth-Token
@@ -279,12 +279,109 @@ zabbix_export:
               value: raw
         - uuid: c258e567922c4f71a4dee9c0d6b88b1e
           name: 'Nova: Get tenants'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: openstack.nova.tenant.get
           delay: '{$INTERVAL.TENANTS}'
           history: '0'
           trends: '0'
           value_type: TEXT
+          params: |
+            // Script for getting tenant usage statistics in a specific time period until now (year, month, week, day).
+            
+            const request_path = '/os-simple-tenant-usage';
+            
+            function checkParams(params) {
+                ['api_url', 'api_token', 'period'].forEach(function (field) {
+                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                        throw 'Required param is not set: ' + field + '.';
+                    }
+                    if (field === 'period') {
+                        const supported_values = ['y', 'm', 'w', 'd']
+                        if (supported_values.indexOf(params[field]) === -1) {
+                            throw 'Tenant period not correctly set. Expected one of "y", "m", "w", "d"; Received: ' + field + '.';
+                        }
+                    }
+                });
+                return params;
+            }
+            
+            function buildUrl(url, period) {
+                const current_date = new Date();
+                var datetime_formatted = ''
+                switch (period) {
+                    case 'y':                                       // if user selected period is this year
+                        datetime_formatted =
+                            current_date.getFullYear() + '-' +      // year
+                            '1-' +                                  // month
+                            '1T' +                                  // date
+                            '00:00:00'                              // time
+                        break;
+                    case 'm':                                       // if user selected period is this month
+                        datetime_formatted =
+                        current_date.getFullYear() + '-' +          // year
+                            (current_date.getMonth() + 1) + '-' +   // month
+                        '1T' +                                      // date
+                        '00:00:00'                                  // time
+                        break;
+                    case 'w':                                       // if user selected period is this week
+                        const first_date_of_week = current_date.getDate() - current_date.getDay() + 1
+                        datetime_formatted =
+                            current_date.getFullYear() + '-' +      // year
+                            (current_date.getMonth() + 1) + '-' +   // month
+                            first_date_of_week + 'T' +              // date
+                            '00:00:00'                              // time
+                        break;
+                    case 'd':                                       // if user selected period is this day
+                        datetime_formatted =
+                            current_date.getFullYear() + '-' +      // year
+                            (current_date.getMonth() + 1) + '-' +   // month
+                            current_date.getDate() + 'T' +          // date
+                            '00:00:00'                              // time
+                        break;
+                }
+            
+                return url + request_path + '?' +
+                    'start=' + datetime_formatted
+            }
+            
+            function getHttpData(url, api_token) {
+                const request = new HttpRequest();
+            
+                request.addHeader('Content-Type: application/json');
+                request.addHeader('X-Auth-Token: ' + api_token);
+            
+            
+                const response = request.get(url, JSON.stringify(params));
+                Zabbix.log(4, '[ Openstack Nova API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+                // check if request status is OK
+                if (request.getStatus() !== 200) {
+                    if (typeof (response.error && response.error.message) !== 'undefined') {
+                        throw response.error.message;
+                    } else {
+                        throw 'Failed to receive data: invalid response status code ( ' + request.getStatus() + ' ). Check debug log for more information.';
+                    }
+                }
+            
+                // return a list with request and response objects
+                return [request, response];
+            }
+            
+            function parseHttpData(http_request, http_response) {
+                // parse the response body and filter out only supported services by Zabbix with only needed data
+                const ret = JSON.parse(http_response);
+            
+                // return list of dictionaries of service name, url and access token
+                return JSON.stringify(ret);
+            }
+            
+            const params = checkParams(JSON.parse(value)),
+                url = params.api_url,
+                token = params.api_token,
+                period = params.period;
+            
+            const httpData = getHttpData(buildUrl(url, period), token);
+            return parseHttpData(httpData[0], httpData[1]);
           description: 'Gets a list of tenants and it''s data.'
           preprocessing:
             - type: JSONPATH
@@ -292,13 +389,13 @@ zabbix_export:
                 - $.tenant_usages
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get tenant list'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
-          url: '{$SERVICE.URL}/os-simple-tenant-usage'
-          headers:
-            - name: X-Auth-Token
+          parameters:
+            - name: api_url
+              value: '{$SERVICE.URL}'
+            - name: api_token
               value: '{$TOKEN}'
+            - name: period
+              value: '{$TENANT.PERIOD}'
           tags:
             - tag: component
               value: raw
@@ -321,6 +418,29 @@ zabbix_export:
           lifetime: 7d
           description: 'Discovers OpenStack Nova availability zones.'
           item_prototypes:
+            - uuid: 46f1348ce86742a6a645e137b0ecea63
+              name: 'Availability zone [{#ZONE_NAME}]: Host count'
+              type: DEPENDENT
+              key: 'openstack.nova.availability_zone.host_count[{#ZONE_NAME}]'
+              delay: '0'
+              history: 7d
+              description: 'A count of host and service objects under single availability zone.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$[''hosts''].[*].[*].length()'
+                  error_handler: CUSTOM_ERROR
+                  error_handler_params: 'Could not parse the detailed availability zone report'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: 'openstack.nova.availability_zone.raw[{#ZONE_NAME}]'
+              tags:
+                - tag: component
+                  value: application
+                - tag: component
+                  value: zone
             - uuid: 988be318a8d345e4ba1d339e7e877a2c
               name: 'Availability zone [{#ZONE_NAME}]: Raw data'
               type: DEPENDENT
@@ -347,9 +467,9 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.state[{#ZONE_NAME}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Gets state of an availability zone.'
+              valuemap:
+                name: 'Availability zone state'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -359,6 +479,9 @@ zabbix_export:
                 - type: BOOL_TO_DECIMAL
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.availability_zone.raw[{#ZONE_NAME}]'
               tags:
@@ -372,7 +495,7 @@ zabbix_export:
                   name: 'Availability zone [{#ZONE_NAME}]: Zone is unavailable'
                   opdata: 'Current zone state: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'Availability zone is unavailable. Acknowledge to close the problem manually.'
+                  description: 'Availability zone is unavailable.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -382,6 +505,10 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#ZONE_NAME}'
               path: $.zoneName
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 84b17b240632413fbc3cd5b261cc2fd6
           name: 'Nova: Hypervisor discovery'
           type: DEPENDENT
@@ -440,15 +567,26 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.state[{#ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Gets state of a hypervisor.'
+              valuemap:
+                name: 'General state'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.state
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed hypervisor report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [   // 10 - Unknown (default)
+                          'down',     // 0
+                          'up'        // 1
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 10;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.hypervisors.raw[{#ID}]'
               tags:
@@ -473,15 +611,26 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.status[{#ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Gets status of a hypervisor.'
+              valuemap:
+                name: 'General status'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.status
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed hypervisor report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [   // 10 - Unknown (default)
+                          'disabled', // 0
+                          'enabled'   // 1
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 10;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.hypervisors.raw[{#ID}]'
               tags:
@@ -506,8 +655,7 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.version[{#ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
+              value_type: FLOAT
               description: 'Gets version of a hypervisor.'
               preprocessing:
                 - type: JSONPATH
@@ -515,6 +663,9 @@ zabbix_export:
                     - $.hypervisor_version
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed hypervisor report'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.hypervisors.raw[{#ID}]'
               tags:
@@ -544,10 +695,14 @@ zabbix_export:
               path: $.id
             - lld_macro: '{#TYPE}'
               path: $.hypervisor_type
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: b38111e1499f414cbe662fada0d40b10
           name: 'Nova: Servers discovery'
           type: DEPENDENT
-          key: openstack.nova.servers.discovery
+          key: openstack.nova.server.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -563,20 +718,46 @@ zabbix_export:
           description: 'Discovers OpenStack Nova servers.'
           item_prototypes:
             - uuid: 84fd4be0c5f84744ac6bd93d4d4e8f0e
-              name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Raw data'
+              name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status'
               type: HTTP_AGENT
-              key: 'openstack.nova.servers.details.get[{#SERVER_ID}]'
+              key: 'openstack.nova.server.status.get[{#SERVER_ID}]'
               delay: '{$INTERVAL.SERVERS}'
-              history: '0'
-              trends: '0'
-              value_type: TEXT
-              description: 'Gets a detailed report of server.'
+              history: 7d
+              description: 'Gets status of server.'
+              valuemap:
+                name: 'Server status'
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.server
+                    - $.server.status
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed server report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [           // 20 - Unknown (default)
+                          'SHUTOFF',          // 0
+                          'ACTIVE',           // 1
+                          'PAUSED',           // 2
+                          'BUILD',            // 3
+                          'DELETED',          // 4
+                          'ERROR',            // 5
+                          'HARD_REBOOT',      // 6
+                          'MIGRATING',        // 7
+                          'PASSWORD',         // 8
+                          'REBOOT',           // 9
+                          'REBUILD',          // 10
+                          'RESCUE',           // 11
+                          'RESIZE',           // 12
+                          'REVERT_RESIZE',    // 13
+                          'SHELVED',          // 14
+                          'SHELVED_OFFLOADED',// 15
+                          'SOFT_DELETED',     // 16
+                          'SUSPENDED',        // 17
+                          'UNKNOWN',          // 18
+                          'VERIFY_RESIZE',    // 19
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 20;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -586,55 +767,12 @@ zabbix_export:
                   value: '{$TOKEN}'
               tags:
                 - tag: component
-                  value: raw
-            - uuid: 1bd84dc430854b75a2bc7ddda6c53353
-              name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Flavor'
-              type: DEPENDENT
-              key: 'openstack.nova.servers.flavor[{#SERVER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: TEXT
-              description: 'Gets flavor of the server.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - $.flavor.id
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Could not get server flavor from master item'
-              master_item:
-                key: 'openstack.nova.servers.details.get[{#SERVER_ID}]'
-              tags:
-                - tag: component
-                  value: application
-                - tag: component
-                  value: server
-            - uuid: 8c3b60d9902c40aebabd4b87657646c7
-              name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status'
-              type: DEPENDENT
-              key: 'openstack.nova.servers.status[{#SERVER_ID}]'
-              delay: '0'
-              history: 7d
-              trends: '0'
-              value_type: TEXT
-              description: 'Gets status of the server.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - $.status
-                  error_handler: CUSTOM_ERROR
-                  error_handler_params: 'Could not get server status from master item'
-              master_item:
-                key: 'openstack.nova.servers.details.get[{#SERVER_ID}]'
-              tags:
-                - tag: component
                   value: application
                 - tag: component
                   value: server
               trigger_prototypes:
                 - uuid: 490262a25fb842c9a9b83a2e0be83654
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.servers.status[{#SERVER_ID}],#1)<>last(/OpenStack Nova by HTTP/openstack.nova.servers.status[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.servers.status[{#SERVER_ID}]))>0'
-                  recovery_mode: NONE
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#1)<>last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}]))>0'
                   name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status has changed'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: INFO
@@ -642,12 +780,12 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     - name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"'
-                      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.servers.status[{#SERVER_ID}])="ERROR"'
+                      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])="ERROR"'
                   tags:
                     - tag: scope
                       value: availability
                 - uuid: 7d2ca81f24154099b3857aeaadef114f
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.servers.status[{#SERVER_ID}])="ERROR"'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])="ERROR"'
                   name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -663,6 +801,10 @@ zabbix_export:
               path: $.id
             - lld_macro: '{#SERVER_NAME}'
               path: $.name
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 4af40cd615d74e54a3759041470995fe
           name: 'Nova: Compute services discovery'
           type: DEPENDENT
@@ -689,20 +831,25 @@ zabbix_export:
           description: 'Discovers OpenStack Compute services.'
           item_prototypes:
             - uuid: 3bd724dad043411187a86466cf8ee2c6
-              name: 'Compute service [{#HOST}]:[{#BINARY}]: Disabled reason'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabled reason'
               type: DEPENDENT
               key: 'openstack.nova.services.disabled.reason[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
-              value_type: TEXT
+              value_type: CHAR
               description: 'Gets disabled reason of a Compute service.'
+              valuemap:
+                name: 'Compute service disabled reason'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.disabled_reason
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed services report'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.services.raw[{#ID}]'
               tags:
@@ -711,7 +858,7 @@ zabbix_export:
                 - tag: component
                   value: service
             - uuid: 60c5f4461ad84269983168b359a0ff87
-              name: 'Compute service [{#HOST}]:[{#BINARY}]: Raw data'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Raw data'
               type: DEPENDENT
               key: 'openstack.nova.services.raw[{#ID}]'
               delay: '0'
@@ -731,20 +878,31 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 8f123b2f902647b381b2c9a5af3bee80
-              name: 'Compute service [{#HOST}]:[{#BINARY}]: State'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State'
               type: DEPENDENT
               key: 'openstack.nova.services.state[{#ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Gets state of a Compute service.'
+              valuemap:
+                name: 'General state'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.state
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed services report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [   // 10 - Unknown (default)
+                          'down',     // 0
+                          'up'        // 1
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 10;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.services.raw[{#ID}]'
               tags:
@@ -755,7 +913,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 9479c68ee2db4104ac44f47931d96929
                   expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.state[{#ID}])="down"'
-                  name: 'Compute service [{#HOST}]:[{#BINARY}]: State is "down"'
+                  name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State is "down"'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'State of the service is "down".'
@@ -764,20 +922,31 @@ zabbix_export:
                     - tag: scope
                       value: availability
             - uuid: 65288a6f75094c74bbb04651c87cb323
-              name: 'Compute service [{#HOST}]:[{#BINARY}]: Status'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status'
               type: DEPENDENT
               key: 'openstack.nova.services.status[{#ID}]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
               description: 'Gets status of a Compute service.'
+              valuemap:
+                name: 'General status'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.status
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed services report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      const idx = [   // 10 - Unknown (default)
+                          'disabled', // 0
+                          'enabled'   // 1
+                      ].indexOf(value);
+                      return idx !== -1 ? idx : 10;
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.services.raw[{#ID}]'
               tags:
@@ -788,7 +957,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: 177fa631136c4340816ee9e2cf90f1ac
               expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])="disabled" and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>0'
-              name: 'Compute service [{#HOST}]:[{#BINARY}]: Status is "disabled"'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status is "disabled"'
               opdata: 'Current state: {ITEM.LASTVALUE1}, Disabled reason: "{ITEM.VALUE2}"'
               priority: INFO
               description: 'Status of the server is disabled. Acknowledge to close the problem manually.'
@@ -805,12 +974,16 @@ zabbix_export:
               path: $.host
             - lld_macro: '{#ID}'
               path: $.id
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: dba72b914e5c45fd9049ee5e4194bdcf
           name: 'Nova: Tenant discovery'
           type: DEPENDENT
           key: openstack.nova.tenant.discovery
           delay: '0'
-          description: 'Usage statistics for all tenants.'
+          description: 'Discovers tenants and their usage data.'
           item_prototypes:
             - uuid: 73e8e9b39da64358948407efd6aded6b
               name: 'Tenant [{#TENANT_ID}]: Total disk usage'
@@ -819,6 +992,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!hours'
               description: 'Multiplying the server disk size (in GiB) by hours the server exists, and then adding that all together for each server.'
               preprocessing:
                 - type: JSONPATH
@@ -826,6 +1000,12 @@ zabbix_export:
                     - $.total_local_gb_usage
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed tenant report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.round(value * 100) / 100;'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
               tags:
@@ -860,6 +1040,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!hours'
               description: 'The total duration that servers exist (in hours).'
               preprocessing:
                 - type: JSONPATH
@@ -867,6 +1048,12 @@ zabbix_export:
                     - $.total_hours
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed tenant report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.round(value * 100) / 100;'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
               tags:
@@ -881,6 +1068,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!hours'
               description: 'Multiplying the server memory size (in MiB) by hours the server exists, and then adding that all together for each server.'
               preprocessing:
                 - type: JSONPATH
@@ -888,6 +1076,12 @@ zabbix_export:
                     - $.total_memory_mb_usage
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed tenant report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.round(value * 100) / 100;'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
               tags:
@@ -902,6 +1096,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
+              units: '!hours'
               description: 'Multiplying the number of virtual CPUs of the server by hours the server exists, and then adding that all together for each server.'
               preprocessing:
                 - type: JSONPATH
@@ -909,6 +1104,12 @@ zabbix_export:
                     - $.total_vcpus_usage
                   error_handler: CUSTOM_ERROR
                   error_handler_params: 'Could not parse the detailed tenant report'
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return Math.round(value * 100) / 100;'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'openstack.nova.tenant.raw[{#TENANT_ID}]'
               tags:
@@ -950,6 +1151,10 @@ zabbix_export:
           lld_macro_paths:
             - lld_macro: '{#TENANT_ID}'
               path: $.tenant_id
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
       tags:
         - tag: class
           value: cloud
@@ -1038,6 +1243,14 @@ zabbix_export:
         - macro: '{$SERVICES.DISCOVERY.HOST.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the host name regex filter to use in Compute services discovery for excluding.'
+        - macro: '{$TENANT.PERIOD}'
+          value: m
+          description: |
+            Period for which tenant usage statistics will be queried. Possible values are:
+              * 'y' - current year until now;
+              * 'm' - current month until now;
+              * 'w' - current week until now;
+              * 'd' - current day until now;
         - macro: '{$TOKEN}'
           type: SECRET_TEXT
           description: 'API token for the monitoring user.'
@@ -1075,6 +1288,82 @@ zabbix_export:
                       value:
                         host: 'OpenStack Nova by HTTP'
                         name: 'Nova: RAM utilization'
+      valuemaps:
+        - uuid: b5d0c4e859eb4b2d854f551e3d8aeff5
+          name: 'Availability zone state'
+          mappings:
+            - value: '0'
+              newvalue: Unavailable
+            - value: '1'
+              newvalue: Available
+        - uuid: 1073ca0bea3f46ebbfbcaba628484be8
+          name: 'Compute service disabled reason'
+          mappings:
+            - value: 'null'
+              newvalue: N/A
+        - uuid: a497438c723f4be88f452af2e8627613
+          name: 'General state'
+          mappings:
+            - value: '0'
+              newvalue: Down
+            - value: '1'
+              newvalue: Up
+            - value: '10'
+              newvalue: Unknown
+        - uuid: c8109a75cda24fe1afec8ea68686cdb0
+          name: 'General status'
+          mappings:
+            - value: '0'
+              newvalue: Disabled
+            - value: '1'
+              newvalue: Enabled
+            - value: '10'
+              newvalue: Unknown
+        - uuid: 375a709551d84ba3b0d4f24b6e0bd291
+          name: 'Server status'
+          mappings:
+            - value: '0'
+              newvalue: SHUTOFF
+            - value: '1'
+              newvalue: ACTIVE
+            - value: '2'
+              newvalue: PAUSED
+            - value: '3'
+              newvalue: BUILD
+            - value: '4'
+              newvalue: DELETED
+            - value: '5'
+              newvalue: ERROR
+            - value: '6'
+              newvalue: HARD_REBOOT
+            - value: '7'
+              newvalue: MIGRATING
+            - value: '8'
+              newvalue: PASSWORD
+            - value: '9'
+              newvalue: REBOOT
+            - value: '10'
+              newvalue: REBUILD
+            - value: '11'
+              newvalue: RESCUE
+            - value: '12'
+              newvalue: RESIZE
+            - value: '13'
+              newvalue: REVERT_RESIZE
+            - value: '14'
+              newvalue: SHELVED
+            - value: '15'
+              newvalue: SHELVED_OFFLOADED
+            - value: '16'
+              newvalue: SOFT_DELETED
+            - value: '17'
+              newvalue: SUSPENDED
+            - value: '18'
+              newvalue: UNKNOWN
+            - value: '19'
+              newvalue: VERIFY_RESIZE
+            - value: '20'
+              newvalue: Unknown
   triggers:
     - uuid: 22592fabc09d416598fb4fb806048040
       expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$PROJECT.INSTANCES.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'

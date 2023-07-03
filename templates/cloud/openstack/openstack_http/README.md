@@ -12,9 +12,10 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- OpenStack release Yoga:
+- OpenStack release Yoga and OpenStack built from sources (27568ea3):
 
   * Identity API v3
+  * Compute API v2.1 (for OpenStack Nova by HTTP template)
 
 ## Configuration
 
@@ -22,7 +23,9 @@ This template has been tested on:
 
 ## Setup
 
-OpenStack template documentation
+This is a master template which needs to be assigned to a host and it will discover all OpenStack services supported by Zabbix automatically.
+
+Before using this template, it is recommended to create a separate monitoring user on OpenStack which will have access to specific API endpoints. Zabbix uses OpenStack application credentials to authorize on OpenStack, as it is a more secure method than a username and password based authentication.
 
 
 ### Macros used

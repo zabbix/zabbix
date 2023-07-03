@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-06-26T13:27:45Z'
+  date: '2023-07-03T07:45:50Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -11,7 +11,13 @@ zabbix_export:
       template: 'OpenStack by HTTP'
       name: 'OpenStack by HTTP'
       description: |
-        OpenStack template documentation.
+        Requests OpenStack API access token and discovers available OpenStack services using OpenStack Identity API by HTTP using script item and creates host prototypes for them.
+        
+        Template uses OpenStack application credentials for authorization.
+        
+        Zabbix currently supports OpenStack Nova service.
+        
+        Read the template documentation prior to using this template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -127,6 +133,7 @@ zabbix_export:
             const httpData = getHttpData(url + request_path, auth_cred_id, auth_cred_secret);
             return parseHttpData(httpData[0], httpData[1]);
           description: 'Authorizes user on the OpenStack Identity service and gets the service catalog.'
+          timeout: 6s
           parameters:
             - name: api_url
               value: '{$KEYSTONE.API.ENDPOINT}'
@@ -177,8 +184,6 @@ zabbix_export:
       tags:
         - tag: class
           value: cloud
-        - tag: target
-          value: nova
         - tag: target
           value: openstack
       macros:
