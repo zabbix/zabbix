@@ -1031,22 +1031,6 @@ class CDashboard {
 		}
 	}
 
-	_doSelectDashboardTab(dashboard_tab) {
-		let darboardid = null;
-
-		for (const [key, val] of this._tabs_dashboard_tabs.entries()) {
-			if (val === dashboard_tab) {
-				darboardid = key;
-			}
-		}
-
-		for (const dashboard of this._data.dashboard_tabs) {
-			if (dashboard.dashboardid === darboardid) {
-				window.location.href = dashboard.link;
-			}
-		}
-	}
-
 	_activatePage(dashboard_page) {
 		dashboard_page.activate();
 		dashboard_page
@@ -1685,6 +1669,22 @@ class CDashboard {
 		return menu;
 	}
 
+	_doSelectDashboardTab(dashboard_tab) {
+		let darboardid = null;
+
+		for (const [key, val] of this._tabs_dashboard_tabs.entries()) {
+			if (val === dashboard_tab) {
+				darboardid = key;
+			}
+		}
+
+		for (const dashboard of this._data.dashboard_tabs) {
+			if (dashboard.dashboardid === darboardid) {
+				window.location.href = dashboard.link;
+			}
+		}
+	}
+
 	// Dashboard view methods.
 
 	_warn(warning) {
@@ -1729,20 +1729,6 @@ class CDashboard {
 		}
 
 		return false;
-	}
-
-	addDashboardTab(dashboard_tab) {
-		const tab = document.createElement('li');
-		const tab_contents = document.createElement('div');
-		const tab_contents_name = document.createElement('span');
-
-		tab.appendChild(tab_contents);
-		tab_contents.appendChild(tab_contents_name);
-
-		tab_contents_name.textContent = dashboard_tab.name;
-
-		this._dashboard_tabs.insertItemBefore(tab);
-		this._tabs_dashboard_tabs.set(dashboard_tab.dashboardid, tab);
 	}
 
 	_addTab(dashboard_page) {
@@ -1853,17 +1839,6 @@ class CDashboard {
 		this._updateNavigationButtons(dashboard_page);
 	}
 
-	_selectDashboardTab() {
-		this._selected_dashboard_tab = this._tabs_dashboard_tabs.get(this._data.dashboardid);
-
-		this._selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
-
-		this._buttons.previous_dashboard.disabled = this._selected_dashboard_tab.previousElementSibling === null;
-		this._buttons.next_dashboard.disabled = this._selected_dashboard_tab.nextElementSibling === null;
-
-		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);
-	}
-
 	_updateNavigationButtons(dashboard_page = null) {
 		this._containers.navigation.classList.toggle(ZBX_STYLE_DASHBOARD_NAVIGATION_IS_SCROLLABLE,
 			this._tabs.isScrollable()
@@ -1969,6 +1944,31 @@ class CDashboard {
 		}
 
 		return used_references;
+	}
+
+	addDashboardTab(dashboard_tab) {
+		const tab = document.createElement('li');
+		const tab_contents = document.createElement('div');
+		const tab_contents_name = document.createElement('span');
+
+		tab.appendChild(tab_contents);
+		tab_contents.appendChild(tab_contents_name);
+
+		tab_contents_name.textContent = dashboard_tab.name;
+
+		this._dashboard_tabs.insertItemBefore(tab);
+		this._tabs_dashboard_tabs.set(dashboard_tab.dashboardid, tab);
+	}
+
+	_selectDashboardTab() {
+		this._selected_dashboard_tab = this._tabs_dashboard_tabs.get(this._data.dashboardid);
+
+		this._selected_dashboard_tab.firstElementChild.classList.add(ZBX_STYLE_DASHBOARD_SELECTED_TAB);
+
+		this._buttons.previous_dashboard.disabled = this._selected_dashboard_tab.previousElementSibling === null;
+		this._buttons.next_dashboard.disabled = this._selected_dashboard_tab.nextElementSibling === null;
+
+		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);
 	}
 
 	// Internal events management methods.
@@ -2114,12 +2114,6 @@ class CDashboard {
 				this._is_unsaved = true;
 			},
 
-			dashboardTabsClick: (e) => {
-				const dashboard_tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
-
-				this._doSelectDashboardTab(dashboard_tab);
-			},
-
 			tabsClick: (e) => {
 				const tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
 
@@ -2166,50 +2160,6 @@ class CDashboard {
 				const tab = this._dashboard_pages.get(this._selected_dashboard_page).tab;
 
 				this._selectDashboardPage(this._tabs_dashboard_pages.get(tab.nextElementSibling), {is_async: true});
-			},
-
-			tabsPreviousDashboardClick: () => {
-				if (this._selected_dashboard_tab.previousElementSibling !== null) {
-					const keys = [...this._tabs_dashboard_tabs.keys()];
-					const previous_darshboardid = keys[keys.indexOf(this._data.dashboardid) - 1];
-					const previous_dashboard_tab = this._tabs_dashboard_tabs.get(previous_darshboardid);
-
-					this._doSelectDashboardTab(previous_dashboard_tab);
-				}
-			},
-
-			tabsNextDashboardClick: () => {
-				if (this._selected_dashboard_tab.nextElementSibling !== null) {
-					const keys = [...this._tabs_dashboard_tabs.keys()];
-					const next_darshboardid = keys[keys.indexOf(this._data.dashboardid) + 1];
-					const next_dashboard_tab = this._tabs_dashboard_tabs.get(next_darshboardid);
-
-					this._doSelectDashboardTab(next_dashboard_tab);
-				}
-			},
-
-			tabsDashboardListClick: (ev) => {
-				let dropdown_items = [];
-				let dropdown = [];
-
-				for (const dashboard of this._data.dashboard_tabs) {
-					dropdown_items.push({
-						label: dashboard.name,
-						clickCallback: () => {
-							window.location.href = dashboard.link;
-						}
-					});
-				}
-
-				dropdown.push({items: dropdown_items});
-
-				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {
-					position: {
-						of: ev.target,
-						my: 'left bottom',
-						at: 'left top'
-					}
-				});
 			},
 
 			slideshowToggle: () => {
@@ -2282,6 +2232,56 @@ class CDashboard {
 				this._cancelEditingWidgetProperties();
 
 				this._is_edit_widget_properties_cancel_subscribed = false;
+			},
+
+			dashboardTabsClick: (e) => {
+				const dashboard_tab = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
+
+				this._doSelectDashboardTab(dashboard_tab);
+			},
+
+			tabsPreviousDashboardClick: () => {
+				if (this._selected_dashboard_tab.previousElementSibling !== null) {
+					const keys = [...this._tabs_dashboard_tabs.keys()];
+					const previous_darshboardid = keys[keys.indexOf(this._data.dashboardid) - 1];
+					const previous_dashboard_tab = this._tabs_dashboard_tabs.get(previous_darshboardid);
+
+					this._doSelectDashboardTab(previous_dashboard_tab);
+				}
+			},
+
+			tabsNextDashboardClick: () => {
+				if (this._selected_dashboard_tab.nextElementSibling !== null) {
+					const keys = [...this._tabs_dashboard_tabs.keys()];
+					const next_darshboardid = keys[keys.indexOf(this._data.dashboardid) + 1];
+					const next_dashboard_tab = this._tabs_dashboard_tabs.get(next_darshboardid);
+
+					this._doSelectDashboardTab(next_dashboard_tab);
+				}
+			},
+
+			tabsDashboardListClick: (ev) => {
+				let dropdown_items = [];
+				let dropdown = [];
+
+				for (const dashboard of this._data.dashboard_tabs) {
+					dropdown_items.push({
+						label: dashboard.name,
+						clickCallback: () => {
+							window.location.href = dashboard.link;
+						}
+					});
+				}
+
+				dropdown.push({items: dropdown_items});
+
+				$(this._target).menuPopup(dropdown, new jQuery.Event(ev), {
+					position: {
+						of: ev.target,
+						my: 'left bottom',
+						at: 'left top'
+					}
+				});
 			}
 		};
 	}

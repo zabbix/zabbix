@@ -196,7 +196,7 @@ if (count($data['dashboard']['pages']) >= 1) {
 
 	$html_page->addItem($dashboard);
 
-	if (count($data['dashboard']['pages']) == 1 && !$data['dashboard']['pages'][0]['widgets']) {
+	if (count($data['dashboard']['pages']) === 1 && !$data['dashboard']['pages'][0]['widgets']) {
 		$html_page->addItem((new CDiv())
 			->addStyle('margin-top: 5px;')
 			->addItem(new CTableInfo())
