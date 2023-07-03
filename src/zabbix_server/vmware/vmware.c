@@ -9494,8 +9494,11 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout, &error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout,
+			&error))
+	{
 		goto clean;
+	}
 
 	/* update performance counter refresh rate for entities */
 

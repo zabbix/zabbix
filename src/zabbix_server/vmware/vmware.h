@@ -582,8 +582,10 @@ void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout, int cache_update_period);
-int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
-int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip, int config_vmware_timeout);
+int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout);
+int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,
+		int config_vmware_timeout);
 void	zbx_vmware_service_remove(zbx_vmware_service_t *service);
 void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *service, int job_type);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);

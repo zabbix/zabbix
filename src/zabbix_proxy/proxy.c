@@ -278,7 +278,7 @@ ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 static char	*config_server		= NULL;
 static int	config_server_port;
 static char	*config_hostname	= NULL;
-static char	*config_hostname_item		= NULL;
+static char	*config_hostname_item	= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
 
@@ -1284,8 +1284,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 							.config_timeout = zbx_config_timeout,
 							zbx_config_source_ip};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
-	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency, config_vmware_perf_frequency,
-								config_vmware_timeout};
+	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
+								config_vmware_perf_frequency, config_vmware_timeout};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 

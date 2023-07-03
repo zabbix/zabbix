@@ -236,20 +236,23 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
  *                                                                            *
  * Purpose: cURL handle prepare                                               *
  *                                                                            *
- * Parameters: url               - [IN] vmware service url                    *
- *             is_new_api        - [IN] flag to use new api version syntax    *
- *             config_source_ip  - [IN]                                       *
- *             config_vm_timeout - [IN]                                       *
- *             easyhandle        - [OUT] cURL handle                          *
- *             page              - [OUT] response buffer for cURL             *
- *             headers           - [OUT] request headers for cURL             *
- *             error             - [OUT] error message in the case of failure *
+ * Parameters: url                   - [IN] vmware service url                *
+ *             is_new_api            - [IN] flag to use new api version       *
+ *                                          syntax                            *
+ *             config_source_ip      - [IN]                                   *
+ *             config_vmware_timeout - [IN]                                   *
+ *             easyhandle            - [OUT] cURL handle                      *
+ *             page                  - [OUT] response buffer for cURL         *
+ *             headers               - [OUT] request headers for cURL         *
+ *             error                 - [OUT] error message in the case of     *
+ *                                           failure                          *
  *                                                                            *
  * Return value: SUCCEED if the cURL prepared, FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_curl_init(const char *url, unsigned char is_new_api, const char *config_source_ip,
-		int config_vm_timeout, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers, char **error)
+		int config_vmware_timeout, CURL **easyhandle, ZBX_HTTPPAGE *page, struct curl_slist **headers,
+		char **error)
 {
 #	define INIT_PERF_REST_SIZE	2 * ZBX_KIBIBYTE
 #	define ZBX_XML_HEADER1		"Accept: application/json, text/plain, */*"
@@ -305,7 +308,7 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 			(NULL != config_source_ip && CURLE_OK != (err = curl_easy_setopt(*easyhandle,
 			opt = CURLOPT_INTERFACE, config_source_ip))) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
-			(long)config_vm_timeout)) ||
+			(long)config_vmware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
