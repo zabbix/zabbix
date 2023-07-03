@@ -24,8 +24,6 @@
  * @var array $data
  */
 
-$tabs = new CTabView();
-
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
@@ -104,7 +102,7 @@ if ($data['linked_templates']) {
 }
 
 $templates_field_items[] = (new CMultiSelect([
-	'name' => 'add_templates[]',
+	'name' => 'template_add_templates[]',
 	'object_name' => 'templates',
 	'data' => $data['add_templates'],
 	'popup' => [
@@ -113,7 +111,7 @@ $templates_field_items[] = (new CMultiSelect([
 			'srcfld1' => 'hostid',
 			'srcfld2' => 'host',
 			'dstfrm' => $form->getName(),
-			'dstfld1' => 'add_templates_',
+			'dstfld1' => 'template_add_templates_',
 			'excludeids' => ($data['templateid'] == null) ? [] : [$data['templateid']],
 			'disableids' => array_column($data['linked_templates'], 'templateid')
 		]
@@ -133,7 +131,7 @@ $template_tab
 		(new CLabel(_('Template groups'), 'groups__ms'))->setAsteriskMark(),
 		new CFormField(
 			(new CMultiSelect([
-			'name' => 'groups[]',
+			'name' => 'template_groups[]',
 			'object_name' => 'templateGroup',
 			'add_new' => (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN),
 			'data' => $data['groups_ms'],
@@ -142,7 +140,7 @@ $template_tab
 					'srctbl' => 'template_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'groups_',
+					'dstfld1' => 'template_groups_',
 					'editable' => true,
 					'disableids' => array_column($data['groups_ms'], 'id')
 				]
@@ -176,7 +174,7 @@ $tags = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
 	'readonly' => $data['readonly'],
-	'tabs_id' => 'tabs',
+	'tabs_id' => 'template-tabs',
 	'tags_tab_id' => 'tags-tab-template'
 ]);
 
@@ -189,7 +187,7 @@ $form->addItem(
 $tmpl = $data['show_inherited_macros'] ? 'hostmacros.inherited.list.html' : 'hostmacros.list.html';
 
 $macros_tab = (new CFormList('macrosFormList'))
-	->addRow(null, (new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+	->addRow(null, (new CRadioButtonList('show_inherited_template_macros', (int) $data['show_inherited_macros']))
 		->addValue(_('Template macros'), 0)
 		->addValue(_('Inherited and template macros'), 1)
 		->setModern()
@@ -197,7 +195,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	->addRow(null, new CPartial($tmpl, [
 		'macros' => $data['macros'],
 		'readonly' => $data['readonly']
-	]), 'macros_container');
+	]), 'template_macros_container');
 
 // Value mapping tab.
 $valuemap_tab = (new CFormList('valuemap-formlist'))
@@ -205,7 +203,7 @@ $valuemap_tab = (new CFormList('valuemap-formlist'))
 		'source' => 'template',
 		'valuemaps' => $data['valuemaps'],
 		'readonly' => $data['readonly'],
-		'form' => 'template'
+		'form' => 'templates'
 	]));
 
 if (!$data['readonly']) {
@@ -330,11 +328,11 @@ else {
 	];
 }
 
-$tabs
-	->addTab('tmplTab', _('Templates'), $template_tab)
-	->addTab('tags-tab', _('Tags'), $tags, TAB_INDICATOR_TAGS)
-	->addTab('macroTab', _('Macros'),$macros_tab, TAB_INDICATOR_MACROS)
-	->addTab('valuemap-tab', _('Value mapping'), $valuemap_tab, TAB_INDICATOR_VALUEMAPS)
+$tabs = (new CTabView(['id' => 'template-tabs']))
+	->addTab('tmpl-tab', _('Templates'), $template_tab)
+	->addTab('tags-tab-template', _('Tags'), $tags, TAB_INDICATOR_TAGS)
+	->addTab('template-macro-tab', _('Macros'),$macros_tab, TAB_INDICATOR_MACROS)
+	->addTab('template-valuemap-tab', _('Value mapping'), $valuemap_tab, TAB_INDICATOR_TEMPLATE_VALUEMAPS)
 	->setSelected(0);
 
 $form

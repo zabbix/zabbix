@@ -127,7 +127,6 @@
 		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
-
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
 			this.initInventoryTab();
@@ -137,6 +136,7 @@
 
 			this.form.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-linked-template')) {
+
 					if (typeof this.overlay !== 'undefined') {
 						this.dialogue = this.overlay.$dialogue[0];
 
@@ -151,6 +151,9 @@
 								new CustomEvent('edit.linked', {detail: {templateid: e.target.dataset.templateid}})
 							)
 						}
+					}
+					else {
+						this.editTemplate({templateid: e.target.dataset.templateid});
 					}
 				}
 			});
@@ -196,6 +199,10 @@
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
 				this.editTemplate({templateid:e.detail.templateid})
 			})
+
+			overlay.$dialogue[0].addEventListener('overlay.close', () => {
+				new TabIndicators('host-tabs');
+			});
 		},
 
 		/**
@@ -214,11 +221,11 @@
 			const $groups_ms = $('#groups_');
 			const $template_ms = $('#add_templates_');
 
-			$template_ms.on('change', (e) => {
+			$template_ms.on('change', () => {
 				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
 			});
 
-			$groups_ms.on('change', (e) => {
+			$groups_ms.on('change', () => {
 				$groups_ms.multiSelect('setDisabledEntries',
 					[... this.form.querySelectorAll('[name^="groups["]')].map((input) => input.value)
 				);

@@ -114,11 +114,9 @@ foreach ($data['tags'] as $i => $tag) {
 
 			foreach ($tag['parent_templates'] as $templateid => $template) {
 				if ($allowed_ui_conf_templates && $template['permission'] == PERM_READ_WRITE) {
-					$template_list[] = (new CLink($template['name'],
-						(new CUrl('templates.php'))
-							->setArgument('form', 'update')
-							->setArgument('templateid', $templateid)
-					))->setTarget('_blank');
+					$template_list[] = (new CLink($template['name']))
+						->onClick('view.editTemplate(event, this.dataset.templateid);')
+						->setAttribute('data-templateid', $templateid);
 				}
 				else {
 					$template_list[] = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);

@@ -48,7 +48,7 @@ window.template_edit_popup = new class {
 	}
 
 	#initActions() {
-		this.#initMacrosTab();
+		this.initMacrosTab();
 		this.#updateMultiselect();
 		this.unlink_clear_templateids = {};
 
@@ -65,7 +65,7 @@ window.template_edit_popup = new class {
 				);
 
 				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
-				$('#add_templates_').trigger('change');
+				$('#template_add_templates_').trigger('change');
 			}
 			else if (e.target.classList.contains('unlink-and-clear')) {
 				e.target.closest('tr').remove();
@@ -113,16 +113,17 @@ window.template_edit_popup = new class {
 		this.dialogue.dispatchEvent(new CustomEvent('edit.linked', {detail: {templateid: parameters.templateid}}));
 	}
 
-	#initMacrosTab() {
+	initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			readonly: this.template.readonly,
-			parent_hostid: this.template.parent_hostid ?? null
+			parent_hostid: this.template.parent_hostid ?? null,
+			source: 'templates-form'
 		});
 
-		$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
+		$('#template-tabs').on('tabscreate tabsactivate', (event, ui) => {
 			let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
 
-			if (panel.attr('id') === 'macroTab') {
+			if (panel.attr('id') === 'template-macro-tab') {
 				const macros_initialized = panel.data('macros_initialized') || false;
 
 				// Please note that macro initialization must take place once and only when the tab is visible.
@@ -138,8 +139,9 @@ window.template_edit_popup = new class {
 						panel.data('templateids', templateids);
 
 						this.macros_manager.load(
-							this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
-							this.linked_templateids.concat(templateids)
+							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
+							this.linked_templateids.concat(templateids),
+							'templates-form'
 						);
 
 						panel.data('macros_initialized', true);
@@ -152,11 +154,11 @@ window.template_edit_popup = new class {
 
 				// Initialize macros.
 				if (this.template.readonly) {
-					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#template_tbl_macros').textareaFlexible();
 				}
 				else {
 					this.macros_manager.initMacroTable(
-						this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1
+						this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
 					);
 				}
 
@@ -164,10 +166,11 @@ window.template_edit_popup = new class {
 			}
 		});
 
-		this.form.querySelector('#show_inherited_macros').onchange = () => {
+		this.form.querySelector('#show_inherited_template_macros').onchange = () => {
 			this.macros_manager.load(
-				this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
-				this.linked_templateids.concat(this.#getAddTemplates())
+				this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
+				this.linked_templateids.concat(this.#getAddTemplates()),
+				'templates-form'
 			);
 		}
 	}
@@ -212,6 +215,12 @@ window.template_edit_popup = new class {
 			fields.templateid = this.templateid;
 		}
 
+		fields.groups = fields.template_groups;
+		delete (fields.template_groups);
+
+		fields.add_templates = fields.template_add_templates;
+		delete (fields.teplate_add_templates);
+
 		this.#trimFields(fields);
 		this.overlay.setLoading();
 
@@ -246,6 +255,8 @@ window.template_edit_popup = new class {
 				if ('value' in tag) {
 					tag.value = tag.value.trim();
 				}
+
+				delete tag.automatic;
 			}
 		}
 
@@ -316,14 +327,14 @@ window.template_edit_popup = new class {
 	}
 
 	#updateMultiselect() {
-		const $groups_ms = $('#groups_, #group_links_');
-		const $template_ms = $('#add_templates_');
+		const $groups_ms = $('#template_groups_, #template_group_links_');
+		const $template_ms = $('#template_add_templates_');
 
 		$template_ms.on('change', () => $template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates()));
 
 		$groups_ms.on('change', () =>
 			$groups_ms.multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="groups["], [name^="group_links["]')].map((input) => input.value)
+				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')].map((input) => input.value)
 			)
 		);
 	}
@@ -334,7 +345,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getAddTemplates() {
-		const $ms = $('#add_templates_');
+		const $ms = $('#template_add_templates_');
 		let templateids = [];
 
 		// Readonly forms don't have multiselect.
@@ -378,7 +389,7 @@ window.template_edit_popup = new class {
 	 * @return {array}  Templateids.
 	 */
 	#getNewTemplates() {
-		const $template_multiselect = $('#add_templates_');
+		const $template_multiselect = $('#template_add_templates_');
 		const templateids = [];
 
 		// Readonly forms don't have multiselect.

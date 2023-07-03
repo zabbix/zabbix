@@ -76,6 +76,8 @@ class TabIndicators {
 				return AUTHENTICATION;
 			case !!GRAPH:
 				return GRAPH;
+			case !!TEMPLATE:
+				return TEMPLATE;
 			case !!HOST:
 				return HOST;
 			case !!HOST_DISCOVERY:
@@ -96,8 +98,6 @@ class TabIndicators {
 				return SERVICE;
 			case !!SLA:
 				return SLA;
-			case !!TEMPLATE:
-				return TEMPLATE;
 			case !!TRIGGER:
 				return TRIGGER;
 			case !!TRIGGER_PROTOTYPE:
@@ -247,6 +247,8 @@ class TabIndicatorFactory {
 				return new TimeTabIndicatorItem;
 			case 'Valuemaps':
 				return new ValuemapsTabIndicatorItem;
+			case 'TemplateValuemaps':
+				return new TemplateValuemapsTabIndicatorItem;
 		}
 
 		return null;
@@ -340,13 +342,22 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return [...document.querySelectorAll('#tbl_macros .form_row')]
+		let macros;
+
+		if (document.querySelector('#templates-form')) {
+			macros = [...document.forms['template-edit-form'].querySelectorAll('#tbl_macros .form_row')];
+		}
+		else {
+			macros = [...document.querySelectorAll('#tbl_macros .form_row')]
+		}
+
+		return macros
 			.filter((row) => {
 				const macro = row.querySelector('textarea[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
-						&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
+					&& parseInt(inherited_type.value, 10) == MacrosTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
 					return false;
 				}
 
@@ -356,7 +367,14 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	initObserver() {
-		const target_node = document.getElementById('macros_container');
+		let target_node;
+
+		if (document.querySelector('#templates-form')) {
+			target_node = document.getElementById('template_macros_container');
+		}
+		else {
+			target_node = document.getElementById('macros_container');
+		}
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {
@@ -372,6 +390,7 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 		}
 	}
 }
+
 
 class TagsTabIndicatorItem extends TabIndicatorItem {
 
@@ -1458,6 +1477,34 @@ class ValuemapsTabIndicatorItem extends TabIndicatorItem {
 
 	initObserver() {
 		const target_node = document.querySelector('#valuemap-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				subtree: true
+			});
+		}
+	}
+}
+
+class TemplateValuemapsTabIndicatorItem extends TabIndicatorItem {
+
+	constructor() {
+		super(TAB_INDICATOR_TYPE_COUNT);
+	}
+
+	getValue() {
+		return document
+			.querySelectorAll('#template-valuemap-table tbody tr')
+			.length;
+	}
+
+	initObserver() {
+		const target_node = document.querySelector('#template-valuemap-table');
 
 		if (target_node !== null) {
 			const observer = new MutationObserver(() => {

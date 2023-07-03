@@ -49,6 +49,93 @@
 
 		init({form_name}) {
 			this.form_name = form_name;
+			this.form = document.getElementById('host-prototype-form');
+			this.initMacrosTab();
+
+			this.form.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-edit-linked-template')) {
+					this.openTemplatePopup({templateid: e.target.dataset.templateid});
+				}
+			});
+		},
+
+		initMacrosTab() {
+			let $show_inherited_macros = $('input[name="show_inherited_macros"]'),
+				linked_templateids = <?= json_encode($data['macros_tab']['linked_templates']) ?>;
+
+			this.macros_manager = new HostMacrosManager(<?= json_encode([
+				'readonly' => $data['readonly'],
+				'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
+			]) ?>);
+
+			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
+				let panel = (event.type === 'tabscreate') ? ui.panel : ui.newPanel;
+
+				if (panel.attr('id') === 'macroTab') {
+					const macros_initialized = panel.data('macros_initialized') || false;
+
+					// Please note that macro initialization must take place once and only when the tab is visible.
+					if (event.type === 'tabsactivate') {
+						const macros_initialized = panel.data('macros_initialized') || false;
+
+						// Please note that macro initialization must take place once and only when the tab is visible.
+						if (event.type === 'tabsactivate') {
+							let panel_templateids = panel.data('templateids') || [];
+							let templateids = this.getAddTemplates();
+
+							if (panel_templateids.xor(templateids).length > 0) {
+								panel.data('templateids', templateids);
+
+								this.macros_manager.load(
+									$show_inherited_macros.filter(':checked').val() == 1,
+									linked_templateids.concat(templateids)
+								);
+
+								panel.data('macros_initialized', true);
+							}
+						}
+					}
+
+					if (macros_initialized) {
+						return;
+					}
+
+					// Initialize macros.
+					<?php if ($data['readonly']): ?>
+					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#tbl_macros').textareaFlexible();
+					<?php else: ?>
+					this.macros_manager.initMacroTable($show_inherited_macros.filter(':checked').val() == 1);
+					<?php endif ?>
+
+					panel.data('macros_initialized', true);
+				}
+			});
+
+			this.form.querySelector('#show_inherited_macros').onchange = () => {
+				this.macros_manager.load(
+					this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
+				);
+			}
+		},
+
+		/**
+		 * Collects IDs selected in "Add templates" multiselect.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAddTemplates() {
+			const $ms = $('#add_templates_');
+			let templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($ms.length) {
+				// Collect IDs from Multiselect.
+				$ms.multiSelect('getData').forEach(function (template) {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
 		},
 
 		editHost(e, hostid) {

@@ -1804,6 +1804,7 @@ define('TAB_INDICATOR_TAG_FILTER', 'tag-filter');
 define('TAB_INDICATOR_TAGS', 'tags');
 define('TAB_INDICATOR_TIME', 'time');
 define('TAB_INDICATOR_VALUEMAPS', 'valuemaps');
+define('TAB_INDICATOR_TEMPLATE_VALUEMAPS', 'template-valuemaps');
 
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');

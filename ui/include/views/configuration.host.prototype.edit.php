@@ -101,11 +101,9 @@ if ($host_prototype['templateid']) {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
+				$template_link = (new CLink($template['name']))
+					->addClass('js-edit-linked-template')
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$template_link = new CSpan($template['name']);
@@ -130,11 +128,9 @@ else {
 
 			if ($data['allowed_ui_conf_templates']
 					&& array_key_exists($template['templateid'], $host_prototype['writable_templates'])) {
-				$template_link = (new CLink($template['name'],
-					(new CUrl('templates.php'))
-						->setArgument('form', 'update')
-						->setArgument('templateid', $template['templateid'])
-				))->setTarget('_blank');
+				$template_link = (new CLink($template['name']))
+					->addClass('js-edit-linked-template')
+					->setAttribute('data-templateid', $template['templateid']);
 			}
 			else {
 				$template_link = new CSpan($template['name']);

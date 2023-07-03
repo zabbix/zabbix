@@ -26,9 +26,18 @@
 
 <script type="text/javascript">
 (() => {
-	document.querySelectorAll('#valuemap-table .element-table-add').forEach((elm) => elm.addEventListener('click',
-		(event) => openAddPopup(event))
-	);
+	this.form = document.querySelector(`#${<?= json_encode($data['data']['form']) ?>}-form`);
+
+	if (this.form.getAttribute('name') === 'template-edit-form') {
+		document.querySelectorAll('#template-valuemap-table .element-table-add').forEach((element) =>
+			element.addEventListener('click', (event) => openAddPopup(event))
+		);
+	}
+	else {
+		document.querySelectorAll('#valuemap-table .element-table-add').forEach((element) =>
+			element.addEventListener('click', (event) => openAddPopup(event))
+		);
+	}
 
 	function openAddPopup(event) {
 		let valuemap_names = [];
@@ -47,6 +56,7 @@ var AddValueMap = class {
 	constructor(data, edit = null) {
 		this.data = data;
 		this.MAX_MAPPINGS = 3;
+		this.form = document.querySelector(`#${<?= json_encode($data['data']['form']) ?>}-form`);
 
 		this.row = document.createElement('tr');
 		this.row.appendChild(this.createNameCell());
@@ -69,8 +79,12 @@ var AddValueMap = class {
 			return edit.replaceWith(this.row);
 		}
 
-		return document
-			.querySelector('#valuemap-table tbody')
+		const table_body = this.form.getAttribute('name') == 'template-edit-form'
+			? '#template-valuemap-table tbody'
+			: '#valuemap-table tbody';
+
+		return this.form
+			.querySelector(table_body)
 			.append(this.row);
 	}
 
@@ -185,7 +199,7 @@ var AddValueMap = class {
 }
 
 // Initialize value maps from data array.
-var valuemaps = <?= json_encode($data['valuemaps']) ?>;
+var valuemaps = <?= json_encode($data['data']['valuemaps']) ?>;
 
 valuemaps.forEach((valuemap) => new AddValueMap(valuemap));
 </script>

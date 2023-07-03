@@ -21,6 +21,7 @@
 
 /**
  * @var CPartial $this
+ * @var array    $data
  */
 $table = (new CTable())
 	->setId('valuemap-table')
@@ -35,6 +36,10 @@ $table = (new CTable())
 		(new CTableColumn(_('Action')))
 			->addClass('table-col-handle')
 	]);
+
+if (array_key_exists('source', $data) && $data['source'] === 'template') {
+	$table->setId('template-valuemap-table');
+}
 
 $buttons = [
 	(new CButton('valuemap_add', _('Add')))
@@ -58,4 +63,5 @@ $table->addItem((new CTag('tfoot', true))->addItem([new CCol($buttons)]));
 
 $table->show();
 
-$this->includeJsFile('configuration.valuemap.js.php', ['valuemaps' => $data['valuemaps']]);
+$this->includeJsFile('configuration.valuemap.js.php', ['data' => $data]);
+
