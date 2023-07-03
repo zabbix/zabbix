@@ -1523,7 +1523,7 @@ class CUser extends CApiService {
 
 					$userdirectoryid = $db_user['userdirectoryid'] != 0
 						? $db_user['userdirectoryid']
-						: $ldap_userdirectoryid;
+						: $user_data['permissions']['userdirectoryid'];
 					$exists = false;
 
 					if ($userdirectoryid != 0) {
@@ -2078,7 +2078,7 @@ class CUser extends CApiService {
 				$userdirectoryids = [];
 			}
 
-			if ($permissions['gui_access'] === $db_usrgrp['gui_access']
+			if ($permissions['gui_access'] == $db_usrgrp['gui_access']
 					&& ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP
 						|| ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
 							&& CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_LDAP
