@@ -189,15 +189,19 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
  * Purpose: check if proxy history table has unsent data and update lastid    *
  *          if necessary                                                      *
  *                                                                            *
+ * Parameters: table  - [IN] history table                                    *
+ *             field  - [IN] key field name                                   *
+ *             lastid - [OUT] id of the last uploaded row                     *
+ *             maxid  - [OUT] max id of the row in database                   *
+ *                                                                            *
  * Return value: SUCCEED - table has unsent data                              *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	pb_check_unsent_rows(const char *table, const char *field)
+static int	pb_check_unsent_rows(const char *table, const char *field, zbx_uint64_t *lastid, zbx_uint64_t *maxid)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	zbx_uint64_t	lastid, maxid;
 	int		ret;
 	char		sql[MAX_STRING_LEN];
 
@@ -206,43 +210,38 @@ static int	pb_check_unsent_rows(const char *table, const char *field)
 	result = zbx_db_select("select nextid from ids where table_name='%s' and field_name='%s'", table, field);
 
 	if (NULL == (row = zbx_db_fetch(result)))
-		lastid = 0;
+		*lastid = 0;
 	else
-		ZBX_STR2UINT64(lastid, row[0]);
+		ZBX_STR2UINT64(*lastid, row[0]);
 
 	zbx_db_free_result(result);
 
-	zbx_snprintf(sql, sizeof(sql), "select null from %s where id>" ZBX_FS_UI64, table, lastid);
-
-	result = zbx_db_select_n(sql, 1);
+	result = zbx_db_select("select max(id) from %s", table);
 
 	if (NULL != (row = zbx_db_fetch(result)))
+		ZBX_DBROW2UINT64(*maxid, row[0]);
+	else
+		*maxid = 0;
+
+	zbx_db_free_result(result);
+
+	if (*lastid < *maxid)
 	{
-		ret = SUCCEED;
+		ret = (0 < *maxid ? SUCCEED : FAIL);
 	}
 	else
 	{
 		ret = FAIL;
 
-		if (0 != lastid)
+		if (*lastid > *maxid)
 		{
-			zbx_db_free_result(result);
-
-			result = zbx_db_select("select max(id) from %s", table);
-
-			if (NULL != (row = zbx_db_fetch(result)))
-				ZBX_DBROW2UINT64(maxid, row[0]);
-			else
-				maxid = 0;
-
-			if (lastid > maxid)
-				pb_set_lastid(table, field, maxid);
+			*lastid = *maxid;
+			pb_set_lastid(table, field, *maxid);
 		}
 	}
 
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s " ZBX_FS_UI64 "/" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+			*lastid, *maxid);
 
 	return ret;
 }
@@ -289,7 +288,8 @@ void	pb_set_state(zbx_pb_t *pb, zbx_pb_state_t state, const char *message)
  ******************************************************************************/
 static void	pb_init_state(zbx_pb_t *pb)
 {
-	int	history_ret, discovery_ret, autoreg_ret;
+	int		history_ret, discovery_ret, autoreg_ret;
+	zbx_uint64_t	lastid, maxid;
 
 	if (ZBX_PB_MODE_MEMORY == pb->mode)
 	{
@@ -299,9 +299,12 @@ static void	pb_init_state(zbx_pb_t *pb)
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	history_ret = pb_check_unsent_rows("proxy_history", "history_lastid");
-	discovery_ret = pb_check_unsent_rows("proxy_dhistory", "dhistory_lastid");
-	autoreg_ret = pb_check_unsent_rows("proxy_autoreg_host", "autoreg_host_lastid");
+	history_ret = pb_check_unsent_rows("proxy_history", "history_lastid", &lastid, &maxid);
+	pb->history_lastid_db = maxid;
+	pb->history_lastid_sent = lastid;
+
+	discovery_ret = pb_check_unsent_rows("proxy_dhistory", "dhistory_lastid", &lastid, &maxid);
+	autoreg_ret = pb_check_unsent_rows("proxy_autoreg_host", "autoreg_host_lastid", &lastid, &maxid);
 
 	zbx_db_close();
 

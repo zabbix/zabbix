@@ -48,7 +48,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			return NOTSUPPORTED;
 		}
 
-		SET_UI64_RESULT(result, zbx_pb_history_get_unset_num());
+		SET_UI64_RESULT(result, zbx_pb_history_get_unsent_num());
 		return SUCCEED;
 	}
 

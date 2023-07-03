@@ -899,9 +899,9 @@ void	zbx_pb_set_history_lastid(const zbx_uint64_t lastid)
  * Purpose: return number of unsent history rows                              *
  *                                                                            *
  ******************************************************************************/
-zbx_uint64_t	zbx_pb_history_get_unset_num(void)
+zbx_uint64_t	zbx_pb_history_get_unsent_num(void)
 {
-	zbx_uint64_t	lastid_sent, lastid, rows_num = 0;
+	zbx_uint64_t	lastid_sent, lastid;
 
 	pb_lock();
 
@@ -910,45 +910,5 @@ zbx_uint64_t	zbx_pb_history_get_unset_num(void)
 
 	pb_unlock();
 
-	if (ZBX_PB_MODE_MEMORY != pb_data->mode)
-	{
-		zbx_db_result_t	result;
-		zbx_db_row_t	row;
-
-		if (0 == lastid)
-		{
-			result = zbx_db_select("select max(id) from proxy_history");
-
-			if (NULL != (row = zbx_db_fetch(result)))
-				ZBX_DBROW2UINT64(lastid, row[0]);
-
-			zbx_db_free_result(result);
-		}
-
-		if (0 == lastid_sent)
-		{
-			result = zbx_db_select("select nextid from ids where table_name='proxy_history'"
-					" and field_name='history_lastid'");
-
-			if (NULL != (row = zbx_db_fetch(result)))
-				ZBX_DBROW2UINT64(lastid_sent, row[0]);
-
-			zbx_db_free_result(result);
-		}
-
-		if (0 == lastid_sent)
-		{
-			result = zbx_db_select("select min(id) from proxy_history");
-
-			if (NULL != (row = zbx_db_fetch(result)))
-				ZBX_DBROW2UINT64(lastid_sent, row[0]);
-
-			zbx_db_free_result(result);
-		}
-	}
-
-	if (lastid_sent < lastid)
-		rows_num = lastid - lastid_sent;
-
-	return rows_num;
+	return (lastid_sent < lastid ? lastid - lastid_sent : 0);
 }
