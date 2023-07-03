@@ -28,10 +28,12 @@
 	const view = {
 		checkbox_object: null,
 		checkbox_hash: null,
+		token: null,
 
-		init({checkbox_hash, checkbox_object}) {
+		init({checkbox_hash, checkbox_object, token}) {
 			this.checkbox_hash = checkbox_hash;
 			this.checkbox_object = checkbox_object;
+			this.token = token;
 
 			// Disable the status filter when using the state filter.
 			$('#filter_state')
@@ -39,6 +41,8 @@
 					$('input[name=filter_status]').prop('disabled', $('input[name=filter_state]:checked').val() != -1);
 				})
 				.trigger('change');
+
+			document.querySelector('.js-execute-now').addEventListener(e => this.executeNow(e.target));
 		},
 
 		editHost(e, hostid) {
@@ -64,19 +68,22 @@
 			}, {once: true});
 		},
 
-		massCheckNow(button) {
+		executeNow(button) {
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
+
+			const data = {
+				itemids: Object.keys(chkbxRange.getSelectedIds()),
+				discovery_rule: 1
+			}
+			data[token[0]] = token[1];
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds()), discovery_rule: 1})
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {

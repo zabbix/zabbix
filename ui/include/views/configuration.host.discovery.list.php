@@ -355,8 +355,8 @@ if ($data['context'] === 'host') {
 	$button_list += [
 		'discoveryrule.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
-				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('js-execute-now')
 				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]
@@ -384,7 +384,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'checkbox_hash' => $data['checkbox_hash'],
-		'checkbox_object' => 'g_hostdruleid'
+		'checkbox_object' => 'g_hostdruleid',
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')]
 	]).');
 '))
 	->setOnDocumentReady()

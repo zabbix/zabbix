@@ -97,9 +97,11 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 <script>
 	const view = {
 		form_name: null,
+		token: null,
 
-		init({form_name, counter}) {
+		init({form_name, counter, token}) {
 			this.form_name = form_name;
+			this.token = token;
 
 			$('#conditions')
 				.dynamicRows({
@@ -171,6 +173,12 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 				.on('click', 'button.element-table-add', () => {
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});
+
+			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-now`);
+
+			if (button instanceof Element) {
+				button.addEventListener(e => this.executeNow(e.target));
+			}
 		},
 
 		updateExpression() {
@@ -201,19 +209,22 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}
 		},
 
-		checkNow(button) {
+		executeNow(button) {
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
+
+			const data = {
+				itemids: [document.querySelector(`[name="${this.form_name}"] [name="itemid"]`).value],
+				discovery_rule: 1
+			};
+			data[token[0]] = token[1];
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: [document.getElementById('itemid').value], discovery_rule: 1})
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
