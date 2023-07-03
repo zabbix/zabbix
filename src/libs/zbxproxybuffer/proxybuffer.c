@@ -203,7 +203,6 @@ static int	pb_check_unsent_rows(const char *table, const char *field, zbx_uint64
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret;
-	char		sql[MAX_STRING_LEN];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:%s", __func__, table);
 

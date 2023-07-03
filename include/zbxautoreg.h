@@ -35,5 +35,4 @@ void	zbx_autoreg_prepare_host(zbx_vector_ptr_t *autoreg_hosts, const char *host,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
 
-
 #endif
