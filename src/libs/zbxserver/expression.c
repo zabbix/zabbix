@@ -6822,7 +6822,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 	for (p = e; p < len + e ; p += sep_pos + 1)
 	{
 		size_t	param_pos, param_len, rel_len = len - (p - e);
-		int	escaped;
+		int	quoted;
 
 		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
@@ -6832,7 +6832,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		/* prepare the parameter (macro substitutions and quoting) */
 
 		zbx_free(param);
-		param = zbx_function_param_unescape_dyn(p + param_pos, param_len, &escaped);
+		param = zbx_function_param_unquote_dyn(p + param_pos, param_len, &quoted);
 
 		if (1 == key_in_param && p == e)
 		{
@@ -6862,7 +6862,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		else
 			zbx_substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-		if (SUCCEED != zbx_function_param_escape(&param, escaped))
+		if (SUCCEED != zbx_function_param_quote(&param, quoted))
 		{
 			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 			ret = FAIL;
