@@ -881,7 +881,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 					str_severity = VERBOSE_TYPE;
 					break;
 				default:
-					*error = zbx_dsprintf(*error, "Invalid severity detected: '%hu'.", evt_severity);
+					*error = zbx_dsprintf(*error, "Invalid severity detected: '%hu'.",
+							evt_severity);
 					goto out;
 			}
 
