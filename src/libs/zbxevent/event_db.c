@@ -21,7 +21,12 @@
 
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
-#include "zbxdbwrap.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #ifdef HAVE_OPENIPMI
 #	define ZBX_IPMI_FIELDS_NUM	4	/* number of selected IPMI-related fields in function */
@@ -359,8 +364,8 @@ int	zbx_event_db_get_drule(const zbx_db_event *event, char **replace_to, const c
 			break;
 		case EVENT_OBJECT_DSERVICE:
 			result = zbx_db_select("select r.%s from drules r,dhosts h,dservices s"
-					" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
-					fieldname, event->objectid);
+					" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid="
+					ZBX_FS_UI64, fieldname, event->objectid);
 			break;
 		default:
 			return ret;
