@@ -71,7 +71,7 @@ jQuery(function($) {
 				this.hideMessage();
 			}
 			else {
-				this.$elem.text(response.message);
+				this.$elem.html($('<span>').text(response.message));
 				this.showMessage()
 			}
 

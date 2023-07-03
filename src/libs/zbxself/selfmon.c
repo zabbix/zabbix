@@ -25,7 +25,7 @@
 #ifndef _WINDOWS
 #	include "zbxmutexs.h"
 #	include "zbxnix.h"
-#	include "log.h"
+#	include "zbxlog.h"
 #	include "zbxtime.h"
 #	include "zbxthreads.h"
 
@@ -72,6 +72,7 @@ static int	selfmon_is_process_monitored(unsigned char proc_type)
 	switch (proc_type)
 	{
 		case ZBX_PROCESS_TYPE_PREPROCESSOR:
+		case ZBX_PROCESS_TYPE_DISCOVERER:
 			return FAIL;
 		default:
 			return SUCCEED;

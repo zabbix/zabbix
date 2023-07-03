@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxpreproc.a
+noinst_LIBRARIES = libzbxpreproc.a libzbxpreprocbase.a
 
 libzbxpreproc_a_SOURCES = \
 	item_preproc.c \
@@ -13,10 +13,6 @@ libzbxpreproc_a_SOURCES = \
 	pp_error.h \
 	pp_execute.c \
 	pp_execute.h \
-	pp_history.c \
-	pp_history.h \
-	pp_item.c \
-	pp_item.h \
 	pp_manager.c \
 	pp_manager.h \
 	pp_queue.c \
@@ -30,4 +26,9 @@ libzbxpreproc_a_SOURCES = \
 	pp_protocol.h
 
 libzbxpreproc_a_CFLAGS = \
-	 $(LIBXML2_CFLAGS)
+	$(LIBXML2_CFLAGS) \
+	$(TLS_CFLAGS)
+
+libzbxpreprocbase_a_SOURCES = \
+	pp_history.c \
+	pp_item.c

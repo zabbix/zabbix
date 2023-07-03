@@ -21,8 +21,7 @@
 #include "sysinfo.h"
 #include "alias/alias.h"
 
-#include "log.h"
-#include "zbxthreads.h"
+#include "zbxlog.h"
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #include "zbxnix.h"
 #endif
@@ -33,13 +32,14 @@
 #include "zbxparam.h"
 #include "zbxexpr.h"
 #include "zbxfile.h"
+#include "zbxthreads.h"
 
 #ifdef WITH_AGENT_METRICS
 #	include "agent/agent.h"
 #endif
 
 #ifdef WITH_COMMON_METRICS
-	#include "common/zbxsysinfo_common.h"
+#	include "common/zbxsysinfo_common.h"
 #endif
 
 #ifdef WITH_HTTP_METRICS
@@ -64,16 +64,27 @@ typedef struct
 zbx_key_access_rule_t;
 
 #ifdef WITH_HOSTNAME_METRIC
-extern ZBX_METRIC	parameter_hostname;
+static zbx_metric_t	parameter_hostname =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+#ifdef ZBX_UNKNOWN_ARCH
+	{"system.hostname",     0,              system_hostname,        NULL};
+#else
+	{"system.hostname",     CF_HAVEPARAMS,  system_hostname,        NULL};
+#endif
 #endif
 
-static ZBX_METRIC		*commands = NULL;
-static ZBX_METRIC		*commands_local = NULL;
+static zbx_metric_t		*commands = NULL;
+static zbx_metric_t		*commands_local = NULL;
 zbx_vector_ptr_t		key_access_rules;
 static zbx_get_config_int_f	get_config_timeout_cb = NULL;
 static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
+static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
+static zbx_get_config_str_f	get_config_hostname_cb = NULL;
+static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
+static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
+static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -122,7 +133,7 @@ static int	parse_command_dyn(const char *command, char **cmd, char **param)
 	return ZBX_COMMAND_WITH_PARAMS;
 }
 
-static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error, size_t max_error_len)
+static int	add_to_metrics(zbx_metric_t **metrics, zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	int		i = 0;
 
@@ -141,20 +152,28 @@ static int	add_to_metrics(ZBX_METRIC **metrics, ZBX_METRIC *metric, char *error,
 	(*metrics)[i].function = metric->function;
 	(*metrics)[i].test_param = (NULL == metric->test_param ? NULL : zbx_strdup(NULL, metric->test_param));
 
-	*metrics = (ZBX_METRIC *)zbx_realloc(*metrics, (i + 2) * sizeof(ZBX_METRIC));
-	memset(&(*metrics)[i + 1], 0, sizeof(ZBX_METRIC));
+	*metrics = (zbx_metric_t *)zbx_realloc(*metrics, (i + 2) * sizeof(zbx_metric_t));
+	memset(&(*metrics)[i + 1], 0, sizeof(zbx_metric_t));
 
 	return SUCCEED;
 }
 
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
-		zbx_get_config_int_f get_config_unsafe_user_parameters_f)
+		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
+		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
+		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
+		get_config_host_metadata_item_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
 	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
 	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
+	get_config_source_ip_cb = get_config_source_ip_f;
+	get_config_hostname_cb = get_config_hostname_f;
+	get_config_hostnames_cb = get_config_hostnames_f;
+	get_config_host_metadata_cb = get_config_host_metadata_f;
+	get_config_host_metadata_item_cb = get_config_host_metadata_item_f;
 }
 
 /******************************************************************************
@@ -162,7 +181,7 @@ void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get
  * Purpose: registers a new item key into the system                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
+int	zbx_add_metric(zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands, metric, error, max_error_len);
 }
@@ -173,7 +192,7 @@ int	zbx_add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len)
  * Purpose: registers a new item key as local into the system                 *
  *                                                                            *
  ******************************************************************************/
-static int	add_metric_local(ZBX_METRIC *metric, char *error, size_t max_error_len)
+static int	add_metric_local(zbx_metric_t *metric, char *error, size_t max_error_len)
 {
 	return add_to_metrics(&commands_local, metric, error, max_error_len);
 }
@@ -184,7 +203,7 @@ int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size
 {
 	int		ret;
 	unsigned	flags = CF_USERPARAMETER;
-	ZBX_METRIC	metric;
+	zbx_metric_t	metric;
 	AGENT_REQUEST	request;
 
 	zbx_init_agent_request(&request);
@@ -235,8 +254,8 @@ void	zbx_remove_user_parameters(void)
 
 	if (0 < usr)
 	{
-		commands = (ZBX_METRIC *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(ZBX_METRIC));
-		memset(&commands[usr], 0, sizeof(ZBX_METRIC));
+		commands = (zbx_metric_t *)zbx_realloc(commands, ((unsigned int)usr + 1) * sizeof(zbx_metric_t));
+		memset(&commands[usr], 0, sizeof(zbx_metric_t));
 	}
 	else if (0 == usr)
 	{
@@ -244,7 +263,7 @@ void	zbx_remove_user_parameters(void)
 	}
 }
 
-void	zbx_get_metrics_copy(ZBX_METRIC **metrics)
+void	zbx_get_metrics_copy(zbx_metric_t **metrics)
 {
 	unsigned int	i;
 
@@ -257,7 +276,7 @@ void	zbx_get_metrics_copy(ZBX_METRIC **metrics)
 	for (i = 0; NULL != commands[i].key; i++)
 		;
 
-	*metrics = (ZBX_METRIC *)zbx_malloc(*metrics, sizeof(ZBX_METRIC) * (i + 1));
+	*metrics = (zbx_metric_t *)zbx_malloc(*metrics, sizeof(zbx_metric_t) * (i + 1));
 
 	for (i = 0; NULL != commands[i].key; i++)
 	{
@@ -268,30 +287,30 @@ void	zbx_get_metrics_copy(ZBX_METRIC **metrics)
 				NULL : zbx_strdup(NULL, commands[i].test_param));
 	}
 
-	memset(&(*metrics)[i], 0, sizeof(ZBX_METRIC));
+	memset(&(*metrics)[i], 0, sizeof(zbx_metric_t));
 }
 
-void	zbx_set_metrics(ZBX_METRIC *metrics)
+void	zbx_set_metrics(zbx_metric_t *metrics)
 {
 	zbx_free_metrics_ext(&commands);
 	commands = metrics;
 }
 #endif
 
-int	sysinfo_get_config_timeout(void)
-{
-	return get_config_timeout_cb();
+#define GET_CONFIG_VAR(type, varname) \
+type	sysinfo_get_config_##varname(void) \
+{ \
+	return get_config_##varname##_cb(); \
 }
-
-int	sysinfo_get_config_log_remote_commands(void)
-{
-	return get_config_log_remote_commands_cb();
-}
-
-int	sysinfo_get_config_unsafe_user_parameters(void)
-{
-	return get_config_unsafe_user_parameters_cb();
-}
+GET_CONFIG_VAR(int, timeout)
+GET_CONFIG_VAR(int, log_remote_commands)
+GET_CONFIG_VAR(int, unsafe_user_parameters)
+GET_CONFIG_VAR(const char *, source_ip)
+GET_CONFIG_VAR(const char *, hostname)
+GET_CONFIG_VAR(const char *, hostnames)
+GET_CONFIG_VAR(const char *, host_metadata)
+GET_CONFIG_VAR(const char *, host_metadata_item)
+#undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
 {
@@ -305,12 +324,14 @@ void	zbx_init_metrics(void)
 
 	zbx_init_key_access_rules();
 
-	commands = (ZBX_METRIC *)zbx_malloc(commands, sizeof(ZBX_METRIC));
+	commands = (zbx_metric_t *)zbx_malloc(commands, sizeof(zbx_metric_t));
 	commands[0].key = NULL;
-	commands_local = (ZBX_METRIC *)zbx_malloc(commands_local, sizeof(ZBX_METRIC));
+	commands_local = (zbx_metric_t *)zbx_malloc(commands_local, sizeof(zbx_metric_t));
 	commands_local[0].key = NULL;
 
 #ifdef WITH_AGENT_METRICS
+	zbx_metric_t	*parameters_agent = get_parameters_agent();
+
 	for (i = 0; NULL != parameters_agent[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_agent[i], error, sizeof(error)))
@@ -322,6 +343,8 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_COMMON_METRICS
+	zbx_metric_t	*parameters_common = get_parameters_common();
+
 	for (i = 0; NULL != parameters_common[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_common[i], error, sizeof(error)))
@@ -330,6 +353,8 @@ void	zbx_init_metrics(void)
 			exit(EXIT_FAILURE);
 		}
 	}
+
+	zbx_metric_t	*parameters_common_local = get_parameters_common_local();
 
 	for (i = 0; NULL != parameters_common_local[i].key; i++)
 	{
@@ -342,6 +367,8 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_HTTP_METRICS
+	zbx_metric_t	*parameters_common_http = get_parameters_common_http();
+
 	for (i = 0; NULL != parameters_common_http[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_common_http[i], error, sizeof(error)))
@@ -353,6 +380,8 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SPECIFIC_METRICS
+	zbx_metric_t	*parameters_specific = get_parameters_specific();
+
 	for (i = 0; NULL != parameters_specific[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_specific[i], error, sizeof(error)))
@@ -364,6 +393,8 @@ void	zbx_init_metrics(void)
 #endif
 
 #ifdef WITH_SIMPLE_METRICS
+	zbx_metric_t	*parameters_simple = get_parameters_simple();
+
 	for (i = 0; NULL != parameters_simple[i].key; i++)
 	{
 		if (SUCCEED != zbx_add_metric(&parameters_simple[i], error, sizeof(error)))
@@ -383,7 +414,7 @@ void	zbx_init_metrics(void)
 #endif
 }
 
-void	zbx_free_metrics_ext(ZBX_METRIC **metrics)
+void	zbx_free_metrics_ext(zbx_metric_t **metrics)
 {
 	if (NULL != *metrics)
 	{
@@ -433,10 +464,10 @@ static void	zbx_key_access_rule_free(zbx_key_access_rule_t *rule)
  *                                                                            *
  * Purpose: creates key access rule                                           *
  *                                                                            *
- * Parameters: pattern - [IN] the rule pattern                                *
- *             type    - [IN] the rule type                                   *
+ * Parameters: pattern - [IN] rule pattern                                    *
+ *             type    - [IN] rule type                                       *
  *                                                                            *
- *  Return value: The created rule or NULL if pattern was invalid.            *
+ *  Return value: created rule or NULL if pattern was invalid                 *
  *                                                                            *
  ******************************************************************************/
 static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_access_rule_type_t type)
@@ -644,8 +675,8 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
 	const zbx_key_access_rule_t	*a, *b;
 	int				i;
 
-	a = *(zbx_key_access_rule_t **)rule_a;
-	b = *(zbx_key_access_rule_t **)rule_b;
+	a = *(zbx_key_access_rule_t * const *)rule_a;
+	b = *(zbx_key_access_rule_t * const *)rule_b;
 
 	if (a->empty_arguments != b->empty_arguments || a->elements.values_num != b->elements.values_num)
 		return 1;
@@ -663,7 +694,7 @@ static int	compare_key_access_rules(const void *rule_a, const void *rule_b)
  *                                                                            *
  * Purpose: adds new key access rule from AllowKey and DenyKey parameters     *
  *                                                                            *
- * Parameters: parameter - [IN] the parameter that defined the rule           *
+ * Parameters: parameter - [IN] parameter that defined the rule               *
  *             pattern   - [IN] key access rule wildcard                      *
  *             type      - [IN] key access rule type (allow/deny)             *
  *                                                                            *
@@ -835,34 +866,6 @@ static void	zbx_log_init(zbx_log_t *log)
 	log->logeventid = 0;
 }
 
-void	zbx_init_agent_result(AGENT_RESULT *result)
-{
-	memset(result, 0, sizeof(AGENT_RESULT));
-}
-
-static void	zbx_log_clean(zbx_log_t *log)
-{
-	zbx_free(log->source);
-	zbx_free(log->value);
-}
-
-void	zbx_log_free(zbx_log_t *log)
-{
-	zbx_log_clean(log);
-	zbx_free(log);
-}
-
-void	zbx_free_agent_result(AGENT_RESULT *result)
-{
-	ZBX_UNSET_UI64_RESULT(result);
-	ZBX_UNSET_DBL_RESULT(result);
-	ZBX_UNSET_STR_RESULT(result);
-	ZBX_UNSET_TEXT_RESULT(result);
-	ZBX_UNSET_BIN_RESULT(result);
-	ZBX_UNSET_LOG_RESULT(result);
-	ZBX_UNSET_MSG_RESULT(result);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: initialize the request structure                                  *
@@ -935,9 +938,11 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
  *                                                                            *
  * Purpose: parse item command (key) and fill AGENT_REQUEST structure         *
  *                                                                            *
- * Parameters: itemkey - complete item key                                    *
+ * Parameters: itemkey - [IN] complete item key                               *
+ *             request - [OUT] structure filled with data from item key       *
  *                                                                            *
- * Return value: request - structure filled with data from item key           *
+ * Return value: SUCCEED - key was parsed successfully                        *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  * Comments: thread-safe                                                      *
  *                                                                            *
@@ -1147,10 +1152,12 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
 
 /**********************************************************************************
  *                                                                                *
- * Parameters: in_command - item key                                              *
- *             flags - ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
+ * Parameters: in_command - [IN] item key                                         *
+ *             flags      - [IN]                                                  *
+ *                     ZBX_PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     ZBX_PROCESS_MODULE_COMMAND, execute item from a module     *
  *                     ZBX_PROCESS_WITH_ALIAS, substitute agent Alias             *
+ *             result     - [OUT]                                                 *
  *                                                                                *
  * Return value: SUCCEED - successful execution                                   *
  *               NOTSUPPORTED - item key is not supported or other error          *
@@ -1160,7 +1167,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
-	ZBX_METRIC	*command = NULL;
+	zbx_metric_t	*command = NULL;
 	AGENT_REQUEST	request;
 
 	zbx_init_agent_request(&request);
@@ -1558,84 +1565,6 @@ void	*get_result_value_by_type(AGENT_RESULT *result, int require_type)
 	return NULL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: unquotes special symbols in item key parameter                    *
- *                                                                            *
- * Parameters: param - [IN/OUT] item key parameter                            *
- *                                                                            *
- * Comments:                                                                  *
- *   "param"     => param                                                     *
- *   "\"param\"" => "param"                                                   *
- *                                                                            *
- ******************************************************************************/
-void	zbx_unquote_key_param(char *param)
-{
-	char	*dst;
-
-	if ('"' != *param)
-		return;
-
-	for (dst = param++; '\0' != *param; param++)
-	{
-		if ('\\' == *param && '"' == param[1])
-			continue;
-
-		*dst++ = *param;
-	}
-	*--dst = '\0';
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: quotes special symbols in item key parameter                      *
- *                                                                            *
- * Parameters: param   - [IN/OUT] item key parameter                          *
- *             forced  - [IN] 1 - enclose parameter in " even if it does not  *
- *                                contain any special characters              *
- *                            0 - do nothing if the parameter does not        *
- *                                contain any special characters              *
- *                                                                            *
- * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
- *                         was not necessary                                  *
- *               FAIL    - if parameter needs to but cannot be quoted due to  *
- *                         backslash in the end                               *
- *                                                                            *
- ******************************************************************************/
-int	zbx_quote_key_param(char **param, int forced)
-{
-	size_t	sz_src, sz_dst;
-
-	if (0 == forced)
-	{
-		if ('"' != **param && ' ' != **param && '[' != **param && NULL == strchr(*param, ',') &&
-				NULL == strchr(*param, ']'))
-		{
-			return SUCCEED;
-		}
-	}
-
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
-		return FAIL;
-
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
-
-	*param = (char *)zbx_realloc(*param, sz_dst);
-
-	(*param)[--sz_dst] = '\0';
-	(*param)[--sz_dst] = '"';
-
-	while (0 < sz_src)
-	{
-		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
-			(*param)[--sz_dst] = '\\';
-	}
-	(*param)[--sz_dst] = '"';
-
-	return SUCCEED;
-}
-
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 #if defined(WITH_AGENT2_METRICS)
 int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -1648,11 +1577,11 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
  *                                                                             *
  * Purpose: serialize agent result to transfer over pipe/socket                *
  *                                                                             *
- * Parameters: data        - [IN/OUT] the data buffer                          *
- *             data_alloc  - [IN/OUT] the data buffer allocated size           *
- *             data_offset - [IN/OUT] the data buffer data size                *
- *             agent_ret   - [IN] the agent result return code                 *
- *             result      - [IN] the agent result                             *
+ * Parameters: data        - [IN/OUT] data buffer                              *
+ *             data_alloc  - [IN/OUT] data buffer allocated size               *
+ *             data_offset - [IN/OUT] data buffer data size                    *
+ *             agent_ret   - [IN] agent result return code                     *
+ *             result      - [IN] agent result                                 *
  *                                                                             *
  * Comments: The agent result is serialized as [rc][type][data] where:         *
  *             [rc] the agent result return code, 4 bytes                      *
@@ -1733,8 +1662,8 @@ static void	serialize_agent_result(char **data, size_t *data_alloc, size_t *data
  *                                                                            *
  * Purpose: deserialize agent result                                          *
  *                                                                            *
- * Parameters: data        - [IN] the data to deserialize                     *
- *             result      - [OUT] the agent result                           *
+ * Parameters: data        - [IN] data to deserialize                         *
+ *             result      - [OUT] agent result                               *
  *                                                                            *
  * Return value: the agent result return code (SYSINFO_RET_*)                 *
  *                                                                            *
@@ -1782,11 +1711,11 @@ static int	deserialize_agent_result(char *data, AGENT_RESULT *result)
  * Purpose: execute metric in a separate process/thread so it can be          *
  *          killed/terminated when timeout is detected                        *
  *                                                                            *
- * Parameters: metric_func - [IN] the metric function to execute              *
- *             ...                the metric function parameters              *
+ * Parameters: metric_func - [IN] metric function to execute                  *
+ *             ...                metric function parameters                  *
  *                                                                            *
  * Return value:                                                              *
- *         SYSINFO_RET_OK - the metric was executed successfully              *
+ *         SYSINFO_RET_OK - metric was executed successfully                  *
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
@@ -1802,7 +1731,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 	if (-1 == pipe(fds))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create data pipe: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create data pipe: %s",
+				zbx_strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1811,7 +1741,8 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	{
 		close(fds[0]);
 		close(fds[1]);
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork data process: %s", strerror_from_system(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot fork data process: %s",
+				zbx_strerror_from_system(errno)));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1914,6 +1845,34 @@ out:
 	return ret;
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_mpoints_free                                                 *
+ *                                                                            *
+ * Purpose: frees previously allocated mount-point structure                  *
+ *                                                                            *
+ * Parameters: mpoint - [IN] pointer to structure from vector                 *
+ *                                                                            *
+ * Return value:                                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
+{
+	zbx_free(mpoint);
+}
+
+int	zbx_fsname_compare(const void *fs1, const void *fs2)
+{
+	int			res;
+	const zbx_mpoint_t	*f1 = *((const zbx_mpoint_t * const *)fs1);
+	const zbx_fsname_t	*f2 = *((const zbx_fsname_t * const *)fs2);
+
+	if (0 != (res = strcmp(f1->fsname, f2->mpoint)))
+		return res;
+
+	return strcmp(f1->fstype, f2->type);
+}
 #else
 
 static ZBX_THREAD_LOCAL zbx_uint32_t	mutex_flag = ZBX_MUTEX_ALL_ALLOW;
@@ -1955,11 +1914,11 @@ ZBX_THREAD_ENTRY(agent_metric_thread, data)
  * Purpose: execute metric in a separate process/thread so it can be          *
  *          killed/terminated when timeout is detected                        *
  *                                                                            *
- * Parameters: metric_func - [IN] the metric function to execute              *
- *             ...                the metric function parameters              *
+ * Parameters: metric_func - [IN] metric function to execute                  *
+ *             ...                metric function parameters                  *
  *                                                                            *
  * Return value:                                                              *
- *         SYSINFO_RET_OK - the metric was executed successfully              *
+ *         SYSINFO_RET_OK - metric was executed successfully                  *
  *         SYSINFO_RET_FAIL - otherwise                                       *
  *                                                                            *
  ******************************************************************************/
@@ -1977,7 +1936,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	if (NULL == (metric_args.timeout_event = CreateEvent(NULL, TRUE, FALSE, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot create timeout event for data thread: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1988,7 +1947,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	if (ZBX_THREAD_ERROR == thread)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot start data thread: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		CloseHandle(metric_args.timeout_event);
 		return SYSINFO_RET_FAIL;
 	}
@@ -1999,7 +1958,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 		/* unexpected error */
 
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot wait for data: %s",
-				strerror_from_system(GetLastError())));
+				zbx_strerror_from_system(GetLastError())));
 		terminate_thread = TRUE;
 	}
 	else if (WAIT_TIMEOUT == rc)
@@ -2010,7 +1969,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 
 		if (FALSE == SetEvent(metric_args.timeout_event))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "SetEvent() failed: %s", strerror_from_system(GetLastError()));
+			zabbix_log(LOG_LEVEL_ERR, "SetEvent() failed: %s", zbx_strerror_from_system(GetLastError()));
 			terminate_thread = TRUE;
 		}
 		else
@@ -2020,7 +1979,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			if (WAIT_FAILED == timeout_rc)
 			{
 				zabbix_log(LOG_LEVEL_ERR, "Waiting for data failed: %s",
-						strerror_from_system(GetLastError()));
+						zbx_strerror_from_system(GetLastError()));
 				terminate_thread = TRUE;
 			}
 			else if (WAIT_TIMEOUT == timeout_rc)
@@ -2045,7 +2004,7 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 			zabbix_log(LOG_LEVEL_ERR, "%s(): TerminateThread() for %s[%s%s] failed: %s", __func__,
 					request->key, (0 < request->nparam) ? request->params[0] : "",
 					(1 < request->nparam) ? ",..." : "",
-					strerror_from_system(GetLastError()));
+					zbx_strerror_from_system(GetLastError()));
 		}
 	}
 
@@ -2058,19 +2017,6 @@ int	zbx_execute_threaded_metric(zbx_metric_func_t metric_func, AGENT_REQUEST *re
 	return WAIT_OBJECT_0 == rc ? metric_args.agent_ret : SYSINFO_RET_FAIL;
 }
 #endif
-
-/******************************************************************************
- *                                                                            *
- * Purpose: frees previously allocated mount-point structure                  *
- *                                                                            *
- * Parameters: mpoint - [IN] pointer to structure from vector                 *
- *                                                                            *
- ******************************************************************************/
-void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
-{
-	zbx_free(mpoint->options);
-	zbx_free(mpoint);
-}
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 static void	get_fqdn(char **hostname)

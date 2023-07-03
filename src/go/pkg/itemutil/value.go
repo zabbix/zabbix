@@ -29,6 +29,42 @@ import (
 
 const StateNotSupported = 1
 
+func ValueToString(u interface{}) string {
+	switch v := u.(type) {
+	case string:
+		return u.(string)
+	case *string:
+		return *u.(*string)
+	case int:
+		return strconv.FormatInt(int64(v), 10)
+	case int8:
+		return strconv.FormatInt(int64(v), 10)
+	case int16:
+		return strconv.FormatInt(int64(v), 10)
+	case int32:
+		return strconv.FormatInt(int64(v), 10)
+	case int64:
+		return strconv.FormatInt(v, 10)
+	case uint:
+		return strconv.FormatUint(uint64(v), 10)
+	case uint8:
+		return strconv.FormatUint(uint64(v), 10)
+	case uint16:
+		return strconv.FormatUint(uint64(v), 10)
+	case uint32:
+		return strconv.FormatUint(uint64(v), 10)
+	case uint64:
+		return strconv.FormatUint(v, 10)
+	case float32:
+		return strconv.FormatFloat(float64(v), 'f', 6, 64)
+	case float64:
+		return strconv.FormatFloat(v, 'f', 6, 64)
+	default:
+		// note that this conversion is slow and it's better to return known value type
+		return fmt.Sprintf("%v", u)
+	}
+}
+
 func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.Result) {
 	var value string
 	switch v := u.(type) {
@@ -36,37 +72,9 @@ func ValueToResult(itemid uint64, ts time.Time, u interface{}) (result *plugin.R
 		return v
 	case plugin.Result:
 		return &v
-	case string:
-		value = u.(string)
-	case *string:
-		value = *u.(*string)
-	case int:
-		value = strconv.FormatInt(int64(v), 10)
-	case int8:
-		value = strconv.FormatInt(int64(v), 10)
-	case int16:
-		value = strconv.FormatInt(int64(v), 10)
-	case int32:
-		value = strconv.FormatInt(int64(v), 10)
-	case int64:
-		value = strconv.FormatInt(v, 10)
-	case uint:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint8:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint16:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint32:
-		value = strconv.FormatUint(uint64(v), 10)
-	case uint64:
-		value = strconv.FormatUint(v, 10)
-	case float32:
-		value = strconv.FormatFloat(float64(v), 'f', 6, 64)
-	case float64:
-		value = strconv.FormatFloat(v, 'f', 6, 64)
 	default:
-		// note that this conversion is slow and it's better to return known value type
-		value = fmt.Sprintf("%v", u)
+		value = ValueToString(u)
 	}
+
 	return &plugin.Result{Itemid: itemid, Value: &value, Ts: ts}
 }

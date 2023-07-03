@@ -21,7 +21,7 @@
 
 #include "zbxnum.h"
 #include "zbxtypes.h"
-#include "log.h"
+#include "zbxlog.h"
 
 /* unresolved symbols needed for linking */
 
@@ -85,7 +85,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 
 int	CONFIG_LISTEN_PORT		= 0;
 char	*CONFIG_LISTEN_IP		= NULL;
-char	*CONFIG_SOURCE_IP		= NULL;
 int	CONFIG_TRAPPER_TIMEOUT		= 300;
 
 int	CONFIG_HOUSEKEEPING_FREQUENCY	= 1;
@@ -149,12 +148,7 @@ const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
-
-ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME	= NULL;
 
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 
@@ -170,10 +164,16 @@ char	**CONFIG_PERF_COUNTERS		= NULL;
 char	**CONFIG_PERF_COUNTERS_EN	= NULL;
 #endif
 
-static int	zbx_config_timeout = 3;
+static ZBX_THREAD_LOCAL int	zbx_config_timeout = 3;
 int	get_zbx_config_timeout(void)
 {
 	return zbx_config_timeout;
+}
+
+static const char	*zbx_config_source_ip = "127.0.0.1";
+const char	*get_zbx_config_source_ip(void)
+{
+	return zbx_config_source_ip;
 }
 
 static int	zbx_config_enable_remote_commands = 0;
@@ -203,7 +203,8 @@ int	main (void)
 		cmocka_unit_test_setup_teardown(zbx_mock_test_entry, zbx_mock_data_init, zbx_mock_data_free)
 	};
 
-	*zbx_plog_level = LOG_LEVEL_INFORMATION;
+	zbx_set_log_level(LOG_LEVEL_INFORMATION);
+	zbx_init_library_common(zbx_mock_log_impl);
 
 	return cmocka_run_group_tests(tests, NULL, NULL);
 }

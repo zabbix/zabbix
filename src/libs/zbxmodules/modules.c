@@ -21,7 +21,6 @@
 #include "module.h"
 
 #include "zbxstr.h"
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "zbxalgo.h"
 
@@ -53,7 +52,7 @@ zbx_history_log_cb_t		*history_log_cbs = NULL;
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_register_module_items(ZBX_METRIC *metrics, char *error, size_t max_error_len)
+static int	zbx_register_module_items(zbx_metric_t *metrics, char *error, size_t max_error_len)
 {
 	int	i;
 
@@ -206,8 +205,8 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 static int	zbx_module_compare_func(const void *d1, const void *d2)
 {
-	const zbx_module_t	*m1 = *(const zbx_module_t **)d1;
-	const zbx_module_t	*m2 = *(const zbx_module_t **)d2;
+	const zbx_module_t	*m1 = *(const zbx_module_t * const *)d1;
+	const zbx_module_t	*m2 = *(const zbx_module_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(m1->lib, m2->lib);
 
@@ -232,7 +231,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	void			*lib;
 	char			full_name[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	int			(*func_init)(void), (*func_version)(void), version;
-	ZBX_METRIC		*(*func_list)(void);
+	zbx_metric_t		*(*func_list)(void);
 	void			(*func_timeout)(int);
 	ZBX_HISTORY_WRITE_CBS	(*func_history_write_cbs)(void);
 	zbx_module_t		*module, module_tmp;

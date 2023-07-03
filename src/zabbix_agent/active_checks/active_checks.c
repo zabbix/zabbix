@@ -24,8 +24,7 @@
 #include "../logfiles/persistent_state.h"
 
 #include "cfg.h"
-#include "log.h"
-#include "module.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxcommshigh.h"
 #include "zbxthreads.h"
@@ -38,6 +37,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxalgo.h"
+#include "zbxparam.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -45,9 +45,7 @@
 #	include "zbxnix.h"
 #endif
 
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 extern int			CONFIG_HEARTBEAT_FREQUENCY;
-extern char			*CONFIG_SOURCE_IP;
 extern char			*CONFIG_HOST_INTERFACE;
 extern char			*CONFIG_HOST_INTERFACE_ITEM;
 extern int			CONFIG_BUFFER_SEND;
@@ -71,6 +69,16 @@ typedef struct
 }
 active_buffer_element_t;
 
+ZBX_PTR_VECTOR_DECL(command_result_ptr, struct zbx_command_result *)
+typedef struct zbx_command_result
+{
+	zbx_uint64_t	id;
+	char		*value;
+	unsigned char	state;
+}
+zbx_command_result_t;
+ZBX_PTR_VECTOR_IMPL(command_result_ptr, zbx_command_result_t *)
+
 typedef struct
 {
 	active_buffer_element_t	*data;
@@ -81,8 +89,20 @@ typedef struct
 }
 active_buffer_t;
 
+typedef struct _zbx_active_command_t zbx_active_command_t;
+ZBX_PTR_VECTOR_DECL(active_command_ptr, zbx_active_command_t *)
+struct _zbx_active_command_t
+{
+	zbx_uint64_t		command_id;
+	char			*key;
+};
+ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
+
 static ZBX_THREAD_LOCAL active_buffer_t			buffer;
+static ZBX_THREAD_LOCAL	zbx_vector_command_result_ptr_t	command_results;
 static ZBX_THREAD_LOCAL zbx_vector_ptr_t		active_metrics;
+static ZBX_THREAD_LOCAL	zbx_vector_active_command_ptr_t	active_commands;
+static ZBX_THREAD_LOCAL zbx_hashset_t			commands_hash;
 static ZBX_THREAD_LOCAL zbx_vector_expression_t		regexps;
 static ZBX_THREAD_LOCAL char				*session_token;
 static ZBX_THREAD_LOCAL zbx_uint64_t			last_valueid = 0;
@@ -90,6 +110,13 @@ static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used 
 										/* into persistent files */
 /* used for deleting inactive persistent files */
 static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
+
+typedef struct
+{
+	zbx_uint64_t	id;
+	time_t		ttl;
+}
+zbx_cmd_hash_t;
 
 #ifndef _WINDOWS
 static volatile sig_atomic_t	need_update_userparam;
@@ -113,7 +140,10 @@ static void	init_active_metrics(void)
 		buffer.first_error = 0;
 	}
 
+	zbx_vector_command_result_ptr_create(&command_results);
 	zbx_vector_ptr_create(&active_metrics);
+	zbx_vector_active_command_ptr_create(&active_commands);
+	zbx_hashset_create(&commands_hash, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_expression_create(&regexps);
 	zbx_vector_pre_persistent_create(&pre_persistent_vec);
 	zbx_vector_persistent_inactive_create(&persistent_inactive_vec);
@@ -138,6 +168,47 @@ static void	free_active_metric(ZBX_ACTIVE_METRIC *metric)
 	zbx_free(metric);
 }
 
+static void	free_active_command(zbx_active_command_t *command)
+{
+	zbx_free(command->key);
+	zbx_free(command);
+}
+
+static void	free_command_result(zbx_command_result_t *result)
+{
+	zbx_free(result->value);
+	zbx_free(result);
+}
+
+static void	clean_command_hash(void)
+{
+	zbx_cmd_hash_t		*cmd_hash;
+	zbx_hashset_iter_t	iter;
+
+	zbx_hashset_iter_reset(&commands_hash, &iter);
+
+	while (NULL != (cmd_hash = (zbx_cmd_hash_t *)zbx_hashset_iter_next(&iter)))
+	{
+		int			i;
+		zbx_command_result_t	*result, result_loc;
+
+		if (cmd_hash->ttl > time(NULL))
+			continue;
+
+		result_loc.id = cmd_hash->id;
+
+		if (FAIL != (i = zbx_vector_command_result_ptr_search(&command_results, &result_loc,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+		{
+			result = (zbx_command_result_t *)command_results.values[i];
+			zbx_vector_command_result_ptr_remove_noorder(&command_results, i);
+			free_command_result(result);
+		}
+
+		zbx_hashset_iter_remove(&iter);
+	}
+}
+
 #ifdef _WINDOWS
 static void	free_active_metrics(void)
 {
@@ -148,6 +219,13 @@ static void	free_active_metrics(void)
 
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
 	zbx_vector_ptr_destroy(&active_metrics);
+
+	zbx_vector_command_result_ptr_clear_ext(&command_results, (zbx_clean_func_t)free_command_result);
+	zbx_vector_command_result_ptr_destroy(&command_results);
+
+	zbx_vector_active_command_ptr_clear_ext(&active_commands, (zbx_clean_func_t)free_command_result);
+	zbx_vector_active_command_ptr_destroy(&active_commands);
+	zbx_hashset_destroy(&commands_hash);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -290,9 +368,34 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	add_command(const char *key, zbx_uint64_t id)
+{
+	zbx_active_command_t	*command;
+	zbx_cmd_hash_t		cmd_hash_loc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s' id:" ZBX_FS_UI64, __func__, key, id);
+
+	if (NULL == zbx_hashset_search(&commands_hash, &id))
+	{
+		cmd_hash_loc.id = id;
+		cmd_hash_loc.ttl = time(NULL) + SEC_PER_HOUR;
+
+		zbx_hashset_insert(&commands_hash, &cmd_hash_loc, sizeof(cmd_hash_loc));
+
+		command = (zbx_active_command_t *)zbx_malloc(NULL, sizeof(zbx_active_command_t));
+
+		command->key = zbx_strdup(NULL, key);
+		command->command_id = id;
+		zbx_vector_active_command_ptr_append(&active_commands, command);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+
 /******************************************************************************
  *                                                                            *
- * Purpose: test log[] or log.count[] item key if <mode> parameter is set to  *
+ * Purpose: tests log[] or log.count[] item key if <mode> parameter is set to *
  *          'skip'                                                            *
  *                                                                            *
  * Return value: SUCCEED - <mode> parameter is set to 'skip'                  *
@@ -326,28 +429,28 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Parse list of active checks received from server                  *
+ * Purpose: parses list of active checks received from server                 *
  *                                                                            *
- * Parameters: str                   - NULL terminated string received from   *
- *                                     server                                 *
- *             host                  - address of host                        *
- *             port                  - port number on host                    *
- *             config_revision_local - revision of processed configuration    *
+ * Parameters: str - [IN] NULL terminated string received from server         *
+ *             host - [IN] address of host                                    *
+ *             port - [IN] port number on host                                *
+ *             config_revision_local - [IN/OUT] revision of processed         *
+ *                                              configuration                 *
  *                                                                            *
  * Comments:                                                                  *
- *    String represented as "ZBX_EOF" termination list                        *
- *    With '\n' delimiter between elements.                                   *
+ *    String is represented as "ZBX_EOF" termination list, with '\n'          *
+ *    delimiter between elements.                                             *
  *    Each element represented as:                                            *
  *           <key>:<refresh time>:<last log size>:<modification time>         *
  *                                                                            *
  ******************************************************************************/
-static void	parse_list_of_checks(char *str, const char *host, unsigned short port,
+static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local)
 {
 	const char		*p;
 	size_t			name_alloc = 0, key_orig_alloc = 0;
 	char			*name = NULL, *key_orig = NULL, expression[MAX_STRING_LEN],
-				tmp[MAX_STRING_LEN], exp_delimiter;
+				tmp[MAX_STRING_LEN] = {0}, exp_delimiter;
 	zbx_uint64_t		lastlogsize;
 	struct zbx_json_parse	jp, jp_data, jp_row;
 	ZBX_ACTIVE_METRIC	*metric;
@@ -394,10 +497,22 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
 		if (0 != *config_revision_local)
-			goto success;
+			goto success;;
 
-		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s", zbx_json_strerror());
 		goto out;
+	}
+
+	if (*config_revision_local > config_revision)
+	{
+		zbx_hashset_iter_t	iter;
+
+		zbx_hashset_iter_reset(&commands_hash, &iter);
+
+		while (NULL != zbx_hashset_iter_next(&iter))
+			zbx_hashset_iter_remove(&iter);
+
+		zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
+		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 	}
 
 	*config_revision_local = config_revision;
@@ -465,9 +580,10 @@ static void	parse_list_of_checks(char *str, const char *host, unsigned short por
 
 		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
 
-		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set to 'skip'. */
-		/* We need to keep their state, namely 'skip_old_data', in case the items become NOTSUPPORTED as */
-		/* server might not send them in a new active check list. */
+		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set */
+		/* to 'skip'. */
+		/* We need to keep their state, namely 'skip_old_data', in case the items become */
+		/* NOTSUPPORTED as  server might not send them in a new active check list. */
 
 		if (0 != (ZBX_METRIC_FLAG_LOG_LOG & metric->flags) && ITEM_STATE_NOTSUPPORTED == metric->state &&
 				0 == metric->skip_old_data && SUCCEED == mode_parameter_is_skip(metric->flags,
@@ -567,25 +683,113 @@ out:
 	zbx_free(name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: process configuration item and set it value to respective parameter  *
- *                                                                               *
- * Parameters: json   - pointer to JSON structure where to put resulting value   *
- *             config - pointer to configuration parameter                       *
- *             length - length of configuration parameter                        *
- *             proto  - configuration parameter prototype                        *
- *                                                                               *
- ********************************************************************************/
-static void	process_config_item(struct zbx_json *json, char *config, size_t length, const char *proto)
+static int	parse_list_of_commands(char *str)
+{
+	const char		*p;
+	char			*cmd = NULL, tmp[MAX_STRING_LEN], *key = NULL;
+	int			ret = FAIL, commands_num = 0;
+	zbx_uint64_t		command_id;
+	struct zbx_json_parse	jp, jp_data, jp_row;
+	size_t			cmd_alloc = 0, key_alloc;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED != zbx_json_open(str, &jp))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s", zbx_json_strerror());
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_COMMANDS, &jp_data))
+	{
+		p = NULL;
+		while (NULL != (p = zbx_json_next(&jp_data, p)))
+		{
+			size_t	offset = 0;
+
+			if (SUCCEED != zbx_json_brackets_open(p, &jp_row))
+			{
+				zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s",
+						zbx_json_strerror());
+				goto out;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_COMMAND, &cmd, &cmd_alloc,
+					NULL) || '\0' == *cmd)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_COMMAND);
+				continue;
+			}
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_WAIT, tmp, sizeof(tmp), NULL) ||
+					'\0' == *tmp)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"",
+						ZBX_PROTO_TAG_WAIT);
+				continue;
+			}
+
+			if (SUCCEED != zbx_quote_key_param(&cmd, 0))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "Invalid command \"%s\"", cmd);
+				continue;
+			}
+
+			if (0 == atoi(tmp))
+			{
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,nowait]",
+						cmd);
+			}
+			else
+				zbx_snprintf_alloc(&key, &key_alloc, &offset, "system.run[%s,wait]",cmd);
+
+			if (SUCCEED != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ID, tmp, sizeof(tmp), NULL) ||
+							SUCCEED != zbx_is_uint64(tmp, &command_id))
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve value of tag \"%s\"", ZBX_PROTO_TAG_ID);
+				continue;
+			}
+
+			add_command(key, command_id);
+
+			commands_num++;
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(key);
+	zbx_free(cmd);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+/*********************************************************************************************
+ *                                                                                           *
+ * Purpose: processes configuration item and sets its value to respective parameter          *
+ *                                                                                           *
+ * Parameters: json - [OUT] pointer to JSON structure where to put resulting value           *
+ *             config - [IN] pointer to configuration parameter                              *
+ *             length - [IN] length of configuration parameter                               *
+ *             proto - [IN] configuration parameter prototype                                *
+ *             config_host_metadata_item - [IN]                                              *
+ *                                                                                           *
+ *********************************************************************************************/
+static void	process_config_item(struct zbx_json *json, const char *config, size_t length, const char *proto,
+		const char *config_host_metadata_item)
 {
 	char		**value;
 	AGENT_RESULT	result;
 	const char	*config_name, *config_type;
 
-	if (CONFIG_HOST_METADATA_ITEM == config)
+	if (config_host_metadata_item == config)
 	{
 		config_name = "HostMetadataItem";
 		config_type = "metadata";
@@ -625,21 +829,22 @@ static void	process_config_item(struct zbx_json *json, char *config, size_t leng
 	}
 	else
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get host %s using \"%s\" item specified by"
-				" \"%s\" configuration parameter",config_type, config,config_name);
+				" \"%s\" configuration parameter", config_type, config, config_name);
 
 	zbx_free_agent_result(&result);
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Retrieve from Zabbix server list of active checks                 *
+ * Purpose: retrieves list of active checks from Zabbix server                *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
  *                                                                            *
  ******************************************************************************/
 static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
-		zbx_uint32_t *config_revision_local, int config_timeout)
+		zbx_uint32_t *config_revision_local, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, const char *config_host_metadata, const char *config_host_metadata_item)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -652,16 +857,17 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 
-	if (NULL != CONFIG_HOST_METADATA)
+	if (NULL != config_host_metadata)
 	{
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, CONFIG_HOST_METADATA, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST_METADATA, config_host_metadata, ZBX_JSON_TYPE_STRING);
 	}
-	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	else if (NULL != config_host_metadata_item)
 	{
 #define HOST_METADATA_LEN	65535	/* UTF-8 characters, not bytes */
-		process_config_item(&json, CONFIG_HOST_METADATA_ITEM, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA);
+		process_config_item(&json, config_host_metadata_item, HOST_METADATA_LEN, ZBX_PROTO_TAG_HOST_METADATA,
+				config_host_metadata_item);
 #undef HOST_METADATA_LEN
 	}
 
@@ -671,7 +877,8 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 	}
 	else if (NULL != CONFIG_HOST_INTERFACE_ITEM)
 	{
-		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE);
+		process_config_item(&json, CONFIG_HOST_INTERFACE_ITEM, HOST_INTERFACE_LEN, ZBX_PROTO_TAG_INTERFACE,
+				config_host_metadata_item);
 	}
 
 	if (NULL != CONFIG_LISTEN_IP)
@@ -695,7 +902,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, config_timeout, config_timeout,
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, config_timeout, config_timeout,
 			0, level, config_tls)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
@@ -714,8 +921,19 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 							" is working again", ((zbx_addr_t *)addrs->values[0])->ip,
 							((zbx_addr_t *)addrs->values[0])->port);
 				}
-				parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
-						((zbx_addr_t *)addrs->values[0])->port, config_revision_local);
+
+				if (SUCCEED != parse_list_of_checks(s.buffer, ((zbx_addr_t *)addrs->values[0])->ip,
+						((zbx_addr_t *)addrs->values[0])->port, config_revision_local))
+				{
+						zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active checks: %s",
+								zbx_json_strerror());
+				}
+
+				if (SUCCEED != parse_list_of_commands(s.buffer))
+				{
+					zabbix_log(LOG_LEVEL_ERR, "cannot parse list of active commands: %s",
+							zbx_json_strerror());
+				}
 			}
 			else
 			{
@@ -750,17 +968,17 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Check whether JSON response is SUCCEED                            *
+ * Purpose: checks whether JSON response is SUCCEED                           *
  *                                                                            *
- * Parameters: JSON response from Zabbix trapper                              *
+ * Parameters: response - [IN] JSON response from Zabbix trapper              *
  *                                                                            *
  * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
+ *                FAIL - error occurred                                       *
  *                                                                            *
  * Comments: zabbix_sender has almost the same function!                      *
  *                                                                            *
  ******************************************************************************/
-static int	check_response(char *response)
+static int	check_response(const char *response)
 {
 	struct zbx_json_parse	jp;
 	char			value[MAX_STRING_LEN], info[MAX_STRING_LEN];
@@ -784,42 +1002,12 @@ static int	check_response(char *response)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: Send value stored in the buffer to Zabbix server                  *
- *                                                                            *
- * Parameters:                                                                *
- *   addrs          - [IN] vector with a pair of Zabbix server IP or          *
- *                             Hostname and port number                       *
- *   prep_vec       - [IN/OUT] vector with data for writing into              *
- *                                 persistent files                           *
- *   config_tls     - [IN]                                                    *
- *   config_timeout - [IN]                                                    *
- *                                                                            *
- * Return value: SUCCEED if:                                                  *
- *                    - no need to send data now (buffer empty or has enough  *
- *                      free elements, or recently sent)                      *
- *                    - data successfully sent to server (proxy)              *
- *               FAIL - error when sending data                               *
- *                                                                            *
- ******************************************************************************/
-static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout)
+static int format_metric_results(struct zbx_json *json, int now)
 {
 	active_buffer_element_t	*el;
-	int			ret = SUCCEED, i, now, level;
-	zbx_timespec_t		ts;
-	zbx_socket_t		s;
-	struct zbx_json		json;
+	int			i, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
-			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
-			buffer.count, CONFIG_BUFFER_SIZE);
-
-	if (0 == buffer.count)
-		goto ret;
-
-	now = (int)time(NULL);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (CONFIG_BUFFER_SIZE / 2 > buffer.pcount && CONFIG_BUFFER_SIZE > buffer.count &&
 			CONFIG_BUFFER_SEND > now - buffer.lastsent)
@@ -829,59 +1017,187 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		goto ret;
 	}
 
-	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
+	if (0 == buffer.count)
+		goto ret;
+
+	zbx_json_addarray(json, ZBX_PROTO_TAG_DATA);
 
 	for (i = 0; i < buffer.count; i++)
 	{
 		el = &buffer.data[i];
 
-		zbx_json_addobject(&json, NULL);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, el->host, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, ZBX_PROTO_TAG_KEY, el->key, ZBX_JSON_TYPE_STRING);
+		zbx_json_addobject(json, NULL);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_HOST, el->host, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_KEY, el->key, ZBX_JSON_TYPE_STRING);
 
 		if (NULL != el->value)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, el->value, ZBX_JSON_TYPE_STRING);
 
 		if (ITEM_STATE_NOTSUPPORTED == el->state)
 		{
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_STATE, ITEM_STATE_NOTSUPPORTED);
 		}
 		else
 		{
 			/* add item meta information only for items in normal state */
 			if (0 != (ZBX_METRIC_FLAG_LOG & el->flags))
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_LASTLOGSIZE, el->lastlogsize);
 			if (0 != (ZBX_METRIC_FLAG_LOG_LOGRT & el->flags))
-				zbx_json_adduint64(&json, ZBX_PROTO_TAG_MTIME, el->mtime);
+				zbx_json_addint64(json, ZBX_PROTO_TAG_MTIME, el->mtime);
 		}
 
 		if (0 != el->timestamp)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGTIMESTAMP, el->timestamp);
 
 		if (NULL != el->source)
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_LOGSOURCE, el->source, ZBX_JSON_TYPE_STRING);
 
 		if (0 != el->severity)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGSEVERITY, el->severity);
 
 		if (0 != el->logeventid)
-			zbx_json_adduint64(&json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
+			zbx_json_addint64(json, ZBX_PROTO_TAG_LOGEVENTID, el->logeventid);
 
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_ID, el->id);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, el->id);
 
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, el->ts.ns);
-		zbx_json_close(&json);
+		zbx_json_addint64(json, ZBX_PROTO_TAG_CLOCK, el->ts.sec);
+		zbx_json_addint64(json, ZBX_PROTO_TAG_NS, el->ts.ns);
+		zbx_json_close(json);
 	}
 
-	zbx_json_close(&json);
+	zbx_json_close(json);
+	ret = SUCCEED;
+ret:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
+static int	format_command_results(struct zbx_json *json)
+{
+	int			i;
+	zbx_command_result_t	*result;
+
+	if (0 == command_results.values_num)
+		return FAIL;
+
+	zbx_json_addarray(json, ZBX_PROTO_TAG_COMMANDS);
+
+	for (i = 0; i < command_results.values_num; i++)
+	{
+		result = (zbx_command_result_t *)command_results.values[i];
+
+		if (NULL == result->value)
+			continue;
+
+		zbx_json_addobject(json, NULL);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ID, result->id);
+
+		if (ITEM_STATE_NOTSUPPORTED == result->state)
+			zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value, ZBX_JSON_TYPE_STRING);
+		else
+			zbx_json_addstring(json, ZBX_PROTO_TAG_VALUE, result->value, ZBX_JSON_TYPE_STRING);
+
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+
+	return SUCCEED;
+}
+
+static void	clear_metric_results(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec, int now,
+		int ret)
+{
+	int			i;
+	active_buffer_element_t	*el;
+
+	if (SUCCEED == ret)
+	{
+#if !defined(_WINDOWS) && !defined(__MINGW32__)
+		zbx_write_persistent_files(prep_vec);
+		zbx_clean_pre_persistent_elements(prep_vec);
+#else
+		ZBX_UNUSED(prep_vec);
+#endif
+		/* free buffer */
+		for (i = 0; i < buffer.count; i++)
+		{
+			el = &buffer.data[i];
+
+			zbx_free(el->host);
+			zbx_free(el->key);
+			zbx_free(el->value);
+			zbx_free(el->source);
+		}
+		buffer.count = 0;
+		buffer.pcount = 0;
+
+		buffer.lastsent = now;
+
+		if (0 != buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
+					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
+			buffer.first_error = 0;
+		}
+	}
+	else
+	{
+		if (0 == buffer.first_error)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "Active check data upload started to fail");
+			buffer.first_error = now;
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: sends value stored in buffer to Zabbix server                     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *   addrs - [IN] vector with pair of Zabbix server IP or Hostname and port   *
+ *                number                                                      *
+ *   prep_vec - [IN/OUT] vector with data for writing into persistent files   *
+ *   config_tls - [IN]                                                        *
+ *   config_timeout - [IN]                                                    *
+ *   config_source_ip - [IN]                                                  *
+ *                                                                            *
+ * Return value: SUCCEED if:                                                  *
+ *                    - no need to send data now (buffer empty or has enough  *
+ *                      free elements, or recently sent)                      *
+ *                    - data successfully sent to server (proxy)              *
+ *               FAIL - error when sending data                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t *prep_vec,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
+{
+	int			ret = SUCCEED, ret_metrics, ret_commands, now, level;
+	zbx_timespec_t		ts;
+	zbx_socket_t		s;
+	struct zbx_json		json;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
+			__func__, ((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port,
+			buffer.count, CONFIG_BUFFER_SIZE);
+
+	now = (int)time(NULL);
+
+	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_AGENT_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_SESSION, session_token, ZBX_JSON_TYPE_STRING);
+
+	ret_metrics = format_metric_results(&json, now);
+	ret_commands = format_command_results(&json);
+
+	if (FAIL == ret_metrics && FAIL == ret_commands)
+		goto ret;
 
 	level = 0 == buffer.first_error ? LOG_LEVEL_WARNING : LOG_LEVEL_DEBUG;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, MIN(buffer.count * config_timeout, 60),
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, MIN(buffer.count * config_timeout, 60),
 			config_timeout, 0, level, config_tls)))
 	{
 		zbx_timespec(&ts);
@@ -922,45 +1238,13 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 		zbx_tcp_close(&s);
 	}
 
-	zbx_json_free(&json);
+	if (SUCCEED == ret_metrics)
+		clear_metric_results(addrs, prep_vec, now, ret);
 
-	if (SUCCEED == ret)
-	{
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
-		zbx_write_persistent_files(prep_vec);
-		zbx_clean_pre_persistent_elements(prep_vec);
-#else
-		ZBX_UNUSED(prep_vec);
-#endif
-		/* free buffer */
-		for (i = 0; i < buffer.count; i++)
-		{
-			el = &buffer.data[i];
-
-			zbx_free(el->host);
-			zbx_free(el->key);
-			zbx_free(el->value);
-			zbx_free(el->source);
-		}
-		buffer.count = 0;
-		buffer.pcount = 0;
-		buffer.lastsent = now;
-		if (0 != buffer.first_error)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] is working again",
-					((zbx_addr_t *)addrs->values[0])->ip, ((zbx_addr_t *)addrs->values[0])->port);
-			buffer.first_error = 0;
-		}
-	}
-	else
-	{
-		if (0 == buffer.first_error)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "Active check data upload started to fail");
-			buffer.first_error = now;
-		}
-	}
+	if (SUCCEED == ret && SUCCEED == ret_commands)
+		zbx_vector_command_result_ptr_clear_ext(&command_results, free_command_result);
 ret:
+	zbx_json_free(&json);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -968,32 +1252,30 @@ ret:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Buffer new value or send the whole buffer to the server           *
+ * Purpose: buffers new value or sends whole buffer to server                 *
  *                                                                            *
  * Parameters:                                                                *
- *   addrs          - in C agent - vector with a pair of Zabbix server        *
- *                           IP or Hostname and port number. In Agent2 it is  *
- *                           not used (NULL).                                 *
- *   agent2_result  - NULL in C agent. In Agent2 it is used for               *
- *                             passing address of buffer where to store       *
- *                             matching log records. It is here to have the   *
- *                             same function prototype as in Agent2.          *
- *   host           - name of host in Zabbix database                         *
- *   key            - name of metric                                          *
- *   value          - key value or error message why an item became           *
- *                           NOTSUPPORTED                                     *
- *   state          - ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED            *
- *   lastlogsize    - size of read logfile                                    *
- *   mtime          - time of last file modification                          *
- *   timestamp      - timestamp of read value                                 *
- *   source         - name of logged data source                              *
- *   severity       - severity of logged data sources                         *
- *   logeventid     - application-specific identifier for                     *
- *                           the event; used for monitoring of Windows        *
- *                           event logs                                       *
- *   flags          - metric flags                                            *
- *   config_tls     - [IN]                                                    *
+ *   addrs - [IN] In C agent - vector with a pair of Zabbix server IP or      *
+ *                Hostname and port number. In Agent2 it is not used (NULL).  *
+ *   agent2_result - [IN] NULL in C agent. In Agent2 it is used for passing   *
+ *                        address of buffer where to store matching log       *
+ *                        records. It is here to have the same function       *
+ *                        prototype as in Agent2.                             *
+ *   host - [IN] name of host in Zabbix database                              *
+ *   key - [IN] name of metric                                                *
+ *   value - [IN] key value or error message why item became NOTSUPPORTED     *
+ *   state - [IN] ITEM_STATE_NORMAL or ITEM_STATE_NOTSUPPORTED                *
+ *   lastlogsize - [IN] size of read logfile                                  *
+ *   mtime - [IN] time of last file modification                              *
+ *   timestamp - [IN] timestamp of read value                                 *
+ *   source - [IN] name of logged data source                                 *
+ *   severity - [IN] severity of logged data sources                          *
+ *   logeventid - [IN] application-specific identifier for the event; used    *
+ *                     for monitoring of Windows event logs                   *
+ *   flags - [IN] metric flags                                                *
+ *   config_tls - [IN]                                                        *
  *   config_timeout - [IN]                                                    *
+ *   config_source_ip - [IN]                                                  *
  *                                                                            *
  * Return value: returns SUCCEED on successful parsing,                       *
  *               FAIL on other cases                                          *
@@ -1011,7 +1293,7 @@ static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source,
 		const unsigned short *severity, const unsigned long *logeventid, unsigned char flags,
-		const zbx_config_tls_t *config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
 {
 	active_buffer_element_t	*el = NULL;
 	int			i, ret = FAIL;
@@ -1043,7 +1325,7 @@ static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 				CONFIG_BUFFER_SIZE <= buffer.count ||
 				0 != strcmp(el->key, key) || 0 != strcmp(el->host, host))
 		{
-			send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+			send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
 		}
 	}
 
@@ -1120,6 +1402,7 @@ static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 		el->logeventid = (int)*logeventid;
 
 	zbx_timespec(&el->ts);
+
 	el->flags = flags;
 	el->id = ++last_valueid;
 
@@ -1131,7 +1414,7 @@ static int	process_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 	if ((0 != (flags & ZBX_METRIC_FLAG_PERSISTENT) && CONFIG_BUFFER_SIZE / 2 <= buffer.pcount) ||
 			CONFIG_BUFFER_SIZE <= buffer.count)
 	{
-		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
 	}
 
 	ret = SUCCEED;
@@ -1139,6 +1422,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+static void	process_remote_command_value(const char *value, zbx_uint64_t id, unsigned char state)
+{
+	zbx_command_result_t	*result;
+
+	result = (zbx_command_result_t *)zbx_malloc(NULL, sizeof(zbx_command_result_t));
+
+	if (NULL != value)
+		result->value = zbx_strdup(NULL, value);
+	else
+		result->value = NULL;
+
+	result->id = id;
+	result->state = state;
+	zbx_vector_command_result_ptr_append(&command_results, result);
 }
 
 static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_sent, int mtime_sent,
@@ -1173,7 +1472,7 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_hostname, char **error)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1184,18 +1483,20 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_hostname);
 
 	return FAIL;
 }
 #else
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		char **error);
+		const char *config_hostname, char **error);
 #endif
 
 static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
-		const zbx_config_tls_t *config_tls, int config_timeout, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, char **error)
 {
 	int		ret;
 	AGENT_RESULT	result;
@@ -1214,8 +1515,8 @@ static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC 
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "for key [%s] received value [%s]", metric->key, *pvalue);
 
-		process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
-				NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout);
+		process_value(addrs, NULL, config_hostname, metric->key_orig, *pvalue, ITEM_STATE_NORMAL, NULL, NULL,
+				NULL, NULL, NULL, NULL, metric->flags, config_tls, config_timeout, config_source_ip);
 	}
 out:
 	zbx_free_agent_result(&result);
@@ -1223,18 +1524,43 @@ out:
 	return ret;
 }
 
+static void	process_command(zbx_active_command_t *command)
+{
+	AGENT_RESULT	result;
+	char		**pvalue, *empty = "", *error = ZBX_NOTSUPPORTED_MSG;
+	unsigned char	state = ITEM_STATE_NORMAL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() command:%s", __func__, command->key);
+
+	zbx_init_agent_result(&result);
+
+	if (SUCCEED != zbx_execute_agent_check(command->key, 0, &result))
+	{
+		state = ITEM_STATE_NOTSUPPORTED;
+		if (NULL == (pvalue = ZBX_GET_MSG_RESULT(&result)))
+			pvalue = &error;
+	}
+	else if (NULL == (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+		pvalue = &empty;
+
+	process_remote_command_value(*pvalue, command->command_id, state);
+
+	zbx_free_agent_result(&result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() state:%d result:%s", __func__, state, *pvalue);
+}
+
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 /******************************************************************************
  *                                                                            *
- * Purpose: initialize an element of preparation vector with available data   *
+ * Purpose: initializes element of preparation vector with available data     *
  *                                                                            *
- * Parameters: lastlogsize   - [IN] lastlogize value to write into persistent *
- *                                  data file                                 *
- *             mtime         - [IN] mtime value to write into persistent data *
- *                                  file                                      *
+ * Parameters: lastlogsize - [IN] lastlogize value to write into persistent   *
+ *                                data file                                   *
+ *             mtime - [IN] mtime value to write into persistent data file    *
  *             prep_vec_elem - [IN/OUT] element of vector to initialize       *
  *                                                                            *
- * Comments: this is a minimal initialization for using before sending status *
+ * Comments: This is a minimal initialization for using before sending status *
  *           updates or meta-data. It initializes only 2 attributes to be     *
  *           usable without any data about log files.                         *
  *                                                                            *
@@ -1265,8 +1591,26 @@ static void	zbx_fill_prep_vec_element(zbx_vector_pre_persistent_t *prep_vec, con
 }
 #endif	/* not WINDOWS, not __MINGW32__ */
 
+static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
+		int config_timeout, const char *config_source_ip)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() server:'%s' port:%hu", __func__, addrs->values[0]->ip,
+			addrs->values[0]->port);
+
+	for (i = 0; i < active_commands.values_num; i++)
+		process_command((zbx_active_command_t *)active_commands.values[i]);
+
+	zbx_vector_active_command_ptr_clear_ext(&active_commands, free_active_command);
+
+	send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
-		int config_timeout)
+		int config_timeout, const char *config_source_ip, const char *config_hostname)
 {
 	char	*error = NULL;
 	int	i, now;
@@ -1302,15 +1646,17 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		else if (0 != ((ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT) & metric->flags))
 		{
 			ret = process_log_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout);
+					&mtime_sent, &error, &pre_persistent_vec, config_tls, config_timeout,
+					config_source_ip, config_hostname);
 		}
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					config_tls, config_timeout, &error);
+					config_tls, config_timeout, config_hostname, &error);
 		}
 		else
-			ret = process_common_check(addrs, metric, config_tls, config_timeout, &error);
+			ret = process_common_check(addrs, metric, config_tls, config_timeout, config_source_ip,
+					config_hostname, &error);
 
 		if (SUCCEED != ret)
 		{
@@ -1339,9 +1685,9 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 						metric->mtime);
 			}
 #endif
-			process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
+			process_value(addrs, NULL, config_hostname, metric->key_orig, perror, ITEM_STATE_NOTSUPPORTED,
 					&metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL, metric->flags,
-					config_tls, config_timeout);
+					config_tls, config_timeout, config_source_ip);
 
 			zbx_free(error);
 		}
@@ -1377,9 +1723,10 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 					}
 #endif
 					/* meta information update */
-					process_value(addrs, NULL, CONFIG_HOSTNAME, metric->key_orig, NULL,
+					process_value(addrs, NULL, config_hostname, metric->key_orig, NULL,
 							metric->state, &metric->lastlogsize, &metric->mtime, NULL, NULL,
-							NULL, NULL, metric->flags, config_tls, config_timeout);
+							NULL, NULL, metric->flags, config_tls, config_timeout,
+							config_source_ip);
 				}
 
 				/* remove "new metric" flag */
@@ -1387,7 +1734,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 			}
 		}
 
-		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout);
+		send_buffer(addrs, &pre_persistent_vec, config_tls, config_timeout, config_source_ip);
 		metric->nextcheck = (int)time(NULL) + metric->refresh;
 	}
 
@@ -1396,8 +1743,8 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update active check and send buffer schedule by the specified     *
- *          time delta                                                        *
+ * Purpose: updates schedules of active checks and buffer by specified time   *
+ *          delta                                                             *
  *                                                                            *
  * Parameters: delta - [IN] time delta in seconds                             *
  *                                                                            *
@@ -1426,7 +1773,8 @@ static void	zbx_active_checks_sigusr_handler(int flags)
 }
 #endif
 
-static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout)
+static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls, int config_timeout,
+		const char *config_source_ip, const char *config_hostname)
 {
 	static ZBX_THREAD_LOCAL int	last_ret = SUCCEED;
 	int				ret, level;
@@ -1438,12 +1786,12 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, CONFIG_HOSTNAME, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, config_hostname, ZBX_JSON_TYPE_STRING);
 	zbx_json_addint64(&json, ZBX_PROTO_TAG_HEARTBEAT_FREQ, CONFIG_HEARTBEAT_FREQUENCY);
 
 	level = SUCCEED != last_ret ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
 
-	if (SUCCEED == (ret = zbx_connect_to_server(&s, CONFIG_SOURCE_IP, addrs, config_timeout, config_timeout,
+	if (SUCCEED == (ret = zbx_connect_to_server(&s, config_source_ip, addrs, config_timeout, config_timeout,
 			0, level, config_tls)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
@@ -1478,7 +1826,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 {
 	zbx_thread_activechk_args	activechk_args, *activechks_args_in;
 	time_t				nextcheck = 0, nextrefresh = 0, nextsend = 0, now, delta, lastcheck = 0,
-					heartbeat_nextcheck = 0;
+					heartbeat_nextcheck = 0, lash_cmd_hash_check = 0;
 	zbx_uint32_t			config_revision_local = 0;
 	zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
@@ -1493,7 +1841,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_vector_addr_ptr_create(&activechk_args.addrs);
 
 	zbx_addr_copy(&activechk_args.addrs, &(activechks_args_in->addrs));
-	CONFIG_HOSTNAME = zbx_strdup(NULL, activechks_args_in->hostname);
+	const char	*config_hostname = zbx_strdup(NULL, activechks_args_in->hostname);
 
 	zbx_free(args);
 
@@ -1527,7 +1875,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		if ((now = time(NULL)) >= nextsend)
 		{
 			send_buffer(&activechk_args.addrs, &pre_persistent_vec, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
 			nextsend = time(NULL) + 1;
 		}
 
@@ -1535,7 +1883,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		{
 			heartbeat_nextcheck = now + CONFIG_HEARTBEAT_FREQUENCY;
 			send_heartbeat_msg(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
+					config_hostname);
 		}
 
 		if (now >= nextrefresh)
@@ -1543,7 +1892,10 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			zbx_setproctitle("active checks #%d [getting list of active checks]", process_num);
 
 			if (FAIL == refresh_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					&config_revision_local, activechks_args_in->config_timeout))
+					&config_revision_local, activechks_args_in->config_timeout,
+					activechks_args_in->config_source_ip, config_hostname,
+					activechks_args_in->config_host_metadata,
+					activechks_args_in->config_host_metadata_item))
 			{
 				nextrefresh = time(NULL) + 60;
 			}
@@ -1557,12 +1909,19 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 #endif
 		}
 
+		if (0 != active_commands.values_num)
+		{
+			process_active_commands(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip);
+		}
+
 		if (now >= nextcheck && CONFIG_BUFFER_SIZE / 2 > buffer.pcount)
 		{
 			zbx_setproctitle("active checks #%d [processing active checks]", process_num);
 
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
-					activechks_args_in->config_timeout);
+					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
+					config_hostname);
 
 			if (CONFIG_BUFFER_SIZE / 2 <= buffer.pcount)
 			{
@@ -1594,13 +1953,19 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 		}
 
 		lastcheck = now;
+
+		if (now > (lash_cmd_hash_check + SEC_PER_HOUR))
+		{
+			clean_command_hash();
+			lash_cmd_hash_check = now;
+		}
 	}
 
 	zbx_free(session_token);
 
 #ifdef _WINDOWS
-	zbx_vector_ptr_clear_ext(&activechk_args.addrs, (zbx_clean_func_t)zbx_addr_free);
-	zbx_vector_ptr_destroy(&activechk_args.addrs);
+	zbx_vector_addr_ptr_clear_ext(&activechk_args.addrs, (zbx_clean_func_t)zbx_addr_free);
+	zbx_vector_addr_ptr_destroy(&activechk_args.addrs);
 	free_active_metrics();
 
 	ZBX_DO_EXIT();

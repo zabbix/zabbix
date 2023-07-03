@@ -525,7 +525,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
 				$this->query('button:Create host')->one()->waitUntilClickable()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
+				$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 			}
 			else {
 				$this->page->login()->open(
@@ -539,10 +539,18 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$name = $is_prototype ? $data['Name'].' {#KEY}' : $data['Name'];
 			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
 			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
-			$form->fill([
+
+			$general_data = [
 					(($host_type === 'template') ? 'Template name' : 'Host name') => $name,
 					$group_field => $group_name
-			]);
+			];
+
+			if ($is_prototype || $host_type === 'template') {
+				$form->asForm(['normalized' => true])->fill($general_data);
+			}
+			else {
+				$form->asGridForm(['normalized' => true])->fill($general_data);
+			}
 		}
 
 		$form->selectTab('Macros');
@@ -704,7 +712,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($is_prototype) {
 			$this->page->login()->open('host_prototypes.php?form=create&context=host&parent_discoveryid='.$lld_id);
-			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm()->one();
+			$form = $this->query('name:'.$form_type.'Form')->waitUntilPresent()->asForm(['normalized' => true])->one();
 			$name = 'Host prototype with edited global {#MACRO} '.time();
 			$form->fill(['Host name' => $name]);
 			$form->fill(['Host groups' => 'Zabbix servers']);
@@ -721,12 +729,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 			}
 
 			$name = $host_type.' with edited global macro '.time();
-			$group_name = ($host_type === 'template') ? 'Templates' : 'Zabbix servers';
-			$group_field = ($host_type === 'template') ? 'Template groups' : 'Host groups';
-			$form->fill([
-					($host_type === 'template') ? 'Template name' : 'Host name' => $name,
-					$group_field => $group_name
-			]);
+
+			if ($host_type === 'template') {
+				$form->asForm(['normalized' => true])->fill([
+					'Template name' => $name,
+					'Template groups' => 'Templates'
+				]);
+			}
+			else {
+				$form->asGridForm(['normalized' => true])->fill([
+					'Host name' => $name,
+					'Host groups' => 'Zabbix servers'
+				]);
+			}
 		}
 
 		$form->selectTab('Macros');

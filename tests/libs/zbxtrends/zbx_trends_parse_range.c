@@ -24,7 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtrends.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxdbhigh.h"
 
 int	__wrap_zbx_db_is_null(const char *field);

@@ -21,7 +21,7 @@
 #include "zbxserver.h"
 #include "zbxdbwrap.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
@@ -45,6 +45,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
 #include "version.h"
+#include "../scripts/scripts.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxrtc.h"
@@ -124,16 +125,20 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (SUCCEED != (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
 	{
+		if (!ZBX_IS_RUNNING())
+		{
+			info = zbx_strdup(info, "Zabbix server shutdown in progress");
+			zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer,
+					info);
+			ret = FAIL;
+		}
+	}
+	else
 		zabbix_log(LOG_LEVEL_WARNING, "received invalid agent history data from \"%s\": %s", sock->peer, info);
-	}
-	else if (!ZBX_IS_RUNNING())
-	{
-		info = zbx_strdup(info, "Zabbix server shutdown in progress");
-		zabbix_log(LOG_LEVEL_WARNING, "cannot receive agent history data from \"%s\": %s", sock->peer, info);
-		ret = FAIL;
-	}
+
+	zbx_process_command_results(jp);
 
 	zbx_send_response_same(sock, ret, info, config_timeout);
 
@@ -1160,7 +1165,10 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_COMMAND))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = node_process_command(sock, s, &jp, config_comms->config_timeout);
+			{
+				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
+						config_comms->config_source_ip);
+			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
 		{
@@ -1196,7 +1204,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			ret = process_active_check_heartbeat(&jp);
 		}
 		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
-				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->server))
+				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->config_source_ip,
+				config_comms->server))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);

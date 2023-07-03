@@ -1407,7 +1407,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: Rps
-              description: 'Thr number of HTTP request for the given verb per second.'
+              description: 'The number of HTTP request for the given verb per second.'
               preprocessing:
                 - type: PROMETHEUS_PATTERN
                   parameters:

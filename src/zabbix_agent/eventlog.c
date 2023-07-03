@@ -19,7 +19,7 @@
 
 #include "eventlog.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxsysinfo.h"
 #include "zbxregexp.h"
 #include "winmeta.h"
@@ -30,8 +30,6 @@
 #include "zbx_item_constants.h"
 
 #define MAX_NAME			256
-
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 static const wchar_t	*RENDER_ITEMS[] = {
 	L"/Event/System/Provider/@Name",
@@ -341,7 +339,8 @@ static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context,
 	if (TRUE != EvtNext(*event_query, 1, &event_bookmark, INFINITE, 0, &size_required_next))
 	{
 		/* no data in eventlog */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() EvtNext failed:%s", __func__, strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() EvtNext failed:%s", __func__,
+				zbx_strerror_from_system(GetLastError()));
 		*id = 0;
 		ret = SUCCEED;
 		goto out;
@@ -354,7 +353,7 @@ static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context,
 		/* information exceeds the allocated space */
 		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
 		{
-			*error = zbx_dsprintf(*error, "EvtRender failed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtRender failed:%s", zbx_strerror_from_system(status));
 			goto out;
 		}
 
@@ -364,7 +363,7 @@ static int get_eventlog6_id(EVT_HANDLE *event_query, EVT_HANDLE *render_context,
 		if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&size_required, &bookmarkedCount))
 		{
-			*error = zbx_dsprintf(*error, "EvtRender failed:%s", strerror_from_system(GetLastError()));
+			*error = zbx_dsprintf(*error, "EvtRender failed:%s", zbx_strerror_from_system(GetLastError()));
 			goto out;
 		}
 	}
@@ -403,7 +402,8 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 	/* create the system render */
 	if (NULL == (*render_context = EvtCreateRenderContext(RENDER_ITEMS_COUNT, RENDER_ITEMS, EvtRenderContextValues)))
 	{
-		*error = zbx_dsprintf(*error, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		*error = zbx_dsprintf(*error, "EvtCreateRenderContext failed:%s",
+				zbx_strerror_from_system(GetLastError()));
 		goto out;
 	}
 
@@ -411,9 +411,9 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 	if (NULL == (tmp_first_event_query = EvtQuery(NULL, wsource, NULL, EvtQueryChannelPath)))
 	{
 		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", zbx_strerror_from_system(status));
 		else
-			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", zbx_strerror_from_system(status));
 
 		goto out;
 	}
@@ -436,9 +436,9 @@ static int	zbx_open_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize,
 			EvtQueryChannelPath | EvtQueryReverseDirection)))
 	{
 		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", zbx_strerror_from_system(status));
 		else
-			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", zbx_strerror_from_system(status));
 
 		goto out;
 	}
@@ -492,9 +492,9 @@ static int	zbx_get_handle_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlo
 		DWORD	status;
 
 		if (ERROR_EVT_CHANNEL_NOT_FOUND == (status = GetLastError()))
-			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery channel missed:%s", zbx_strerror_from_system(status));
 		else
-			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", strerror_from_system(status));
+			*error = zbx_dsprintf(*error, "EvtQuery failed:%s", zbx_strerror_from_system(status));
 
 		goto out;
 	}
@@ -561,7 +561,7 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
 	{
 		tmp_pname = zbx_unicode_to_utf8(pname);
 		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s",
-				tmp_pname, strerror_from_system(GetLastError()));
+				tmp_pname, zbx_strerror_from_system(GetLastError()));
 		zbx_free(tmp_pname);
 		goto out;
 	}
@@ -589,7 +589,7 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
 			else
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__,
-						strerror_from_system(error));
+						zbx_strerror_from_system(error));
 				goto out;
 			}
 		}
@@ -615,7 +615,7 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 	if (0 == LookupAccountSid(NULL, sidVal, name, &nlen, dom, &dlen, (PSID_NAME_USE)&iUse))
 	{
 		/* don't replace security ID if no mapping between account names and security IDs was done */
-		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid failed:%s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_DEBUG, "LookupAccountSid failed:%s", zbx_strerror_from_system(GetLastError()));
 		return;
 	}
 
@@ -627,7 +627,8 @@ static void	replace_sid_to_account(PSID sidVal, char **out_message)
 
 	if (0 == ConvertSidToStringSid(sidVal, &sid))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "ConvertSidToStringSid failed:%s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_DEBUG, "ConvertSidToStringSid failed:%s",
+				zbx_strerror_from_system(GetLastError()));
 		return;
 	}
 
@@ -657,7 +658,8 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 
 	if (NULL == (render_context = EvtCreateRenderContext(0, NULL, EvtRenderContextUser)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "EvtCreateRenderContext failed:%s", strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_WARNING, "EvtCreateRenderContext failed:%s",
+				zbx_strerror_from_system(GetLastError()));
 		goto cleanup;
 	}
 
@@ -666,7 +668,7 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 	{
 		if (ERROR_INSUFFICIENT_BUFFER != (status = GetLastError()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(status));
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", zbx_strerror_from_system(status));
 			goto cleanup;
 		}
 
@@ -676,7 +678,7 @@ static void	replace_sids_to_accounts(EVT_HANDLE event_bookmark, char **out_messa
 		if (TRUE != EvtRender(render_context, event_bookmark, EvtRenderEventValues, dwBufferSize,
 				renderedContent, &dwBufferUsed, &dwPropertyCount))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", strerror_from_system(GetLastError()));
+			zabbix_log(LOG_LEVEL_WARNING, "EvtRender failed:%s", zbx_strerror_from_system(GetLastError()));
 			goto cleanup;
 		}
 	}
@@ -737,7 +739,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 		/* information exceeds the space allocated */
 		if (ERROR_INSUFFICIENT_BUFFER != (error_code = GetLastError()))
 		{
-			*error = zbx_dsprintf(*error, "EvtRender failed: %s", strerror_from_system(error_code));
+			*error = zbx_dsprintf(*error, "EvtRender failed: %s", zbx_strerror_from_system(error_code));
 			goto out;
 		}
 
@@ -747,7 +749,7 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 		if (TRUE != EvtRender(*render_context, *event_bookmark, EvtRenderEventValues, size, renderedContent,
 				&require, &bookmarkedCount))
 		{
-			*error = zbx_dsprintf(*error, "EvtRender failed: %s", strerror_from_system(GetLastError()));
+			*error = zbx_dsprintf(*error, "EvtRender failed: %s", zbx_strerror_from_system(GetLastError()));
 			goto out;
 		}
 	}
@@ -865,6 +867,8 @@ out:
  *                                     the server                             *
  *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
+ *             config_hostname  - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
@@ -874,12 +878,13 @@ out:
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
-		EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize, zbx_uint64_t FirstID,
-		zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
-		const char *key_source, const char *key_logeventid, int rate,
+static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+		const char *eventlog_name, EVT_HANDLE *render_context, EVT_HANDLE *query, zbx_uint64_t lastlogsize,
+		zbx_uint64_t FirstID, zbx_uint64_t LastID, zbx_vector_expression_t *regexps, const char *pattern,
+		const char *key_severity, const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
-		ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
+		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
+		zbx_uint64_t *lastlogsize_sent, char **error)
 {
 #	define EVT_ARRAY_SIZE	100
 
@@ -936,7 +941,7 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 				continue;
 
 			*error = zbx_dsprintf(*error, "EvtNext failed: %s, EventRecordID:" ZBX_FS_UI64,
-					strerror_from_system(error_code), lastlogsize + 1);
+					zbx_strerror_from_system(error_code), lastlogsize + 1);
 			goto out;
 		}
 
@@ -1051,11 +1056,11 @@ static int	process_eventslog6(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
+				send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig,
 						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
 						evt_provider, &evt_severity, &evt_eventid,
 						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-						config_timeout);
+						config_timeout, config_source_ip);
 
 				if (SUCCEED == send_err)
 				{
@@ -1194,7 +1199,7 @@ static int	seek_eventlog(HANDLE *eventlog_handle, zbx_uint64_t FirstID, DWORD Re
 		}
 
 		*error = zbx_dsprintf(*error, "Cannot read eventlog '%s': %s.", eventlog_name,
-				strerror_from_system(*error_code));
+				zbx_strerror_from_system(*error_code));
 		return FAIL;
 	}
 
@@ -1239,7 +1244,7 @@ static int	seek_eventlog(HANDLE *eventlog_handle, zbx_uint64_t FirstID, DWORD Re
 				break;
 
 			*error = zbx_dsprintf(*error, "Cannot read eventlog '%s': %s.", eventlog_name,
-					strerror_from_system(*error_code));
+					zbx_strerror_from_system(*error_code));
 			return FAIL;
 		}
 
@@ -1394,6 +1399,8 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  *                                     the server                             *
  *             config_tls       - [IN]                                        *
  *             config_timeout   - [IN]                                        *
+ *             config_source_ip - [IN]                                        *
+ *             config_hostname  - [IN]                                        *
  *             metric           - [IN/OUT] parameters for EventLog process    *
  *             lastlogsize_sent - [OUT] position of the last record sent to   *
  *                                      the server                            *
@@ -1403,11 +1410,11 @@ static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGREC
  * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  ******************************************************************************/
-static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *eventlog_name,
-		zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity, const char *key_source,
-		const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
-		const zbx_config_tls_t *config_tls, int config_timeout, ZBX_ACTIVE_METRIC *metric,
-		zbx_uint64_t *lastlogsize_sent, char **error)
+static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char
+		*eventlog_name, zbx_vector_expression_t *regexps, const char *pattern, const char *key_severity,
+		const char *key_source, const char *key_logeventid, int rate, zbx_process_value_func_t process_value_cb,
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
 	int		ret = FAIL;
 	HANDLE		eventlog_handle = NULL;
@@ -1444,7 +1451,7 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 	if (SUCCEED != zbx_open_eventlog(eventlog_name_w, &eventlog_handle, &FirstID, &LastID, &error_code))
 	{
 		*error = zbx_dsprintf(*error, "Cannot open eventlog '%s': %s.", eventlog_name,
-				strerror_from_system(error_code));
+				zbx_strerror_from_system(error_code));
 		goto out;
 	}
 
@@ -1492,7 +1499,8 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s(): state before EventLog reading: num_bytes_read=%u error=%s FirstID="
 			ZBX_FS_UI64 " LastID=" ZBX_FS_UI64 " lastlogsize=" ZBX_FS_UI64, __func__,
-			(unsigned int)num_bytes_read, strerror_from_system(error_code), FirstID, LastID, lastlogsize);
+			(unsigned int)num_bytes_read, zbx_strerror_from_system(error_code), FirstID, LastID,
+			lastlogsize);
 
 	if (ERROR_HANDLE_EOF == error_code)
 		goto finish;
@@ -1523,7 +1531,7 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 				break;
 
 			*error = zbx_dsprintf(*error, "Cannot read eventlog '%s': %s.", eventlog_name,
-					strerror_from_system(error_code));
+					zbx_strerror_from_system(error_code));
 			goto out;
 		}
 
@@ -1643,11 +1651,11 @@ static int	process_eventslog(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_r
 
 				if (1 == match)
 				{
-					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
+					send_err = process_value_cb(addrs, agent2_result, config_hostname,
 							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
 							NULL, &timestamp, source, &severity, &logeventid,
 							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-							config_timeout);
+							config_timeout, config_source_ip);
 
 					if (SUCCEED == send_err)
 					{
@@ -1698,9 +1706,10 @@ out:
 	return ret;
 }
 
-int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
+int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
-		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout, char **error)
+		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
+		const char *config_source_ip, const char *config_hostname, char **error)
 {
 	int 		ret = FAIL;
 	AGENT_REQUEST	request;
@@ -1818,7 +1827,8 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 			ret = process_eventslog6(addrs, agent2_result, filename, &eventlog6_render_context,
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
-					config_tls, config_timeout, metric, lastlogsize_sent, error);
+					config_tls, config_timeout, config_source_ip, config_hostname, metric,
+					lastlogsize_sent, error);
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -1830,8 +1840,8 @@ int	process_eventlog_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
-				key_logeventid, rate, process_value_cb, config_tls, config_timeout, metric,
-				lastlogsize_sent, error);
+				key_logeventid, rate, process_value_cb, config_tls, config_timeout, config_source_ip,
+				config_hostname, metric, lastlogsize_sent, error);
 	}
 out:
 	zbx_free_agent_request(&request);

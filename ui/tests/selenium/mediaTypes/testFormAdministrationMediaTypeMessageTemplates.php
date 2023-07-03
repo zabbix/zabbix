@@ -131,33 +131,33 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	public function testFormAdministrationMediaTypeMessageTemplates_Layout() {
 		// Open a new media type configuration form and switch to Message templates tab.
-		$this->openMediaTypeTemplates('new');
-
+		$overlay = $this->openMediaTypeTemplates('new');
+		$this->assertEquals('New media type', $overlay->getTitle());
 		// Check message templates tab.
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		$this->assertTrue($templates_list->query('button:Add')->one()->isEnabled());
 		$this->assertSame(['Message type', 'Template', 'Actions'], $templates_list->getHeadersText());
-		$this->assertEquals(1, $templates_list->getRows()->count());
+		$this->assertEquals(0, $templates_list->getRows()->count());
 		// Check that media type configuration form buttons are clickable from Message templates tab.
-		$this->assertEquals(2, $this->query('id', ['add', 'cancel'])->all()
+		$this->assertEquals(2, $overlay->getFooter()->query('button', ['Add', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Check message template configuration form.
 		$templates_list->query('button:Add')->one()->click();
-		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
-		$this->assertEquals('Message template', $overlay->getTitle());
-		$form = $this->query('id:mediatype_message_form')->asForm()->one();
+		$message_form = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$this->assertEquals('Message template', $message_form->getTitle());
+		$form = $message_form->query('id:mediatype-message-form')->asForm()->one();
 		$this->assertEquals(['Message type', 'Subject', 'Message'], $form->getLabels()->asText());
 		$form->getField('Message type')->checkValue('Problem');
 		$this->assertEquals(255, $form->getField('Subject')->getAttribute('maxlength'));
 		$this->assertEquals(65535, $form->getField('Message')->getAttribute('maxlength'));
 		// Check that both buttons in the media type template configuration form are clickable.
-		$this->assertEquals(2, $overlay->query('button', ['Add', 'Cancel'])->all()
+		$this->assertEquals(2, $overlay->getFooter()->query('button', ['Add', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count());
 
 		// Add a "Problem" message template and check that corresponding row is added in Message templates table.
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
+		$message_form->waitUntilNotVisible();
 		$templates_list->invalidate();
 		$row = $templates_list->findRow('Message type', 'Problem');
 
@@ -167,12 +167,13 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		);
 		// Check that it is possible to edit a newly created message template.
 		$row->query('button:Edit')->one()->click();
-		COverlayDialogElement::find()->one()->waitUntilReady()->close();
+		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 
 		// Check that it is possible to remove a newly created message template.
 		$row->query('button:Remove')->one()->click();
-		// Check that only the row with "Add" button is present after removing the previously added row.
-		$this->assertEquals(1, $templates_list->getRows()->count());
+		// Check that none of the rows are present after removing the previously added row.
+		$this->assertEquals(0, $templates_list->getRows()->count());
 	}
 
 	public function getDefaultMessageTemplateData() {
@@ -443,20 +444,20 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$last = count($data['message_templates']) - 1;
 		foreach ($data['message_templates'] as $i => $template) {
 			$templates_list->query('button:Add')->one()->click();
-			COverlayDialogElement::find()->one()->waitUntilReady();
+			$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 
 			// Check the fields available in the message template configuration form.
-			$form = $this->query('id:mediatype_message_form')->asForm()->one();
+			$form = $this->query('id:mediatype-message-form')->asForm()->one();
 			$form->checkValue($template);
 			if ($data['media_type']['Type'] === 'SMS') {
 				$this->assertFalse($form->query('id:subject')->one(false)->isValid());
 			}
 			$form->submit();
-			COverlayDialogElement::ensureNotPresent();
+			$message_overlay->waitUntilNotVisible();
 			$templates_list->waitUntilReady()->invalidate();
 
 			// Check that the number of rows has increased after adding previously checked message template.
-			$this->assertEquals($i + 2, $templates_list->getRows()->count());
+			$this->assertEquals($i + 1, $templates_list->getRows()->count());
 			$row = $templates_list->findRow('Message type', $template['Message type']);
 			// Convert the reference message to a single line and compare it with the message added to message templates.
 			$message = preg_replace('/[\r\n ]+/', ' ', $template['Message']);
@@ -469,13 +470,13 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			}
 			else {
 				$templates_list->query('button:Add')->one()->click();
-				COverlayDialogElement::find()->one()->waitUntilReady();
+				$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 				$form->invalidate();
 				$disabled_options = $form->getField('Message type')->getOptions()->filter(
 						new CElementFilter(CElementFilter::ATTRIBUTES_PRESENT, ['disabled'])
 				)->asText();
 				$this->assertContains($template['Message type'], $disabled_options);
-				COverlayDialogElement::find()->one()->close();
+				$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 			}
 		}
 	}
@@ -836,7 +837,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 	 */
 	public function testFormAdministrationMediaTypeMessageTemplates_Update($data) {
 		// Open configuration of an existing media type, update its format if needed and switch to Message templates tab.
-		$this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
+		$overlay = $this->openMediaTypeTemplates($data['media_type'], CTestArrayHelper::get($data, 'media_type_fields'));
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		// Edit the list of existing message templates or remove all message templates if corresponding key exists.
 		if (array_key_exists('remove_all', $data)) {
@@ -845,22 +846,25 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		else {
 			$this->modifyMessageTemplates($data);
 		}
-		$this->query('id:media-type-form')->asForm()->one()->submit();
+		$overlay->asForm()->submit();
+		COverlayDialogElement::ensureNotPresent();
 		// Open message template list of the edited media type and check that message template updates took place.
-		$this->query('link', $data['media_type'])->one()->WaitUntilClickable()->click();
-		$media_form = $this->query('id:media-type-form')->asForm()->one();
+		$this->query('link', $data['media_type'])->waitUntilClickable()->one()->click();
+		$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$media_form = $message_overlay->asForm();
 		$media_form->selectTab('Message templates');
 		$templates_list->invalidate();
 		if (array_key_exists('remove_all', $data)) {
-			// Check that only the row with "Add" button is present after removing all message templates.
-			$this->assertEquals(1, $templates_list->getRows()->count());
+			// Check that none of rows are present after removing all Message templates.
+			$this->assertEquals(0, $templates_list->getRows()->count());
 		}
 		else {
 			$this->assertEquals(CTestArrayHelper::get($data, 'rows', count($data['message_templates'])),
-					$templates_list->getRows()->count() - 1
+					$templates_list->getRows()->count()
 			);
 			$this->checkMessageTemplates($data, $templates_list);
 		}
+		$message_overlay->close();
 	}
 
 	public function testFormAdministrationMediaTypeMessageTemplates_SimpleUpdate() {
@@ -869,7 +873,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$this->openMediaTypeTemplates('Email');
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 		$templates_list->findRow('Message type', 'Problem')->query('button:Edit')->one()->click();
-		$this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one()->submit();
+		$this->query('id:mediatype-message-form')->waitUntilVisible()->asForm()->one()->submit();
 		$this->query('id:media-type-form')->asForm()->one()->submit();
 
 		// Check that no DB changes took place.
@@ -883,7 +887,7 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 		$templates_list = $this->query('id:messageTemplatesFormlist')->asTable()->one();
 
 		$templates_list->findRow('Message type', 'Problem')->query('button:Edit')->one()->click();
-		$form = $this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:mediatype-message-form')->waitUntilVisible()->asForm()->one();
 		$form->fill([
 			'Message type' => 'Internal problem',
 			'Subject' => 'New subject',
@@ -907,18 +911,20 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 			switch (CTestArrayHelper::get($template, 'action', 'Edit')) {
 				case 'Edit':
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
-					$form = $this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one();
+					$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$form = $message_overlay->asForm();
 					$form->fill($template);
 					$form->submit();
-					COverlayDialogElement::ensureNotPresent();
+					$message_overlay->waitUntilNotVisible();
 					break;
 				case 'Add':
 					$templates_list->query('button:Add')->waitUntilClickable()->one()->click();
-					$form = $this->query('id:mediatype_message_form')->waitUntilVisible()->asForm()->one();
+					$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$form = $message_overlay->asForm();
 					unset($template['action']);
 					$form->fill($template);
 					$form->submit();
-					COverlayDialogElement::ensureNotPresent();
+					$message_overlay->waitUntilNotVisible();
 					break;
 				case 'Remove':
 				case 'Remove temporary':
@@ -941,10 +947,9 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 				case 'Skip':
 					// Open the corresponding message template and check its content according to the values in data provider.
 					$templates_list->findRow('Message type', $template['Message type'])->query('button:Edit')->one()->click();
-					COverlayDialogElement::find()->one()->waitUntilReady();
-					$form = $this->query('id:mediatype_message_form')->asForm()->one();
-					$form->checkValue($template);
-					COverlayDialogElement::find()->one()->close();
+					$message_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$message_overlay->asForm()->checkValue($template);
+					$message_overlay->query('class:btn-overlay-close')->one()->click()->waitUntilNotVisible();
 					break;
 				case 'Remove':
 					// Check that the previously removed row is not present in message template list.
@@ -956,19 +961,24 @@ class testFormAdministrationMediaTypeMessageTemplates extends CWebTest {
 
 	/**
 	 * Function creates new or opens existing media type, modifies media type parameters and opens message templates tab.
+	 *
+	 * @param string $media_type		the name of existing media type or the 'new' keyword to create a new media type
+	 * @param array $media_type_fields  media type field values to fill in the form
+	 *
+	 * @return COverlayDialogElement
 	 */
 	private function openMediaTypeTemplates($media_type, $media_type_fields = null) {
-		if ($media_type === 'new') {
-			$this->page->login()->open('zabbix.php?action=mediatype.edit')->waitUntilReady();
-		}
-		else {
-			$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
-			$this->query('link', $media_type)->one()->WaitUntilClickable()->click();
-		}
-		$media_form = $this->query('id:media-type-form')->asForm()->one();
+		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
+		$this->query(($media_type === 'new') ? 'button:Create media type' : 'link:'.$media_type)->one()
+				->WaitUntilClickable()->click();
+		$overlay = COverlayDialogElement::find()->one()->waitUntilReady();
+		$media_form = $overlay->asForm();
+
 		if ($media_type_fields !== null) {
 			$media_form->fill($media_type_fields);
 		}
 		$media_form->selectTab('Message templates');
+
+		return $overlay;
 	}
 }

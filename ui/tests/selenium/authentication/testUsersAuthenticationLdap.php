@@ -484,6 +484,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 
 		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
+		$test_form_dialog->waitUntilNotVisible();
 		$server_form_dialog->close();
 	}
 

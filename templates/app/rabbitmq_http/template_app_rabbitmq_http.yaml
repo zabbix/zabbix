@@ -1665,7 +1665,7 @@ zabbix_export:
               username: '{$RABBITMQ.API.USER}'
               password: '{$RABBITMQ.API.PASSWORD}'
               description: |
-                It responds with a status code`200 OK` if there are no alarms in effect in the cluster. 
+                It responds with a status code `200 OK` if there are no alarms in effect in the cluster.
                 Otherwise, it responds with a status code `503 Service Unavailable`.
               valuemap:
                 name: 'RabbitMQ healthcheck'

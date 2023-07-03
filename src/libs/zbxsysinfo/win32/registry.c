@@ -25,6 +25,7 @@
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxlog.h"
 
 #include <locale.h>
 #include <winreg.h>
@@ -344,7 +345,7 @@ static int	registry_discover(char *key, int mode, AGENT_RESULT *result, const ch
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(retCode)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror_from_system(retCode)));
 		ret = FAIL;
 		goto out;
 	}
@@ -389,7 +390,7 @@ static int	registry_get_value(char *key, const char *value, AGENT_RESULT *result
 
 	if (ERROR_SUCCESS != errCode)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, strerror_from_system(errCode)));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, zbx_strerror_from_system(errCode)));
 		ret = FAIL;
 		goto out;
 	}

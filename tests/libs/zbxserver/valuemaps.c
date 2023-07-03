@@ -25,7 +25,7 @@
 #include "zbxmockutil.h"
 
 #include "zbxserver.h"
-#include "log.h"
+#include "zbxlog.h"
 
 #define ZBX_VALUEMAP_STRING_LEN	64
 

@@ -256,32 +256,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'create'
 				]
 			],
 			// #25 Event correlation update.
 			[
 				[
 					'db' => 'SELECT * FROM correlation',
-					'link' => 'zabbix.php?correlationid=99002&action=correlation.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=correlation.list',
+					'overlay' => 'update'
 				]
 			],
 			// #26 Discovery create.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'zabbix.php?action=discovery.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=discovery.list',
+					'overlay' => 'create'
 				]
 			],
 			// #27 Discovery update.
 			[
 				[
 					'db' => 'SELECT * FROM host_discovery',
-					'link' => 'zabbix.php?action=discovery.edit&druleid=5',
-					'return_button' => true
+					'link' => 'zabbix.php?action=discovery.list',
+					'overlay' => 'update'
 				]
 			],
 			// #28 GUI update.
@@ -456,32 +456,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit&mediatypeid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'update'
 				]
 			],
 			// #50 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
-					'link' => 'zabbix.php?action=mediatype.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=mediatype.list',
+					'overlay' => 'create'
 				]
 			],
 			// #51 Script update.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'link' => 'zabbix.php?action=script.edit&scriptid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=script.list',
+					'overlay' => 'update'
 				]
 			],
 			// #52 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
-					'link' => 'zabbix.php?action=script.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=script.list',
+					'overlay' => 'create'
 				]
 			],
 			// #53 User profile update.

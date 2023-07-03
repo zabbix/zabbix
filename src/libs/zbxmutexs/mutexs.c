@@ -21,7 +21,7 @@
 
 #ifdef _WINDOWS
 #	include "zbxsysinfo.h"
-#	include "log.h"
+#	include "zbxlog.h"
 #else
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 typedef struct
@@ -386,7 +386,7 @@ int	zbx_mutex_create(zbx_mutex_t *mutex, zbx_mutex_name_t name, char **error)
 #ifdef _WINDOWS
 	if (NULL == (*mutex = CreateMutex(NULL, FALSE, name)))
 	{
-		*error = zbx_dsprintf(*error, "error on mutex creating: %s", strerror_from_system(GetLastError()));
+		*error = zbx_dsprintf(*error, "error on mutex creating: %s", zbx_strerror_from_system(GetLastError()));
 		return FAIL;
 	}
 #else
@@ -443,7 +443,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 			exit(EXIT_FAILURE);
 		default:
 			zbx_error("[file:'%s',line:%d] lock failed: %s",
-				filename, line, strerror_from_system(GetLastError()));
+				filename, line, zbx_strerror_from_system(GetLastError()));
 			exit(EXIT_FAILURE);
 	}
 #else
@@ -497,7 +497,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 	if (0 == ReleaseMutex(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
-				filename, line, strerror_from_system(GetLastError()));
+				filename, line, zbx_strerror_from_system(GetLastError()));
 		exit(EXIT_FAILURE);
 	}
 #else
@@ -541,7 +541,7 @@ void	zbx_mutex_destroy(zbx_mutex_t *mutex)
 		return;
 
 	if (0 == CloseHandle(*mutex))
-		zbx_error("error on mutex destroying: %s", strerror_from_system(GetLastError()));
+		zbx_error("error on mutex destroying: %s", zbx_strerror_from_system(GetLastError()));
 #endif
 	*mutex = ZBX_MUTEX_NULL;
 }

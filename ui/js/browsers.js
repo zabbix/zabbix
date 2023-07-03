@@ -38,3 +38,10 @@ if (document.cookie.indexOf('browserwarning_ignore') < 0) {
 		window.location.replace('browserwarning.php');
 	}
 }
+
+// This is a hack to to enable Safari specific CSS.
+document.addEventListener('DOMContentLoaded', () => {
+	if (SF) {
+		document.body.classList.add('safari');
+	}
+});

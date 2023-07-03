@@ -21,9 +21,8 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert unsigned integer 64 bit                                   *
- *          from host byte order                                              *
- *          to little-endian byte order format                                *
+ * Purpose: Converts unsigned integer 64 bit from host byte order to          *
+ *          little-endian byte order format.                                  *
  *                                                                            *
  * Return value: unsigned integer 64 bit in little-endian byte order format   *
  *                                                                            *
@@ -48,9 +47,8 @@ zbx_uint64_t	zbx_htole_uint64(zbx_uint64_t data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert unsigned integer 64 bit                                   *
- *          from little-endian byte order format                              *
- *          to host byte order                                                *
+ * Purpose: Converts unsigned integer 64 bit from little-endian byte order    *
+ *          format to host byte order.                                        *
  *                                                                            *
  * Return value: unsigned integer 64 bit in host byte order                   *
  *                                                                            *
@@ -75,9 +73,8 @@ zbx_uint64_t	zbx_letoh_uint64(zbx_uint64_t data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert unsigned integer 32 bit                                   *
- *          from host byte order                                              *
- *          to little-endian byte order format                                *
+ * Purpose: Converts unsigned integer 32 bit from host byte order to          *
+ *          little-endian byte order format.                                  *
  *                                                                            *
  * Return value: unsigned integer 32 bit in little-endian byte order format   *
  *                                                                            *
@@ -98,9 +95,8 @@ zbx_uint32_t	zbx_htole_uint32(zbx_uint32_t data)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: convert unsigned integer 32 bit                                   *
- *          from little-endian byte order format                              *
- *          to host byte order                                                *
+ * Purpose: Converts unsigned integer 32 bit from little-endian byte order    *
+ *          format to host byte order.                                        *
  *                                                                            *
  * Return value: unsigned integer 32 bit in host byte order                   *
  *                                                                            *
