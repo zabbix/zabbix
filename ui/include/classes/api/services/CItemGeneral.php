@@ -408,7 +408,7 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Add host_status property to given items in accordance of given hosts and templates statuses.
+	 * Add host_status property to given items in accordance to statuses of given hosts and templates.
 	 *
 	 * @param array $items
 	 * @param array $db_hosts
@@ -416,12 +416,9 @@ abstract class CItemGeneral extends CApiService {
 	 */
 	protected static function addHostStatus(array &$items, array $db_hosts, array $db_templates): void {
 		foreach ($items as &$item) {
-			if (array_key_exists($item['hostid'], $db_templates)) {
-				$item['host_status'] = HOST_STATUS_TEMPLATE;
-			}
-			else {
-				$item['host_status'] = $db_hosts[$item['hostid']]['status'];
-			}
+			$item['host_status'] = array_key_exists($item['hostid'], $db_templates)
+				? HOST_STATUS_TEMPLATE
+				: $db_hosts[$item['hostid']]['status'];
 		}
 		unset($item);
 	}

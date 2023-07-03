@@ -1010,7 +1010,7 @@ class CItem extends CItemGeneral {
 	 * @param array $tpl_links
 	 * @param array $hostids
 	 */
-	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+	private static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 

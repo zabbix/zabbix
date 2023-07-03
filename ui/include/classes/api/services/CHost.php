@@ -1492,6 +1492,7 @@ class CHost extends CHostGeneral {
 			],
 			'preservekeys' => true
 		]);
+
 		if ($db_lld_rules) {
 			CDiscoveryRule::deleteForce($db_lld_rules);
 		}

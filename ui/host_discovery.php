@@ -604,7 +604,6 @@ if (hasRequest('action') && hasRequest('g_hostdruleid') && !$result) {
  */
 if (hasRequest('form')) {
 	$master_itemid = getRequest('master_itemid', 0);
-	$has_errors = false;
 
 	if (hasRequest('itemid') && !hasRequest('clone')) {
 		$items = API::DiscoveryRule()->get([
@@ -651,9 +650,7 @@ if (hasRequest('form')) {
 	$data['host'] = $hosts[0];
 	$data['preprocessing_test_type'] = CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD;
 	$data['preprocessing_types'] = CDiscoveryRule::SUPPORTED_PREPROCESSING_TYPES;
-	$data['display_interfaces'] = ($hosts[0]['status'] == HOST_STATUS_MONITORED
-		|| $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED
-	);
+	$data['display_interfaces'] = in_array($hosts[0]['status'], [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED]);
 	$data['backurl'] = getRequest('backurl');
 
 	if (!hasRequest('form_refresh')) {
@@ -700,10 +697,7 @@ if (hasRequest('form')) {
 		$data['counter'] = key($conditions) + 1;
 	}
 
-	// render view
-	if (!$has_errors) {
-		echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
-	}
+	echo (new CView('configuration.host.discovery.edit', $data))->getOutput();
 }
 else {
 	$data = [

@@ -193,8 +193,8 @@ class CTriggerGeneralHelper {
 		]);
 
 		$error = array_key_exists('status', $dst_host)
-			? _('Cannot copy trigger "%1$s" without the trigger "%2$s" on which it depends to the host "%3$s".')
-			: _('Cannot copy trigger "%1$s" without the trigger "%2$s" on which it depends to the template "%3$s".');
+			? _('Cannot copy trigger "%1$s" without the trigger "%2$s", on which it depends, to the host "%3$s".')
+			: _('Cannot copy trigger "%1$s" without the trigger "%2$s", on which it depends, to the template "%3$s".');
 
 		error(sprintf($error, $src_triggers[0]['description'], $src_master_description, $dst_host['host']));
 
@@ -202,10 +202,10 @@ class CTriggerGeneralHelper {
 	}
 
 	/**
-	 * Purpose: Replaces host in trigger expression.
+	 * Replaces a host in the trigger expression with the one provided.
 	 * nodata(/localhost/agent.ping, 5m)  =>  nodata(/localhost6/agent.ping, 5m)
 	 *
-	 * @param string $expression	full expression with host names and item keys
+	 * @param string $expression  Full expression with host names and item keys.
 	 * @param string $src_host
 	 * @param string $dst_host
 	 *
@@ -220,8 +220,10 @@ class CTriggerGeneralHelper {
 				[CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]
 			);
 			$hist_function = end($hist_functions);
+
 			do {
 				$query_parameter = $hist_function['data']['parameters'][0];
+
 				if ($query_parameter['data']['host'] === $src_host) {
 					$expression = substr_replace($expression, '/'.$dst_host.'/'.$query_parameter['data']['item'],
 						$query_parameter['pos'], $query_parameter['length']

@@ -1078,8 +1078,8 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		/*
-		 * The fields "headers" and "query_fields" in API are arrays, but there is necessary to get the values of these
-		 * fields as they stored in database.
+		 * The fields "headers" and "query_fields" in API are arrays, but it is necessary to get the values of these
+		 * fields as stored in database.
 		 */
 		$db_items = DB::select('items', [
 			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
@@ -1665,7 +1665,6 @@ class CDiscoveryRule extends CItemGeneral {
 	 * Check that templates specified in override operations of the given LLD rules are valid.
 	 *
 	 * @param array  $items
-	 * @param string $path
 	 *
 	 * @throws APIException
 	 */
@@ -2602,6 +2601,9 @@ class CDiscoveryRule extends CItemGeneral {
 		API::HostPrototype()->linkTemplateObjects($ruleids, $hostids);
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	protected static function inherit(array $items, array $db_items = [], ?array $hostids = null,
 			bool $is_dep_items = false): void {
 		$tpl_links = self::getTemplateLinks($items, $hostids);
@@ -2633,7 +2635,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array $tpl_links
 	 * @param array $hostids
 	 */
-	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+	private static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 
@@ -3067,7 +3069,7 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Delete item prototypes, which belongs to the given LLD rules.
+	 * Delete item prototypes which belong to the given LLD rules.
 	 *
 	 * @param array $del_itemids
 	 */
@@ -3085,7 +3087,7 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Delete host prototypes, which belongs to the given LLD rules.
+	 * Delete host prototypes which belong to the given LLD rules.
 	 *
 	 * @param array $del_itemids
 	 */
@@ -3103,7 +3105,7 @@ class CDiscoveryRule extends CItemGeneral {
 	}
 
 	/**
-	 * Delete overrides, which belongs to the given LLD rules.
+	 * Delete overrides which belong to the given LLD rules.
 	 *
 	 * @param array $del_itemids
 	 */

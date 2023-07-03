@@ -142,115 +142,55 @@ class CControllerCopyCreate extends CController {
 	}
 
 	protected function doAction(): void {
-		$output = [];
+		$copy_targetids = $this->getTargetIds();
+		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
+			? ['templateids' => $copy_targetids]
+			: ['hostids' => $copy_targetids];
 
-		try {
-			DBstart();
+		$success = false;
+		DBstart();
 
-			$copy_targetids = $this->getTargetIds();
-			$source = $this->getInput('source');
+		switch ($this->getInput('source')) {
+			case 'items':
+				$src_options = ['itemids' => $this->getInput('itemids')];
+				$success = CItemHelper::copy($src_options, $dst_options);
 
-			switch ($source) {
-				case 'items':
-					$items_count = count($this->getInput('itemids'));
+				$items_count = count($src_options['itemids']);
+				$title = $success
+					? _n('Item copied', 'Items copied', $items_count)
+					: _n('Cannot copy item', 'Cannot copy items', $items_count);
+				break;
 
-					if ($this->copyItems($copy_targetids)) {
-						$output['success']['title'] = _n('Item copied', 'Items copied', $items_count);
+			case 'triggers':
+				$src_options = ['triggerids' => $this->getInput('triggerids')]
+					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
+				$success = CTriggerHelper::copy($src_options, $dst_options);
 
-						if ($messages = get_and_clear_messages()) {
-							$output['success']['messages'] = array_column($messages, 'message');
-						}
-					}
-					else {
-						$output['error'] = [
-							'title' => _n('Cannot copy item', 'Cannot copy items', $items_count),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						];
+				$triggers_count = count($src_options['triggerids']);
+				$title = $success
+					? _n('Trigger copied', 'Triggers copied', $triggers_count)
+					: _n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count);
+				break;
 
-						throw new Exception();
-					}
-					break;
+			case 'graphs':
+				$src_options = ['graphids' => $this->getInput('graphids')]
+					+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
+				$success = CGraphHelper::copy($src_options, $dst_options);
 
-				case 'triggers':
-					$triggers_count = count($this->getInput('triggerids'));
-
-					if ($this->copyTriggers($copy_targetids)) {
-						$output['success']['title'] = _n('Trigger copied', 'Triggers copied', $triggers_count);
-
-						if ($messages = get_and_clear_messages()) {
-							$output['success']['messages'] = array_column($messages, 'message');
-						}
-					}
-					else {
-						$output['error'] = [
-							'title' => _n('Cannot copy trigger', 'Cannot copy triggers', $triggers_count),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						];
-
-						throw new Exception();
-					}
-					break;
-
-				case 'graphs':
-					$graphs_count = count($this->getInput('graphids'));
-
-					if ($this->copyGraphs($copy_targetids)) {
-						$output['success']['title'] = _n('Graph copied', 'Graphs copied', $graphs_count);
-
-						if ($messages = get_and_clear_messages()) {
-							$output['success']['messages'] = array_column($messages, 'message');
-						}
-					}
-					else {
-						$output['error'] = [
-							'title' => _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						];
-
-						throw new Exception();
-					}
-					break;
-			}
-
-			DBend(true);
+				$graphs_count = count($src_options['graphids']);
+				$title = $success
+					? _n('Graph copied', 'Graphs copied', $graphs_count)
+					: _n('Cannot copy graph', 'Cannot copy graphs', $graphs_count);
+				break;
 		}
-		catch (Exception $e) {
-			DBend(false);
-		}
+
+		DBend($success);
+
+		$output = $success
+			? ['success' => ['title' => $title]]
+			: ['error' => ['title' => $title, 'messages' => array_column(get_and_clear_messages(), 'message')]];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
-	}
-
-	private function copyItems(array $copy_targetids): bool {
-		$src_options = ['itemids' => $this->getInput('itemids')];
-
-		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
-			? ['templateids' => $copy_targetids]
-			: ['hostids' => $copy_targetids];
-
-		return CItemHelper::copy($src_options, $dst_options);
-	}
-
-	private function copyTriggers(array $copy_targetids): bool {
-		$src_options = ['triggerids' => $this->getInput('triggerids')]
-			+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-
-		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
-			? ['templateids' => $copy_targetids]
-			: ['hostids' => $copy_targetids];
-
-		return CTriggerHelper::copy($src_options, $dst_options);
-	}
-
-	private function copyGraphs(array $copy_targetids): bool {
-		$src_options = ['graphids' => $this->getInput('graphids')]
-			+ ($this->hasInput('src_hostid') ? ['hostids' => $this->getInput('src_hostid')] : []);
-
-		$dst_options = in_array($this->getInput('copy_type'), [COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_TEMPLATE_GROUP])
-			? ['templateids' => $copy_targetids]
-			: ['hostids' => $copy_targetids];
-
-		return CGraphHelper::copy($src_options, $dst_options);
 	}
 
 	private function getTargetIds(): array {
