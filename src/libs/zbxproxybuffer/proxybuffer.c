@@ -29,6 +29,9 @@
 #include "zbxshmem.h"
 #include "zbxdbhigh.h"
 
+#define PB_DB_FLUSH_DISABLED	0
+#define PB_DB_FLUSH_ENABLED	1
+
 ZBX_PTR_VECTOR_IMPL(pb_history_ptr, zbx_pb_history_t *)
 ZBX_PTR_VECTOR_IMPL(pb_discovery_ptr, zbx_pb_discovery_t *)
 
@@ -467,7 +470,7 @@ static void	pb_flush_lastids(zbx_pb_t *pb)
 
 static void	pb_flush(zbx_pb_t *pb)
 {
-	if (ZBX_PB_MODE_HYBRID == pb->mode)
+	if (PB_DB_FLUSH_ENABLED == pb->flush_to_db)
 	{
 		do
 		{
@@ -633,8 +636,14 @@ void	zbx_pb_update_state(int more)
 void	zbx_pb_disable(void)
 {
 	pb_lock();
-	pb_data->state = PB_DATABASE;
-	pb_data->mode = ZBX_PB_MODE_DISK;
+
+	if (ZBX_PB_MODE_HYBRID == pb_data->mode)
+	{
+		pb_data->flush_to_db = PB_DB_FLUSH_ENABLED;
+		pb_data->state = PB_DATABASE;
+		pb_data->mode = ZBX_PB_MODE_DISK;
+	}
+
 	pb_unlock();
 }
 
