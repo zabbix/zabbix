@@ -116,6 +116,10 @@ class WidgetForm extends CWidgetForm {
 	public function validate(bool $strict = false): array {
 		$errors = parent::validate($strict);
 
+		if ($errors) {
+			return $errors;
+		}
+
 		$number_parser = new CNumberParser([
 			'with_size_suffix' => true,
 			'with_time_suffix' => true,
@@ -178,7 +182,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldNumericBox('max', _('Max')))
-				->setDefault(self::DEFAULT_MAX)
+					->setDefault(self::DEFAULT_MAX)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
