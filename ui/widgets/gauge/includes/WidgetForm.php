@@ -40,8 +40,7 @@ use Zabbix\Widgets\Fields\{
 };
 
 use API,
-	CNumberParser,
-	CParser;
+	CNumberParser;
 
 use Widgets\Gauge\Widget;
 
