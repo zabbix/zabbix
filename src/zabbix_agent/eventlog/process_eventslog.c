@@ -196,11 +196,7 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
  *                                                                            *
  * Parameters: wsource       - [IN] Event Log file name                       *
  *             pELR          - [IN] buffer with single Event Log Record       *
- *             out_source    - [OUT] ELR detail                               *
- *             out_message   - [OUT] ELR detail                               *
- *             out_severity  - [OUT] ELR detail                               *
- *             out_timestamp - [OUT] ELR detail                               *
- *             out_eventid   - [OUT] ELR detail                               *
+ *             ...           - [OUT] ELR detail                               *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_parse_eventlog_message(const wchar_t *wsource, const EVENTLOGRECORD *pELR, char **out_source,

@@ -88,7 +88,7 @@ typedef struct _EVT_VARIANT
 }
 EVT_VARIANT, *PEVT_VARIANT;
 
-typedef enum	_EVT_RENDER_CONTEXT_FLAGS
+typedef enum _EVT_RENDER_CONTEXT_FLAGS
 {
 	EvtRenderContextValues = 0,	/* render specific properties */
 	EvtRenderContextSystem,		/* render all system properties (System) */
@@ -96,7 +96,7 @@ typedef enum	_EVT_RENDER_CONTEXT_FLAGS
 }
 EVT_RENDER_CONTEXT_FLAGS;
 
-typedef enum	_EVT_QUERY_FLAGS
+typedef enum _EVT_QUERY_FLAGS
 {
 	EvtQueryChannelPath = 0x1,
 	EvtQueryFilePath = 0x2,
@@ -106,7 +106,7 @@ typedef enum	_EVT_QUERY_FLAGS
 }
 EVT_QUERY_FLAGS;
 
-typedef enum	_EVT_RENDER_FLAGS
+typedef enum _EVT_RENDER_FLAGS
 {
 	EvtRenderEventValues = 0,	/* variants */
 	EvtRenderEventXml,		/* XML */
@@ -114,7 +114,7 @@ typedef enum	_EVT_RENDER_FLAGS
 }
 EVT_RENDER_FLAGS;
 
-typedef enum	_EVT_FORMAT_MESSAGE_FLAGS
+typedef enum _EVT_FORMAT_MESSAGE_FLAGS
 {
 	EvtFormatMessageEvent = 1,
 	EvtFormatMessageLevel,
@@ -128,7 +128,7 @@ typedef enum	_EVT_FORMAT_MESSAGE_FLAGS
 }
 EVT_FORMAT_MESSAGE_FLAGS;
 
-typedef enum	_EVT_VARIANT_TYPE
+typedef enum _EVT_VARIANT_TYPE
 {
 	EvtVarTypeNull = 0,
 	EvtVarTypeString = 1,
@@ -598,13 +598,7 @@ cleanup:
  *             render_context - [IN] handle to rendering context              *
  *             event_bookmark - [IN/OUT] handle of Event record for parsing   *
  *             which          - [IN/OUT] position of Event Log record         *
- *             out_severity   - [OUT] ELR detail                              *
- *             out_timestamp  - [OUT] ELR detail                              *
- *             out_provider   - [OUT] ELR detail                              *
- *             out_source     - [OUT] ELR detail                              *
- *             out_message    - [OUT] ELR detail                              *
- *             out_eventid    - [OUT] ELR detail                              *
- *             out_keywords   - [OUT] ELR detail                              *
+ *             ...            - [OUT] ELR detail                              *
  *             error          - [OUT] error message in case of failure        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -781,8 +775,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, char **error)
 {
-#	define EVT_ARRAY_SIZE	100
-
+#define EVT_ARRAY_SIZE	100
 	const char	*str_severity;
 	zbx_uint64_t	keywords, i, reading_startpoint = 0;
 	wchar_t		*eventlog_name_w = NULL;

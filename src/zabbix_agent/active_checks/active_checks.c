@@ -1480,10 +1480,10 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 	ZBX_UNUSED(metric);
 	ZBX_UNUSED(process_value_cb);
 	ZBX_UNUSED(lastlogsize_sent);
-	ZBX_UNUSED(error);
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_timeout);
 	ZBX_UNUSED(config_hostname);
+	ZBX_UNUSED(error);
 
 	return FAIL;
 }

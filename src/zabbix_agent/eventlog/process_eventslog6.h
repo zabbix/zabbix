@@ -17,6 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZBX_EVENTLOG6_H
+#define ZBX_EVENTLOG6_H
+
 #include "../metrics.h"
 #include "../logfiles/logfiles.h"
 
@@ -37,3 +40,4 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
 		zbx_uint64_t *lastlogsize_sent, char **error);
+#endif /* ZBX_EVENTLOG6_H */

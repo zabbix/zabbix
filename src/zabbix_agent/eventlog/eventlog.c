@@ -199,7 +199,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 			zabbix_log(LOG_LEVEL_WARNING, "failed to process eventlog");
 		}
 	}
-	else if (versionInfo.dwMajorVersion < 6)    /* Windows versions before Vista */
+	else if (versionInfo.dwMajorVersion < 6)	/* Windows versions before Vista */
 	{
 		ret = process_eventslog(addrs, agent2_result, filename, regexps, pattern, key_severity, key_source,
 				key_logeventid, rate, process_value_cb, config_tls, config_timeout, config_source_ip,
