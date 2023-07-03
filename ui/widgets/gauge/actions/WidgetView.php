@@ -177,7 +177,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$number_parser->parse($this->fields_values['max']);
 		$config['max'] = $number_parser->calcValue();
 
-		if ($this->fields_values['scale_show'] == 1) {
+		$scale_show = $this->fields_values['scale_show'] == 1;
+
+		if ($scale_show) {
 			$config['scale'] = [
 				'show' => true,
 				'size' => $this->fields_values['scale_size']
@@ -190,16 +192,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$scale_units = '';
 			}
 
-			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $config['min']);
+			$scale_decimal_places = $this->fields_values['scale_decimal_places'];
+
+			$labels = self::makeValueLabels(['units' => $scale_units] + $item, $config['min'], $scale_decimal_places);
 			$config['scale']['min_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
 
-			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $config['max']);
+			$labels = self::makeValueLabels(['units' => $scale_units] + $item, $config['max'], $scale_decimal_places);
 			$config['scale']['max_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
 		}
 		else {
 			$config['scale']['show'] = false;
-
-			$scale_units = '';
 		}
 
 		$widget_description = $this->fields_values['description'];
@@ -273,12 +275,21 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$threshold_value = $number_parser->calcValue();
 
-			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $threshold_value);
+			if ($scale_show) {
+				$labels = self::makeValueLabels(['units' => $scale_units] + $item, $threshold_value,
+					$scale_decimal_places
+				);
+
+				$threshold_text = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
+			}
+			else {
+				$threshold_text = '';
+			}
 
 			$config['thresholds']['data'][] = [
 				'color' => $threshold['color'],
 				'value' => $threshold_value,
-				'text' => $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '')
+				'text' => $threshold_text
 			];
 		}
 
@@ -314,7 +325,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item['units'] = '';
 		}
 
-		$labels = $this->makeValueLabels($item, $value);
+		$labels = self::makeValueLabels($item, $value, $this->fields_values['decimal_places']);
 
 		return [
 			'value' => (float) $value,
@@ -330,9 +341,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			->getUrl();
 	}
 
-	private function makeValueLabels(array $item, $value): array {
+	private static function makeValueLabels(array $item, $value, int $decimal_places): array {
 		return formatHistoryValueRaw($value, $item, false, [
-			'decimals' => $this->fields_values['decimal_places'],
+			'decimals' => $decimal_places,
 			'decimals_exact' => true,
 			'small_scientific' => false,
 			'zero_as_zero' => false

@@ -60,6 +60,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
 	private const DEFAULT_SCALE_SHOW = 1;
+	private const DEFAULT_SCALE_DECIMAL_PLACES = 0;
 	private const DEFAULT_SCALE_SHOW_UNITS = 0;
 	private const DEFAULT_SCALE_SIZE_PERCENT = 10;
 
@@ -262,6 +263,13 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('scale_show', _('Scale')))->setDefault(self::DEFAULT_SCALE_SHOW)
+			)
+			->addField(
+				(new CWidgetFieldIntegerBox('scale_decimal_places', _('Decimal places'),
+					self::DECIMAL_PLACES_MIN, self::DECIMAL_PLACES_MAX
+				))
+					->setDefault(self::DEFAULT_SCALE_DECIMAL_PLACES)
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))

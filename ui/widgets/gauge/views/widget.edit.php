@@ -188,7 +188,8 @@ function getScaleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetF
 			(new CDiv([$scale_show_field->getView(), $scale_size_field->getLabel()]))->addClass('scale-show'),
 			(new CFormField([$scale_size_field->getView(), '%']))->addClass('field-size')
 		])
-		->addField(new CWidgetFieldCheckBoxView($fields['scale_show_units']));
+		->addField(new CWidgetFieldCheckBoxView($fields['scale_show_units']))
+		->addField(new CWidgetFieldIntegerBoxView($fields['scale_decimal_places']));
 }
 
 function getThresholdFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
