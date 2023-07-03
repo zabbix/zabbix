@@ -1126,7 +1126,7 @@ function getMenuPopupItem(options) {
 			execute.clickCallback = function() {
 				jQuery(this).closest('.menu-popup').menuPopup('close', null);
 
-				view.checkNow(options.itemid);
+				view.executeNow(null, {itemids: [options.itemid]});
 			};
 		}
 

@@ -31,8 +31,9 @@
 <script>
 	const view = new class {
 
-		init({confirm_messages}) {
+		init({confirm_messages, token}) {
 			this.confirm_messages = confirm_messages;
+			this.token = token;
 
 			this._initFilterForm();
 			this._initActions();
@@ -80,7 +81,7 @@
 				else if (target.classList.contains('js-massdisable-item')) {
 					this._disable(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (target.classList.contains('js-massexecute-item')) {
+				else if (target.classList.contains('js-execute-item')) {
 					this._execute(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massclearhistory-item')) {
@@ -102,28 +103,28 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.enable');
 
-			this._confirmWithPost(target, itemids, curl);
+			this._confirmWithPost(target, {itemids}, curl);
 		}
 
 		_disable(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.disable');
 
-			this._confirmWithPost(target, itemids, curl);
+			this._confirmWithPost(target, {itemids}, curl);
 		}
 
 		_execute(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
 
-			this._post(target, itemids, curl);
+			this._post(target, {itemids}, curl);
 		}
 
 		_clear(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.clear');
 
-			this._confirmWithPost(target, itemids, curl);
+			this._confirmWithPost(target, {itemids}, curl);
 		}
 
 		_copy(target, itemids) {
@@ -138,25 +139,20 @@
 			console.error('Not implemented');
 		}
 
-		_confirmWithPost(target, itemids, curl) {
+		_confirmWithPost(target, data, curl) {
 			const confirm = this.confirm_messages[curl.getArgument('action')];
-			const message = confirm[itemids.length > 1 ? 1 : 0];
+			const message = confirm[data.itemids.length > 1 ? 1 : 0];
 
 			if (message != '' && !window.confirm(message)) {
 				return;
 			}
 
-			this._post(target, {itemids}, curl);
+			this._post(target, data, curl);
 		}
 
 		_post(target, data, curl) {
 			target.classList.add('is-loading');
-
-			const csrf = document.querySelector('#item-csrf-token');
-
-			if (csrf) {
-				data[csrf.getAttribute('name')] = csrf.getAttribute('value');
-			}
+			data[this.token[0]] = this.token[1];
 
 			return fetch(curl.getUrl(), {
 				method: 'POST',

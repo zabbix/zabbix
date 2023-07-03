@@ -205,7 +205,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			button.classList.add('is-loading');
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
+			curl.setArgument('action', 'item.execute');
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
 			);

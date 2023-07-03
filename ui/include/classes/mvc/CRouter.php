@@ -149,7 +149,7 @@ class CRouter {
 		'item.list'									=> ['CControllerItemList',								'layout.htmlpage',		'item.list'],
 		'item.enable'								=> ['CControllerItemEnable',							'layout.json',			null],
 		'item.disable'								=> ['CControllerItemDisable',							'layout.json',			null],
-		'item.masscheck_now'						=> ['CControllerItemMassCheckNow',						'layout.json',			null],
+		'item.execute'								=> ['CControllerItemExecuteNow',						'layout.json',			null],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],

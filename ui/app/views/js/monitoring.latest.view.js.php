@@ -53,6 +53,7 @@
 
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
+			this.initListActions();
 
 			if (this.refresh_interval != 0) {
 				this.running = true;
@@ -240,6 +241,15 @@
 			this.getCurrentForm().replaceWith(body);
 			this.getCurrentSubfilter().replaceWith(subfilter);
 			chkbxRange.init();
+			this.initListActions();
+		},
+
+		initListActions() {
+			let form = this.getCurrentForm().get(0);
+
+			form.querySelector('.js-execute-now').addEventListener('click', e => {
+				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+			});
 		},
 
 		bindDataEvents(deferred) {
@@ -315,62 +325,20 @@
 			}
 		},
 
-		massCheckNow(button) {
-			button.classList.add('is-loading');
+		executeNow(button, data) {
+			if (button instanceof Element) {
+				button.classList.add('is-loading');
+			}
 
+			let clear_checkboxes = false;
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
+			curl.setArgument('action', 'item.execute');
+			data['<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>'] = <?= json_encode(CCsrfTokenHelper::get('item')) ?>;
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
 				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds())})
-			})
-				.then((response) => response.json())
-				.then((response) => {
-					clearMessages();
-
-					if ('error' in response) {
-						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
-					}
-					else if('success' in response) {
-						addMessage(makeMessageBox('good', [], response.success.title, true, false));
-
-						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
-						uncheckTableRows('latest', []);
-						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-						chkbxRange.update(this.checkbox_object);
-					}
-				})
-				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
-
-					clearMessages();
-					addMessage(message_box);
-				})
-				.finally(() => {
-					button.classList.remove('is-loading');
-
-					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
-					button.blur();
-				});
-		},
-
-		checkNow(itemid) {
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
-
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: [itemid]})
+				body: JSON.stringify(data)
 			})
 				.then((response) => response.json())
 				.then((response) => {
@@ -386,6 +354,7 @@
 						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
 					}
 					else if('success' in response) {
+						clear_checkboxes = true;
 						addMessage(makeMessageBox('good', [], response.success.title, true, false));
 					}
 				})
@@ -395,6 +364,21 @@
 
 					clearMessages();
 					addMessage(message_box);
+				})
+				.finally(() => {
+					if (!(button instanceof Element)) {
+						return;
+					}
+
+					if (clear_checkboxes) {
+						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
+						uncheckTableRows('latest', []);
+						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
+						chkbxRange.update(this.checkbox_object);
+					}
+
+					button.classList.remove('is-loading');
+					button.blur();
 				});
 		},
 

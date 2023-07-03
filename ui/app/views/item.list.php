@@ -37,7 +37,6 @@ $filter = new CPartial('item.list.filter', [
 $form = (new CForm())
 	->setId('item-list')
 	->setName('item_list')
-	->addVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item'), 'item-csrf-token')
 	->addVar('context', $data['context'])
 	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null);
 
@@ -236,9 +235,8 @@ $buttons = [
 	'item.massexecute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massexecute-item')
-			->addClass('js-no-chkbxrange')
 			->addClass('js-execute-now')
+			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	],
 	'item.massclearhistory' => [
@@ -313,6 +311,7 @@ $confirm_messages = [
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'token' => [CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('item')],
 		'confirm_messages' => $confirm_messages
 	]).');
 '))
