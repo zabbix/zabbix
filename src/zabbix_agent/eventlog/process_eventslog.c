@@ -692,7 +692,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 						str_severity = AUDIT_SUCCESS;
 						break;
 					default:
-						*error = zbx_dsprintf(*error, "Invalid severity detected: '%h.",
+						*error = zbx_dsprintf(*error, "Invalid severity detected: '%hu'.",
 								severity);
 						goto out;
 				}
