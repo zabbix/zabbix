@@ -721,7 +721,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 		data->rows_num = 0;
 	}
 
-	if (PB_DATABASE == pb_dst[pb_data->state])
+	if (PB_DATABASE == pb_dst[data->state])
 	{
 		zbx_db_insert_prepare(&data->db_insert, "proxy_history", "id", "itemid", "clock", "timestamp", "source",
 				"severity", "value", "logeventid", "ns", "state", "lastlogsize", "mtime", "flags",
