@@ -172,7 +172,7 @@ class CDashboard {
 
 				this._dashboard_tabs = new CSortable(sortable_element, {
 					is_vertical: false,
-					is_sorting_enabled: this._is_edit_mode
+					is_sorting_enabled: false
 				});
 
 				this._tabs_dashboard_tabs = new Map();
@@ -1968,7 +1968,7 @@ class CDashboard {
 		this._buttons.previous_dashboard.disabled = this._selected_dashboard_tab.previousElementSibling === null;
 		this._buttons.next_dashboard.disabled = this._selected_dashboard_tab.nextElementSibling === null;
 
-		// this._tabs.scrollItemIntoView(this._selected_dashboard_tab);
+		this._dashboard_tabs.scrollItemIntoView(this._selected_dashboard_tab);
 	}
 
 	// Internal events management methods.
