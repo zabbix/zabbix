@@ -214,6 +214,8 @@ typedef int	(*zbx_macro_expand_func_t)(void *data, char **str, const zbx_uint64_
 		char **error);
 
 int	zbx_eval_parse_expression(zbx_eval_context_t *ctx, const char *expression, zbx_uint64_t rules, char **error);
+int	zbx_eval_parse_expression_str_v64_compat(zbx_eval_context_t *ctx, const char *expression,
+		zbx_uint64_t rules, char **error);
 void	zbx_eval_init(zbx_eval_context_t *ctx);
 void	zbx_eval_clear(zbx_eval_context_t *ctx);
 int	zbx_eval_status(const zbx_eval_context_t *ctx);
@@ -253,6 +255,7 @@ char	*zbx_eval_format_function_error(const char *function, const char *host, con
 		const char *parameter, const char *error);
 
 void	zbx_eval_extract_item_refs(zbx_eval_context_t *ctx, zbx_vector_str_t *refs);
+int	zbx_eval_compare_tokens_by_loc(const void *d1, const void *d2);
 
 typedef struct
 {

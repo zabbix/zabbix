@@ -38,11 +38,12 @@ class CHistFunctionParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false    Enable user macros usage in function parameters.
-	 *   'lldmacros' => false     Enable low-level discovery macros usage in function parameters.
-	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *   'usermacros' => false             Enable user macros usage in function parameters.
+	 *   'lldmacros' => false              Enable low-level discovery macros usage in function parameters.
+	 *   'host_macro' => false             Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false           Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false             Allow empty hostname in the query string.
+	 *   'no_backslash_escaping' => false  Enable backslash escaping in history functions.
 	 *
 	 * @var array
 	 */
@@ -52,7 +53,8 @@ class CHistFunctionParser extends CParser {
 		'calculated' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'no_backslash_escaping' => false
 	];
 
 	private $query_parser;
@@ -328,6 +330,14 @@ class CHistFunctionParser extends CParser {
 				case self::STATE_QUOTED:
 					$_parameters[$num]['match'] .= $source[$p];
 					$_parameters[$num]['length']++;
+
+					if ($this->options['no_backslash_escaping']) {
+						if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
+							$state = self::STATE_END;
+						}
+
+						break;
+					}
 
 					switch ($source[$p]) {
 						case '\\':
