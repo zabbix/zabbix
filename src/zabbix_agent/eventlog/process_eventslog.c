@@ -691,6 +691,10 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 						severity = ITEM_LOGTYPE_SUCCESS_AUDIT;
 						str_severity = AUDIT_SUCCESS;
 						break;
+					default:
+						*error = zbx_dsprintf(*error, "Invalid severity detected: '%h.",
+								severity);
+						goto out;
 				}
 
 				zbx_snprintf(str_logeventid, sizeof(str_logeventid), "%lu", logeventid);
@@ -736,9 +740,11 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 						ret = FAIL;
 						break;
 					}
-
-					match = ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
-							ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4;
+					else
+					{
+						match = ZBX_REGEXP_MATCH == ret1 && ZBX_REGEXP_MATCH == ret2 &&
+								ZBX_REGEXP_MATCH == ret3 && ZBX_REGEXP_MATCH == ret4;
+					}
 				}
 				else
 				{
