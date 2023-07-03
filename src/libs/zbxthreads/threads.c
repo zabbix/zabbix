@@ -44,7 +44,7 @@ void CALLBACK	ZBXEndThread(ULONG_PTR dwParam)
 #else
 /******************************************************************************
  *                                                                            *
- * Purpose: Flush stdout and stderr before forking                            *
+ * Purpose: Flush stdout and stderr before forking.                           *
  *                                                                            *
  * Return value: same as system fork() function                               *
  *                                                                            *
@@ -60,7 +60,7 @@ int	zbx_fork(void)
  *                                                                            *
  * Purpose: fork from master process and set SIGCHLD handler                  *
  *                                                                            *
- * Return value: same as system fork() function                               *
+ * Parameters: pid - [OUT]                                                    *
  *                                                                            *
  * Comments: use this function only for forks from the main process           *
  *                                                                            *
@@ -93,7 +93,7 @@ void	zbx_child_fork(pid_t *pid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Start the handled function as "thread"                            *
+ * Purpose: Start handler function as "thread".                               *
  *                                                                            *
  * Parameters: handler     - [IN] new thread starts execution from this       *
  *                                handler function                            *
@@ -106,11 +106,12 @@ void	zbx_child_fork(pid_t *pid)
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread)
 {
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	unsigned		thrdaddr;
+	unsigned	thrdaddr;
 
 	thread_args->entry = handler;
 	/* NOTE: _beginthreadex returns 0 on failure, rather than 1 */
-	if (0 == (*thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0, &thrdaddr)))
+	if (0 == (*thread = (ZBX_THREAD_HANDLE)_beginthreadex(NULL, 0, zbx_win_thread_entry, thread_args, 0,
+			&thrdaddr)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "failed to create a thread: %s", zbx_strerror_from_system(GetLastError()));
 		*thread = (ZBX_THREAD_HANDLE)ZBX_THREAD_ERROR;
@@ -137,9 +138,9 @@ void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thre
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Waits until the "thread" is in the signalled state                *
+ * Purpose: Waits until the thread is in the signalled state.                 *
  *                                                                            *
- * Parameters: "thread" handle                                                *
+ * Parameters: thread - [IN] thread handle                                    *
  *                                                                            *
  * Return value: process or thread exit code                                  *
  *                                                                            *
@@ -194,7 +195,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sends termination signal to "threads"                             *
+ * Purpose: sends termination signal to threads                               *
  *                                                                            *
  * Parameters: threads       - [IN] handles to threads or processes           *
  *             threads_num   - [IN] number of handles                         *
@@ -208,9 +209,7 @@ int	zbx_thread_wait(ZBX_THREAD_HANDLE thread)
 static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int *threads_flags, int priority,
 		int ret)
 {
-	int	i;
-
-	for (i = 0; i < threads_num; i++)
+	for (int i = 0; i < threads_num; i++)
 	{
 		if (!threads[i])
 			continue;
@@ -230,17 +229,20 @@ static void	threads_kill(ZBX_THREAD_HANDLE *threads, int threads_num, const int 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Waits until the "threads" are in the signalled state              *
+ * Purpose: Kills and waits until the threads are in the signalled state.     *
  *                                                                            *
- * Parameters: "threads" handles                                              *
+ * Parameters: threads       - [IN] handles to threads or processes           *
+ *             threads_flags - [IN] thread priority flags                     *
+ *             threads_num   - [IN] number of handles                         *
+ *             ret           - [IN] terminate thread politely on SUCCEED or   *
+ *                                  ask all threads to exit immediately on    *
+ *                                  FAIL                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
 {
-	int		i;
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
-	int		j;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
@@ -250,11 +252,11 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	/* signal all threads to go into idle state and wait for threads with higher priority to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
 
-	for (j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
+	for (int j = ZBX_THREAD_PRIORITY_FIRST; j < ZBX_THREAD_PRIORITY_COUNT; j++)
 	{
 		threads_kill(threads, threads_num, threads_flags, j, ret);
 
-		for (i = 0; i < threads_num; i++)
+		for (int i = 0; i < threads_num; i++)
 		{
 			if (!threads[i] || j != threads_flags[i])
 				continue;
@@ -268,12 +270,12 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 	/* signal idle threads to exit */
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, FAIL);
 #else
-	/* wait for threads to finish first. although listener threads will never end */
+	/* wait for threads to finish first; although listener threads will never end */
 	WaitForMultipleObjectsEx(threads_num, threads, TRUE, 1000, FALSE);
 	threads_kill(threads, threads_num, threads_flags, ZBX_THREAD_PRIORITY_NONE, ret);
 #endif
 
-	for (i = 0; i < threads_num; i++)
+	for (int i = 0; i < threads_num; i++)
 	{
 		if (!threads[i])
 			continue;
@@ -282,15 +284,6 @@ void	zbx_threads_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int 
 
 		threads[i] = ZBX_THREAD_HANDLE_NULL;
 	}
-}
-
-long int	zbx_get_thread_id(void)
-{
-#if defined(_WINDOWS) || defined(__MINGW32__)
-	return (long int)GetCurrentThreadId();
-#else
-	return (long int)getpid();
-#endif
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)

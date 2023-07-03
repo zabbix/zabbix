@@ -639,7 +639,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 
 		if ($show_timeline) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 

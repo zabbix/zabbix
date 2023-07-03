@@ -172,6 +172,9 @@
 
 					return ui;
 				},
+				start: (e, ui) => {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
 				stop: (e, ui) => {
 					for (const td of ui.item.find('>td')) {
 						jQuery(td).removeAttr('style');

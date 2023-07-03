@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-19 18:52+0000\n"
+"PO-Revision-Date: 2023-06-20 18:12+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2481,7 +2481,7 @@ msgstr "Impossible de créer un rôle utilisateur"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:56
 msgid "Cannot create web scenario step"
-msgstr ""
+msgstr "Impossible de créer une étape de scénario web"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -4197,7 +4197,7 @@ msgstr "Impossible de mettre à jour le scénario web"
 
 #: app/controllers/CControllerWebScenarioStepCheck.php:57
 msgid "Cannot update web scenario step"
-msgstr ""
+msgstr "Impossible de mettre à jour l'étape du scénario web"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -14222,7 +14222,7 @@ msgstr "Nouveau service"
 
 #: app/views/webscenario.step.edit.php:286
 msgid "New step of web scenario"
-msgstr ""
+msgstr "Nouvelle étape du scénario web"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
