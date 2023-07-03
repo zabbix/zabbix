@@ -41,10 +41,15 @@ function local_showHeader(array $data): void {
 				: null;
 
 			if ($url_to_check) {
-				foreach ($allowed_urls as $allowed_url) {
-					if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-						$x_frame_options = $allowed_url;
-						break;
+				if ($url_to_check == $_SERVER['HTTP_HOST']) {
+					$allowed_urls[] = $_SERVER['HTTP_HOST'];
+					$x_frame_options = implode(' ', $allowed_urls);
+				} else {
+					foreach ($allowed_urls as $allowed_url) {
+						if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
+							$x_frame_options = $allowed_url;
+							break;
+						}
 					}
 				}
 			}
