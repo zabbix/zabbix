@@ -154,8 +154,7 @@ if ($data['has_time_selector']) {
 	);
 }
 
-if (count($data['dashboard']['pages']) > 1
-		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
+if (count($data['dashboard']['pages']) >= 1) {
 	$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 
 	if (count($data['dashboard']['pages']) > 1) {
@@ -195,14 +194,16 @@ if (count($data['dashboard']['pages']) > 1
 
 	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-	$html_page
-		->addItem($dashboard)
-		->show();
-}
-else {
-	$html_page
-		->addItem(new CTableInfo())
-		->show();
+	$html_page->addItem($dashboard);
+
+	if (count($data['dashboard']['pages']) == 1 && !$data['dashboard']['pages'][0]['widgets']) {
+		$html_page->addItem((new CDiv())
+			->addStyle('margin-top: 5px;')
+			->addItem(new CTableInfo())
+		);
+	}
+
+	$html_page->show();
 }
 
 (new CScriptTag('

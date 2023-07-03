@@ -214,6 +214,14 @@ class CDashboard {
 		}
 	}
 
+	activateDashboardTabs() {
+		this._activateEvents();
+
+		if (this._data.with_dashboard_tabs) {
+			this._selectDashboardTab();
+		}
+	}
+
 	// External events management methods.
 
 	isEditMode() {
