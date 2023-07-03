@@ -29,14 +29,14 @@ window.widget_gauge_form = new class {
 		this._value_arc = document.getElementById('value_arc');
 		this._units_show = document.getElementById('units_show');
 		this._needle_show = document.getElementById('needle_show');
-		this._minmax_show = document.getElementById('minmax_show');
+		this._scale_show = document.getElementById('scale_show');
 		this._th_show_arc = document.getElementById('th_show_arc');
 
 		const checkboxes = [
 			this._value_arc,
 			this._units_show,
 			this._needle_show,
-			this._minmax_show,
+			this._scale_show,
 			this._th_show_arc
 		];
 
@@ -75,14 +75,14 @@ window.widget_gauge_form = new class {
 
 		document.getElementById('value_arc_size').disabled = !this._value_arc.checked;
 
-		document.getElementById('minmax_show').disabled = (!this._th_show_arc.checked || this._th_show_arc.disabled)
+		document.getElementById('scale_show').disabled = (!this._th_show_arc.checked || this._th_show_arc.disabled)
 			&& !this._value_arc.checked;
 
-		document.getElementById('minmax_size').disabled = !this._minmax_show.checked || this._minmax_show.disabled
+		document.getElementById('scale_size').disabled = !this._scale_show.checked || this._scale_show.disabled
 			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled) && !this._value_arc.checked);
 
-		document.getElementById('minmax_show_units').disabled = !this._units_show.checked || !this._minmax_show.checked
-			|| this._minmax_show.disabled
+		document.getElementById('scale_show_units').disabled = !this._units_show.checked || !this._scale_show.checked
+			|| this._scale_show.disabled
 			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled) && !this._value_arc.checked);
 
 		for (const element of

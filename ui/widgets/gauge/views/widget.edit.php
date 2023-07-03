@@ -26,8 +26,6 @@
  * @var array $data
  */
 
-use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
-
 $form = new CWidgetFormView($data);
 
 $form
@@ -56,7 +54,7 @@ $form
 				getNeedleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-needle')
 			)
 			->addFieldsGroup(
-				getMinMaxFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-minmax')
+				getScaleFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-scale')
 			)
 			->addField(
 				(new CWidgetFieldColorView($data['fields']['empty_color']))->addRowClass('js-row-empty-color')
@@ -181,16 +179,16 @@ function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidget
 		]);
 }
 
-function getMinMaxFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
-	$minmax_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['minmax_show']));
-	$minmax_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['minmax_size']));
+function getScaleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
+	$scale_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show']));
+	$scale_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['scale_size']));
 
-	return (new CWidgetFieldsGroupView(_('Min/Max')))
+	return (new CWidgetFieldsGroupView(_('Scale')))
 		->addItem([
-			(new CDiv([$minmax_show_field->getView(), $minmax_size_field->getLabel()]))->addClass('minmax-show'),
-			(new CFormField([$minmax_size_field->getView(), '%']))->addClass('field-size')
+			(new CDiv([$scale_show_field->getView(), $scale_size_field->getLabel()]))->addClass('scale-show'),
+			(new CFormField([$scale_size_field->getView(), '%']))->addClass('field-size')
 		])
-		->addField(new CWidgetFieldCheckBoxView($fields['minmax_show_units']));
+		->addField(new CWidgetFieldCheckBoxView($fields['scale_show_units']));
 }
 
 function getThresholdFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {

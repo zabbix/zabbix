@@ -49,7 +49,7 @@ class CSVGGauge {
 	static UNITS_POSITION_AFTER = 2;
 	static UNITS_POSITION_BELOW = 3;
 
-	static MINMAX_SIZE_DEFAULT = 10;
+	static SCALE_SIZE_DEFAULT = 10;
 
 	static ARCS_GAP = 2;
 
@@ -194,7 +194,7 @@ class CSVGGauge {
 				this.#createNeedle();
 			}
 
-			if (this.#config.minmax.show || this.#config.thresholds.show_labels) {
+			if (this.#config.scale.show || this.#config.thresholds.show_labels) {
 				this.#createLabels();
 			}
 		}
@@ -511,22 +511,22 @@ class CSVGGauge {
 	 * Create and position min/max and threshold labels.
 	 */
 	#createLabels() {
-		const minmax_size = this.#config.minmax.show ? this.#config.minmax.size : CSVGGauge.MINMAX_SIZE_DEFAULT;
-		const font_size = minmax_size / 100;
+		const scale_size = this.#config.scale.show ? this.#config.scale.size : CSVGGauge.SCALE_SIZE_DEFAULT;
+		const font_size = scale_size / 100;
 		const radius = 1 + font_size * CSVGGauge.LABEL_GAP / 100;
 
 		const labels_data = this.#config.thresholds.show_labels ? [...this.#config.thresholds.data] : [];
 
-		if (this.#config.minmax.show) {
+		if (this.#config.scale.show) {
 			const do_add_min = labels_data.length === 0 || this.#config.min < labels_data[0].value;
 			const do_add_max = labels_data.length === 0 || this.#config.max > labels_data[labels_data.length - 1].value;
 
 			if (do_add_min) {
-				labels_data.push({value: this.#config.min, text: this.#config.minmax.min_text});
+				labels_data.push({value: this.#config.min, text: this.#config.scale.min_text});
 			}
 
 			if (do_add_max) {
-				labels_data.push({value: this.#config.max, text: this.#config.minmax.max_text});
+				labels_data.push({value: this.#config.max, text: this.#config.scale.max_text});
 			}
 		}
 

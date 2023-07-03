@@ -56,12 +56,12 @@ class WidgetForm extends CWidgetForm {
 	private const ANGLES = [180, 270];
 	private const DEFAULT_ANGLE = 180;
 
-	// Min/Max defaults.
+	// Scale defaults.
 	private const DEFAULT_MIN = 0;
 	private const DEFAULT_MAX = 100;
-	private const DEFAULT_MINMAX_SHOW = 1;
-	private const DEFAULT_MINMAX_SHOW_UNITS = 0;
-	private const DEFAULT_MINMAX_SIZE_PERCENT = 10;
+	private const DEFAULT_SCALE_SHOW = 1;
+	private const DEFAULT_SCALE_SHOW_UNITS = 0;
+	private const DEFAULT_SCALE_SIZE_PERCENT = 10;
 
 	// Description defaults.
 	private const DEFAULT_DESCRIPTION_SIZE_PERCENT = 15;
@@ -261,15 +261,15 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('needle_color', _('Color'))
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('minmax_show', _('Min/Max')))->setDefault(self::DEFAULT_MINMAX_SHOW)
+				(new CWidgetFieldCheckBox('scale_show', _('Scale')))->setDefault(self::DEFAULT_SCALE_SHOW)
 			)
 			->addField(
-				(new CWidgetFieldIntegerBox('minmax_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
-					->setDefault(self::DEFAULT_MINMAX_SIZE_PERCENT)
+				(new CWidgetFieldIntegerBox('scale_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+					->setDefault(self::DEFAULT_SCALE_SIZE_PERCENT)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('minmax_show_units', _('Show units')))
-					->setDefault(self::DEFAULT_MINMAX_SHOW_UNITS)
+				(new CWidgetFieldCheckBox('scale_show_units', _('Show units')))
+					->setDefault(self::DEFAULT_SCALE_SHOW_UNITS)
 			)
 			->addField(
 				new CWidgetFieldColor('empty_color', _('Empty color'))

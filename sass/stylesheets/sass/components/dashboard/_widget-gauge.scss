@@ -5,7 +5,7 @@ form.dashboard-widget-gauge {
 		&.fields-group-description,
 		&.fields-group-value,
 		&.fields-group-needle,
-		&.fields-group-minmax,
+		&.fields-group-scale,
 		&.fields-group-thresholds {
 			display: grid;
 			grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
@@ -70,11 +70,11 @@ form.dashboard-widget-gauge {
 			}
 		}
 
-		&.fields-group-minmax {
-			.minmax-show {
+		&.fields-group-scale {
+			.scale-show {
 				display: flex;
 
-				label[for='minmax_size'] {
+				label[for='scale_size'] {
 					width: 100%;
 				}
 			}

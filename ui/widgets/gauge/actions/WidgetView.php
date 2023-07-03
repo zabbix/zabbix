@@ -177,29 +177,29 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$number_parser->parse($this->fields_values['max']);
 		$config['max'] = $number_parser->calcValue();
 
-		if ($this->fields_values['minmax_show'] == 1) {
-			$config['minmax'] = [
+		if ($this->fields_values['scale_show'] == 1) {
+			$config['scale'] = [
 				'show' => true,
-				'size' => $this->fields_values['minmax_size']
+				'size' => $this->fields_values['scale_size']
 			];
 
-			if ($this->fields_values['units_show'] == 1 && $this->fields_values['minmax_show_units'] == 1) {
-				$minmax_units = $this->fields_values['units'] !== '' ? $this->fields_values['units'] : $item['units'];
+			if ($this->fields_values['units_show'] == 1 && $this->fields_values['scale_show_units'] == 1) {
+				$scale_units = $this->fields_values['units'] !== '' ? $this->fields_values['units'] : $item['units'];
 			}
 			else {
-				$minmax_units = '';
+				$scale_units = '';
 			}
 
-			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $config['min']);
-			$config['minmax']['min_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
+			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $config['min']);
+			$config['scale']['min_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
 
-			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $config['max']);
-			$config['minmax']['max_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
+			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $config['max']);
+			$config['scale']['max_text'] = $labels['value'].($labels['units'] !== '' ? ' '.$labels['units'] : '');
 		}
 		else {
-			$config['minmax']['show'] = false;
+			$config['scale']['show'] = false;
 
-			$minmax_units = '';
+			$scale_units = '';
 		}
 
 		$widget_description = $this->fields_values['description'];
@@ -273,7 +273,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$threshold_value = $number_parser->calcValue();
 
-			$labels = $this->makeValueLabels(['units' => $minmax_units] + $item, $threshold_value);
+			$labels = $this->makeValueLabels(['units' => $scale_units] + $item, $threshold_value);
 
 			$config['thresholds']['data'][] = [
 				'color' => $threshold['color'],
