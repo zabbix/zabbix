@@ -121,7 +121,7 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 			->addItem(
 				(new CDiv())
 					->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_CONTROLS_LEFT)
-					->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+					->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_DASHBOARD)
 					)
 			)
@@ -132,7 +132,7 @@ if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
 					->addItem([
 						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
 							->addClass(ZBX_STYLE_BTN_DASHBOARD_LIST),
-						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
 							->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_DASHBOARD)
 					])
 			)
