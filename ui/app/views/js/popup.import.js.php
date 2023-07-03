@@ -89,20 +89,36 @@ function openImportComparePopup(overlay) {
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			document.getElementById('import_file').value = '';
-			$(response.errors).insertBefore(form);
-		}
-		else {
-			overlayDialogue({
-				title: response.header,
-				class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
-				content: response.body,
-				buttons: response.buttons,
-				script_inline: response.script_inline,
-				debug: response.debug
-			}, overlay.$btn_submit);
+			throw {error: response.errors};
 		}
 
+		overlayDialogue({
+			title: response.header,
+			class: response.no_changes ? 'position-middle' : 'modal-popup modal-popup-fullscreen',
+			content: response.body,
+			buttons: response.buttons,
+			script_inline: response.script_inline,
+			debug: response.debug
+		}, overlay.$btn_submit);
+	})
+	.catch((exception) => {
+		document.getElementById('import_file').value = '';
+
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title);
+
+		message_box.insertBefore(form);
+	})
+	.finally(() => {
 		overlay.unsetLoading();
 	});
 }
@@ -126,18 +142,39 @@ function submitImportPopup(overlay) {
 	.then((response) => response.json())
 	.then((response) => {
 		if ('errors' in response) {
-			document.getElementById('import_file').value = '';
-			overlay.unsetLoading();
-			$(response.errors).insertBefore(form);
+			throw {error: response.errors};
+		}
+
+		postMessageOk(response.title);
+
+		if ('messages' in response) {
+			postMessageDetails('success', response.messages);
+		}
+
+		overlayDialogueDestroy(overlay.dialogueid);
+
+		location.href = location.href.split('#')[0];
+
+	})
+	.catch((exception) => {
+		document.getElementById('import_file').value = '';
+
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
 		}
 		else {
-			postMessageOk(response.title);
-			if ('messages' in response) {
-				postMessageDetails('success', response.messages);
-			}
-			overlayDialogueDestroy(overlay.dialogueid);
-			location.href = location.href.split('#')[0];
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
+
+		const message_box = makeMessageBox('bad', messages, title);
+
+		message_box.insertBefore(form);
+	})
+	.finally(() => {
+		overlay.unsetLoading();
 	});
 }
 
