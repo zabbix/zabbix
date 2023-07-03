@@ -61,6 +61,7 @@ class CSVGGauge {
 
 	static NEEDLE_GAP = 20;
 
+	// Synchronize with CSS stroke for ZBX_STYLE_NEEDLE class.
 	static NEEDLE_STROKE_BRIGHTNESS = 0.85;
 
 	static ANIMATE_DURATION = 500;

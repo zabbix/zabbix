@@ -3183,7 +3183,7 @@ section {
     text-anchor: middle; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
-    fill: #ffffff; }
+    fill: #f3f3f3; }
   .svg-gauge .svg-gauge-value-arc-sector {
     fill: #555555; }
   .svg-gauge .svg-gauge-value-arc-sector,
@@ -3191,7 +3191,7 @@ section {
     transition: fill 0.5s ease-in-out; }
   .svg-gauge .svg-gauge-needle {
     fill: #000000;
-    stroke: #000000;
+    stroke: black;
     vector-effect: non-scaling-stroke;
     transition: fill 0.5s ease-in-out, stroke 0.5s ease-in-out; }
   .svg-gauge .svg-gauge-label-left {

@@ -23,7 +23,10 @@
 
 	.svg-gauge-needle {
 		fill: $gauge-needle-color;
-		stroke: $gauge-needle-color;
+
+		// Synchronize with JavaScript CSVGGauge.NEEDLE_STROKE_BRIGHTNESS.
+		stroke: darken($gauge-needle-color, 15);
+
 		vector-effect: non-scaling-stroke;
 		transition: fill $transition, stroke $transition;
 	}

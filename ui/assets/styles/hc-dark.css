@@ -3183,15 +3183,15 @@ section {
     text-anchor: middle; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
-    fill: #000000; }
+    fill: #111111; }
   .svg-gauge .svg-gauge-value-arc-sector {
-    fill: #555555; }
+    fill: #ffffff; }
   .svg-gauge .svg-gauge-value-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
     transition: fill 0.5s ease-in-out; }
   .svg-gauge .svg-gauge-needle {
     fill: #ffffff;
-    stroke: #ffffff;
+    stroke: #d9d9d9;
     vector-effect: non-scaling-stroke;
     transition: fill 0.5s ease-in-out, stroke 0.5s ease-in-out; }
   .svg-gauge .svg-gauge-label-left {
