@@ -472,9 +472,11 @@ func sessionToMap(session interface{}) (out map[string]string, err error) {
 
 func setDefaults(params map[string]string, hardcoded map[string]bool, defaults map[string]string) {
 	for k, v := range defaults {
-		p := params[k]
-		if p == "" || hardcoded[k] {
-			params[k] = v
+		if v != "" {
+			p := params[k]
+			if p == "" || hardcoded[k] {
+				params[k] = v
+			}
 		}
 	}
 }

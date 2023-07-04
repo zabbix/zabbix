@@ -2611,6 +2611,21 @@ $icon-widget-btn: (
 	border-color: $form-disabled-border-color;
 }
 
+/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
+.safari {
+	%form-disabled {
+		-webkit-text-fill-color: $form-disabled-font-color;
+	}
+
+	input,
+	textarea {
+		&[readonly] {
+			-webkit-text-fill-color: $font-color !important;
+			@extend %form-disabled;
+		}
+	}
+}
+
 .inaccessible {
 	.subfilter-enabled {
 		color: darken($font-selected-color, 25%);

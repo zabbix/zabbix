@@ -251,6 +251,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		if (CTestArrayHelper::get($data, 'disabled')) {
 			$this->query('button:Disable')->one()->click();
 			$this->page->acceptAlert();
+			$this->assertMessage(TEST_GOOD, 'Discovery rule disabled');
 			$this->selectTableRows($data['names']);
 		}
 
