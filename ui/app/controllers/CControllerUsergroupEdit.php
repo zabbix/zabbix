@@ -83,7 +83,6 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	protected function doAction() {
-		// default values
 		$db_defaults = DB::getDefaults('usrgrp');
 		$data = [
 			'usrgrpid' => 0,
@@ -95,7 +94,6 @@ class CControllerUsergroupEdit extends CController {
 			'form_refresh' => 0
 		];
 
-		// get values from the database
 		if ($this->hasInput('usrgrpid')) {
 			$data['usrgrpid'] = $this->user_group['usrgrpid'];
 			$data['name'] = $this->user_group['name'];
@@ -105,11 +103,67 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
-		// overwrite with input variables
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
 
 		$data['group_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
+
+		$groupedTemplateRights = [];
+		foreach ($data['templategroup_rights'] as $id => $right) {
+			if ($right['permission'] == PERM_NONE) {
+				continue;
+			}
+			switch ($right['permission']) {
+				case PERM_DENY:
+					$group = PERM_DENY;
+					break;
+				case PERM_READ:
+					$group = PERM_READ;
+					break;
+				case PERM_READ_WRITE:
+					$group = PERM_READ_WRITE;
+					break;
+				default:
+					$group = PERM_NONE;
+			}
+
+			if (!isset($groupedTemplateRights[$group])) {
+				$groupedTemplateRights[$group] = [];
+			}
+
+			$groupedTemplateRights[$group][$id] = $right;
+		}
+
+		$data['templategroup_rights'] = $groupedTemplateRights;
+
+		$groupedHostRights = [];
+		foreach ($data['group_rights'] as $id => $right) {
+			if ($right['permission'] == PERM_NONE) {
+				continue;
+			}
+			switch ($right['permission']) {
+				case PERM_DENY:
+					$group = PERM_DENY;
+					break;
+				case PERM_READ:
+					$group = PERM_READ;
+					break;
+				case PERM_READ_WRITE:
+					$group = PERM_READ_WRITE;
+					break;
+				default:
+					$group = PERM_NONE;
+			}
+
+			if (!isset($groupedHostRights[$group])) {
+				$groupedHostRights[$group] = [];
+			}
+
+			$groupedHostRights[$group][$id] = $right;
+		}
+
+		$data['group_rights'] = $groupedHostRights;
+
 		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
 			'groupids' => [],
 			'permission' => PERM_NONE,

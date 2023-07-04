@@ -24,27 +24,175 @@
  */
 ?>
 
+<script>
+	const view = new class {
+		init({templategroup_rights, hostgroup_rights, tag_filters}) {
+			this.templategroup_rights = templategroup_rights;
+			this.template_permission_template = new Template(document.getElementById('template-permissions-row-template').innerHTML);
+			this.template_counter = 0;
+
+			this.hostgroup_rights = hostgroup_rights;
+			this.host_permission_template = new Template(document.getElementById('host-permissions-row-template').innerHTML);
+			this.host_counter = 0;
+
+			this.tag_filters = tag_filters;
+			this.tag_filter_template = new Template(document.getElementById('tab-filter-row-template').innerHTML);
+			this.tag_filter_counter = 0;
+
+			const permissionTypes = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
+
+			permissionTypes.forEach(permissionType => {
+				if (this.templategroup_rights[permissionType]) {
+					this.#addTemplateRow(this.templategroup_rights[permissionType], permissionType)
+				}
+				if (this.hostgroup_rights[permissionType]) {
+					this.#addHostRow(this.hostgroup_rights[permissionType], permissionType)
+				}
+			})
+
+			this.tag_filters.forEach(tagFilter => {
+				this.#addTagFilterRow(tagFilter);
+			});
+
+			document.querySelector('.add-new-template-row').addEventListener('click', () => this.#addTemplateRow());
+			document.querySelector('.add-new-host-row').addEventListener('click', () => this.#addHostRow());
+			document.querySelector('.add-new-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
+
+			document.getElementById('update').addEventListener('click', function() {
+				let groups = [];
+
+				document.querySelectorAll('.multiselect').forEach(function(multiselect) {
+					let selectedItems = $(multiselect).multiSelect('getSelectedItems');
+					let groupIds = selectedItems.map(function(item) {
+						return item.id;
+					});
+					groups.push(groupIds);
+				});
+			});
+		}
+
+		#addTemplateRow(templategroup_rights = [], permission = <?= PERM_NONE ?>) {
+			const rowid = this.template_counter++;
+			const data = {
+				'rowid': rowid
+			};
+
+			document
+				.getElementById('new-templategroup-right-table')
+				.insertAdjacentHTML('beforeend', this.template_permission_template.evaluate(data));
+
+			const ms = document.getElementById('ms_new_templategroup_right_groupids_'+rowid+'_');
+			$(ms).multiSelect();
+
+			for (const id in templategroup_rights) {
+				if (templategroup_rights[id]['permission'] == <?= PERM_NONE ?> || templategroup_rights.length == 0) {
+					continue;
+				}
+
+				const groups = {
+					'id': id,
+					'name': templategroup_rights[id]['name']
+				};
+				$(ms).multiSelect('addData', [groups]);
+			}
+
+			const permission_radio = document
+				.querySelector('input[name="new_templategroup_right[permission][' + rowid + ']"][value="' + permission + '"]')
+				.closest('li');
+			permission_radio.querySelector('input[type="radio"]').checked = true;
+
+			document.getElementById('user-group-form').addEventListener('click', event => {
+				if (event.target.classList.contains('element-table-remove')) {
+					this.#removeRow(event.target);
+				}
+			});
+		}
+
+		#addHostRow(hostgroup_rights = [], permission = <?= PERM_NONE ?>) {
+			const rowid = this.host_counter++;
+			const data = {
+				'rowid': rowid
+			};
+
+			document
+				.getElementById('new-group-right-table')
+				.insertAdjacentHTML('beforeend', this.host_permission_template.evaluate(data));
+
+			const ms = document.getElementById('ms_new_group_right_groupids_'+rowid+'_');
+			$(ms).multiSelect();
+
+			for (const id in hostgroup_rights) {
+				if (hostgroup_rights[id]['permission'] == <?= PERM_NONE ?> || hostgroup_rights.length == 0) {
+					continue;
+				}
+
+				const groups = {
+					'id': id,
+					'name': hostgroup_rights[id]['name']
+				};
+				$(ms).multiSelect('addData', [groups]);
+			}
+
+			const permission_radio = document
+				.querySelector('input[name="new_group_right[permission][' + rowid + ']"][value="' + permission + '"]')
+				.closest('li');
+			permission_radio.querySelector('input[type="radio"]').checked = true;
+
+			document.getElementById('user-group-form').addEventListener('click', event => {
+				if (event.target.classList.contains('element-table-remove')) {
+					this.#removeRow(event.target);
+				}
+			});
+		}
+
+		#addTagFilterRow(tag_filter = []) {
+			const rowid = this.tag_filter_counter++;
+			const data = {
+				'rowid': rowid
+			};
+
+			document
+				.getElementById('new-tag-filter-table')
+				.insertAdjacentHTML('beforeend', this.tag_filter_template.evaluate(data));
+
+			const ms = document.getElementById('ms_new_tag_filter_groupids_'+rowid+'_');
+			$(ms).multiSelect();
+
+			if (tag_filter.length != 0) {
+				const filter = {
+					'id': tag_filter['groupid'],
+					'name': tag_filter['name']
+				};
+				$(ms).multiSelect('addData', [filter]);
+
+				const tag_id = 'new_tag_filter_tag_'+rowid;
+				document.getElementById(tag_id).value = tag_filter['tag'];
+
+				const value_id = 'new_tag_filter_value_'+rowid;
+				document.getElementById(value_id).value = tag_filter['value'];
+			}
+
+			document.getElementById('user-group-form').addEventListener('click', event => {
+				if (event.target.classList.contains('element-table-remove')) {
+					this.#removeRow(event.target);
+				}
+			});
+		}
+
+		#removeRow(button) {
+			button
+				.closest('tr')
+				.remove();
+		}
+	};
+</script>
+
 <script type="text/javascript">
 
 	jQuery(function($) {
 		let $form = $('form[name="user_group_form"]'),
-			$new_group_right_table = $form.find('table#new-group-right-table'),
-			$new_templategroup_right_table = $form.find('table#new-templategroup-right-table'),
-			$group_right_table_container = $form.find('table#group-right-table').parent(),
-			$templategroup_right_table_container = $form.find('table#templategroup-right-table').parent(),
-			$new_tag_filter_table = $form.find('table#new-tag-filter-table'),
-			$tag_filter_table_container = $form.find('table#tag-filter-table').parent(),
-			$ms_tag_filter_groups = $new_tag_filter_table.find('.multiselect'),
-			$ms_group_right_groups = $new_group_right_table.find('.multiselect'),
-			$ms_templategroup_right_groups = $new_templategroup_right_table.find('.multiselect'),
 			$userdirectory = $form.find('[name="userdirectoryid"]'),
-			$gui_access = $form.find('[name="gui_access"]'),
-			timeoutid_new_group_right,
-			timeoutid_new_templategroup_right,
-			timeoutid_new_tag_filter,
-			xhr_new_group_right,
-			xhr_new_templategroup_right,
-			xhr_new_tag_filter;
+			$gui_access = $form.find('[name="gui_access"]');
 
 		$gui_access.on('change', onFrontendAccessChange);
 		onFrontendAccessChange.apply($gui_access);
@@ -66,329 +214,5 @@
 				$userdirectory.removeAttr('disabled');
 			}
 		}
-
-		/**
-		 * Collects tag filter form data.
-		 *
-		 * @return {object}
-		 */
-		function collectTagFilterFormData() {
-			var data = {
-				new_tag_filter: {groupids: []},
-				tag_filters: []
-			};
-
-			$ms_tag_filter_groups.multiSelect('getData').forEach(function(ms_item) {
-				data.new_tag_filter.groupids.push(ms_item.id);
-			});
-
-			data.new_tag_filter.include_subgroups = $new_tag_filter_table
-				.find('[name="new_tag_filter[include_subgroups]"]').prop('checked') ? '1' : '0';
-
-			data.new_tag_filter.tag = $new_tag_filter_table.find('[name="new_tag_filter[tag]"]').val();
-			data.new_tag_filter.value = $new_tag_filter_table.find('[name="new_tag_filter[value]"]').val();
-
-			$tag_filter_table_container.find('[name="tag_filter"]').each(function(i, node) {
-				data.tag_filters.push(JSON.parse(node.value));
-			});
-
-			return data;
-		}
-
-		/**
-		 * Collects host group right form data.
-		 *
-		 * @return {object}
-		 */
-		function collectGroupRightFormData() {
-			var data = {
-				new_group_right: {groupids: []},
-				group_rights: {}
-			};
-
-			$ms_group_right_groups.multiSelect('getData').forEach(function(ms_item) {
-				data.new_group_right.groupids.push(ms_item.id);
-			});
-
-			data.new_group_right.include_subgroups = $new_group_right_table
-				.find('[name="new_group_right[include_subgroups]"]').prop('checked') ? '1' : '0';
-
-			data.new_group_right.permission = $new_group_right_table
-				.find('[name="new_group_right[permission]"]').filter(':checked').val();
-
-			data.group_rights = $.extend.apply({},
-				$group_right_table_container.find('[name="group_right"]').map(function(i, node) {
-					var obj = JSON.parse(node.value),
-						permission = jQuery(node).parent().find('input[type="radio"]').filter(':checked').val();
-
-					if (typeof permission !== 'undefined') {
-						obj[Object.keys(obj)[0]].permission = permission;
-					}
-					return obj;
-				})
-			);
-
-			return data;
-		}
-
-		/**
-		 * Collects template group right form data.
-		 *
-		 * @return {object}
-		 */
-		function collectTemplategroupRightFormData() {
-			let data = {
-				new_templategroup_right: {groupids: []},
-				templategroup_rights: {}
-			};
-
-			$ms_templategroup_right_groups.multiSelect('getData').forEach(function(ms_item) {
-				data.new_templategroup_right.groupids.push(ms_item.id);
-			});
-
-			data.new_templategroup_right.include_subgroups = $new_templategroup_right_table
-				.find('[name="new_templategroup_right[include_subgroups]"]').prop('checked') ? '1' : '0';
-
-			data.new_templategroup_right.permission = $new_templategroup_right_table
-				.find('[name="new_templategroup_right[permission]"]').filter(':checked').val();
-
-			data.templategroup_rights = $.extend.apply({},
-				$templategroup_right_table_container.find('[name="templategroup_right"]').map(function(i, node) {
-					let obj = JSON.parse(node.value),
-						permission = jQuery(node).parent().find('input[type="radio"]').filter(':checked').val();
-
-					if (typeof permission !== 'undefined') {
-						obj[Object.keys(obj)[0]].permission = permission;
-					}
-
-					return obj;
-				})
-			);
-
-			return data;
-		}
-
-		/**
-		 * During long request, shows indicator and disables form elements.
-		 */
-		function disableNewGroupRightForm() {
-			timeoutid_new_group_right = setTimeout(function() {
-				$ms_group_right_groups.multiSelect('disable');
-				$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', true);
-				$group_right_table_container.find('input[type="radio"]').prop('disabled', true);
-			}, 150);
-		}
-
-		/**
-		 * During long request, shows indicator and disables form elements.
-		 */
-		function disableNewTemplateGroupRightForm() {
-			timeoutid_new_templategroup_right = setTimeout(function() {
-				$ms_templategroup_right_groups.multiSelect('disable');
-				$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', true);
-				$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', true);
-			}, 150);
-		}
-
-		/**
-		 * During long request, shows indicator and disables form elements.
-		 */
-		function disableNewTagFilterForm() {
-			timeoutid_new_tag_filter = setTimeout(function() {
-				$ms_tag_filter_groups.multiSelect('disable');
-				$new_tag_filter_table.find('button, [name^="new_tag_filter"]').prop('disabled', true);
-				$tag_filter_table_container.find('button').prop('disabled', true);
-			}, 150);
-		}
-
-		/**
-		 * Removes loading indicator and enables form elements.
-		 */
-		function enableNewGroupRightForm() {
-			clearTimeout(timeoutid_new_group_right);
-			$ms_group_right_groups.multiSelect('enable');
-			$new_group_right_table.find('button, [name^="new_group_right"]').prop('disabled', false);
-			$group_right_table_container.find('input[type="radio"]').prop('disabled', false);
-		}
-
-		/**
-		 * Removes loading indicator and enables form elements.
-		 */
-		function enableNewTemplateGroupRightForm() {
-			clearTimeout(timeoutid_new_templategroup_right);
-			$ms_templategroup_right_groups.multiSelect('enable');
-			$new_templategroup_right_table.find('button, [name^="new_templategroup_right"]').prop('disabled', false);
-			$templategroup_right_table_container.find('input[type="radio"]').prop('disabled', false);
-		}
-
-		/**
-		 * Removes loading indicator and enables form elements.
-		 */
-		function enableNewTagFilterForm() {
-			clearTimeout(timeoutid_new_tag_filter);
-			$ms_tag_filter_groups.multiSelect('enable');
-			$new_tag_filter_table.find('button, [name^="new_tag_filter"]').prop('disabled', false);
-			$tag_filter_table_container.find('button').prop('disabled', false);
-		}
-
-		/**
-		 * Successful response handler.
-		 *
-		 * @param {string} html
-		 */
-		function respNewGroupRight(html) {
-			$ms_group_right_groups.multiSelect('clean');
-			$new_group_right_table.find('[name="new_group_right[tag]"]').val('');
-			$new_group_right_table.find('[name="new_group_right[value]"]').val('');
-			$group_right_table_container.html(html);
-
-			// Trigger event to update tab indicator.
-			document.dispatchEvent(new Event('tab-indicator-update'));
-		}
-
-		/**
-		 * Successful response handler.
-		 *
-		 * @param {string} html
-		 */
-		function respNewTemplateGroupRight(html) {
-			$ms_templategroup_right_groups.multiSelect('clean');
-			$new_templategroup_right_table.find('[name="new_group_right[tag]"]').val('');
-			$new_templategroup_right_table.find('[name="new_group_right[value]"]').val('');
-			$templategroup_right_table_container.html(html);
-
-			// Trigger event to update tab indicator.
-			document.dispatchEvent(new Event('tab-indicator-update'));
-		}
-
-		/**
-		 * Successful response handler.
-		 *
-		 * @param {string} html
-		 */
-		function respNewTagFilter(html) {
-			$ms_tag_filter_groups.multiSelect('clean');
-			$new_tag_filter_table.find('[name="new_tag_filter[tag]"]').val('');
-			$new_tag_filter_table.find('[name="new_tag_filter[value]"]').val('');
-			$tag_filter_table_container.html(html);
-
-			// Trigger event to update tab indicator.
-			document.dispatchEvent(new Event('tab-indicator-update'));
-		}
-
-		/**
-		 * Response handler factory, dries up logic on how error response is recognized and handled.
-		 *
-		 * @param {callable} handle_data  Successful response handler.
-		 *
-		 * @return {callable}  Response handler.
-		 */
-		function respHandler(handle_data) {
-			return function(resp) {
-				clearMessages();
-
-				if ('error' in resp) {
-					const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title);
-
-					addMessage(message_box);
-				}
-				else if ('messages' in resp) {
-					addMessage(resp.messages);
-				}
-
-				if (resp.body) {
-					var	html = resp.body;
-
-					if (resp.debug) {
-						html += resp.debug;
-					}
-
-					handle_data(html);
-				}
-			}
-		}
-
-		/**
-		 * Collects data, sends to controller for processing. On success, tag filter table is updated and form objects
-		 * are removed from DOM. On failure error message is displayed. During request, loader is displayed.
-		 *
-		 * @param {string} action
-		 */
-		function submitNewTagFilter(action) {
-			var url = new Curl('zabbix.php'),
-				data = collectTagFilterFormData();
-
-			url.setArgument('action', action);
-
-			disableNewTagFilterForm();
-
-			xhr_new_tag_filter && xhr_new_tag_filter.abort();
-			xhr_new_tag_filter = $.post(url.getUrl(), data)
-				.always(enableNewTagFilterForm)
-				.done(respHandler(respNewTagFilter))
-				.fail(function() {});
-		}
-
-		/**
-		 * Collects template data, sends to controller for processing. On success, permissions table is updated and
-		 * form objects are removed from DOM. On failure error message is displayed. During request, loader is
-		 * displayed.
-		 *
-		 * @param {string} action
-		 */
-		function submitNewTemplateGroupRight(action) {
-			let url = new Curl('zabbix.php'),
-				data = collectTemplategroupRightFormData();
-
-			url.setArgument('action', action);
-
-			disableNewTemplateGroupRightForm();
-
-			xhr_new_templategroup_right && xhr_new_templategroup_right.abort();
-			xhr_new_templategroup_right = $.post(url.getUrl(), data)
-				.always(enableNewTemplateGroupRightForm)
-				.done(respHandler(respNewTemplateGroupRight))
-				.fail(function() {});
-		}
-
-		/**
-		 * Collects host data, sends to controller for processing. On success, permissions table is updated and form
-		 * objects are removed from DOM. On failure error message is displayed. During request, loader is displayed.
-		 *
-		 * @param {string} action
-		 */
-		function submitNewGroupRight(action) {
-			let url = new Curl('zabbix.php'),
-				data = collectGroupRightFormData();
-
-			url.setArgument('action', action);
-
-			disableNewGroupRightForm();
-
-			xhr_new_group_right && xhr_new_group_right.abort();
-			xhr_new_group_right = $.post(url.getUrl(), data)
-				.always(enableNewGroupRightForm)
-				.done(respHandler(respNewGroupRight))
-				.fail(function() {});
-		}
-
-		function removeTagFilterRow($this) {
-			$this
-				.closest('tr')
-				.remove();
-
-			// Trigger event to update tab indicator.
-			document.dispatchEvent(new Event('tab-indicator-update'));
-		}
-
-		/**
-		 * Public API.
-		 */
-		window.usergroups = {
-			submitNewGroupRight: submitNewGroupRight,
-			submitNewTemplateGroupRight: submitNewTemplateGroupRight,
-			submitNewTagFilter: submitNewTagFilter,
-			removeTagFilterRow: removeTagFilterRow
-		};
 	});
 </script>

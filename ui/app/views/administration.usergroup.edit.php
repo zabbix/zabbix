@@ -140,54 +140,17 @@ $form_grid
 		)
 	]);
 
-$template_permissions_form_grid = (new CFormGrid())
-	->addItem([
-		new CLabel(_('Permissions')),
-		new CFormField((new CDiv(new CPartial('administration.usergroup.templategrouprights.html', [
-			'templategroup_rights' => $data['templategroup_rights']
-		])))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
-	]);
+$template_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
 
 $new_templategroup_right_table = (new CTable())
 	->setId('new-templategroup-right-table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Template groups'), _('Permissions')])
 	->addRow([
-		(new CMultiSelect([
-			'name' => 'new_templategroup_right[groupids][]',
-			'object_name' => 'templateGroup',
-			'data' => array_intersect_key($data['template_groups_ms'],
-				array_flip($data['new_templategroup_right']['groupids'])
-			),
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'template_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_templategroup_right_groupids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CCol(
-			(new CRadioButtonList('new_templategroup_right[permission]',
-				(int) $data['new_templategroup_right']['permission']
-			))
-				->addValue(_('Read-write'), PERM_READ_WRITE)
-				->addValue(_('Read'), PERM_READ)
-				->addValue(_('Deny'), PERM_DENY)
-				->addValue(_('None'), PERM_NONE)
-				->setModern(true)
-		))->setAttribute('style', 'vertical-align: top')
-	])
-	->addRow(
-		(new CCheckBox('new_templategroup_right[include_subgroups]'))
-			->setChecked((bool) $data['new_templategroup_right']['include_subgroups'])
-			->setLabel(_('Include subgroups'))
-	)
-	->addRow(
 		(new CSimpleButton(_('Add')))
-			->onClick('javascript: usergroups.submitNewTemplateGroupRight("usergroup.templategroupright.add");')
-	);
+			->addClass('add-new-template-row')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 $template_permissions_form_grid
 	->addItem(
@@ -198,49 +161,52 @@ $template_permissions_form_grid
 		)
 	);
 
-$host_permissions_form_grid = (new CFormGrid())
-	->addItem([
-		new CLabel(_('Permissions')),
-		new CFormField((new CDiv(new CPartial('administration.usergroup.grouprights.html', [
-			'group_rights' => $data['group_rights']
-		])))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'))
-	]);
+$templates_multiselect = (new CMultiSelect([
+	'name' => 'ms_new_templategroup_right[groupids][#{rowid}][]',
+	'object_name' => 'templateGroup',
+	'popup' => [
+		'parameters' => [
+			'srctbl' => 'template_groups',
+			'srcfld1' => 'groupid',
+			'dstfrm' => $form->getName(),
+			'dstfld1' => 'ms_new_templategroup_right_groupids_#{rowid}_'
+		]
+	],
+	'add_post_js' => false
+]))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$new_group_right_table = (new CTable())
-	->setId('new-group-right-table')
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'new_group_right[groupids][]',
-			'object_name' => 'hostGroup',
-			'data' => array_intersect_key($data['host_groups_ms'], array_flip($data['new_group_right']['groupids'])),
-			'popup' => [
-				'parameters' => [
-					'srctbl' => 'host_groups',
-					'srcfld1' => 'groupid',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_group_right_groupids_'
-				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+$template_permissions_row_template = (new CTemplateTag('template-permissions-row-template'))->addItem(
+	new CRow([
+		$templates_multiselect,
 		(new CCol(
-			(new CRadioButtonList('new_group_right[permission]', (int) $data['new_group_right']['permission']))
+			(new CRadioButtonList('new_templategroup_right[permission][#{rowid}]', PERM_DENY))
 				->addValue(_('Read-write'), PERM_READ_WRITE)
 				->addValue(_('Read'), PERM_READ)
 				->addValue(_('Deny'), PERM_DENY)
-				->addValue(_('None'), PERM_NONE)
 				->setModern(true)
+		))->setAttribute('style', 'vertical-align: top'),
+		(new CCol(
+			(new CButton('template_permission_rights_remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
 		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow(
-		(new CCheckBox('new_group_right[include_subgroups]'))
-			->setChecked((bool) $data['new_group_right']['include_subgroups'])
-			->setLabel(_('Include subgroups'))
-	)
-	->addRow(
-		(new CButtonLink(_('Add')))->onClick('javascript: usergroups.submitNewGroupRight("usergroup.groupright.add");')
-	);
+);
+
+$template_permissions_form_grid->addItem($template_permissions_row_template);
+
+$host_permissions_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
+
+$new_group_right_table = (new CTable())
+	->setId('new-group-right-table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host groups'), _('Permissions')])
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->addClass('add-new-host-row')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 $host_permissions_form_grid
 	->addItem(
@@ -251,53 +217,52 @@ $host_permissions_form_grid
 		)
 	);
 
-$tag_filter_form_grid = (new CFormGrid())
-	->addItem([
-		new CLabel(_('Permissions')),
-		new CFormField(
-			(new CDiv(
-				new CPartial('administration.usergroup.tagfilters.html', ['tag_filters' => $data['tag_filters']])
-			))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		)
-	]);
-
-$new_tag_filter_table = (new CTable())
-	->setId('new-tag-filter-table')
-	->addRow([
-		(new CMultiSelect([
-			'name' => 'new_tag_filter[groupids][]',
+$hosts_multiselect = (new CMultiSelect([
+			'name' => 'ms_new_group_right[groupids][#{rowid}][]',
 			'object_name' => 'hostGroup',
-			'data' => array_intersect_key($data['host_groups_ms'], array_flip($data['new_tag_filter']['groupids'])),
 			'popup' => [
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
 					'dstfrm' => $form->getName(),
-					'dstfld1' => 'new_tag_filter_groupids_'
+					'dstfld1' => 'ms_new_group_right_groupids_#{rowid}_'
 				]
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+$host_permissions_row_template = (new CTemplateTag('host-permissions-row-template'))->addItem(
+	new CRow([
+		$hosts_multiselect,
 		(new CCol(
-			(new CTextBox('new_tag_filter[tag]', $data['new_tag_filter']['tag']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('tag'))
-		))->addStyle('vertical-align: top;'),
+			(new CRadioButtonList('new_group_right[permission][#{rowid}]', PERM_DENY))
+				->addValue(_('Read-write'), PERM_READ_WRITE)
+				->addValue(_('Read'), PERM_READ)
+				->addValue(_('Deny'), PERM_DENY)
+				->setModern(true)
+		))->setAttribute('style', 'vertical-align: top'),
 		(new CCol(
-			(new CTextBox('new_tag_filter[value]', $data['new_tag_filter']['value']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAttribute('placeholder', _('value'))
-		))->addStyle('vertical-align: top;')
+			(new CButton('host_permission_rights_remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->setAttribute('style', 'vertical-align: top')
 	])
-	->addRow(
-		(new CCheckBox('new_tag_filter[include_subgroups]'))
-			->setChecked((bool) $data['new_tag_filter']['include_subgroups'])
-			->setLabel(_('Include subgroups'))
-	)
-	->addRow(
-		(new CButtonLink(_('Add')))->onClick('javascript: usergroups.submitNewTagFilter("usergroup.tagfilter.add");')
-	);
+);
+
+$host_permissions_form_grid->addItem($host_permissions_row_template);
+
+$tag_filter_form_grid = (new CFormGrid())->addItem([new CLabel(_('Permissions'))]);
+
+$new_tag_filter_table = (new CTable())
+	->setId('new-tag-filter-table')
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Host groups'), _('Tags')])
+	->addRow([
+		(new CSimpleButton(_('Add')))
+			->addClass('add-new-tag-filter-row')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
 $tag_filter_form_grid
 	->addItem(
@@ -307,6 +272,44 @@ $tag_filter_form_grid
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 		)
 	);
+
+$tag_filter_multiselect = (new CMultiSelect([
+			'name' => 'ms_new_tag_filter[groupids][#{rowid}][]',
+			'object_name' => 'hostGroup',
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'host_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'ms_new_tag_filter_groupids_#{rowid}_'
+				]
+			],
+			'add_post_js' => false
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+$tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addItem(
+	new CRow([
+		$tag_filter_multiselect,
+		(new CCol(
+			(new CTextBox('new_tag_filter[tag][#{rowid}]'))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('tag'))
+		))->setAttribute('style', 'vertical-align: top'),
+		(new CCol(
+			(new CTextBox('new_tag_filter[value][#{rowid}]'))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setAttribute('placeholder', _('value'))
+		))->setAttribute('style', 'vertical-align: top'),
+		(new CCol(
+			(new CButton('tag_filter_remove', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->setAttribute('style', 'vertical-align: top')
+	])
+);
+
+$tag_filter_form_grid->addItem($tag_filter_row_template);
 
 $tabs = (new CTabView())
 	->addTab('user_group_tab', _('User group'), $form_grid)
@@ -345,8 +348,15 @@ else {
 	));
 }
 
-// append tab to form
 $form->addItem($tabs);
+
+$form->addItem(
+	(new CScriptTag('view.init('.json_encode([
+		'templategroup_rights' => $data['templategroup_rights'],
+		'hostgroup_rights' => $data['group_rights'],
+		'tag_filters' => $data['tag_filters']
+	]).');'))->setOnDocumentReady()
+);
 
 $html_page
 	->addItem($form)
