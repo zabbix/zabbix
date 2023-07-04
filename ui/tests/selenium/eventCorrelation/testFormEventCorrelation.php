@@ -18,13 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup correlation
+ *
+ * @onBefore prepareEventData
  */
 class testFormEventCorrelation extends CLegacyWebTest {
 
@@ -35,6 +38,84 @@ class testFormEventCorrelation extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return ['class' => CMessageBehavior::class];
+	}
+
+	public function prepareEventData() {
+		CDataHelper::call('correlation.create', [
+			[
+				'name' => 'Event correlation for cancel',
+				'description' => 'Test description cancel',
+				'status' => ZBX_CORRELATION_DISABLED,
+				'filter' => [
+					'evaltype' => 1,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'cancel tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for clone',
+				'description' => 'Test description clone',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'clone tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for delete',
+				'description' => 'Test description delete',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'delete tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			],
+			[
+				'name' => 'Event correlation for update',
+				'description' => 'Test description update',
+				'filter' => [
+					'evaltype' => 0,
+					'conditions' => [
+						[
+							'type' => ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+							'tag' => 'update tag'
+						]
+					]
+				],
+				'operations' => [
+					[
+						'type' => ZBX_CORR_OPERATION_CLOSE_OLD
+					]
+				]
+			]
+		]);
 	}
 
 	public static function create() {
@@ -503,11 +584,11 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags' => [
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag'  => 'Test tag1'
+							'Tag' => 'Test tag1'
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag'  => 'Test tag2'
+							'Tag' => 'Test tag2'
 						]
 					]
 				]
@@ -518,11 +599,11 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags' => [
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag'  => 'Test tag1'
+							'Tag' => 'Test tag1'
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag'  => 'Test tag2'
+							'Tag' => 'Test tag2'
 						]
 					],
 					'calculation' => 'And'
@@ -534,11 +615,11 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'tags' => [
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('Old event tag name'),
-							'Tag'  => 'Test tag1'
+							'Tag' => 'Test tag1'
 						],
 						[
 							'Type' => CFormElement::RELOADABLE_FILL('New event tag name'),
-							'Tag'  => 'Test tag2'
+							'Tag' => 'Test tag2'
 						]
 					],
 					'calculation' => 'Or'
@@ -625,7 +706,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Tag' => 'Test tag2'
 						]
 					],
-					'formula'=> '',
+					'formula' => '',
 					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
@@ -648,7 +729,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Value' => 'Value'
 						]
 					],
-					'formula'=> 'A or B',
+					'formula' => 'A or B',
 					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
 				]
 			],
@@ -671,7 +752,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Value' => 'Value'
 						]
 					],
-					'formula'=> '(A or B) and (C or D)',
+					'formula' => '(A or B) and (C or D)',
 					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
 				]
 			],
@@ -694,7 +775,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Value' => 'Value'
 						]
 					],
-					'formula'=> 'Wrong formula',
+					'formula' => 'Wrong formula',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Wrong formula".'
 				]
 			],
@@ -711,7 +792,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Tag' => 'Test tag2'
 						]
 					],
-					'formula'=> 'A and Not B',
+					'formula' => 'A and Not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Not B".'
 				]
 			],
@@ -728,7 +809,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Tag' => 'Test tag2'
 						]
 					],
-					'formula'=> 'NOT A and not B',
+					'formula' => 'NOT A and not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " A and not B".'
 				]
 			],
@@ -745,7 +826,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 							'Tag' => 'Test tag2'
 						]
 					],
-					'formula'=> 'not A not B',
+					'formula' => 'not A not B',
 					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " not B".'
 				]
 			]

@@ -70,6 +70,10 @@ require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
 require_once dirname(__FILE__).'/dashboard/testPageDashboardWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
 
+// Event correlation.
+require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
+require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
+
 // Filter tabs.
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
@@ -227,7 +231,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
-require_once dirname(__FILE__).'/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
@@ -257,7 +260,6 @@ require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
 require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
 require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
-require_once dirname(__FILE__).'/testFormEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
@@ -346,6 +348,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageDashboardList');
 		$suite->addTestSuite('testPageDashboardWidgets');
 		$suite->addTestSuite('testPageTemplateDashboards');
+
+		// Event correlation.
+		$suite->addTestSuite('testFormEventCorrelation');
+		$suite->addTestSuite('testPageEventCorrelation');
 
 		// Filter tabs.
 		$suite->addTestSuite('testFormFilterHosts');
@@ -497,7 +503,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
-		$suite->addTestSuite('testPageEventCorrelation');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageTriggers');
@@ -531,7 +536,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
-		$suite->addTestSuite('testFormEventCorrelation');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormMap');
