@@ -331,7 +331,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 *
 	 * @dataProvider getCheckDependingData
 	 */
-	public function testDashboardGraphWidgetSelectedHosts_CheckItems($data) {
+	public function testDashboardGraphWidgetSelectedHosts_CheckItemsWithArrows($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
 		$form->fill(['Type' => 'Graph']);
@@ -351,11 +351,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			}
 
 			$form->fill($field_data);
-			$this->checkSuggestionList($data_set, $data);
+			$this->checkSuggestionListWithArrows($data_set, $data);
 		}
 	}
 
-	private function checkSuggestionList($data_set, $data){
+	private function checkSuggestionListWithArrows($data_set, $data){
 		$merged_text = [];
 		/**
 		 * In case created API data under section "Data set" there's more than two or exactly two array keys,
@@ -395,5 +395,19 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			}
 			$this->assertEquals($data['expected'], $merged_text);
 		}
+	}
+
+	public function testDashboardGraphWidgetSelectedHosts_CheckItemsCommon() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$form = CDashboardElement::find()->one()->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Graph')]);
+
+		$field = $form->getField('xpath://div[@id="ds_0_hosts_"]/..');
+
+		$field->query('tag:input')->one()->type('a');
+		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
+
+		$test = $field->getSuggestions();
+		var_dump($test);
 	}
 }

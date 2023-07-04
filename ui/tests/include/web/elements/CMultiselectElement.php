@@ -372,4 +372,13 @@ class CMultiselectElement extends CElement {
 
 		return true;
 	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function getSuggestions() {
+		$prefix = '//ul[@class="multiselect-suggest"]/li';
+		$result = $this->query('xpath', $prefix)->all()->asText();
+		return $result;
+	}
 }
