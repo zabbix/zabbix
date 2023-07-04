@@ -310,7 +310,7 @@ $button_list = [
 	'item.execute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-execute-now')
+			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	]

@@ -247,7 +247,7 @@
 		initListActions() {
 			let form = this.getCurrentForm().get(0);
 
-			form.querySelector('.js-execute-now').addEventListener('click', e => {
+			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
 				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
 			});
 		},

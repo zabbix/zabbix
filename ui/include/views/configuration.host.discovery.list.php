@@ -225,7 +225,8 @@ foreach ($data['discoveries'] as $discovery) {
 		}
 		else {
 			$description[] = (new CLink($discovery['master_item']['name'],
-				(new CUrl('items.php'))
+				(new CUrl())
+					->setArgument('action', 'item.list')
 					->setArgument('form', 'update')
 					->setArgument('itemid', $discovery['master_item']['itemid'])
 					->setArgument('context', $data['context'])
@@ -356,7 +357,7 @@ if ($data['context'] === 'host') {
 		'discoveryrule.masscheck_now' => [
 			'content' => (new CSimpleButton(_('Execute now')))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('js-execute-now')
+				->addClass('js-massexecute-item')
 				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]

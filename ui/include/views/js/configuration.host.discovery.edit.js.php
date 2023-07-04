@@ -174,7 +174,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 					$('#lld_macro_paths .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 				});
 
-			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-now`);
+			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
 
 			if (button instanceof Element) {
 				button.addEventListener(e => this.executeNow(e.target));

@@ -42,7 +42,7 @@
 				})
 				.trigger('change');
 
-			document.querySelector('.js-execute-now').addEventListener(e => this.executeNow(e.target));
+			document.querySelector('.js-massexecute-item').addEventListener(e => this.executeNow(e.target));
 		},
 
 		editHost(e, hostid) {

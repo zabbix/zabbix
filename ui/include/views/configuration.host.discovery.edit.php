@@ -990,7 +990,7 @@ if (!empty($data['itemid'])) {
 					&& $data['item']['status'] == ITEM_STATUS_ACTIVE
 					&& $data['host']['status'] == HOST_STATUS_MONITORED
 			)
-			->addClass('js-execute-now');
+			->addClass('js-execute-item');
 	}
 
 	$buttons[] = (new CSimpleButton(_('Test')))->setId('test_item');

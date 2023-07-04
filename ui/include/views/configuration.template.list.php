@@ -223,7 +223,8 @@ foreach ($data['templates'] as $template) {
 		],
 		[
 			new CLink(_('Items'),
-				(new CUrl('items.php'))
+				(new CUrl())
+					->setArgument('action', 'item.list')
 					->setArgument('filter_set', '1')
 					->setArgument('filter_hostids', [$template['templateid']])
 					->setArgument('context', 'template')

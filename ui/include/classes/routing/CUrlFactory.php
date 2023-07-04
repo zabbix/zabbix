@@ -51,9 +51,6 @@ class CUrlFactory {
 		'httpconf.php' => [
 			'remove' => ['httptestid']
 		],
-		'items.php' => [
-			'remove' => ['itemid']
-		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']
 		],
