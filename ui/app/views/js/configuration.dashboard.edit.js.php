@@ -211,11 +211,14 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		events: {
@@ -281,7 +284,7 @@
 				view.updateBusy();
 			},
 
-			elementSuccess(e) {
+			templateSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

@@ -65,7 +65,7 @@
 
 			this.macros_manager = new HostMacrosManager(<?= json_encode([
 				'readonly' => $data['readonly'],
-				'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null,
+				'parent_hostid' =>  array_key_exists('parent_hostid', $data) ? $data['parent_hostid'] : null
 			]) ?>);
 
 			$('#tabs').on('tabscreate tabsactivate', (event, ui) => {
@@ -157,11 +157,14 @@
 				prevent_navigation: true
 			});
 
-			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid: e.detail.templateid})
+			);
 		},
 
 		refresh() {
@@ -173,7 +176,7 @@
 		},
 
 		events: {
-			elementSuccess(e) {
+			templateSuccess(e) {
 				const data = e.detail;
 
 				if ('success' in data) {

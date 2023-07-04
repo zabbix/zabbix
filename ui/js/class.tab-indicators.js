@@ -391,7 +391,6 @@ class MacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 }
 
-
 class TagsTabIndicatorItem extends TabIndicatorItem {
 
 	static ZBX_PROPERTY_INHERITED = 1;

@@ -136,7 +136,6 @@
 
 			this.form.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-linked-template')) {
-
 					if (typeof this.overlay !== 'undefined') {
 						this.dialogue = this.overlay.$dialogue[0];
 

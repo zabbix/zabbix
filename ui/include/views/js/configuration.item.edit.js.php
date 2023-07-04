@@ -177,7 +177,9 @@ include __DIR__.'/itemtest.js.php';
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete',
+				this.events.elementDelete.bind(this, 'host.list'), {once: true}
+			);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -202,10 +204,15 @@ include __DIR__.'/itemtest.js.php';
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete',
+				this.events.elementDelete.bind(this, 'template.list'), {once: true}
+			);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		refresh() {
@@ -231,7 +238,7 @@ include __DIR__.'/itemtest.js.php';
 				view.refresh();
 			},
 
-			hostDelete(e) {
+			elementDelete(action, e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -240,29 +247,12 @@ include __DIR__.'/itemtest.js.php';
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+
+					const curl = new Curl('zabbix.php');
+					curl.setArgument('action', action);
+
+					location.href = curl.getUrl();
 				}
-
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'host.list');
-
-				location.href = curl.getUrl();
-			},
-
-			templateDelete(e) {
-				const data = e.detail;
-
-				if ('success' in data) {
-					postMessageOk(data.success.title);
-
-					if ('messages' in data.success) {
-						postMessageDetails('success', data.success.messages);
-					}
-				}
-
-				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'template.list');
-
-				location.href = curl.getUrl();
 			}
 		}
 	};

@@ -94,7 +94,9 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete',
+				this.events.elementDelete.bind(this, 'host.list'), {once: true}
+			);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
@@ -119,10 +121,15 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.delete',
+				this.events.elementDelete.bind(this, 'template.list'), {once: true}
+			);
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+				this.openTemplatePopup({templateid:e.detail.templateid})
+			);
 		},
 
 		openCopyPopup() {
@@ -169,7 +176,7 @@
 				location.href = curl.getUrl();
 			},
 
-			templateDelete(e) {
+			elementDelete(action, e) {
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -181,7 +188,7 @@
 				}
 
 				const curl = new Curl('zabbix.php');
-				curl.setArgument('action', 'template.list');
+				curl.setArgument('action', action);
 
 				location.href = curl.getUrl();
 			}
