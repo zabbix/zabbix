@@ -1107,6 +1107,7 @@ static void	zbx_on_exit(int ret)
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
 	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
 	zbx_pb_flush();
+	zbx_pb_destroy();
 	zbx_free_configuration_cache();
 	zbx_db_close();
 

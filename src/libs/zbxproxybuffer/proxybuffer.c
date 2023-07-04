@@ -52,14 +52,12 @@ const char	*pb_state_desc[] = {"database", "database->memory", "memory", "memory
 
 void	pb_lock(void)
 {
-	if (NULL != pb_data->mutex)
-		zbx_mutex_lock(pb_data->mutex);
+	zbx_mutex_lock(pb_data->mutex);
 }
 
 void	pb_unlock(void)
 {
-	if (NULL != pb_data->mutex)
-		zbx_mutex_unlock(pb_data->mutex);
+	zbx_mutex_unlock(pb_data->mutex);
 }
 
 void	*pb_malloc(size_t size)
@@ -571,20 +569,21 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 
 	if (ZBX_PB_MODE_DISK == mode)
 	{
-		pb_data = (zbx_pb_t *)zbx_malloc(NULL, sizeof(zbx_pb_t));
-		memset(pb_data, 0, sizeof(zbx_pb_t));
-		pb_data->mutex = ZBX_MUTEX_NULL;
-
-		pb_init_state(pb_data);
-		ret = SUCCEED;
-		goto out;
+		/* allocate proxy buffer only to store statistics */
+		ret = zbx_shmem_create_min(&pb_mem, sizeof(zbx_pb_t), "proxy memory buffer size",
+				"ProxyMemoryBufferSize", 0, error);
 	}
+	else
+		ret = zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", 1, error);
 
-	if (SUCCEED != zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", 1, error))
+	if (SUCCEED != ret)
 		goto out;
 
 	pb_data = (zbx_pb_t *)__pb_shmem_malloc_func(NULL, sizeof(zbx_pb_t));
 	memset(pb_data, 0, sizeof(zbx_pb_t));
+
+	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
+		goto out;
 
 	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
 	zbx_list_create_ext(&pb_data->discovery, __pb_shmem_malloc_func, __pb_shmem_free_func);
@@ -594,9 +593,6 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	pb_data->max_age = age;
 	pb_data->offline_buffer = offline_buffer;
 
-	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
-		goto out;
-
 	pb_init_state(pb_data);
 
 	ret = SUCCEED;
@@ -604,6 +600,17 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s state:%d", __func__, ZBX_NULL2EMPTY_STR(*error), pb_data->state);
 
 	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: destroy proxy buffer                                              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pb_destroy(void)
+{
+	zbx_mutex_destroy(&pb_data->mutex);
+	zbx_shmem_destroy(pb_mem);
 }
 
 /******************************************************************************

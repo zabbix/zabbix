@@ -44,6 +44,7 @@ zbx_pb_state_info_t;
 
 int	zbx_pb_parse_mode(const char *str, int *mode);
 int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error);
+void	zbx_pb_destroy(void);
 
 void	zbx_pb_update_state(int more);
 void	zbx_pb_disable(void);
