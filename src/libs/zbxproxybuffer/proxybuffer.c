@@ -579,7 +579,8 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	if (SUCCEED != ret)
 		goto out;
 
-	pb_data = (zbx_pb_t *)__pb_shmem_malloc_func(NULL, sizeof(zbx_pb_t));
+	/* use realloc only to suppress 'unused function' warnings */
+	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
 	memset(pb_data, 0, sizeof(zbx_pb_t));
 
 	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
