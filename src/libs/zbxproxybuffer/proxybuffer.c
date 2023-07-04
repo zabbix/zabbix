@@ -583,7 +583,7 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
 	memset(pb_data, 0, sizeof(zbx_pb_t));
 
-	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_DATACACHE, error))
+	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_BUFFER, error))
 		goto out;
 
 	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
@@ -716,4 +716,18 @@ void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 		info->changes_num = pb_data->changes_num;
 		pb_unlock();
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get shared memory allocator statistics                            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_pb_get_mem_stats(zbx_shmem_stats_t *stats)
+{
+	pb_lock();
+
+	zbx_shmem_get_stats(pb_mem, stats);
+
+	pb_unlock();
 }

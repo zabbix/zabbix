@@ -1617,7 +1617,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	thread_args.info.program_type = program_type;
 
 	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
-		rtc_process_request_func = rtc_process_request_ex_passive;
+		rtc_process_request_func = rtc_process_request_ex_proxy_passive;
+	else
+		rtc_process_request_func = rtc_process_request_ex_proxy;
 
 	for (i = 0; i < threads_num; i++)
 	{

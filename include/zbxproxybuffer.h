@@ -23,6 +23,7 @@
 #include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxjson.h"
+#include "zbxshmem.h"
 
 typedef struct
 {
@@ -52,6 +53,7 @@ void	zbx_pb_flush(void);
 
 int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error);
 void	zbx_pb_get_state_info(zbx_pb_state_info_t *info);
+void	zbx_pb_get_mem_stats(zbx_shmem_stats_t *stats);
 
 /* discovery */
 
