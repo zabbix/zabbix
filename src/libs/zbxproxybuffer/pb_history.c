@@ -751,9 +751,9 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 		if (0 == data->rows_num)
 			goto out;
 
-		pb_history_set_row_ids(&data->rows, data->rows_num);
-
 		pb_lock();
+
+		pb_history_set_row_ids(&data->rows, data->rows_num);
 
 		if (PB_MEMORY == pb_data->state && SUCCEED != pb_history_check_age(pb_data))
 		{
