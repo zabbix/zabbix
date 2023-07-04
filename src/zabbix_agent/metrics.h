@@ -35,6 +35,7 @@
 #define ZBX_METRIC_FLAG_LOG_LOGRT	0x08	/* logrt[ or logrt.count[, depending on ZBX_METRIC_FLAG_LOG_COUNT */
 #define ZBX_METRIC_FLAG_LOG_EVENTLOG	0x10	/* eventlog[ */
 #define ZBX_METRIC_FLAG_LOG_COUNT	0x20	/* log.count[ or logrt.count[ */
+#define ZBX_METRIC_FLAG_EVENTLOG_COUNT	0x40	/* eventlog.count[ */
 #define ZBX_METRIC_FLAG_LOG			/* item for log file monitoring, one of the above */	\
 		(ZBX_METRIC_FLAG_LOG_LOG | ZBX_METRIC_FLAG_LOG_LOGRT | ZBX_METRIC_FLAG_LOG_EVENTLOG)
 

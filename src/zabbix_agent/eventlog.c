@@ -891,7 +891,7 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 	const char	*str_severity;
 	zbx_uint64_t	keywords, i, reading_startpoint = 0;
 	wchar_t		*eventlog_name_w = NULL;
-	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED;
+	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED, is_count_item;
 	DWORD		required_buf_size = 0, error_code = ERROR_SUCCESS;
 
 	unsigned long	evt_timestamp, evt_eventid = 0;
@@ -902,6 +902,11 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source: '%s' previous lastlogsize: " ZBX_FS_UI64 ", FirstID: "
 			ZBX_FS_UI64 ", LastID: " ZBX_FS_UI64, __func__, eventlog_name, lastlogsize, FirstID,
 			LastID);
+
+	if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+		is_count_item = 1;
+	else
+		is_count_item = 0;
 
 	/* update counters */
 	if (1 == metric->skip_old_data)
@@ -1056,17 +1061,22 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 			if (1 == match)
 			{
-				send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig,
-						evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL, &evt_timestamp,
-						evt_provider, &evt_severity, &evt_eventid,
-						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-						config_timeout, config_source_ip);
-
-				if (SUCCEED == send_err)
+				if (0 == is_count_item)
 				{
-					*lastlogsize_sent = lastlogsize;
-					s_count++;
+					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
+						metric->key_orig, evt_message, ITEM_STATE_NORMAL, &lastlogsize, NULL,
+						&evt_timestamp, evt_provider, &evt_severity, &evt_eventid,
+						metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout,
+						config_source_ip);
+
+					if (SUCCEED == send_err)
+					{
+						*lastlogsize_sent = lastlogsize;
+						s_count++;
+					}
 				}
+				else
+					s_count++;
 			}
 			p_count++;
 
@@ -1074,19 +1084,22 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 			zbx_free(evt_provider);
 			zbx_free(evt_message);
 
-			if (SUCCEED == send_err)
+			if (0 == is_count_item)
 			{
-				metric->lastlogsize = lastlogsize;
-			}
-			else
-			{
-				/* buffer is full, stop processing active checks */
-				/* till the buffer is cleared */
-				break;
+				if (SUCCEED == send_err)
+				{
+					metric->lastlogsize = lastlogsize;
+				}
+				else
+				{
+					/* buffer is full, stop processing active checks */
+					/* till the buffer is cleared */
+					break;
+				}
 			}
 
 			/* do not flood Zabbix server if file grows too fast */
-			if (s_count >= (rate * metric->refresh))
+			if (0 == is_count_item && s_count >= (rate * metric->refresh))
 				break;
 
 			/* do not flood local system if file grows too fast */
@@ -1099,6 +1112,23 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 	}
 finish:
 	ret = SUCCEED;
+
+	if (p_count > 0 && 0 != is_count_item)
+	{
+		char	buf[ZBX_MAX_UINT64_LEN];
+
+		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
+
+		send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
+				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+
+		if (SUCCEED == send_err)
+		{
+			*lastlogsize_sent = lastlogsize;
+			metric->lastlogsize = lastlogsize;
+		}
+	}
 out:
 	for (i = 0; i < required_buf_size; i++)
 	{
@@ -1422,7 +1452,7 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 	int		buffer_size = 64 * ZBX_KIBIBYTE;
 	DWORD		num_bytes_read = 0, required_buf_size, ReadDirection, error_code;
 	BYTE		*pELRs = NULL;
-	int		s_count, p_count, send_err = SUCCEED, match = SUCCEED;
+	int		s_count, p_count, send_err = SUCCEED, match = SUCCEED, is_count_item;
 	unsigned long	timestamp = 0;
 	char		*source;
 
@@ -1438,6 +1468,11 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 	/*                                                                                                  */
 	/* This RecordNumber wraparound is handled simply by using 64bit integer to calculate record        */
 	/* numbers and then converting to DWORD values.                                                     */
+
+	if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+		is_count_item = 1;
+	else
+		is_count_item = 0;
 
 	if (NULL == eventlog_name || '\0' == *eventlog_name)
 	{
@@ -1650,36 +1685,44 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 
 				if (1 == match)
 				{
-					send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
-							metric->key_orig, value, ITEM_STATE_NORMAL, &lastlogsize,
-							NULL, &timestamp, source, &severity, &logeventid,
-							metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls,
-							config_timeout, config_source_ip);
-
-					if (SUCCEED == send_err)
+					if (0 == is_count_item)
 					{
-						*lastlogsize_sent = lastlogsize;
-						s_count++;
+						send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME,
+								metric->key_orig, value, ITEM_STATE_NORMAL,
+								&lastlogsize, NULL, &timestamp, source, &severity,
+								&logeventid, metric->flags | ZBX_METRIC_FLAG_PERSISTENT,
+								config_tls, config_timeout, config_source_ip);
+
+						if (SUCCEED == send_err)
+						{
+							*lastlogsize_sent = lastlogsize;
+							s_count++;
+						}
 					}
+					else
+						s_count++;
 				}
 				p_count++;
 
 				zbx_free(source);
 				zbx_free(value);
 
-				if (SUCCEED == send_err)
+				if (0 == is_count_item)
 				{
-					metric->lastlogsize = lastlogsize;
-				}
-				else
-				{
-					/* buffer is full, stop processing active checks */
-					/* till the buffer is cleared */
-					break;
+					if (SUCCEED == send_err)
+					{
+						metric->lastlogsize = lastlogsize;
+					}
+					else
+					{
+						/* buffer is full, stop processing active checks */
+						/* till the buffer is cleared */
+						break;
+					}
 				}
 
 				/* do not flood Zabbix server if file grows too fast */
-				if (s_count >= (rate * metric->refresh))
+				if (0 == is_count_item && s_count >= (rate * metric->refresh))
 					break;
 
 				/* do not flood local system if file grows too fast */
@@ -1696,6 +1739,23 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 
 finish:
 	ret = SUCCEED;
+
+	if (p_count > 0 && 0 != is_count_item)
+	{
+		char	buf[ZBX_MAX_UINT64_LEN];
+
+		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
+
+		send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
+				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+
+		if (SUCCEED == send_err)
+		{
+			*lastlogsize_sent = lastlogsize;
+			metric->lastlogsize = lastlogsize;
+		}
+	}
 out:
 	zbx_close_eventlog(eventlog_handle);
 	zbx_free(eventlog_name_w);
@@ -1785,6 +1845,9 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 	if (NULL == (maxlines_persec = get_rparam(&request, 5)) || '\0' == *maxlines_persec)
 	{
 		rate = CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
+
+		if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+			rate *= 10;
 	}
 	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
 	{
