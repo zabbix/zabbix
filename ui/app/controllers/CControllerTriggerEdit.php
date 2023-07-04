@@ -33,7 +33,7 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>							'in '.implode(',', ['host', 'template']),
+			'context' =>							'required|in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid'
 		];
@@ -56,15 +56,18 @@ class CControllerTriggerEdit extends CController {
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('triggerid')) {
 			$this->trigger = API::Trigger()->get([
-				'output' => ['triggerid', 'name'],
-				'triggerids' => $this->getInput('triggerid')
+				'output' => API_OUTPUT_EXTEND,
+				'triggerids' => $this->getInput('triggerid'),
+				'selectHosts' => ['hostid'],
+				'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
+				'selectTriggerDiscovery' => ['parent_triggerid'],
+				'selectDependencies' => ['triggerid'],
+				'selectTags' => ['tag', 'value']
 			]);
 
 			if (!$this->trigger) {
 				return false;
 			}
-
-			$this->trigger = $this->trigger[0];
 		}
 		else {
 			$this->trigger = null;
@@ -73,30 +76,58 @@ class CControllerTriggerEdit extends CController {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction()
+	{
 		$data = [
-			'triggerid' => $this->getInput('triggerid', 0),
 			'hostid' => $this->getInput('hostid', 0),
-			'dependencies' => []
+			'dependencies' => [],
+			'context' => $this->getInput('context'),
+			'expression' => '',
+			'recovery_expression' => '',
+			'expression_full' => '',
+			'recovery_expression_full' => '',
+			'manual_close' => 1,
+			'correlation_mode' => 0,
+			'correlation_tag' => '',
+			'description' => '',
+			'opdata' => '',
+			'priority' => '0',
+			'recovery_mode' => 0,
+			'type' => '0',
+			'event_name' => '',
+			'db_dependencies' => [],
+			'limited' => false,
+			'tags' => [],
+			'recovery_expression_field_readonly' => false,
+			'triggerid' => null
 		];
 
-		$data = getTriggerFormData($data);
 
-		$data['context'] = $this->getInput('context');
-		$data['expression'] = array_key_exists('expression', $data) ? $data['expression'] : '';
-		$data['recovery_expression'] = array_key_exists('recovery_expression', $data) ? $data['recovery_expression'] : '';
-		$data['expression_full'] = $data['expression'];
-		$data['recovery_expression_full'] = $data['recovery_expression'];
-		$data['manual_close'] = array_key_exists('manual_close', $data) ? $data['manual_close'] : 1;
-		$data['correlation_mode'] = array_key_exists('correlation_mode', $data) ? $data['correlation_mode'] : 0;
-		$data['correlation_tag'] = array_key_exists('correlation_tag', $data) ? $data['correlation_tag'] : '';
-		$data['description'] = array_key_exists('description', $data) ? $data['description'] : '';
-		$data['opdata'] = array_key_exists('opdata', $data) ? $data['opdata'] : '';
-		$data['priority'] = array_key_exists('priority', $data) ? $data['priority'] : '0';
-		$data['recovery_mode'] = array_key_exists('recovery_mode', $data) ? $data['recovery_mode'] : 0;
-		$data['type'] = array_key_exists('type', $data) ? $data['type'] : '0';
-		$data['event_name'] = array_key_exists('event_name', $data) ? $data['event_name'] : $data['description'];
-		$data['db_dependencies'] = array_key_exists('db_dependencies', $data) ? $data['db_dependencies'] : [];
+		if ($this->trigger) {
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
+				['sources' => ['expression', 'recovery_expression']]
+			);
+
+			$data = array_merge($data, reset($triggers));
+
+			$data['db_dependencies'] = API::Trigger()->get([
+				'output' => ['triggerid', 'description', 'flags'],
+				'selectHosts' => ['hostid', 'name'],
+				'triggerids' => array_column($data['dependencies'], 'triggerid'),
+				'preservekeys' => true
+			]);
+
+			foreach ($data['db_dependencies'] as &$dependency) {
+				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+			}
+			unset($dependency);
+
+			order_result($data['db_dependencies'], 'description');
+
+			$data['limited'] = ($data['templateid'] != 0);
+			$data['expression_full'] = $data['expression'];
+			$data['recovery_expression_full'] = $data['recovery_expression'];
+		}
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

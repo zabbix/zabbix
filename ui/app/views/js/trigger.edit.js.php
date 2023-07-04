@@ -517,7 +517,7 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', this.triggerid !== 0 ? 'trigger.update' : 'trigger.create');
+			curl.setArgument('action', this.triggerid !== null ? 'trigger.update' : 'trigger.create');
 
 			this.#post(curl.getUrl(), fields);
 		}
