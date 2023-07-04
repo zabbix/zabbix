@@ -97,7 +97,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertEquals($hash_expressions, CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid'));
 	}
 
-
 	public static function getDeleteData()
 	{
 		return [
