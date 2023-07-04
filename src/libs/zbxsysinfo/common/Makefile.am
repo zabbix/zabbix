@@ -29,7 +29,9 @@ libcommonsysinfo_a_SOURCES = \
 	procstat.h \
 	procstat.c \
 	stats.h \
-	stats.c
+	stats.c \
+	zbxkstat.h \
+	zbxkstat.c
 
 libcommonsysinfo_http_a_SOURCES = \
 	http.c \
