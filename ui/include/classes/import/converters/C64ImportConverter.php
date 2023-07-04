@@ -191,7 +191,9 @@ class C64ImportConverter extends CConverter {
 	 */
 	private static function convertSelements(array $selements): array {
 		foreach ($selements as &$selement) {
-			if ($selement['type'] == SYSMAP_ELEMENT_TYPE_TRIGGER && array_key_exists('elements', $selement)) {
+			if (array_key_exists('type', $selement) && $selement['type'] == SYSMAP_ELEMENT_TYPE_TRIGGER
+					&& array_key_exists('elements', $selement)
+			) {
 				$selement['elements'] = self::convertTriggers($selement['elements']);
 			}
 		}
