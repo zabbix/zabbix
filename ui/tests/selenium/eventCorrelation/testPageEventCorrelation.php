@@ -52,7 +52,6 @@ class testPageEventCorrelation extends CWebTest {
 	private static $event_old_value = 'Old event tag value';
 	private static $event_new_value = 'New event tag value';
 	private static $multiple_conditions = 'Conditions';
-
 	private static $event_for_filter = '€√Σnt correlation for filter and deletion';
 
 
@@ -429,7 +428,7 @@ class testPageEventCorrelation extends CWebTest {
 						self::$event_pair,
 						self::$event_new_value,
 						self::$event_old_value,
-						self::$event_for_filter,
+						self::$event_for_filter
 					]
 				]
 			],
@@ -592,7 +591,6 @@ class testPageEventCorrelation extends CWebTest {
 						self::$event_new_operations,
 						self::$multiple_conditions,
 						self::$event_both_operations
-
 					]
 				]
 			],
@@ -608,7 +606,7 @@ class testPageEventCorrelation extends CWebTest {
 						'Enabled',
 						'Enabled',
 						'Disabled',
-						'Disabled',
+						'Disabled'
 					]
 				]
 			]
