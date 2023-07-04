@@ -78,12 +78,12 @@ window.widget_gauge_form = new class {
 		document.getElementById('scale_show').disabled = (!this._th_show_arc.checked || this._th_show_arc.disabled)
 			&& !this._value_arc.checked;
 
-		document.getElementById('scale_size').disabled = !this._scale_show.checked || this._scale_show.disabled
-			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled) && !this._value_arc.checked);
-
 		document.getElementById('scale_show_units').disabled = !this._units_show.checked || !this._scale_show.checked
-			|| this._scale_show.disabled
-			|| ((!this._th_show_arc.checked || this._th_show_arc.disabled) && !this._value_arc.checked);
+			|| this._scale_show.disabled;
+
+		for (const element of document.querySelectorAll('#scale_size, #scale_decimal_places')) {
+			element.disabled = !this._scale_show.checked || this._scale_show.disabled;
+		}
 
 		for (const element of
 				document.querySelectorAll('#units, #units_pos, #units_size, #units_bold, #units_color')) {

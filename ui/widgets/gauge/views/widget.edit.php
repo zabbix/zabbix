@@ -185,13 +185,17 @@ function getNeedleFieldsGroupView(CWidgetFormView $form, array $fields): CWidget
 function getScaleFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
 	$scale_show_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show']));
 	$scale_size_field = $form->registerField(new CWidgetFieldIntegerBoxView($fields['scale_size']));
+	$scale_show_units_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['scale_show_units']));
 
 	return (new CWidgetFieldsGroupView(_('Scale')))
 		->addItem([
-			(new CDiv([$scale_show_field->getView(), $scale_size_field->getLabel()]))->addClass('scale-show'),
+			(new CDiv([$scale_show_field->getView(), $scale_show_units_field->getLabel()]))->addClass('scale-show'),
+			(new CFormField($scale_show_units_field->getView()))
+		])
+		->addItem([
+			$scale_size_field->getLabel(),
 			(new CFormField([$scale_size_field->getView(), '%']))->addClass('field-size')
 		])
-		->addField(new CWidgetFieldCheckBoxView($fields['scale_show_units']))
 		->addField(new CWidgetFieldIntegerBoxView($fields['scale_decimal_places']));
 }
 

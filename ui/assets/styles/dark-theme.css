@@ -3765,7 +3765,7 @@ form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show {
     width: 100%; }
 form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show {
   display: flex; }
-  form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show label[for='scale_size'] {
+  form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show label[for='scale_show_units'] {
     width: 100%; }
 form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field:first-child {
   grid-column: 1 / -1; }

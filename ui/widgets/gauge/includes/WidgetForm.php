@@ -61,7 +61,7 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_MAX = 100;
 	private const DEFAULT_SCALE_SHOW = 1;
 	private const DEFAULT_SCALE_DECIMAL_PLACES = 0;
-	private const DEFAULT_SCALE_SHOW_UNITS = 0;
+	private const DEFAULT_SCALE_SHOW_UNITS = 1;
 	private const DEFAULT_SCALE_SIZE_PERCENT = 10;
 
 	// Description defaults.
