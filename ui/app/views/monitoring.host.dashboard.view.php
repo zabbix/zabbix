@@ -106,44 +106,40 @@ $html_page = (new CHtmlPage())
 			: null
 	);
 
-$navigation = (new CList())->addItem(new CBreadcrumbs([
-	(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
-	(new CSpan())->addItem($data['host']['name'])
-]));
+$navigation = (new CDiv())
+	->addClass(ZBX_STYLE_HOST_DASHBOARD_HEADER_NAVIGATION)
+	->addItem((new CList())->addItem(new CBreadcrumbs([
+		(new CSpan())->addItem(new CLink(_('All hosts'), (new CUrl('zabbix.php'))->setArgument('action', 'host.view'))),
+		(new CSpan())->addItem($data['host']['name'])
+	])));
 
 if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
-	$dashboard_tabs = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD_TABS);
-
-	$dashboard_tabs->addItem(
-		(new CDiv())
-			->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION)
-			->addItem(
-				(new CDiv())
-					->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
-					->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
-						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD)
-					)
-			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS))
-			->addItem(
-				(new CDiv())
-					->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
-					->addItem([
-						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
-							->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_LIST),
-						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
-							->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD)
-					])
-			)
-	);
+	$dashboard_tabs = (new CDiv())
+		->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
+					->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD)
+				)
+		)
+		->addItem((new CDiv())->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS))
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
+				->addItem([
+					(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_LIST),
+					(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD)
+				])
+		);
 
 	$navigation->addItem($dashboard_tabs);
 }
 
-$html_page->setNavigation($navigation);
-
 if ($data['has_time_selector']) {
-	$html_page->addItem(
+	$navigation->addItem(
 		(new CFilter())
 			->setProfile($data['time_period']['profileIdx'], $data['time_period']['profileIdx2'])
 			->setActiveTab($data['active_tab'])
@@ -152,6 +148,8 @@ if ($data['has_time_selector']) {
 			)
 	);
 }
+
+$html_page->addItem($navigation);
 
 if (count($data['dashboard']['pages']) > 1
 		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
@@ -201,7 +199,7 @@ if (count($data['dashboard']['pages']) > 1
 else {
 	$html_page
 		->addItem((new CDiv())
-			->addStyle('margin-top: 5px;')
+			->addStyle('margin-top: 10px;')
 			->addItem(new CTableInfo())
 		)
 		->show();
