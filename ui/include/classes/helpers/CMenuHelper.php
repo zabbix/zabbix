@@ -177,7 +177,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Templates')))
 					->setUrl(new CUrl('templates.php'), 'templates.php')
 					->setAliases([
-						'template.dashboard.list', 'template.dashboard.edit', 'items.php?context=template',
+						'template.dashboard.list', 'template.dashboard.edit', 'item.list?context=template',
 						'triggers.php?context=template', 'graphs.php?context=template',
 						'host_discovery.php?context=template', 'disc_prototypes.php?context=template',
 						'trigger_prototypes.php?context=template', 'host_prototypes.php?context=template',

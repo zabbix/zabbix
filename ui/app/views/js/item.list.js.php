@@ -70,73 +70,115 @@
 				const target = e.target;
 
 				if (target.classList.contains('js-enable-item')) {
-					this._enable(target, [target.dataset.itemid]);
+					this._enableItems(target, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-disable-item')) {
-					this._disable(target, [target.dataset.itemid]);
+					this._disableItems(target, [target.dataset.itemid]);
+				}
+				else if (target.classList.contains('js-update-item')) {
+					this._updateItems(target, [target.dataset.itemid]);
 				}
 				else if (target.classList.contains('js-massenable-item')) {
-					this._enable(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._enableItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massdisable-item')) {
-					this._disable(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._disableItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
-				else if (target.classList.contains('js-execute-item')) {
-					this._execute(target, Object.keys(chkbxRange.getSelectedIds()));
+				else if (target.classList.contains('js-massexecute-item')) {
+					this._executeItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massclearhistory-item')) {
-					this._clear(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._clearItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-masscopy-item')) {
-					this._copy(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._copyItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massupdate-item')) {
-					this._update(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._updateItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (target.classList.contains('js-massdelete-item')) {
-					this._delete(target, Object.keys(chkbxRange.getSelectedIds()));
+					this._deleteItems(target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 			});
 		}
 
-		_enable(target, itemids) {
+		_enableItems(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.enable');
 
 			this._confirmWithPost(target, {itemids}, curl);
 		}
 
-		_disable(target, itemids) {
+		_disableItems(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.disable');
 
 			this._confirmWithPost(target, {itemids}, curl);
 		}
 
-		_execute(target, itemids) {
+		_executeItems(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
 
 			this._post(target, {itemids}, curl);
 		}
 
-		_clear(target, itemids) {
+		_clearItems(target, itemids) {
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.clear');
 
 			this._confirmWithPost(target, {itemids}, curl);
 		}
 
-		_copy(target, itemids) {
-			console.error('Not implemented');
+		_copyItems(target, itemids) {
+			const parameters = {
+				itemids: Object.keys(chkbxRange.getSelectedIds()),
+				source: 'items'
+			};
+			const overlay = PopUp('copy.edit', parameters, {
+				dialogueid: 'copy',
+				dialogue_class: 'modal-popup-static'
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+				uncheckTableRows('item');
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
 		}
 
-		_update(target, itemids) {
-			console.error('Not implemented');
+		_updateItems(target, itemids) {
+			let action = 'item.update';
+			let params = {
+				context: target.closest('form').querySelector('[name="context"]').value,
+				prototype: 0
+			}
+			params[this.token[0]] = this.token[1];
+			const reloadPage = e => {
+				location.href = location.href;
+			}
+
+			if (target.classList.contains('js-massupdate-item')) {
+				action = 'item.massupdate';
+				params.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
+
+			const overlay = PopUp(action, params, {
+				dialogue_class: 'modal-popup-preprocessing',
+				trigger_element: target
+			});
 		}
 
-		_delete(target, itemids) {
-			console.error('Not implemented');
+		_deleteItems(target, itemids) {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'item.delete');
+
+			this._confirmWithPost(target, {itemids}, curl);
 		}
 
 		_confirmWithPost(target, data, curl) {
@@ -188,39 +230,8 @@
 				})
 				.finally(() => {
 					target.classList.remove('is-loading');
+					target.blur();
 				});
-		}
-
-
-
-		oldActions() {
-			document.querySelector('.js-copy').addEventListener('click', () => {
-				const overlay = this.openCopyPopup();
-				const dialogue = overlay.$dialogue[0];
-
-				dialogue.addEventListener('dialogue.submit', (e) => {
-					postMessageOk(e.detail.title);
-
-					const uncheckids = Object.keys(chkbxRange.getSelectedIds());
-					uncheckTableRows('items_' + this.checkbox_hash, [], false);
-					chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-					chkbxRange.update(this.checkbox_object);
-
-					if ('messages' in e.detail) {
-						postMessageDetails('success', e.detail.messages);
-					}
-
-					location.href = location.href;
-				});
-			});
-
-			const execute_now = document.querySelector('.js-execute-now');
-
-			if (execute_now !== null) {
-				execute_now.addEventListener('click', () => {
-					this.massCheckNow();
-				});
-			}
 		}
 
 		editHost(e, hostid) {
@@ -231,146 +242,38 @@
 		}
 
 		openHostPopup(host_data) {
-			const original_url = location.href;
+			let original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
 			});
-			const events = {
-				hostSuccess(e) {
-					const data = e.detail;
+			const reloadPage = (e) => {
+				const data = e.detail;
 
-					if ('success' in data) {
-						postMessageOk(data.success.title);
+				if ('success' in data) {
+					postMessageOk(data.success.title);
 
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
+					if ('messages' in data.success) {
+						postMessageDetails('success', data.success.messages);
 					}
-
-					location.href = location.href;
-				},
-
-				hostDelete(e) {
-					const data = e.detail;
-
-					if ('success' in data) {
-						postMessageOk(data.success.title);
-
-						if ('messages' in data.success) {
-							postMessageDetails('success', data.success.messages);
-						}
-					}
-
-					const curl = new Curl('zabbix.php');
-					curl.setArgument('action', 'host.list');
-
-					location.href = curl.getUrl();
 				}
+
+				location.href = original_url;
 			}
 
-			overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.update', this.events.hostSuccess, {once: true});
-			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.hostDelete, {once: true});
+			overlay.$dialogue[0].addEventListener('dialogue.create', reloadPage);
+			overlay.$dialogue[0].addEventListener('dialogue.update', reloadPage);
+			overlay.$dialogue[0].addEventListener('dialogue.delete', e => {
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'host.list');
+
+				original_url = curl.getUrl();
+				return reloadPage(e);
+			});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
-			}, {once: true});
-		}
-
-		openCopyPopup() {
-			const parameters = {
-				itemids: Object.keys(chkbxRange.getSelectedIds()),
-				source: 'items'
-			};
-
-			return PopUp('copy.edit', parameters, {
-				dialogueid: 'copy',
-				dialogue_class: 'modal-popup-static'
 			});
-		}
-
-		massCheckNow() {
-			document.activeElement.classList.add('is-loading');
-
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
-
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: Object.keys(chkbxRange.getSelectedIds())})
-			})
-				.then((response) => response.json())
-				.then((response) => {
-					clearMessages();
-
-					if ('error' in response) {
-						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
-					}
-					else if('success' in response) {
-						addMessage(makeMessageBox('good', [], response.success.title, true, false));
-
-						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
-						uncheckTableRows('items_' + this.checkbox_hash, [], false);
-						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-						chkbxRange.update(this.checkbox_object);
-					}
-				})
-				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
-
-					clearMessages();
-					addMessage(message_box);
-				})
-				.finally(() => {
-					// Deselect the "Execute now" button in both success and error cases, since there is no page reload.
-					document.activeElement.blur();
-				});
-
-			document.activeElement.classList.remove('is-loading');
-		}
-
-		checkNow(itemid) {
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'item.masscheck_now');
-			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
-				<?= json_encode(CCsrfTokenHelper::get('item')) ?>
-			);
-
-			fetch(curl.getUrl(), {
-				method: 'POST',
-				headers: {'Content-Type': 'application/json'},
-				body: JSON.stringify({itemids: [itemid]})
-			})
-				.then((response) => response.json())
-				.then((response) => {
-					clearMessages();
-
-					/*
-					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
-					 * messages and that would mean to reload the page and show them. Also postMessageError would be
-					 * displayed right after header is loaded. Meaning message is not inside the page form like that is
-					 * in postMessageOk case. Instead show message directly that comes from controller.
-					 */
-					if ('error' in response) {
-						addMessage(makeMessageBox('bad', [response.error.messages], response.error.title, true, true));
-					}
-					else if('success' in response) {
-						addMessage(makeMessageBox('good', [], response.success.title, true, false));
-					}
-				})
-				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
-					const message_box = makeMessageBox('bad', [], title)[0];
-
-					clearMessages();
-					addMessage(message_box);
-				});
 		}
 	};
 </script>

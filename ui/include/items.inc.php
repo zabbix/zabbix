@@ -911,7 +911,8 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('items.php'))
+			$url = (new CUrl())
+				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
 				->setArgument('context', 'template');
@@ -959,7 +960,8 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('items.php'))
+				$url = (new CUrl())
+					->setArgument('action', 'item.list')
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');

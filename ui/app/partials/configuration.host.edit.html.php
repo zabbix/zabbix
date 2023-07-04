@@ -377,7 +377,7 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 		$item_name = $data['inventory_items'][$inventory_no]['name'];
 
 		$link = (new CLink($item_name,
-			(new CUrl('items.php'))
+			(new CUrl('item.list'))
 				->setArgument('form', 'update')
 				->setArgument('itemid', $data['inventory_items'][$inventory_no]['itemid'])
 				->setArgument('context', 'host')
