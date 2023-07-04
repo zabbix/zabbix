@@ -279,8 +279,8 @@ $filter
 			->setArgument('action', $data['action'])
 			->setArgument('context', $data['context'])
 	)
-	->addVar('action', $data['action'])
-	->addVar('context', $data['context'])
+	->addVar('action', $data['action'], uniqid('item_'))
+	->addVar('context', $data['context'], uniqid('item_'))
 	->addFilterTab(_('Filter'),
 		[$filter_column_1, $filter_column_2, $filter_column_3],
 		$subfilters_table

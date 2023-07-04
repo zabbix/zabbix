@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/forms.inc.php';
 
-class CControllerPopupMassupdateItem extends CController {
+class CControllerItemMassupdate extends CController {
 
 	protected function checkInput() {
 		$fields = [
@@ -276,9 +276,11 @@ class CControllerPopupMassupdateItem extends CController {
 
 		if ($result) {
 			$messages = CMessageHelper::getMessages();
-			$output = ['title' => $item_prototypes
-				? _n('Item prototype updated', 'Item prototypes updated', $items_count)
-				: _n('Item updated', 'Items updated', $items_count)
+			$output = [
+				'title' => $item_prototypes
+					? _n('Item prototype updated', 'Item prototypes updated', $items_count)
+					: _n('Item updated', 'Items updated', $items_count),
+				'clear_checkboxes' => 'item'
 			];
 
 			if (count($messages)) {
@@ -381,7 +383,8 @@ class CControllerPopupMassupdateItem extends CController {
 		}
 		else {
 			$data += [
-				'location_url' => (new CUrl('items.php'))
+				'location_url' => (new CUrl())
+					->setArgument('action', 'item.list')
 					->setArgument('context', $this->getInput('context'))
 					->getUrl(),
 				'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,

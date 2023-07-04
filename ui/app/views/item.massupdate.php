@@ -491,7 +491,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.item.js.php', $data)));
+$form->addItem(new CJsScript($this->readJsFile('item.massupdate.js.php', $data)));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/item.preprocessing.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
 $form->addItem(new CJsScript($this->readJsFile('../../../include/views/js/itemtest.js.php')));

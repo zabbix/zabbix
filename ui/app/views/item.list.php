@@ -24,6 +24,8 @@
  * @var array $data
  */
 
+$this->addJsFile('multilineinput.js');
+$this->addJsFile('items.js');
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('item.list.js.php', $data);
 
@@ -35,9 +37,8 @@ $filter = new CPartial('item.list.filter', [
 ]);
 
 $form = (new CForm())
-	->setId('item-list')
 	->setName('item_list')
-	->addVar('context', $data['context'])
+	->addVar('context', $data['context'], uniqid('item_'))
 	->addVar('hostid', $data['hostid'] != 0 ? $data['hostid'] : null);
 
 $list_url = (new CUrl())
@@ -91,27 +92,19 @@ foreach ($data['items'] as $item) {
 			$description[] = $item['master_item']['name'];
 		}
 		else {
-			$description[] = (new CLink($item['master_item']['name'],
-				(new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('hostid', $item['hostid'])
-					->setArgument('itemid', $item['master_item']['itemid'])
-					->setArgument('context', $data['context'])
-			))
+			$description[] = (new CLink($item['master_item']['name']))
 				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_TEAL);
+				->addClass(ZBX_STYLE_TEAL)
+				->addClass('js-update-item')
+				->setAttribute('data-itemid', $item['master_item']['itemid']);
 		}
 
 		$description[] = NAME_DELIMITER;
 	}
 
-	$description[] = new CLink($item['name'],
-		(new CUrl('items.php'))
-			->setArgument('form', 'update')
-			->setArgument('hostid', $item['hostid'])
-			->setArgument('itemid', $item['itemid'])
-			->setArgument('context', $data['context'])
-	);
+	$description[] = (new CLink($item['name']))
+		->addClass('js-update-item')
+		->setAttribute('data-itemid', $item['itemid']);
 
 	// Trigger information
 	$hint_table = (new CTableInfo())->setHeader([_('Severity'), _('Name'), _('Expression'), _('Status')]);
@@ -235,7 +228,7 @@ $buttons = [
 	'item.massexecute' => [
 		'content' => (new CSimpleButton(_('Execute now')))
 			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-execute-now')
+			->addClass('js-massexecute-item')
 			->addClass('js-no-chkbxrange')
 			->setAttribute('data-required', 'execute')
 	],
