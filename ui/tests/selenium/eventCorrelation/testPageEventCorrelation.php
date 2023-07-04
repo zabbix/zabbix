@@ -54,8 +54,6 @@ class testPageEventCorrelation extends CWebTest {
 	private static $multiple_conditions = 'Conditions';
 	private static $event_for_filter = '€√Σnt correlation for filter and deletion';
 
-
-
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
 			[
