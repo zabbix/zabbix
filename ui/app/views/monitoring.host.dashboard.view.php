@@ -112,28 +112,27 @@ $navigation = (new CList())->addItem(new CBreadcrumbs([
 ]));
 
 if ($web_layout_mode != ZBX_LAYOUT_KIOSKMODE) {
-	$dashboard_tabs = (new CDiv())
-		->addClass(ZBX_STYLE_DASHBOARD_TABS);
+	$dashboard_tabs = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD_TABS);
 
 	$dashboard_tabs->addItem(
 		(new CDiv())
-			->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION)
+			->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION)
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_CONTROLS_LEFT)
+					->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem((new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous dashboard')))
-						->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_DASHBOARD)
+						->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_PREVIOUS_DASHBOARD)
 					)
 			)
-			->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_TABS))
+			->addItem((new CDiv())->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_TABS))
 			->addItem(
 				(new CDiv())
-					->addClass(ZBX_STYLE_DASHBOARD_TABS_NAVIGATION_CONTROLS_RIGHT)
+					->addClass(ZBX_STYLE_HOST_DASHBOARD_NAVIGATION_CONTROLS)
 					->addItem([
 						(new CButtonIcon(ZBX_ICON_CHEVRON_DOWN, _('Dashboard list')))
-							->addClass(ZBX_STYLE_BTN_DASHBOARD_LIST),
+							->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_LIST),
 						(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next dashboard')))
-							->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_DASHBOARD)
+							->addClass(ZBX_STYLE_BTN_HOST_DASHBOARD_NEXT_DASHBOARD)
 					])
 			)
 	);
@@ -154,7 +153,8 @@ if ($data['has_time_selector']) {
 	);
 }
 
-if (count($data['dashboard']['pages']) >= 1) {
+if (count($data['dashboard']['pages']) > 1
+		|| (count($data['dashboard']['pages']) == 1 && $data['dashboard']['pages'][0]['widgets'])) {
 	$dashboard = (new CDiv())->addClass(ZBX_STYLE_DASHBOARD);
 
 	if (count($data['dashboard']['pages']) > 1) {
@@ -194,16 +194,17 @@ if (count($data['dashboard']['pages']) >= 1) {
 
 	$dashboard->addItem((new CDiv())->addClass(ZBX_STYLE_DASHBOARD_GRID));
 
-	$html_page->addItem($dashboard);
-
-	if (count($data['dashboard']['pages']) === 1 && !$data['dashboard']['pages'][0]['widgets']) {
-		$html_page->addItem((new CDiv())
+	$html_page
+		->addItem($dashboard)
+		->show();
+}
+else {
+	$html_page
+		->addItem((new CDiv())
 			->addStyle('margin-top: 5px;')
 			->addItem(new CTableInfo())
-		);
-	}
-
-	$html_page->show();
+		)
+		->show();
 }
 
 (new CScriptTag('
@@ -214,7 +215,7 @@ if (count($data['dashboard']['pages']) >= 1) {
 		'configuration_hash' => $data['configuration_hash'],
 		'time_period' => $data['time_period'],
 		'web_layout_mode' => $web_layout_mode,
-		'dashboard_tabs' => $data['host_dashboards']
+		'host_dashboards' => $data['host_dashboards']
 	]).');
 '))
 	->setOnDocumentReady()

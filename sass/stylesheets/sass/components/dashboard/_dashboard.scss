@@ -36,7 +36,7 @@
 }
 
 .dashboard-navigation,
-.dashboard-tabs-navigation {
+.host-dashboard-navigation {
 	display: flex;
 	margin-top: 10px;
 	padding-bottom: 2px;
@@ -54,7 +54,7 @@
 }
 
 .dashboard-navigation-tabs,
-.dashboard-tabs-navigation-tabs {
+.host-dashboard-navigation-tabs {
 	// Compensate 2px padding of tabs.
 	margin: -2px 10px -2px 0;
 	overflow: hidden;
