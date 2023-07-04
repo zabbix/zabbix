@@ -808,7 +808,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	private function updateForce(array &$hosts, array $db_hosts): void {
+	private function updateForce(array &$hosts, array &$db_hosts): void {
 		// Helps to avoid deadlocks.
 		CArrayHelper::sort($hosts, ['hostid', 'order' => ZBX_SORT_DOWN]);
 
@@ -837,6 +837,7 @@ class CHostPrototype extends CHostBase {
 				$internal_fields + $upd_host + $nested_object_fields + $inventory_fields
 			);
 		}
+		unset($host);
 
 		if ($upd_hosts) {
 			DB::update('hosts', $upd_hosts);
@@ -1371,7 +1372,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateInterfaces(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
+	private static function updateInterfaces(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$ins_interfaces = [];
 		$del_interfaceids = [];
 
@@ -1432,7 +1433,7 @@ class CHostPrototype extends CHostBase {
 					$upd_hostids[$i] = $host['hostid'];
 				}
 				else {
-					unset($host['interfaces']);
+					unset($host['interfaces'], $db_hosts[$host['hostid']]['interfaces']);
 				}
 			}
 		}
@@ -1515,7 +1516,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateGroupLinks(array &$hosts, array $db_hosts = null, array &$upd_hostids = null): void {
+	private static function updateGroupLinks(array &$hosts, array &$db_hosts = null, array &$upd_hostids = null): void {
 		$ins_group_links = [];
 		$upd_group_links = []; // Used to update templateid value upon inheritance.
 		$del_group_prototypeids = [];
@@ -1566,7 +1567,7 @@ class CHostPrototype extends CHostBase {
 					$upd_hostids[$i] = $host['hostid'];
 				}
 				else {
-					unset($host['groupLinks']);
+					unset($host['groupLinks'], $db_hosts[$host['hostid']]['groupLinks']);
 				}
 			}
 		}
@@ -1604,7 +1605,7 @@ class CHostPrototype extends CHostBase {
 	 * @param array|null $db_hosts
 	 * @param array|null $upd_hostids
 	 */
-	private static function updateGroupPrototypes(array &$hosts, array $db_hosts = null,
+	private static function updateGroupPrototypes(array &$hosts, array &$db_hosts = null,
 			array &$upd_hostids = null): void {
 		$ins_group_prototypes = [];
 		$upd_group_prototypes = []; // Used to update templateid value upon inheritance.
@@ -1657,7 +1658,7 @@ class CHostPrototype extends CHostBase {
 					$upd_hostids[$i] = $host['hostid'];
 				}
 				else {
-					unset($host['groupPrototypes']);
+					unset($host['groupPrototypes'], $db_hosts[$host['hostid']]['groupPrototypes']);
 				}
 			}
 		}
@@ -2036,7 +2037,7 @@ class CHostPrototype extends CHostBase {
 
 		if ($hosts_to_update) {
 			$_upd_db_hosts = self::getChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $ruleids);
-			$_upd_hosts = self::getUpdChildObjectsUsingTemplateid($hosts_to_update, $_upd_db_hosts);
+			$_upd_hosts = self::getUpdChildObjectsUsingTemplateid($hosts_to_update, $db_hosts, $_upd_db_hosts);
 
 			self::checkDuplicates($_upd_hosts, $_upd_db_hosts, true);
 
@@ -2150,7 +2151,7 @@ class CHostPrototype extends CHostBase {
 				'host_status' => $upd_db_host['host_status']
 			];
 
-			self::addInheritedFields($upd_host, $host);
+			self::addInheritedFields($upd_host, $host, $upd_db_host);
 
 			$upd_host += [
 				'interfaces' => [],
@@ -2261,23 +2262,25 @@ class CHostPrototype extends CHostBase {
 
 	/**
 	 * @param array $hosts
+	 * @param array $db_hosts
 	 * @param array $upd_db_hosts
 	 *
 	 * @return array
 	 */
-	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $upd_db_hosts): array {
+	private static function getUpdChildObjectsUsingTemplateid(array $hosts, array $db_hosts,
+			array $upd_db_hosts): array {
 		$parent_indexes = array_flip(array_column($hosts, 'hostid'));
 
 		$upd_hosts = [];
 
 		foreach ($upd_db_hosts as $upd_db_host) {
-			$host = $hosts[$parent_indexes[$upd_db_host['templateid']]];
-
 			$upd_host = array_intersect_key($upd_db_host,
 				array_flip(['hostid', 'ruleid', 'host_status'])
 			);
+			$host = $hosts[$parent_indexes[$upd_db_host['templateid']]];
+			$db_host = $db_hosts[$host['hostid']];
 
-			self::addInheritedFields($upd_host, $host);
+			self::addInheritedFields($upd_host, $host, $upd_db_host, $db_host);
 
 			$upd_hosts[] = $upd_host;
 		}
@@ -2288,8 +2291,11 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * @param array      $inh_host
 	 * @param array      $host
+	 * @param array|null $inh_db_host
+	 * @param array|null $db_host
 	 */
-	private static function addInheritedFields(array &$inh_host, array $host): void {
+	private static function addInheritedFields(array &$inh_host, array $host, array $inh_db_host = null,
+			array $db_host = null): void {
 		$inh_host += array_intersect_key($host,
 			array_flip(['host', 'name', 'custom_interfaces', 'status', 'discover', 'inventory_mode'])
 		);
@@ -2343,8 +2349,26 @@ class CHostPrototype extends CHostBase {
 		if (array_key_exists('macros', $host)) {
 			$inh_host['macros'] = [];
 
+			$inh_hostmacroids = $inh_db_host !== null
+				? array_column($inh_db_host['macros'], 'hostmacroid', 'macro')
+				: [];
+
 			foreach ($host['macros'] as $host_macro) {
-				$inh_host['macros'][] =  array_diff_key($host_macro, array_flip(['hostmacroid']));
+				if ($db_host === null) {
+					$macro = $host_macro['macro'];
+				}
+				else {
+					$macro = array_key_exists($host_macro['hostmacroid'], $db_host['macros'])
+						? $db_host['macros'][$host_macro['hostmacroid']]['macro']
+						: $host_macro['macro'];
+				}
+
+				if (array_key_exists($macro, $inh_hostmacroids)) {
+					$inh_host['macros'][] = ['hostmacroid' => $inh_hostmacroids[$macro]] + $host_macro;
+				}
+				else {
+					$inh_host['macros'][] =  array_diff_key($host_macro, array_flip(['hostmacroid']));
+				}
 			}
 		}
 	}
