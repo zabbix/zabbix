@@ -71,7 +71,6 @@ class CControllerTemplateDelete extends CController {
 				]);
 
 				if (!$result) {
-					// todo - fix this:
 					throw new Exception();
 				}
 			}

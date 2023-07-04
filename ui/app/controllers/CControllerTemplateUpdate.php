@@ -116,7 +116,6 @@ class CControllerTemplateUpdate extends CController {
 			}
 		}
 
-		// todo - fix exceptions:
 		if ($upd_valuemaps && !API::ValueMap()->update($upd_valuemaps)) {
 			throw new Exception();
 		}
@@ -143,7 +142,6 @@ class CControllerTemplateUpdate extends CController {
 		if ($new_groups) {
 			$new_groupid = API::TemplateGroup()->create($new_groups);
 
-			// todo - fix exceptions:
 			if (!$new_groupid) {
 				throw new Exception();
 			}
