@@ -3025,7 +3025,7 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($itemids as $i => $itemid) {
 			if ($db_items[$itemid]['templateid'] != 0) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
-					_('cannot delete inherited item')
+					_('cannot delete inherited LLD rule')
 				));
 			}
 		}
