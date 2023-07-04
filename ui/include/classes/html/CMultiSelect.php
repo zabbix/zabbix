@@ -124,7 +124,7 @@ class CMultiSelect extends CTag {
 			}
 		}
 
-		$this->params = $params;
+		$this->setAttribute('data-params', $params);
 
 		if (!array_key_exists('add_post_js', $options) || $options['add_post_js']) {
 			zbx_add_post_js($this->getPostJS());
@@ -137,7 +137,7 @@ class CMultiSelect extends CTag {
 	}
 
 	public function getPostJS() {
-		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect('.json_encode($this->params).');';
+		return 'jQuery("#'.$this->getAttribute('id').'").multiSelect();';
 	}
 
 	/**

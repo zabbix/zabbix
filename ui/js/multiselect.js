@@ -332,7 +332,7 @@
 	 */
 	$.fn.multiSelect = function(options) {
 		// Call a public method.
-		if (methods[options]) {
+		if (options !== undefined && methods[options]) {
 			return methods[options].apply(this, Array.prototype.slice.call(arguments, 1));
 		}
 
@@ -358,10 +358,11 @@
 				styles: {}
 			};
 
-		options = $.extend({}, defaults, options);
-
 		return this.each(function() {
 			var $obj = $(this);
+
+			let options = JSON.parse(this.dataset.params);
+			options = $.extend({}, defaults, options);
 
 			if ($obj.data('multiSelect') !== undefined) {
 				return;
