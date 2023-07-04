@@ -86,8 +86,9 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
+				overlayDialogueDestroy(overlay.dialogueid);
+				this.editTemplate({templateid:e.detail.templateid});
+			});
 		},
 
 		edit(parameters = {}) {

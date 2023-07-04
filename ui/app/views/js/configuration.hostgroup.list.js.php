@@ -146,8 +146,9 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => this._reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => this._reload(e.detail.success));
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
+				overlayDialogueDestroy(overlay.dialogueid);
+				this.editTemplate({templateid:e.detail.templateid});
+			});
 		},
 
 		_post(target, groupids, url) {

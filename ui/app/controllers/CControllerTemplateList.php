@@ -168,6 +168,7 @@ class CControllerTemplateList extends CController {
 		$editable_templates = [];
 		$linked_hostids = [];
 		$editable_hosts = [];
+
 		foreach ($templates as &$template) {
 			order_result($template['templates'], 'name');
 			order_result($template['parentTemplates'], 'name');

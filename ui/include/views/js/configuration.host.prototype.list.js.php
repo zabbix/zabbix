@@ -26,55 +26,12 @@
 
 <script>
 	const view = {
-
 		init() {
 			document.addEventListener('click', (e) => {
 				if (e.target.classList.contains('js-edit-template')) {
-					this.editLinkedTemplate({templateid: e.target.dataset.templateid})
+					this.openTemplatePopup({templateid: e.target.dataset.templateid})
 				}
 			});
-		},
-
-		editLinkedTemplate(parameters) {
-			const overlay = PopUp('template.edit', parameters, {
-				dialogueid: 'templates-form',
-				dialogue_class: 'modal-popup-large',
-				prevent_navigation: true
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('dialogue.delete', (e) => {
-				uncheckTableRows('templates');
-				postMessageOk(e.detail.title);
-
-				if ('success' in e.detail) {
-					postMessageOk(e.detail.success.title);
-
-					if ('messages' in e.detail.success) {
-						postMessageDetails('success', e.detail.success.messages);
-					}
-				}
-
-				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
 		},
 
 		editHost(e, hostid) {
@@ -127,9 +84,10 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
+			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
+				overlayDialogueDestroy(overlay.dialogueid);
 				this.openTemplatePopup({templateid:e.detail.templateid})
-			);
+			});
 		},
 
 		events: {

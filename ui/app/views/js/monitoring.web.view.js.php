@@ -79,8 +79,9 @@
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
+				overlayDialogueDestroy(overlay.dialogueid);
+				this.editTemplate({templateid:e.detail.templateid});
+			});
 		},
 
 		events: {

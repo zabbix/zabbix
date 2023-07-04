@@ -37,7 +37,7 @@ window.template_edit_popup = new class {
 		if (template.warnings && template.warnings.length > 0) {
 			const message_box = template.warnings.length > 1
 				? makeMessageBox('warning', template.warnings,
-					<?= json_encode(_('Cloned host parameter values have been modified.')) ?>, true, false
+					<?= json_encode(_('Cloned template parameter values have been modified.')) ?>, true, false
 				)[0]
 				: makeMessageBox('warning', template.warnings, null, true, false)[0];
 
@@ -54,8 +54,7 @@ window.template_edit_popup = new class {
 
 		this.form.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-edit-linked')) {
-				this.#editLinkedTemplate({templateid: e.target.dataset.templateid}, e.target.dataset.templateid);
-
+				this.#editLinkedTemplate({templateid: e.target.dataset.templateid});
 			}
 			else if (e.target.classList.contains('unlink')) {
 				e.target.closest('tr').remove();
@@ -64,7 +63,7 @@ window.template_edit_popup = new class {
 					value !== e.target.dataset.templateid
 				);
 
-				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
+				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
 				$('#template_add_templates_').trigger('change');
 			}
 			else if (e.target.classList.contains('unlink-and-clear')) {
@@ -74,9 +73,10 @@ window.template_edit_popup = new class {
 					value !== e.target.dataset.templateid
 				);
 
-				this.form.querySelector('#show_inherited_macros').dispatchEvent(new Event('change'));
-				this.unlink_clear_templateids[`${e.target.dataset.templateid}`] = e.target.dataset.templateid
-				this.#unlinkAndClearTemplate(e.target.dataset.templateid)
+				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
+				this.unlink_clear_templateids[`${e.target.dataset.templateid}`] = e.target.dataset.templateid;
+				this.#unlinkAndClearTemplate(e.target.dataset.templateid);
+				$('#template_add_templates_').trigger('change');
 			}
 		});
 
@@ -178,14 +178,31 @@ window.template_edit_popup = new class {
 	clone() {
 		this.overlay.setLoading();
 		const parameters = this.#trimFields(getFormFields(this.form));
+
 		parameters.clone = 1;
 		parameters.clone_templateid = this.templateid;
+		this.#prepareFields(parameters);
 
 		this.overlay = PopUp('template.edit', parameters, {
 			dialogueid: 'templates-form',
 			dialogue_class: 'modal-popup-large',
 			prevent_navigation: true
 		});
+	}
+
+	#prepareFields(parameters) {
+		const mappings = [
+			{from: 'template_groups', to: 'groups'},
+			{from: 'template_add_templates', to: 'add_templates'},
+			{from: 'show_inherited_template_macros', to: 'show_inherited_macros'}
+		];
+
+		for (const mapping of mappings) {
+			parameters[mapping.to] = parameters[mapping.from];
+			delete parameters[mapping.from];
+		}
+
+		return parameters;
 	}
 
 	delete(clear = false) {
@@ -215,12 +232,7 @@ window.template_edit_popup = new class {
 			fields.templateid = this.templateid;
 		}
 
-		fields.groups = fields.template_groups;
-		delete (fields.template_groups);
-
-		fields.add_templates = fields.template_add_templates;
-		delete (fields.teplate_add_templates);
-
+		this.#prepareFields(fields);
 		this.#trimFields(fields);
 		this.overlay.setLoading();
 
@@ -334,7 +346,8 @@ window.template_edit_popup = new class {
 
 		$groups_ms.on('change', () =>
 			$groups_ms.multiSelect('setDisabledEntries',
-				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')].map((input) => input.value)
+				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')]
+					.map((input) => input.value)
 			)
 		);
 	}

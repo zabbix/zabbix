@@ -196,8 +196,9 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				this.editTemplate({templateid:e.detail.templateid})
-			})
+				overlayDialogueDestroy(overlay.dialogueid);
+				this.editTemplate({templateid:e.detail.templateid});
+			});
 
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				new TabIndicators('host-tabs');

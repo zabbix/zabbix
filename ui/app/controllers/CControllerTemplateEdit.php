@@ -34,19 +34,20 @@ class CControllerTemplateEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'templateid' =>			'db hosts.hostid',
-			'clone_templateid' =>	'db hosts.hostid',
-			'groupids' =>			'array_db hosts_groups.groupid',
-			'template_name' =>		'db hosts.host',
-			'visiblename' =>		'db hosts.name',
-			'groups' =>				'array',
-			'description' =>		'db hosts.description',
-			'tags' =>				'array',
-			'macros' =>				'array',
-			'valuemaps' =>			'array',
-			'templates' =>			'array_db hosts.hostid',
-			'add_templates' =>		'array_db hosts.hostid',
-			'clone' =>				'in 1'
+			'templateid' =>				'db hosts.hostid',
+			'clone_templateid' =>		'db hosts.hostid',
+			'groupids' =>				'array_db hosts_groups.groupid',
+			'template_name' =>			'db hosts.host',
+			'visiblename' =>			'db hosts.name',
+			'groups' =>					'array',
+			'description' =>			'db hosts.description',
+			'tags' =>					'array',
+			'macros' =>					'array',
+			'valuemaps' =>				'array',
+			'templates' =>				'array_db hosts.hostid',
+			'add_templates' =>			'array_db hosts.hostid',
+			'show_inherited_macros' =>	'in 0,1',
+			'clone' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -86,9 +87,8 @@ class CControllerTemplateEdit extends CController {
 		return true;
 	}
 
-	// todo - optimize the code.
 	protected function doAction(): void {
-		$templateid = $this->getInput('templateid');
+		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
 		$clone = $this->hasInput('clone');
 
 		// Remove inherited macros data.
@@ -106,7 +106,7 @@ class CControllerTemplateEdit extends CController {
 			'template_name' =>$this->getInput('template_name', ''),
 			'visible_name' => $this->getInput('visiblename', ''),
 			'description' => $this->getInput('description', ''),
-			'groups_ms' => $this->getInput('groups_ms', []),
+			'groups_ms' => [],
 			'linked_templates' => $this->getInput('linked_templates', []),
 			'templates' => $this->getInput('templates', []),
 			'add_templates' => [],
@@ -114,35 +114,36 @@ class CControllerTemplateEdit extends CController {
 			'macros' => $macros,
 			'tags' => $this->getInput('tags', []),
 			'valuemaps' => $this->getInput('valuemaps', []),
-			// todo - read from input?
 			'readonly' => false,
-			'show_inherited_macros' => false,
+			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 			'vendor' => [],
 			'clone' => $this->hasInput('clone')
 		];
 
-		// Add already linked and new templates.
+		// Add already linked and new templates when cloning element.
 		$templates = [];
-		$request_linked_templates = $this->getInput('templates', $data['original_templates']);
-		// todo - add 'add_templates'
-		$request_add_templates = $this->getInput('add_templates', []);
 
-		if ($request_linked_templates || $request_add_templates) {
-			$templates = API::Template()->get([
-				'output' => ['templateid', 'name'],
-				'templateids' => array_merge($request_linked_templates, $request_add_templates),
-				'preservekeys' => true
-			]);
+		if ($clone) {
+			$request_linked_templates = $this->getInput('templates', $data['original_templates']);
+			$request_add_templates = $this->getInput('add_templates', []);
 
-			$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
-			CArrayHelper::sort($data['linked_templates'], ['name']);
+			if ($request_linked_templates || $request_add_templates) {
+				$templates = API::Template()->get([
+					'output' => ['templateid', 'name'],
+					'templateids' => array_merge($request_linked_templates, $request_add_templates),
+					'preservekeys' => true
+				]);
 
-			$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+				$data['linked_templates'] = array_intersect_key($templates, array_flip($request_linked_templates));
+				CArrayHelper::sort($data['linked_templates'], ['name']);
 
-			foreach ($data['add_templates'] as &$template) {
-				$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+				$data['add_templates'] = array_intersect_key($templates, array_flip($request_add_templates));
+
+				foreach ($data['add_templates'] as &$template) {
+					$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
+				}
+				unset($template);
 			}
-			unset($template);
 		}
 
 		$data['writable_templates'] = API::Template()->get([
@@ -151,8 +152,6 @@ class CControllerTemplateEdit extends CController {
 			'editable' => true,
 			'preservekeys' => true
 		]);
-
-		$data['templates'] = $templates;
 
 		if ($this->hasInput('templateid')) {
 			$dbTemplates = API::Template()->get([
@@ -167,10 +166,12 @@ class CControllerTemplateEdit extends CController {
 
 			$data['dbTemplate'] = reset($dbTemplates);
 
-			$data['vendor'] = array_filter([
-				'name' => $data['dbTemplate']['vendor_name'],
-				'version' => $data['dbTemplate']['vendor_version']
-			], 'strlen');
+			if (!$clone) {
+				$data['vendor'] = array_filter([
+					'name' => $data['dbTemplate']['vendor_name'],
+					'version' => $data['dbTemplate']['vendor_version']
+				], 'strlen');
+			}
 
 			foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 				$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
@@ -182,8 +183,6 @@ class CControllerTemplateEdit extends CController {
 			CArrayHelper::sort($data['dbTemplate']['valuemaps'], ['name']);
 
 			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
-
-
 			$data['template_name'] = $data['dbTemplate']['host'];
 			$data['visible_name'] = $data['dbTemplate']['name'];
 
@@ -191,24 +190,22 @@ class CControllerTemplateEdit extends CController {
 			if ($data['visible_name'] === $data['template_name']) {
 				$data['visible_name'] = '';
 			}
-
-//			$templateids = $data['original_templates'];
 		}
 
-		// description
+		// Add description.
 		$data['description'] = ($data['templateid'] !== null)
 			? $data['dbTemplate']['description']
 			: $this->getInput('description', '');
 
-		// tags
+		// Insert empty tag row when no tags are present.
 		if (count($data['tags']) == 0) {
 			$data['tags'][] = ['tag' => '', 'value' => ''];
 		}
 
 		CArrayHelper::sort($data['tags'], ['tag', 'value']);
 
-		// Add already linked and new templates.
-		if (!$clone) {
+		// Add already linked templates.
+		if (!$clone && array_key_exists('dbTemplate', $data)) {
 			$templates = [];
 			$linked_templates = $data['dbTemplate']['parentTemplates'];
 
@@ -216,25 +213,15 @@ class CControllerTemplateEdit extends CController {
 				$linked_template_ids[$template['templateid']] = $template['templateid'];
 			}
 
-			// todo - add add_templates
-			$add_templates = $this->getInput('add_templates', []);
-
-			if ($linked_templates || $add_templates) {
+			if ($linked_templates) {
 				$templates = API::Template()->get([
 					'output' => ['templateid', 'name'],
-					'templateids' => array_merge($linked_template_ids, $add_templates),
+					'templateids' => $linked_template_ids,
 					'preservekeys' => true
 				]);
 
 				$data['linked_templates'] = array_intersect_key($templates, array_flip($linked_template_ids));
 				CArrayHelper::sort($data['linked_templates'], ['name']);
-
-				$data['add_templates'] = array_intersect_key($templates, array_flip($add_templates));
-
-				foreach ($data['add_templates'] as &$template) {
-					$template = CArrayHelper::renameKeys($template, ['templateid' => 'id']);
-				}
-				unset($template);
 			}
 		}
 
@@ -394,6 +381,8 @@ class CControllerTemplateEdit extends CController {
 
 		// Prepare data for multiselect.
 		foreach ($groups as $group) {
+			$disabled = (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw);
+
 			if (is_array($group) && array_key_exists('new', $group)) {
 				$data['groups_ms'][] = [
 					'id' => $group['new'],
@@ -405,7 +394,7 @@ class CControllerTemplateEdit extends CController {
 				$data['groups_ms'][] = [
 					'id' => $group,
 					'name' => $groups_all[$group]['name'],
-					'disabled' => (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw)
+					'disabled' => $disabled
 				];
 			}
 		}

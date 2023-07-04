@@ -117,11 +117,9 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 				$caption[] = ' (';
 				foreach ($linkedTemplates as $tpl) {
 					if (array_key_exists($tpl['templateid'], $data['writable_templates'])) {
-						$caption[] = (new CLink($tpl['name'],
-							(new CUrl('templates.php'))
-								->setArgument('form', 'update')
-								->setArgument('templateid', $tpl['templateid'])
-						))
+						$caption[] = (new CLink($tpl['name']))
+							->addClass('js-edit-template')
+							->setAttribute('data-templateid',  $tpl['templateid'])
 							->addClass(ZBX_STYLE_LINK_ALT)
 							->addClass(ZBX_STYLE_GREY);
 					}

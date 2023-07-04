@@ -306,10 +306,6 @@ function getHostNavigation($current_element, $hostid, $lld_ruleid = 0) {
 	$list = new CList();
 
 	if ($is_template) {
-//		$template = new CSpan(
-//			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
-//		);
-
 		$template = new CSpan(
 			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
 				->setArgument('action', 'template.edit')
