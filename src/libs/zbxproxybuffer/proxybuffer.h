@@ -52,7 +52,7 @@ typedef struct
 	zbx_uint64_t	id;
 	zbx_uint64_t	druleid;
 	zbx_uint64_t	dcheckid;
-	zbx_uint64_t	batchid;
+	zbx_uint64_t	handleid;
 	char		*dns;
 	char		*ip;
 	char		*value;
@@ -125,7 +125,9 @@ typedef struct
 
 	zbx_uint64_t		history_lastid_mem;
 
-	zbx_uint64_t		discovery_batchid;
+	/* opened data handle tracking */
+	zbx_uint64_t		handleid;
+	zbx_vector_uint64_t	history_handleids;
 }
 zbx_pb_t;
 
@@ -164,5 +166,10 @@ void	pb_get_rows_db(struct zbx_json *j, const char *proto_tag, const zbx_history
 
 void	pb_set_lastid(const char *table_name, const char *lastidfield, const zbx_uint64_t lastid);
 void pd_fallback_to_database(zbx_pb_t *pb, const char *message);
+
+zbx_uint64_t	pb_get_next_handleid(zbx_pb_t *pb);
+zbx_uint64_t	pb_register_handle(zbx_pb_t *pb, zbx_vector_uint64_t *handleids);
+void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid);
+void	pb_wait_handles(const zbx_vector_uint64_t *handleids);
 
 #endif

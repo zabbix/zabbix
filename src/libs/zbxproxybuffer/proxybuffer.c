@@ -158,7 +158,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 
 		if (NULL != drow)
 		{
-			zbx_uint64_t	batchid = drow->batchid;
+			zbx_uint64_t	handleid = drow->handleid;
 
 			do
 			{
@@ -169,7 +169,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 				size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
 				pb_list_free_discovery(&pb->discovery, drow);
 			}
-			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->batchid == batchid);
+			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->handleid == handleid);
 
 			continue;
 		}
@@ -547,6 +547,101 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 	}
 }
 
+zbx_uint64_t	pb_get_next_handleid(zbx_pb_t *pb)
+{
+	return ++pb->handleid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: register opened data handle                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	pb_register_handle(zbx_pb_t *pb, zbx_vector_uint64_t *handleids)
+{
+	zbx_uint64_t	handleid;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
+
+	handleid = pb_get_next_handleid(pb);
+	zbx_vector_uint64_append(handleids, handleid);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() handleid:" ZBX_FS_UI64 " handles:%d", __func__, handleid,
+			handleids->values_num);
+
+	return handleid;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: deregister data handle                                            *
+ *                                                                            *
+ ******************************************************************************/
+void	pb_deregister_handle(zbx_vector_uint64_t *handleids, zbx_uint64_t handleid)
+{
+	int	i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() handleid:" ZBX_FS_UI64, __func__, handleid);
+
+	if (FAIL != (i = zbx_vector_uint64_search(handleids, handleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		zbx_vector_uint64_remove_noorder(handleids, i);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() handles:%d", __func__, handleids->values_num);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: wait for the opened data handles to be closed                     *
+ *                                                                            *
+ * parameters: handleids - [IN] the handle list to wait on                    *
+ *                                                                            *
+ ******************************************************************************/
+void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
+{
+	int		i;
+	zbx_uint64_t	handleid = 0;
+	struct timespec	delay = { 0, 100000000L };
+
+	if (NULL == handleids)
+	{
+		nanosleep(&delay, NULL);
+		return;
+	}
+
+	pb_lock();
+
+	for (i = 0; i < handleids->values_num; i++)
+	{
+		if (handleids->values[i] > handleid)
+			handleid = handleids->values[i];
+	}
+
+	pb_unlock();
+
+	if (0 != handleid)
+	{
+		int	wait_handles = 1;
+
+		while (0 != wait_handles)
+		{
+			nanosleep(&delay, NULL);
+
+			pb_lock();
+
+			for (i = 0; i < handleids->values_num; i++)
+			{
+				if (handleids->values[i] <= handleid)
+				{
+					wait_handles = 0;
+					break;
+				}
+			}
+
+			pb_unlock();
+		}
+	}
+}
+
 /* public api */
 
 /******************************************************************************
@@ -563,24 +658,27 @@ static void pb_update_state(zbx_pb_t *pb, int more)
  ******************************************************************************/
 int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char **error)
 {
-	int	ret = FAIL;
+	int	ret = FAIL, allow_oom;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() mode:%d", __func__, mode);
 
 	if (ZBX_PB_MODE_DISK == mode)
 	{
-		/* allocate proxy buffer only to store statistics */
-		ret = zbx_shmem_create_min(&pb_mem, sizeof(zbx_pb_t), "proxy memory buffer size",
-				"ProxyMemoryBufferSize", 0, error);
+		/* allocate proxy buffer only to store statistics and track opened history handles */
+		size = ZBX_KIBIBYTE * 16;
+
+		allow_oom = 0;
 	}
 	else
-		ret = zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", 1, error);
+		allow_oom = 1;
 
-	if (SUCCEED != ret)
+	if (FAIL == zbx_shmem_create(&pb_mem, size, "proxy memory buffer size", "ProxyMemoryBufferSize", allow_oom,
+			error))
+	{
 		goto out;
+	}
 
-	/* use realloc only to suppress 'unused function' warnings */
-	pb_data = (zbx_pb_t *)__pb_shmem_realloc_func(NULL, sizeof(zbx_pb_t));
+	pb_data = (zbx_pb_t *)__pb_shmem_malloc_func(NULL, sizeof(zbx_pb_t));
 	memset(pb_data, 0, sizeof(zbx_pb_t));
 
 	if (SUCCEED != zbx_mutex_create(&pb_data->mutex, ZBX_MUTEX_PROXY_BUFFER, error))
@@ -589,6 +687,11 @@ int	zbx_pb_init(int mode, zbx_uint64_t size, int age, int offline_buffer, char *
 	zbx_list_create_ext(&pb_data->history, __pb_shmem_malloc_func, __pb_shmem_free_func);
 	zbx_list_create_ext(&pb_data->discovery, __pb_shmem_malloc_func, __pb_shmem_free_func);
 	zbx_list_create_ext(&pb_data->autoreg, __pb_shmem_malloc_func, __pb_shmem_free_func);
+
+	zbx_vector_uint64_create_ext(&pb_data->history_handleids, __pb_shmem_malloc_func, __pb_shmem_realloc_func,
+			__pb_shmem_free_func);
+	/* preallocate handle tracking vector to avoid handling memory allocation errors later */
+	zbx_vector_uint64_reserve(&pb_data->history_handleids, 100);
 
 	pb_data->mode = mode;
 	pb_data->max_age = age;

@@ -46,6 +46,7 @@ struct zbx_pb_discovery_data
 	zbx_list_t	rows;
 	int		rows_num;
 	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	handleid;
 };
 
 void	pb_list_free_discovery(zbx_list_t *list, zbx_pb_discovery_t *row)
@@ -197,13 +198,11 @@ out:
  * Purpose: set ids to new discovery rows                                     *
  *                                                                            *
  ******************************************************************************/
-static void	pb_discovery_set_row_ids(zbx_pb_t *pb, zbx_list_t *rows, int rows_num)
+static void	pb_discovery_set_row_ids(zbx_list_t *rows, int rows_num, zbx_uint64_t handleid)
 {
 	zbx_uint64_t		id;
 	zbx_pb_discovery_t	*row;
 	zbx_list_iterator_t	li;
-
-	pb->discovery_batchid++;
 
 	id = zbx_dc_get_nextid("proxy_dhistory", rows_num);
 	zbx_list_iterator_init(rows, &li);
@@ -212,7 +211,7 @@ static void	pb_discovery_set_row_ids(zbx_pb_t *pb, zbx_list_t *rows, int rows_nu
 	{
 		(void)zbx_list_iterator_peek(&li, (void **)&row);
 		row->id = id++;
-		row->batchid = pb->discovery_batchid;
+		row->handleid = handleid;
 	}
 }
 
@@ -455,8 +454,12 @@ zbx_pb_discovery_data_t	*zbx_pb_discovery_open(void)
 	data = (zbx_pb_discovery_data_t *)zbx_malloc(NULL, sizeof(zbx_pb_discovery_data_t));
 
 	pb_lock();
+
+	data->handleid = pb_get_next_handleid(pb_data);
+
 	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
 		pb_data->db_handles_num++;
+
 	pb_unlock();
 
 	if (PB_MEMORY == data->state)
@@ -495,7 +498,7 @@ void	zbx_pb_discovery_close(zbx_pb_discovery_data_t *data)
 
 		pb_lock();
 
-		pb_discovery_set_row_ids(pb_data, &data->rows, data->rows_num);
+		pb_discovery_set_row_ids(&data->rows, data->rows_num, data->handleid);
 
 		if (PB_MEMORY == pb_data->state && SUCCEED != pb_discovery_check_age(pb_data))
 		{

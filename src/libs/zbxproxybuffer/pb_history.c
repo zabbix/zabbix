@@ -34,6 +34,7 @@ struct zbx_pb_history_data
 	zbx_list_t	rows;
 	int		rows_num;
 	zbx_db_insert_t	db_insert;
+	zbx_uint64_t	handleid;
 };
 
 void	pb_list_free_history(zbx_list_t *list, zbx_pb_history_t *row)
@@ -123,9 +124,7 @@ static int	pb_history_get_rows_db(zbx_uint64_t lastid, zbx_vector_pb_history_ptr
 	zbx_db_row_t		row;
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
-	zbx_uint64_t		id;
-	int			retries = 1, total_retries = 10;
-	struct timespec		t_sleep = { 0, 100000000L }, t_rem;
+	zbx_uint64_t		id, gapid = 0;
 	zbx_pb_history_t	*hist;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastid:" ZBX_FS_UI64, __func__, lastid);
@@ -151,19 +150,14 @@ try_again:
 		{
 			/* At least one record is missing. It can happen if some DB syncer process has */
 			/* started but not yet committed a transaction or a rollback occurred in a DB syncer. */
-			if (0 < retries--)
-			{
-				/* limit the number of total retries to avoid being stuck */
-				/* in history full of 'holes' for a long time             */
-				if (0 >= total_retries--)
-					break;
 
+			if (id != gapid)
+			{
 				zbx_db_free_result(result);
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() " ZBX_FS_UI64 " record(s) missing."
-						" Waiting " ZBX_FS_DBL " sec, retrying.",
-						__func__, id - lastid - 1,
-						(double)t_sleep.tv_sec + (double)t_sleep.tv_nsec / 1e9);
-				nanosleep(&t_sleep, &t_rem);
+
+				gapid = id;
+				pb_wait_handles(&pb_data->history_handleids);
+
 				goto try_again;
 			}
 			else
@@ -172,8 +166,6 @@ try_again:
 						__func__, id - lastid - 1);
 			}
 		}
-
-		retries = 1;
 
 		hist = (zbx_pb_history_t *)zbx_malloc(NULL, sizeof(zbx_pb_history_t));
 		hist->id = id;
@@ -208,7 +200,7 @@ try_again:
 	}
 	zbx_db_free_result(result);
 
-	if (ZBX_MAX_HRECORDS != rows->values_num && 1 == retries)
+	if (ZBX_MAX_HRECORDS != rows->values_num)
 		*more = ZBX_PROXY_DATA_DONE;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:" ZBX_FS_SIZE_T, __func__, rows->values_num);
@@ -711,8 +703,12 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
 	data = (zbx_pb_history_data_t *)zbx_malloc(NULL, sizeof(zbx_pb_history_data_t));
 
 	pb_lock();
+
+	data->handleid = pb_register_handle(pb_data, &pb_data->history_handleids);
+
 	if (PB_DATABASE == (data->state = pb_dst[pb_data->state]))
 		pb_data->db_handles_num++;
+
 	pb_unlock();
 
 	if (PB_MEMORY == data->state)
@@ -748,10 +744,10 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 	{
 		zbx_list_item_t	*next = NULL;
 
+		pb_lock();
+
 		if (0 == data->rows_num)
 			goto out;
-
-		pb_lock();
 
 		pb_history_set_row_ids(&data->rows, data->rows_num);
 
@@ -762,10 +758,7 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 		else if (PB_MEMORY == pb_dst[pb_data->state])
 		{
 			if (NULL == (next = pb_history_add_rows_mem(pb_data, &data->rows)))
-			{
-				pb_unlock();
 				goto out;
-			}
 
 			if (PB_DATABASE_MEMORY == pb_data->state)
 			{
@@ -810,9 +803,10 @@ void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 		pb_data->history_lastid_db = lastid;
 
 	pb_data->db_handles_num--;
-
-	pb_unlock();
 out:
+	pb_deregister_handle(&pb_data->history_handleids, data->handleid);
+	pb_unlock();
+
 	pb_history_data_free(data);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
