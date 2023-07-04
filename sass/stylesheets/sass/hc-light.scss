@@ -169,7 +169,8 @@ $clock-lines-color: #555555;
 // Gauge arcs
 $gauge-empty-color: #f3f3f3;
 $gauge-fill-color: #555555;
-$gauge-needle-color: #000000;
+$gauge-needle-fill-color: #000000;
+$gauge-needle-stoke-color: #000000;
 
 // Statuses
 $status-disabled-border-color: rgba(#000000, 0.2);

@@ -26,6 +26,8 @@ class CSVGGauge {
 	static ZBX_STYLE_VALUE_ARC_SECTOR =			'svg-gauge-value-arc-sector';
 	static ZBX_STYLE_EMPTY_ARC_SECTOR =			'svg-gauge-empty-arc-sector';
 	static ZBX_STYLE_NEEDLE =					'svg-gauge-needle';
+	static ZBX_STYLE_NEEDLE_LIGHT =				'svg-gauge-needle-light';
+	static ZBX_STYLE_NEEDLE_DARK =				'svg-gauge-needle-dark';
 	static ZBX_STYLE_LABEL =					'svg-gauge-label';
 	static ZBX_STYLE_LABEL_LEFT =				'svg-gauge-label-left';
 	static ZBX_STYLE_LABEL_RIGHT =				'svg-gauge-label-right';
@@ -60,9 +62,6 @@ class CSVGGauge {
 	static NEEDLE_RADIUS = 6.5;
 
 	static NEEDLE_GAP = 20;
-
-	// Synchronize with CSS stroke for ZBX_STYLE_NEEDLE class.
-	static NEEDLE_STROKE_BRIGHTNESS = 0.85;
 
 	static ANIMATE_DURATION = 500;
 
@@ -308,12 +307,20 @@ class CSVGGauge {
 				this.#elements.needle.container.style.fill = needle_color_new !== '' ? `#${needle_color_new}` : '';
 
 				if (needle_color_new !== '') {
-					this.#elements.needle.container.style.stroke = `#${
-						CSVGGauge.#adjustBrightness(needle_color_new, CSVGGauge.NEEDLE_STROKE_BRIGHTNESS)
-					}`;
+					const hsl = convertRGBToHSL(
+						parseInt(needle_color_new.slice(0, 2), 16) / 255,
+						parseInt(needle_color_new.slice(2, 4), 16) / 255,
+						parseInt(needle_color_new.slice(4, 6), 16) / 255
+					);
+
+					this.#elements.needle.container.classList.toggle(CSVGGauge.ZBX_STYLE_NEEDLE_LIGHT, hsl[2] > 0.25);
+					this.#elements.needle.container.classList.toggle(CSVGGauge.ZBX_STYLE_NEEDLE_DARK, hsl[2] <= 0.25);
 				}
 				else {
 					this.#elements.needle.container.style.stroke = '';
+					this.#elements.needle.container.classList.remove(CSVGGauge.ZBX_STYLE_NEEDLE_LIGHT,
+						CSVGGauge.ZBX_STYLE_NEEDLE_DARK
+					);
 				}
 			}
 
@@ -906,31 +913,6 @@ class CSVGGauge {
 		};
 
 		requestAnimationFrame(animate);
-	}
-
-	/**
-	 * Adjust color brightness.
-	 *
-	 * @param {string} color       Color consisting of 6 hexadecimal digits.
-	 * @param {number} brightness  Brightness multiplier.
-	 *
-	 * @returns {string}
-	 */
-	static #adjustBrightness(color, brightness) {
-		let color_new = '';
-
-		for (let i = 0; i < 3; i++) {
-			let component = color.slice(i * 2, (i + 1) * 2);
-
-			component = parseInt(component, 16);
-			component = component * brightness;
-			component = Math.min(255, Math.round(component));
-			component = component.toString(16).padStart(2, '0');
-
-			color_new += component;
-		}
-
-		return color_new;
 	}
 
 	/**

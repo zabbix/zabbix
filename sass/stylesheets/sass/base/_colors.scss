@@ -322,7 +322,8 @@ $clock-lines-color: #acbbc2 !default;
 // Gauge arcs and needle.
 $gauge-empty-color: #ebebeb !default;
 $gauge-fill-color: #0275b8 !default;
-$gauge-needle-color: #1f2c33 !default;
+$gauge-needle-fill-color: #1f2c33 !default;
+$gauge-needle-stroke-color: #1f2c33 !default;
 
 // Timeline.
 $timeline-color: #aad7f0;

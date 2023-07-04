@@ -238,7 +238,7 @@ class WidgetForm extends CWidgetForm {
 				new CWidgetFieldColor('empty_color', _('Arc background'))
 			)
 			->addField(
-				new CWidgetFieldColor('bg_color', _('Widget background'))
+				new CWidgetFieldColor('bg_color', _('Background'))
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('units_show', _('Units')))->setDefault(self::DEFAULT_UNITS_SHOW)

@@ -992,3 +992,37 @@ function getFormFields(form) {
 
 	return fields;
 }
+
+/**
+ * Convert RGB encoded color into HSL encoded color.
+ *
+ * @param {number} r  Red component in range of 0-1.
+ * @param {number} g  Green component in range of 0-1.
+ * @param {number} b  Blue component in range of 0-1.
+ *
+ * @returns [{number}, {number}, {number}]  Hue, saturation and lightness components.
+ */
+function convertRGBToHSL(r, g, b) {
+	const v = Math.max(r, g, b);
+	const c = v - Math.min(r, g, b);
+	const f = 1 - Math.abs(v * 2 - c - 1);
+	const h = c && ((v === r) ? (g - b) / c : ((v === g) ? 2 + (b - r) / c : 4 + (r - g) / c));
+
+	return [60 * (h < 0 ? h + 6 : h), f ? c / f : 0, (v * 2 - c) / 2];
+}
+
+/**
+ * Convert HSL encoded color into RGB encoded color.
+ *
+ * @param {number} h  Hue component in range of 0-360.
+ * @param {number} s  Saturation component in range of 0-1.
+ * @param {number} l  Lightness component in range of 0-1.
+ *
+ * @returns [{number}, {number}, {number}]  Red, green and blue components in range 0-1.
+ */
+function convertHSLToRGB(h, s, l) {
+	const a = s * Math.min(l, 1 - l);
+	const f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
+
+	return [f(0), f(8), f(4)];
+}

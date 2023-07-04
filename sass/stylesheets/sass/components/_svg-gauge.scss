@@ -22,13 +22,18 @@
 	}
 
 	.svg-gauge-needle {
-		fill: $gauge-needle-color;
-
-		// Synchronize with JavaScript CSVGGauge.NEEDLE_STROKE_BRIGHTNESS.
-		stroke: darken($gauge-needle-color, 15);
-
+		fill: $gauge-needle-fill-color;
+		stroke: $gauge-needle-stroke-color;
 		vector-effect: non-scaling-stroke;
 		transition: fill $transition, stroke $transition;
+
+		&.svg-gauge-needle-light {
+			stroke: rgba(0, 0, 0, 0.2);
+		}
+
+		&.svg-gauge-needle-dark {
+			stroke: rgba(255, 255, 255, 0.3);
+		}
 	}
 
 	.svg-gauge-label-left {
@@ -47,5 +52,17 @@
 	.svg-gauge-no-data {
 		text-anchor: middle;
 		fill: $font-alt-color;
+	}
+}
+
+// Modifications by themes.
+
+@if $theme-name == 'dark' or $theme-name == 'hc-dark' {
+	.svg-gauge {
+		.svg-gauge-needle {
+			&.svg-gauge-needle-dark {
+				stroke: rgba(255, 255, 255, 0.2);
+			}
+		}
 	}
 }
