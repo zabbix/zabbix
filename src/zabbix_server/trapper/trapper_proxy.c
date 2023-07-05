@@ -182,8 +182,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 		if (0 != areg_lastid)
 			zbx_pb_autoreg_set_lastid(areg_lastid);
 
-		if (0 != history_lastid || 0 != discovery_lastid || 0 != areg_lastid)
-			zbx_pb_update_state(more);
+		zbx_pb_update_state(more);
 
 		if (0 != tasks.values_num)
 		{

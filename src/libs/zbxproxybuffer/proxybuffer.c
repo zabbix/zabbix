@@ -477,7 +477,9 @@ static void	pb_flush_lastids(zbx_pb_t *pb)
 
 static void	pb_flush(zbx_pb_t *pb)
 {
-	if (PB_DB_FLUSH_ENABLED == pb->flush_to_db)
+
+	if (ZBX_PB_MODE_MEMORY != pb->mode && (SUCCEED == pb_history_has_mem_rows(pb) ||
+			SUCCEED == pb_discovery_has_mem_rows(pb) || SUCCEED != pb_autoreg_has_mem_rows(pb)))
 	{
 		do
 		{
@@ -761,7 +763,6 @@ void	zbx_pb_disable(void)
 
 	if (ZBX_PB_MODE_HYBRID == pb_data->mode)
 	{
-		pb_data->flush_to_db = PB_DB_FLUSH_ENABLED;
 		pb_data->state = PB_DATABASE;
 		pb_data->mode = ZBX_PB_MODE_DISK;
 	}

@@ -45,8 +45,6 @@
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
 
-#define ZBX_DATA_UPLOAD		(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY | ZBX_DATASENDER_AUTOREGISTRATION)
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
@@ -91,7 +89,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	struct zbx_json_parse	jp, jp_tasks;
 	int			availability_ts, history_records = 0, discovery_records = 0,
 				areg_records = 0, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay,
-				host_avail_records = 0;
+				host_avail_records = 0, data_read = FAIL;
 	zbx_uint64_t		history_lastid = 0, discovery_lastid = 0, areg_lastid = 0, flags = 0;
 	zbx_timespec_t		ts;
 	char			*error = NULL, *buffer = NULL;
@@ -131,6 +129,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		{
 			data_timestamp = now;
 		}
+
+		data_read = SUCCEED;
 	}
 
 	zbx_vector_tm_task_create(&tasks);
@@ -249,15 +249,15 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_pb_autoreg_set_lastid(areg_lastid);
 
 				zbx_db_commit();
+			}
 
-				if (0 != (flags & ZBX_DATA_UPLOAD))
-				{
-					/* elapsed time being greater than connection timeout means */
-					/* there were connection retries and the 'more' flag might  */
-					/* not represent the latest database buffer state           */
-					if (time(NULL) - time_connect <= args->config_timeout)
-						zbx_pb_update_state(*more);
-				}
+			if (SUCCEED == data_read)
+			{
+				/* elapsed time being greater than connection timeout means */
+				/* there were connection retries and the 'more' flag might  */
+				/* not represent the latest database buffer state           */
+				if (time(NULL) - time_connect <= args->config_timeout)
+					zbx_pb_update_state(*more);
 			}
 		}
 
