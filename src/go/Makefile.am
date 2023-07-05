@@ -80,9 +80,9 @@ sbom.json:
 		   -output-version 1.4 \
 		   -licenses -assert-licenses -json -output "$@"
 
+# cyclonedx-gomod mod defaults to xml as the output format if the -json flag is not given
+# there is no way to specify this explicitly
 sbom.xml:
-	# cyclonedx-gomod mod defaults to xml as the output format if the -json flag is not given
-	# there is no way to specify this explicitly
 	CGO_CFLAGS="${CGO_CFLAGS}" CGO_LDFLAGS="${CGO_LDFLAGS}" cyclonedx-gomod mod \
 		   -output-version 1.4 \
 		   -licenses -assert-licenses -output "$@"
