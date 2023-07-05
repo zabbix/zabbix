@@ -35,124 +35,73 @@ $expression_table = (new CTable())
 
 $allowed_testing = true;
 
-if ($data['expression_type'] === TRIGGER_EXPRESSION) {
-	if ($data['expression_tree']) {
-		foreach ($data['expression_tree'] as $i => $e) {
-			$info_icons = [];
-			if (isset($e['expression']['levelErrors'])) {
-				$allowed_testing = false;
-				$errors = [];
+if ($data['expression_tree']) {
+	foreach ($data['expression_tree'] as $i => $e) {
+		$info_icons = [];
+		if (isset($e['expression']['levelErrors'])) {
+			$allowed_testing = false;
+			$errors = [];
 
-				if (is_array($e['expression']['levelErrors'])) {
-					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
-						if ($errors) {
-							$errors[] = BR();
-						}
-						$errors[] = $expVal.':'.$errTxt;
+			if (is_array($e['expression']['levelErrors'])) {
+				foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
+					if ($errors) {
+						$errors[] = BR();
 					}
-				}
-
-				$info_icons[] = makeErrorIcon($errors);
-			}
-
-			foreach ($e['list'] as &$obj) {
-				if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
-					// Templated or discovered trigger.
-					if ($data['readonly']) {
-						// Make all links inside inactive.
-						$obj = new CSpan($obj->items);
-					}
-					else {
-						$obj->addClass('js-expression');
-					}
+					$errors[] = $expVal.':'.$errTxt;
 				}
 			}
-			unset($obj);
 
-			$expression_table->addRow(
-				new CRow([
-					!$data['readonly']
-						? (new CCheckBox('expr_target_single', $e['id']))
-							->setChecked($i == 0)
-							->addClass('js-check-target')
-							->removeId()
-						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
-					!$data['readonly']
-						? (new CCol((new CButtonLink(_('Remove')))
-							->addClass('js_remove_expression')
-							->setAttribute('data-id', $e['id']))
-						)->addClass(ZBX_STYLE_NOWRAP)
-						: null,
-					makeInformationList($info_icons)
-				])
-			);
+			$info_icons[] = makeErrorIcon($errors);
 		}
-	}
-	else {
-		$allowed_testing = false;
-		$data['expression_formula'] = '';
+
+		foreach ($e['list'] as &$obj) {
+			if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+				// Templated or discovered trigger.
+				if ($data['readonly']) {
+					// Make all links inside inactive.
+					$obj = new CSpan($obj->items);
+				}
+				else {
+					$obj->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
+						? 'js-expression'
+						: 'js-recovery-expression'
+					);
+				}
+			}
+		}
+		unset($obj);
+
+		$expression_table->addRow(
+			new CRow([
+				!$data['readonly']
+					? (new CCheckBox(($data['expression_type'] === TRIGGER_EXPRESSION)
+						? 'expr_target_single' : 'recovery_expr_target_single', $e['id']
+					))
+						->setChecked($i == 0)
+						->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
+							? 'js-check-target'
+							: 'js-check-recovery-target'
+						)
+						->removeId()
+					: null,
+				(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
+				!$data['readonly']
+					? (new CCol((new CButtonLink(_('Remove')))
+						->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
+							? 'js_remove_expression'
+							: 'js_remove_recovery_expression'
+						)
+						->setAttribute('data-id', $e['id']))
+					)->addClass(ZBX_STYLE_NOWRAP)
+					: null,
+				makeInformationList($info_icons)
+			])
+		);
 	}
 }
-
-if ($data['expression_type'] === TRIGGER_RECOVERY_EXPRESSION) {
-	if ($data['recovery_expression_tree']) {
-		foreach ($data['recovery_expression_tree'] as $i => $e) {
-			$info_icons = [];
-			if (isset($e['expression']['levelErrors'])) {
-				$allowed_testing = false;
-				$errors = [];
-
-				if (is_array($e['expression']['levelErrors'])) {
-					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
-						if ($errors) {
-							$errors[] = BR();
-						}
-						$errors[] = $expVal.':'.$errTxt;
-					}
-				}
-
-				$info_icons[] = makeErrorIcon($errors);
-			}
-
-			foreach ($e['list'] as &$obj) {
-				if ($obj instanceof CLinkAction && $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
-					// Templated or discovered trigger.
-					if ($data['readonly']) {
-						// Make all links inside inactive.
-						$obj = new CSpan($obj->items);
-					}
-					else {
-						$obj->addClass('js-recovery-expression');
-					}
-				}
-			}
-			unset($obj);
-
-			$expression_table->addRow(
-				new CRow([
-					!$data['readonly']
-						? (new CCheckBox('recovery_expr_target_single', $e['id']))
-							->setChecked($i == 0)
-							->addClass('js-check-recovery-target')
-							->removeId()
-						: null,
-					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
-					!$data['readonly']
-						? (new CCol((new CButtonLink(_('Remove')))
-							->setAttribute('data-id', $e['id'])
-							->addClass('js_remove_recovery_expression')
-						))->addClass(ZBX_STYLE_NOWRAP)
-						: null,
-					makeInformationList($info_icons)
-				])
-			);
-		}
-	}
-	else {
-		$allowed_testing = false;
-		$data['recovery_expression_formula'] = '';
-	}
+else {
+	$allowed_testing = false;
+	$data['expression_formula'] = '';
 }
 
 $testButton = (new CButton('test_expression', _('Test')))
@@ -192,7 +141,7 @@ if ($data['expression_type'] === TRIGGER_EXPRESSION) {
 	$output['expression'] = $data['expression'];
 }
 else {
-	$output['recovery_expression'] = $data['recovery_expression'];
+	$output['recovery_expression'] = $data['expression'];
 }
 
 echo json_encode($output);

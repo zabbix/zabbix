@@ -71,9 +71,9 @@ class CControllerTriggerExpressionConstructor extends CController {
 		}
 		else {
 			$data = [
-				'recovery_expr_target_single' => $this->getInput('recovery_expr_target_single', ''),
-				'recovery_expression' => $this->getInput('recovery_expression', ''),
-				'recovery_expr_temp' => $this->getInput('recovery_expr_temp', '')
+				'expr_target_single' => $this->getInput('recovery_expr_target_single', ''),
+				'expression' => $this->getInput('recovery_expression', ''),
+				'expr_temp' => $this->getInput('recovery_expr_temp', '')
 			];
 		}
 
@@ -90,22 +90,12 @@ class CControllerTriggerExpressionConstructor extends CController {
 		}
 		elseif ($this->hasInput('remove_expression')) {
 			$expression_action = 'R';
-			if ($this->hasInput('expression')) {
-				$data['expr_target_single'] = $this->getInput('remove_expression');
-			}
-			else {
-				$data['recovery_expr_target_single'] = $this->getInput('remove_expression');
-			}
+			$data['expr_target_single'] = $this->getInput('remove_expression');
 		}
 
-		if ($this->hasInput('expression')) {
-			$data['expression_action'] = $expression_action;
-			$data = $this->getTriggerExpressionConstructor($data);
-		}
-		else {
-			$data['recovery_expression_action'] = $expression_action;
-			$data = $this->getTriggerRecoveryExpressionContructor($data);
-		}
+		$data['expression_action'] = $expression_action;
+		$expression_type = ($this->hasInput('expression')) ? TRIGGER_EXPRESSION : TRIGGER_RECOVERY_EXPRESSION;
+		$data = $this->getTriggerExpressionConstructor($data, $expression_type);
 
 		$data['readonly'] = $this->getInput('readonly', '');
 		$data['expression_type'] = ($this->hasInput('expression')) ? TRIGGER_EXPRESSION : TRIGGER_RECOVERY_EXPRESSION;
@@ -114,8 +104,12 @@ class CControllerTriggerExpressionConstructor extends CController {
 		$this->setResponse($response);
 	}
 
-	function getTriggerExpressionConstructor($data): array {
-		$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
+	function getTriggerExpressionConstructor(array $data, int $expression_type): array {
+		$show_message_text = ($expression_type === TRIGGER_EXPRESSION)
+			? 'Expression syntax error.'
+			: 'Recovery expression syntax error.';
+
+		$analyze = analyzeExpression($data['expression'], $expression_type, $error);
 
 		if ($analyze !== false) {
 			list($data['expression_formula'], $data['expression_tree']) = $analyze;
@@ -134,59 +128,20 @@ class CControllerTriggerExpressionConstructor extends CController {
 					}
 					else {
 						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Expression syntax error.'));
+						show_messages(false, '', _($show_message_text));
 					}
 
 					$data['expr_temp'] = '';
 				}
 				else {
 					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Expression syntax error.'));
+					show_messages(false, '', _($show_message_text));
 				}
 			}
 		}
 		else {
 			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Expression syntax error.'));
-		}
-
-		return $data;
-	}
-
-	function getTriggerRecoveryExpressionContructor($data): array {
-		$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-		if ($analyze !== false) {
-			list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-
-			if ($data['recovery_expression_action'] !== '' && $data['recovery_expression_tree'] !== null) {
-				$new_expr = remakeExpression($data['recovery_expression'], $data['recovery_expr_target_single'],
-					$data['recovery_expression_action'], $data['recovery_expr_temp'], $error
-				);
-
-				if ($new_expr !== false) {
-					$data['recovery_expression'] = $new_expr;
-					$analyze = analyzeExpression($data['recovery_expression'], TRIGGER_RECOVERY_EXPRESSION, $error);
-
-					if ($analyze !== false) {
-						list($data['recovery_expression_formula'], $data['recovery_expression_tree']) = $analyze;
-					}
-					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _('Recovery expression syntax error.'));
-					}
-
-					$data['recovery_expr_temp'] = '';
-				}
-				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _('Recovery expression syntax error.'));
-				}
-			}
-		}
-		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _('Recovery expression syntax error.'));
+			show_messages(false, '', _($show_message_text));
 		}
 
 		return $data;
