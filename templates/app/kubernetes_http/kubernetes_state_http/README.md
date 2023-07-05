@@ -24,7 +24,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -35,7 +35,7 @@ Template needs to use Authorization via API token.
 
 Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
-Get the generated service account token using the command
+Get the generated service account token using the command:
 
 `kubectl get secret zabbix-service-account -n monitoring -o jsonpath={.data.token} | base64 -d`
 
@@ -48,15 +48,16 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 - /etc/kubernetes/manifests/kube-controller-manager.yaml
 - /etc/kubernetes/manifests/kube-scheduler.yaml
 
+Depending on your Kubernetes distribution, you might need to adjust `{$KUBE.CONTROL_PLANE.TAINT}` macro (for example, set it to `node-role.kubernetes.io/master` for OpenShift).
 
 *NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
 
 Also, see the Macros section for a list of macros used to set trigger values.
 
-Set up the macros to filter the metrics of discovered worker nodes:
+Set up the macros to filter the metrics of discovered Kubelets by node names:
 
-- {$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}
-- {$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}
+- {$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}
+- {$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}
 
 Set up macros to filter metrics by namespace:
 
@@ -70,18 +71,53 @@ Set up macros to filter node metrics by nodename:
 
 **Note**, If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
 
+You can use the `{$KUBE.KUBELET.FILTER.LABELS}` and `{$KUBE.KUBELET.FILTER.ANNOTATIONS}` macros for advanced filtering of Kubelets by node labels and annotations.
+
+Notes about labels and annotations filters:
+
+- Macro values should be specified separated by commas and must have the key/value form with support for regular expressions in the value (`key1: value, key2: regexp`).
+- ECMAScript syntax is used for regular expressions.
+- Filters are applied if such a label key exists for the entity that is being filtered (it means that if you specify a key in a filter, entities which do not have this key will not be affected by the filter and will still be discovered, and only entities containing that key will be filtered by the value).
+- You can also use the exclamation point symbol (`!`) to invert the filter (`!key: value`).
+
+For example: `kubernetes.io/hostname: kubernetes-node[5-25], !node-role.kubernetes.io/ingress: .*`. As a result, the Kubelets on nodes 5-25 without the "ingress" role will be discovered.
+
+
+See the Kubernetes documentation for details about labels and annotations:
+
+- <https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/>
+- <https://kubernetes.io/docs/concepts/overview/working-with-objects/annotations/>
+
+You can also set up evaluation periods for replica mismatch triggers (Deployments, ReplicaSets, StatefulSets) with the macro `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}`, which supports context and regular expressions. For example, you can create the following macros:
+
+- Set the evaluation period for the Deployment "nginx-deployment" in the namespace "default" to the 3 last values:
+
+`{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:default:nginx-deployment"} = #3`
+
+- Set the evaluation period for all Deployments to the 10 last values:
+
+`{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:"deployment:.*:.*"} = #10` or `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:"^deployment.*"} = #10`
+
+- Set the evaluation period for Deployments, ReplicaSets and StatefulSets in the namespace "default" to 15 minutes:
+
+`{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:".*:default:.*"} = 15m`
+
+**Note**, that different context macros with regular expressions matching the same string can be applied in an undefined order and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context) for details.
+
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
+|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.READYZ.ENDPOINT}|<p>Kubernetes API readyz endpoint /readyz</p>|`/readyz`|
 |{$KUBE.API.LIVEZ.ENDPOINT}|<p>Kubernetes API livez endpoint /livez</p>|`/livez`|
 |{$KUBE.API.COMPONENTSTATUSES.ENDPOINT}|<p>Kubernetes API componentstatuses endpoint /api/v1/componentstatuses</p>|`/api/v1/componentstatuses`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
+|{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.STATE.ENDPOINT.NAME}|<p>Kubernetes state endpoint name.</p>|`zabbix-kube-state-metrics`|
 |{$KUBE.API_SERVER.SCHEME}|<p>Kubernetes API servers metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.API_SERVER.PORT}|<p>Kubernetes API servers metrics endpoint port. Used in ControlPlane LLD.</p>|`6443`|
+|{$KUBE.CONTROL_PLANE.TAINT}|<p>Taint that applies to control plane nodes. Change if needed. Used in ControlPlane LLD.</p>|`node-role.kubernetes.io/control-plane`|
 |{$KUBE.CONTROLLER_MANAGER.SCHEME}|<p>Kubernetes Controller manager metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
 |{$KUBE.CONTROLLER_MANAGER.PORT}|<p>Kubernetes Controller manager metrics endpoint port. Used in ControlPlane LLD.</p>|`10257`|
 |{$KUBE.SCHEDULER.SCHEME}|<p>Kubernetes Scheduler metrics endpoint scheme. Used in ControlPlane LLD.</p>|`https`|
@@ -92,10 +128,13 @@ Set up macros to filter node metrics by nodename:
 |{$KUBE.LLD.FILTER.NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered metrics by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$KUBE.LLD.FILTER.NODE.MATCHES}|<p>Filter of discoverable nodes by nodename.</p>|`.*`|
 |{$KUBE.LLD.FILTER.NODE.NOT_MATCHES}|<p>Filter to exclude discovered nodes by nodename.</p>|`CHANGE_IF_NEEDED`|
-|{$KUBE.LLD.FILTER.WORKER_NODE.MATCHES}|<p>Filter of discoverable worker nodes by nodename.</p>|`.*`|
-|{$KUBE.LLD.FILTER.WORKER_NODE.NOT_MATCHES}|<p>Filter to exclude discovered worker nodes by nodename.</p>|`CHANGE_IF_NEEDED`|
+|{$KUBE.LLD.FILTER.KUBELET_NODE.MATCHES}|<p>Filter of discoverable Kubelets by nodename.</p>|`.*`|
+|{$KUBE.LLD.FILTER.KUBELET_NODE.NOT_MATCHES}|<p>Filter to exclude discovered Kubelets by nodename.</p>|`CHANGE_IF_NEEDED`|
+|{$KUBE.KUBELET.FILTER.ANNOTATIONS}|<p>Node annotations to filter Kubelets (regex in values are supported). See the template's README.md for details.</p>||
+|{$KUBE.KUBELET.FILTER.LABELS}|<p>Node labels to filter Kubelets (regex in values are supported). See the template's README.md for details.</p>||
 |{$KUBE.LLD.FILTER.PV.MATCHES}|<p>Filter of discoverable persistent volumes by name.</p>|`.*`|
 |{$KUBE.LLD.FILTER.PV.NOT_MATCHES}|<p>Filter to exclude discovered persistent volumes by name.</p>|`CHANGE_IF_NEEDED`|
+|{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD}|<p>The evaluation period range which is used for calculation of expressions in trigger prototypes (time period or value range). Can be used with context.</p>|`#5`|
 
 ### Items
 
@@ -109,11 +148,11 @@ Set up macros to filter node metrics by nodename:
 |Kubernetes: Get livez||HTTP agent|kube.livez<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Kubernetes: Namespace count|<p>The number of namespaces.</p>|Dependent item|kube.namespace.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_namespace_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: CronJob count|<p>Number of cronjobs.</p>|Dependent item|kube.cronjob.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_cronjob_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Job count|<p>Number of jobs(generated by cronjob + job).</p>|Dependent item|kube.job.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_job_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Job count|<p>Number of jobs (generated by cronjob + job).</p>|Dependent item|kube.job.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_job_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Endpoint count|<p>Number of endpoints.</p>|Dependent item|kube.endpoint.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_endpoint_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Deployment count|<p>The number of deployments.</p>|Dependent item|kube.deployment.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_deployment_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Service count|<p>The number of services.</p>|Dependent item|kube.service.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_service_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Statefulset count|<p>The number of statefulsets.</p>|Dependent item|kube.statefulset.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_statefulset_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: StatefulSet count|<p>The number of statefulsets.</p>|Dependent item|kube.statefulset.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_statefulset_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Node count|<p>The number of nodes.</p>|Dependent item|kube.node.count<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `COUNT(kube_node_created)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule API servers discovery
@@ -144,7 +183,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Daemonset discovery||Dependent item|kube.daemonset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_daemonset_status_number_ready`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Daemonset discovery||Dependent item|kube.daemonset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_daemonset_status_number_ready`</p></li></ul>|
 
 ### Item prototypes for Daemonset discovery
 
@@ -206,7 +245,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Deployment discovery||Dependent item|kube.deployment.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_deployment_spec_paused`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Deployment discovery||Dependent item|kube.deployment.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_deployment_spec_paused`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Deployment discovery
 
@@ -219,18 +258,19 @@ Set up macros to filter node metrics by nodename:
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas available|<p>The number of available replicas per deployment.</p>|Dependent item|kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas unavailable|<p>The number of unavailable replicas per deployment.</p>|Dependent item|kube.deployment.replicas_unavailable[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas updated|<p>The number of updated replicas per deployment.</p>|Dependent item|kube.deployment.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Replicas mismatched|<p>The number of available replicas that mismatch the desired number of replicas.</p>|Dependent item|kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Trigger prototypes for Deployment discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch||`(last(/Kubernetes cluster state by HTTP/kube.deployment.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}]))<>0`|Warning||
+|Kubernetes: Namespace [{#NAMESPACE}] Deployment [{#NAME}]: Deployment replicas mismatch|<p>Deployment has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.deployment.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"deployment:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.deployment.replicas_available[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
 ### LLD rule Endpoint discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Endpoint discovery||Dependent item|kube.endpoint.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_endpoint_created`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Endpoint discovery||Dependent item|kube.endpoint.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_endpoint_created`</p></li></ul>|
 
 ### Item prototypes for Endpoint discovery
 
@@ -244,7 +284,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Node discovery||Dependent item|kube.node.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_node_info`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Node discovery||Dependent item|kube.node.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_node_info`</p></li></ul>|
 
 ### Item prototypes for Node discovery
 
@@ -263,7 +303,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_pod_start_time`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Pod discovery||Dependent item|kube.pod.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_pod_start_time`</p></li></ul>|
 
 ### Item prototypes for Pod discovery
 
@@ -292,57 +332,59 @@ Set up macros to filter node metrics by nodename:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is not healthy||`min(/Kubernetes cluster state by HTTP/kube.pod.phase.failed[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.pending[{#NAMESPACE}/{#NAME}],10m)>0 or min(/Kubernetes cluster state by HTTP/kube.pod.phase.unknown[{#NAMESPACE}/{#NAME}],10m)>0`|High||
-|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping||`(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],#3))>2`|Warning||
+|Kubernetes: Namespace [{#NAMESPACE}] Pod [{#NAME}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}])-min(/Kubernetes cluster state by HTTP/kube.pod.containers_restarts[{#NAMESPACE}/{#NAME}],15m))>1`|Warning||
 
-### LLD rule Replicaset discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Replicaset discovery||Dependent item|kube.replicaset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_replicaset_status_replicas`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-
-### Item prototypes for Replicaset discovery
+### LLD rule ReplicaSet discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Replicas|<p>The number of replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Desired replicas|<p>Number of desired pods for a ReplicaSet.</p>|Dependent item|kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Fully labeled replicas|<p>The number of fully labeled replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Replicaset [{#NAME}]: Ready|<p>The number of ready replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|ReplicaSet discovery||Dependent item|kube.replicaset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_replicaset_status_replicas`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
-### Trigger prototypes for Replicaset discovery
+### Item prototypes for ReplicaSet discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas|<p>The number of replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Desired replicas|<p>Number of desired pods for a ReplicaSet.</p>|Dependent item|kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Fully labeled replicas|<p>The number of fully labeled replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.fully_labeled_replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Ready|<p>The number of ready replicas per ReplicaSet.</p>|Dependent item|kube.replicaset.ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] ReplicaSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas that mismatch the desired number of replicas.</p>|Dependent item|kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for ReplicaSet discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicasSet mismatch||`(last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}]))<>0`|Warning||
+|Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: ReplicaSet mismatch|<p>ReplicaSet has not matched the expected number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"replicaset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.replicas_desired[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.replicaset.ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
-### LLD rule Statefulset discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Statefulset discovery||Dependent item|kube.statefulset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_statefulset_status_replicas`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
-
-### Item prototypes for Statefulset discovery
+### LLD rule StatefulSet discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Replicas|<p>The number of replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Desired replicas|<p>Number of desired pods for a StatefulSet.</p>|Dependent item|kube.statefulset.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Current replicas|<p>The number of current replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Ready replicas|<p>The number of ready replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Kubernetes: Namespace [{#NAMESPACE}] Statefulset [{#NAME}]: Updated replicas|<p>The number of updated replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|StatefulSet discovery||Dependent item|kube.statefulset.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_statefulset_status_replicas`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
-### Trigger prototypes for Statefulset discovery
+### Item prototypes for StatefulSet discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas|<p>The number of replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Desired replicas|<p>Number of desired pods for a StatefulSet.</p>|Dependent item|kube.statefulset.replicas_desired[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Current replicas|<p>The number of current replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Ready replicas|<p>The number of ready replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Updated replicas|<p>The number of updated replicas per StatefulSet.</p>|Dependent item|kube.statefulset.replicas_updated[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: Replicas mismatched|<p>The number of ready replicas that mismatch the number of replicas.</p>|Dependent item|kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}]<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `The text is too long. Please see the template.`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+
+### Trigger prototypes for StatefulSet discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatfulSet is down||`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1`|High||
-|Kubernetes: Namespace [{#NAMESPACE}] RS [{#NAME}]: Statefulset replicas mismatch||`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])-last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]))<>0`|Warning||
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet is down||`(last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}]) / last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_current[{#NAMESPACE}/{#NAME}]))<>1`|High||
+|Kubernetes: Namespace [{#NAMESPACE}] StatefulSet [{#NAME}]: StatefulSet replicas mismatch|<p>StatefulSet has not matched the number of replicas during the specified trigger evaluation period.</p>|`min(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_mismatched[{#NAMESPACE}/{#NAME}],{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:"statefulset:{#NAMESPACE}:{#NAME}"})>0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas[{#NAMESPACE}/{#NAME}])>=0 and last(/Kubernetes cluster state by HTTP/kube.statefulset.replicas_ready[{#NAMESPACE}/{#NAME}])>=0`|Warning||
 
 ### LLD rule PodDisruptionBudget discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PodDisruptionBudget discovery||Dependent item|kube.pdb.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_poddisruptionbudget_created`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|PodDisruptionBudget discovery||Dependent item|kube.pdb.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_poddisruptionbudget_created`</p></li></ul>|
 
 ### Item prototypes for PodDisruptionBudget discovery
 
@@ -357,7 +399,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CronJob discovery||Dependent item|kube.cronjob.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_cronjob_created`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|CronJob discovery||Dependent item|kube.cronjob.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_cronjob_created`</p></li></ul>|
 
 ### Item prototypes for CronJob discovery
 
@@ -376,7 +418,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Job discovery||Dependent item|kube.job.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_job_owner{owner_is_controller="<none>"}`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Job discovery||Dependent item|kube.job.discovery<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `kube_job_owner{owner_is_controller!="true"}`</p></li></ul>|
 
 ### Item prototypes for Job discovery
 
@@ -391,7 +433,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Component statuses discovery||Dependent item|kube.componentstatuses.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Component statuses discovery||Dependent item|kube.componentstatuses.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.items`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Component statuses discovery
 
@@ -409,7 +451,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Readyz discovery||Dependent item|kube.readyz.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Readyz discovery||Dependent item|kube.readyz.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Readyz discovery
 
@@ -427,7 +469,7 @@ Set up macros to filter node metrics by nodename:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Livez discovery||Dependent item|kube.livez.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Livez discovery||Dependent item|kube.livez.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Livez discovery
 

@@ -126,7 +126,7 @@ foreach ($data['groups'] as $group) {
 			$count = new CSpan($template_count);
 		}
 
-		$count->addClass(ZBX_STYLE_ICON_COUNT);
+		$count->addClass(ZBX_STYLE_ENTITY_COUNT);
 	}
 
 	$table->addRow([
@@ -145,7 +145,7 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-templategroup')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'templategroup')
 ]);

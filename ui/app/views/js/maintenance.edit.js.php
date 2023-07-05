@@ -36,7 +36,8 @@ window.maintenance_edit = new class {
 		// Setup Tags.
 		jQuery(document.getElementById('tags')).dynamicRows({
 			template: '#tag-row-tmpl',
-			rows: tags
+			rows: tags,
+			allow_empty: true
 		});
 
 		if (allowed_edit) {

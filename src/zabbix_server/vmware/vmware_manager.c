@@ -21,6 +21,8 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtime.h"
+#include "zbxlog.h"
+#include "zbxthreads.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

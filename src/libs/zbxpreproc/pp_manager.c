@@ -34,7 +34,7 @@
 #include "zbx_item_constants.h"
 #include "zbxnix.h"
 #include "zbxvariant.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "pp_cache.h"
 #include "zbxcacheconfig.h"
 #include "zbxipcservice.h"
@@ -1201,7 +1201,7 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCMAN, 0, rtc_msgs, ARRSIZE(rtc_msgs),
 			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
@@ -1272,7 +1272,8 @@ ZBX_THREAD_ENTRY(zbx_pp_manager_thread, args)
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					goto out;			}
+					goto out;
+			}
 
 			zbx_ipc_message_free(message);
 		}

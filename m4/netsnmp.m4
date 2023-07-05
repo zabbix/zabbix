@@ -49,7 +49,12 @@ AS_HELP_STRING([--with-net-snmp@<:@=ARG@:>@],
 	fi
 
 	if test -d "$_libnetsnmp_config"; then
-		AC_PATH_PROG([_libnetsnmp_config], [net-snmp-config], [], [$_libnetsnmp_config])
+		AC_PATH_PROG([_libnetsnmp_config_bin], [net-snmp-config], [$_libnetsnmp_config/bin], [$_libnetsnmp_config])
+		_libnetsnmp_config=$_libnetsnmp_config_bin
+	fi
+	if test -d "$_libnetsnmp_config"; then
+		AC_PATH_PROG([_libnetsnmp_config_root], [net-snmp-config], [], [$_libnetsnmp_config])
+		test -z $_libnetsnmp_config_root || _libnetsnmp_config=$_libnetsnmp_config_root
 	fi
 
 	if test -x "$_libnetsnmp_config"; then
@@ -196,6 +201,8 @@ session.localname = "";
 		]])],[AC_DEFINE(HAVE_NETSNMP_SESSION_LOCALNAME, 1, Define to 1 if 'session.localname' exist.)
 		AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
 
+		dnl Check for DES protocol support for privacy
+		AC_MSG_CHECKING(for DES privacy protocol support)
 		AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <net-snmp/net-snmp-config.h>
 #include <net-snmp/net-snmp-includes.h>]], [[

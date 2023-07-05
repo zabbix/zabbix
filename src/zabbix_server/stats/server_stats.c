@@ -22,7 +22,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachevalue.h"
 #include "../lld/lld_protocol.h"
-#include "log.h"
 #include "zbxtrends.h"
 #include "zbxconnector.h"
 #include "../ha/ha.h"
@@ -68,7 +67,6 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot get connector queue size: %s", error);
 		zbx_free(error);
 	}
-
 
 	/* zabbix[triggers] */
 	zbx_json_adduint64(json, "triggers", zbx_dc_get_trigger_count());

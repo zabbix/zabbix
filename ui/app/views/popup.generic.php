@@ -94,6 +94,39 @@ if (array_key_exists('templates', $data['filter'])) {
 
 // Show Type dropdown in header for help items.
 if ($data['popup_type'] === 'help_items') {
+	switch ($options['itemtype']) {
+		case ITEM_TYPE_ZABBIX:
+		case ITEM_TYPE_ZABBIX_ACTIVE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_AGENT;
+			break;
+
+		case ITEM_TYPE_SIMPLE:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SIMPLE_CHECK;
+			break;
+
+		case ITEM_TYPE_SNMPTRAP:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_SNMP_TRAP;
+			break;
+
+		case ITEM_TYPE_INTERNAL:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_ZABBIX_INTERNAL;
+			break;
+
+		case ITEM_TYPE_DB_MONITOR:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_DB_MONITOR;
+			break;
+
+		case ITEM_TYPE_IPMI:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_IPMI_AGENT;
+			break;
+
+		case ITEM_TYPE_JMX:
+			$popup_doc_url = CDocHelper::ITEM_TYPES_JMX_AGENT;
+			break;
+	}
+
+	$output['doc_url'] = CDocHelper::getUrl($popup_doc_url);
+
 	$types_select = (new CSelect('itemtype'))
 		->setId('itemtype')
 		->setFocusableElementId('label-itemtype')
@@ -159,6 +192,7 @@ switch ($data['popup_type']) {
 	case 'roles':
 	case 'api_methods':
 	case 'dashboard':
+	case 'sysmaps':
 		foreach ($data['table_records'] as $item) {
 			$check_box = $data['multiselect']
 				? new CCheckBox('item['.$item['id'].']', $item['id'])
@@ -364,50 +398,6 @@ switch ($data['popup_type']) {
 		unset($trigger);
 		break;
 
-	case 'sysmaps':
-		foreach ($data['table_records'] as $sysmap) {
-			if ($data['multiselect']) {
-				$check_box = new CCheckBox('item['.$sysmap['sysmapid'].']', $sysmap['sysmapid']);
-			}
-
-			$name = (new CLink($sysmap['name']))->setId('spanid'.$sysmap['sysmapid']);
-
-			if ($data['multiselect']) {
-				$name
-					->setAttribute('data-reference', $options['reference'])
-					->setAttribute('data-sysmapid', $sysmap['sysmapid'])
-					->setAttribute('data-parentid', $options['parentid'])
-					->onClick('
-						addValue(this.dataset.reference, this.dataset.sysmapid, this.dataset.parentid ?? null);
-						popup_generic.closePopup(event);
-					');
-			}
-			else {
-				$values = [];
-
-				if ($options['dstfld1'] !== '' && $options['srcfld1'] !== '') {
-					$values[$options['dstfld1']] = $sysmap[$options['srcfld1']];
-				}
-				if ($options['dstfld2'] !== '' && $options['srcfld2'] !== '') {
-					$values[$options['dstfld2']] = $sysmap[$options['srcfld2']];
-				}
-				if ($options['dstfld3'] !== '' && $options['srcfld3'] !== '') {
-					$values[$options['dstfld3']] = $sysmap[$options['srcfld3']];
-				}
-
-				$name
-					->setAttribute('data-dstfrm', $options['dstfrm'])
-					->setAttribute('data-values', json_encode($values))
-					->onClick('
-						addValues(this.dataset.dstfrm, JSON.parse(this.dataset.values));
-						popup_generic.closePopup(event);
-					');
-			}
-
-			$table->addRow([$data['multiselect'] ? $check_box : null, $name]);
-		}
-		break;
-
 	case 'help_items':
 		foreach ($data['table_records'] as $key => $item) {
 			$item['key'] = $key;
@@ -441,7 +431,14 @@ switch ($data['popup_type']) {
 
 					popup_generic.closePopup(event);
 				');
-			$table->addRow([$name, $item['description']]);
+
+			$documentation_link = (new CLink(null, CDocHelper::getUrl($item['documentation_link'])))
+				->addClass(ZBX_STYLE_BTN_ICON)
+				->addClass(ZBX_ICON_HELP)
+				->setTitle(_('Help'))
+				->setTarget('_blank');
+
+			$table->addRow([$name, $item['description'], $documentation_link]);
 		}
 		unset($data['table_records']);
 		break;
@@ -902,7 +899,8 @@ $types = [
 	'usrgrp',
 	'sla',
 	'valuemaps',
-	'template_valuemaps'
+	'template_valuemaps',
+	'sysmaps'
 ];
 
 if (array_key_exists('table_records', $data) && ($data['multiselect'] || in_array($data['popup_type'], $types))) {
@@ -917,12 +915,11 @@ $output['script_inline'] = $this->readJsFile('popup.generic.js.php').
 	'});';
 
 if ($form) {
-	$form->addItem([
-		$table,
-		(new CInput('submit', 'submit'))
-			->addStyle('display: none;')
-			->removeId()
-	]);
+	// Enable form submitting on Enter.
+	$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
+	$form->addItem($table);
+
 	$output['body'] = (new CDiv([$data['messages'], $form]))->toString();
 }
 else {

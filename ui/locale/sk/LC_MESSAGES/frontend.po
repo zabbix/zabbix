@@ -592,6 +592,11 @@ msgstr "Potvrdené PROBLÉMOVÉ udalosti"
 msgid "Acknowledged RESOLVED events"
 msgstr "Potvrdené VYRIEŠENÉ udalosti"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -1988,6 +1993,11 @@ msgstr "Bulharsky (bg_BG)"
 msgid "By host"
 msgstr "Podľa hosta"
 
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
+
 #: report2.php:196
 msgid "By trigger template"
 msgstr "Podľa šablóny spúšťača"
@@ -2456,6 +2466,11 @@ msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samo
 msgid "Cannot create discovery rule"
 msgstr "Nie je možné vytvoriť pravidlo zisťovania"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Nie je možné vytvoriť mapu ikon"
@@ -2492,6 +2507,10 @@ msgstr "Nie je možné vytvoriť konfiguračný súbor."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "Nie je možné vytvoriť rolu používateľa"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2562,6 +2581,13 @@ msgstr[2] "  "
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "Nie je možné zmazať zisťovacie pravidlá"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2885,6 +2911,13 @@ msgstr[0] "Nie je možné vypnúť zisťovacie pravidlo"
 msgstr[1] "Nie je možné vypnúť zisťovacie pravidlá"
 msgstr[2] "Nie je možné vypnúť zisťovacie pravidlá"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2994,6 +3027,13 @@ msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Nie je možné povoliť zisťovacie pravidlo"
 msgstr[1] "Nie je možné povoliť zisťovacie pravidlá"
 msgstr[2] "Nie je možné povoliť zisťovacie pravidlá"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3493,6 +3533,11 @@ msgstr "Šablónu „%1$s“ nie je možné prepojiť s hostom „%2$s“ z dôv
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Nie je možné prepojiť template \"%1$s\" s hostom \"%2$s\" z dôvodu výrazu triggra \"%3$s\"."
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3513,6 +3558,11 @@ msgstr "Nie je možné prepojiť template „%1$s“ s host prototypom „%2$s�
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr "Nie je možné prepojiť template \"%1$s\" s hostom \"%2$s\" z dôvodu výrazu triggra \"%3$s\"."
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
 #, c-format
@@ -3544,6 +3594,41 @@ msgstr "Nie je možné prepojiť template \"%1$s\" s templatom \"%2$s\" z dôvod
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
 msgstr "Nie je možné prepojiť template \"%1$s\" s templatom \"%2$s\", pretože by došlo ku kruhovému prepojeniu (%3$s)."
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
 #, c-format
@@ -3962,6 +4047,11 @@ msgstr[0] "Udalosť nie je možné aktualizovať"
 msgstr[1] "Udalosti nie je možné aktualizovať"
 msgstr[2] " "
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr "Nie je možné aktualizovať udalosti"
@@ -4196,6 +4286,10 @@ msgstr "Nie je možné aktualizovať rolu používateľa"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Nie je možné aktualizovať web scenár"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5279,6 +5373,10 @@ msgstr "Počet zhodných riadkov pri monitorovaní súboru denníka s podporou r
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr "Počet zhodných riadkov v monitorovaní súboru denníka. Vráti integer"
 
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
 msgstr ""
@@ -5372,6 +5470,10 @@ msgstr "Vytvoriť pravidlo discovery (najskôr vyberte template)"
 #: include/views/configuration.trigger.prototype.list.php:201
 msgid "Create enabled"
 msgstr "Vytvoriť povolené"
+
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
@@ -6197,6 +6299,10 @@ msgstr "Odstrániť dashboard?"
 msgid "Delete discovery rule?"
 msgstr "Zmazať zisťovacie pravidlo?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6327,6 +6433,14 @@ msgstr "Zmazať označené zisťovacie pravidlá?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Zmazať označené elementy?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6823,6 +6937,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Zakázať označené zisťovacie pravidlá?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7721,6 +7843,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "Povoliť označené zisťovacie pravidlá?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7981,11 +8111,49 @@ msgstr "Udalosť potvrdená"
 msgid "Event correlation"
 msgstr "Korelácia udalostí"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Pravidlá korelácie udalostí"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -13222,6 +13390,10 @@ msgstr ""
 msgid "Max zoom level"
 msgstr "Maximálna úroveň priblíženia"
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr "Maximálny počet otvorených súborov podporovaný OS. Vráti celé číslo"
@@ -14123,6 +14295,10 @@ msgstr ""
 msgid "New element"
 msgstr "Nový element"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14155,6 +14331,10 @@ msgstr "Nová host grupa"
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr "Nové mapovanie typov médií"
@@ -14171,9 +14351,18 @@ msgstr "Nový proxy"
 msgid "New regular expression"
 msgstr "Nový regulárny výraz"
 
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
+
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Nová služba"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr ""
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -17377,6 +17566,17 @@ msgstr "Vyriešené korelačným pravidlom \"%1$s\"."
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
 msgstr "Vyriešené korelačným pravidlom."
+
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

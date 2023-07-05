@@ -29,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxip.h"
 #include "zbxcomms.h"
-#include "log.h"
 #include "cfg.h"
 
 #ifdef HAVE_LDAP
@@ -40,16 +39,6 @@
 #	include <lber.h>
 #endif
 
-ZBX_METRIC	parameters_simple[] =
-/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
-{
-	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
-	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
-	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
-	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
-	{NULL}
-};
-
 #ifdef HAVE_LDAP
 static int	check_ldap(const char *host, unsigned short port, int timeout, int *value_int)
 {
@@ -58,12 +47,11 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 	LDAPMessage	*msg	= NULL;
 	BerElement	*ber	= NULL;
 
-	char	*attrs[2] = {"namingContexts", NULL };
-	char	*attr	 = NULL;
-	char	**valRes = NULL;
-	int	ldapErr = 0;
-
-	zbx_alarm_on(timeout);
+	struct timeval	tm;
+	char		*attrs[2] = {"namingContexts", NULL };
+	char		*attr	 = NULL;
+	char		**valRes = NULL;
+	int		ldapErr = 0;
 
 	*value_int = 0;
 
@@ -85,6 +73,14 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 		}
 	}
 #endif
+	tm.tv_sec = timeout;
+	tm.tv_usec = 0;
+
+	if (LDAP_SUCCESS != (ldapErr = ldap_set_option(ldap, LDAP_OPT_NETWORK_TIMEOUT, &tm)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "LDAP - failed to set network timeout [%s]", ldap_err2string(ldapErr));
+		goto lbl_ret;
+	}
 
 	if (LDAP_SUCCESS != (ldapErr = ldap_search_s(ldap, "", LDAP_SCOPE_BASE, "(objectClass=*)", attrs, 0, &res)))
 	{
@@ -109,7 +105,6 @@ static int	check_ldap(const char *host, unsigned short port, int timeout, int *v
 
 	*value_int = 1;
 lbl_ret:
-	zbx_alarm_off();
 
 	if (NULL != valRes)
 		ldap_value_free(valRes);
@@ -503,4 +498,19 @@ int	check_service(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	check_service_perf(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return zbx_check_service_default_addr(request, "127.0.0.1", result, 1);
+}
+
+static zbx_metric_t	parameters_simple[] =
+/*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
+{
+	{"net.tcp.service",	CF_HAVEPARAMS,	check_service,		"ssh,127.0.0.1,22"},
+	{"net.tcp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ssh,127.0.0.1,22"},
+	{"net.udp.service",	CF_HAVEPARAMS,	check_service,		"ntp,127.0.0.1,123"},
+	{"net.udp.service.perf",CF_HAVEPARAMS,	check_service_perf,	"ntp,127.0.0.1,123"},
+	{NULL}
+};
+
+zbx_metric_t	*get_parameters_simple(void)
+{
+	return &parameters_simple[0];
 }

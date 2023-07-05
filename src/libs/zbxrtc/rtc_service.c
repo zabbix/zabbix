@@ -23,30 +23,12 @@
 #include "zbxserialize.h"
 #include "zbxjson.h"
 #include "zbxnix.h"
-#include "log.h"
 #include "zbxdiag.h"
 #include "zbxstr.h"
 #include "zbxnum.h"
 
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
-
-#if defined(HAVE_SIGQUEUE)
-
-/******************************************************************************
- *                                                                            *
- * Purpose: change log level of service process                               *
- *                                                                            *
- ******************************************************************************/
-static void	rtc_change_service_loglevel(zbx_uint32_t code)
-{
-	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
-		zabbix_increase_log_level();
-	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
-		zabbix_decrease_log_level();
-
-	zabbix_report_log_level_change();
-}
 
 /******************************************************************************
  *                                                                            *
@@ -106,6 +88,24 @@ int	zbx_rtc_get_command_target(const char *data, pid_t *pid, int *proc_type, int
 
 	return SUCCEED;
 }
+
+#if defined(HAVE_SIGQUEUE)
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level of service process                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_change_service_loglevel(zbx_uint32_t code)
+{
+	if (ZBX_RTC_LOG_LEVEL_INCREASE == code)
+		zabbix_increase_log_level();
+	else if (ZBX_RTC_LOG_LEVEL_DECREASE == code)
+		zabbix_decrease_log_level();
+
+	zabbix_report_log_level_change();
+}
+
 
 /******************************************************************************
  *                                                                            *
@@ -436,7 +436,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_POLLER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_UNREACHABLE, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
-			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TASKMANAGER, 0, ZBX_RTC_SNMP_CACHE_RELOAD, NULL, 0);
 #else
 			*result = zbx_strdup(NULL, "Invalid runtime control option: no SNMP support enabled\n");

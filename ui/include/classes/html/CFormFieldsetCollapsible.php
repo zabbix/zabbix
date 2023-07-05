@@ -43,6 +43,7 @@ class CFormFieldsetCollapsible extends CFormFieldset {
 		return (new CTag('legend', true,
 			(new CSimpleButton(new CSpan($this->caption)))
 				->addClass(self::ZBX_STYLE_TOGGLE)
+				->addClass($this->is_expanded ? ZBX_ICON_CHEVRON_UP : ZBX_ICON_CHEVRON_DOWN)
 				->setTitle($this->is_expanded ? _('Collapse') : _('Expand'))
 		))->toString();
 	}

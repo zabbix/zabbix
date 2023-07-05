@@ -25,6 +25,7 @@
 #include <stdbool.h>
 #include <stdarg.h>
 #include <setjmp.h>
+#include <stdint.h>
 #include <cmocka.h>
 #include "zbxtypes.h"
 
@@ -48,5 +49,7 @@ zbx_uint64_t	get_zbx_config_value_cache_size(void);
 void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size);
 
 void	zbx_mock_test_entry(void **state);
+
+void	zbx_mock_log_impl(int level, const char *fmt, va_list args);
 
 #endif	/* ZABBIX_MOCK_TEST_H */

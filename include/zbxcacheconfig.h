@@ -622,6 +622,46 @@ typedef struct
 }
 zbx_config_cache_info_t;
 
+typedef struct
+{
+	zbx_uint64_t	dcheckid;
+	zbx_uint64_t	druleid;
+	unsigned char	type;
+	char		*key_;
+	char		*snmp_community;
+	char		*ports;
+	char		*snmpv3_securityname;
+	unsigned char	snmpv3_securitylevel;
+	char		*snmpv3_authpassphrase;
+	char		*snmpv3_privpassphrase;
+	unsigned char	uniq;
+	unsigned char	snmpv3_authprotocol;
+	unsigned char	snmpv3_privprotocol;
+	char		*snmpv3_contextname;
+	unsigned char	allow_redirect;
+}
+zbx_dc_dcheck_t;
+
+ZBX_PTR_VECTOR_DECL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
+
+typedef struct
+{
+	zbx_uint64_t			druleid;
+	zbx_uint64_t			proxy_hostid;
+	time_t				nextcheck;
+	int				delay;
+	char				*delay_str;
+	char				*iprange;
+	unsigned char			status;
+	unsigned char			location;
+	zbx_uint64_t			revision;
+	char				*name;
+	zbx_uint64_t			unique_dcheckid;
+	zbx_vector_dc_dcheck_ptr_t	dchecks;
+	int				concurrency_max;
+}
+zbx_dc_drule_t;
+
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	zbx_in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
@@ -714,6 +754,7 @@ void	zbx_dc_config_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_i
 void	zbx_dc_config_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	zbx_dc_config_unlock_all_triggers(void);
 int	zbx_dc_config_trigger_exists(zbx_uint64_t triggerid);
+int	zbx_config_get_trigger_severity_name(int priority, char **replace_to);
 
 void	zbx_dc_free_triggers(zbx_vector_ptr_t *triggers);
 void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
@@ -722,8 +763,10 @@ int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint6
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, zbx_dc_item_t **items);
+#ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);
+#endif
 int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx_dc_item_t **items);
 
@@ -1133,8 +1176,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-int	zbx_dc_drule_next(time_t now, zbx_uint64_t *druleid, time_t *nextcheck);
-void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
+void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);

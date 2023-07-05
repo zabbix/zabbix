@@ -20,12 +20,11 @@
 #include "nodecommand.h"
 
 #include "zbxserver.h"
-#include "log.h"
 #include "trapper_auth.h"
 
 #include "../scripts/scripts.h"
 #include "audit/zbxaudit.h"
-#include "../../libs/zbxserver/get_host_from_event.h"
+#include "zbxevent.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
@@ -368,7 +367,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			goto fail;
 		}
 
-		if (SUCCEED != get_host_from_event((NULL != recovery_event) ? recovery_event : problem_event,
+		if (SUCCEED != zbx_event_db_get_host((NULL != recovery_event) ? recovery_event : problem_event,
 				&host, error, sizeof(error)))
 		{
 			goto fail;

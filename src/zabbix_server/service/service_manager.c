@@ -20,7 +20,7 @@
 #include "service_manager.h"
 #include "../server.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxservice.h"

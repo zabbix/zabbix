@@ -32,6 +32,9 @@ $form = (new CForm())
 	->addVar('action', 'popup.discovery.check')
 	->addVar('validate', 1);
 
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);
 }
@@ -127,10 +130,8 @@ $form_list = (new CFormList())
 		'row_dcheck_allow_redirect'
 	);
 
-$form->addItem([
-	$form_list,
-	(new CInput('submit', 'submit'))->addStyle('display: none;')
-]);
+$form->addItem($form_list);
+
 
 $output = [
 	'header' => $data['title'],

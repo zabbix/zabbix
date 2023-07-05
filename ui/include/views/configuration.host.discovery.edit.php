@@ -161,12 +161,10 @@ if ($parameters_data) {
 			)
 				->setAttribute('style', 'width: 100%;')
 				->removeId(),
-			(new CButton('', _('Remove')))
-				->removeId()
-				->onClick('jQuery(this).closest("tr").remove()')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButtonLink(_('Remove')))
 				->addClass('element-table-remove')
 				->setEnabled(!$data['limited'])
+				->onClick('jQuery(this).closest("tr").remove();')
 		]);
 	}
 }
@@ -189,8 +187,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$data['limited'])
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -198,11 +195,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -210,8 +206,7 @@ $item_tab
 						(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['limited']))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$data['limited'])
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -236,11 +231,9 @@ $item_tab
 					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
 						->setAttribute('style', 'width: 100%;')
 						->removeId(),
-					(new CButton('', _('Remove')))
-						->removeId()
-						->onClick('jQuery(this).closest("tr").remove()')
-						->addClass(ZBX_STYLE_BTN_LINK)
+					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
+						->onClick('jQuery(this).closest("tr").remove();')
 				]))
 			)
 	)
@@ -346,8 +339,7 @@ $item_tab
 					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 					->setFooter(new CRow(
 						(new CCol(
-							(new CButton(null, _('Add')))
-								->addClass(ZBX_STYLE_BTN_LINK)
+							(new CButtonLink(_('Add')))
 								->setEnabled(!$data['limited'])
 								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
@@ -355,11 +347,10 @@ $item_tab
 				(new CTag('script', true))
 					->setAttribute('type', 'text/x-jquery-tmpl')
 					->addItem(new CRow([
-						(new CCol(
-							(new CDiv(
-								new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-							))->addClass(ZBX_STYLE_DRAG_ICON)
-						))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('headers[sortorder][#{index}]', '#{sortorder}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 						(new CTextBox('headers[name][#{index}]', '#{name}', $data['limited']))
 							->setAttribute('placeholder', _('name'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
@@ -367,8 +358,7 @@ $item_tab
 						(new CTextBox('headers[value][#{index}]', '#{value}', $data['limited'], 2000))
 							->setAttribute('placeholder', _('value'))
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButton(null, _('Remove')))
-							->addClass(ZBX_STYLE_BTN_LINK)
+						(new CButtonLink(_('Remove')))
 							->setEnabled(!$data['limited'])
 							->setAttribute('data-row-action', 'remove_row')
 					])),
@@ -595,8 +585,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('User name'), 'username'))->setId('js-item-username-label'),
-		(new CFormField((new CTextBox('username', $data['username'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('username', $data['username'], false, DB::getFieldLength('items', 'username')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-username-field')
 	])
@@ -620,8 +610,8 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
-		(new CFormField((new CTextBox('password', $data['password'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		(new CFormField((new CTextBox('password', $data['password'], false, DB::getFieldLength('items', 'password')))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->disableAutocomplete()
 		))->setId('js-item-password-field')
 	])
@@ -942,7 +932,7 @@ $overrides_tab = new CFormGrid();
 $overrides_list = (new CTable())
 	->addClass('lld-overrides-table')
 	->setHeader([
-		(new CColHeader())->setWidth('15'),
+		new CColHeader(),
 		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('350'),
 		(new CColHeader(_('Stop processing')))->setWidth('100'),

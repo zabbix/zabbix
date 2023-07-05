@@ -13,14 +13,6 @@ SUBDIRS = \
 
 sbin_PROGRAMS = zabbix_proxy
 
-noinst_LIBRARIES = libzbxproxy.a
-
-libzbxproxy_a_SOURCES =
-
-libzbxproxy_a_CFLAGS = \
-	-DZABBIX_DAEMON \
-	$(TLS_CFLAGS)
-
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
@@ -62,6 +54,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
@@ -114,8 +107,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
-	libzbxproxy.a
+	$(top_builddir)/src/libs/zbxversion/libzbxversion.a
 
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
 

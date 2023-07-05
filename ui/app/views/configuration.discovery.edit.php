@@ -1,4 +1,4 @@
-<?php declare(strict_types=0);
+<?php declare(strict_types = 0);
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -30,7 +30,7 @@ $csrf_token = CCsrfTokenHelper::get('discovery');
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('discoveryForm')
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
@@ -78,6 +78,22 @@ $form_grid
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
 		)
+	])
+	->addItem([
+		new CLabel(_('Maximum concurrent checks'), 'concurrency_max_type'),
+		(new CFormField([
+			(new CDiv(
+				(new CRadioButtonList('concurrency_max_type', (int) $data['concurrency_max_type']))
+					->addValue(_('One'), ZBX_DISCOVERY_CHECKS_ONE)
+					->addValue(_('Unlimited'), ZBX_DISCOVERY_CHECKS_UNLIMITED)
+					->addValue(_('Custom'), ZBX_DISCOVERY_CHECKS_CUSTOM)
+					->setModern()
+			))->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('concurrency_max', $data['drule']['concurrency_max'], 3, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+				->setAriaRequired()
+		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 
 $form_grid->addItem([
@@ -90,10 +106,7 @@ $form_grid->addItem([
 				(new CTag('tfoot', true))
 					->addItem(
 						(new CCol(
-							(new CSimpleButton(_('Add')))
-								->setAttribute('data-action', 'add')
-								->addClass(ZBX_STYLE_BTN_LINK)
-								->addClass('js-check-add')
+							(new CButtonLink(_('Add')))->addClass('js-check-add')
 						))->setColSpan(2)
 					)
 			)->setId('dcheckListFooter')
@@ -189,12 +202,8 @@ $check_template_default = (new CTemplateTag('dcheck-row-tmpl'))->addItem(
 			->addStyle(ZBX_TEXTAREA_BIG_WIDTH)
 			->setId('dcheckCell_#{dcheckid}'),
 		new CHorList([
-			(new CSimpleButton(_('Edit')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-edit'),
-			(new CSimpleButton(_('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('js-remove')
+			(new CButtonLink(_('Edit')))->addClass('js-edit'),
+			(new CButtonLink(_('Remove')))->addClass('js-remove')
 		])
 	]))
 		->setId('dcheckRow_#{dcheckid}')

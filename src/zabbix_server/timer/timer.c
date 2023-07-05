@@ -19,7 +19,7 @@
 
 #include "timer.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxnix.h"
 #include "zbxself.h"

@@ -20,7 +20,6 @@
 #include "zbxdbwrap.h"
 
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "zbxserver.h"
 #include "zbxtasks.h"
@@ -2102,7 +2101,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
 		zbx_client_item_validator_t validator_func, void *validator_args, char **info)
 {
-	int			ret;
+	int			ret = SUCCEED;
 	char			*token = NULL;
 	size_t			token_alloc = 0;
 	struct zbx_json_parse	jp_data;
@@ -2113,11 +2112,8 @@ static int	process_client_history_data(zbx_socket_t *sock, struct zbx_json_parse
 
 	log_client_timediff(LOG_LEVEL_DEBUG, jp, ts);
 
-	if (SUCCEED != (ret = zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data)))
-	{
-		*info = zbx_strdup(*info, zbx_json_strerror());
+	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 		goto out;
-	}
 
 	if (SUCCEED == zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_SESSION, &token, &token_alloc, NULL))
 	{
@@ -2381,8 +2377,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	for (;*processed_num < services_num; (*processed_num)++)
@@ -2395,8 +2392,9 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			continue;
 		}
 
-		zbx_discovery_update_service(&drule, service->dcheckid, &dhost, ip, service->dns, service->port,
-				service->status, service->value, service->itemtime, add_event_cb);
+		zbx_discovery_update_service(drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
+				service->dns, service->port, service->status, service->value, service->itemtime,
+				add_event_cb);
 	}
 
 	service = services->values[(*processed_num)++];
