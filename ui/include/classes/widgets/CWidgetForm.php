@@ -113,7 +113,7 @@ class CWidgetForm {
 	}
 
 	protected function normalizeValues(array $values): array {
-		return self::convertDottedKeys($values);
+		return self::convertArrayKeys(self::convertDottedKeys($values));
 	}
 
 	/**
@@ -137,8 +137,6 @@ class CWidgetForm {
 	 *                                           ],
 	 *                                           'problemhosts' => ['ph1', 'ph2']
 	 *                                       ]
-	 *
-	 * @static
 	 *
 	 * @param array $data  An array of key => value pairs.
 	 *
@@ -176,5 +174,68 @@ class CWidgetForm {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Convert array-styled keys into arrays.
+	 *
+	 * Example:
+	 *     In: [
+	 *         'a[0]'          => 'value_1',
+	 *         'a[1]'          => 'value_2',
+	 *         'b[0][c][0][d]' => 'value_3'
+	 *     ]
+	 *
+	 *     Out: [
+	 *         'a' => ['value_1', 'value_2'],
+	 *         'b' => [0 => ['c' => [0 => ['d' => 'value_3']]]]
+	 *     ]
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected static function convertArrayKeys(array $data): array {
+		$data_new = [];
+
+		uksort($data,
+			static fn(string $key_1, string $key_2): int => strnatcmp($key_1, $key_2)
+		);
+
+		foreach ($data as $key => $value) {
+			if (preg_match('/^([a-z]+)((\\[([a-z_]+|[0-9]+)\\])+)$/', $key, $matches) === false) {
+				$data_new[$key] = $value;
+
+				continue;
+			}
+
+			$field_name = $matches[1];
+			$field_path = $matches[2];
+
+			preg_match_all('/\\[([a-z_]+|[0-9]+)\\]/', $field_path, $matches);
+
+			$field_path_keys = array_merge([$field_name], $matches[1]);
+
+			$data_ptr = &$data_new;
+
+			for ($i = 0, $count = count($field_path_keys); $i < $count; $i++) {
+				$field_path_key = $field_path_keys[$i];
+
+				if ($i < $count - 1) {
+					if (!array_key_exists($field_path_key, $data_ptr)) {
+						$data_ptr[$field_path_key] = [];
+					}
+
+					$data_ptr = &$data_ptr[$field_path_key];
+				}
+				else {
+					$data_ptr[$field_path_key] = $value;
+				}
+			}
+
+			unset($data_ptr);
+		}
+
+		return $data_new;
 	}
 }
