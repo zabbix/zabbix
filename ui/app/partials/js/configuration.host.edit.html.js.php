@@ -240,7 +240,7 @@
 
 				for (const macro_key in form_macro) {
 					if (['description', 'macro', 'type', 'value'].includes(macro_key)) {
-						changes.push(form_macro[macro_key] === initial_data[key][macro][macro_key]);
+						changes.push(form_macro[macro_key] == initial_data[key][macro][macro_key]);
 					}
 				}
 
