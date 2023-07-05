@@ -31,6 +31,7 @@
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
 #include "zbxautoreg.h"
+#include "../scripts/scripts.h"
 
 extern unsigned char	program_type;
 
@@ -632,6 +633,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	}
 
 	zbx_json_close(&json);
+
+	zbx_remote_commans_prepare_to_send(&json, hostid);
 
 	if (ZBX_COMPONENT_VERSION(4, 4, 0) == version || ZBX_COMPONENT_VERSION(5, 0, 0) == version)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_REFRESH_UNSUPPORTED, 600);

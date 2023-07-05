@@ -25,6 +25,7 @@ DIST_SUBDIRS = \
 	zbxdiscovery \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexec \
 	zbxexport \
 	zbxexpr \
@@ -90,6 +91,7 @@ SERVER_SUBDIRS = \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxexpr \
 	zbxhistory \
@@ -141,6 +143,7 @@ PROXY_SUBDIRS = \
 	zbxdiag \
 	zbxembed \
 	zbxeval \
+	zbxevent \
 	zbxexport \
 	zbxhistory \
 	zbxhttp \

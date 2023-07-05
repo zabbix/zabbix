@@ -29,11 +29,10 @@ $form = (new CForm())
 	->addVar('action', $data['action'])
 	->addVar('update', 1)
 	->addVar('source-name', $data['name'])
-	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')))
-	->addItem((new CInput('submit', 'submit'))
-		->addStyle('display: none;')
-		->removeId()
-	);
+	->addItem(new CJsScript($this->readJsFile('../../../include/views/js/editabletable.js.php')));
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 if ($data['valuemapid']) {
 	$form->addVar('valuemapid', $data['valuemapid']);
@@ -58,9 +57,7 @@ $mappings = (new CDiv([
 		->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
 		->setFooter(new CRow(
 			(new CCol(
-				(new CButton(null, _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->setAttribute('data-row-action', 'add_row')
+				(new CButtonLink(_('Add')))->setAttribute('data-row-action', 'add_row')
 			))->setColSpan(count($header_row))
 		))
 ]))->setAttribute('data-sortable-pairs-table', '1');
@@ -70,9 +67,7 @@ $mappings->addItem(
 	(new CTag('script', true))
 		->setAttribute('type', 'text/x-jquery-tmpl')
 		->addItem((new CRow([
-			(new CCol((new CDiv)
-				->addClass(ZBX_STYLE_DRAG_ICON)))
-				->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 			(new CSelect('mappings[#{index}][type]'))
 				->setValue('#{type}')
 				->addOptions(CSelect::createOptionsFromArray([

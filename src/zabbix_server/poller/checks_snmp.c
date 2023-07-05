@@ -458,7 +458,7 @@ static char	*zbx_get_snmp_type_error(u_char type)
 	}
 }
 
-static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const zbx_dc_interface_t *interface, int status,
+static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface, int status,
 		const struct snmp_pdu *response, char *error, size_t max_error_len)
 {
 	int	ret;
@@ -470,9 +470,12 @@ static int	zbx_get_snmp_response_error(const struct snmp_session *ss, const zbx_
 	}
 	else if (STAT_ERROR == status)
 	{
-		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
-				interface->addr, interface->port, snmp_api_errstring(ss->s_snmp_errno));
+		char	*tmp_err_str;
 
+		snmp_sess_error(ssp, NULL, NULL, &tmp_err_str);
+		zbx_snprintf(error, max_error_len, "Cannot connect to \"%s:%hu\": %s.",
+				interface->addr, interface->port, tmp_err_str);
+		zbx_free(tmp_err_str);
 		ret = NETWORK_ERROR;
 	}
 	else if (STAT_TIMEOUT == status)
@@ -1237,7 +1240,7 @@ reduce_max_vars:
 			if (1 >= level)
 				goto reduce_max_vars;
 
-			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
+			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error, max_error_len);
 			running = 0;
 			goto next;
 		}
@@ -1547,7 +1550,7 @@ retry:
 
 		if (NULL == query_and_ignore_type || 0 == query_and_ignore_type[j])
 		{
-			errcodes[j] = zbx_get_snmp_response_error(ss, &items[0].interface, status, response, error,
+			errcodes[j] = zbx_get_snmp_response_error(ssp, &items[0].interface, status, response, error,
 					max_error_len);
 			SET_MSG_RESULT(&results[j], zbx_strdup(NULL, error));
 			*error = '\0';
@@ -2070,7 +2073,7 @@ static int	snmp_bulkwalk(zbx_snmp_sess_t ssp, int pdu_type, const zbx_dc_item_t 
 		status = snmp_sess_synch_response(ssp, pdu, &response);
 		if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
-			ret = zbx_get_snmp_response_error(snmp_sess_session(ssp), &item->interface, status, response,
+			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response,
 					error, max_error_len);
 			goto out;
 		}

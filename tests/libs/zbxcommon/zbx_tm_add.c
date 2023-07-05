@@ -24,7 +24,7 @@
 
 #include "zbxcommon.h"
 #include "zbxtrends.h"
-#include "log.h"
+#include "zbxlog.h"
 
 void	zbx_mock_test_entry(void **state)
 {

@@ -58,6 +58,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \

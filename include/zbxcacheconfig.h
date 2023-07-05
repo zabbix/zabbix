@@ -754,6 +754,7 @@ void	zbx_dc_config_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_i
 void	zbx_dc_config_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	zbx_dc_config_unlock_all_triggers(void);
 int	zbx_dc_config_trigger_exists(zbx_uint64_t triggerid);
+int	zbx_config_get_trigger_severity_name(int priority, char **replace_to);
 
 void	zbx_dc_free_triggers(zbx_vector_ptr_t *triggers);
 void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);
@@ -762,8 +763,10 @@ int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint6
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, zbx_dc_item_t **items);
+#ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);
+#endif
 int	zbx_dc_config_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	zbx_dc_config_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, zbx_dc_item_t **items);
 

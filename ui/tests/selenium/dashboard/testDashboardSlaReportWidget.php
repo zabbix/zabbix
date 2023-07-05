@@ -69,6 +69,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			[
 				'name' => 'Dashboard for SLA report widget tests',
 				'private' => 0,
+				'auto_start' => 1,
 				'pages' => [
 					[
 						'name' => 'Page with widgets',
@@ -1951,7 +1952,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [
@@ -2031,7 +2032,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					]
 				]
 			],
-			// Months are excluded as strtotime() calculates month substraction incorrectly on he last days on the month.
+			// Months are excluded as strtotime() calculates month subtraction incorrectly on he last days on the month.
 			[
 				[
 					'fields' => [

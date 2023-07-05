@@ -203,8 +203,7 @@ class CControllerActionOperationCheck extends CController {
 
 			return (bool) API::Action()->get([
 				'output' => [],
-				'actionids' => $this->getInput('actionid'),
-				'editable' => true
+				'actionids' => $this->getInput('actionid')
 			]);
 		}
 
