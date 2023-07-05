@@ -669,6 +669,7 @@ class testPageEventCorrelation extends CWebTest {
 	 */
 	public function testPageEventCorrelation_CancelAction($data) {
 		$old_hash = CDBHelper::getHash(self::$correlation_sql);
+
 		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
 			$data['name'] = [$data['name']];
 		}
