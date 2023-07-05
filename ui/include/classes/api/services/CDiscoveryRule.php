@@ -1629,7 +1629,7 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($constants as $constant) {
 				if (!in_array($constant, $condition_formulaids)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $subpath.'/formula',
-						_s('missing filter condition for the ID "%1$s"', $constant)
+						_s('missing filter condition "%1$s"', $constant)
 					));
 				}
 			}
