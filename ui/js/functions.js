@@ -57,20 +57,15 @@ function delete_expression(id, type) {
  * @param number type	Expression (type = 0) or recovery expression (type = 1).
  */
 function copy_expression(id, type) {
-	// If type is expression.
-	if (type == 0) {
-		var element = document.getElementsByName('expression')[0];
-	}
-	// Type is recovery expression.
-	else {
-		var element = document.getElementsByName('recovery_expression')[0];
-	}
+	const element = (type == 0)
+		? document.getElementById('expression')
+		: document.getElementById('recovery_expression');
 
 	if (element.value.length > 0 && !confirm(t('Do you wish to replace the conditional expression?'))) {
 		return null;
 	}
 
-	var src = document.getElementById(id);
+	const src = document.getElementById(id);
 	if (typeof src.textContent != 'undefined') {
 		element.value = src.textContent;
 	}

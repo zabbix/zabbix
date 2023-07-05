@@ -106,10 +106,6 @@ else {
 
 $trigger_form_grid->addItem([new CLabel(_('Severity')), $severity]);
 
-if ($data['recovery_expression_field_readonly']) {
-	$trigger_form->addItem((new CVar('recovery_expression', $data['recovery_expression']))->removeId());
-}
-
 $expression_popup_parameters = [
 	'dstfrm' => $trigger_form->getName(),
 	'dstfld1' => 'expression',
