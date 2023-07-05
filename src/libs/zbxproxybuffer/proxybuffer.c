@@ -139,8 +139,8 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 					" id:" ZBX_FS_UI64 " clock:%d", __func__, arow->id, arow->clock);
 
 			zbx_list_pop(&pb->autoreg, NULL);
-			size_left -= pb_autoreg_estimate_row_size(arow->host, arow->host_metadata, arow->listen_dns,
-					arow->listen_ip);
+			size_left -= (ssize_t)pb_autoreg_estimate_row_size(arow->host, arow->host_metadata,
+					arow->listen_dns, arow->listen_ip);
 			pb_list_free_autoreg(&pb->autoreg, arow);
 			continue;
 		}
@@ -151,7 +151,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 					" id:" ZBX_FS_UI64 " clock:%d", __func__, hrow->id, hrow->ts.sec);
 
 			zbx_list_pop(&pb->history, NULL);
-			size_left -= pb_history_estimate_row_size(hrow->value, hrow->source);
+			size_left -= (ssize_t)pb_history_estimate_row_size(hrow->value, hrow->source);
 			pb_list_free_history(&pb->history, hrow);
 			continue;
 		}
@@ -166,7 +166,7 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 						" id:" ZBX_FS_UI64 " clock:%d", __func__, drow->id, drow->clock);
 
 				zbx_list_pop(&pb->discovery, NULL);
-				size_left -= pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
+				size_left -= (ssize_t)pb_discovery_estimate_row_size(drow->value, drow->ip, drow->dns);
 				pb_list_free_discovery(&pb->discovery, drow);
 			}
 			while (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->handleid == handleid);
