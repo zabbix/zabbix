@@ -759,6 +759,7 @@ class testPageEventCorrelation extends CWebTest {
 		if (!is_array(CTestArrayHelper::get($data, 'name', []))) {
 			$data['name'] = [$data['name']];
 		}
+
 		$selected_count = array_key_exists('name', $data) ? count($data['name']) : CDBHelper::getCount(self::$correlation_sql);
 		$plural = count(CTestArrayHelper::get($data, 'name', [])) === 1 ? '' : 's';
 
