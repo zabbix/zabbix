@@ -18,6 +18,7 @@
 **/
 
 #include "test_get_value_ssh.h"
+#include "zbxmocktest.h"
 
 #include "zbxsysinfo.h"
 #include "../../../src/zabbix_server/poller/checks_ssh.h"
