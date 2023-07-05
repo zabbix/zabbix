@@ -219,8 +219,13 @@ require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
-require_once dirname(__FILE__).'/testExecuteNow.php';
+// Web scenarios.
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
+require_once dirname(__FILE__).'/webScenarios/testFormWebScenarioStep.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
+
+require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
@@ -272,11 +277,8 @@ require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWeb.php';
-require_once dirname(__FILE__).'/webScenarios/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
@@ -543,8 +545,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
-		$suite->addTestSuite('testFormWeb');
-		$suite->addTestSuite('testFormWebStep');
+		$suite->addTestSuite('testFormWebScenario');
+		$suite->addTestSuite('testFormWebScenarioStep');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceWeb');
