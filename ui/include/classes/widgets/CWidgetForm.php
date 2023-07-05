@@ -203,7 +203,7 @@ class CWidgetForm {
 		);
 
 		foreach ($data as $key => $value) {
-			if (preg_match('/^([a-z]+)((\\[([a-z_]+|[0-9]+)\\])+)$/', $key, $matches) === false) {
+			if (preg_match('/^([a-z]+)((\\[([a-z_]+|[0-9]+)\\])+)$/', $key, $matches) === 0) {
 				$data_new[$key] = $value;
 
 				continue;
