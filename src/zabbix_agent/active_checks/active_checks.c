@@ -362,7 +362,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 		if ('[' == metric->key[8])
 			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG;
 		else if (0 == strncmp(metric->key + 8, ".count[", 7))
-			metric->flags |= ZBX_METRIC_FLAG_EVENTLOG_COUNT;
+			metric->flags |= ZBX_METRIC_FLAG_LOG_EVENTLOG | ZBX_METRIC_FLAG_EVENTLOG_COUNT;
 	}
 
 	metric->start_time = 0.0;

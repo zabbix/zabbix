@@ -397,7 +397,7 @@ static void	zbx_itemkey_extract_global_regexps(const char *key, zbx_vector_str_t
 	if (0 == strncmp(key, "log[", 4) || 0 == strncmp(key, "logrt[", 6) || 0 == strncmp(key, "log.count[", 10) ||
 			0 == strncmp(key, "logrt.count[", 12))
 		item_key = ZBX_KEY_LOG;
-	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 9))
+	else if (0 == strncmp(key, "eventlog[", 9) || 0 == strncmp(key, "eventlog.count[", 15))
 		item_key = ZBX_KEY_EVENTLOG;
 	else
 		return;
