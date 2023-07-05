@@ -353,6 +353,18 @@ void	pb_autoreg_set_lastid(zbx_uint64_t lastid)
 	pb_set_lastid(areg.table, areg.lastidfield, lastid);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if auto registration rows are cached in memory buffer       *
+ *                                                                            *
+ ******************************************************************************/
+int	pb_autoreg_has_mem_rows(zbx_pb_t *pb)
+{
+	void	*ptr;
+
+	return zbx_list_peek(&pb->autoreg, &ptr);
+}
+
 /* public api */
 
 /******************************************************************************

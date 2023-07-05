@@ -685,6 +685,18 @@ void	pb_history_set_lastid(zbx_uint64_t lastid)
 	pb_set_lastid("proxy_history", "history_lastid", lastid);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if history rows are cached in memory buffer                 *
+ *                                                                            *
+ ******************************************************************************/
+int	pb_history_has_mem_rows(zbx_pb_t *pb)
+{
+	void	*ptr;
+
+	return zbx_list_peek(&pb->history, &ptr);
+}
+
 /* public api */
 
 /******************************************************************************

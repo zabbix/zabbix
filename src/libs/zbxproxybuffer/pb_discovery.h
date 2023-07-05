@@ -30,5 +30,6 @@ void	pb_discovery_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_discovery_flush(zbx_pb_t *pb);
 void	pb_discovery_set_lastid(zbx_uint64_t lastid);
 int	pb_discovery_check_age(zbx_pb_t *pb);
+int	pb_discovery_has_mem_rows(zbx_pb_t *pb);
 
 #endif

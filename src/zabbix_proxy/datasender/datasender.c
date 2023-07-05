@@ -154,6 +154,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	if (0 != flags)
 	{
 		size_t	buffer_size, reserved;
+		time_t	now;
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
@@ -179,6 +180,8 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
+
+		now = time(NULL);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
@@ -246,7 +249,10 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 				zbx_db_commit();
 			}
 
-			zbx_pb_update_state(*more);
+			/* don't update proxy buffer state if there were connection retries */
+			/* because 'more' flag might not represent the latest buffer state  */
+			if (time(NULL) - now <= args->config_timeout)
+				zbx_pb_update_state(*more);
 		}
 
 		zbx_disconnect_from_server(&sock);

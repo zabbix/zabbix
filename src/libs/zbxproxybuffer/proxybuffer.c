@@ -523,7 +523,9 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 		/* Both cases ar checked when adding data to cache. */
 		break;
 	case PB_MEMORY_DATABASE:
-		if (ZBX_PROXY_DATA_DONE == more)
+		if (SUCCEED != pb_history_has_mem_rows(pb) &&
+				SUCCEED != pb_discovery_has_mem_rows(pb) &&
+				SUCCEED != pb_autoreg_has_mem_rows(pb))
 		{
 			zbx_db_begin();
 			pb_flush_lastids(pb);
@@ -536,7 +538,7 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 			pb_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
 		break;
 	case PB_DATABASE_MEMORY:
-		if (ZBX_PROXY_DATA_DONE == more && 0 == pb_data->db_handles_num &&
+		if (0 == pb_data->db_handles_num &&
 				pb_data->history_lastid_db <= pb_data->history_lastid_sent &&
 				pb_data->discovery_lastid_db <= pb_data->discovery_lastid_sent &&
 				pb_data->autoreg_lastid_db <= pb_data->autoreg_lastid_sent)

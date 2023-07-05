@@ -436,6 +436,18 @@ void	pb_discovery_set_lastid(zbx_uint64_t lastid)
 	pb_set_lastid(dht.table, dht.lastidfield, lastid);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if discovery rows are cached in memory buffer               *
+ *                                                                            *
+ ******************************************************************************/
+int	pb_discovery_has_mem_rows(zbx_pb_t *pb)
+{
+	void	*ptr;
+
+	return zbx_list_peek(&pb->discovery, &ptr);
+}
+
 /* public api */
 
 /******************************************************************************

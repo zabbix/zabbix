@@ -29,5 +29,6 @@ void	pb_history_clear(zbx_pb_t *pb, zbx_uint64_t lastid);
 void	pb_history_flush(zbx_pb_t *pb);
 void	pb_history_set_lastid(zbx_uint64_t lastid);
 int	pb_history_check_age(zbx_pb_t *pb);
+int	pb_history_has_mem_rows(zbx_pb_t *pb);
 
 #endif
