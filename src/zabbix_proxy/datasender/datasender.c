@@ -45,6 +45,8 @@
 					ZBX_DATASENDER_AUTOREGISTRATION | ZBX_DATASENDER_TASKS |	\
 					ZBX_DATASENDER_TASKS_RECV)
 
+#define ZBX_DATA_UPLOAD		(ZBX_DATASENDER_HISTORY | ZBX_DATASENDER_DISCOVERY | ZBX_DATASENDER_AUTOREGISTRATION)
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Get current history upload state (disabled/enabled)               *
@@ -154,7 +156,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 	if (0 != flags)
 	{
 		size_t	buffer_size, reserved;
-		time_t	now;
+		time_t	time_connect;
 
 		if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
 				ZBX_PROXY_DATA_MORE == more_areg)
@@ -181,7 +183,7 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 		reserved = j.buffer_size;
 		zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
 
-		now = time(NULL);
+		time_connect = time(NULL);
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);
 
@@ -247,12 +249,16 @@ static int	proxy_data_sender(int *more, int now, int *hist_upload_state, const z
 					zbx_pb_autoreg_set_lastid(areg_lastid);
 
 				zbx_db_commit();
-			}
 
-			/* don't update proxy buffer state if there were connection retries */
-			/* because 'more' flag might not represent the latest buffer state  */
-			if (time(NULL) - now <= args->config_timeout)
-				zbx_pb_update_state(*more);
+				if (0 != (flags & ZBX_DATA_UPLOAD))
+				{
+					/* elapsed time being greater than connection timeout means */
+					/* there were connection retries and the 'more' flag might  */
+					/* not represent the latest database buffer state           */
+					if (time(NULL) - time_connect <= args->config_timeout)
+						zbx_pb_update_state(*more);
+				}
+			}
 		}
 
 		zbx_disconnect_from_server(&sock);
