@@ -79,6 +79,16 @@
 				});
 			});
 
+			document.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-trigger-edit')) {
+					this.editTrigger({
+						triggerid: e.target.dataset.triggerid,
+						hostid: e.target.dataset.hostid,
+						context: e.target.dataset.context
+					})
+				}
+			});
+
 			const execute_now = document.querySelector('.js-execute-now');
 
 			if (execute_now !== null) {
@@ -120,6 +130,26 @@
 			return PopUp('copy.edit', parameters, {
 				dialogueid: 'copy',
 				dialogue_class: 'modal-popup-static'
+			});
+		},
+
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
 			});
 		},
 

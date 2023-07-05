@@ -525,7 +525,7 @@
 		}
 
 		clone({title, buttons}) {
-			this.triggerid = 0;
+			this.triggerid = null;
 
 			this.overlay.setProperties({title, buttons});
 			this.overlay.unsetLoading();

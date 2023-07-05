@@ -433,6 +433,26 @@
 			this.filter.unsetSubfilter(field[0], field[1]);
 		},
 
+		editTrigger(trigger_data) {
+			clearMessages();
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		},
+
 		events: {
 			hostSuccess(e) {
 				const data = e.detail;

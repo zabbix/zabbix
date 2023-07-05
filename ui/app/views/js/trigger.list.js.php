@@ -51,14 +51,16 @@
 		}
 
 		#initActions() {
-			document.getElementById('filter_state').addEventListener('change', () => {
-				const filter_state = document.querySelector('input[name=filter_state]:checked').value;
-				const filter_status_fields = document.getElementsByName('filter_status');
+			if (this.context === 'host') {
+				document.getElementById('filter_state').addEventListener('change', () => {
+					const filter_state = document.querySelector('input[name=filter_state]:checked').value;
+					const filter_status_fields = document.getElementsByName('filter_status');
 
-				for (let i = 0; i < filter_status_fields.length; i++) {
-					filter_status_fields[i].disabled = filter_state != -1;
-				}
-			})
+					for (let i = 0; i < filter_status_fields.length; i++) {
+						filter_status_fields[i].disabled = filter_state != -1;
+					}
+				})
+			}
 
 			document.addEventListener('click', (e) => {
 				if (e.target.id === 'js-create') {

@@ -33,9 +33,11 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'context' =>							'required|in '.implode(',', ['host', 'template']),
+			'context' =>							'in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
-			'triggerid' =>							'db triggers.triggerid'
+			'triggerid' =>							'db triggers.triggerid',
+			'description' =>						'string',
+			'expression' =>							'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -81,15 +83,15 @@ class CControllerTriggerEdit extends CController {
 		$data = [
 			'hostid' => $this->getInput('hostid', 0),
 			'dependencies' => [],
-			'context' => $this->getInput('context'),
-			'expression' => '',
+			'context' => $this->getInput('context', ''),
+			'expression' =>  $this->getInput('expression', ''),
 			'recovery_expression' => '',
 			'expression_full' => '',
 			'recovery_expression_full' => '',
 			'manual_close' => 1,
 			'correlation_mode' => 0,
 			'correlation_tag' => '',
-			'description' => '',
+			'description' => $this->getInput('description', ''),
 			'opdata' => '',
 			'priority' => '0',
 			'recovery_mode' => 0,
@@ -109,6 +111,12 @@ class CControllerTriggerEdit extends CController {
 			);
 
 			$data = array_merge($data, reset($triggers));
+
+			// Get templates.
+			$data['templates'] = makeTriggerTemplatesHtml($data['triggerid'],
+				getTriggerParentTemplates([$data], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
+				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+			);
 
 			$data['db_dependencies'] = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'flags'],
