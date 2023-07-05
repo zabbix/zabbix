@@ -305,7 +305,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unsupressed filter',
+						'Name' => 'Group, unsuppressed filter',
 						'Host groups' => 'Group for Problems Widgets',
 						'Show suppressed problems' => true
 					],
