@@ -1193,7 +1193,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
-.list-table .icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
+.list-table .icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
 .table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
   min-width: 18px;
   height: 18px; }
@@ -2254,8 +2254,8 @@ button {
     word-break: break-word;
     cursor: pointer;
     transition: background-color 0.2s ease-out; }
-    .search-suggest li.suggest-hover {
-      background-color: #e8f5ff; }
+  .search-suggest .suggest-hover {
+    background-color: #e8f5ff; }
 
 .inline-filter {
   text-align: right; }
@@ -2871,6 +2871,126 @@ output {
     min-height: 32px; }
     output.msg-global-footer::before {
       top: 0; }
+
+.multiselect-control {
+  display: flex;
+  position: relative;
+  vertical-align: top;
+  white-space: nowrap; }
+
+.multiselect {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  margin-right: 3px;
+  min-height: 24px;
+  white-space: normal; }
+  .multiselect.active {
+    border-color: #02659f; }
+  .multiselect input[type="text"] {
+    border: 0;
+    background: none;
+    box-sizing: border-box;
+    width: 100%;
+    padding-bottom: 2px;
+    min-height: 20px; }
+  .multiselect.search-disabled input[type="text"] {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 0;
+    padding: 0;
+    margin: 0; }
+  .multiselect .multiselect-list {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding-left: 2px;
+    padding-bottom: 2px; }
+    .multiselect .multiselect-list li {
+      display: block;
+      padding-left: 0 !important;
+      margin: 2px 2px 0 0;
+      overflow: hidden;
+      white-space: nowrap;
+      cursor: default; }
+      .multiselect .multiselect-list li.selected .subfilter-enabled {
+        background-color: #93a5af; }
+    .multiselect .multiselect-list .subfilter-enabled {
+      padding-right: 0;
+      display: flex;
+      flex-direction: row;
+      line-height: 18px; }
+      .multiselect .multiselect-list .subfilter-enabled > span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis; }
+      .multiselect .multiselect-list .subfilter-enabled .btn-icon {
+        flex-shrink: 0;
+        margin-left: 0;
+        color: #fff; }
+        .multiselect .multiselect-list .subfilter-enabled .btn-icon:hover, .multiselect .multiselect-list .subfilter-enabled .btn-icon:focus {
+          color: #dfe4e7; }
+        .multiselect .multiselect-list .subfilter-enabled .btn-icon:active, .multiselect .multiselect-list .subfilter-enabled .btn-icon:focus {
+          box-shadow: none; }
+  .multiselect .disabled {
+    background-color: #ebebeb;
+    opacity: 1; }
+    .multiselect .disabled .subfilter-enabled {
+      background-color: #ccd5d9;
+      color: #768d99; }
+      .multiselect .disabled .subfilter-enabled .btn-icon {
+        pointer-events: none;
+        color: #768d99; }
+  .multiselect div[aria-live] {
+    overflow: hidden;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    z-index: -1; }
+
+.multiselect-button {
+  vertical-align: top; }
+
+.multiselect-suggest, .multiselect-matches {
+  padding: 0 5px;
+  white-space: normal;
+  color: #768d99;
+  background-color: #ffffff; }
+  .multiselect-suggest li, .multiselect-matches li {
+    display: block;
+    height: inherit;
+    line-height: normal;
+    color: #1f2c33;
+    padding: .4em 5px;
+    margin: 0 -5px;
+    cursor: pointer;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: background-color 0.2s ease-out; }
+  .multiselect-suggest .suggest-hover, .multiselect-matches .suggest-hover {
+    background-color: #e8f5ff; }
+  .multiselect-suggest .suggest-new, .multiselect-matches .suggest-new {
+    border-top: 1px solid #acbbc2; }
+    .multiselect-suggest .suggest-new span:first-child, .multiselect-matches .suggest-new span:first-child {
+      font-weight: bold; }
+
+.multiselect-matches {
+  padding: .4em 5px;
+  color: #1f2c33;
+  font-weight: bold; }
+
+.multiselect-available {
+  position: absolute;
+  z-index: 20000;
+  border: 1px solid #ccd5d9;
+  overflow-y: auto;
+  box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5); }
+
+.suggest-found {
+  font-weight: bold;
+  color: #e99003; }
 
 .radio-list-control {
   display: inline-block;
@@ -4547,127 +4667,6 @@ form.is-loading {
     background-color: transparent;
     border-color: transparent; }
 
-.multiselect-control {
-  display: flex;
-  position: relative;
-  vertical-align: top;
-  white-space: nowrap; }
-
-.multiselect {
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  margin-right: 3px;
-  min-height: 24px;
-  white-space: normal; }
-  .multiselect.active {
-    border-color: #02659f; }
-  .multiselect input[type="text"] {
-    border: 0;
-    background: none;
-    box-sizing: border-box;
-    width: 100%;
-    padding-bottom: 2px;
-    min-height: 20px; }
-  .multiselect.search-disabled input[type="text"] {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 0;
-    padding: 0;
-    margin: 0; }
-  .multiselect .multiselect-list {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: wrap;
-    padding-left: 2px;
-    padding-bottom: 2px; }
-    .multiselect .multiselect-list li {
-      display: block;
-      padding-left: 0 !important;
-      margin: 2px 2px 0 0;
-      overflow: hidden;
-      white-space: nowrap;
-      cursor: default; }
-      .multiselect .multiselect-list li.selected .subfilter-enabled {
-        background-color: #93a5af; }
-    .multiselect .multiselect-list .subfilter-enabled {
-      padding-right: 0;
-      display: flex;
-      flex-direction: row;
-      line-height: 18px; }
-      .multiselect .multiselect-list .subfilter-enabled > span:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis; }
-      .multiselect .multiselect-list .subfilter-enabled .btn-icon {
-        flex-shrink: 0;
-        margin-left: 0;
-        color: #fff; }
-        .multiselect .multiselect-list .subfilter-enabled .btn-icon:hover, .multiselect .multiselect-list .subfilter-enabled .btn-icon:focus {
-          color: #dfe4e7; }
-        .multiselect .multiselect-list .subfilter-enabled .btn-icon:active, .multiselect .multiselect-list .subfilter-enabled .btn-icon:focus {
-          box-shadow: none; }
-  .multiselect .disabled {
-    background-color: #ebebeb;
-    opacity: 1; }
-    .multiselect .disabled .subfilter-enabled {
-      background-color: #ccd5d9;
-      color: #768d99; }
-      .multiselect .disabled .subfilter-enabled .btn-icon {
-        pointer-events: none;
-        color: #768d99; }
-  .multiselect div[aria-live] {
-    overflow: hidden;
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    z-index: -1; }
-
-.multiselect-button {
-  vertical-align: top; }
-
-.multiselect-suggest, .multiselect-matches {
-  padding: 0 5px;
-  white-space: normal;
-  color: #768d99;
-  background-color: #ffffff; }
-  .multiselect-suggest li, .multiselect-matches li {
-    display: block;
-    height: inherit;
-    line-height: normal;
-    color: #1f2c33;
-    padding: .4em 5px;
-    margin: 0 -5px;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    transition: background-color 0.2s ease-out; }
-    .multiselect-suggest li.suggest-hover, .multiselect-matches li.suggest-hover {
-      background-color: #e8f5ff; }
-
-.multiselect-matches {
-  padding: .4em 5px;
-  color: #1f2c33;
-  font-weight: bold; }
-
-.multiselect-available {
-  position: absolute;
-  z-index: 20000;
-  border: 1px solid #ccd5d9;
-  overflow-y: auto;
-  box-shadow: 0 6px 10px 0 rgba(118, 141, 153, 0.5); }
-
-.suggest-found {
-  font-weight: bold;
-  color: #e99003; }
-
-.suggest-new {
-  border-top: 1px solid #acbbc2; }
-  .suggest-new span:first-child {
-    font-weight: bold; }
-
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px;
   background-color: #ffffff;
@@ -4741,8 +4740,6 @@ form.is-loading {
         padding-left: 5px; }
     .table-forms .table-forms-td-right .wrap-multiple-controls {
       display: flex; }
-    .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
-      margin-top: 5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -4943,18 +4940,18 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   padding: 0 5px;
   min-height: 24px; }
 
-z-select button.focusable,
+.multiselect, z-select button.focusable,
 .z-select button.focusable, z-select .list,
-.z-select .list, .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
+.z-select .list, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #ffffff;
   border: 1px solid #acbbc2;
   box-sizing: border-box;
   color: #1f2c33;
   outline: 0;
   transition: border-color 0.2s ease-out, box-shadow 0.2s ease-out; }
-  z-select button.focusable:focus,
+  .multiselect:focus, z-select button.focusable:focus,
   .z-select button.focusable:focus, z-select .list:focus,
-  .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
+  .z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #02659f; }
 
 .filter-space {
@@ -5057,20 +5054,20 @@ z-select button.focusable,
 .btn-dashboard-normal {
   box-shadow: 1px 1px 2px rgba(118, 141, 153, 0.5); }
 
-.radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
+.multiselect[aria-disabled], .radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
 .z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
+.z-select[readonly] button, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
 .safari textarea[readonly] {
   color: #acbbc2;
   background-color: #ebebeb !important;
   border-color: #ccd5d9; }
 
 /* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari z-select[disabled] button, z-select[disabled] .safari button,
+.safari .multiselect[aria-disabled], .safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari z-select[disabled] button, z-select[disabled] .safari button,
 .safari .z-select[disabled] button,
 .z-select[disabled] .safari button, .safari z-select[readonly] button, z-select[readonly] .safari button,
 .safari .z-select[readonly] button,
-.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span, .safari .checkbox-radio[readonly] + label span, .checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
+.z-select[readonly] .safari button, .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span, .safari .checkbox-radio[readonly] + label span, .checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
 .safari textarea[readonly] {
   -webkit-text-fill-color: #acbbc2; }
 .safari input[readonly],
@@ -6051,27 +6048,27 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-contents, output .msg-details ul, z-select button.focusable,
+.dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, z-select button.focusable,
 .z-select button.focusable, z-select .list,
-.z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+.z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
-  .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
+  .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
   .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-  .z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
+  .z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px; }
-  .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
   .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-  .z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
+  .z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: rgba(172, 187, 194, 0.55); }
-  .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
+  .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
   .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-  .z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
+  .z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body > div::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: rgba(135, 135, 135, 0.85);
