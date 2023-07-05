@@ -828,7 +828,7 @@ return [
 				'length' => 20
 			],
 			'hostid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'hosts',
