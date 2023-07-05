@@ -2104,6 +2104,14 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
 			$override['filter']['conditions'] = [];
 		}
 
+		if (array_key_exists('filter', $override)) {
+			$override['filter'] = prepareLldFilter([
+				'evaltype' => $override['filter']['evaltype'],
+				'formula' => $override['filter']['formula'],
+				'conditions' => $override['filter']['conditions']
+			]);
+		}
+
 		if (!array_key_exists('operations', $override)) {
 			$override['operations'] = [];
 		}
