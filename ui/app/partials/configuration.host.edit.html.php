@@ -235,6 +235,7 @@ $host_tab
 				? null
 				: new CDiv(
 					(new CButton(null, _('Add')))
+						->addClass('add-interface')
 						->addClass(ZBX_STYLE_BTN_LINK)
 						->setMenuPopup([
 							'type' => 'submenu',

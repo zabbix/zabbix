@@ -29,14 +29,14 @@ window.host_edit_popup = {
 	dialogue: null,
 	form: null,
 
-	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings}) {
+	init({popup_url, form_name, host_interfaces, host_is_discovered, warnings, host}) {
 		this.overlay = overlays_stack.getById('host_edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		history.replaceState({}, '', popup_url);
 
-		host_edit.init({form_name, host_interfaces, host_is_discovered});
+		host_edit.init({form_name, host_interfaces, host_is_discovered, host});
 
 		if (warnings.length) {
 			const message_box = warnings.length == 1

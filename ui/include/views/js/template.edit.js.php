@@ -344,15 +344,16 @@ window.template_edit_popup = new class {
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
-			this.change.push(true);
+			this.ms_change = true;
 		});
 
-		$groups_ms.on('change', () =>
+		$groups_ms.on('change', () => {
+			this.ms_change = true;
 			$groups_ms.multiSelect('setDisabledEntries',
 				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')]
 					.map((input) => input.value)
 			)
-		);
+		});
 	}
 
 	/**
@@ -422,10 +423,10 @@ window.template_edit_popup = new class {
 		this.change = [];
 
 		const form_data = getFormFields(this.form);
-		this.#prepareFields(form_data);
-
-		delete form_data.csrf_token;
 		const initial_data = this.template;
+
+		this.#prepareFields(form_data);
+		delete form_data.csrf_token;
 
 		for (const key in initial_data) {
 			if (Array.isArray(initial_data[key])) {
@@ -457,11 +458,12 @@ window.template_edit_popup = new class {
 				this.#checkValuemapChanges(form_data, initial_data, key);
 			}
 		}
+		this.change.push(this.ms_change);
 
 		return this.change.includes(true);
 	}
 
-	#checkValuemapChanges(initial_data, form_data, key) {
+	#checkValuemapChanges(initial_data, form_data) {
 		const changes = [];
 
 		if (Object.keys(form_data.valuemaps).length !== Object.keys(initial_data.valuemaps).length) {
@@ -473,7 +475,6 @@ window.template_edit_popup = new class {
 			Object.keys(initial_data.valuemaps).forEach((key, index) => {
 				initial_data.valuemaps[index] = initial_data.valuemaps[key];
 			});
-
 
 			if (typeof(initial_data.valuemaps[valuemap].mappings) === 'object') {
 				initial_data.valuemaps[valuemap].mappings = Object.values(initial_data.valuemaps[valuemap].mappings);

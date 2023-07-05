@@ -79,6 +79,8 @@ else {
 	];
 }
 
+sdff($data['host']);
+
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_EDIT),
@@ -90,7 +92,8 @@ $output = [
 			'form_name' => $data['form_name'],
 			'host_interfaces' => $data['host']['interfaces'],
 			'host_is_discovered' => ($data['host']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-			'warnings' => $data['warnings']
+			'warnings' => $data['warnings'],
+			'host' => $data['host']
 		]).');',
 	'buttons' => $buttons
 ];
