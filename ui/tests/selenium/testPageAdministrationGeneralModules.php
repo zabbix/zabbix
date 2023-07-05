@@ -1042,10 +1042,10 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		// Get widget dimensions from the style attribute of the widget grid element and compare with expected values.
 		$grid_selector = 'xpath:.//div[contains(@class, "dashboard-grid-widget-head")]/../..';
 		$widget_dimensions = $dashboard->getWidget($data['widget_name'])->query($grid_selector)->one()->getAttribute('style');
-		$dimention_array = array_map('trim', explode(';', $widget_dimensions));
+		$dimension_array = array_map('trim', explode(';', $widget_dimensions));
 
-		foreach ($data['dimensions'] as $dimention) {
-			$this->assertContains($dimention, $dimention_array);
+		foreach ($data['dimensions'] as $dimension) {
+			$this->assertContains($dimension, $dimension_array);
 		}
 	}
 
