@@ -231,9 +231,8 @@ $host_tab
 			$host_is_discovered
 				? null
 				: new CDiv(
-					(new CButton(null, _('Add')))
+					(new CButtonLink(_('Add')))
 						->addClass('add-interface')
-						->addClass(ZBX_STYLE_BTN_LINK)
 						->setMenuPopup([
 							'type' => 'submenu',
 							'data' => [
