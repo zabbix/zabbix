@@ -35,7 +35,7 @@ $expression_table = (new CTable())
 
 $allowed_testing = true;
 
-if ($data['expression_type'] === 'expression') {
+if ($data['expression_type'] === TRIGGER_EXPRESSION) {
 	if ($data['expression_tree']) {
 		foreach ($data['expression_tree'] as $i => $e) {
 			$info_icons = [];
@@ -95,7 +95,7 @@ if ($data['expression_type'] === 'expression') {
 	}
 }
 
-if ($data['expression_type'] === 'recovery_expression') {
+if ($data['expression_type'] === TRIGGER_RECOVERY_EXPRESSION) {
 	if ($data['recovery_expression_tree']) {
 		foreach ($data['recovery_expression_tree'] as $i => $e) {
 			$info_icons = [];
@@ -156,7 +156,7 @@ if ($data['expression_type'] === 'recovery_expression') {
 }
 
 $testButton = (new CButton('test_expression', _('Test')))
-	->setId(($data['expression_type'] === 'expression') ? 'test-expression' : 'test-recovery-expression')
+	->setId(($data['expression_type'] === TRIGGER_EXPRESSION) ? 'test-expression' : 'test-recovery-expression')
 	->addClass(ZBX_STYLE_BTN_LINK);
 
 if (!$allowed_testing) {
@@ -173,7 +173,7 @@ $expression_table->addItem(
 	)
 );
 
-$wrapOutline = new CSpan([($data['expression_type'] === 'expression')
+$wrapOutline = new CSpan([($data['expression_type'] === TRIGGER_EXPRESSION)
 	? $data['expression_formula']
 	: $data['recovery_expression_formula']
 ]);
@@ -188,7 +188,7 @@ $table = new CDiv([
 
 $output = ['body' => $table->toString()];
 
-if ($data['expression_type'] === 'expression') {
+if ($data['expression_type'] === TRIGGER_EXPRESSION) {
 	$output['expression'] = $data['expression'];
 }
 else {

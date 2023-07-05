@@ -102,10 +102,12 @@
 					const parameter = e.target.id.split('_recovery');
 					fields[parameter[0]] = '1';
 
-					this.#expressionConstructor(fields, false);
+					this.#expressionConstructor(fields, <?= TRIGGER_RECOVERY_EXPRESSION ?>);
 				}
 				else if (e.target.classList.contains('js_remove_recovery_expression')) {
-					this.#expressionConstructor({'remove_expression': e.target.dataset.id}, false);
+					this.#expressionConstructor({'remove_expression': e.target.dataset.id},
+						<?= TRIGGER_RECOVERY_EXPRESSION ?>
+					);
 				}
 				else if (e.target.id === 'test-recovery-expression') {
 					return PopUp('popup.testtriggerexpr',
@@ -297,7 +299,7 @@
 					this.#showRecoveryConstructorAddButton(false);
 				}
 
-				this.#expressionConstructor({}, false);
+				this.#expressionConstructor({}, <?= TRIGGER_RECOVERY_EXPRESSION ?>);
 			}
 			else {
 				elements.forEach((element) => {
@@ -327,8 +329,8 @@
 			);
 		}
 
-		#expressionConstructor(fields = {}, type_expression = true) {
-			if (type_expression) {
+		#expressionConstructor(fields = {}, expression_type = <?= TRIGGER_EXPRESSION ?>) {
+			if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
 				if (Object.keys(fields).length === 0 || fields.add_expression) {
 					fields.expression = this.expression.value;
 				}
@@ -373,7 +375,7 @@
 						throw {error: response.error};
 					}
 
-					if (type_expression) {
+					if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
 						const table = this.form.querySelector('#expression-table');
 						table.innerHTML = response.body;
 						this.expression_full.value = response.expression;

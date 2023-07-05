@@ -108,7 +108,7 @@ class CControllerTriggerExpressionConstructor extends CController {
 		}
 
 		$data['readonly'] = $this->getInput('readonly', '');
-		$data['expression_type'] = ($this->hasInput('expression')) ? 'expression' : 'recovery_expression'; // todo change to constant
+		$data['expression_type'] = ($this->hasInput('expression')) ? TRIGGER_EXPRESSION : TRIGGER_RECOVERY_EXPRESSION;
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
