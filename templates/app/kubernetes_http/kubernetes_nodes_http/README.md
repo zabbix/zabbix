@@ -200,7 +200,7 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node [{#NODE}] Pod [{#POD}]: Pod is crash looping|<p>Pos restarts more than 2 times in the last 3 minutes.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2`|Warning||
+|Node [{#NODE}] Pod [{#POD}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],15m))>1`|Warning||
 |Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy|<p>Pod has been in a non-ready state for longer than 10 minutes.</p>|`count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#POD}],10m, "regexp","^(1\|4\|5)$")>=9`|High||
 
 ## Feedback

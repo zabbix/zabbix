@@ -1,0 +1,1 @@
+...G...... [ZBX-21547] fixed reading of non-UTF-8 encoded files in Zabbix agent 2 (arimdjonoks)

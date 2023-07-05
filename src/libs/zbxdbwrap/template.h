@@ -20,9 +20,7 @@
 #ifndef ZABBIX_TEMPLATE_H
 #define ZABBIX_TEMPLATE_H
 
-#include "zbxcommon.h"
 #include "zbxdbhigh.h"
-#include "zbxtypes.h"
 #include "zbxalgo.h"
 
 typedef struct _zbx_template_item_preproc_t zbx_template_item_preproc_t;
@@ -195,4 +193,6 @@ typedef struct
 zbx_template_item_t;
 
 void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
+void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item,
+			zbx_uint64_t hostid);
 #endif

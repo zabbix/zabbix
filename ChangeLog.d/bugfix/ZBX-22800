@@ -1,0 +1,1 @@
+A.F....... [ZBX-22800] fixed detection of authentication LDAP userdirectory when user is assigned to multiple user groups with LDAP authentication (gcalenko)

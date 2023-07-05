@@ -19,9 +19,7 @@ libzbxagent_a_SOURCES = \
 	listener.h \
 	metrics.h \
 	zbxconf.c \
-	zbxconf.h \
-	zbxkstat.c \
-	zbxkstat.h
+	zbxconf.h
 
 libzbxagent_a_CFLAGS = \
 	-DZABBIX_DAEMON \

@@ -18,7 +18,6 @@
 **/
 
 #include "zbxcommon.h"
-#include "zbxthreads.h"
 
 const int	INTERFACE_TYPE_PRIORITY[INTERFACE_TYPE_COUNT] =
 {

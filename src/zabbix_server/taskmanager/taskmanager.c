@@ -40,7 +40,6 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxdbwrap.h"
-#include "zbxserver.h"
 #include "zbxevent.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5

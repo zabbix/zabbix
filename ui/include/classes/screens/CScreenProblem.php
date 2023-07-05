@@ -737,8 +737,10 @@ class CScreenProblem extends CScreenBase {
 	 * @param int    $problem['clock']            Timestamp of the current record.
 	 * @param int    $problem['symptom_count']    Problem symptom count.
 	 * @param bool   $nested                      True if this is a nested block.
+	 * @param bool   $has_checkboxes              True if this is block is represented in Problem view with checkboxes.
+	 *                                            It will add additional colspan for timeline breakpoint.
 	 */
-	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested): void {
+	public static function addTimelineBreakpoint(CTableInfo $table, $data, $problem, $nested, $has_checkboxes): void {
 		if ($data['sortorder'] === ZBX_SORT_UP) {
 			[$problem['clock'], $data['last_clock']] = [$data['last_clock'], $problem['clock']];
 		}
@@ -769,7 +771,6 @@ class CScreenProblem extends CScreenBase {
 		}
 
 		if ($breakpoint !== null) {
-
 			$colspan = 1;
 
 			if ($data['show_three_columns']) {
@@ -781,7 +782,7 @@ class CScreenProblem extends CScreenBase {
 				$colspan = 2;
 			}
 
-			if (!($table instanceof widgets\problems\includes\WidgetProblems)) {
+			if ($has_checkboxes) {
 				$colspan++;
 			}
 
@@ -1156,7 +1157,7 @@ class CScreenProblem extends CScreenBase {
 			];
 
 			// Add problems to table.
-			self::addProblemsToTable($table, $data['problems'], $data);
+			self::addProblemsToTable($table, $data['problems'], $data, false);
 
 			$footer = new CActionButtonList('action', 'eventids', [
 				'popup.acknowledge.edit' => [
@@ -1338,7 +1339,7 @@ class CScreenProblem extends CScreenBase {
 	 * @param array      $data['tags']                          List of tags.
 	 * @param bool       $nested                                If true, show the symptom rows with indentation.
 	 */
-	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested = false): void {
+	private static function addProblemsToTable(CTableInfo $table, array $problems, array $data, $nested): void {
 		foreach ($problems as $problem) {
 			$trigger = $data['triggers'][$problem['objectid']];
 
@@ -1621,7 +1622,7 @@ class CScreenProblem extends CScreenBase {
 
 			if ($data['show_timeline']) {
 				if ($data['last_clock'] != 0) {
-					self::addTimelineBreakpoint($table, $data, $problem, $nested);
+					self::addTimelineBreakpoint($table, $data, $problem, $nested, true);
 				}
 				$data['last_clock'] = $problem['clock'];
 
