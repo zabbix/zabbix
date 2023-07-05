@@ -1326,7 +1326,6 @@ class CItem extends CItemGeneral {
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'type' => $row['type'],
 				'templateid' => 0
 			];
 
@@ -1340,9 +1339,13 @@ class CItem extends CItemGeneral {
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
 					$item += array_intersect_key($row,
-						array_flip(['key_', 'hostid', 'host_status', 'value_type'])
+						array_flip(['type', 'key_', 'hostid', 'host_status', 'value_type'])
 					);
 				}
+			}
+
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+				unset($row['type']);
 			}
 
 			$items[$i++] = $item;

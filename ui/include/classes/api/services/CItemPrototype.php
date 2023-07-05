@@ -1290,7 +1290,6 @@ class CItemPrototype extends CItemGeneral {
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'type'  => $row['type'],
 				'templateid' => 0,
 				'host_status' => $row['host_status']
 			];
@@ -1305,8 +1304,12 @@ class CItemPrototype extends CItemGeneral {
 
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
-					$item += array_intersect_key($row, array_flip(['key_', 'hostid']));
+					$item += array_intersect_key($row, array_flip(['type', 'key_', 'hostid']));
 				}
+			}
+
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+				unset($row['type']);
 			}
 
 			$items[$i++] = $item;
