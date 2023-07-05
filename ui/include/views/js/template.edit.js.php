@@ -48,7 +48,7 @@ window.template_edit_popup = new class {
 	}
 
 	#initActions() {
-		this.initMacrosTab();
+		this.#initMacrosTab();
 		this.#updateMultiselect();
 		this.unlink_clear_templateids = {};
 
@@ -100,20 +100,20 @@ window.template_edit_popup = new class {
 	}
 
 	#editLinkedTemplate(parameters) {
-		// todo - get approval about warning message.
-		// todo - wait for decision about checking changes in form.
-		const confirmation = <?= json_encode(
-			_('Open the linked template configuration form? Any changes you made may not be saved.')
-		) ?>;
+		if (this.#hasChanges()) {
+			const confirmation = <?= json_encode(
+				_('Any changes made in the current form will be lost.')
+			) ?>;
 
-		if (!window.confirm(confirmation)) {
-			return;
+			if (!window.confirm(confirmation)) {
+				return;
+			}
 		}
 
 		this.dialogue.dispatchEvent(new CustomEvent('edit.linked', {detail: {templateid: parameters.templateid}}));
 	}
 
-	initMacrosTab() {
+	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
 			readonly: this.template.readonly,
 			parent_hostid: this.template.parent_hostid ?? null,
@@ -342,7 +342,10 @@ window.template_edit_popup = new class {
 		const $groups_ms = $('#template_groups_, #template_group_links_');
 		const $template_ms = $('#template_add_templates_');
 
-		$template_ms.on('change', () => $template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates()));
+		$template_ms.on('change', () => {
+			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
+			this.change.push(true);
+		});
 
 		$groups_ms.on('change', () =>
 			$groups_ms.multiSelect('setDisabledEntries',
@@ -413,5 +416,97 @@ window.template_edit_popup = new class {
 		}
 
 		return templateids;
+	}
+
+	#hasChanges() {
+		this.change = [];
+
+		const form_data = getFormFields(this.form);
+		this.#prepareFields(form_data);
+
+		delete form_data.csrf_token;
+		const initial_data = this.template;
+
+		for (const key in initial_data) {
+			if (Array.isArray(initial_data[key])) {
+				initial_data[key] = {...initial_data[key]};
+			}
+		}
+
+		for (const key in form_data) {
+			// Compare text input fields.
+			if (typeof form_data[key] === 'string') {
+				initial_data.visiblename = initial_data.visible_name;
+				if (['template_name', 'visiblename', 'description'].includes(key)) {
+					this.change.push(form_data[key] !== initial_data[key]);
+				}
+			}
+
+			// Compare Tags.
+			if (key === 'tags') {
+				this.change.push(JSON.stringify(form_data[key]) !== JSON.stringify(initial_data[key]));
+			}
+
+			// Compare Macros.
+			if (key === 'macros') {
+				this.#checkMacroChanges(form_data, initial_data, key);
+			}
+
+			// Compare Value mapping
+			if (key === 'valuemaps') {
+				this.#checkValuemapChanges(form_data, initial_data, key);
+			}
+		}
+
+		return this.change.includes(true);
+	}
+
+	#checkValuemapChanges(initial_data, form_data, key) {
+		const changes = [];
+
+		if (Object.keys(form_data.valuemaps).length !== Object.keys(initial_data.valuemaps).length) {
+			this.change.push(true);
+			return;
+		}
+
+		for (const valuemap in form_data.valuemaps) {
+			Object.keys(initial_data.valuemaps).forEach((key, index) => {
+				initial_data.valuemaps[index] = initial_data.valuemaps[key];
+			});
+
+
+			if (typeof(initial_data.valuemaps[valuemap].mappings) === 'object') {
+				initial_data.valuemaps[valuemap].mappings = Object.values(initial_data.valuemaps[valuemap].mappings);
+			}
+
+			const form_mappings = form_data.valuemaps[valuemap].mappings;
+			const initial_mappings = initial_data.valuemaps[valuemap].mappings;
+
+			for (const mapping in form_mappings) {
+				changes.push(JSON.stringify(form_mappings[mapping]) === JSON.stringify(initial_mappings[mapping]));
+			}
+
+			this.change.push(changes.includes(false));
+		}
+	}
+
+	#checkMacroChanges(form_data, initial_data, key) {
+		if (Object.keys(form_data[key]).length !== Object.keys(initial_data[key]).length) {
+			this.change.push(true);
+			return;
+		}
+
+		for (const macro in form_data[key]) {
+			let changes = [],
+				form_macro = form_data[key][macro];
+
+			for (const macro_key in form_macro) {
+				if (['description', 'macro', 'type', 'value'].includes(macro_key)) {
+					changes.push(form_macro[macro_key] === initial_data[key][macro][macro_key]);
+				}
+			}
+
+			this.change.push(changes.includes(false));
+		}
 	}
 }
