@@ -63,6 +63,7 @@ int	__wrap_ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encodi
 	ZBX_UNUSED(item);
 	ZBX_UNUSED(encoding);
 	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(config_source_ip);
 
 #if defined(HAVE_SSH) || defined(HAVE_SSH2)
 	char	*err_msg = NULL;
