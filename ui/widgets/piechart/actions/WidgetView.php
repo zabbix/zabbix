@@ -511,6 +511,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$others_value = 0;
 		$below_threshold_count = 0;
 		$to_remove = [];
+		$percent_of_total_used = 0;
 
 		foreach ($metrics as &$metric) {
 			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
@@ -563,6 +564,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
+			unset($formatted_value['is_numeric']);
 
 			$metric = [
 				'name' => $metric['name'],
@@ -615,6 +617,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
+			unset($others_formatted_value['is_numeric']);
 
 			$others_metric = [
 				'name' => _('Others'),
@@ -651,6 +654,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
+			unset($total_value['is_numeric']);
+		}
+
+		foreach ($metrics as $metric) {
+			if (!$metric['is_total'] && $raw_total_value > 0) {
+				$percent_of_total_used += $metric['percent_of_total'];
+			}
+		}
+
+		foreach ($metrics as &$metric) {
+			if ($metric['is_total']) {
+				$metric['percent_of_total'] -= $percent_of_total_used;
+				break;
+			}
 		}
 	}
 
