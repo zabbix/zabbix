@@ -138,7 +138,7 @@ class CWidgetSvgGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, '.svg-graph-legend', 'graph.png');
+				downloadSvgImage(this._svg, 'graph.png', '.svg-graph-legend');
 			}
 		});
 

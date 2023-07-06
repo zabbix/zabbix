@@ -806,7 +806,7 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
  * @param {string}     legend_class
  * @param {string}     file_name
  */
-function downloadSvgImage(svg, legend_class, file_name) {
+function downloadSvgImage(svg, file_name, legend_class = '') {
 	var $dom_node = jQuery(svg),
 		canvas = document.createElement('canvas'),
 		labels = $dom_node.next(legend_class),

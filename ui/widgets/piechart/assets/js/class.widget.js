@@ -105,7 +105,7 @@ class CWidgetPieChart extends CWidget {
 			label: t('Download image'),
 			disabled: this.pie_chart === null,
 			clickCallback: () => {
-				downloadSvgImage(this.pie_chart.getSVGElement(), '.pie-chart-legend', 'image.png');
+				downloadSvgImage(this.pie_chart.getSVGElement(), 'image.png', '.pie-chart-legend');
 			}
 		});
 
