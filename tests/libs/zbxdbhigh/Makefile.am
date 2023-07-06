@@ -1,7 +1,8 @@
 if SERVER
 noinst_PROGRAMS = \
 	DBselect_uint64 \
-	DBadd_condition_alloc
+	DBadd_condition_alloc \
+	zbx_merge_tags
 else
 if PROXY
 noinst_PROGRAMS = \
@@ -114,6 +115,20 @@ DBadd_condition_alloc_LDADD += @SERVER_LIBS@
 DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
+
+zbx_merge_tags_SOURCES = \
+	zbx_merge_tags.c \
+	$(COMMON_SRC)
+
+zbx_merge_tags_LDADD = \
+	$(SERVER_COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a
+
+zbx_merge_tags_LDADD += @SERVER_LIBS@
+
+zbx_merge_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_merge_tags_CFLAGS = $(COMMON_FLAGS)
 
 else
 if PROXY
