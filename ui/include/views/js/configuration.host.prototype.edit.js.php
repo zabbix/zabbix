@@ -56,6 +56,8 @@
 					this.openTemplatePopup({templateid: e.target.dataset.templateid});
 				}
 			});
+
+			this.updateMultiselect();
 		},
 
 		initMacrosTab() {
@@ -113,6 +115,7 @@
 			this.form.querySelector('#show_inherited_macros').onchange = () => {
 				this.macros_manager.load(
 					this.form.querySelector('input[name=show_inherited_macros]:checked').value == 1,
+					this.getAllTemplates()
 				);
 			}
 		},
@@ -130,6 +133,65 @@
 			if ($ms.length) {
 				// Collect IDs from Multiselect.
 				$ms.multiSelect('getData').forEach(function (template) {
+					templateids.push(template.id);
+				});
+			}
+
+			return templateids;
+		},
+
+		updateMultiselect() {
+			const $groups_ms = $('#groups_, #group_links_');
+			const $template_ms = $('#add_templates_');
+
+			$template_ms.on('change', () => {
+				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
+			});
+
+			$groups_ms.on('change', () => {
+				$groups_ms.multiSelect('setDisabledEntries',
+					[...document.querySelectorAll('[name^="groups["], [name^="group_links["]')]
+						.map((input) => input.value)
+				)
+			});
+		},
+
+		/**
+		 * Collects ids of currently active (linked + new) templates.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getAllTemplates() {
+			return this.getLinkedTemplates().concat(this.getNewTemplates());
+		},
+
+		/**
+		 * Helper to get linked template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getLinkedTemplates() {
+			const linked_templateids = [];
+
+			this.form.querySelectorAll('[name^="templates["').forEach((input) => {
+				linked_templateids.push(input.value);
+			});
+
+			return linked_templateids;
+		},
+
+		/**
+		 * Helper to get added template IDs as an array.
+		 *
+		 * @return {array}  Templateids.
+		 */
+		getNewTemplates() {
+			const $template_multiselect = $('#add_templates_');
+			const templateids = [];
+
+			// Readonly forms don't have multiselect.
+			if ($template_multiselect.length) {
+				$template_multiselect.multiSelect('getData').forEach(template => {
 					templateids.push(template.id);
 				});
 			}
