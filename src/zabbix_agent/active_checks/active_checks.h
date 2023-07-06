@@ -30,7 +30,6 @@
 typedef struct
 {
 	zbx_vector_addr_ptr_t	addrs;
-	char			*hostname;
 	zbx_config_tls_t	*zbx_config_tls;
 	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
 	char			*config_file;
