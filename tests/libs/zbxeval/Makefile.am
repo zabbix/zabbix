@@ -94,6 +94,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \

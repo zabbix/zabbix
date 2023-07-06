@@ -2007,6 +2007,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxdiscovery/Makefile
 	src/libs/zbxembed/Makefile
 	src/libs/zbxeval/Makefile
+	src/libs/zbxevent/Makefile
 	src/libs/zbxexec/Makefile
 	src/libs/zbxexport/Makefile
 	src/libs/zbxexpr/Makefile

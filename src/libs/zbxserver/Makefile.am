@@ -13,8 +13,6 @@ libzbxserver_a_SOURCES = \
 	expression.h \
 	macrofunc.c \
 	macrofunc.h \
-	get_host_from_event.c \
-	get_host_from_event.h \
 	zabbix_users.c \
 	zabbix_users.h \
 	calc_checks_eval.c \
