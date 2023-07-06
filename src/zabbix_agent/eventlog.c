@@ -1119,7 +1119,7 @@ finish:
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
 
-		send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
 
@@ -1747,7 +1747,7 @@ finish:
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
 
-		send_err = process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
 
