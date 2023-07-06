@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 
 /**
  * @dataSource Services
+ * @dataSource EntitiesTags
  *
  * @backup services
  * @backup profiles
@@ -800,7 +801,7 @@ class testFormTabIndicators extends CWebTest {
 		$overlay->query('id:serviceid_all')->asCheckbox()->one()->check();
 		$overlay->query('button:Select')->one()->click();
 		$overlay->waitUntilNotVisible();
-		$this->assertTabIndicator($tab_selector, count(CDataHelper::get('Services.serviceids')));
+		$this->assertTabIndicator($tab_selector, CDBHelper::getCount('SELECT null FROM services'));
 
 		// Remove all child services and check count indicator.
 		$child_services_tab->query('button:Remove')->all()->click();

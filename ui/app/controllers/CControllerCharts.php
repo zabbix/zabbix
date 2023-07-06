@@ -127,10 +127,11 @@ abstract class CControllerCharts extends CController {
 	protected function getSimpleGraphs(array $hostids, string $name): array {
 		return API::Item()->get([
 			'output' => ['itemid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			// TODO VM: filter by tags
 			'hostids' => $hostids,
 			'search' => $name !== '' ? ['name' => $name] : null,
-			// TODO VM: filter by tags
-			'selectTags' => ['tag', 'value'],
+			'filter' => ['value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]],
 			'preservekeys' => true
 		]);
 	}
