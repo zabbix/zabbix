@@ -903,7 +903,7 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 			ZBX_FS_UI64 ", LastID: " ZBX_FS_UI64, __func__, eventlog_name, lastlogsize, FirstID,
 			LastID);
 
-	if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
 		is_count_item = 1;
 	else
 		is_count_item = 0;
@@ -1469,7 +1469,7 @@ static int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *age
 	/* This RecordNumber wraparound is handled simply by using 64bit integer to calculate record        */
 	/* numbers and then converting to DWORD values.                                                     */
 
-	if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
 		is_count_item = 1;
 	else
 		is_count_item = 0;
@@ -1846,7 +1846,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 	{
 		rate = CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
-		if (0 != (ZBX_METRIC_FLAG_EVENTLOG_COUNT & metric->flags))
+		if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
 			rate *= 10;
 	}
 	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
