@@ -624,10 +624,12 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
 
 	if (0 != handleid)
 	{
-		int	wait_handles = 1;
+		int	wait_handles;
 
-		while (0 != wait_handles)
+		do
 		{
+			wait_handles = 0;
+
 			nanosleep(&delay, NULL);
 
 			pb_lock();
@@ -636,13 +638,14 @@ void	pb_wait_handles(const zbx_vector_uint64_t *handleids)
 			{
 				if (handleids->values[i] <= handleid)
 				{
-					wait_handles = 0;
+					wait_handles = 1;
 					break;
 				}
 			}
 
 			pb_unlock();
 		}
+		while (0 != wait_handles);
 	}
 }
 
