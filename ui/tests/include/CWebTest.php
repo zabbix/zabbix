@@ -158,8 +158,8 @@ class CWebTest extends CTest {
 		}
 		catch (Exception $exception) {
 			// Error handling is not missing here.
-			}
 		}
+	}
 
 	/**
 	 * @inheritdoc

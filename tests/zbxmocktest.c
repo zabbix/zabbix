@@ -182,18 +182,6 @@ int	get_zbx_config_enable_remote_commands(void)
 	return zbx_config_enable_remote_commands;
 }
 
-static int	zbx_config_log_remote_commands = 0;
-int	get_zbx_config_log_remote_commands(void)
-{
-	return zbx_config_log_remote_commands;
-}
-
-static int	zbx_config_unsafe_user_parameters = 0;
-int	get_zbx_config_unsafe_user_parameters(void)
-{
-	return zbx_config_unsafe_user_parameters;
-}
-
 /* test itself */
 
 int	main (void)

@@ -215,7 +215,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->query($selector)->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Dashboard properties');
 					break;
 

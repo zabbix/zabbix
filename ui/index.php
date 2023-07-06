@@ -24,7 +24,6 @@ require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/forms.inc.php';
 
-$page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION

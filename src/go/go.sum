@@ -1,5 +1,3 @@
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230503081642-61ed4a9d9246 h1:nRrITHmaXPmQCAvnBnJ5ked8E4eTQw2fl2opZ6KYyV8=
-git.zabbix.com/ap/plugin-support v1.2.2-0.20230503081642-61ed4a9d9246/go.mod h1:hBZQJDWXEBg2DpEIGzQD8R9xrvfdwveqLlJgDRVagHk=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da h1:SGrLbxs3//G2fEtQSUNJFix1wZN+5h5fegZbIMZNuWg=
 git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da/go.mod h1:F82aoIfLotyv5ExPLCnbUXklH89O6iS1jeU1Kh3lYGs=
 github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69 h1:+tu3HOoMXB7RXEINRVIpxJCT+KdYiI7LAEAUrOw3dIU=
@@ -40,8 +38,8 @@ github.com/gobwas/pool v0.2.1 h1:xfeeEhW7pwmX8nuLVlqbzVc7udMDrwetjEv+TZIz1og=
 github.com/gobwas/pool v0.2.1/go.mod h1:q8bcK0KcYlCgd9e7WYLm9LpyS+YeLd8JVDW6WezmKEw=
 github.com/gobwas/ws v1.1.0 h1:7RFti/xnNkMJnrK7D1yQ/iCIB5OrrY/54/H930kIbHA=
 github.com/gobwas/ws v1.1.0/go.mod h1:nzvNcVha5eUziGrbxFCo6qFIojQHjJV5cLYIbezhfL0=
-github.com/godbus/dbus v4.1.0+incompatible h1:WqqLRTsQic3apZUK9qC5sGNfXthmPXzUZ7nQPrNITa4=
-github.com/godbus/dbus v4.1.0+incompatible/go.mod h1:/YcGZj5zSblfDWMMoOzV4fas9FZnQYTkDnsGvmh2Grw=
+github.com/godbus/dbus/v5 v5.1.0 h1:4KLkAxT3aOY8Li4FRJe/KvhoNFFxo0m6fNuFUO8QJUk=
+github.com/godbus/dbus/v5 v5.1.0/go.mod h1:xhWf0FNVPg57R7Z0UbKHbJfkEywrmjJnf7w5xrFpKfA=
 github.com/godror/godror v0.34.0 h1:/D40cxuWY3PtMa1oIcfXqqInlts5anEL3vj6IkTW8Q8=
 github.com/godror/godror v0.34.0/go.mod h1:9QtjJWw+r1v9zh93Qx+hSOfYRVgj11a/7TUnU/00Wbc=
 github.com/godror/knownpb v0.1.0 h1:dJPK8s/I3PQzGGaGcUStL2zIaaICNzKKAK8BzP1uLio=
