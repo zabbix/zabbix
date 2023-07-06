@@ -153,15 +153,4 @@ class CPopupMenuElement extends CElement {
 	public function getSelected() {
 		return $this->query('xpath:.//a[contains(@aria-label, "selected")]')->one();
 	}
-
-	/**
-	 * @inheritDoc
-	 */
-	public function getReadyCondition() {
-		$target = $this;
-
-		return function () use ($target) {
-			return ($target->query('xpath:.//ul[@role="menu"]')->one(false)->isValid());
-		};
-	}
 }

@@ -98,7 +98,7 @@ class testDashboardGaugeWidget extends CWebTest {
 							'view_mode' => 0,
 							'fields' => [
 								[
-									'type' => '1',
+									'type' => '4',
 									'name' => 'itemid',
 									'value' => $itemids['1 Item for gauge widget']
 								],
@@ -111,7 +111,7 @@ class testDashboardGaugeWidget extends CWebTest {
 									'type' => '1',
 									'name' => 'max',
 									'value' => '100'
-								],
+								]
 							]
 						],
 						[
@@ -124,7 +124,7 @@ class testDashboardGaugeWidget extends CWebTest {
 							'view_mode' => 0,
 							'fields' => [
 								[
-									'type' => '1',
+									'type' => '4',
 									'name' => 'itemid',
 									'value' => $itemids['1 Item for gauge widget']
 								],
@@ -137,7 +137,7 @@ class testDashboardGaugeWidget extends CWebTest {
 									'type' => '1',
 									'name' => 'max',
 									'value' => '100'
-								],
+								]
 							]
 						]
 					]
@@ -632,7 +632,8 @@ class testDashboardGaugeWidget extends CWebTest {
 	public function testDashboardGaugeWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$this->assertTrue($dashboard->edit()->getWidget(self::DELETE_GAUGE)->isEditable());
+		$dashboard->edit();
+		$this->assertTrue($dashboard->getWidget(self::DELETE_GAUGE)->isEditable());
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$dashboard->save();
 		$this->page->waitUntilReady();
