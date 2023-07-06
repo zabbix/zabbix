@@ -160,7 +160,7 @@ class CTriggerPrototypeHelper extends CTriggerGeneralHelper {
 				'type', 'recovery_mode', 'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close',
 				'opdata', 'event_name', 'discover'
 			],
-			'selectDependencies' => ['triggerid', 'flags'],
+			'selectDependencies' => ['triggerid'],
 			'selectTags' => ['tag', 'value'],
 			'selectHosts' => ['hostid', 'host'],
 			'selectDiscoveryRule' => ['itemid', 'hostid'],
