@@ -800,7 +800,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 		else {
 			$current_percentage = 0;
-			$remaining_percentage = 100 - $current_percentage;
+			$remaining_percentage = 100;
 			$sectors_to_keep = [];
 
 			foreach ($non_total_sectors as $sector) {
@@ -813,6 +813,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					else {
 						$sectors_to_keep[] = $sector;
 						$current_percentage += $sector['percent_of_total'];
+						$remaining_percentage -= $sector['percent_of_total'];
 					}
 				}
 				elseif ($sector['percent_of_total'] >= $remaining_percentage && $current_percentage < 100) {
