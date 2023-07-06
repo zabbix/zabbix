@@ -209,7 +209,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 		goto out;
 	}
 
-	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, hostlen, NULL, 0, NI_NAMEREQD))
+	if (0 != getnameinfo(ai->ai_addr, ai->ai_addrlen, host, (socklen_t)hostlen, NULL, 0, NI_NAMEREQD))
 	{
 		host[0] = '\0';
 		goto out;
@@ -241,10 +241,10 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen)
 
 	switch(ai->ai_addr->sa_family) {
 		case AF_INET:
-			inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, iplen);
+			inet_ntop(AF_INET, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
 			break;
 		case AF_INET6:
-			inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, iplen);
+			inet_ntop(AF_INET6, &(((struct sockaddr_in *)ai->ai_addr)->sin_addr), ip, (socklen_t)iplen);
 			break;
 		default:
 			ip[0] = '\0';
@@ -838,31 +838,30 @@ void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state)
 int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event)
 {
 #define ZBX_TLS_MAX_REC_LEN	16384
-	ssize_t	bytes_sent;
-	size_t	send_bytes;
+	ssize_t	bytes_sent, send_bytes;
 
 	if (NULL != event)
 		*event = 0;
 
 	if (context->header_len > (size_t)context->written_header)
 	{
-		size_t	data_len;
+		ssize_t	data_len;
 		char	buf[ZBX_TLS_MAX_REC_LEN];	/* Buffer is allocated on stack with a hope that it   */
 							/* will be short-lived in CPU cache. Static buffer is */
 							/* not used on purpose.                               */
-		size_t	remaining_header_len = context->header_len - context->written_header;
+		ssize_t	remaining_header_len = (ssize_t)context->header_len - context->written_header;
 
-		memcpy(buf, context->header_buf + context->written_header, remaining_header_len);
+		memcpy(buf, context->header_buf + context->written_header, (size_t)remaining_header_len);
 
-		data_len = MIN(context->send_len, ZBX_TLS_MAX_REC_LEN - remaining_header_len);
-		memcpy(buf + remaining_header_len, context->data, data_len);
+		data_len = MIN((ssize_t)context->send_len, ZBX_TLS_MAX_REC_LEN - remaining_header_len);
+		memcpy(buf + remaining_header_len, context->data, (size_t)data_len);
 
 		send_bytes = remaining_header_len + data_len;
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, buf, send_bytes, event)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, buf, (size_t)send_bytes, event)))
 			return FAIL;
 
-		if ((size_t)bytes_sent > remaining_header_len)
+		if (bytes_sent > remaining_header_len)
 		{
 			context->written += bytes_sent - remaining_header_len;
 			context->written_header += remaining_header_len;
@@ -874,16 +873,18 @@ int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short
 			return FAIL;
 	}
 
-	while (context->written < (ssize_t) context->send_len)
+	while (context->written < (ssize_t)context->send_len)
 	{
 		if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
-			send_bytes = context->send_len - (size_t)context->written;
+			send_bytes = (ssize_t)context->send_len - context->written;
 		else
-			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, context->send_len - (size_t)context->written);
+			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, (ssize_t)context->send_len - context->written);
 
-		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, context->data + context->written, send_bytes,
-				event)))
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tcp_write(s, context->data + context->written,
+				(size_t)send_bytes, event)))
+		{
 			return FAIL;
+		}
 
 		context->written += bytes_sent;
 

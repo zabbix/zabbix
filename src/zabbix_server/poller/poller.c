@@ -178,7 +178,7 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 	zbx_interface_availability_init(&in, interface->interfaceid);
 	zbx_interface_availability_init(&out, interface->interfaceid);
 
-	if (FAIL == interface_availability_by_item_type(type, interface->type))
+	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
 		goto out;
 
 	interface_get_availability(interface, &in);
@@ -236,7 +236,7 @@ void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *inter
 	zbx_interface_availability_init(&in, interface->interfaceid);
 	zbx_interface_availability_init(&out, interface->interfaceid);
 
-	if (FAIL == interface_availability_by_item_type(type, interface->type))
+	if (FAIL == interface_availability_by_item_type((unsigned char)type, interface->type))
 		goto out;
 
 	interface_get_availability(interface, &in);
@@ -947,7 +947,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 
 	zbx_preprocessor_flush();
 	zbx_clean_items(items, num, results);
-	zbx_dc_config_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, (size_t)num);
 	zbx_vector_ptr_clear_ext(&add_results, (zbx_mem_free_func_t)zbx_free_agent_result_ptr);
 	zbx_vector_ptr_destroy(&add_results);
 

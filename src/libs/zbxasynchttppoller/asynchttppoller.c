@@ -153,7 +153,7 @@ static void	destroy_curl_context(zbx_curl_context_t *context)
 static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, void *socketp)
 {
 	zbx_curl_context_t		*curl_context;
-	int				events = 0;
+	short				events = 0;
 	zbx_asynchttppoller_config	*asynchttppoller_config = (zbx_asynchttppoller_config *)userp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() action:%d", __func__, action);

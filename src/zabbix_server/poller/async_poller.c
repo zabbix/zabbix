@@ -253,8 +253,8 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	if (0 == num)
 		goto exit;
 
-	results = zbx_malloc(NULL, num * sizeof(AGENT_RESULT));
-	errcodes = zbx_malloc(NULL, num * sizeof(int));
+	results = zbx_malloc(NULL, (size_t)num * sizeof(AGENT_RESULT));
+	errcodes = zbx_malloc(NULL, (size_t)num * sizeof(int));
 
 	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
 
@@ -301,7 +301,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	}
 
 	zbx_clean_items(items, num, results);
-	zbx_dc_config_clean_items(items, NULL, num);
+	zbx_dc_config_clean_items(items, NULL, (size_t)num);
 	zbx_free(results);
 	zbx_free(errcodes);
 exit:
@@ -325,7 +325,7 @@ static void	poller_requeue_items(zbx_poller_config_t *poller_config)
 		return;
 
 	zbx_dc_poller_requeue_items(poller_config->itemids.values, poller_config->lastclocks.values,
-			poller_config->errcodes.values, poller_config->itemids.values_num,
+			poller_config->errcodes.values, (size_t)poller_config->itemids.values_num,
 			poller_config->poller_type, &nextcheck);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() requeued:%d", __func__, poller_config->itemids.values_num);
