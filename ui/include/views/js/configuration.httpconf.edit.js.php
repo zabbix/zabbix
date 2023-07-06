@@ -58,6 +58,7 @@
 				->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
+			->addClass('form_row')
 			->addClass('sortable')
 			->toString()
 	?>
@@ -83,6 +84,7 @@
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
+			->addClass('form_row')
 			->addClass('sortable')
 			->toString()
 	?>
@@ -602,6 +604,7 @@
 
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
+					e.new_node.classList.remove('sortable');
 					e.new_node.prepend(td_element);
 				}
 
@@ -918,6 +921,7 @@
 
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
+					e.new_node.classList.remove('sortable');
 					e.new_node.prepend(td_element);
 				});
 			}
