@@ -154,7 +154,7 @@ class testFormWebScenario extends CWebTest {
 			: 'button:Create web scenario';
 
 		$this->query($selector)->waitUntilClickable()->one()->click();
-		$form = $this->query('name:httpForm')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('name:webscenario_form')->waitUntilVisible()->asForm()->one();
 
 		$this->page->assertHeader('Web monitoring');
 		$this->page->assertTitle('Configuration of web monitoring');
@@ -167,12 +167,12 @@ class testFormWebScenario extends CWebTest {
 			'Update interval' => ['value' => '1m', 'maxlength' => 255],
 			'Attempts' => ['value' => 1, 'maxlength' => 2],
 			'Agent' => ['value' => 'Zabbix'],
-			'id:agent_other' => ['visible' => false, 'enabled' => false, 'maxlength' => 255],
+			'id:agent_other' => ['visible' => false, 'maxlength' => 255],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
-			"xpath:(//table[@data-type='variables']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@data-type='variables']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
-			"xpath:(//table[@data-type='headers']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@data-type='headers']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(//table[@id='variables']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(//table[@id='variables']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(//table[@id='headers']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(//table[@id='headers']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
 			'Enabled' => ['value' => true]
 		];
 
@@ -224,6 +224,8 @@ class testFormWebScenario extends CWebTest {
 			$add_button = $table->query('button:Add')->one();
 			$this->assertTrue($add_button->isClickable());
 			$remove_button = $row->query('button:Remove')->one();
+			$this->assertTrue($remove_button->isClickable());
+			$remove_button->click();
 			$this->assertFalse($remove_button->isClickable());
 
 			// Check the presence of the draggable icon.
@@ -235,9 +237,11 @@ class testFormWebScenario extends CWebTest {
 				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
 			}
 
-			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
-			$row->getColumn('Name')->query('xpath:./input')->one()->fill('zabbix');
-			$this->assertTrue($remove_button->isClickable());
+			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
+			foreach(['Name', 'Value'] as $column) {
+				$row->getColumn($column)->query('xpath:./textarea')->one()->fill('zabbix');
+			}
+			$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
 			// Check that draggable icon becomes enabled when a new row is added.
 			if ($row_dragable) {
@@ -290,8 +294,8 @@ class testFormWebScenario extends CWebTest {
 		$form->selectTab('Authentication');
 		$authentication_fields = [
 			'HTTP authentication' => ['value' => 'None'],
-			'User' => ['visible' => false, 'enabled' => false, 'maxlength' => 64],
-			'Password' => ['visible' => false, 'enabled' => false, 'maxlength' => 64],
+			'User' => ['visible' => false, 'maxlength' => 255],
+			'Password' => ['visible' => false, 'maxlength' => 255],
 			'SSL verify peer' => ['value' => false],
 			'SSL verify host' => ['value' => false],
 			'SSL certificate file' => ['maxlength' => 255],
@@ -321,7 +325,7 @@ class testFormWebScenario extends CWebTest {
 			? ['Update' => true, 'Clone' => true, 'Clear history and trends' => true, 'Delete' => false, 'Cancel' => true]
 			: ['Add' => true, 'Cancel' => true];
 
-		$footer_buttons = $form->query('xpath:.//div[contains(@class, "tfoot-buttons")]')->one()->query('xpath:.//button')->all();
+		$footer_buttons = $form->query('class:form-grid-actions')->one()->query('tag:button')->all();
 		$this->assertEquals(count($expected_buttons), $footer_buttons->count());
 
 		foreach ($footer_buttons as $footer_button) {
@@ -862,22 +866,20 @@ class testFormWebScenario extends CWebTest {
 		$this->query('link', self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		$form = $this->query('name:httpForm')->asForm()->one();
+		$form = $this->query('name:webscenario_form')->asForm()->one();
 
 		// Get initial field values before cloning. Tags need to be handled separately as their table has no label.
 		$fields = $form->getFields()->asValues();
-		$tags = $fields[''];
-		unset($fields['']);
 
 		foreach (['variables', 'headers'] as $field_name) {
 			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
 //			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 			$field = $form->getField(ucfirst($field_name));
 
-			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue();
-			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue();
+			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@id=".
+					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue();
+			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@id=".
+					CXPathHelper::escapeQuotes($field_name)."]//textarea)[2]")->one()->getValue();
 		}
 
 		$form->query('button:Clone')->one()->click();
@@ -901,17 +903,13 @@ class testFormWebScenario extends CWebTest {
 //			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
 			$field = $form->getField(ucfirst($field_name));
 
-			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue()
+			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@id=".
+					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue()
 			);
-			$this->assertEquals($table_fields[$field_name]['value'], $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue()
+			$this->assertEquals($table_fields[$field_name]['value'], $field->query("xpath:(//table[@id=".
+					CXPathHelper::escapeQuotes($field_name)."]//textarea)[2]")->one()->getValue()
 			);
 		}
-
-		// Check that tags were cloned along with all other web scenario fields.
-		$form->selectTab('Tags');
-		$form->query('class:tags-table')->asMultifieldTable()->one()->checkValue($tags);
 	}
 
 	/**
@@ -928,7 +926,7 @@ class testFormWebScenario extends CWebTest {
 		switch ($action) {
 			case 'simple_update':
 				$this->query('link:'.self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
-				$this->query('name:httpForm')->asForm()->one()->submit();
+				$this->query('name:webscenario_form')->asForm()->one()->submit();
 				$this->page->waitUntilReady();
 				$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 				break;
@@ -939,7 +937,7 @@ class testFormWebScenario extends CWebTest {
 				$this->query('link:'.self::CLONE_SCENARIO)->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 
-				$form = $this->query('name:httpForm')->asForm()->one();
+				$form = $this->query('name:webscenario_form')->asForm()->one();
 				$this->fillScenarioForm(self::$all_fields, $form);
 				$form->query('button:Cancel')->one()->click();
 				$this->page->waitUntilReady();
@@ -977,7 +975,7 @@ class testFormWebScenario extends CWebTest {
 		$selector = ($action === 'create') ? 'button:Create web scenario' : 'link:'.self::$update_scenario;
 		$this->query($selector)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$form = $this->query('name:httpForm')->asForm()->one();
+		$form = $this->query('name:webscenario_form')->asForm()->one();
 
 		// Add postfix to scenario name in case of update scenario exept for empty name and template scenario update cases.
 		if ($action === 'update' && !in_array($data['scenario_fields']['Name'], ['', '   ', self::TEMPLATE_SCENARIO])) {
@@ -1053,11 +1051,11 @@ class testFormWebScenario extends CWebTest {
 
 					$i = 1;
 					foreach ($data[$field_name] as $field_pair) {
-						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue()
+						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@id=".
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//textarea)[1]")->one()->getValue()
 						);
-						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[2]")->one()->getValue()
+						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@id=".
+								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//textarea)[2]")->one()->getValue()
 						);
 						$i++;
 					}
@@ -1100,10 +1098,10 @@ class testFormWebScenario extends CWebTest {
 
 				$i = 1;
 				foreach ($data[$field_name] as $field_pair) {
-					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//input)[1]")->one()->fill($field_pair['name']);
-					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//input)[2]")->one()->fill($field_pair['value']);
+					$field->query("xpath:(//table[@id=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
+							$i."]//textarea)[1]")->one()->fill($field_pair['name']);
+					$field->query("xpath:(//table[@id=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
+							$i."]//textarea)[2]")->one()->fill($field_pair['value']);
 					$i++;
 				}
 			}

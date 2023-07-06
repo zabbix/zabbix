@@ -93,7 +93,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$selector = (array_key_exists('scenario_name', $data)) ? $data['scenario_name'] : self::UPDATE_SCENARIO;
 
 		$this->query('link', $selector)->waitUntilClickable()->one()->click();
-		$scenario_form = $this->query('name:httpForm')->waitUntilVisible()->asForm()->one();
+		$scenario_form = $this->query('name:webscenario_form')->waitUntilVisible()->asForm()->one();
 
 		$scenario_form->selectTab('Steps');
 		$steps_table = $scenario_form->getField('Steps')->asTable();
@@ -109,21 +109,22 @@ class testFormWebScenarioStep extends CWebTest {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$step_form = $dialog->asForm();
 
-		$this->assertEquals('Step of web scenario', $dialog->getTitle());
+		$title = (array_key_exists('step_name', $data)) ? 'Step of web scenario' : 'New step of web scenario';
+		$this->assertEquals($title, $dialog->getTitle());
 
 		$step_fields = [
 			'Name' => ['maxlength' => 64],
 			'id:url' => [],
-			"xpath:(.//table[@data-type='query_fields']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='query_fields']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='post_fields']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='post_fields']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(.//table[@id='step-query-fields']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(.//table[@id='step-query-fields']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 255],
+			"xpath:(.//table[@id='step-post-fields']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(.//table[@id='step-post-fields']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
 			'Post type' => ['value' => 'Form data'],
 			'Raw post' => ['visible' => false],
-			"xpath:(.//table[@data-type='variables']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='variables']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
-			"xpath:(.//table[@data-type='headers']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='headers']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(.//table[@id='step-variables']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(.//table[@id='step-variables']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			"xpath:(.//table[@id='step-headers']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
+			"xpath:(.//table[@id='step-headers']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
 			'Follow redirects' => ['value' => false],
 			'Retrieve mode' => ['value' => 'Body'],
 			'Timeout' => ['value' => '15s', 'maxlength' => 255],
@@ -137,20 +138,25 @@ class testFormWebScenarioStep extends CWebTest {
 			$step_fields['id:url']['value'] = 'http://zabbix.com';
 			$step_fields['Post type']['value'] = 'Raw data';
 			$step_fields['Raw post']['visible'] = true;
-			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[1]"]['visible'] = false;
-			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[2]"]['visible'] = false;
 			$step_fields['Follow redirects']['value'] = true;
 
 			$initial_type = 'Raw data';
 			$new_type = 'Form data';
 			$buttons = ['Parse', 'Update', 'Cancel'];
-			$post_fields = ['Post type', 'Post fields'];
+			$post_fields = ['Post type', 'Raw post'];
+
+			foreach (['[1]', '[2]'] as $element_index) {
+				$xpath = "xpath:(.//table[@id='step-post-fields']//textarea)".$element_index;
+
+				unset($step_fields[$xpath]);
+				$this->assertFalse($step_form->query($xpath)->one(false)->isValid());
+			}
 		}
 		else {
 			$initial_type = 'Form data';
 			$new_type = 'Raw data';
 			$buttons = ['Parse', 'Add', 'Cancel'];
-			$post_fields = ['Post type', 'Raw post'];
+			$post_fields = ['Post type', 'Post fields'];
 		}
 
 		foreach ($step_fields as $field => $attributes) {
@@ -199,12 +205,25 @@ class testFormWebScenarioStep extends CWebTest {
 
 		$mode_field = $step_form->getField('Retrieve mode');
 
-		// Check that "Post fields" and "Post type" fields are disabled only when Retrieve mode is set to Headers.
+		// Check that "Post fields" related fields are disabled only when Retrieve mode is set to Headers.
 		foreach (['Body and headers' => true, 'Headers' => false, 'Body' => true] as $value => $enabled) {
 			$mode_field->select($value);
 
 			foreach ($post_fields as $post_field) {
-				$this->assertTrue($step_form->getField($post_field)->isEnabled($enabled));
+				/*
+				 * Post fields table has the disabled class even when enabled to disable the drag icon if table has only
+				 * one row. Therefore, the state of all four interactable elements is checked induvidually.
+				 */
+				if ($post_field === 'Post fields') {
+					$post_fields_table = $step_form->getField($post_field);
+
+					foreach (['xpath:(.//textarea)[1]', 'xpath:(.//textarea)[2]', 'button:Add', 'button:Remove'] as $element) {
+						$this->assertTrue($post_fields_table->query($element)->one()->isEnabled($enabled));
+					}
+				}
+				else {
+					$this->assertTrue($step_form->getField($post_field)->isEnabled($enabled));
+				}
 			}
 		}
 
@@ -228,20 +247,24 @@ class testFormWebScenarioStep extends CWebTest {
 			$add_button = $table->query('button:Add')->one();
 			$this->assertTrue($add_button->isClickable());
 			$remove_button = $row->query('button:Remove')->one();
+			$this->assertTrue($remove_button->isClickable());
+			$remove_button->click();
 			$this->assertFalse($remove_button->isClickable());
 
 			// Check the presence of the draggable icon.
 			if ($table_name === 'Variables') {
-				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
+				$this->assertFalse($row->query('class:drag-icon')->one(false)->isValid());
 			}
 			else {
-				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
+				$drag_icon = $row->query('class:drag-icon')->one();
 				$this->assertFalse($drag_icon->isEnabled());
 			}
 
-			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
-			$row->getColumn('Name')->query('xpath:./input')->one()->fill('zabbix');
-			$this->assertTrue($remove_button->isClickable());
+			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
+			foreach(['Name', 'Value'] as $column) {
+				$row->getColumn($column)->query('xpath:./textarea')->one()->fill('zabbix');
+			}
+			$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
 			// Check that draggable icon becomes enabled when a new row is added.
 			if ($table_name !== 'Variables') {
@@ -267,7 +290,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => '',
 						'id:url' => 'https://zabbix.com'
 					],
-					'step_error' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			// Empty space in name
@@ -278,7 +301,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => '   ',
 						'id:url' => 'https://zabbix.com'
 					],
-					'step_error' => 'Incorrect value for field "name": cannot be empty.'
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			],
 			// Empty URL
@@ -289,7 +312,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with empty URL',
 						'id:url' => ''
 					],
-					'step_error' => 'Incorrect value for field "url": cannot be empty.'
+					'error' => 'Incorrect value for field "url": cannot be empty.'
 				]
 			],
 			// Blank space in URL
@@ -300,7 +323,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with blank space in URL',
 						'id:url' => '   '
 					],
-					'step_error' => 'Incorrect value for field "url": cannot be empty.'
+					'error' => 'Incorrect value for field "url": cannot be empty.'
 				]
 			],
 			// Empty Query field name.
@@ -317,7 +340,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => 'query field value'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/query_fields/1/name": cannot be empty.'
+					'error' => 'Incorrect value for field "query_fields/1/name": cannot be empty.'
 				]
 			],
 			// Empty Post field name.
@@ -335,7 +358,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => 'post field value'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/posts/1/name": cannot be empty.'
+					'error' => 'Incorrect value for field "post_fields/1/name": cannot be empty.'
 				]
 			],
 			// Empty Variables field name.
@@ -352,7 +375,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => 'variable field value'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": cannot be empty.'
+					'error' => 'Incorrect value for field "variables/1/name": cannot be empty.'
 				]
 			],
 			// Variables field name without opening bracket.
@@ -368,7 +391,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'name' => 'name}'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
+					'error' => 'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Variables field name without closing bracket.
@@ -384,7 +407,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'name' => '{name'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
+					'error' => 'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Misplaced brackets in Variables field name.
@@ -400,7 +423,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'name' => '{na}me'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
+					'error' => 'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Double brackets in Variables field name.
@@ -416,7 +439,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'name' => '{{name}}'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
+					'error' => 'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Only brackets in Variables field name.
@@ -432,7 +455,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'name' => '{}'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
+					'error' => 'Incorrect value for field "variables/1/name": is not enclosed in {} or is malformed.'
 				]
 			],
 			// Duplicate Variable names.
@@ -453,7 +476,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => 'BBB'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/2": value (name)=({name}) already exists.'
+					'error' => 'Incorrect value for field "variables/2": value (name)=({name}) already exists.'
 				]
 			],
 			// Missing Headers name.
@@ -470,7 +493,7 @@ class testFormWebScenarioStep extends CWebTest {
 							'value' => 'AAA'
 						]
 					],
-					'scenario_error' => 'Invalid parameter "/1/steps/2/headers/1/name": cannot be empty.'
+					'error' => 'Incorrect value for field "headers/1/name": cannot be empty.'
 				]
 			],
 			// Empty timeout.
@@ -482,7 +505,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => ''
 					],
-					'step_error' => 'Incorrect value for field "timeout": cannot be empty.'
+					'error' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
 			// Empty space in timeout.
@@ -494,7 +517,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '   '
 					],
-					'step_error' => 'Incorrect value for field "timeout": cannot be empty.'
+					'error' => 'Incorrect value for field "timeout": cannot be empty.'
 				]
 			],
 			// Non-numeric timeout.
@@ -506,7 +529,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 'two'
 					],
-					'step_error' => 'Incorrect value for field "timeout": a time unit is expected.'
+					'error' => 'Incorrect value for field "timeout": a time unit is expected.'
 				]
 			],
 			// Negative timeout.
@@ -518,7 +541,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '-5s'
 					],
-					'step_error' => 'Incorrect value for field "timeout": a time unit is expected.'
+					'error' => 'Incorrect value for field "timeout": a time unit is expected.'
 				]
 			],
 			// Zero timeout.
@@ -530,7 +553,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 0
 					],
-					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
+					'error' => 'Incorrect value for field "timeout": value must be one of 1-3600.'
 				]
 			],
 			// Too big timeout.
@@ -542,7 +565,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => 3601
 					],
-					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
+					'error' => 'Incorrect value for field "timeout": value must be one of 1-3600.'
 				]
 			],
 			// Too big timeout with suffix.
@@ -554,7 +577,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Timeout' => '2h'
 					],
-					'step_error' => 'Invalid parameter "timeout": value must be one of 1-3600.'
+					'error' => 'Incorrect value for field "timeout": value must be one of 1-3600.'
 				]
 			],
 			// Non-numeric status code.
@@ -566,7 +589,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => 'AAA'
 					],
-					'scenario_error' => 'Invalid response code "AAA".'
+					'error' => 'Invalid response code "AAA".'
 				]
 			],
 			// Too big status code.
@@ -578,7 +601,7 @@ class testFormWebScenarioStep extends CWebTest {
 						'id:url' => 'http://zabbix.com',
 						'Required status codes' => '2150000000'
 					],
-					'scenario_error' => 'Invalid response code "2150000000".'
+					'error' => 'Invalid response code "2150000000".'
 				]
 			],
 			// Minimal step configuration.
@@ -738,11 +761,6 @@ class testFormWebScenarioStep extends CWebTest {
 	private function checkStepAction($data, $action) {
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 
-		// An attempt to save form is done only in TEST_BAD scenarios with scenario level errors, so only then hash is needed.
-		if (CTestArrayHelper::get($data, 'scenario_error')) {
-			$old_hash = CDBHelper::getHash(self::SQL);
-		}
-
 		// Open the web scenario step configuration form in create or update mode depending on the executed action.
 		$scenario = ($action === 'update') ? self::UPDATE_SCENARIO : self::CREATE_SCENARIO;
 		$scenario_form = $this->getScenarioFormOnStepsTab($scenario);
@@ -769,15 +787,8 @@ class testFormWebScenarioStep extends CWebTest {
 
 		if ($expected === TEST_BAD) {
 			// There are step form level errors and scenario form level errors. They are checked checked differently.
-			if (CTestArrayHelper::get($data, 'step_error')) {
-				$this->assertMessage(TEST_BAD, null, $data['step_error']);
-				$dialog->close();
-			}
-			else {
-				$scenario_form->submit();
-				$this->assertMessage(TEST_BAD, 'Cannot update web scenario', $data['scenario_error']);
-				$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
-			}
+			$this->assertMessage(TEST_BAD, 'Cannot '.$action.' web scenario step', $data['error']);
+			$dialog->close();
 		}
 		else {
 			$scenario_form->submit();
@@ -1201,7 +1212,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$this->query('link:'.$scenario)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
-		$scenario_form = $this->query('name:httpForm')->asForm()->one();
+		$scenario_form = $this->query('name:webscenario_form')->asForm()->one();
 		$scenario_form->selectTab('Steps');
 
 		return $scenario_form;
@@ -1224,18 +1235,18 @@ class testFormWebScenarioStep extends CWebTest {
 	/**
 	 * Compare values from corresponding value pair table with expected data.
 	 *
-	 * @param	string	$table_field	name of the value pair field
-	 * @param	array	$expected		array with reference values
+	 * @param	CElement	$table_field	value pair field object
+	 * @param	array		$expected		array with reference values
 	 */
 	private function checkTableField($table_field, $expected) {
 		$obtained_fields = [];
 		$i = 0;
 
-		foreach ($table_field->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
-			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
+		foreach ($table_field->query('class:form_row')->all() as $table_row) {
+			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//textarea)[1]')->one()->getValue();
 
 			if (array_key_exists('value', $expected[$i])) {
-				$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
+				$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//textarea)[2]')->one()->getValue();
 			}
 
 			$i++;
@@ -1257,14 +1268,14 @@ class testFormWebScenarioStep extends CWebTest {
 		$i = 1;
 		foreach ($input_data as $row) {
 			// Add row in  field table if required
-			if ($table_field->query('xpath:.//tr[@class="sortable"]')->all()->count() !== $count) {
+			if ($table_field->query('class:form_row')->all()->count() !== $count) {
 				$add_button->click();
 			}
 
-			$table_field->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($row['name']);
+			$table_field->query("xpath:(.//tr[".$i."]//textarea)[1]")->one()->fill($row['name']);
 
 			if (array_key_exists('value', $row)) {
-				$table_field->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($row['value']);
+				$table_field->query("xpath:(.//tr[".$i."]//textarea)[2]")->one()->fill($row['value']);
 			}
 
 			$i++;
