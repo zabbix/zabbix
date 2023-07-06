@@ -44,7 +44,8 @@ class CWidgetPieChart extends CWidget {
 		return {
 			...super.getUpdateRequestData(),
 			from: this._time_period.from,
-			to: this._time_period.to
+			to: this._time_period.to,
+			with_config: this.pie_chart === null ? 1 : undefined
 		};
 	}
 

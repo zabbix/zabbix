@@ -44,7 +44,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$this->addValidationRules([
 			'from' => 'range_time',
-			'to' => 'range_time'
+			'to' => 'range_time',
+			'with_config' => 'in 1'
 		]);
 	}
 
@@ -115,10 +116,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			error($metrics['errors']);
 		}
 
-		$data['vars']['sectors'] = $metrics['sectors'];
-		$data['vars']['total_value'] = $metrics['total_value'];
-		$data['vars']['config'] = $this->getConfig();
+		$svg_data = $this->getSVGData($metrics['sectors'], $metrics['total_value']);
+
+		$data['vars']['sectors'] = $svg_data['svg_sectors'];
+		$data['vars']['total_value'] = $svg_data['svg_total_value'];
 		$data['vars']['legend'] = $this->getLegend($metrics['sectors']);
+		if ($this->hasInput('with_config')) {
+			$data['vars']['config'] = $this->getConfig();
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
@@ -126,7 +131,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getData($options): array {
 		$metrics = [];
 		$errors = [];
-		$total_value = 0;
+		$total_value = [];
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid']);
 		self::sortByDataset($metrics);
@@ -504,14 +509,13 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 	}
 
-	private static function getSectorsData(array &$metrics, int &$total_value, array $merge_sectors, array $total_config,
-			array $units_config, string $templateid): void {
+	private static function getSectorsData(array &$metrics, array &$total_value, array $merge_sectors,
+			array $total_config, array $units_config, string $templateid): void {
 		$set_default_item = true;
 		$raw_total_value = 0;
 		$others_value = 0;
 		$below_threshold_count = 0;
 		$to_remove = [];
-		$percent_of_total_used = 0;
 
 		foreach ($metrics as &$metric) {
 			$is_total = ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE
@@ -526,8 +530,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'value' => null,
 						'units' => ''
 					],
-					'is_total' => $is_total,
-					'percent_of_total' => 0
+					'is_total' => $is_total
 				];
 				continue;
 			}
@@ -574,6 +577,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'is_total' => $is_total
 			];
 
+			if ($metric['value'] < 0) {
+				continue;
+			}
 			$raw_total_value += $metric['value'];
 		}
 
@@ -581,7 +587,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		foreach ($metrics as $metric) {
 			if ($metric['is_total']) {
-				$raw_total_value = $metric['value'];
+				$raw_total_value = ($metric['value'] <= 0) ? 0 : $metric['value'];
 				break;
 			}
 		}
@@ -591,18 +597,20 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
-			if (!$metric['is_total'] && $raw_total_value > 0) {
+			if ($metric['value'] <= 0 || $raw_total_value <= 0) {
+				$percentage = 0;
+			} else {
 				$percentage = ($metric['value'] / $raw_total_value) * 100;
-				$metric['percent_of_total'] = $percentage;
-			}
-			else {
-				$metric['percent_of_total'] = 100;
 			}
 
 			if ($merge_sectors['merge'] == PIE_CHART_MERGE_ON) {
-				if ($metric['percent_of_total'] < $merge_sectors['percent']) {
+				if ($percentage < $merge_sectors['percent']) {
 					$below_threshold_count++;
-					$others_value += $metric['value'];
+
+					if ($metric['value'] > 0) {
+						$others_value += $metric['value'];
+					}
+
 					$to_remove[] = &$metric;
 				}
 			}
@@ -624,8 +632,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'color' => $merge_sectors['color'],
 				'value' => $others_value,
 				'formatted_value' => $others_formatted_value,
-				'is_total' => false,
-				'percent_of_total' => ($others_value / $raw_total_value) * 100
+				'is_total' => false
 			];
 
 			$metrics[] = &$others_metric;
@@ -638,7 +645,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($templateid != '' || $raw_total_value == null) {
+		if ($templateid != '' || $raw_total_value <= 0) {
 			$total_value = [
 				'value' => null,
 				'value_text' => _('No data'),
@@ -646,7 +653,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 		else {
-			$total_value = convertUnitsRaw([
+			$formatted_total_value = convertUnitsRaw([
 				'value' => $raw_total_value,
 				'units' => $default_item['units'] ?? '',
 				'decimals' => $total_config['decimal_places'],
@@ -654,20 +661,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
-			unset($total_value['is_numeric']);
-		}
 
-		foreach ($metrics as $metric) {
-			if (!$metric['is_total'] && $raw_total_value > 0) {
-				$percent_of_total_used += $metric['percent_of_total'];
-			}
-		}
-
-		foreach ($metrics as &$metric) {
-			if ($metric['is_total']) {
-				$metric['percent_of_total'] -= $percent_of_total_used;
-				break;
-			}
+			$total_value = [
+				'value' => $raw_total_value,
+				'formatted_value' => $formatted_total_value
+			];
+			unset($total_value['formatted_value']['is_numeric']);
 		}
 	}
 
@@ -753,5 +752,92 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		return $legend;
+	}
+
+	private function getSVGData(array $sectors, array $total_value): array {
+		if ($total_value['value'] <= 0) {
+			return [
+				'svg_sectors' => [],
+				'svg_total_value' => $total_value
+			];
+		}
+
+		$index = null;
+		$total_percentage_used = 0;
+		$non_total_sectors = [];
+
+		foreach ($sectors as $key => $sector) {
+			if ($sector['is_total']) {
+				$index = $key;
+				break;
+			}
+		}
+
+		if ($index !== null) {
+			$total_sector = $sectors[$index];
+			unset($sectors[$index]);
+
+			$sectors[] = $total_sector;
+		}
+
+		$svg_sectors = array_values($sectors);
+
+		foreach ($svg_sectors as &$sector) {
+			$sector['percent_of_total'] = ($sector['value'] / $total_value['value']) * 100;
+
+			if (!$sector['is_total']) {
+				$total_percentage_used += $sector['percent_of_total'];
+				$non_total_sectors[] = &$sector;
+			}
+		}
+
+		if ($total_percentage_used < 100) {
+			foreach ($svg_sectors as &$sector) {
+				if ($sector['is_total']) {
+					$sector['percent_of_total'] -= $total_percentage_used;
+				}
+			}
+		}
+		else {
+			$current_percentage = 0;
+			$remaining_percentage = 100 - $current_percentage;
+			$sectors_to_keep = [];
+
+			foreach ($non_total_sectors as $sector) {
+				if (($current_percentage + $sector['percent_of_total']) <= $remaining_percentage) {
+					if ($current_percentage == 0 && $sector['percent_of_total'] > 100) {
+						$sector['percent_of_total'] = 100;
+						$sectors_to_keep[] = $sector;
+						break;
+					}
+					else {
+						$sectors_to_keep[] = $sector;
+						$current_percentage += $sector['percent_of_total'];
+					}
+				}
+				elseif ($sector['percent_of_total'] >= $remaining_percentage && $current_percentage < 100) {
+					$sector['percent_of_total'] = $remaining_percentage;
+					$sectors_to_keep[] = $sector;
+					break;
+				} else {
+					break;
+				}
+			}
+
+			$svg_sectors = $sectors_to_keep;
+		}
+
+		$svg_sectors = array_filter($svg_sectors, function ($sector) {
+			return $sector['value'] > 0;
+		});
+
+		foreach($svg_sectors as &$sector) {
+			unset($sector['value'], $sector['is_total']);
+		}
+
+		return [
+			'svg_sectors' => $svg_sectors,
+			'svg_total_value' => $total_value['formatted_value']
+		];
 	}
 }
