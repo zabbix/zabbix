@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-03T08:23:22Z'
+  date: '2023-07-06T06:21:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -9,7 +9,11 @@ zabbix_export:
       template: 'OpenStack Nova by HTTP'
       name: 'OpenStack Nova by HTTP'
       description: |
-        OpenStack template documentation.
+        Discovers and monitors project limits, servers, services, hypervisors, availability zones, hypervisors and tenants with OpenStack Compute API by HTTP using script and HTTP agent items.
+        
+        This template receives token and service URL from parent host, therefore no additional configuration is not necessary.
+        
+        Read the template documentation prior to using this template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
         
@@ -21,7 +25,7 @@ zabbix_export:
           name: 'Nova: Get availability zones'
           type: HTTP_AGENT
           key: openstack.nova.availability_zone.get
-          delay: '{$INTERVAL.AVAILABILITY_ZONE}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.AVAILABILITY_ZONE}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -32,10 +36,12 @@ zabbix_export:
                 - $.availabilityZoneInfo
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get availability zones list'
-          url: '{$SERVICE.URL}/os-availability-zone/detail'
+          timeout: 10s
+          url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-availability-zone/detail'
+          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
           tags:
             - tag: component
               value: raw
@@ -43,7 +49,7 @@ zabbix_export:
           name: 'Nova: Get hypervisors'
           type: HTTP_AGENT
           key: openstack.nova.hypervisors.get
-          delay: '{$INTERVAL.HYPERVISOR}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.HYPERVISOR}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -54,10 +60,12 @@ zabbix_export:
                 - $.hypervisors
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get hypervisors list'
-          url: '{$SERVICE.URL}/os-hypervisors/detail'
+          timeout: 10s
+          url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-hypervisors/detail'
+          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
           tags:
             - tag: component
               value: raw
@@ -65,7 +73,7 @@ zabbix_export:
           name: 'Nova: Get absolute limits'
           type: HTTP_AGENT
           key: openstack.nova.limits.get
-          delay: '{$INTERVAL.LIMITS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -76,10 +84,12 @@ zabbix_export:
                 - $.limits.absolute
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get absolute project limits'
-          url: '{$SERVICE.URL}/limits'
+          timeout: 10s
+          url: '{$OPENSTACK.NOVA.SERVICE.URL}/limits'
+          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
           tags:
             - tag: component
               value: raw
@@ -89,7 +99,7 @@ zabbix_export:
           key: openstack.nova.limits.instances.current
           delay: '0'
           history: 7d
-          description: 'Gets the current instances count.'
+          description: 'The number of servers in each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -103,10 +113,10 @@ zabbix_export:
           name: 'Nova: Instances count, free'
           type: CALCULATED
           key: openstack.nova.limits.instances.free
-          delay: '{$INTERVAL.LIMITS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: 7d
           params: last(//openstack.nova.limits.instances.max)-last(//openstack.nova.limits.instances.current)
-          description: 'Gets the free instances count.'
+          description: 'The number of available servers for each tenant.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -120,7 +130,7 @@ zabbix_export:
           key: openstack.nova.limits.instances.max
           delay: '0'
           history: 7d
-          description: 'Gets the maximum instance count.'
+          description: 'The number of allowed servers for each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -136,15 +146,15 @@ zabbix_export:
           key: openstack.nova.limits.ram.current
           delay: '0'
           history: 7d
-          units: bytes
-          description: 'Gets the current instances count.'
+          units: b
+          description: 'The amount of used server RAM.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.totalRAMUsed
             - type: MULTIPLIER
               parameters:
-                - '1000000'
+                - '1048576'
           master_item:
             key: openstack.nova.limits.get
           tags:
@@ -154,11 +164,11 @@ zabbix_export:
           name: 'Nova: RAM usage, free'
           type: CALCULATED
           key: openstack.nova.limits.ram.free
-          delay: '{$INTERVAL.LIMITS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: 7d
-          units: bytes
+          units: b
           params: last(//openstack.nova.limits.ram.max)-last(//openstack.nova.limits.ram.current)
-          description: 'Gets the free RAM.'
+          description: 'The amount of available server RAM.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -172,15 +182,15 @@ zabbix_export:
           key: openstack.nova.limits.ram.max
           delay: '0'
           history: 7d
-          units: bytes
-          description: 'Gets the maximum instance count.'
+          units: b
+          description: 'The amount of allowed server RAM.'
           preprocessing:
             - type: JSONPATH
               parameters:
                 - $.maxTotalRAMSize
             - type: MULTIPLIER
               parameters:
-                - '1000000'
+                - '1048576'
           master_item:
             key: openstack.nova.limits.get
           tags:
@@ -192,7 +202,7 @@ zabbix_export:
           key: openstack.nova.limits.vcpu.current
           delay: '0'
           history: 7d
-          description: 'Gets the current vCPUs count.'
+          description: 'The number of used server cores in each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -206,10 +216,10 @@ zabbix_export:
           name: 'Nova: vCPUs usage, free'
           type: CALCULATED
           key: openstack.nova.limits.vcpu.free
-          delay: '{$INTERVAL.LIMITS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: 7d
           params: last(//openstack.nova.limits.vcpu.max)-last(//openstack.nova.limits.vcpu.current)
-          description: 'Gets the free vCPUs count.'
+          description: 'The number of available server cores for each tenant.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -223,7 +233,7 @@ zabbix_export:
           key: openstack.nova.limits.vcpu.max
           delay: '0'
           history: 7d
-          description: 'Gets the maximum vCPUs count.'
+          description: 'The number of allowed server cores for each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -237,7 +247,7 @@ zabbix_export:
           name: 'Nova: Get servers'
           type: HTTP_AGENT
           key: openstack.nova.servers.get
-          delay: '{$INTERVAL.SERVERS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -248,10 +258,12 @@ zabbix_export:
                 - $.servers
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get servers list'
-          url: '{$SERVICE.URL}/servers'
+          timeout: 10s
+          url: '{$OPENSTACK.NOVA.SERVICE.URL}/servers'
+          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
           tags:
             - tag: component
               value: raw
@@ -259,7 +271,7 @@ zabbix_export:
           name: 'Nova: Get compute services'
           type: HTTP_AGENT
           key: openstack.nova.services.get
-          delay: '{$INTERVAL.SERVICES}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.SERVICES}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -270,10 +282,12 @@ zabbix_export:
                 - $.services
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get compute services list'
-          url: '{$SERVICE.URL}/os-services'
+          timeout: 10s
+          url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-services'
+          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
           tags:
             - tag: component
               value: raw
@@ -281,7 +295,7 @@ zabbix_export:
           name: 'Nova: Get tenants'
           type: SCRIPT
           key: openstack.nova.tenant.get
-          delay: '{$INTERVAL.TENANTS}'
+          delay: '{$OPENSTACK.NOVA.INTERVAL.TENANTS}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -341,15 +355,19 @@ zabbix_export:
                 }
             
                 return url + request_path + '?' +
-                    'start=' + datetime_formatted
+                    'start=' + encodeURIComponent(datetime_formatted)
             }
             
-            function getHttpData(url, api_token) {
+            function getHttpData(url, params, api_token) {
                 const request = new HttpRequest();
             
                 request.addHeader('Content-Type: application/json');
                 request.addHeader('X-Auth-Token: ' + api_token);
-            
+                // set proxy if needed
+                if (params['http_proxy']) {
+                    request.setProxy(params['http_proxy'])
+                    Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
+                }
             
                 const response = request.get(url, JSON.stringify(params));
                 Zabbix.log(4, '[ Openstack Nova API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -364,15 +382,7 @@ zabbix_export:
                 }
             
                 // return a list with request and response objects
-                return [request, response];
-            }
-            
-            function parseHttpData(http_request, http_response) {
-                // parse the response body and filter out only supported services by Zabbix with only needed data
-                const ret = JSON.parse(http_response);
-            
-                // return list of dictionaries of service name, url and access token
-                return JSON.stringify(ret);
+                return response;
             }
             
             const params = checkParams(JSON.parse(value)),
@@ -380,8 +390,7 @@ zabbix_export:
                 token = params.api_token,
                 period = params.period;
             
-            const httpData = getHttpData(buildUrl(url, period), token);
-            return parseHttpData(httpData[0], httpData[1]);
+            return getHttpData(buildUrl(url, period), params, token);
           description: 'Gets a list of tenants and it''s data.'
           preprocessing:
             - type: JSONPATH
@@ -389,13 +398,16 @@ zabbix_export:
                 - $.tenant_usages
               error_handler: CUSTOM_ERROR
               error_handler_params: 'Could not get tenant list'
+          timeout: 10s
           parameters:
             - name: api_url
-              value: '{$SERVICE.URL}'
+              value: '{$OPENSTACK.NOVA.SERVICE.URL}'
             - name: api_token
-              value: '{$TOKEN}'
+              value: '{$OPENSTACK.TOKEN}'
             - name: period
-              value: '{$TENANT.PERIOD}'
+              value: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
+            - name: http_proxy
+              value: '{$OPENSTACK.NOVA.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -409,10 +421,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#ZONE_NAME}'
-                value: '{$HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
+                value: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.MATCHES}'
                 formulaid: A
               - macro: '{#ZONE_NAME}'
-                value: '{$HYPERVISOR.DISCOVERY.HOSTNAME.NOT.MATCHES}'
+                value: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
@@ -424,7 +436,7 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.host_count[{#ZONE_NAME}]'
               delay: '0'
               history: 7d
-              description: 'A count of host and service objects under single availability zone.'
+              description: 'The count of hosts and service objects under single availability zone.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -449,7 +461,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of an availability zone.'
+              description: 'The raw data of the availability zone.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -467,7 +479,7 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.state[{#ZONE_NAME}]'
               delay: '0'
               history: 7d
-              description: 'Gets state of an availability zone.'
+              description: 'The current state of the availability zone.'
               valuemap:
                 name: 'Availability zone state'
               preprocessing:
@@ -495,7 +507,7 @@ zabbix_export:
                   name: 'Availability zone [{#ZONE_NAME}]: Zone is unavailable'
                   opdata: 'Current zone state: {ITEM.LASTVALUE}'
                   priority: WARNING
-                  description: 'Availability zone is unavailable.'
+                  description: 'Availability zone is not available.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -518,24 +530,24 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#HOSTNAME}'
-                value: '{$HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
                 formulaid: A
               - macro: '{#HOSTNAME}'
-                value: '{$HYPERVISOR.DISCOVERY.HOSTNAME.NOT.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
               - macro: '{#TYPE}'
-                value: '{$HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
                 formulaid: E
               - macro: '{#TYPE}'
-                value: '{$HYPERVISOR.DISCOVERY.TYPE.NOT.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: F
               - macro: '{#HOST_IP}'
-                value: '{$HYPERVISOR.DISCOVERY.IP.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.MATCHES}'
                 formulaid: C
               - macro: '{#HOST_IP}'
-                value: '{$HYPERVISOR.DISCOVERY.IP.NOT.MATCHES}'
+                value: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
           lifetime: 7d
@@ -549,7 +561,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of a hypervisor.'
+              description: 'The raw data of the hypervisor.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -567,7 +579,7 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.state[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'Gets state of a hypervisor.'
+              description: 'The state of the hypervisor.'
               valuemap:
                 name: 'General state'
               preprocessing:
@@ -596,7 +608,7 @@ zabbix_export:
                   value: hypervisor
               trigger_prototypes:
                 - uuid: 5fb5ed829d9747499c385d268bf229ea
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.state[{#ID}])="down"'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.state[{#ID}])=0'
                   name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: State is "down"'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
@@ -611,7 +623,7 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.status[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'Gets status of a hypervisor.'
+              description: 'The status of the hypervisor.'
               valuemap:
                 name: 'General status'
               preprocessing:
@@ -640,11 +652,11 @@ zabbix_export:
                   value: hypervisor
               trigger_prototypes:
                 - uuid: 5022a6a84f884a31be1ff440a3c14732
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.status[{#ID}])="disabled"'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.status[{#ID}])=0'
                   name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: Status is "disabled"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: INFO
-                  description: 'Status of the hypervisor is disabled. Acknowledge to close the problem manually.'
+                  description: 'Status of the hypervisor is disabled.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -656,7 +668,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'Gets version of a hypervisor.'
+              description: 'The hypervisor version.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -675,11 +687,11 @@ zabbix_export:
                   value: hypervisor
               trigger_prototypes:
                 - uuid: 958ce612bb0a4b1ea67aba594dbd53b3
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}],#1)<>last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}]))>0'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.hypervisors.version[{#ID}]))>0'
                   name: 'Hypervisor [{#ID}]:[{#HOSTNAME}]: Version has changed'
                   opdata: 'Current version: {ITEM.LASTVALUE}'
                   priority: INFO
-                  description: 'Status of the hypervisor is disabled. Acknowledge to close the problem manually.'
+                  description: 'Version of the hypervisor has changed. Acknowledge to close the problem manually.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -708,10 +720,10 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#SERVER_NAME}'
-                value: '{$SERVER.DISCOVERY.SERVER.NAME.MATCHES}'
+                value: '{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}'
                 formulaid: A
               - macro: '{#SERVER_NAME}'
-                value: '{$SERVER.DISCOVERY.SERVER.NAME.NOT.MATCHES}'
+                value: '{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
@@ -721,9 +733,9 @@ zabbix_export:
               name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status'
               type: HTTP_AGENT
               key: 'openstack.nova.server.status.get[{#SERVER_ID}]'
-              delay: '{$INTERVAL.SERVERS}'
+              delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
               history: 7d
-              description: 'Gets status of server.'
+              description: 'The server status.'
               valuemap:
                 name: 'Server status'
               preprocessing:
@@ -735,7 +747,7 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [           // 20 - Unknown (default)
+                      const idx = [           // 30 - Unknown (default)
                           'SHUTOFF',          // 0
                           'ACTIVE',           // 1
                           'PAUSED',           // 2
@@ -757,14 +769,16 @@ zabbix_export:
                           'UNKNOWN',          // 18
                           'VERIFY_RESIZE',    // 19
                       ].indexOf(value);
-                      return idx !== -1 ? idx : 20;
+                      return idx !== -1 ? idx : 30;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
-              url: '{$SERVICE.URL}/servers/{#SERVER_ID}'
+              timeout: 10s
+              url: '{$OPENSTACK.NOVA.SERVICE.URL}/servers/{#SERVER_ID}'
+              http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
               headers:
                 - name: X-Auth-Token
-                  value: '{$TOKEN}'
+                  value: '{$OPENSTACK.TOKEN}'
               tags:
                 - tag: component
                   value: application
@@ -772,7 +786,7 @@ zabbix_export:
                   value: server
               trigger_prototypes:
                 - uuid: 490262a25fb842c9a9b83a2e0be83654
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#1)<>last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}]))>0'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])<>last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}],#2) and length(last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}]))>0'
                   name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status has changed'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: INFO
@@ -780,12 +794,12 @@ zabbix_export:
                   manual_close: 'YES'
                   dependencies:
                     - name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"'
-                      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])="ERROR"'
+                      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])=5'
                   tags:
                     - tag: scope
                       value: availability
                 - uuid: 7d2ca81f24154099b3857aeaadef114f
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])="ERROR"'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.server.status.get[{#SERVER_ID}])=5'
                   name: 'Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status is "ERROR"'
                   opdata: 'Current status: {ITEM.LASTVALUE}'
                   priority: HIGH
@@ -814,17 +828,17 @@ zabbix_export:
             evaltype: AND
             conditions:
               - macro: '{#HOST}'
-                value: '{$SERVICES.DISCOVERY.HOST.MATCHES}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
                 formulaid: C
               - macro: '{#HOST}'
-                value: '{$SERVICES.DISCOVERY.HOST.NOT.MATCHES}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: D
               - macro: '{#BINARY}'
-                value: '{$SERVICES.DISCOVERY.BINARY.MATCHES}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}'
                 formulaid: A
               - macro: '{#BINARY}'
-                value: '{$SERVICES.DISCOVERY.BINARY.NOT.MATCHES}'
+                value: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
@@ -838,7 +852,7 @@ zabbix_export:
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'Gets disabled reason of a Compute service.'
+              description: 'The reason for disabling a service.'
               valuemap:
                 name: 'Compute service disabled reason'
               preprocessing:
@@ -865,7 +879,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of a single Compute service.'
+              description: 'The raw data of the service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -883,7 +897,7 @@ zabbix_export:
               key: 'openstack.nova.services.state[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'Gets state of a Compute service.'
+              description: 'The state of the service.'
               valuemap:
                 name: 'General state'
               preprocessing:
@@ -912,7 +926,7 @@ zabbix_export:
                   value: service
               trigger_prototypes:
                 - uuid: 9479c68ee2db4104ac44f47931d96929
-                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.state[{#ID}])="down"'
+                  expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.state[{#ID}])=0'
                   name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State is "down"'
                   opdata: 'Current state: {ITEM.LASTVALUE}'
                   priority: WARNING
@@ -927,7 +941,7 @@ zabbix_export:
               key: 'openstack.nova.services.status[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'Gets status of a Compute service.'
+              description: 'The status of the service.'
               valuemap:
                 name: 'General status'
               preprocessing:
@@ -956,7 +970,7 @@ zabbix_export:
                   value: service
           trigger_prototypes:
             - uuid: 177fa631136c4340816ee9e2cf90f1ac
-              expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])="disabled" and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>0'
+              expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])=0 and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>=0'
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status is "disabled"'
               opdata: 'Current state: {ITEM.LASTVALUE1}, Disabled reason: "{ITEM.VALUE2}"'
               priority: INFO
@@ -993,7 +1007,9 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!hours'
-              description: 'Multiplying the server disk size (in GiB) by hours the server exists, and then adding that all together for each server.'
+              description: |
+                Total disk usage hours for the current tenant (project).
+                Multiplying the server disk size (in GiB) by hours the server exists, and then adding that all together for each server.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1021,7 +1037,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Gets raw data of tenant.'
+              description: 'The raw data of a tenant.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1069,7 +1085,9 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!hours'
-              description: 'Multiplying the server memory size (in MiB) by hours the server exists, and then adding that all together for each server.'
+              description: |
+                Total memory usage hours for the current tenant (project).
+                Multiplying the server memory size (in MiB) by hours the server exists, and then adding that all together for each server.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1097,7 +1115,9 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!hours'
-              description: 'Multiplying the number of virtual CPUs of the server by hours the server exists, and then adding that all together for each server.'
+              description: |
+                Total vCPU usage hours for the current tenant (project).
+                Multiplying the number of virtual CPUs of the server by hours the server exists, and then adding that all together for each server.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1163,95 +1183,97 @@ zabbix_export:
         - tag: target
           value: openstack
       macros:
-        - macro: '{$AVAILABILITY_ZONE.DISCOVERY.NAME.MATCHES}'
+        - macro: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.MATCHES}'
           value: '.*'
           description: 'Sets the zone name regex filter to use in availability zone discovery for including.'
-        - macro: '{$AVAILABILITY_ZONE.DISCOVERY.NAME.NOT.MATCHES}'
+        - macro: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the zone name regex filter to use in availability zone discovery for excluding.'
-        - macro: '{$HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
           value: '.*'
           description: 'Sets the hostname regex filter to use in hypervisor discovery for including.'
-        - macro: '{$HYPERVISOR.DISCOVERY.HOSTNAME.NOT.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the hostname regex filter to use in hypervisor discovery for excluding.'
-        - macro: '{$HYPERVISOR.DISCOVERY.IP.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.MATCHES}'
           value: '.*'
           description: 'Sets the host IP address regex filter to use in hypervisor discovery for including.'
-        - macro: '{$HYPERVISOR.DISCOVERY.IP.NOT.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.IP.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the host IP address regex filter to use in hypervisor discovery for excluding.'
-        - macro: '{$HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}'
           value: '.*'
           description: 'Sets the type regex filter to use in hypervisor discovery for including.'
-        - macro: '{$HYPERVISOR.DISCOVERY.TYPE.NOT.MATCHES}'
+        - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the type regex filter to use in hypervisor discovery for excluding.'
-        - macro: '{$INTERVAL.AVAILABILITY_ZONE}'
-          value: 3m
-          description: 'Interval for availability zone HTTP agent item query.'
-        - macro: '{$INTERVAL.HYPERVISOR}'
-          value: 3m
-          description: 'Interval for hypervisor HTTP agent item query.'
-        - macro: '{$INTERVAL.LIMITS}'
-          value: 3m
-          description: 'Interval for absolute limit HTTP agent item query.'
-        - macro: '{$INTERVAL.SERVERS}'
-          value: 3m
-          description: 'Interval for server HTTP agent item queries.'
-        - macro: '{$INTERVAL.SERVICES}'
-          value: 3m
-          description: 'Interval for service HTTP agent item query.'
-        - macro: '{$INTERVAL.TENANTS}'
-          value: 3m
-          description: 'Interval for tenant HTTP agent item query.'
-        - macro: '{$PROJECT.CPU.TRIGGER.HIGH}'
+        - macro: '{$OPENSTACK.NOVA.CPU.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a high severity event about vCPU resource usage.'
-        - macro: '{$PROJECT.CPU.TRIGGER.WARNING}'
+        - macro: '{$OPENSTACK.NOVA.CPU.UTIL.WARN}'
           value: '75'
           description: 'Sets the percentage threshold for creating a warning severity event about vCPU resource usage.'
-        - macro: '{$PROJECT.INSTANCES.TRIGGER.HIGH}'
+        - macro: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy for authorization item. If this parameter is empty, then no proxy is used.'
+        - macro: '{$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a high severity event about instances resource count.'
-        - macro: '{$PROJECT.INSTANCES.TRIGGER.WARNING}'
+        - macro: '{$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}'
           value: '75'
           description: 'Sets the percentage threshold for creating a warning severity event about instances resource count.'
-        - macro: '{$PROJECT.RAM.TRIGGER.HIGH}'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.AVAILABILITY_ZONE}'
+          value: 3m
+          description: 'Interval for availability zone HTTP agent item query.'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.HYPERVISOR}'
+          value: 3m
+          description: 'Interval for hypervisor HTTP agent item query.'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
+          value: 3m
+          description: 'Interval for absolute limit HTTP agent item query.'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
+          value: 3m
+          description: 'Interval for server HTTP agent item queries.'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.SERVICES}'
+          value: 3m
+          description: 'Interval for service HTTP agent item query.'
+        - macro: '{$OPENSTACK.NOVA.INTERVAL.TENANTS}'
+          value: 3m
+          description: 'Interval for tenant HTTP agent item query.'
+        - macro: '{$OPENSTACK.NOVA.RAM.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a high severity event about RAM resource usage.'
-        - macro: '{$PROJECT.RAM.TRIGGER.WARNING}'
+        - macro: '{$OPENSTACK.NOVA.RAM.UTIL.WARN}'
           value: '75'
           description: 'Sets the percentage threshold for creating a warning severity event about RAM resource usage.'
-        - macro: '{$SERVER.DISCOVERY.SERVER.NAME.MATCHES}'
-          value: '.*'
-          description: 'Sets the server name regex filter to use in server discovery for including.'
-        - macro: '{$SERVER.DISCOVERY.SERVER.NAME.NOT.MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Sets the server name regex filter to use in server discovery for excluding.'
-        - macro: '{$SERVICE.URL}'
+        - macro: '{$OPENSTACK.NOVA.SERVICE.URL}'
           description: 'API endpoint for Nova Service, e.g., https://local.openstack:8774/v2.1.'
-        - macro: '{$SERVICES.DISCOVERY.BINARY.MATCHES}'
-          value: '.*'
-          description: 'Sets the binary name regex filter to use in Compute services discovery for including.'
-        - macro: '{$SERVICES.DISCOVERY.BINARY.NOT.MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Sets the binary name regex filter to use in Compute services discovery for excluding.'
-        - macro: '{$SERVICES.DISCOVERY.HOST.MATCHES}'
-          value: '.*'
-          description: 'Sets the host name regex filter to use in Compute services discovery for including.'
-        - macro: '{$SERVICES.DISCOVERY.HOST.NOT.MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Sets the host name regex filter to use in Compute services discovery for excluding.'
-        - macro: '{$TENANT.PERIOD}'
+        - macro: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
           value: m
           description: |
             Period for which tenant usage statistics will be queried. Possible values are:
-              * 'y' - current year until now;
-              * 'm' - current month until now;
-              * 'w' - current week until now;
-              * 'd' - current day until now;
-        - macro: '{$TOKEN}'
+             'y' - current year until now,
+             'm' - current month until now,
+             'w' - current week until now,
+             'd' - current day until now.
+        - macro: '{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}'
+          value: '.*'
+          description: 'Sets the server name regex filter to use in server discovery for including.'
+        - macro: '{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the server name regex filter to use in server discovery for excluding.'
+        - macro: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}'
+          value: '.*'
+          description: 'Sets the binary name regex filter to use in Compute services discovery for including.'
+        - macro: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the binary name regex filter to use in Compute services discovery for excluding.'
+        - macro: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
+          value: '.*'
+          description: 'Sets the host name regex filter to use in Compute services discovery for including.'
+        - macro: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Sets the host name regex filter to use in Compute services discovery for excluding.'
+        - macro: '{$OPENSTACK.TOKEN}'
           type: SECRET_TEXT
           description: 'API token for the monitoring user.'
       dashboards:
@@ -1362,69 +1384,75 @@ zabbix_export:
               newvalue: UNKNOWN
             - value: '19'
               newvalue: VERIFY_RESIZE
-            - value: '20'
+            - value: '30'
               newvalue: Unknown
   triggers:
-    - uuid: 22592fabc09d416598fb4fb806048040
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$PROJECT.INSTANCES.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
-      name: 'Nova: Current instances count exceeded {$PROJECT.INSTANCES.TRIGGER.HIGH}% of max available'
-      opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
-      priority: HIGH
-      description: 'Current instances count has exceeded {$PROJECT.INSTANCES.TRIGGER.HIGH}% of the max available instances count.'
-      tags:
-        - tag: scope
-          value: capacity
     - uuid: 3dbae725014d4f289e20f002f2674dc7
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current,#1) >= ({$PROJECT.INSTANCES.TRIGGER.WARNING} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max,#1))'
-      name: 'Nova: Current instances count exceeded {$PROJECT.INSTANCES.TRIGGER.WARNING}% of max available'
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
+      name: 'Nova: Current instances count is high'
+      event_name: 'Nova: Current instances count is high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'Current instances count has exceeded {$PROJECT.INSTANCES.TRIGGER.WARNING}% of the max available instances count.'
+      description: 'Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.WARN}% of the max available instances count.'
       dependencies:
-        - name: 'Nova: Current instances count exceeded {$PROJECT.INSTANCES.TRIGGER.HIGH}% of max available'
-          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$PROJECT.INSTANCES.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
+        - name: 'Nova: Current instances count is too high'
+          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
       tags:
         - tag: scope
           value: capacity
-    - uuid: 9dfd643fb555419c9c3200a07cc7647e
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$PROJECT.RAM.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
-      name: 'Nova: Current RAM usage exceeded {$PROJECT.RAM.TRIGGER.HIGH}% of max available'
+    - uuid: 22592fabc09d416598fb4fb806048040
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.current) >= ({$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.instances.max))'
+      name: 'Nova: Current instances count is too high'
+      event_name: 'Nova: Current instances count is too high (used >= {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: HIGH
-      description: 'Current RAM usage has exceeded {$PROJECT.RAM.TRIGGER.HIGH}% of the max available RAM usage.'
+      description: 'Current instances count has exceeded {$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}% of the max available instances count.'
       tags:
         - tag: scope
           value: capacity
     - uuid: c9d9eca4b3e540f491210b5c2312e1ba
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$PROJECT.RAM.TRIGGER.WARNING} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
-      name: 'Nova: Current RAM usage exceeded {$PROJECT.RAM.TRIGGER.WARNING}% of max available'
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
+      name: 'Nova: Current RAM usage is high'
+      event_name: 'Nova: Current RAM usage is high (used >= {$OPENSTACK.NOVA.RAM.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'Current RAM usage has exceeded {$PROJECT.RAM.TRIGGER.WARNING}% of the max available RAM usage.'
+      description: 'Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.WARN}% of the max available RAM usage.'
       dependencies:
-        - name: 'Nova: Current RAM usage exceeded {$PROJECT.RAM.TRIGGER.HIGH}% of max available'
-          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$PROJECT.RAM.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
+        - name: 'Nova: Current RAM usage is too high'
+          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
       tags:
         - tag: scope
           value: capacity
-    - uuid: e62a7fb598b34a0cb5bee6bc0370f7dd
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$PROJECT.CPU.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
-      name: 'Nova: Current vCPU usage exceeded {$PROJECT.CPU.TRIGGER.HIGH}% of max available'
+    - uuid: 9dfd643fb555419c9c3200a07cc7647e
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.current) >= ({$OPENSTACK.NOVA.RAM.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.ram.max))'
+      name: 'Nova: Current RAM usage is too high'
+      event_name: 'Nova: Current RAM usage is too high (used >= {$OPENSTACK.NOVA.RAM.UTIL.HIGH}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: HIGH
-      description: 'Current vCPU usage has exceeded {$PROJECT.CPU.TRIGGER.HIGH}% of the max available vCPU usage.'
+      description: 'Current RAM usage has exceeded {$OPENSTACK.NOVA.RAM.UTIL.HIGH}% of the max available RAM usage.'
       tags:
         - tag: scope
           value: capacity
     - uuid: 85b1a132602344e39a50ef10b29fca15
-      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$PROJECT.CPU.TRIGGER.WARNING} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
-      name: 'Nova: Current vCPU usage exceeded {$PROJECT.CPU.TRIGGER.WARNING}% of max available'
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.WARN} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
+      name: 'Nova: Current vCPU usage is high'
+      event_name: 'Nova: Current vCPU usage is high (used >= {$OPENSTACK.NOVA.CPU.UTIL.WARN}%)'
       opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
       priority: WARNING
-      description: 'Current vCPU usage has exceeded {$PROJECT.CPU.TRIGGER.WARNING}% of the max available vCPU usage.'
+      description: 'Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.WARN}% of the max available vCPU usage.'
       dependencies:
-        - name: 'Nova: Current vCPU usage exceeded {$PROJECT.CPU.TRIGGER.HIGH}% of max available'
-          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$PROJECT.CPU.TRIGGER.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
+        - name: 'Nova: Current vCPU usage is too high'
+          expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
+      tags:
+        - tag: scope
+          value: capacity
+    - uuid: e62a7fb598b34a0cb5bee6bc0370f7dd
+      expression: 'last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.current) >= ({$OPENSTACK.NOVA.CPU.UTIL.HIGH} / 100 * last(/OpenStack Nova by HTTP/openstack.nova.limits.vcpu.max))'
+      name: 'Nova: Current vCPU usage is too high'
+      event_name: 'Nova: Current vCPU usage is too high (used >= {$OPENSTACK.NOVA.CPU.UTIL.HIGH}%)'
+      opdata: 'Current: {ITEM.LASTVALUE1}, MAX: {ITEM.LASTVALUE2}'
+      priority: HIGH
+      description: 'Current vCPU usage has exceeded {$OPENSTACK.NOVA.CPU.UTIL.HIGH}% of the max available vCPU usage.'
       tags:
         - tag: scope
           value: capacity

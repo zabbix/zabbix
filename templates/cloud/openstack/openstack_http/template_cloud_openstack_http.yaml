@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-03T07:45:50Z'
+  date: '2023-07-06T06:21:12Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -29,7 +29,7 @@ zabbix_export:
           name: 'OpenStack: Get access token and service catalog'
           type: SCRIPT
           key: openstack.identity.auth
-          delay: '{$AUTH.INTERVAL}'
+          delay: '{$OPENSTACK.AUTH.INTERVAL}'
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -47,7 +47,7 @@ zabbix_export:
                 return params;
             }
             
-            function getHttpData(url, app_cred_id, app_cred_secret) {
+            function getHttpData(url, params, app_cred_id, app_cred_secret) {
                 const request = new HttpRequest();
             
                 request.addHeader('Content-Type: application/json');
@@ -67,6 +67,12 @@ zabbix_export:
                     }
                 };
             
+                // set proxy if needed
+                if (params['http_proxy']) {
+                    request.setProxy(params['http_proxy'])
+                    Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
+                }
+            
                 const response = request.post(url, JSON.stringify(request_body));
                 Zabbix.log(4, '[ Openstack Identity API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -80,19 +86,19 @@ zabbix_export:
                 }
             
                 // return a list with request and response objects
-                return [request, response];
+                return {'request': request, 'response': response};
             }
             
-            function parseHttpData(http_request, http_response) {
+            function parseHttpData(http_data) {
                 // parse header and check if it is valid
                 var token;
-                const headers = http_request.getHeaders(true);
+                const headers = http_data['request'].getHeaders(true);
                 if (typeof headers === "object") {
                     if (headers !== null) {
                         try {
                             token = headers["X-Subject-Token"][0]; // save received token
                         } catch (error) {
-                            throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information. ' + error;
+                            throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
                         }
                     } else {
                         throw 'Response object is empty. Check debug log for more information.';
@@ -106,7 +112,14 @@ zabbix_export:
             
                 // parse the response body and filter out only supported services by Zabbix with only needed data
                 var ret = [];
-                const service_catalog = JSON.parse(http_response)['token']['catalog'];
+                const data = JSON.parse(http_data['response']);
+                // check if service catalog exists
+                if (data['token']['catalog']) {
+                    const service_catalog = data['token']['catalog'];
+                } else {
+                    throw 'Cannot find service catalog in HTTP response.'
+                }
+            
                 service_catalog.forEach(function (service) {                // loop through service catalog
                     if (supported_services.indexOf(service.name) > -1) {    // check if service is supported by Zabbix
                         service.endpoints.forEach(function (endpoint) {     // loop through each endpoint for catalog
@@ -130,17 +143,19 @@ zabbix_export:
                 auth_cred_id = params.app_cred_id,
                 auth_cred_secret = params.app_cred_secret;
             
-            const httpData = getHttpData(url + request_path, auth_cred_id, auth_cred_secret);
-            return parseHttpData(httpData[0], httpData[1]);
+            const httpData = getHttpData(url + request_path, params, auth_cred_id, auth_cred_secret);
+            return parseHttpData(httpData);
           description: 'Authorizes user on the OpenStack Identity service and gets the service catalog.'
-          timeout: 6s
+          timeout: 10s
           parameters:
             - name: api_url
-              value: '{$KEYSTONE.API.ENDPOINT}'
+              value: '{$OPENSTACK.KEYSTONE.API.ENDPOINT}'
             - name: app_cred_id
-              value: '{$APP.CRED.ID}'
+              value: '{$OPENSTACK.APP.CRED.ID}'
             - name: app_cred_secret
-              value: '{$APP.CRED.SECRET}'
+              value: '{$OPENSTACK.APP.CRED.SECRET}'
+            - name: http_proxy
+              value: '{$OPENSTACK.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -166,10 +181,10 @@ zabbix_export:
               templates:
                 - name: 'OpenStack Nova by HTTP'
               macros:
-                - macro: '{$SERVICE.URL}'
+                - macro: '{$OPENSTACK.NOVA.SERVICE.URL}'
                   value: '{#SERVICE_URL}'
                   description: 'OpenStack Nova service path.'
-                - macro: '{$TOKEN}'
+                - macro: '{$OPENSTACK.TOKEN}'
                   type: SECRET_TEXT
                   description: 'OpenStack authorization token.'
           master_item:
@@ -187,13 +202,15 @@ zabbix_export:
         - tag: target
           value: openstack
       macros:
-        - macro: '{$APP.CRED.ID}'
+        - macro: '{$OPENSTACK.APP.CRED.ID}'
           description: 'Application credential ID for monitoring user access.'
-        - macro: '{$APP.CRED.SECRET}'
+        - macro: '{$OPENSTACK.APP.CRED.SECRET}'
           type: SECRET_TEXT
           description: 'Application credential password for monitoring user access.'
-        - macro: '{$AUTH.INTERVAL}'
+        - macro: '{$OPENSTACK.AUTH.INTERVAL}'
           value: 50m
           description: 'Interval in minutes, in which API token will be regenerated. By default, OpenStack API tokens expire after 60m.'
-        - macro: '{$KEYSTONE.API.ENDPOINT}'
+        - macro: '{$OPENSTACK.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy for authorization item. If this parameter is empty, then no proxy is used.'
+        - macro: '{$OPENSTACK.KEYSTONE.API.ENDPOINT}'
           description: 'API endpoint for Identity Service, e.g., https://local.openstack:5000.'
