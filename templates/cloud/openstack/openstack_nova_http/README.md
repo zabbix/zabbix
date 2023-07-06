@@ -18,7 +18,13 @@ This template has been tested on:
 
 ## Configuration
 
-You can specify an HTTP proxy to use by changing value of `{$OPENSTACK.NOVA.HTTP.PROXY}` user macro.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+
+## Setup
+
+This template is not meant to be used independently. A host with __OpenStack by HTTP__ template will discover __Nova__ service automatically and create host prototype with this template assigned to it.
+
+If needed, you can specify an HTTP proxy for the template to use by changing value of `{$OPENSTACK.NOVA.HTTP.PROXY}` user macro.
 
 For tenant usage statistics, a custom time period can be chosen for which the data will be queried. This can be set with `{$OPENSTACK.NOVA.TENANT.PERIOD}` macro value.
 Value can be one of the following:
@@ -31,13 +37,8 @@ Value can be one of the following:
 
 * `d` - current day until now;
 
-This template discovers servers present in Nova and monitors their statuses, but depending on different OpenStack use-cases, it, most likely, is not necessary to monitor all servers.
-To specify which servers to monitor, set the `{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}` and `{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}` macro values accordingly. This logic also applies to other low-level discovery rules.
-
-
-## Setup
-
-This template is not meant to be used independently. Host with __OpenStack by HTTP__ template will discover __Nova__ service automatically and create host prototype with this template assigned to it.
+This template discovers servers (instances) present in project and monitors their statuses, but depending on different use-cases, it, most likely, is not necessary to monitor all servers.
+To filter which servers to monitor, set the `{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}` and `{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}` macro values accordingly. This logic also applies to other low-level discovery rules.
 
 **OpenStack configuration.**
 
