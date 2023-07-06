@@ -456,6 +456,7 @@ window.template_edit_popup = new class {
 				this.#checkValuemapChanges(form_data, initial_data, key);
 			}
 		}
+
 		this.change.push(this.ms_change);
 
 		return this.change.includes(true);
@@ -501,7 +502,7 @@ window.template_edit_popup = new class {
 
 			for (const macro_key in form_macro) {
 				if (['description', 'macro', 'type', 'value'].includes(macro_key)) {
-					changes.push(form_macro[macro_key] === initial_data[key][macro][macro_key]);
+					changes.push(form_macro[macro_key] == initial_data[key][macro][macro_key]);
 				}
 			}
 
