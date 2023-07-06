@@ -1192,8 +1192,6 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	ret_metrics = format_metric_results(&json, now);
 	ret_commands = format_command_results(&json);
 
-	zbx_json_close(&json);
-
 	if (FAIL == ret_metrics && FAIL == ret_commands)
 		goto ret;
 
