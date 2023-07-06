@@ -976,7 +976,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkDuplicates($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);
@@ -1119,7 +1118,6 @@ class CDiscoveryRule extends CItemGeneral {
 		self::checkDuplicates($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
 		self::checkFilterFormula($items);
 		self::checkOverridesFilterFormula($items);
 		self::checkOverridesOperationTemplates($items);

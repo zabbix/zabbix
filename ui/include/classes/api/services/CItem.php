@@ -551,7 +551,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -694,7 +693,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**

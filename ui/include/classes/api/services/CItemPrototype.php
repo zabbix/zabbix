@@ -423,7 +423,6 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -568,7 +567,6 @@ class CItemPrototype extends CItemGeneral {
 		self::checkValueMaps($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
