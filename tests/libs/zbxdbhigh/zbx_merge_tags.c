@@ -107,7 +107,6 @@ static void	read_tags(const char *path, zbx_vector_db_tag_ptr_t *tags)
 		zbx_mock_handle_t	hid, hname, hname_orig, hvalue, hvalue_orig, hauto;
 		zbx_db_tag_t		*db_tag;
 		const char		*tag_str, *tag_orig_str, *value_str, *value_orig_str, *auto_str;
-		printf("[MPLOG] i = %d\n", i);
 
 		if (ZBX_MOCK_SUCCESS != mock_err)
 			fail_msg("Cannot read '%s' %s", path, zbx_mock_error_string(mock_err));
@@ -242,7 +241,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 
 	zbx_vector_db_tag_ptr_clear_ext(&optags, zbx_db_tag_free);
-	zbx_vector_db_tag_ptr_destroy(&out_host_tags);
+	zbx_vector_db_tag_ptr_destroy(&optags);
 
 	zbx_vector_db_tag_ptr_clear_ext(&out_host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&out_host_tags);
