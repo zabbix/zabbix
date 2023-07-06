@@ -766,6 +766,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 		$total_percentage_used = 0;
 		$non_total_sectors = [];
 
+		$sectors = array_filter($sectors, function ($sector) {
+			return $sector['value'] > 0;
+		});
+
 		foreach ($sectors as $key => $sector) {
 			if ($sector['is_total']) {
 				$index = $key;
@@ -803,7 +807,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$remaining_percentage = 100;
 			$sectors_to_keep = [];
 
-			foreach ($non_total_sectors as $sector) {
+			foreach ($non_total_sectors as &$sector) {
 				if (($current_percentage + $sector['percent_of_total']) <= $remaining_percentage) {
 					if ($current_percentage == 0 && $sector['percent_of_total'] > 100) {
 						$sector['percent_of_total'] = 100;
@@ -827,10 +831,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			$svg_sectors = $sectors_to_keep;
 		}
-
-		$svg_sectors = array_filter($svg_sectors, function ($sector) {
-			return $sector['value'] > 0;
-		});
 
 		foreach($svg_sectors as &$sector) {
 			unset($sector['value'], $sector['is_total']);
