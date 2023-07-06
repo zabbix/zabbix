@@ -79,8 +79,6 @@ else {
 	];
 }
 
-sdff($data['host']);
-
 $output = [
 	'header' => ($data['hostid'] == 0) ? _('New host') : _('Host'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_HOST_EDIT),

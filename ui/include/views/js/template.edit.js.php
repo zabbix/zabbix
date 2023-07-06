@@ -101,9 +101,7 @@ window.template_edit_popup = new class {
 
 	#editLinkedTemplate(parameters) {
 		if (this.#hasChanges()) {
-			const confirmation = <?= json_encode(
-				_('Any changes made in the current form will be lost.')
-			) ?>;
+			const confirmation = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
 
 			if (!window.confirm(confirmation)) {
 				return;

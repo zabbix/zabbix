@@ -28,7 +28,7 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('template')))->removeId())
 	->setId('templates-form')
 	->setName('template-edit-form')
-	->addItem((new CInput('submit', null))->addStyle('display: none;'))
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
 	->addVar('clone_templateid', $data['clone_templateid'] ?? null);
 
 if ($data['clone']) {
