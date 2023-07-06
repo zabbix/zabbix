@@ -91,7 +91,7 @@ class CControllerHostDashboardView extends CController {
 					$this->getInput('hostid')
 				);
 
-				$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'],
+				$dashboard['pages'] = CDashboardHelper::prepareDashboardPages($dashboard['pages'],
 					$dashboard['templateid'], true
 				);
 

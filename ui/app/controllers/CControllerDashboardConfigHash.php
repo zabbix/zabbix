@@ -84,7 +84,7 @@ class CControllerDashboardConfigHash extends CController {
 			if ($db_dashboards) {
 				$db_dashboard = $db_dashboards[0];
 
-				$db_dashboard['pages'] = CDashboardHelper::preparePagesForGrid($db_dashboard['pages'],
+				$db_dashboard['pages'] = CDashboardHelper::prepareDashboardPages($db_dashboard['pages'],
 					$this->hasInput('templateid') ? $this->getInput('templateid') : null,
 					true
 				);

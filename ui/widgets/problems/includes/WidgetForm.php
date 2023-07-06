@@ -46,7 +46,7 @@ class WidgetForm extends CWidgetForm {
 	private bool $show_tags = false;
 
 	protected function normalizeValues(array $values): array {
-		$values = self::convertDottedKeys($values);
+		$values = parent::normalizeValues($values);
 
 		if (array_key_exists('show_tags', $values)) {
 			$this->show_tags = $values['show_tags'] !== SHOW_TAGS_NONE;

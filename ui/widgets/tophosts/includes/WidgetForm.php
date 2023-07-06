@@ -49,7 +49,7 @@ class WidgetForm extends CWidgetForm {
 	private array $field_column_values = [];
 
 	protected function normalizeValues(array $values): array {
-		$values = self::convertDottedKeys($values);
+		$values = parent::normalizeValues($values);
 
 		if (array_key_exists('columnsthresholds', $values)) {
 			foreach ($values['columnsthresholds'] as $column_index => $fields) {

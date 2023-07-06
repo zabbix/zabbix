@@ -1453,7 +1453,7 @@ class CDashboard {
 
 		return Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
-			.then(() => {
+			.then((fields) => {
 				this._is_unsaved = true;
 
 				overlayDialogueDestroy(overlay.dialogueid);
@@ -1555,6 +1555,8 @@ class CDashboard {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
+				return response.fields;
 			});
 	}
 

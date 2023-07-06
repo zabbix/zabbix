@@ -41,8 +41,6 @@ class CDashboardHelper {
 	/**
 	 * Update editable flag.
 	 *
-	 * @static
-	 *
 	 * @param array $dashboards  An associative array of the dashboards.
 	 */
 	public static function updateEditableFlag(array &$dashboards): void {
@@ -60,22 +58,28 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Prepare widget pages for dashboard grid.
+	 * Prepare and validate widget data for displaying on the dashboard.
+	 *
+	 * @param array       $pages         Dashboard pages with widgets as returned by the dashboard API.
+	 * @param string|null $templateid    Template ID, if used.
+	 * @param bool        $with_rf_rate  Supply refresh rates for widgets, for the current user.
+	 *
+	 * @return array
 	 */
-	public static function preparePagesForGrid(array $pages, ?string $templateid, bool $with_rf_rate): array {
+	public static function prepareDashboardPages(array $pages, ?string $templateid, bool $with_rf_rate): array {
 		if (!$pages) {
 			return [];
 		}
 
-		$grid_pages = [];
+		$prepared_pages = [];
 
 		foreach ($pages as $page) {
-			$grid_page_widgets = [];
+			$prepared_widgets = [];
 
 			CArrayHelper::sort($page['widgets'], ['y', 'x']);
 
 			foreach ($page['widgets'] as $widget_data) {
-				$grid_page_widget = [
+				$prepared_widget = [
 					'widgetid' => $widget_data['widgetid'],
 					'type' => $widget_data['type'],
 					'name' => $widget_data['name'],
@@ -94,50 +98,50 @@ class CDashboardHelper {
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$grid_page_widget['fields'] = self::convertWidgetFields($widget_data['fields']);
+					$widget_fields = self::constructWidgetFields($widget_data['fields']);
+					$widget_fields = self::constructWidgetFieldsFromDottedNames($widget_fields);
+					$widget_fields = self::constructWidgetFieldsFromArrayNames($widget_fields);
+
+					$widget_form = $widget->getForm($widget_fields, $templateid);
+					$widget_form->validate();
+
+					$prepared_widget['fields'] = $widget_form->getFieldsValues();
 
 					if ($with_rf_rate) {
 						$rf_rate = (int) CProfile::get('web.dashboard.widget.rf_rate', -1, $widget_data['widgetid']);
 
 						if ($rf_rate == -1) {
-							// Transforms corrupted data to default values.
-							$widget_form = $widget->getForm($grid_page_widget['fields'], $templateid);
-							$widget_form->validate();
-							$values = $widget_form->getFieldsValues();
-
-							$rf_rate = $values['rf_rate'] == -1
+							$rf_rate = $prepared_widget['fields']['rf_rate'] == -1
 								? $widget->getDefaultRefreshRate()
-								: $values['rf_rate'];
+								: $prepared_widget['fields']['rf_rate'];
 						}
 
-						$grid_page_widget['rf_rate'] = $rf_rate;
+						$prepared_widget['rf_rate'] = $rf_rate;
 					}
 				}
 
-				$grid_page_widgets[] = $grid_page_widget;
+				$prepared_widgets[] = $prepared_widget;
 			}
 
-			$grid_pages[] = [
+			$prepared_pages[] = [
 				'dashboard_pageid' => $page['dashboard_pageid'],
 				'name' => $page['name'],
 				'display_period' => $page['display_period'],
-				'widgets' => $grid_page_widgets
+				'widgets' => $prepared_widgets
 			];
 		}
 
-		return $grid_pages;
+		return $prepared_pages;
 	}
 
 	/**
-	 * Get widget pages with inaccessible fields unset.
+	 * Unset widget fields referring to inaccessible objects.
 	 *
-	 * @static
-	 *
-	 * @param array $pages
-	 * @param array $pages[]['widgets']
-	 * @param array $pages[]['widgets'][]['fields']
-	 * @param array $pages[]['widgets'][]['fields'][]['type']
-	 * @param array $pages[]['widgets'][]['fields'][]['value']
+	 * @param array $pages  Dashboard pages with widgets, as returned by the dashboard API.
+	 *        array $pages[]['widgets']
+	 *        array $pages[]['widgets'][]['fields']
+	 *        array $pages[]['widgets'][]['fields'][]['type']
+	 *        array $pages[]['widgets'][]['fields'][]['value']
 	 *
 	 * @return array
 	 */
@@ -346,34 +350,170 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Converts fields, received from API to key/value format.
+	 * Construct widget fields from widget field data returned by the dashboards API.
 	 *
-	 * @static
-	 *
-	 * @param array $fields  fields as received from API
+	 * @param array $fields
 	 *
 	 * @return array
 	 */
-	public static function convertWidgetFields(array $fields): array {
-		$ret = [];
+	public static function constructWidgetFields(array $fields): array {
+		$fields_new = [];
 
 		foreach ($fields as $field) {
-			if (array_key_exists($field['name'], $ret)) {
-				$ret[$field['name']] = (array) $ret[$field['name']];
-				$ret[$field['name']][] = $field['value'];
+			if (array_key_exists($field['name'], $fields_new)) {
+				$fields_new[$field['name']] = (array) $fields_new[$field['name']];
+				$fields_new[$field['name']][] = $field['value'];
 			}
 			else {
-				$ret[$field['name']] = $field['value'];
+				$fields_new[$field['name']] = $field['value'];
 			}
 		}
 
-		return $ret;
+		$fields_new = self::constructWidgetFieldsFromDottedNames($fields_new);
+		$fields_new = self::constructWidgetFieldsFromArrayNames($fields_new);
+
+		return $fields_new;
+	}
+
+	/**
+	 * Construct widget fields from dot-styled widget field names.
+	 *
+	 * Example:
+	 *     In: [
+	 *         'tags.tag.0'     => 'tag1',
+	 *         'tags.value.0'   => 'value1',
+	 *         'tags.tag.1'     => 'tag2',
+	 *         'tags.value.1'   => 'value2',
+	 *         'ds.hosts.0.0'   => 'host1',
+	 *         'ds.hosts.1.0'   => 'host2',
+	 *         'ds.hosts.1.1'   => 'host3',
+	 *         'ds.color.0'     => 'AB43C5',
+	 *         'ds.color.1'     => 'CCCCCC',
+	 *         'problemhosts.0' => 'ph1',
+	 *         'problemhosts.1' => 'ph2'
+	 *    ]
+	 *
+	 *    Out: [
+	 *       'tags' => [
+	 *           ['tag' => 'tag1', 'value' => 'value1'],
+	 *           ['tag' => 'tag2', 'value' => 'value2']
+	 *       ],
+	 *       'ds' => [
+	 *           [
+	 *               'hosts' => ['host1'],
+	 *               'color' => 'AB43C5'
+	 *           ],
+	 *           [
+	 *               'hosts => ['host2', 'host3'],
+	 *               'color' => 'CCCCCC'
+	 *           ],
+	 *        ],
+	 *       'problemhosts' => ['ph1', 'ph2']
+	 *    ]
+	 *
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	public static function constructWidgetFieldsFromDottedNames(array $fields): array {
+		// API doesn't guarantee fields to be retrieved in same order as stored. Sorting by key...
+		uksort($fields, static function ($key1, $key2) {
+			foreach (['key1', 'key2'] as $var) {
+				if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $$var, $matches) === 1) {
+					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2].'.'.$matches[4];
+				}
+				elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $$var, $matches) === 1) {
+					$$var = $matches[1].'.'.$matches[3].'.'.$matches[2];
+				}
+			}
+
+			return strnatcmp((string) $key1, (string) $key2);
+		});
+
+		// Converting dot-delimited keys to the arrays.
+		foreach ($fields as $key => $value) {
+			if (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)\.(\d+)$/', (string) $key, $matches) === 1) {
+				$fields[$matches[1]][$matches[3]][$matches[2]][$matches[4]] = $value;
+				unset($fields[$key]);
+			}
+			elseif (preg_match('/^([a-z]+)\.([a-z_]+)\.(\d+)$/', (string) $key, $matches) === 1) {
+				$fields[$matches[1]][$matches[3]][$matches[2]] = $value;
+				unset($fields[$key]);
+			}
+			elseif (preg_match('/^([a-z]+)\.(\d+)$/', (string) $key, $matches) === 1) {
+				$fields[$matches[1]][$matches[2]] = $value;
+				unset($fields[$key]);
+			}
+		}
+
+		return $fields;
+	}
+
+	/**
+	 * Construct widget fields from array-styled widget field names.
+	 *
+	 * Example:
+	 *     In: [
+	 *         'a[0]'          => 'value_1',
+	 *         'a[1]'          => 'value_2',
+	 *         'b[0][c][0][d]' => 'value_3'
+	 *     ]
+	 *
+	 *     Out: [
+	 *         'a' => ['value_1', 'value_2'],
+	 *         'b' => [0 => ['c' => [0 => ['d' => 'value_3']]]]
+	 *     ]
+	 *
+	 * @param array $fields
+	 *
+	 * @return array
+	 */
+	public static function constructWidgetFieldsFromArrayNames(array $fields): array {
+		$fields_new = [];
+
+		uksort($fields,
+			static fn(string $key_1, string $key_2): int => strnatcmp($key_1, $key_2)
+		);
+
+		foreach ($fields as $key => $value) {
+			if (preg_match('/^([a-z_]+)((\\[([a-z_]+|[0-9]+)\\])+)$/', $key, $matches) === 0) {
+				$fields_new[$key] = $value;
+
+				continue;
+			}
+
+			$field_name = $matches[1];
+			$field_path = $matches[2];
+
+			preg_match_all('/\\[([a-z_]+|[0-9]+)\\]/', $field_path, $matches);
+
+			$field_path_keys = array_merge([$field_name], $matches[1]);
+
+			$field_ptr = &$fields_new;
+
+			for ($i = 0, $count = count($field_path_keys); $i < $count; $i++) {
+				$field_path_key = $field_path_keys[$i];
+
+				if ($i < $count - 1) {
+					if (!array_key_exists($field_path_key, $field_ptr)) {
+						$field_ptr[$field_path_key] = [];
+					}
+
+					$field_ptr = &$field_ptr[$field_path_key];
+				}
+				else {
+					$field_ptr[$field_path_key] = $value;
+				}
+			}
+
+			unset($field_ptr);
+		}
+
+		return $fields_new;
 	}
 
 	/**
 	 * Checks, if any of widgets needs time selector.
-	 *
-	 * @static
 	 *
 	 * @param array $pages
 	 *
@@ -396,8 +536,6 @@ class CDashboardHelper {
 
 	/**
 	 * Validate input parameters of dashboard pages.
-	 *
-	 * @static
 	 *
 	 * @var array  $dashboard_pages
 	 * @var array  $dashboard_pages[]['widgets']
@@ -517,8 +655,6 @@ class CDashboardHelper {
 	/**
 	 * Prepare data for cloning template dashboards.
 	 * Replace item and graph ids to new ids.
-	 *
-	 * @static
 	 *
 	 * @param array  $dashboards  Dashboards array.
 	 * @param string $templateid  New template id.
@@ -642,9 +778,6 @@ class CDashboardHelper {
 		return $widget_last_type;
 	}
 
-	/**
-	 * @throws JsonException
-	 */
 	public static function getConfigurationHash(array $dashboard, array $widget_defaults): string {
 		ksort($widget_defaults);
 

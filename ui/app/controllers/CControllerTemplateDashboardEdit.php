@@ -68,7 +68,7 @@ class CControllerTemplateDashboardEdit extends CController {
 	protected function doAction(): void {
 		if ($this->hasInput('dashboardid')) {
 			$dashboard = $this->dashboard;
-			$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], $dashboard['templateid'],
+			$dashboard['pages'] = CDashboardHelper::prepareDashboardPages($dashboard['pages'], $dashboard['templateid'],
 				false
 			);
 		}

@@ -210,7 +210,7 @@ class CControllerDashboardView extends CController {
 					'display_period' => $dashboards[0]['display_period'],
 					'auto_start' => $dashboards[0]['auto_start'],
 					'editable' => true,
-					'pages' => CDashboardHelper::preparePagesForGrid(
+					'pages' => CDashboardHelper::prepareDashboardPages(
 						CDashboardHelper::unsetInaccessibleFields($dashboards[0]['pages']), null, true
 					),
 					'owner' => [
@@ -260,7 +260,7 @@ class CControllerDashboardView extends CController {
 					CDashboardHelper::updateEditableFlag($dashboards);
 
 					$dashboard = array_shift($dashboards);
-					$dashboard['pages'] = CDashboardHelper::preparePagesForGrid($dashboard['pages'], null, true);
+					$dashboard['pages'] = CDashboardHelper::prepareDashboardPages($dashboard['pages'], null, true);
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
 						'name' => CDashboardHelper::getOwnerName($dashboard['userid'])
