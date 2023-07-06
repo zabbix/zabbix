@@ -1885,7 +1885,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and B or C',
-					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					'error_message' => 'Invalid parameter "/1/filter/formula": missing filter condition "C".'
 				]
 			],
 			// #4
