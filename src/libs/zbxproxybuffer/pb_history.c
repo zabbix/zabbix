@@ -597,11 +597,14 @@ static void	pb_history_add_rows_db(zbx_list_t *rows, zbx_list_item_t *next, zbx_
 
 void	pb_history_flush(zbx_pb_t *pb)
 {
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pb_history_add_rows_db(&pb->history, NULL, &lastid);
+
+	if (pb_data->history_lastid_db < lastid)
+		pb_data->history_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -748,7 +751,7 @@ zbx_pb_history_data_t	*zbx_pb_history_open(void)
  ******************************************************************************/
 void	zbx_pb_history_close(zbx_pb_history_data_t *data)
 {
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 

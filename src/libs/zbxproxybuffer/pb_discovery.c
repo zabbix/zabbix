@@ -133,11 +133,14 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 
 void	pb_discovery_flush(zbx_pb_t *pb)
 {
-	zbx_uint64_t	lastid;
+	zbx_uint64_t	lastid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	pb_discovery_add_rows_db(&pb->discovery, NULL, &lastid);
+
+	if (pb_data->discovery_lastid_db < lastid)
+		pb_data->discovery_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

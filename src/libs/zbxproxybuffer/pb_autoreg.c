@@ -286,6 +286,7 @@ void	pb_autoreg_flush(zbx_pb_t *pb)
 	zbx_db_insert_t		db_insert;
 	void			*ptr;
 	int			rows_num = 0;
+	zbx_uint64_t		lastid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -304,11 +305,15 @@ void	pb_autoreg_flush(zbx_pb_t *pb)
 			zbx_db_insert_add_values(&db_insert, row->id, row->host, row->listen_ip, row->listen_dns,
 					row->listen_port, row->tls_accepted, row->host_metadata, row->flags, row->clock);
 			rows_num++;
+			lastid = row->id;
 		}
 
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
 	}
+
+	if (pb_data->autoreg_lastid_db < lastid)
+		pb_data->autoreg_lastid_db = lastid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows_num:%d", __func__, rows_num);
 }
