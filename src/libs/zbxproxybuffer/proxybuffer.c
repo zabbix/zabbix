@@ -479,7 +479,7 @@ static void	pb_flush(zbx_pb_t *pb)
 {
 
 	if (ZBX_PB_MODE_MEMORY != pb->mode && (SUCCEED == pb_history_has_mem_rows(pb) ||
-			SUCCEED == pb_discovery_has_mem_rows(pb) || SUCCEED != pb_autoreg_has_mem_rows(pb)))
+			SUCCEED == pb_discovery_has_mem_rows(pb) || SUCCEED == pb_autoreg_has_mem_rows(pb)))
 	{
 		do
 		{
