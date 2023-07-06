@@ -1582,62 +1582,6 @@ int	zbx_check_user_perm2system(zbx_uint64_t userid)
 	return res;
 }
 
-
-/* user role permissions */
-typedef enum
-{
-	ROLE_PERM_DENY = 0,
-	ROLE_PERM_ALLOW = 1,
-}
-zbx_user_role_permission_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
- *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			role_rule_default);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(role_rule_default, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *

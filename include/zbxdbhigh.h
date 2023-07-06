@@ -586,8 +586,6 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
 
 int	zbx_check_user_permissions(const zbx_uint64_t *userid, const zbx_uint64_t *recipient_userid);
 int	zbx_check_user_perm2system(zbx_uint64_t userid);
-int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule);
 
 const char	*zbx_host_string(zbx_uint64_t hostid);
 const char	*zbx_host_key_string(zbx_uint64_t itemid);
