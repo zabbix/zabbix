@@ -706,6 +706,24 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 
 	zbx_vector_db_tag_ptr_create(&optags);
 
+	if (ZBX_OP_HOST_TAGS_ADD == op)
+	{
+		int	i;
+
+		for (i = 0; i < host_tags->values_num; i++)
+		{
+			zbx_db_tag_t	*host_tag = host_tags->values[i];
+
+			if (ZBX_DB_TAG_AUTOMATIC == host_tag->automatic)
+			{
+				zbx_db_tag_t	*auto_tag = zbx_db_tag_create(auto_tag->tag, auto_tag->value);
+
+				auto_tag->automatic = ZBX_DB_TAG_AUTOMATIC;
+				zbx_vector_db_tag_ptr_append(&optags, auto_tag);
+			}
+		}
+	}
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select tag,value"
 			" from optag"
