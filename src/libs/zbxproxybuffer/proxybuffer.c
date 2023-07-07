@@ -523,36 +523,36 @@ static void pb_update_state(zbx_pb_t *pb, int more)
 
 	switch (pb->state)
 	{
-	case PB_MEMORY:
-		/* memory state can switch to database when:        */
-		/*   1) no space left to cache data                 */
-		/*   2) cached data exceeds maximum age             */
-		/* Both cases ar checked when adding data to cache. */
-		break;
-	case PB_MEMORY_DATABASE:
-		if (SUCCEED != pb_history_has_mem_rows(pb) &&
-				SUCCEED != pb_discovery_has_mem_rows(pb) &&
-				SUCCEED != pb_autoreg_has_mem_rows(pb))
-		{
-			zbx_db_begin();
-			pb_flush_lastids(pb);
-			zbx_db_commit();
-			pb_set_state(pb, PB_DATABASE, "memory records have been uploaded");
-		}
-		break;
-	case PB_DATABASE:
-		if (ZBX_PROXY_DATA_DONE == more)
-			pb_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
-		break;
-	case PB_DATABASE_MEMORY:
-		if (0 == pb_data->db_handles_num &&
-				pb_data->history_lastid_db <= pb_data->history_lastid_sent &&
-				pb_data->discovery_lastid_db <= pb_data->discovery_lastid_sent &&
-				pb_data->autoreg_lastid_db <= pb_data->autoreg_lastid_sent)
-		{
-			pb_set_state(pb, PB_MEMORY, "database records have been uploaded");
-		}
-		break;
+		case PB_MEMORY:
+			/* memory state can switch to database when:        */
+			/*   1) no space left to cache data                 */
+			/*   2) cached data exceeds maximum age             */
+			/* Both cases ar checked when adding data to cache. */
+			break;
+		case PB_MEMORY_DATABASE:
+			if (SUCCEED != pb_history_has_mem_rows(pb) &&
+					SUCCEED != pb_discovery_has_mem_rows(pb) &&
+					SUCCEED != pb_autoreg_has_mem_rows(pb))
+			{
+				zbx_db_begin();
+				pb_flush_lastids(pb);
+				zbx_db_commit();
+				pb_set_state(pb, PB_DATABASE, "memory records have been uploaded");
+			}
+			break;
+		case PB_DATABASE:
+			if (ZBX_PROXY_DATA_DONE == more)
+				pb_set_state(pb, PB_DATABASE_MEMORY, "no more database records to upload");
+			break;
+		case PB_DATABASE_MEMORY:
+			if (0 == pb_data->db_handles_num &&
+					pb_data->history_lastid_db <= pb_data->history_lastid_sent &&
+					pb_data->discovery_lastid_db <= pb_data->discovery_lastid_sent &&
+					pb_data->autoreg_lastid_db <= pb_data->autoreg_lastid_sent)
+			{
+				pb_set_state(pb, PB_MEMORY, "database records have been uploaded");
+			}
+			break;
 	}
 }
 
