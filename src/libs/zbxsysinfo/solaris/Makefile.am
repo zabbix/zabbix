@@ -3,7 +3,7 @@
 noinst_LIBRARIES = libfunclistsysinfo.a libspecsysinfo.a libspechostnamesysinfo.a
 
 libfunclistsysinfo_a_SOURCES = \
-        solaris.c
+	solaris.c
 
 libspecsysinfo_a_CFLAGS = -I$(top_srcdir)/src/zabbix_agent
 
