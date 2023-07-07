@@ -677,10 +677,6 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-
-
-
-
 			// #13 False default checkboxes.
 			[
 				[
@@ -697,7 +693,6 @@ class testDashboardGaugeWidget extends CWebTest {
 		];
 	}
 
-
 	public static function getWidgetCreateData() {
 		return [
 			// #14 Minimal required fields.
@@ -710,19 +705,6 @@ class testDashboardGaugeWidget extends CWebTest {
 			]
 		];
 	}
-
-
-	//	public static function getWidgetUpdateData() {
-//		return [
-//			[
-//				[
-//					'fields' => [
-//						'Name' => 'New name'
-//					]
-//				]
-//			]
-//		];
-//	}
 
 	/**
 	 *
