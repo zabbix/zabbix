@@ -133,7 +133,7 @@ class CConfiguration extends CApiService {
 	 *
 	 * @throws APIException if the input is invalid.
 	 */
-	protected function validateImport(&$params): void {
+	protected function validateImport(array &$params): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
 			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
@@ -182,7 +182,7 @@ class CConfiguration extends CApiService {
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateLinkage' =>	['type' => API_OBJECT, 'fields' => [
+				'templateLinkage' =>	['type' => API_OBJECT, 'default' => [], 'fields' => [
 					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
 					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
 				]],

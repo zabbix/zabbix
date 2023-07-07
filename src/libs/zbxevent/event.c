@@ -19,9 +19,14 @@
 
 #include "zbxevent.h"
 
-#include "zbx_macro_constants.h"
+#include "zbx_expression_constants.h"
 #include "zbx_trigger_constants.h"
-#include "zbxdbwrap.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 ZBX_VECTOR_IMPL(eventdata, zbx_eventdata_t)
 
@@ -403,4 +408,3 @@ int	zbx_problem_get_actions(const zbx_db_acknowledge *ack, int actions, const ch
 
 	return SUCCEED;
 }
-
