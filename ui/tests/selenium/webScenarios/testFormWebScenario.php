@@ -235,7 +235,7 @@ class testFormWebScenario extends CWebTest {
 				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
 			}
 
-			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
+			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
 			$row->getColumn('Name')->query('xpath:./input')->one()->fill('zabbix');
 			$this->assertTrue($remove_button->isClickable());
 
@@ -321,7 +321,7 @@ class testFormWebScenario extends CWebTest {
 			? ['Update' => true, 'Clone' => true, 'Clear history and trends' => true, 'Delete' => false, 'Cancel' => true]
 			: ['Add' => true, 'Cancel' => true];
 
-		$footer_buttons = $form->query('xpath:.//div[contains(@class, "tfoot-buttons")]')->one()->query('xpath:.//button')->all();
+		$footer_buttons = $form->query('class:tfoot-buttons')->one()->query('tag:button')->all();
 		$this->assertEquals(count($expected_buttons), $footer_buttons->count());
 
 		foreach ($footer_buttons as $footer_button) {

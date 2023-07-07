@@ -144,13 +144,13 @@ class testFormWebScenarioStep extends CWebTest {
 			$initial_type = 'Raw data';
 			$new_type = 'Form data';
 			$buttons = ['Parse', 'Update', 'Cancel'];
-			$post_fields = ['Post type', 'Post fields'];
+			$post_fields = ['Post type', 'Raw post'];
 		}
 		else {
 			$initial_type = 'Form data';
 			$new_type = 'Raw data';
 			$buttons = ['Parse', 'Add', 'Cancel'];
-			$post_fields = ['Post type', 'Raw post'];
+			$post_fields = ['Post type', 'Post fields'];
 		}
 
 		foreach ($step_fields as $field => $attributes) {
@@ -199,7 +199,7 @@ class testFormWebScenarioStep extends CWebTest {
 
 		$mode_field = $step_form->getField('Retrieve mode');
 
-		// Check that "Post fields" and "Post type" fields are disabled only when Retrieve mode is set to Headers.
+		// Check that "Post fields" related fields are disabled only when Retrieve mode is set to Headers.
 		foreach (['Body and headers' => true, 'Headers' => false, 'Body' => true] as $value => $enabled) {
 			$mode_field->select($value);
 
@@ -232,15 +232,15 @@ class testFormWebScenarioStep extends CWebTest {
 
 			// Check the presence of the draggable icon.
 			if ($table_name === 'Variables') {
-				$this->assertFalse($row->query('xpath:.//div[contains(@class,"drag-icon")]')->one(false)->isValid());
+				$this->assertFalse($row->query('class:drag-icon')->one(false)->isValid());
 			}
 			else {
-				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
+				$drag_icon = $row->query('class:drag-icon')->one();
 				$this->assertFalse($drag_icon->isEnabled());
 			}
 
 			// Fill in some data in first for and check that Remove buttons and draggable icon became enabled.
-			$row->getColumn('Name')->query('xpath:./input')->one()->fill('zabbix');
+			$row->getColumn('Name')->query('tag:input')->one()->fill('zabbix');
 			$this->assertTrue($remove_button->isClickable());
 
 			// Check that draggable icon becomes enabled when a new row is added.
@@ -1198,7 +1198,7 @@ class testFormWebScenarioStep extends CWebTest {
 	private function getScenarioFormOnStepsTab($scenario) {
 		$this->page->login()->open('httpconf.php?filter_set=1&filter_hostids%5B0%5D='.self::HOSTID.'&context=host')
 				->waitUntilReady();
-		$this->query('link:'.$scenario)->waitUntilClickable()->one()->click();
+		$this->query('link', $scenario)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		$scenario_form = $this->query('name:httpForm')->asForm()->one();
@@ -1224,8 +1224,8 @@ class testFormWebScenarioStep extends CWebTest {
 	/**
 	 * Compare values from corresponding value pair table with expected data.
 	 *
-	 * @param	string	$table_field	name of the value pair field
-	 * @param	array	$expected		array with reference values
+	 * @param	CElement	$table_field	value pair field object
+	 * @param	array		$expected		array with reference values
 	 */
 	private function checkTableField($table_field, $expected) {
 		$obtained_fields = [];
