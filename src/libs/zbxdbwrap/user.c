@@ -19,6 +19,9 @@
 
 #include "zbxdbwrap.h"
 
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+
 /* group statuses */
 typedef enum
 {
