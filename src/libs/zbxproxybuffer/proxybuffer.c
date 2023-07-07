@@ -118,12 +118,17 @@ int	pb_free_space(zbx_pb_t *pb, size_t size)
 		zbx_pb_history_t	*hrow;
 		zbx_pb_discovery_t	*drow;
 		zbx_pb_autoreg_t	*arow;
-		int			clock = 0;
+		int			clock;
 
 		if (SUCCEED == zbx_list_peek(&pb->history, (void **)&hrow))
+		{
 			clock = hrow->ts.sec;
+		}
 		else
+		{
 			hrow = NULL;
+			clock = INT_MAX;
+		}
 
 		if (SUCCEED == zbx_list_peek(&pb->discovery, (void **)&drow) && drow->clock < clock)
 		{
