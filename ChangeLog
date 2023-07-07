@@ -1,8 +1,17 @@
 Changes for 6.0.20rc1
 
 New features:
+.........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
 
 Bug fixes:
+........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
+..F....... [ZBX-21970] fixed console error in map nav tree widget; disabled add button on a 10th depth level (acikuns, ashubin)
+A......... [ZBX-19393] fixed undefined index errors in configuration.importcompare (agriscenko)
+..F....... [ZBX-22290] fixed generation of double page headers when general warning appears (epulke)
+...G...... [ZBX-21845] fixed Zabbix agent 2 systemd plugin failing with newer dbus (esneiders)
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
+..F....... [ZBX-22912] fixed not being able to save an event correlation when custom formula was selected but only one condition remained (Ivo)
+.........T [ZBX-21571] updated pod crash loop trigger expressions in Kubernetes nodes and cluster state templates (drasikhov)
 ..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Top hosts" widget (esekace)
 ..F....... [ZBX-22825] fixed Zabbix access to the first page for user with specific page access (dpetra)
 ..F....... [ZBX-22867] fixed import popup showing circle animation even if PHP code failed (dfofanovs)
