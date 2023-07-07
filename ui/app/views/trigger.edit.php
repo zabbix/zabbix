@@ -360,7 +360,9 @@ $trigger_form_grid
 
 // Append tabs to form.
 $triggers_tab = new CTabView();
-$triggers_tab->setSelected(0);
+if ($data['form_refresh'] == 0) {
+	$triggers_tab->setSelected(0);
+}
 $triggers_tab->addTab('triggersTab', _('Trigger'), $trigger_form_grid);
 
 // tags

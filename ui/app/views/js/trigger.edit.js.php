@@ -137,6 +137,9 @@
 				else if (e.target.classList.contains('js-related-trigger-edit')) {
 					this.#openRelatedTrigger(e.target.dataset);
 				}
+				else if (e.target.name === 'show_inherited_tags') {
+					this.#toggleInheritedTags(e.target.value);
+				}
 			});
 		}
 
@@ -524,6 +527,17 @@
 				.finally(() => {
 					this.overlay.unsetLoading();
 				});
+		}
+
+		#toggleInheritedTags(value) {
+			const form_refresh = document.createElement('input');
+
+			form_refresh.setAttribute('type', 'hidden');
+			form_refresh.setAttribute('name', 'form_refresh');
+			form_refresh.setAttribute('value', 1);
+			this.form.append(form_refresh);
+
+			reloadPopup(this.form, 'trigger.edit');
 		}
 
 		#post(url, data) {

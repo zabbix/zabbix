@@ -149,7 +149,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 		case 'trigger':
 		case 'trigger_prototype':
 			$btn_labels = [_('Trigger tags'), _('Inherited and trigger tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = '';
 			break;
 
 		case 'httptest':

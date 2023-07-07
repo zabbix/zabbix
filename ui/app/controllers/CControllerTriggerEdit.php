@@ -38,7 +38,9 @@ class CControllerTriggerEdit extends CController {
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
 			'description' =>						'string',
-			'expression' =>							'string'
+			'expression' =>							'string',
+			'show_inherited_tags' =>				'in 0,1',
+			'form_refresh' =>						'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -58,7 +60,7 @@ class CControllerTriggerEdit extends CController {
 
 	protected function checkPermissions(): bool {
 		if ($this->hasInput('triggerid')) {
-			$this->trigger = API::Trigger()->get([
+			$parameters = [
 				'output' => API_OUTPUT_EXTEND,
 				'triggerids' => $this->getInput('triggerid'),
 				'selectHosts' => ['hostid'],
@@ -66,7 +68,13 @@ class CControllerTriggerEdit extends CController {
 				'selectTriggerDiscovery' => ['parent_triggerid'],
 				'selectDependencies' => ['triggerid'],
 				'selectTags' => ['tag', 'value']
-			]);
+			];
+
+			if ($this->hasInput('show_inherited_tags') && $this->getInput('show_inherited_tags')) {
+				$parameters['selectItems'] = ['itemid', 'templateid', 'flags'];
+			}
+
+			$this->trigger = API::Trigger()->get($parameters);
 
 			if (!$this->trigger) {
 				return false;
@@ -79,13 +87,12 @@ class CControllerTriggerEdit extends CController {
 		return true;
 	}
 
-	protected function doAction()
-	{
+	protected function doAction() {
 		$data = [
 			'hostid' => $this->getInput('hostid', 0),
 			'dependencies' => [],
 			'context' => $this->getInput('context', ''),
-			'expression' =>  $this->getInput('expression', ''),
+			'expression' => $this->getInput('expression', ''),
 			'recovery_expression' => '',
 			'expression_full' => '',
 			'recovery_expression_full' => '',
@@ -102,9 +109,11 @@ class CControllerTriggerEdit extends CController {
 			'limited' => false,
 			'tags' => [],
 			'recovery_expression_field_readonly' => false,
-			'triggerid' => null
+			'triggerid' => null,
+			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
+			'form_refresh' => $this->getInput('form_refresh', 0),
+			'templates' => []
 		];
-
 
 		if ($this->trigger) {
 			$triggers = CMacrosResolverHelper::resolveTriggerExpressions($this->trigger,
@@ -118,6 +127,87 @@ class CControllerTriggerEdit extends CController {
 				getTriggerParentTemplates([$data], ZBX_FLAG_DISCOVERY_NORMAL), ZBX_FLAG_DISCOVERY_NORMAL,
 				CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 			);
+
+			if ($data['show_inherited_tags']) {
+				$items = [];
+				$item_prototypes = [];
+
+				foreach ($data['items'] as $item) {
+					if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+						$items[] = $item;
+					}
+					else {
+						$item_prototypes[] = $item;
+					}
+				}
+
+				$item_parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates']
+					+ getItemParentTemplates($item_prototypes, ZBX_FLAG_DISCOVERY_PROTOTYPE)['templates'];
+
+				unset($item_parent_templates[0]);
+
+				$db_templates = $item_parent_templates
+					? API::Template()->get([
+						'output' => ['templateid'],
+						'selectTags' => ['tag', 'value'],
+						'templateids' => array_keys($item_parent_templates),
+						'preservekeys' => true
+					])
+					: [];
+
+				$inherited_tags = [];
+
+				foreach ($item_parent_templates as $templateid => $template) {
+					if (array_key_exists($templateid, $db_templates)) {
+						foreach ($db_templates[$templateid]['tags'] as $tag) {
+							if (array_key_exists($tag['tag'], $inherited_tags)
+								&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+								$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+									$templateid => $template
+								];
+							}
+							else {
+								$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+										'parent_templates' => [$templateid => $template],
+										'type' => ZBX_PROPERTY_INHERITED
+									];
+							}
+						}
+					}
+				}
+
+				$db_hosts = API::Host()->get([
+					'output' => [],
+					'selectTags' => ['tag', 'value'],
+					'hostids' => $data['hostid'],
+					'templated_hosts' => true
+				]);
+
+				if ($db_hosts) {
+					foreach ($db_hosts[0]['tags'] as $tag) {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+						$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+					}
+				}
+
+				foreach ($data['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $inherited_tags)
+						&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+					}
+					else {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+					}
+				}
+
+				$data['tags'] = [];
+
+				foreach ($inherited_tags as $tag) {
+					foreach ($tag as $value) {
+						$data['tags'][] = $value;
+					}
+				}
+			}
 
 			$data['db_dependencies'] = API::Trigger()->get([
 				'output' => ['triggerid', 'description', 'flags'],
@@ -140,6 +230,13 @@ class CControllerTriggerEdit extends CController {
 			if ($data['hostid'] == 0) {
 				$data['hostid'] = $data['hosts'][0]['hostid'];
 			}
+		}
+
+		if (!$data['tags']) {
+			$data['tags'][] = ['tag' => '', 'value' => ''];
+		}
+		else {
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
 		}
 
 		$response = new CControllerResponseData($data);
