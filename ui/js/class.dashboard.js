@@ -612,7 +612,7 @@ class CDashboard {
 
 		const busy_condition = this._createBusyCondition();
 
-		return Promise.resolve()
+		Promise.resolve()
 			.then(() => this._promiseDashboardWidgetsSanitize(widgets))
 			.then((response) => {
 				if (this._dashboard_pages.size >= this._max_dashboard_pages) {
@@ -809,7 +809,8 @@ class CDashboard {
 
 				clearMessages();
 
-				let title, messages;
+				let title;
+				let messages = [];
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
@@ -1148,14 +1149,15 @@ class CDashboard {
 					}
 				}
 
-				let title, messages;
+				let title;
+				let messages = [];
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [t('Failed to update dashboard properties.')];
+					title = t('Failed to update dashboard properties.');
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -1212,7 +1214,7 @@ class CDashboard {
 
 		const busy_condition = this._createBusyCondition();
 
-		return Promise.resolve()
+		Promise.resolve()
 			.then(() => this._promiseApplyDashboardPageProperties(properties, overlay.data))
 			.then(() => {
 				this._is_unsaved = true;
@@ -1226,14 +1228,15 @@ class CDashboard {
 					}
 				}
 
-				let title, messages;
+				let title;
+				let messages = [];
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [t('Failed to update dashboard page properties.')];
+					title = t('Failed to update dashboard page properties.');
 				}
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
@@ -1451,7 +1454,7 @@ class CDashboard {
 
 		const busy_condition = this._createBusyCondition();
 
-		return Promise.resolve()
+		Promise.resolve()
 			.then(() => this._promiseDashboardWidgetCheck({templateid, type, name, view_mode, fields}))
 			.then((fields) => {
 				this._is_unsaved = true;
@@ -1510,25 +1513,32 @@ class CDashboard {
 				}
 			})
 			.catch((exception) => {
-				for (const element of form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
+				let title;
+				let messages = [];
 
 				if (typeof exception === 'object' && 'error' in exception) {
 					title = exception.error.title;
 					messages = exception.error.messages;
 				}
 				else {
-					messages = [t('Failed to update widget properties.')];
+					title = t('Failed to update widget properties.');
 				}
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+				const message_box = makeMessageBox('bad', messages, title);
 
-				form.parentNode.insertBefore(message_box, form);
+				if (overlays_stack.getById('widget_properties') !== undefined) {
+					for (const element of form.parentNode.children) {
+						if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+							element.parentNode.removeChild(element);
+						}
+					}
+
+					form.parentNode.insertBefore(message_box[0], form);
+				}
+				else {
+					clearMessages();
+					addMessage(message_box);
+				}
 			})
 			.finally(() => {
 				overlay.unsetLoading();
