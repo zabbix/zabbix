@@ -534,7 +534,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	while (0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
+	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
@@ -564,7 +564,12 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (-1 == nbytes)	/* error occurred */
+	if (ZBX_READ_WRONG_ENCODING == nbytes)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file. Wrong encoding detected."));
+		goto err;
+	}
+	else if (ZBX_READ_ERR == nbytes)	/* general error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;
@@ -656,7 +661,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	while (0 == res && 0 < (nbytes = zbx_read(f, buf, sizeof(buf), encoding)))
+	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
 	{
 		if (sysinfo_get_config_timeout() < zbx_time() - ts)
 		{
@@ -668,6 +673,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 			continue;
 
 		utf8 = zbx_convert_to_utf8(buf, nbytes, encoding);
+
 		zbx_rtrim(utf8, "\r\n");
 		if (NULL != zbx_regexp_match(utf8, regexp, NULL))
 			res = 1;
@@ -677,7 +683,12 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 			break;
 	}
 
-	if (-1 == nbytes)	/* error occurred */
+	if (ZBX_READ_WRONG_ENCODING == nbytes)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file. Wrong encoding detected."));
+		goto err;
+	}
+	else if (ZBX_READ_ERR == nbytes)	/* error occurred */
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot read from file."));
 		goto err;

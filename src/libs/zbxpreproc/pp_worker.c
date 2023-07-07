@@ -27,6 +27,7 @@
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
 #include "zbxregexp.h"
+#include "zbxthreads.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
