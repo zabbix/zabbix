@@ -352,7 +352,7 @@ class testFormFilterProblems extends testFormFilter {
 			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click();
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
 			$this->query('id:apply')->one()->click();
-			$filter->selectTab($data['filter']['Name']);
+			$filter->getTab($data['filter']['Name'])->click(true);
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();
