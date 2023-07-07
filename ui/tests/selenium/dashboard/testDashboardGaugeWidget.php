@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGaugeWidget extends CWebTest {
 
-	CONST HOST = 'Simple form test host';
+	CONST HOST = 'Host for gauge widget';
 	CONST DELETE_GAUGE = 'Gauge for deleting';
 
 	/**
@@ -74,6 +74,13 @@ class testDashboardGaugeWidget extends CWebTest {
 				'hostid' => $hostids['Host for gauge widget'],
 				'name' => '1 Item for gauge widget',
 				'key_' => 'trap1',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			],
+			[
+				'hostid' => $hostids['Host for gauge widget'],
+				'name' => '2 Item for gauge widget',
+				'key_' => 'trap2',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
@@ -155,16 +162,9 @@ class testDashboardGaugeWidget extends CWebTest {
 
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Add widget', $dialog->getTitle());
+
 		$form->fill(['Type' => 'Gauge']);
 		$dialog->waitUntilReady();
-
-		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colors',
-			'Advanced configuration', 'Angle', 'DescriptionSupported macros:{HOST.*}{ITEM.*}{INVENTORY.*}User macros', 'Value', 'Needle', 'Scale', 'Thresholds',
-			'Enable host selection'],
-			$form->getLabels()->asText()
-		);
-
-		$this->assertEquals(['Item', 'Min', 'Max'], $form->getRequiredLabels());
 
 		// Check default fields.
 		$fields = [
@@ -349,23 +349,20 @@ class testDashboardGaugeWidget extends CWebTest {
 		// Enable Show arc.
 		$form->fill(['id:th_show_arc' => true]);
 		$this->assertTrue($form->getField('id:th_arc_size')->isEnabled());
-	}
 
-	public static function getWidgetCreateData() {
-		return [
-			[
-				[
-					'fields' => [
-						'Type' => 'Gauge',
-						'Item' => 'testFormItem1'
-					]
-				]
-			]
-		];
+		// Check fields' labels and required fields.
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Item', 'Min', 'Max', 'Colors',
+				'Advanced configuration', 'Angle', 'Description', 'Value', 'Needle', 'Scale', 'Thresholds',
+				'Enable host selection'],
+				$form->getLabels()->asText()
+		);
+
+		$this->assertEquals(['Item', 'Min', 'Max'], $form->getRequiredLabels());
 	}
 
 	public static function getWidgetCommonData() {
 		return [
+			// #0 Empty item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -374,23 +371,367 @@ class testDashboardGaugeWidget extends CWebTest {
 					],
 					'error' => 'Invalid parameter "Item": cannot be empty.'
 				]
-			]
-		];
-	}
-
-	public static function getWidgetUpdateData() {
-		return [
+			],
+			// #1 Both min and max equal zeros.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => 0,
+						'Max' => 0
+					],
+					'error' => [
+						'Invalid parameter "Max": value must be greater than "0".'
+					]
+				]
+			],
+			// #2 All fields are zeros.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => 0,
+						'Max' => 0,
+						'id:desc_size' => 0,
+						'id:value_size' => 0,
+						'id:value_arc_size' => 0,
+						'id:units_size' => 0,
+						'id:scale_size' => 0,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 0
+					],
+					'Thresholds' => [
+						['value' => '10']
+					],
+					'error' => [
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #3 Min and Max are the biggest possible.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => str_repeat(9,255),
+						'Max' => str_repeat(9,255)
+					],
+					'error' => 'Invalid parameter "Max": value must be greater than "1.0E+255".'
+				]
+			],
+			// #4 Min more than Max.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => 10,
+						'Max' => 3
+					],
+					'error' => 'Invalid parameter "Max": value must be greater than "10".'
+				]
+			],
+			// #5 All fields are empty.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => '',
+						'Max' => '',
+						'id:desc_size' => '',
+						'id:decimal_places' => '',
+						'id:value_size' => '',
+						'id:value_arc_size' => '',
+						'id:units_size' => '',
+						'id:scale_size' => '',
+						'id:scale_decimal_places' => '',
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => ''
+					],
+					'Thresholds' => [
+						['value' => '10']
+					],
+					'error' => [
+						'Invalid parameter "Min": cannot be empty.',
+						'Invalid parameter "Max": cannot be empty.',
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #6 Text in numeric fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => 'text',
+						'Max' => 'test',
+						'id:desc_size' => 'abc',
+						'id:decimal_places' => 'abc',
+						'id:value_size' => 'abc',
+						'id:value_arc_size' => 'abc',
+						'id:units_size' => 'abc',
+						'id:scale_size' => 'abc',
+						'id:scale_decimal_places' => 'abc',
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 'abc'
+					],
+					'Thresholds' => [
+						['value' => 'test']
+					],
+					'error' => [
+						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Max": a number is expected.',
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #7 Mixed numbers and random text in numeric fields.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => '2t',
+						'Max' => '3y',
+						'id:desc_size' => '1a',
+						'id:decimal_places' => '2b',
+						'id:value_size' => '1a',
+						'id:value_arc_size' => '1a',
+						'id:units_size' => '1a',
+						'id:scale_size' => '1a',
+						'id:scale_decimal_places' => '2b',
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => '1a'
+					],
+					'Thresholds' => [
+						['value' => '1', 'color' => 'ERERER']
+					],
+					'error' => [
+						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Thresholds/1/color": a hexadecimal color code (6 symbols) is expected.'
+					]
+				]
+			],
+			// #8 2-bytes special characters.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'Min' => 'そこ',
+						'Max' => 'ߘ',
+						'id:desc_size' => '۞',
+						'id:decimal_places' => 'Ֆ',
+						'id:value_size' => '©',
+						'id:value_arc_size' => 'ֈ',
+						'id:units_size' => 'æ',
+						'id:scale_size' => '߷',
+						'id:scale_decimal_places' => '',
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 'Ä'
+					],
+					'Thresholds' => [
+						['value' => 'ß']
+					],
+					'error' => [
+						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Max": a number is expected.',
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #9 4-bytes characters.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '𒀐',
+						'Item' => '2 Item for gauge widget',
+						'Min' => '😁',
+						'Max' => '🙂',
+						'id:desc_size' => '😅',
+						'id:decimal_places' => '😘',
+						'id:value_size' => '😒',
+						'id:value_arc_size' => '😔',
+						'id:units_size' => '🤢',
+						'id:scale_size' => '😨',
+						'id:scale_decimal_places' => '😩',
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => '😽'
+					],
+					'Thresholds' => [
+						['value' => '𒉹']
+					],
+					'error' => [
+						'Invalid parameter "Min": a number is expected.',
+						'Invalid parameter "Max": a number is expected.',
+						'Invalid parameter "Description size": value must be one of 1-100.',
+						'Invalid parameter "Value size": value must be one of 1-100.',
+						'Invalid parameter "Arc size": value must be one of 1-100.',
+						'Invalid parameter "Units size": value must be one of 1-100.',
+						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
+						'Invalid parameter "Arc size": value must be one of 1-100.'
+					]
+				]
+			],
+			// #10 Too big numbers in decimal places.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Item' => '2 Item for gauge widget',
+						'id:decimal_places' => '900',
+						'id:scale_decimal_places' => '900'
+					],
+					'error' => [
+						'Invalid parameter "Decimal places": value must be one of 0-10.',
+						'Invalid parameter "Decimal places": value must be one of 0-10.'
+					]
+				]
+			],
+			// #11 All fields successful case.
 			[
 				[
 					'fields' => [
-						'Name' => 'New name'
+						'Name' => '😁🙂𒀐',
+						'Item' => '2 Item for gauge widget',
+						'Min' => 99,
+						'Max' => 88888,
+						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
+						'xpath:.//input[@id="empty_color"]/..' => 'FFBF00',
+						'xpath:.//input[@id="bg_color"]/..' => 'BA68C8',
+						'Angle' => '270°',
+						'Description' => '𒀐 New test Description 😁🙂😁🙂',
+						'id:desc_size' => 30,
+						'id:desc_bold' => true,
+						'id:desc_v_pos' => 'Top',
+						'xpath:.//input[@id="desc_color"]/..' => 'FFB300',
+						'id:decimal_places' => 10,
+						'id:value_size' => 50,
+						'id:value_bold' => true,
+						'xpath:.//input[@id="value_color"]/..' => '283593',
+						'id:value_arc' => true,
+						'id:value_arc_size' => 12,
+						'id:units' => 'Bytes 𒀐  😁',
+						'id:units_size' => 27,
+						'id:units_bold' => true,
+						'id:units_pos' => 'Above value',
+						'xpath:.//input[@id="units_color"]/..' => '4E342E',
+						'id:needle_show' => true,
+						'xpath:.//input[@id="needle_color"]/..' => '4DD0E1',
+						'id:scale_size' => 33,
+						'id:scale_decimal_places' => 8,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 85,
+						'id:th_show_labels' => true,
+						'id:th_show_arc' => true,
+						'id:th_arc_size' => 99,
+						'Enable host selection' => true
+					],
+					'Thresholds' => [
+						['value' => '555', 'color' => '1976D2']
+					]
+				]
+			],
+			// #12 Test other fields 1.
+			[
+				[
+					'fields' => [
+						'Name' =>  'Other fields 1',
+						'Min' => 1,
+						'Max' => 20,
+						'Refresh interval' => '30 seconds',
+						'Item' => '2 Item for gauge widget',
+						'id:units_pos' => 'Before value'
+					],
+					'Thresholds' => [
+						['value' => '3', 'color' => '03A9F4'],
+						['value' => '5', 'color' => '283593']
+					]
+				]
+			],
+
+
+
+
+			// #13 False default checkboxes + multiple thresholds.
+			[
+				[
+					'fields' => [
+						'Name' => 'False default checkboxes',
+						'Item' => '2 Item for gauge widget',
+						'Min' => 1,
+						'Max' => 20,
+						'id:show_header' => false,
+						'id:value_arc' => false,
+						'id:units_show' => false,
+						'id:scale_show' => false
+					],
+					'Thresholds' => [
+						['value' => '3', 'color' => '03A9F4'],
+						['value' => '5', 'color' => '283593']
 					]
 				]
 			]
 		];
 	}
 
+
+	public static function getWidgetCreateData() {
+		return [
+			// #14 Minimal required fields.
+			[
+				[
+					'fields' => [
+						'Item' => '2 Item for gauge widget'
+					]
+				]
+			]
+		];
+	}
+
+
+	//	public static function getWidgetUpdateData() {
+//		return [
+//			[
+//				[
+//					'fields' => [
+//						'Name' => 'New name'
+//					]
+//				]
+//			]
+//		];
+//	}
+
 	/**
+	 *
 	 * @backupOnce widget
 	 *
 	 * @dataProvider getWidgetCreateData
@@ -402,7 +743,6 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	/**
 	 * @dataProvider getWidgetCommonData
-	 * @dataProvider getWidgetUpdateData
 	 */
 	public function testDashboardGaugeWidget_Update($data) {
 		$this->checkFormGaugeWidget($data, true);
@@ -434,22 +774,45 @@ class testDashboardGaugeWidget extends CWebTest {
 			$form->getField('Item')->clear();
 		}
 
+		$form->fill(['Advanced configuration' => true]);
+
+		if (array_key_exists('Thresholds', $data)) {
+			$thresholds_field = $form->getField('Thresholds');
+
+			// To update Thresholds previously saved values should be removed.
+			$removed = false;
+			if ($update) {
+				$remove_buttons = $thresholds_field->query('button:Remove');
+
+				for ($j = 0; $j < $remove_buttons->count(); $j++) {
+					$thresholds_field->query('id:thresholds_'.$j.'_remove')->one()->click();
+					$removed = true;
+				}
+			}
+
+			foreach ($data['Thresholds'] as $i => $threshold) {
+				// If Thresholds were previously removed, indexes' counts continue from the last removed number.
+				if ($removed) {
+					$i = $i + $j;
+				}
+
+				$thresholds_field->query('button:Add')->one()->waitUntilClickable()->click();
+
+				if (array_key_exists('value', $threshold)) {
+					$form->fill(['id:thresholds_'.$i.'_threshold' => $threshold['value']]);
+				}
+
+				if (array_key_exists('color', $threshold)) {
+					$form->query('xpath:.//input[@id="thresholds_'.$i.'_color"]/..')->asColorPicker()->one()
+							->fill($threshold['color']);
+				}
+			}
+		}
+
 		$form->fill($data['fields']);
 
 		if (array_key_exists('show_header', $data)) {
 			$form->getField('id:show_header')->fill($data['show_header']);
-		}
-
-		if (array_key_exists('Tags', $data)) {
-			$tags_table = $form->getField('id:tags_table_tags')->asMultifieldTable();
-
-			if (empty($data['Tags'])) {
-				$tags_table->clear();
-			}
-			else {
-				$form->getField('id:evaltype')->fill(CTestArrayHelper::get($data['Tags'], 'evaluation', 'And/Or'));
-				$form->getField('id:tags_table_tags')->asMultifieldTable()->fill(CTestArrayHelper::get($data['Tags'], 'tags'));
-			}
 		}
 
 		$values = $form->getFields()->asValues();
@@ -485,6 +848,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			$saved_form = $dashboard->getWidget($header)->edit();
 
 			// Check widget form fields and values in frontend.
+			$saved_form->fill(['Advanced configuration' => true]);
 			$this->assertEquals($values, $saved_form->getFields()->asValues());
 
 			if (array_key_exists('show_header', $data)) {
