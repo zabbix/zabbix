@@ -23,7 +23,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
-#include "zbx_macro_constants.h"
+#include "zbx_expression_constants.h"
 
 typedef struct
 {
