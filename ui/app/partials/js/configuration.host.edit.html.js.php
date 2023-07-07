@@ -122,51 +122,21 @@
 		/**
 		 * Host form setup.
 		 */
-		init({form_name, host_interfaces, host_is_discovered, host = null}) {
+		init({form_name, host_interfaces, host_is_discovered}) {
 			this.form_name = form_name;
 			this.form = document.getElementById(form_name);
+			this.overlay = overlays_stack.getById('host_edit');
 			this.initHostTab(host_interfaces, host_is_discovered);
 			this.initMacrosTab();
 			this.initInventoryTab();
 			this.initEncryptionTab();
-			this.valuemap_table = document.getElementById('valuemap-table');
-			this.initialValuemapTableHTML = this.valuemap_table.innerHTML;
-			this.tag_table = this.form.querySelector('.tags-table');
-			this.initialTagTableHTML = this.tag_table.innerHTML;
-			this.ms_change = false;
+			this._initActions();
+			this.initial_form_fields = getFormFields(this.form);
+		},
 
-			if (host) {
-				this.host = host;
-			}
-
-			this.overlay = overlays_stack.getById('host_edit');
-
+		_initActions() {
 			this.form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-edit-linked-template')) {
-					if (typeof this.overlay !== 'undefined') {
-						this.dialogue = this.overlay.$dialogue[0];
-
-						if (this.hasChanges()) {
-							const confirmation = <?= json_encode(
-								_('Any changes made in the current form will be lost.')
-							) ?>;
-
-							if (!window.confirm(confirmation)) {
-								return;
-							}
-						}
-
-						overlayDialogueDestroy(this.overlay.dialogueid);
-
-						this.dialogue.dispatchEvent(
-							new CustomEvent('edit.linked', {detail: {templateid: e.target.dataset.templateid}})
-						)
-					}
-					else {
-						this.editTemplate({templateid: e.target.dataset.templateid});
-					}
-				}
-				else if (e.target.classList.contains('add-interface')) {
+				if (e.target.classList.contains('add-interface')) {
 					this.interface_change = true;
 				}
 				else if (e.target.classList.contains('element-table-remove')) {
@@ -178,74 +148,28 @@
 				else if (e.target.classList.contains('checkbox-radio')) {
 					this.checkbox_change = true;
 				}
+				else if (e.target.classList.contains('js-edit-linked-template')) {
+					if (typeof this.overlay !== 'undefined') {
+						this.dialogue = this.overlay.$dialogue[0];
+
+						const form_fields = getFormFields(this.form);
+						const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
+
+						if (!diff) {
+							if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+								return;
+							}
+						}
+
+						overlayDialogueDestroy(this.overlay.dialogueid);
+
+						this.editTemplate({templateid: e.target.dataset.templateid});
+					}
+					else {
+						this.editTemplate({templateid: e.target.dataset.templateid});
+					}
+				}
 			});
-		},
-
-		hasChanges() {
-			this.change = [];
-			const form_data = getFormFields(this.form);
-			const changes = [];
-			const tag_changes = [];
-			const valuemap_changes = [];
-
-			for (const key in form_data) {
-				// Compare text input fields.
-				if (typeof form_data[key] === 'string') {
-					const check_values = [
-						'host', 'inventory_mode', 'ipmi_authtype', 'ipmi_password', 'ipmi_privilege', 'ipmi_username',
-						'proxy_hostid', 'status', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_psk',
-						'tls_psk_identity', 'tls_subject', 'description', 'visiblename'
-					]
-					if (check_values.includes(key)) {
-						changes.push(form_data[key] !== this.host[key]);
-					}
-				}
-
-				// Compare Tags table.
-				if (key === 'tags') {
-					tag_changes.push(this.initialTagTableHTML !== this.tag_table.innerHTML);
-				}
-
-				// Compare Macros.
-				if (key === 'macros') {
-					this.checkMacroChanges(form_data, this.host, key);
-				}
-
-				// Compare Value mapping table.
-				if (key === 'valuemaps') {
-					valuemap_changes.push(this.initialValuemapTableHTML !== this.valuemap_table.innerHTML);
-				}
-			}
-
-			this.change.push(changes.includes(true));
-			this.change.push(tag_changes.includes(true));
-			this.change.push(valuemap_changes.includes(true));
-			this.change.push(this.ms_change);
-			this.change.push(this.interface_change);
-			this.change.push(this.remove_element);
-			this.change.push(this.checkbox_change);
-
-			return this.change.includes(true);
-		},
-
-		checkMacroChanges(form_data, initial_data, key) {
-			if (Object.keys(form_data[key]).length !== Object.keys(initial_data[key]).length) {
-				this.change.push(true);
-				return;
-			}
-
-			for (const macro in form_data[key]) {
-				let changes = [],
-					form_macro = form_data[key][macro];
-
-				for (const macro_key in form_macro) {
-					if (['description', 'macro', 'type', 'value'].includes(macro_key)) {
-						changes.push(form_macro[macro_key] == initial_data[key][macro][macro_key]);
-					}
-				}
-
-				this.change.push(changes.includes(false));
-			}
 		},
 
 		editTemplate(parameters) {
@@ -283,11 +207,6 @@
 				}
 
 				location.href = location.href;
-			});
-
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this.editTemplate({templateid:e.detail.templateid});
 			});
 
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {

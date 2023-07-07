@@ -45,6 +45,7 @@ window.template_edit_popup = new class {
 		}
 
 		this.#initActions();
+		this.initial_form_fields = getFormFields(this.form);
 	}
 
 	#initActions() {
@@ -99,17 +100,52 @@ window.template_edit_popup = new class {
 		$('#add_templates_').trigger('change');
 	}
 
-	#editLinkedTemplate(parameters) {
-		if (this.#hasChanges()) {
-			const confirmation = <?= json_encode(_('Any changes made in the current form will be lost.')) ?>;
+	#editLinkedTemplate(data) {
+		const form_fields = getFormFields(this.form);
+		const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
 
-			if (!window.confirm(confirmation)) {
+		if (!diff) {
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
 				return;
 			}
 		}
 
-		this.dialogue.dispatchEvent(new CustomEvent('edit.linked', {detail: {templateid: parameters.templateid}}));
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', 'template.edit');
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
+				response.buttons.push({
+					'title': t('Cancel'),
+					'class': 'btn-alt js-cancel',
+					'cancel': true,
+					'action': function() {}
+				});
+
+				const new_data = {
+					content: response.body,
+					buttons: response.buttons,
+					title: response.header,
+					script_inline: response.script_inline
+				};
+
+				this.overlay.setProperties(new_data);
+			})
+			.catch(this.ajaxExceptionHandler)
+			.finally(() => {
+				this.overlay.unsetLoading();
+			});
 	}
+
 
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
@@ -415,98 +451,5 @@ window.template_edit_popup = new class {
 		}
 
 		return templateids;
-	}
-
-	#hasChanges() {
-		this.change = [];
-
-		const form_data = getFormFields(this.form);
-		const initial_data = this.template;
-
-		this.#prepareFields(form_data);
-		delete form_data.csrf_token;
-
-		for (const key in initial_data) {
-			if (Array.isArray(initial_data[key])) {
-				initial_data[key] = {...initial_data[key]};
-			}
-		}
-
-		for (const key in form_data) {
-			// Compare text input fields.
-			if (typeof form_data[key] === 'string') {
-				initial_data.visiblename = initial_data.visible_name;
-				if (['template_name', 'visiblename', 'description'].includes(key)) {
-					this.change.push(form_data[key] !== initial_data[key]);
-				}
-			}
-
-			// Compare Tags.
-			if (key === 'tags') {
-				this.change.push(JSON.stringify(form_data[key]) !== JSON.stringify(initial_data[key]));
-			}
-
-			// Compare Macros.
-			if (key === 'macros') {
-				this.#checkMacroChanges(form_data, initial_data, key);
-			}
-
-			// Compare Value mapping
-			if (key === 'valuemaps') {
-				this.#checkValuemapChanges(form_data, initial_data, key);
-			}
-		}
-
-		this.change.push(this.ms_change);
-
-		return this.change.includes(true);
-	}
-
-	#checkValuemapChanges(initial_data, form_data) {
-		const changes = [];
-
-		if (Object.keys(form_data.valuemaps).length !== Object.keys(initial_data.valuemaps).length) {
-			this.change.push(true);
-			return;
-		}
-
-		for (const valuemap in form_data.valuemaps) {
-			Object.keys(initial_data.valuemaps).forEach((key, index) => {
-				initial_data.valuemaps[index] = initial_data.valuemaps[key];
-			});
-
-			if (typeof(initial_data.valuemaps[valuemap].mappings) === 'object') {
-				initial_data.valuemaps[valuemap].mappings = Object.values(initial_data.valuemaps[valuemap].mappings);
-			}
-
-			const form_mappings = form_data.valuemaps[valuemap].mappings;
-			const initial_mappings = initial_data.valuemaps[valuemap].mappings;
-
-			for (const mapping in form_mappings) {
-				changes.push(JSON.stringify(form_mappings[mapping]) === JSON.stringify(initial_mappings[mapping]));
-			}
-
-			this.change.push(changes.includes(false));
-		}
-	}
-
-	#checkMacroChanges(form_data, initial_data, key) {
-		if (Object.keys(form_data[key]).length !== Object.keys(initial_data[key]).length) {
-			this.change.push(true);
-			return;
-		}
-
-		for (const macro in form_data[key]) {
-			let changes = [],
-				form_macro = form_data[key][macro];
-
-			for (const macro_key in form_macro) {
-				if (['description', 'macro', 'type', 'value'].includes(macro_key)) {
-					changes.push(form_macro[macro_key] == initial_data[key][macro][macro_key]);
-				}
-			}
-
-			this.change.push(changes.includes(false));
-		}
 	}
 }

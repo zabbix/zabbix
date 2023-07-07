@@ -120,11 +120,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this.#edit({templateid:e.detail.templateid})
-			})
 		}
 
 		preventNavigation = function(event) {

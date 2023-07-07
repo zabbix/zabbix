@@ -71,9 +71,6 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
-				this.openTemplatePopup({templateid:e.detail.templateid})
-			);
 		},
 
 		openTemplatePopup(template_data) {
@@ -91,10 +88,6 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this.openTemplatePopup({templateid:e.detail.templateid})
-			});
 		},
 
 		massCheckNow(button) {

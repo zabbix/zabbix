@@ -49,9 +49,6 @@
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				history.replaceState({}, '', original_url);
 			});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) =>
-				this._editTemplate({templateid:e.detail.templateid})
-			);
 		}
 
 		_editTemplate(parameters) {
@@ -63,10 +60,6 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.elementDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this._editTemplate({templateid:e.detail.templateid});
-			});
 		}
 
 		_registerEvents() {

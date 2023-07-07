@@ -80,11 +80,6 @@
 
 				location.href = location.href;
 			});
-
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this.editTemplate({templateid:e.detail.templateid});
-			});
 		},
 
 		initFilter() {
@@ -133,11 +128,6 @@
 				dialogueid: 'host_edit',
 				dialogue_class: 'modal-popup-large',
 				prevent_navigation: true
-			});
-
-			this.overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(this.overlay.dialogueid);
-				this.editTemplate(e.detail);
 			});
 
 			this.overlay.$dialogue[0].addEventListener('dialogue.create', this.events.hostSuccess, {once: true});

@@ -29,6 +29,7 @@ class CControllerTemplateEdit extends CController {
 	private $template = [];
 
 	protected function init(): void {
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
 	}
 

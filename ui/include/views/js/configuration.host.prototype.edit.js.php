@@ -220,10 +220,6 @@
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.templateSuccess, {once: true});
 			overlay.$dialogue[0].addEventListener('dialogue.delete', this.events.templateDelete, {once: true});
-			overlay.$dialogue[0].addEventListener('edit.linked', (e) => {
-				overlayDialogueDestroy(overlay.dialogueid);
-				this.openTemplatePopup({templateid:e.detail.templateid})
-			});
 			overlay.$dialogue[0].addEventListener('overlay.close', () => {
 				new TabIndicators('host-tabs');
 				history.replaceState({}, '', original_url);

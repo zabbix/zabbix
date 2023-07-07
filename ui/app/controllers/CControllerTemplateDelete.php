@@ -47,7 +47,7 @@ class CControllerTemplateDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_DISCOVERY);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	/**
@@ -88,7 +88,6 @@ class CControllerTemplateDelete extends CController {
 				]);
 
 				if (!$result) {
-					// todo - fix this:
 					throw new Exception();
 				}
 			}
