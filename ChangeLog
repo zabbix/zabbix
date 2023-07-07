@@ -4032,6 +4032,7 @@ Changes for 5.0.37rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.36
