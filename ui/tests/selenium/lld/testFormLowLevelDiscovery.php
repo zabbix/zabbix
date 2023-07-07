@@ -2129,9 +2129,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @param string         $name    name of a host or template
 	 */
 	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }
