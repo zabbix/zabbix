@@ -192,6 +192,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('desc_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+					->setFullName(_('Description size'))
 					->setDefault(self::DEFAULT_DESCRIPTION_SIZE_PERCENT)
 			)
 			->addField(
@@ -221,6 +222,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('value_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+					->setFullName(_('Value size'))
 					->setDefault(self::DEFAULT_VALUE_SIZE_PERCENT)
 			)
 			->addField(
@@ -248,6 +250,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('units_size', _('Size'),self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+					->setFullName(_('Units size'))
 					->setDefault(self::DEFAULT_UNITS_SIZE_PERCENT)
 			)
 			->addField(
@@ -282,6 +285,7 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('scale_size', _('Size'), self::SIZE_PERCENT_MIN, self::SIZE_PERCENT_MAX))
+					->setFullName(_('Scale size'))
 					->setDefault(self::DEFAULT_SCALE_SIZE_PERCENT)
 			)
 			->addField(
