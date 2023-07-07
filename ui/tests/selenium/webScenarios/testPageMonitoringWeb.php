@@ -191,8 +191,9 @@ class testPageMonitoringWeb extends CWebTest {
 		// Directly open API created Web scenario and add one more step.
 		$this->page->open('httpconf.php?context=host&form=update&hostid='.self::$hostid.'&httptestid='.self::$httptestid)
 				->waitUntilReady();
-		$this->query('xpath://a[@id="tab_stepTab"]')->one()->click();
-		$this->query('xpath://button[@class="element-table-add btn-link"]')->one()->click();
+		$scenario_form = $this->query('id:httpForm')->asForm()->one();
+		$scenario_form->selectTab('Steps');
+		$scenario_form->getField('Steps')->query('button:Add')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $this->query('id:http_step')->asForm()->one();
 		$form->fill(['Name' => 'Step number 3', 'id:url' => 'test.com']);
