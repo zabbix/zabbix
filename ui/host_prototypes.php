@@ -513,6 +513,11 @@ if (hasRequest('form')) {
 	}
 	unset($macro);
 
+	$data['macros_tab'] = [
+		'linked_templates' => array_map('strval', $templateids),
+		'add_templates' => array_map('strval', array_keys($data['host_prototype']['add_templates']))
+	];
+
 	// Editable host groups.
 	$groups_rw = ($data['groups'] && CWebUser::getType() != USER_TYPE_SUPER_ADMIN)
 		? API::HostGroup()->get([
