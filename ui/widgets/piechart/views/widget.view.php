@@ -28,29 +28,29 @@
 
 $view = new CWidgetView($data);
 
-$svgContainer = new CDiv();
-$svgContainer->addClass('svg-pie-chart');
+$svg_container = new CDiv();
+$svg_container->addClass('svg-pie-chart');
 
 if ($data['vars']['legend'] && $data['vars']['legend']['show']){
-	$legendItems = [];
+	$legend_items = [];
 
 	foreach ($data['vars']['legend']['data'] as $sector) {
-		$legendItem = (new CDiv(new CSpan($sector['name'])))
+		$legend_item = (new CDiv(new CSpan($sector['name'])))
 			->addClass('pie-chart-legend-item')
 			->setAttribute('style', '--color: ' . $sector['color']);
-		$legendItems[] = $legendItem;
+		$legend_items[] = $legend_item;
 	}
 
-	$legendContainer = (new CDiv($legendItems))
+	$legend_container = (new CDiv($legend_items))
 		->addClass('pie-chart-legend')
 		->addStyle('--lines: ' . $data['vars']['legend']['lines'] . ';')
 		->addStyle('--columns: ' . $data['vars']['legend']['columns'] . ';');
 
-	$view->addItem($svgContainer);
-	$view->addItem($legendContainer);
+	$view->addItem($svg_container);
+	$view->addItem($legend_container);
 }
 else {
-	$view->addItem($svgContainer);
+	$view->addItem($svg_container);
 }
 
 if ($data['info'] !== null) {

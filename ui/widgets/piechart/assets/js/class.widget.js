@@ -59,6 +59,8 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	setContents(response) {
+		this._body.innerHTML = response.body;
+
 		if (this.pie_chart !== null) {
 			this.pie_chart.setValue(response.sectors);
 
@@ -70,7 +72,7 @@ class CWidgetPieChart extends CWidget {
 			horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
 		};
 
-		this.pie_chart = new CSVGPie(padding, response.config);
+		this.pie_chart = new CSVGPie(this._body, padding, response.config);
 		this.pie_chart.setSize(super._getContentsSize());
 		this.pie_chart.setValue(response.sectors);
 	}
