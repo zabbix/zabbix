@@ -1,0 +1,1 @@
+........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
