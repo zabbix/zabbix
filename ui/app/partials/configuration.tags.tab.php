@@ -159,7 +159,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 
 		case 'item':
 			$btn_labels = [_('Item tags'), _('Inherited and item tags')];
-			$on_change = 'this.form.submit()';
+			$on_change = null;
 			break;
 	}
 

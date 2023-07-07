@@ -31,15 +31,19 @@
 <script>
 	const view = new class {
 
-		init({confirm_messages, token}) {
+		init({form_name, confirm_messages, token, hostids}) {
 			this.confirm_messages = confirm_messages;
 			this.token = token;
+			this.hostids = hostids;
+
+			this.form = document.forms[form_name];
 
 			this._initFilterForm();
 			this._initActions();
 		}
 
 		_initFilterForm() {
+			// TODO: bind events on filter+subfilter form only
 			document.querySelector('#filter_state').addEventListener('change', e => {
 				const state = e.target.getAttribute('value');
 
@@ -66,7 +70,8 @@
 		}
 
 		_initActions() {
-			document.addEventListener('click', (e) => {
+			// TODO: bind events on items list only
+			this.form.addEventListener('click', (e) => {
 				const target = e.target;
 
 				if (target.classList.contains('js-enable-item')) {
@@ -153,7 +158,7 @@
 		}
 
 		_updateItems(target, itemids) {
-			let action = 'item.update';
+			let action;
 			let params = {
 				context: target.closest('form').querySelector('[name="context"]').value,
 				prototype: 0
@@ -166,6 +171,11 @@
 			if (target.classList.contains('js-massupdate-item')) {
 				action = 'item.massupdate';
 				params.ids = Object.keys(chkbxRange.getSelectedIds());
+			}
+			else {
+				action = 'item.edit';
+				params.hostid = this.hostids[0];
+				params.itemid = itemids.pop();
 			}
 
 			const overlay = PopUp(action, params, {
