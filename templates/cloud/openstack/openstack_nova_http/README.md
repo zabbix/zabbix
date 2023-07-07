@@ -69,7 +69,7 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 |----|-----------|-------|
 |{$OPENSTACK.NOVA.SERVICE.URL}|<p>API endpoint for Nova Service, e.g., https://local.openstack:8774/v2.1.</p>||
 |{$OPENSTACK.TOKEN}|<p>API token for the monitoring user.</p>||
-|{$OPENSTACK.NOVA.HTTP.PROXY}|<p>Sets the HTTP proxy for authorization item. If this parameter is empty, then no proxy is used.</p>||
+|{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for script and HTTP agent items. If this parameter is empty, then no proxy is used.</p>||
 |{$OPENSTACK.NOVA.TENANT.PERIOD}|<p>Period for which tenant usage statistics will be queried. Possible values are:</p><p> 'y' - current year until now,</p><p> 'm' - current month until now,</p><p> 'w' - current week until now,</p><p> 'd' - current day until now.</p>|`m`|
 |{$OPENSTACK.NOVA.INTERVAL.LIMITS}|<p>Interval for absolute limit HTTP agent item query.</p>|`3m`|
 |{$OPENSTACK.NOVA.INTERVAL.SERVERS}|<p>Interval for server HTTP agent item queries.</p>|`3m`|

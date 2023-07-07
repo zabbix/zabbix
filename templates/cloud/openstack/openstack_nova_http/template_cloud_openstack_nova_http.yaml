@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-07T08:42:57Z'
+  date: '2023-07-07T13:30:57Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -38,7 +38,7 @@ zabbix_export:
               error_handler_params: 'Could not get availability zones list'
           timeout: 10s
           url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-availability-zone/detail'
-          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          http_proxy: '{$OPENSTACK.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
               value: '{$OPENSTACK.TOKEN}'
@@ -62,7 +62,7 @@ zabbix_export:
               error_handler_params: 'Could not get hypervisors list'
           timeout: 10s
           url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-hypervisors/detail'
-          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          http_proxy: '{$OPENSTACK.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
               value: '{$OPENSTACK.TOKEN}'
@@ -86,7 +86,7 @@ zabbix_export:
               error_handler_params: 'Could not get absolute project limits'
           timeout: 10s
           url: '{$OPENSTACK.NOVA.SERVICE.URL}/limits'
-          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          http_proxy: '{$OPENSTACK.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
               value: '{$OPENSTACK.TOKEN}'
@@ -260,7 +260,7 @@ zabbix_export:
               error_handler_params: 'Could not get servers list'
           timeout: 10s
           url: '{$OPENSTACK.NOVA.SERVICE.URL}/servers'
-          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          http_proxy: '{$OPENSTACK.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
               value: '{$OPENSTACK.TOKEN}'
@@ -284,7 +284,7 @@ zabbix_export:
               error_handler_params: 'Could not get compute services list'
           timeout: 10s
           url: '{$OPENSTACK.NOVA.SERVICE.URL}/os-services'
-          http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+          http_proxy: '{$OPENSTACK.HTTP.PROXY}'
           headers:
             - name: X-Auth-Token
               value: '{$OPENSTACK.TOKEN}'
@@ -407,7 +407,7 @@ zabbix_export:
             - name: period
               value: '{$OPENSTACK.NOVA.TENANT.PERIOD}'
             - name: http_proxy
-              value: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+              value: '{$OPENSTACK.HTTP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -775,7 +775,7 @@ zabbix_export:
                     - 1h
               timeout: 10s
               url: '{$OPENSTACK.NOVA.SERVICE.URL}/servers/{#SERVER_ID}'
-              http_proxy: '{$OPENSTACK.NOVA.HTTP.PROXY}'
+              http_proxy: '{$OPENSTACK.HTTP.PROXY}'
               headers:
                 - name: X-Auth-Token
                   value: '{$OPENSTACK.TOKEN}'
@@ -1189,6 +1189,8 @@ zabbix_export:
         - macro: '{$OPENSTACK.AVAILABILITY_ZONE.DISCOVERY.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Sets the zone name regex filter to use in availability zone discovery for excluding.'
+        - macro: '{$OPENSTACK.HTTP.PROXY}'
+          description: 'Sets the HTTP proxy for script and HTTP agent items. If this parameter is empty, then no proxy is used.'
         - macro: '{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}'
           value: '.*'
           description: 'Sets the hostname regex filter to use in hypervisor discovery for including.'
@@ -1213,8 +1215,6 @@ zabbix_export:
         - macro: '{$OPENSTACK.NOVA.CPU.UTIL.WARN}'
           value: '75'
           description: 'Sets the percentage threshold for creating a warning severity event about vCPU resource usage.'
-        - macro: '{$OPENSTACK.NOVA.HTTP.PROXY}'
-          description: 'Sets the HTTP proxy for authorization item. If this parameter is empty, then no proxy is used.'
         - macro: '{$OPENSTACK.NOVA.INSTANCES.UTIL.HIGH}'
           value: '90'
           description: 'Sets the percentage threshold for creating a high severity event about instances resource count.'

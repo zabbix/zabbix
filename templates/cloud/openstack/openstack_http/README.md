@@ -134,7 +134,7 @@ Access rights are set using policies. Each service has its own policy file, ther
 |----|-----------|-------|
 |{$OPENSTACK.KEYSTONE.API.ENDPOINT}|<p>API endpoint for Identity Service, e.g., https://local.openstack:5000.</p>||
 |{$OPENSTACK.AUTH.INTERVAL}|<p>Interval in minutes, in which API token will be regenerated. By default, OpenStack API tokens expire after 60m.</p>|`50m`|
-|{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for authorization item. If this parameter is empty, then no proxy is used.</p>||
+|{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
 |{$OPENSTACK.APP.CRED.ID}|<p>Application credential ID for monitoring user access.</p>||
 |{$OPENSTACK.APP.CRED.SECRET}|<p>Application credential password for monitoring user access.</p>||
 
