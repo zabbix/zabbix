@@ -82,11 +82,13 @@
 
 .btn-add,
 .btn-edit,
+.btn-import,
 .btn-remove {
 	&[disabled],
 	&[disabled]:hover {
 		background-color: transparent;
 		opacity: .25;
+		cursor: default;
 	}
 }
 
