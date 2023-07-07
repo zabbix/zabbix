@@ -384,7 +384,7 @@ class CWidgetBase {
 	 * @returns {boolean}
 	 */
 	supportsDynamicHosts() {
-		return this._fields.dynamic === '1';
+		return this._fields.dynamic === 1;
 	}
 
 	/**

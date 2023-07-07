@@ -35,7 +35,6 @@ class CWidgetMap extends CWidget {
 	onInitialize() {
 		this._map_svg = null;
 
-		this._source_type = this._fields.source_type || CWidgetMap.SOURCETYPE_MAP;
 		this._filter_widget = null;
 		this._filter_itemid = null;
 
@@ -75,7 +74,7 @@ class CWidgetMap extends CWidget {
 			this._filter_widget.off(CWidgetMap.WIDGET_NAVTREE_EVENT_SELECT, this._events.select);
 		}
 
-		if (this._source_type == CWidgetMap.SOURCETYPE_FILTER) {
+		if (this._fields.source_type === CWidgetMap.SOURCETYPE_FILTER) {
 			for (const widget of widgets) {
 				if (widget._fields.reference === this._fields.filter_widget_reference) {
 					this._filter_widget = widget;
@@ -90,7 +89,7 @@ class CWidgetMap extends CWidget {
 	promiseUpdate() {
 		if (!this._has_contents || this._map_svg === null) {
 			if (this._sysmapid !== null
-					|| this._source_type == CWidgetMap.SOURCETYPE_MAP
+					|| this._fields.source_type === CWidgetMap.SOURCETYPE_MAP
 					|| this._filter_widget === null) {
 				return super.promiseUpdate();
 			}

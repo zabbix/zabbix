@@ -48,6 +48,6 @@ class CWidgetProblemsBySv extends CWidget {
 
 	hasPadding() {
 		return this._view_mode === ZBX_WIDGET_VIEW_MODE_NORMAL
-			&& this._fields.show_type != CWidgetProblemsBySv.SHOW_TOTALS;
+			&& this._fields.show_type !== CWidgetProblemsBySv.SHOW_TOTALS;
 	}
 }

@@ -244,6 +244,6 @@ class CWidgetClock2 extends CWidget {
 	}
 
 	hasPadding() {
-		return this._fields.clock_type === undefined || this._fields.clock_type == CWidgetClock2.TYPE_ANALOG;
+		return this._fields.clock_type === CWidgetClock2.TYPE_ANALOG;
 	}
 }

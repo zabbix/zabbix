@@ -106,7 +106,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 		foreach ($navtree_items as $fieldid => &$navtree_item) {
 			if ($navtree_item['parent'] != 0 && !array_key_exists($navtree_item['parent'], $navtree_items)) {
 				$errors[] = _s('Incorrect value for field "%1$s": %2$s.',
-					'navtree.parent.'.$fieldid, _('reference to a non-existent tree element')
+					'navtree['.$fieldid.'][parent]', _('reference to a non-existent tree element')
 				);
 				$navtree_item['parent'] = 0;
 			}
@@ -121,7 +121,7 @@ class CWidgetFieldNavTree extends CWidgetField {
 			while ($parentid != 0) {
 				if (array_key_exists($navtree_items[$parentid]['parent'], $parentids)) {
 					$errors[] = _s('Incorrect value for field "%1$s": %2$s.',
-						'navtree.parent.'.$parentid, _('circular dependency is not allowed')
+						'navtree['.$parentid.'][parent]', _('circular dependency is not allowed')
 					);
 					$navtree_items[$parentid]['parent'] = 0;
 				}

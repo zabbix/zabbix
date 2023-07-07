@@ -195,7 +195,7 @@ class CWidgetNavTree extends CWidget {
 				const button = e.target;
 
 				const id = button.getAttribute('data-id');
-				const parent = this._target.querySelector(`input[name="navtree.parent.${id}"]`).value;
+				const parent = this._target.querySelector(`input[name="navtree[${id}][parent]"]`).value;
 				const depth = parseInt(button.closest('[data-depth]').getAttribute('data-depth'));
 
 				this._itemEditDialog(id, parent, depth, button);
@@ -622,23 +622,23 @@ class CWidgetNavTree extends CWidget {
 
 		if (this._is_edit_mode && editable) {
 			const name_fld = document.createElement('input');
-			name_fld.id = `${this._unique_id}_navtree.name.${item.id}`;
+			name_fld.id = `${this._unique_id}_navtree.${item.id}.name`;
 			name_fld.type = 'hidden';
-			name_fld.name = `navtree.name.${item.id}`;
+			name_fld.name = `navtree[${item.id}][name]`;
 			name_fld.value = item.name;
 			li_item.appendChild(name_fld);
 
 			const parent_fld = document.createElement('input');
-			parent_fld.id = `${this._unique_id}_navtree.parent.${item.id}`;
+			parent_fld.id = `${this._unique_id}_navtree.${item.id}.parent`;
 			parent_fld.type = 'hidden';
-			parent_fld.name = `navtree.parent.${item.id}`;
+			parent_fld.name = `navtree[${item.id}][parent]`;
 			parent_fld.value = item.parent || 0;
 			li_item.appendChild(parent_fld);
 
 			const mapid_fld = document.createElement('input');
-			mapid_fld.id = `${this._unique_id}_navtree.sysmapid.${item.id}`;
+			mapid_fld.id = `${this._unique_id}_navtree.${item.id}.sysmapid`;
 			mapid_fld.type = 'hidden';
-			mapid_fld.name = `navtree.sysmapid.${item.id}`;
+			mapid_fld.name = `navtree[${item.id}][sysmapid]`;
 			mapid_fld.value = item.sysmapid;
 			li_item.appendChild(mapid_fld);
 		}
@@ -752,7 +752,7 @@ class CWidgetNavTree extends CWidget {
 	_getNextId() {
 		this._last_id++;
 
-		while (jQuery(`[name="navtree.name.${this._last_id}"]`).length) {
+		while (jQuery(`[name="navtree[${this._last_id}][name]"]`).length) {
 			this._last_id++;
 		}
 
@@ -816,8 +816,8 @@ class CWidgetNavTree extends CWidget {
 			url: url.getUrl(),
 			method: 'POST',
 			data: {
-				name: item_edit ? this._target.querySelector(`[name="navtree.name.${id}"]`).value : '',
-				sysmapid: item_edit ? this._target.querySelector(`[name="navtree.sysmapid.${id}"]`).value : 0,
+				name: item_edit ? this._target.querySelector(`[name="navtree[${id}][name]"]`).value : '',
+				sysmapid: item_edit ? this._target.querySelector(`[name="navtree[${id}][sysmapid]"]`).value : 0,
 				depth: depth
 			},
 			dataType: 'json',
@@ -887,8 +887,8 @@ class CWidgetNavTree extends CWidget {
 											if (item_edit) {
 												const $row = jQuery(`[data-id="${id}"]`, jQuery(this._target));
 
-												jQuery(`[name="navtree.name.${id}"]`, $row).val(resp.name);
-												jQuery(`[name="navtree.sysmapid.${id}"]`, $row)
+												jQuery(`[name="navtree[${id}][name]"]`, $row).val(resp.name);
+												jQuery(`[name="navtree[${id}][sysmapid]"]`, $row)
 													.val(resp['sysmapid']);
 												jQuery('> .tree-row > .content > .item-name', $row)
 													.empty()
@@ -967,45 +967,40 @@ class CWidgetNavTree extends CWidget {
 	}
 
 	_updateWidgetFields() {
-		const prefix = `${this.getUniqueId()}_`;
-
 		if (!this._is_edit_mode) {
 			return false;
 		}
 
-		for (const name in this._fields) {
-			if (/^navtree\.(name|order|parent|sysmapid)\.\d+$/.test(name)) {
-				delete this._fields[name]
+		const prefix = `${this.getUniqueId()}_`;
+
+		this._fields.navtree = {};
+
+		jQuery('input[name$="[name]"]', jQuery(this._body)).each((index, field) => {
+			const matches = field.getAttribute('name').match(/^navtree\[(\d+)\]/);
+			const id = matches[1];
+
+			const parent = document.getElementById(`${prefix}navtree.${id}.parent`).value;
+			const sysmapid = document.getElementById(`${prefix}navtree.${id}.sysmapid`).value;
+			const sibling = document.getElementById(`${prefix}children-of-${parent}`).childNodes;
+
+			let order = 0;
+
+			while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
+				order++;
 			}
-		}
 
-		jQuery('input[name^="navtree.name."]', jQuery(this._body)).each((index, field) => {
-			const id = field.getAttribute('name').substr(13);
+			this._fields.navtree[id] = {name: field.value};
 
-			if (id) {
-				const parent = document.getElementById(`${prefix}navtree.parent.${id}`).value;
-				const sysmapid = document.getElementById(`${prefix}navtree.sysmapid.${id}`).value;
-				const sibling = document.getElementById(`${prefix}children-of-${parent}`).childNodes;
+			if (parent != 0) {
+				this._fields.navtree[id].parent = parent;
+			}
 
-				let order = 0;
+			if (order != 0) {
+				this._fields.navtree[id].order = order + 1;
+			}
 
-				while (sibling[order] !== undefined && sibling[order].getAttribute('data-id') != id) {
-					order++;
-				}
-
-				this._fields[`navtree.name.${id}`] = field.value;
-
-				if (parent != 0) {
-					this._fields[`navtree.parent.${id}`] = parent;
-				}
-
-				if (order != 0) {
-					this._fields[`navtree.order.${id}`] = order + 1;
-				}
-
-				if (sysmapid != 0) {
-					this._fields[`navtree.sysmapid.${id}`] = sysmapid;
-				}
+			if (sysmapid != 0) {
+				this._fields.navtree[id].sysmapid = sysmapid;
 			}
 		});
 	}

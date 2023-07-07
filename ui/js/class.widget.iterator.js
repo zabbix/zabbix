@@ -147,12 +147,12 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_setFields(fields) {
-		const num_columns = this._getColumnsField();
-		const num_rows = this._getRowsField();
+		const num_columns = this._fields.columns;
+		const num_rows = this._fields.rows;
 
 		super._setFields(fields);
 
-		if (num_columns !== this._getColumnsField() || num_rows !== this._getRowsField()) {
+		if (num_columns !== this._fields.columns || num_rows !== this._fields.rows) {
 			this._clearContents();
 			this._clearAltContent();
 
@@ -457,8 +457,8 @@ class CWidgetIterator extends CWidget {
 	}
 
 	_updateTooSmallState() {
-		const is_too_small = this._pos.width < this._getColumnsField()
-			|| this._pos.height < this._getRowsField() * this._min_rows;
+		const is_too_small = this._pos.width < this._fields.columns
+			|| this._pos.height < this._fields.rows * this._min_rows;
 
 		this._target.classList.toggle('iterator-too-small', is_too_small);
 	}
@@ -466,8 +466,8 @@ class CWidgetIterator extends CWidget {
 	_updateGridPositions() {
 		this._grid_pos = [];
 
-		const num_columns = this._getColumnsField();
-		const num_rows = this._getRowsField();
+		const num_columns = this._fields.columns;
+		const num_rows = this._fields.rows;
 
 		for (let index = 0, count = num_columns * num_rows; index < count; index++) {
 			const cell_column = index % num_columns;
@@ -518,14 +518,6 @@ class CWidgetIterator extends CWidget {
 			- parseFloat(getComputedStyle(this._pager).marginRight);
 
 		this._header.classList.toggle('pager-visible', width_available >= 0);
-	}
-
-	_getColumnsField() {
-		return this._fields.columns !== undefined ? this._fields.columns : 2;
-	}
-
-	_getRowsField() {
-		return this._fields.rows !== undefined ? this._fields.rows : 1;
 	}
 
 	_createUniqueId() {
