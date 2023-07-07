@@ -660,20 +660,20 @@ class testDashboardGaugeWidget extends CWebTest {
 					]
 				]
 			],
-			// #12 Test other fields 1.
+			// #12 Multiple thresholds.
 			[
 				[
 					'fields' => [
-						'Name' =>  'Other fields 1',
-						'Min' => 1,
-						'Max' => 20,
+						'Name' => 'Multiple thresholds',
+						'Min' => 15,
+						'Max' => 200,
 						'Refresh interval' => '30 seconds',
 						'Item' => '2 Item for gauge widget',
 						'id:units_pos' => 'Before value'
 					],
 					'Thresholds' => [
-						['value' => '3', 'color' => '03A9F4'],
-						['value' => '5', 'color' => '283593']
+						['value' => '30', 'color' => '03A9F4'],
+						['value' => '50', 'color' => '283593']
 					]
 				]
 			],
@@ -681,22 +681,16 @@ class testDashboardGaugeWidget extends CWebTest {
 
 
 
-			// #13 False default checkboxes + multiple thresholds.
+			// #13 False default checkboxes.
 			[
 				[
 					'fields' => [
 						'Name' => 'False default checkboxes',
 						'Item' => '2 Item for gauge widget',
-						'Min' => 1,
-						'Max' => 20,
 						'id:show_header' => false,
 						'id:value_arc' => false,
 						'id:units_show' => false,
 						'id:scale_show' => false
-					],
-					'Thresholds' => [
-						['value' => '3', 'color' => '03A9F4'],
-						['value' => '5', 'color' => '283593']
 					]
 				]
 			]
@@ -956,7 +950,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					'Refresh interval' => '10 minutes',
 					'Item' => 'testFormItem4',
 					'Min' => 10,
-					'Max' => 200
+					'Max' => 300
 				]
 			);
 		}
