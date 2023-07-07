@@ -2015,7 +2015,7 @@ class CDashboardPage {
 
 				this._events_data.dashboard_grid_resize_width = this._dashboard_grid.clientWidth;
 
-				if (this._events_data.dashboard_grid_resize_timeout_id != null) {
+				if (this._events_data.dashboard_grid_resize_timeout_id !== null) {
 					clearTimeout(this._events_data.dashboard_grid_resize_timeout_id);
 				}
 
@@ -2052,8 +2052,9 @@ class CDashboardPage {
 	_deactivateEvents() {
 		this._events_data.dashboard_grid_resize_observer.disconnect();
 
-		if (this._events_data.dashboard_grid_resize_timeout_id != null) {
+		if (this._events_data.dashboard_grid_resize_timeout_id !== null) {
 			clearTimeout(this._events_data.dashboard_grid_resize_timeout_id);
+			this._events_data.dashboard_grid_resize_timeout_id = null;
 		}
 	}
 
