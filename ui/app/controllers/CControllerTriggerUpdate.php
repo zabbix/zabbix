@@ -21,6 +21,11 @@
 
 class CControllerTriggerUpdate extends CController {
 
+	/**
+	 * @var array
+	 */
+	private $db_trigger;
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -65,6 +70,17 @@ class CControllerTriggerUpdate extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		$db_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'templateid', 'flags'],
+			'triggerids' => $this->getInput('triggerid')
+		]);
+
+		if (!$db_triggers) {
+			return false;
+		}
+
+		$this->db_trigger = reset($db_triggers);
+
 		if ($this->getInput('hostid') && !isWritableHostTemplates([$this->getInput('hostid')])) {
 			return false;
 		}
@@ -73,53 +89,63 @@ class CControllerTriggerUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$tags = $this->getInput('tags', []);
+		$trigger = [];
 
-		// Unset empty and inherited tags.
-		foreach ($tags as $key => $tag) {
-			if ($tag['tag'] === '' && $tag['value'] === '') {
-				unset($tags[$key]);
+		if ($this->db_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+			if ($this->db_trigger['templateid'] == 0) {
+				$trigger += [
+					'description' => $this->getInput('description'),
+					'event_name' => $this->getInput('event_name', ''),
+					'opdata' => $this->getInput('opdata', ''),
+					'expression' => $this->getInput('expression'),
+					'recovery_mode' => $this->getInput('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
+					'manual_close' => $this->getInput('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED)
+				];
+
+				switch ($trigger['recovery_mode']) {
+					case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
+						$trigger['recovery_expression'] = $this->getInput('recovery_expression', '');
+						// break; is not missing here.
+					case ZBX_RECOVERY_MODE_EXPRESSION:
+						$trigger['correlation_mode'] = $this->getInput('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
+
+						if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
+							$trigger['correlation_tag'] = $this->getInput('correlation_tag', '');
+						}
+						break;
+				}
 			}
-			elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
-				unset($tags[$key]);
+
+			$tags = $this->getInput('tags', []);
+
+			// Unset empty and inherited tags.
+			foreach ($tags as $key => $tag) {
+				if ($tag['tag'] === '' && $tag['value'] === '') {
+					unset($tags[$key]);
+				}
+				elseif (array_key_exists('type', $tag) && !($tag['type'] & ZBX_PROPERTY_OWN)) {
+					unset($tags[$key]);
+				}
+				else {
+					unset($tags[$key]['type']);
+				}
 			}
-			else {
-				unset($tags[$key]['type']);
-			}
+
+			$trigger += [
+				'type' => $this->getInput('type', 0),
+				'url_name' => $this->getInput('url_name', ''),
+				'url' => $this->getInput('url', ''),
+				'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
+				'comments' => $this->getInput('comments', ''),
+				'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
+				'tags' => $tags
+			];
 		}
 
-		$trigger = [
+		$trigger += [
 			'triggerid' => $this->getInput('triggerid'),
-			'description' => $this->getInput('description'),
-			'event_name' => $this->getInput('event_name', ''),
-			'opdata' => $this->getInput('opdata', ''),
-			'expression' => $this->getInput('expression'),
-			'recovery_mode' => $this->getInput('recovery_mode', ZBX_RECOVERY_MODE_EXPRESSION),
-			'type' => $this->getInput('type', 0),
-			'url_name' => $this->getInput('url_name', ''),
-			'url' => $this->getInput('url', ''),
-			'priority' => $this->getInput('priority', TRIGGER_SEVERITY_NOT_CLASSIFIED),
-			'comments' => $this->getInput('comments', ''),
-			'tags' => $tags,
-			'manual_close' => $this->getInput('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
-			'dependencies' => zbx_toObject($this->getInput('dependencies', []), 'triggerid'),
 			'status' => $this->hasInput('status') ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED
 		];
-
-
-		switch ($trigger['recovery_mode']) {
-			case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
-				$trigger['recovery_expression'] = $this->getInput('recovery_expression', '');
-			// break; is not missing here.
-
-			case ZBX_RECOVERY_MODE_EXPRESSION:
-				$trigger['correlation_mode'] = $this->getInput('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
-
-				if ($trigger['correlation_mode'] == ZBX_TRIGGER_CORRELATION_TAG) {
-					$trigger['correlation_tag'] = $this->getInput('correlation_tag', '');
-				}
-				break;
-		}
 
 		$result = (bool) API::Trigger()->update($trigger);
 
