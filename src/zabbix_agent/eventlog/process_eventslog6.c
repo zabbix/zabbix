@@ -890,7 +890,8 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 			if (0 == p_count)
 			{
-				int	ret1, ret2, ret3, ret4;
+				int	ret1 = ZBX_REGEXP_NO_MATCH, ret2 = ZBX_REGEXP_NO_MATCH,
+					ret3 = ZBX_REGEXP_NO_MATCH, ret4 = ZBX_REGEXP_NO_MATCH;
 
 				if (FAIL == (ret1 = zbx_regexp_match_ex(regexps, evt_message, pattern,
 						ZBX_CASE_SENSITIVE)))
