@@ -27,7 +27,7 @@
 #include "../actions.h"
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
-#include "../../libs/zbxserver/get_host_from_event.h"
+#include "zbxevent.h"
 #include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
@@ -1431,8 +1431,8 @@ static void	execute_commands(const zbx_db_event *event, const zbx_db_event *r_ev
 			if (0 == host.hostid)
 			{
 				/* target is "Current host" */
-				if (SUCCEED != (rc = get_host_from_event((NULL != r_event ? r_event : event), &host, error,
-						sizeof(error))))
+				if (SUCCEED != (rc = zbx_event_db_get_host((NULL != r_event ? r_event : event), &host,
+						error, sizeof(error))))
 				{
 					goto fail;
 				}

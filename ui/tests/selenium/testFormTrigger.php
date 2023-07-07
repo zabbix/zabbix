@@ -303,7 +303,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$form = $this->query('id:triggers-form')->asForm()->one();
+		$form = $this->query('id:triggers-form')->asForm(['normalized' => true])->one();
 		$entry_name = $form->getField('Menu entry name');
 
 		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
@@ -1025,10 +1025,11 @@ class testFormTrigger extends CLegacyWebTest {
 	* @param string    $name    name of a host or template where triggers are opened
 	*/
 	private function filterEntriesAndOpenTriggers($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-			->getColumn('Triggers')->query('link:Triggers')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Triggers')->query('link:Triggers')->one()->click();
 	}
 }

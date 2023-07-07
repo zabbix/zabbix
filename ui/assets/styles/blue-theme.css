@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1126,10 +1126,11 @@ footer {
       width: auto; }
     .form-grid table .sortable td {
       padding-bottom: 0;
-      vertical-align: middle;
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
+      .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+        line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #768d99; }
@@ -1158,7 +1159,7 @@ footer {
     display: inline-flex;
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
-      padding: 5px 5px 5px 0; }
+      padding: 5px 5px 0 0; }
     .form-grid .table-forms-separator tfoot td {
       padding-bottom: 0; }
 
@@ -5386,10 +5387,8 @@ z-select button.focusable,
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #ebeef0; }
-  .overlay-dialogue .table-forms-td-right td {
-    vertical-align: middle; }
-    .overlay-dialogue .table-forms-td-right td label {
-      display: block; }
+  .overlay-dialogue .table-forms-td-right td label {
+    display: block; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -6688,6 +6687,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .form-grid .subscriptions-table .icon {
   margin-right: 3px;
   vertical-align: text-bottom; }
+.form-grid .tags-table {
+  width: auto; }
+  .form-grid .tags-table tr:not(.form_row) td {
+    padding-top: 0; }
 
 .import-compare {
   display: flex;
@@ -6709,6 +6712,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
+.overlay-dialogue #host-form #tagsFormList .form-field,
+.overlay-dialogue #host-form #macrosFormList .form-field,
+.overlay-dialogue #host-form #valuemap-formlist .form-field {
+  grid-column-start: 1; }
 .overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
 .overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {

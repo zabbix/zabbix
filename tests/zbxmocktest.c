@@ -148,12 +148,7 @@ const char	*progname = "mock_progname";
 const char	syslog_app_name[] = "mock_syslog_app_name";
 
 char	*CONFIG_HOSTS_ALLOWED		= NULL;
-char	*CONFIG_HOSTNAMES		= NULL;
 char	*CONFIG_HOSTNAME_ITEM		= NULL;
-char	*CONFIG_HOST_METADATA		= NULL;
-char	*CONFIG_HOST_METADATA_ITEM	= NULL;
-
-ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME	= NULL;
 
 int	CONFIG_REFRESH_ACTIVE_CHECKS	= 120;
 
@@ -185,18 +180,6 @@ static int	zbx_config_enable_remote_commands = 0;
 int	get_zbx_config_enable_remote_commands(void)
 {
 	return zbx_config_enable_remote_commands;
-}
-
-static int	zbx_config_log_remote_commands = 0;
-int	get_zbx_config_log_remote_commands(void)
-{
-	return zbx_config_log_remote_commands;
-}
-
-static int	zbx_config_unsafe_user_parameters = 0;
-int	get_zbx_config_unsafe_user_parameters(void)
-{
-	return zbx_config_unsafe_user_parameters;
 }
 
 /* test itself */

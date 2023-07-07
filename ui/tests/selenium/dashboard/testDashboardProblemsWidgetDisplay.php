@@ -62,6 +62,11 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 	}
 
 	public function prepareProblemsData() {
+		// Remove PROBLEM event status blinking to get correct status in table column.
+		CDataHelper::call('settings.update', [
+			'problem_unack_style' => 0
+		]);
+
 		// Create hostgroup for hosts with items triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [
 			['name' => 'Group for Problems Widgets'],
@@ -300,7 +305,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unsupressed filter',
+						'Name' => 'Group, unsuppressed filter',
 						'Host groups' => 'Group for Problems Widgets',
 						'Show suppressed problems' => true
 					],
