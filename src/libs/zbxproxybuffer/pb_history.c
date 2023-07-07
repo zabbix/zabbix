@@ -65,8 +65,12 @@ size_t	pb_history_estimate_row_size(const char *value, const char *source)
 
 static void	pb_history_free(zbx_pb_history_t *row)
 {
-	zbx_free(row->value);
-	zbx_free(row->source);
+	if (0 == (row->flags & ZBX_PROXY_HISTORY_FLAG_NOVALUE))
+	{
+		zbx_free(row->value);
+		zbx_free(row->source);
+	}
+
 	zbx_free(row);
 }
 
