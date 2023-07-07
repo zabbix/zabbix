@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-05T13:39:37Z'
+  date: '2023-07-07T14:24:48Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -10,7 +10,7 @@ zabbix_export:
       name: 'AWS Cost by HTTP'
       description: |
         The template gets AWS Cost Explorer metrics and uses the script item to make HTTP requests to the Cost Explorer API.
-        The Cost Explorer API can access up to 12 months of historical data and data for the current month
+        The Cost Explorer API can access the historical data over up to 12 months and the data for current month.
         Don't forget to read the README.md for the correct setup of the template.
         
         You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback
@@ -111,17 +111,17 @@ zabbix_export:
             
                     response = request.post(url, data);
             
-                    Zabbix.log(4, '[ AWS Billing ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ AWS Billing ] Received response with the status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                        throw 'Request failed with the status code ' + request.getStatus() + ': ' + response;
                     }
             
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+                        throw 'Failed to parse the response received from AWS API. Check debug log for more information.';
                     }
             
                     return response;
@@ -175,7 +175,7 @@ zabbix_export:
             
                 return JSON.stringify({ 'error': error });
             }
-          description: 'Get raw data daily costs by service'
+          description: 'Get raw data on the daily costs by service'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -197,7 +197,7 @@ zabbix_export:
           name: 'AWS Cost: Get monthly costs'
           type: SCRIPT
           key: aws.get.monthly.costs
-          delay: 0s;wd1h9m/30
+          delay: 0s;h9
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -287,17 +287,17 @@ zabbix_export:
             
                     response = request.post(url, data);
             
-                    Zabbix.log(4, '[ AWS Billing ] Received response with status code ' + request.getStatus() + ': ' + response);
+                    Zabbix.log(4, '[ AWS Billing ] Received response with the status code ' + request.getStatus() + ': ' + response);
             
                     if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                        throw 'Request failed with the status code ' + request.getStatus() + ': ' + response;
                     }
             
                     try {
                         response = JSON.parse(response);
                     }
                     catch (error) {
-                        throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+                        throw 'Failed to parse the response received from AWS API. Check debug log for more information.';
                     }
             
                     return response;
@@ -371,10 +371,10 @@ zabbix_export:
             try {
                 AwsBilling.setParams(JSON.parse(value));
             
-                monthy_costs = AwsBilling.getCostMonth();
-                monthy_service_costs = AwsBilling.getCostMonthService();
+                monthly_costs = AwsBilling.getCostMonth();
+                monthly_service_costs = AwsBilling.getCostMonthService();
             
-                return JSON.stringify({ monthy_costs, monthy_service_costs });
+                return JSON.stringify({ monthly_costs, monthly_service_costs });
             
             }
             catch (error) {
@@ -416,7 +416,7 @@ zabbix_export:
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery monthly cost by services.'
+          description: 'Discovery of monthly costs by services.'
           item_prototypes:
             - uuid: d01ee8df0e204f1a857b8188df47402a
               name: 'AWS Cost: ["{#AWS.BILLING.SERVICE.NAME}"]: Month ["{#AWS.BILLING.MONTH}"] Blended cost'
@@ -430,7 +430,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.monthy_service_costs.[?(@.month == "{#AWS.BILLING.MONTH}")]'
+                    - '$.monthly_service_costs.[?(@.month == "{#AWS.BILLING.MONTH}")]'
                   error_handler: DISCARD_VALUE
                 - type: JSONPATH
                   parameters:
@@ -466,7 +466,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.monthy_service_costs
+                - $.monthly_service_costs
         - uuid: 6e65d15251ea4355ac41ed7956f9e5b0
           name: 'AWS daily costs by services discovery'
           type: DEPENDENT
@@ -482,7 +482,7 @@ zabbix_export:
                 value: '{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-          description: 'Discovery daily blended costs by services.'
+          description: 'Discovery of daily blended costs by services.'
           item_prototypes:
             - uuid: b6e121c3a1eb49858e942beab12660e2
               name: 'AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost'
@@ -492,7 +492,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '{#AWS.BILLING.UNIT}'
-              description: 'The daily blended cost for the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
+              description: 'The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -530,7 +530,7 @@ zabbix_export:
           type: DEPENDENT
           key: aws.monthly.cost.discovery
           delay: '0'
-          description: 'Discovery monthly costs.'
+          description: 'Discovery of monthly costs.'
           item_prototypes:
             - uuid: aaf85a53d1804c858fc20189f0483bad
               name: 'AWS Cost: ["{#AWS.BILLING.MONTH}"]: Blended cost per month'
@@ -544,7 +544,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.monthy_costs.[?(@.month == "{#AWS.BILLING.MONTH}")].amount.first()'
+                    - '$.monthly_costs.[?(@.month == "{#AWS.BILLING.MONTH}")].amount.first()'
                   error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -575,7 +575,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.monthy_costs
+                - $.monthly_costs
       tags:
         - tag: class
           value: software
@@ -596,7 +596,7 @@ zabbix_export:
           value: us-east-1
           description: 'Amazon Billing region code.'
         - macro: '{$AWS.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'

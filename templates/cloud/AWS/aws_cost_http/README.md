@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS Cost Explorer by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS Cost Explorer by HTTP via Zabbix, which works without any external scripts.  
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the Cost Explorer API calls to list and retrieve metrics.
@@ -36,7 +36,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement": [
         {
             "Action": [
-                 "aws-portal:ViewBilling"
+                 "ce:*"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -47,7 +47,7 @@ Add the following required permissions to your Zabbix IAM policy in order to col
 
 Set macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}.
 
-For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
+For more information about managing access keys, see the [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
 Also, see the Macros section for a list of macros used in LLD filters.
 
@@ -60,7 +60,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
+|{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
@@ -72,25 +72,25 @@ Additional information about metrics and used API methods:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |AWS Cost: Get monthly costs||Script|aws.get.monthly.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|AWS Cost: Get daily costs|<p>Get raw data daily costs by service</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Cost: Get daily costs|<p>Get raw data on the daily costs by service</p>|Script|aws.get.daily.costs<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule AWS daily costs by services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS daily costs by services discovery|<p>Discovery daily blended costs by services.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
+|AWS daily costs by services discovery|<p>Discovery of daily blended costs by services.</p>|Dependent item|aws.daily.services.costs.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..Groups.first()`</p></li></ul>|
 
 ### Item prototypes for AWS daily costs by services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost|<p>The daily blended cost for the {#AWS.BILLING.SERVICE.NAME} service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|AWS Cost: Service ["{#AWS.BILLING.SERVICE.NAME}"]: Blended daily cost|<p>The daily blended cost of the {#AWS.BILLING.SERVICE.NAME} service for the previous day.</p>|Dependent item|aws.daily.service.cost["{#AWS.BILLING.SERVICE.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 
 ### LLD rule AWS monthly costs by services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS monthly costs by services discovery|<p>Discovery monthly cost by services.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthy_service_costs`</p></li></ul>|
+|AWS monthly costs by services discovery|<p>Discovery of monthly costs by services.</p>|Dependent item|aws.cost.service.monthly.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_service_costs`</p></li></ul>|
 
 ### Item prototypes for AWS monthly costs by services discovery
 
@@ -102,7 +102,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|AWS monthly costs discovery|<p>Discovery monthly costs.</p>|Dependent item|aws.monthly.cost.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthy_costs`</p></li></ul>|
+|AWS monthly costs discovery|<p>Discovery of monthly costs.</p>|Dependent item|aws.monthly.cost.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.monthly_costs`</p></li></ul>|
 
 ### Item prototypes for AWS monthly costs discovery
 
