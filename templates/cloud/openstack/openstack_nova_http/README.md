@@ -12,7 +12,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- OpenStack release Yoga and OpenStack built from sources (27568ea3):
+- OpenStack Yoga release and OpenStack built from sources (27568ea3):
 
   * Compute API v2.1
 
@@ -22,12 +22,12 @@ This template has been tested on:
 
 ## Setup
 
-This template is not meant to be used independently. A host with __OpenStack by HTTP__ template will discover __Nova__ service automatically and create host prototype with this template assigned to it.
+This template is not meant to be used independently. A host with the __OpenStack by HTTP__ template will discover the __Nova__ service automatically and create a host prototype with this template assigned to it.
 
-If needed, you can specify an HTTP proxy for the template to use by changing value of `{$OPENSTACK.NOVA.HTTP.PROXY}` user macro.
+If needed, you can specify an HTTP proxy for the template to use by changing the value of `{$OPENSTACK.NOVA.HTTP.PROXY}` user macro.
 
-For tenant usage statistics, a custom time period can be chosen for which the data will be queried. This can be set with `{$OPENSTACK.NOVA.TENANT.PERIOD}` macro value.
-Value can be one of the following:
+For tenant usage statistics, a custom time period can be chosen for which the data will be queried. This can be set with the `{$OPENSTACK.NOVA.TENANT.PERIOD}` macro value.
+The value can be one of the following:
 
 * `y` - current year until now;
 
@@ -37,16 +37,16 @@ Value can be one of the following:
 
 * `d` - current day until now;
 
-This template discovers servers (instances) present in project and monitors their statuses, but depending on different use-cases, it, most likely, is not necessary to monitor all servers.
+This template discovers servers (instances) present in the project and monitors their statuses, but, depending on different use cases, most likely it is not necessary to monitor all servers.
 To filter which servers to monitor, set the `{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}` and `{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}` macro values accordingly. This logic also applies to other low-level discovery rules.
 
-**OpenStack configuration.**
+**OpenStack configuration**
 
-For the OpenStack monitoring user to be able to access API resources used in this template, it is needed to configure policy file for OpenStack Nova.
+For the OpenStack monitoring user to be able to access the API resources used in this template, it is needed to configure the policy file for OpenStack Nova.
 
-On OpenStack server open `/etc/nova/policy.json` file in your favourite text editor.
+On the OpenStack server open the `/etc/nova/policy.json` file in your favourite text editor.
 
-In this file, assign following target resources to a role, which the monitoring user uses:
+In this file, assign the following target resources to the role that the monitoring user uses:
 ```
 {
   "os_compute_api:servers:index": "role:monitoring",
@@ -58,9 +58,9 @@ In this file, assign following target resources to a role, which the monitoring 
 }
 ```
 
-If some role is already assigned to target, it is possible to add another role with `or`, for example, `role:firstRole or role:monitoring`.
+If some role is already assigned to the target, it is possible to add another role with `or`, for example, `role:firstRole or role:monitoring`.
 
-Note that a restart of OpenStack Nova services might be needed, for these new changes to be applied.
+Note that a restart of OpenStack Nova services might be needed for these new changes to be applied.
 
 
 ### Macros used
@@ -104,10 +104,10 @@ Note that a restart of OpenStack Nova services might be needed, for these new ch
 |----|-----------|----|-----------------------|
 |Nova: Get absolute limits|<p>Gets absolute limits for the project.</p>|HTTP agent|openstack.nova.limits.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.limits.absolute`</p><p>⛔️Custom on fail: Set error to: `Could not get absolute project limits`</p></li></ul>|
 |Nova: Get servers|<p>Gets a list of servers.</p>|HTTP agent|openstack.nova.servers.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.servers`</p><p>⛔️Custom on fail: Set error to: `Could not get servers list`</p></li></ul>|
-|Nova: Get compute services|<p>Gets a list of compute services and it's data.</p>|HTTP agent|openstack.nova.services.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p><p>⛔️Custom on fail: Set error to: `Could not get compute services list`</p></li></ul>|
-|Nova: Get hypervisors|<p>Gets a list of hypervisors and it's data.</p>|HTTP agent|openstack.nova.hypervisors.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisors`</p><p>⛔️Custom on fail: Set error to: `Could not get hypervisors list`</p></li></ul>|
-|Nova: Get availability zones|<p>Gets a list of availability zones and it's data.</p>|HTTP agent|openstack.nova.availability_zone.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.availabilityZoneInfo`</p><p>⛔️Custom on fail: Set error to: `Could not get availability zones list`</p></li></ul>|
-|Nova: Get tenants|<p>Gets a list of tenants and it's data.</p>|Script|openstack.nova.tenant.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tenant_usages`</p><p>⛔️Custom on fail: Set error to: `Could not get tenant list`</p></li></ul>|
+|Nova: Get compute services|<p>Gets a list of compute services and its data.</p>|HTTP agent|openstack.nova.services.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.services`</p><p>⛔️Custom on fail: Set error to: `Could not get compute services list`</p></li></ul>|
+|Nova: Get hypervisors|<p>Gets a list of hypervisors and its data.</p>|HTTP agent|openstack.nova.hypervisors.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisors`</p><p>⛔️Custom on fail: Set error to: `Could not get hypervisors list`</p></li></ul>|
+|Nova: Get availability zones|<p>Gets a list of availability zones and its data.</p>|HTTP agent|openstack.nova.availability_zone.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.availabilityZoneInfo`</p><p>⛔️Custom on fail: Set error to: `Could not get availability zones list`</p></li></ul>|
+|Nova: Get tenants|<p>Gets a list of tenants and its data.</p>|Script|openstack.nova.tenant.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tenant_usages`</p><p>⛔️Custom on fail: Set error to: `Could not get tenant list`</p></li></ul>|
 |Nova: Instances count, current|<p>The number of servers in each tenant.</p>|Dependent item|openstack.nova.limits.instances.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalInstancesUsed`</p></li></ul>|
 |Nova: Instances count, max|<p>The number of allowed servers for each tenant.</p>|Dependent item|openstack.nova.limits.instances.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalInstances`</p></li></ul>|
 |Nova: Instances count, free|<p>The number of available servers for each tenant.</p>|Calculated|openstack.nova.limits.instances.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|

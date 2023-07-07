@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-06T06:21:20Z'
+  date: '2023-07-07T08:42:57Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -29,7 +29,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Gets a list of availability zones and it''s data.'
+          description: 'Gets a list of availability zones and its data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -53,7 +53,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Gets a list of hypervisors and it''s data.'
+          description: 'Gets a list of hypervisors and its data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -275,7 +275,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'Gets a list of compute services and it''s data.'
+          description: 'Gets a list of compute services and its data.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -391,7 +391,7 @@ zabbix_export:
                 period = params.period;
             
             return getHttpData(buildUrl(url, period), params, token);
-          description: 'Gets a list of tenants and it''s data.'
+          description: 'Gets a list of tenants and its data.'
           preprocessing:
             - type: JSONPATH
               parameters:

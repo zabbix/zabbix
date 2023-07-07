@@ -12,7 +12,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- OpenStack release Yoga and OpenStack built from sources (27568ea3):
+- OpenStack Yoga release and OpenStack built from sources (27568ea3):
 
   * Identity API v3
   * Compute API v2.1 (for OpenStack Nova by HTTP template)
@@ -23,17 +23,17 @@ This template has been tested on:
 
 ## Setup
 
-This is a master template which needs to be assigned to a host and it will discover all OpenStack services supported by Zabbix automatically.
+This is a master template that needs to be assigned to a host and it will discover all OpenStack services supported by Zabbix automatically.
 
-Before using this template, it is recommended to create a separate monitoring user on OpenStack which will have access to specific API resources. Zabbix uses OpenStack application credentials for authorization, as it is a more secure method than a username and password based authentication.
+Before using this template it is recommended to create a separate monitoring user on OpenStack that will have access to specific API resources. Zabbix uses OpenStack application credentials for authorization, as it is a more secure method than a username and password-based authentication.
 
-Below are instructions and examples on how to setup user on OpenStack that will be used by Zabbix. Examples use OpenStack CLI (commandline interface) tool, but this can also be done from OpenStack Horizon (web interface).
+Below are instructions and examples on how to set up a user on OpenStack that will be used by Zabbix. Examples use the OpenStack CLI (commandline interface) tool, but this can also be done from OpenStack Horizon (web interface).
 
-> **If using CLI tool, make sure you have OpenStack RC file for your project with user that has rights to create other users, roles, etc. and source it** , for example, `. zabbix-admin-openrc.sh`.
+> **If using the CLI tool, make sure you have the OpenStack RC file for your project with a user that has rights to create other users, roles, etc. and source it** , for example, `. zabbix-admin-openrc.sh`.
 >
-> OpenStack RC file can be obtained from Horizon.
+> The OpenStack RC file can be obtained from Horizon.
 
-It is assumed, that a project which needs to be monitored is already present in OpenStack. In the following examples, a project named `zabbix` is used:
+It is assumed that a project, which needs to be monitored, is already present in OpenStack. In the following examples a project named `zabbix` is used:
 
 ```
 # openstack project list
@@ -46,7 +46,7 @@ It is assumed, that a project which needs to be monitored is already present in 
 +----------------------------------+--------------------+
 ```
 
-1. After project name is noted, a monitoring user needs to be created. This can be done by executing `openstack user create` command:
+1. After the project name is noted, a monitoring user needs to be created. This can be done by executing an `openstack user create` command:
 
 ```
 # openstack user create --project zabbix --password-prompt zabbix-monitoring
@@ -65,7 +65,7 @@ Repeat User Password:
 +---------------------+----------------------------------+
 ```
 
-2. When monitoring user is created, it needs to be added to a role. But first, a monitoring specific role needs to be created:
+2. When the monitoring user is created, it needs to be added to a role. But first, a monitoring-specific role needs to be created:
 
 ```
 # openstack role create --description "A role for Zabbix monitoring user" monitoring
@@ -80,7 +80,7 @@ Repeat User Password:
 +-------------+-----------------------------------+
 ```
 
-3. Then assign this newly created role to monitoring user created in 1st step:
+3. Then assign this newly created role to the monitoring user created in Step 1:
 ```
 # openstack role add --user zabbix-monitoring --project zabbix monitoring
 ```
@@ -96,7 +96,7 @@ Repeat User Password:
 +------------+---------------------------+-------+----------------+--------+--------+-----------+
 ```
 
-5. Get OpenStack RC file for the monitoring user in this project, source it and generate application credentials:
+5. Get the OpenStack RC file for the monitoring user in this project, source it and generate application credentials:
 ```
 # openstack application credential create --description "Application credential for Zabbix monitoring" zabbix-app-cred
   +--------------+----------------------------------------------------------------------------------------+
@@ -115,7 +115,7 @@ Repeat User Password:
   +--------------+----------------------------------------------------------------------------------------+
 ```
 
-While creating application credential, it is also possible to define __access rules__ using `--access-rules` flag, which offers even more fine-grained access to various API endpoints.
+While creating the application credential, it is also possible to define __access rules__ using the `--access-rules` flag, which offers even more fine-grained access to various API endpoints.
 This is optional and up to the user to decide if such rules are needed.
 
 Once the application credential is created, the values of `id` and `secret` need to be set as user macro values in Zabbix:
@@ -124,7 +124,7 @@ Once the application credential is created, the values of `id` and `secret` need
 * value of `secret` in `{$APP.CRED.SECRET}` user macro.
 
 
-At this point monitoring user will not be able to access any resources on OpenStack, therefore some access rights need to be defined.
+At this point the monitoring user will not be able to access any resources on OpenStack, therefore some access rights need to be defined.
 Access rights are set using policies. Each service has its own policy file, therefore **further steps for setting up policies, are mentioned in the template documentation of each supported service**, e.g., __OpenStack Nova by HTTP__.
 
 
@@ -148,7 +148,7 @@ Access rights are set using policies. Each service has its own policy file, ther
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|OpenStack: Nova discovery|<p>Discovers OpenStack services from monitoring user's services catalog.</p>|Dependent item|openstack.services.nova.discovery|
+|OpenStack: Nova discovery|<p>Discovers OpenStack services from the monitoring user's services catalog.</p>|Dependent item|openstack.services.nova.discovery|
 
 ## Feedback
 

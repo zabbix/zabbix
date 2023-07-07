@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-06T06:21:12Z'
+  date: '2023-07-07T08:42:46Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -170,7 +170,7 @@ zabbix_export:
               - macro: '{#SERVICE_NAME}'
                 value: ^Nova$
                 formulaid: A
-          description: 'Discovers OpenStack services from monitoring user''s services catalog.'
+          description: 'Discovers OpenStack services from the monitoring user''s services catalog.'
           host_prototypes:
             - uuid: 580d769292ec48379c5b84cd5c72533b
               host: 'OpenStack {#SERVICE_NAME}'
