@@ -98,11 +98,7 @@ class CDashboardHelper {
 				$widget = APP::ModuleManager()->getModule($widget_data['type']);
 
 				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$widget_fields = self::constructWidgetFields($widget_data['fields']);
-					$widget_fields = self::constructWidgetFieldsFromDottedNames($widget_fields);
-					$widget_fields = self::constructWidgetFieldsFromArrayNames($widget_fields);
-
-					$widget_form = $widget->getForm($widget_fields, $templateid);
+					$widget_form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
 					$widget_form->validate();
 
 					$prepared_widget['fields'] = $widget_form->getFieldsValues();
