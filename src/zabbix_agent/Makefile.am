@@ -32,6 +32,7 @@ zabbix_agentd_LDADD = \
 	active_checks/libzbxactive_checks.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
