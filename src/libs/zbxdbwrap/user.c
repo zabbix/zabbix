@@ -39,7 +39,7 @@ zbx_group_status_type_t;
  * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_user_perm2system(zbx_uint64_t userid)
+int	zbx_db_check_user_perm2system(zbx_uint64_t userid)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
