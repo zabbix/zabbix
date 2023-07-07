@@ -1498,10 +1498,10 @@ zabbix_export:
                   value: '{#POD}'
               trigger_prototypes:
                 - uuid: 8f1808cd67614cda959ec70e92a59235
-                  expression: '(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2'
+                  expression: '(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],15m))>1'
                   name: 'Node [{#NODE}] Pod [{#POD}]: Pod is crash looping'
                   priority: WARNING
-                  description: 'Pos restarts more than 2 times in the last 3 minutes.'
+                  description: 'Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.'
                   tags:
                     - tag: scope
                       value: availability
