@@ -21,7 +21,7 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for discovery rules
+ * Test suite for autoregistration
  *
  * @required-components server, agent
  * @configurationDataProvider agentConfigurationProvider
@@ -83,15 +83,9 @@ class testAutoregistration extends CIntegrationTest {
 	 */
 	public function agentConfigurationProvider() {
 		return [
-			// self::COMPONENT_SERVER => [
-			// 	'UnreachablePeriod' => 5,
-			// 	'UnavailableDelay' => 5,
-			// 	'UnreachableDelay' => 1,
-			// 	'DebugLevel' => 4
-			// ],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
-				'ServerActive' => '127.0.0.1',
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'HostMetadata' => self::$HOST_METADATA
 			]
 		];
@@ -121,9 +115,14 @@ class testAutoregistration extends CIntegrationTest {
 			'filter' => [
 				'conditions' => [
 					[
+						'conditiontype' => CONDITION_TYPE_HOST_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::COMPONENT_AGENT
+					],
+					[
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
-						'value' => strval(self::HOST_METADATA1)
+						'value' => self::HOST_METADATA1
 					],
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -170,6 +169,11 @@ class testAutoregistration extends CIntegrationTest {
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
 				'conditions' => [
+					[
+						'conditiontype' => CONDITION_TYPE_HOST_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::COMPONENT_AGENT
+					],
 					[
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
