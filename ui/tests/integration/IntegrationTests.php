@@ -45,6 +45,7 @@ require_once dirname(__FILE__).'/testTriggerState.php';
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
 require_once dirname(__FILE__).'/testDiscoveryRules.php';
+require_once dirname(__FILE__).'/testAutoregistration.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -56,6 +57,7 @@ class IntegrationTests {
 			$suite->addTestSuite('testTimescaleDb');
 		}
 		$suite->addTestSuite('testDiscoveryRules');
+		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testDataCollection');
 		$suite->addTestSuite('testBinaryValueTypeDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
