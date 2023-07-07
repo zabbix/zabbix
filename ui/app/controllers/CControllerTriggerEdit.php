@@ -29,6 +29,7 @@ class CControllerTriggerEdit extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
 	protected function checkInput(): bool {
@@ -135,6 +136,10 @@ class CControllerTriggerEdit extends CController {
 			$data['limited'] = ($data['templateid'] != 0);
 			$data['expression_full'] = $data['expression'];
 			$data['recovery_expression_full'] = $data['recovery_expression'];
+
+			if ($data['hostid'] == 0) {
+				$data['hostid'] = $data['hosts'][0]['hostid'];
+			}
 		}
 
 		$response = new CControllerResponseData($data);

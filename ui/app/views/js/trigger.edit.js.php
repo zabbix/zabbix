@@ -46,6 +46,9 @@
 			if (this.db_dependencies) {
 				this.#loadDependencyTable(this.db_dependencies);
 			}
+
+			// Form fields should be collected after dependency table is loaded.
+			this.initial_form_fields = getFormFields(this.form);
 		}
 
 		#initActions() {
@@ -130,6 +133,9 @@
 				}
 				else if (e.target.classList.contains('js-check-recovery-target')) {
 					check_target(e.target, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
+				}
+				else if (e.target.classList.contains('js-related-trigger-edit')) {
+					this.#openRelatedTrigger(e.target.dataset);
 				}
 			});
 		}
@@ -468,6 +474,58 @@
 			}
 		}
 
+		#openRelatedTrigger(data) {
+			const form_fields = getFormFields(this.form);
+			const diff = JSON.stringify(this.initial_form_fields) === JSON.stringify(form_fields);
+
+			if (!diff) {
+				if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+					return;
+				}
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.edit');
+
+			const fields = {
+				triggerid: data.triggerid,
+				hostid: data.hostid,
+				context: data.context
+			}
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+
+					response.buttons.push({
+						'title': t('Cancel'),
+						'class': 'btn-alt js-cancel',
+						'cancel': true,
+						'action': function() {}
+					});
+
+					const new_data = {
+						content: response.body,
+						buttons: response.buttons,
+						title: response.header,
+						script_inline: response.script_inline
+					};
+
+					this.overlay.setProperties(new_data);
+				})
+				.catch(this.ajaxExceptionHandler)
+				.finally(() => {
+					this.overlay.unsetLoading();
+				});
+		}
+
 		#post(url, data) {
 			fetch(url, {
 				method: 'POST',
@@ -526,6 +584,13 @@
 
 		clone({title, buttons}) {
 			this.triggerid = null;
+
+			const fields = this.form.querySelectorAll("input[readonly], input[disabled], textarea[readonly]");
+
+			fields.forEach((field) => {
+				field.removeAttribute("readonly");
+				field.removeAttribute("disabled");
+			})
 
 			this.overlay.setProperties({title, buttons});
 			this.overlay.unsetLoading();

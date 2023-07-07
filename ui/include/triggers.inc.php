@@ -2200,7 +2200,8 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('triggers.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.list')
 					->setArgument('filter_hostids', [$template['hostid']])
 					->setArgument('filter_set', 1)
 					->setArgument('context', 'template');
@@ -2258,17 +2259,21 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
 						->setArgument('context', 'template');
+
+					$attribute_name = 'data-parent_discoveryid';
+					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
-					$url = (new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('hostid', $template['hostid'])
-						->setArgument('context', 'template');
+					$attribute_name = 'data-hostid';
+					$attribute_value = $template['hostid'];
 				}
 
-				$name = new CLink($template['name'], $url);
+				$name = (new CLink($template['name']))
+					->addClass('js-related-trigger-edit')
+					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
+					->setAttribute('data-context', 'template')
+					->setAttribute($attribute_name, $attribute_value);
 			}
 			else {
 				$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);

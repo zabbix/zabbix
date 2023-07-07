@@ -62,17 +62,19 @@ if ($readonly) {
 
 // Create form list.
 $trigger_form_grid = new CFormGrid();
-if (!empty($data['templates'])) {
+if ($data['templates']) {
 	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
 }
 
 if ($discovered_trigger) {
-	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CLink($data['discoveryRule']['name'],
-		(new CUrl('trigger_prototypes.php'))
-			->setArgument('form', 'update')
-			->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-			->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
-			->setArgument('context', $data['context'])
+	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
+		new CLink($data['discoveryRule']['name'],
+			(new CUrl('trigger_prototypes.php'))
+				->setArgument('form', 'update')
+				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
+				->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
+				->setArgument('context', $data['context'])
+		)
 	)]);
 }
 
@@ -384,11 +386,11 @@ $dependencies_table = (new CTable())
 
 $dependency_template_default = (new CTemplateTag('dependency-row-tmpl'))->addItem(
 	(new CRow([
-		(new CLink(['#{description}'],
-			(new CUrl('zabbix.php'))
-				->setArgument('triggerid', '#{triggerid}')
-				->setArgument('context', $data['context'])
-		)),
+		(new CLink(['#{description}']))
+			->addClass('js-related-trigger-edit')
+			->setAttribute('data-triggerid', '#{triggerid}')
+			->setAttribute('data-hostid', $data['hostid'])
+			->setAttribute('data-context', $data['context']),
 		(new CButtonLink(_('Remove')))
 			->addClass('js-remove-dependency')
 			->setAttribute('data-triggerid', '#{triggerid}'),
