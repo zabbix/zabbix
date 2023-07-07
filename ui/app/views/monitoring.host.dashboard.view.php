@@ -93,12 +93,14 @@ $html_page = (new CHtmlPage())
 			? (new CList())
 				->addClass(ZBX_STYLE_DASHBOARD_KIOSKMODE_CONTROLS)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_LEFT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_PREVIOUS_PAGE)
 						->setTitle(_('Previous page'))
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_PAUSE)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_TOGGLE_SLIDESHOW)
 						->setTitle(($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 							? _s('Stop slideshow')
@@ -111,7 +113,8 @@ $html_page = (new CHtmlPage())
 						)
 				)
 				->addItem(
-					(new CSimpleButton(null))
+					(new CSimpleButton())
+						->addClass(ZBX_ICON_CHEVRON_RIGHT)
 						->addClass(ZBX_STYLE_BTN_DASHBOARD_KIOSKMODE_NEXT_PAGE)
 						->setTitle(_('Next page'))
 				)
@@ -157,20 +160,18 @@ if (count($data['dashboard']['pages']) > 1
 					(new CDiv())
 						->addClass(ZBX_STYLE_DASHBOARD_NAVIGATION_CONTROLS)
 						->addItem([
-							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_PREVIOUS_PAGE)
-								->addClass('btn-iterator-page-previous')
+							(new CButtonIcon(ZBX_ICON_CHEVRON_LEFT, _('Previous page')))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_PREVIOUS_PAGE)
 								->setEnabled(false),
-							(new CSimpleButton())
-								->addClass(ZBX_STYLE_DASHBOARD_NEXT_PAGE)
-								->addClass('btn-iterator-page-next')
+							(new CButtonIcon(ZBX_ICON_CHEVRON_RIGHT, _('Next page')))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_NEXT_PAGE)
 								->setEnabled(false),
 							(new CSimpleButton([
 								(new CSpan(_s('Start slideshow')))->addClass('slideshow-state-stopped'),
 								(new CSpan(_s('Stop slideshow')))->addClass('slideshow-state-started')
 							]))
+								->addClass(ZBX_STYLE_BTN_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(ZBX_STYLE_BTN_ALT)
-								->addClass(ZBX_STYLE_DASHBOARD_TOGGLE_SLIDESHOW)
 								->addClass(
 									($data['dashboard']['dashboardid'] !== null && $data['dashboard']['auto_start'] == 1)
 										? 'slideshow-state-started'

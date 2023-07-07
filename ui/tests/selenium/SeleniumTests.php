@@ -196,6 +196,7 @@ require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 
 // Tags.
+require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHostPrototype.php';
 require_once dirname(__FILE__).'/tags/testFormTagsServices.php';
@@ -219,7 +220,7 @@ require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
-require_once dirname(__FILE__).'/testPageWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
@@ -271,11 +272,11 @@ require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
-require_once dirname(__FILE__).'/testFormWeb.php';
-require_once dirname(__FILE__).'/testFormWebStep.php';
+require_once dirname(__FILE__).'/webScenarios/testFormWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testFormWebStep.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/testInheritanceWeb.php';
+require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
@@ -466,6 +467,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageServicesSlaReport');
 
 		// Tags.
+		$suite->addTestSuite('testFormTagsConnectors');
 		$suite->addTestSuite('testFormTagsHost');
 		$suite->addTestSuite('testFormTagsHostPrototype');
 		$suite->addTestSuite('testFormTagsServices');
@@ -515,7 +517,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
-		$suite->addTestSuite('testPageWeb');
+		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');

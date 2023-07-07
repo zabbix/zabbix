@@ -409,6 +409,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
 		$this->zbxTestCheckHeader('Problems');
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$form = $this->query('id:tabfilter_0')->asForm()->one();
 		$this->zbxTestClickButtonText('Reset');
 		$form->waitUntilReloaded();
@@ -447,7 +448,7 @@ class testPageProblems extends CLegacyWebTest {
 
 		// Apply filter and check result
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');
@@ -495,7 +496,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
 
 		// Check Show tags 3
 		$this->zbxTestClickXpath('//label[@for="show_tags_30"]');
@@ -508,7 +509,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
 	}
 
 	public function getTagPriorityData() {
@@ -683,7 +684,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 
 		// Click on suppression icon and check text in hintbox.
-		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/button[@class="icon-action-suppress"]');
+		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/button['.CXPathHelper::fromClass('zi-eye-off').']');
 		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 Maintenance: Maintenance for suppression test');
 	}
 }

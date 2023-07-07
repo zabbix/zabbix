@@ -21,7 +21,6 @@
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
-#include "log.h"
 #include "zbxdb.h"
 #include "zbxcacheconfig.h"
 

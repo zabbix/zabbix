@@ -90,7 +90,7 @@ class testFormUserPermissions extends CWebTest {
 		return [
 			[
 				[
-					'expected' => TEST_GOOD,
+					'expected' => TEST_BAD,
 					'user_name' => 'http-auth-admin',
 					'new_role' => ''
 				]

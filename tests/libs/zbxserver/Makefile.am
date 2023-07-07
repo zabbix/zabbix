@@ -38,17 +38,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
-	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
-	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
-	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
-	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
@@ -63,13 +54,11 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
-	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
-	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
 	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
 	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
@@ -101,11 +90,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
-	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
-	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
@@ -118,6 +103,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
 

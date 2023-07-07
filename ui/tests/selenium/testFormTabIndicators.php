@@ -411,7 +411,7 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
-					'form' => 'name:httpForm',
+					'form' => 'name:webscenario_form',
 					'tabs' => [
 						[
 							'name' => 'Steps',
@@ -518,7 +518,8 @@ class testFormTabIndicators extends CWebTest {
 			// Media type configuration form tab data.
 			[
 				[
-					'url' => 'zabbix.php?action=mediatype.edit',
+					'url' => 'zabbix.php?action=mediatype.list',
+					'create_button' => 'Create media type',
 					'form' => 'id:media-type-form',
 					'tabs' => [
 						[
@@ -664,7 +665,7 @@ class testFormTabIndicators extends CWebTest {
 
 		// Open widget configuration form if indicator check is performed on dachboard.
 		if ($data['url'] === 'zabbix.php?action=dashboard.view') {
-			$this->query('class:btn-widget-edit')->one()->click();
+			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
 			$form->getField('Type')->fill('Graph');
@@ -673,6 +674,9 @@ class testFormTabIndicators extends CWebTest {
 		elseif (CTestArrayHelper::get($data, 'create_button')) {
 			$this->query('button', $data['create_button'])->one()->click();
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		}
+		elseif ($data['form'] === 'name:triggersForm') {
+			$form = $this->query($data['form'])->asForm(['normalized' => true])->one()->waitUntilVisible();
 		}
 		else {
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
@@ -929,14 +933,14 @@ class testFormTabIndicators extends CWebTest {
 					}
 				}
 				else {
-					foreach($tab['entries'] as $entry) {
+					foreach ($tab['entries'] as $entry) {
 						if (array_key_exists('table_selector', $tab)) {
 							$form->query($tab['table_selector'])->query('button:Add')->one()->click();
 						}
 						else {
 							$form->getFieldContainer($tab['name'])->query('button:Add')->one()->click();
 						}
-						$overlay = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+						$overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady()->asForm();
 						if (array_key_exists('selector', $entry)) {
 							$overlay->query($entry['selector'])->one()->detect()->fill($entry['value']);
 						}
@@ -947,7 +951,10 @@ class testFormTabIndicators extends CWebTest {
 							}
 						}
 						$overlay->submit();
+						$overlay->waitUntilNotVisible();
+					}
 
+					if (CTestArrayHelper::get($tab, 'name') !== 'Message templates') {
 						COverlayDialogElement::ensureNotPresent();
 					}
 				}
@@ -957,7 +964,7 @@ class testFormTabIndicators extends CWebTest {
 				if ($action === USER_ACTION_REMOVE) {
 					// In graph widget form the 1st row is covered by header with tabs if scroll is not in top position.
 					COverlayDialogElement::find()->one()->scrollToTop();
-					$form->query('class:btn-remove')->all()->click();
+					$form->query('class:js-remove')->all()->click();
 				}
 				else {
 					for ($i = 0; $i < $tab['new_entries']; $i++) {

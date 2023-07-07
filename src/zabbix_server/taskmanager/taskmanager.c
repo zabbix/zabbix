@@ -23,7 +23,7 @@
 #include "../events/events.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "../actions.h"
@@ -40,7 +40,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxdbwrap.h"
-#include "zbxserver.h"
+#include "zbxevent.h"
 
 #define ZBX_TM_PROCESS_PERIOD		5
 #define ZBX_TM_CLEANUP_PERIOD		SEC_PER_HOUR

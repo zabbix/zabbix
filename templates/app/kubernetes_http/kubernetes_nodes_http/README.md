@@ -14,7 +14,7 @@ For example:
  -  ## Enables use of **Zabbix proxy**
     enabled: false
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -36,13 +36,13 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/7.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
 Install the [Zabbix Helm Chart](https://git.zabbix.com/projects/ZT/repos/kubernetes-helm/browse?at=refs%2Fheads%2Frelease%2F7.0) in your Kubernetes cluster.
 
-Set the `{$KUBE.API.ENDPOINT.URL}` such as `<scheme>://<host>:<port>`.
+Set the `{$KUBE.API.URL}` such as `<scheme>://<host>:<port>`.
 
 Get the generated service account token using the command
 
@@ -90,7 +90,7 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$KUBE.API.ENDPOINT.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://localhost:6443`|
+|{$KUBE.API.URL}|<p>Kubernetes API endpoint URL in the format <scheme>://<host>:<port></p>|`https://kubernetes.default.svc.cluster.local:443`|
 |{$KUBE.API.TOKEN}|<p>Service account bearer token.</p>||
 |{$KUBE.HTTP.PROXY}|<p>Sets the HTTP proxy to `http_proxy` value. If this parameter is empty, then no proxy is used.</p>||
 |{$KUBE.NODES.ENDPOINT.NAME}|<p>Kubernetes nodes endpoint name. See "kubectl -n monitoring get ep".</p>|`zabbix-zabbix-helm-chrt-agent`|
@@ -200,7 +200,7 @@ See the Kubernetes documentation for details about labels and annotations:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Node [{#NODE}] Pod [{#POD}]: Pod is crash looping|<p>Pos restarts more than 2 times in the last 3 minutes.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],3m))>2`|Warning||
+|Node [{#NODE}] Pod [{#POD}]: Pod is crash looping|<p>Containers of the pod keep restarting. This most likely indicates that the pod is in the CrashLoopBackOff state.</p>|`(last(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}])-min(/Kubernetes nodes by HTTP/kube.pod.containers.restartcount[{#POD}],15m))>1`|Warning||
 |Node [{#NODE}] Pod [{#POD}] Status: Kubernetes Pod not healthy|<p>Pod has been in a non-ready state for longer than 10 minutes.</p>|`count(/Kubernetes nodes by HTTP/kube.pod.status.phase[{#POD}],10m, "regexp","^(1\|4\|5)$")>=9`|High||
 
 ## Feedback

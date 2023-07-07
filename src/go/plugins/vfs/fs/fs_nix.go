@@ -55,7 +55,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 			continue
 		}
 
-		fsmap[*info.FsName] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
+		fsmap[*info.FsName+*info.FsType] = &FsInfoNew{info.FsName, info.FsType, nil, nil, bytes, inodes, info.FsOptions}
 	}
 
 	allData, err = p.getFsInfo()
@@ -64,7 +64,7 @@ func (p *Plugin) getFsInfoStats() (data []*FsInfoNew, err error) {
 	}
 
 	for _, info := range allData {
-		if fsInfo, ok := fsmap[*info.FsName]; ok {
+		if fsInfo, ok := fsmap[*info.FsName+*info.FsType]; ok {
 			data = append(data, fsInfo)
 		}
 	}
@@ -123,7 +123,7 @@ func getFsStats(path string) (stats *FsStats, err error) {
 	total := fs.Blocks * uint64(fs.Bsize)
 	free := available * uint64(fs.Bsize)
 	used := (fs.Blocks - fs.Bfree) * uint64(fs.Bsize)
-	pfree := float64(fs.Blocks-fs.Bfree+fs.Bavail)
+	pfree := float64(fs.Blocks - fs.Bfree + fs.Bavail)
 
 	if pfree > 0 {
 		pfree = 100.00 * float64(available) / pfree

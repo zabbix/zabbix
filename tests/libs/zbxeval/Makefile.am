@@ -18,7 +18,10 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
+	$(top_srcdir)/src/libs/zbxthreads/libzbxthreads.a \
 	$(top_srcdir)/src/zabbix_server/alerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
@@ -91,6 +94,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_srcdir)/src/zabbix_server/libzbxserver.a \
+	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
 	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
 	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
@@ -111,9 +115,8 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
-	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS) $(TLS_CFLAGS)

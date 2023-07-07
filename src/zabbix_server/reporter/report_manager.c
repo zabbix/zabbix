@@ -30,6 +30,7 @@
 #include "report_protocol.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
+#include "zbxlog.h"
 
 #define ZBX_REPORT_STATUS_ENABLED	0
 #define ZBX_REPORT_STATUS_DISABLED	1
