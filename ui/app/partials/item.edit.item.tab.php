@@ -73,6 +73,7 @@ $formgrid = (new CFormGrid())
 					(new CSimpleButton(_('Select')))
 						->addClass('js-select-key')
 						->addClass(ZBX_STYLE_BTN_GREY)
+						->setEnabled(in_array($data['form']['type'], $data['type_with_key_select']))
 			]
 		]))
 	])

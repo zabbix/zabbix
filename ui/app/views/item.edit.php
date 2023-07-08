@@ -109,6 +109,10 @@ $value_types = [
 	ITEM_VALUE_TYPE_TEXT => _('Text'),
 	ITEM_VALUE_TYPE_BINARY => _('Binary')
 ];
+$type_with_key_select = [
+	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,
+	ITEM_TYPE_SNMPTRAP, ITEM_TYPE_JMX, ITEM_TYPE_IPMI
+];
 $tabs = (new CTabView())
 	->addTab('item-tab', _('Item'),
 		new CPartial('item.edit.item.tab', [
@@ -125,7 +129,8 @@ $tabs = (new CTabView())
 			'readonly' => $data['readonly'],
 			'types' => $data['types'],
 			'valuemap' => $data['valuemap'],
-			'value_types' => $value_types
+			'value_types' => $value_types,
+			'type_with_key_select' => $type_with_key_select
 		])
 	)
 	->addTab('tags-tab', _('Tags'),
@@ -165,6 +170,7 @@ $output = [
 		'value_type_keys' => $data['value_type_keys'],
 		'optional_interfaces' => $data['optional_interfaces'],
 		'testable_item_types' => $data['testable_item_types'],
+		'type_with_key_select' => $type_with_key_select
 	])
 ];
 

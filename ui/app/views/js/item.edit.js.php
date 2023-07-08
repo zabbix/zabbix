@@ -32,10 +32,11 @@ const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 
 (new class {
-	init({testable_item_types, optional_interfaces, field_switches, value_type_keys}) {
+	init({testable_item_types, optional_interfaces, field_switches, value_type_keys, type_with_key_select}) {
 		this.testable_item_types = testable_item_types;
 		this.optional_interfaces = optional_interfaces;
 		this.value_type_keys = value_type_keys;
+		this.type_with_key_select = type_with_key_select;
 
 		this.overlay = overlays_stack.end();
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -157,6 +158,9 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 
 		this.updateActionButtons();
 		this.#updateValueTypeHintVisibility();
+		this.field.key_button.toggleAttribute('disabled',
+			this.type_with_key_select.indexOf(parseInt(this.field.type.value, 10)) == -1
+		);
 	}
 
 	#updateValueTypeHintVisibility() {
@@ -197,13 +201,13 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
-		this.#updateValueTypeHintVisibility();
+		this.updateFieldsVisibility();
 	}
 
 	#valueTypeChangeHandler(e) {
 		this.field.value_type.value = e.target.value;
 		this.field.value_type_steps.value = e.target.value;
-		this.#updateValueTypeHintVisibility();
+		this.updateFieldsVisibility();
 	}
 
 	#keyChangeHandler(e) {
@@ -242,7 +246,8 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 	'field_switches' => $data['field_switches'],
 	'value_type_keys' => $data['value_type_keys'],
 	'optional_interfaces' => $data['optional_interfaces'],
-	'testable_item_types' => $data['testable_item_types']
+	'testable_item_types' => $data['testable_item_types'],
+	'type_with_key_select' => $data['type_with_key_select']
 ]) ?>);
 
 // function updateItemFormElements(){}// common.item.edit.js.php TODO: remove when prototype will be moved to popup
