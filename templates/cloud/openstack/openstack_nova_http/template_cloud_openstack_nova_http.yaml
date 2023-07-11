@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-07T13:30:57Z'
+  date: '2023-07-11T13:09:00Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -11,7 +11,7 @@ zabbix_export:
       description: |
         Discovers and monitors project limits, servers, services, hypervisors, availability zones, hypervisors and tenants with OpenStack Compute API by HTTP using script and HTTP agent items.
         
-        This template receives token and service URL from parent host, therefore no additional configuration is not necessary.
+        This template receives token and service URL from parent host, therefore no additional configuration is necessary.
         
         Read the template documentation prior to using this template.
         
@@ -99,7 +99,7 @@ zabbix_export:
           key: openstack.nova.limits.instances.current
           delay: '0'
           history: 7d
-          description: 'The number of servers in each tenant.'
+          description: 'Number of servers in each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -116,7 +116,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: 7d
           params: last(//openstack.nova.limits.instances.max)-last(//openstack.nova.limits.instances.current)
-          description: 'The number of available servers for each tenant.'
+          description: 'Number of available servers for each tenant.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -130,7 +130,7 @@ zabbix_export:
           key: openstack.nova.limits.instances.max
           delay: '0'
           history: 7d
-          description: 'The number of allowed servers for each tenant.'
+          description: 'Number of allowed servers for each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -147,7 +147,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: b
-          description: 'The amount of used server RAM.'
+          description: 'Amount of used server RAM.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -168,7 +168,7 @@ zabbix_export:
           history: 7d
           units: b
           params: last(//openstack.nova.limits.ram.max)-last(//openstack.nova.limits.ram.current)
-          description: 'The amount of available server RAM.'
+          description: 'Amount of available server RAM.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -183,7 +183,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           units: b
-          description: 'The amount of allowed server RAM.'
+          description: 'Amount of allowed server RAM.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -202,7 +202,7 @@ zabbix_export:
           key: openstack.nova.limits.vcpu.current
           delay: '0'
           history: 7d
-          description: 'The number of used server cores in each tenant.'
+          description: 'Number of used server cores in each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -219,7 +219,7 @@ zabbix_export:
           delay: '{$OPENSTACK.NOVA.INTERVAL.LIMITS}'
           history: 7d
           params: last(//openstack.nova.limits.vcpu.max)-last(//openstack.nova.limits.vcpu.current)
-          description: 'The number of available server cores for each tenant.'
+          description: 'Number of available server cores for each tenant.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -233,7 +233,7 @@ zabbix_export:
           key: openstack.nova.limits.vcpu.max
           delay: '0'
           history: 7d
-          description: 'The number of allowed server cores for each tenant.'
+          description: 'Number of allowed server cores for each tenant.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -300,7 +300,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            // Script for getting tenant usage statistics in a specific time period until now (year, month, week, day).
+            // Script for getting tenant usage statistics for a specific time period until now (year, month, week, day).
             
             const request_path = '/os-simple-tenant-usage';
             
@@ -312,7 +312,7 @@ zabbix_export:
                     if (field === 'period') {
                         const supported_values = ['y', 'm', 'w', 'd']
                         if (supported_values.indexOf(params[field]) === -1) {
-                            throw 'Tenant period not correctly set. Expected one of "y", "m", "w", "d"; Received: ' + field + '.';
+                            throw 'Tenant period not correctly set. Expected one of "y", "m", "w", "d"; received: ' + field + '.';
                         }
                     }
                 });
@@ -323,21 +323,21 @@ zabbix_export:
                 const current_date = new Date();
                 var datetime_formatted = ''
                 switch (period) {
-                    case 'y':                                       // if user selected period is this year
+                    case 'y':                                       // if user-selected period is this year
                         datetime_formatted =
                             current_date.getFullYear() + '-' +      // year
                             '1-' +                                  // month
                             '1T' +                                  // date
                             '00:00:00'                              // time
                         break;
-                    case 'm':                                       // if user selected period is this month
+                    case 'm':                                       // if user-selected period is this month
                         datetime_formatted =
                         current_date.getFullYear() + '-' +          // year
                             (current_date.getMonth() + 1) + '-' +   // month
                         '1T' +                                      // date
                         '00:00:00'                                  // time
                         break;
-                    case 'w':                                       // if user selected period is this week
+                    case 'w':                                       // if user-selected period is this week
                         const first_date_of_week = current_date.getDate() - current_date.getDay() + 1
                         datetime_formatted =
                             current_date.getFullYear() + '-' +      // year
@@ -345,7 +345,7 @@ zabbix_export:
                             first_date_of_week + 'T' +              // date
                             '00:00:00'                              // time
                         break;
-                    case 'd':                                       // if user selected period is this day
+                    case 'd':                                       // if user-selected period is this day
                         datetime_formatted =
                             current_date.getFullYear() + '-' +      // year
                             (current_date.getMonth() + 1) + '-' +   // month
@@ -436,7 +436,7 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.host_count[{#ZONE_NAME}]'
               delay: '0'
               history: 7d
-              description: 'The count of hosts and service objects under single availability zone.'
+              description: 'Count of hosts and service objects under single availability zone.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -461,7 +461,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of the availability zone.'
+              description: 'Raw data of the availability zone.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -479,7 +479,7 @@ zabbix_export:
               key: 'openstack.nova.availability_zone.state[{#ZONE_NAME}]'
               delay: '0'
               history: 7d
-              description: 'The current state of the availability zone.'
+              description: 'Current state of the availability zone.'
               valuemap:
                 name: 'Availability zone state'
               preprocessing:
@@ -561,7 +561,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of the hypervisor.'
+              description: 'Raw data of the hypervisor.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -579,7 +579,7 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.state[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'The state of the hypervisor.'
+              description: 'State of the hypervisor.'
               valuemap:
                 name: 'General state'
               preprocessing:
@@ -623,7 +623,7 @@ zabbix_export:
               key: 'openstack.nova.hypervisors.status[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'The status of the hypervisor.'
+              description: 'Status of the hypervisor.'
               valuemap:
                 name: 'General status'
               preprocessing:
@@ -668,7 +668,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               value_type: FLOAT
-              description: 'The hypervisor version.'
+              description: 'Hypervisor version.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -735,7 +735,7 @@ zabbix_export:
               key: 'openstack.nova.server.status.get[{#SERVER_ID}]'
               delay: '{$OPENSTACK.NOVA.INTERVAL.SERVERS}'
               history: 7d
-              description: 'The server status.'
+              description: 'Server status.'
               valuemap:
                 name: 'Server status'
               preprocessing:
@@ -842,19 +842,19 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           lifetime: 7d
-          description: 'Discovers OpenStack Compute services.'
+          description: 'Discovers OpenStack compute services.'
           item_prototypes:
             - uuid: 3bd724dad043411187a86466cf8ee2c6
-              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabled reason'
+              name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabling reason'
               type: DEPENDENT
               key: 'openstack.nova.services.disabled.reason[{#ID}]'
               delay: '0'
               history: 7d
               trends: '0'
               value_type: CHAR
-              description: 'The reason for disabling a service.'
+              description: 'Reason for disabling a service.'
               valuemap:
-                name: 'Compute service disabled reason'
+                name: 'Compute service disabling reason'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -879,7 +879,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of the service.'
+              description: 'Raw data of the service.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -897,7 +897,7 @@ zabbix_export:
               key: 'openstack.nova.services.state[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'The state of the service.'
+              description: 'State of the service.'
               valuemap:
                 name: 'General state'
               preprocessing:
@@ -941,7 +941,7 @@ zabbix_export:
               key: 'openstack.nova.services.status[{#ID}]'
               delay: '0'
               history: 7d
-              description: 'The status of the service.'
+              description: 'Status of the service.'
               valuemap:
                 name: 'General status'
               preprocessing:
@@ -972,7 +972,7 @@ zabbix_export:
             - uuid: 177fa631136c4340816ee9e2cf90f1ac
               expression: 'last(/OpenStack Nova by HTTP/openstack.nova.services.status[{#ID}])=0 and length(last(/OpenStack Nova by HTTP/openstack.nova.services.disabled.reason[{#ID}]))>=0'
               name: 'Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status is "disabled"'
-              opdata: 'Current state: {ITEM.LASTVALUE1}, Disabled reason: "{ITEM.VALUE2}"'
+              opdata: 'Current state: {ITEM.LASTVALUE1}, disabling reason: "{ITEM.VALUE2}"'
               priority: INFO
               description: 'Status of the server is disabled. Acknowledge to close the problem manually.'
               manual_close: 'YES'
@@ -1037,7 +1037,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'The raw data of a tenant.'
+              description: 'Raw data of the tenant.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1057,7 +1057,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: '!hours'
-              description: 'The total duration that servers exist (in hours).'
+              description: 'Total duration that the servers exist (in hours).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1263,16 +1263,16 @@ zabbix_export:
           description: 'Sets the server name regex filter to use in server discovery for excluding.'
         - macro: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}'
           value: '.*'
-          description: 'Sets the binary name regex filter to use in Compute services discovery for including.'
+          description: 'Sets the binary name regex filter to use in compute services discovery for including.'
         - macro: '{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the binary name regex filter to use in Compute services discovery for excluding.'
+          description: 'Sets the binary name regex filter to use in compute services discovery for excluding.'
         - macro: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}'
           value: '.*'
-          description: 'Sets the host name regex filter to use in Compute services discovery for including.'
+          description: 'Sets the host name regex filter to use in compute services discovery for including.'
         - macro: '{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Sets the host name regex filter to use in Compute services discovery for excluding.'
+          description: 'Sets the host name regex filter to use in compute services discovery for excluding.'
         - macro: '{$OPENSTACK.TOKEN}'
           type: SECRET_TEXT
           description: 'API token for the monitoring user.'
@@ -1319,7 +1319,7 @@ zabbix_export:
             - value: '1'
               newvalue: Available
         - uuid: 1073ca0bea3f46ebbfbcaba628484be8
-          name: 'Compute service disabled reason'
+          name: 'Compute service disabling reason'
           mappings:
             - value: 'null'
               newvalue: N/A

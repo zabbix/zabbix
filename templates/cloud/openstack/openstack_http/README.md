@@ -23,17 +23,17 @@ This template has been tested on:
 
 ## Setup
 
-This is a master template that needs to be assigned to a host and it will discover all OpenStack services supported by Zabbix automatically.
+This is a master template that needs to be assigned to a host, and it will discover all OpenStack services supported by Zabbix automatically.
 
 Before using this template it is recommended to create a separate monitoring user on OpenStack that will have access to specific API resources. Zabbix uses OpenStack application credentials for authorization, as it is a more secure method than a username and password-based authentication.
 
-Below are instructions and examples on how to set up a user on OpenStack that will be used by Zabbix. Examples use the OpenStack CLI (commandline interface) tool, but this can also be done from OpenStack Horizon (web interface).
+Below are instructions and examples on how to set up a user on OpenStack that will be used by Zabbix. Examples use the OpenStack CLI (command-line interface) tool, but this can also be done from OpenStack Horizon (web interface).
 
-> **If using the CLI tool, make sure you have the OpenStack RC file for your project with a user that has rights to create other users, roles, etc. and source it** , for example, `. zabbix-admin-openrc.sh`.
+> **If using the CLI tool, make sure you have the OpenStack RC file for your project with a user that has rights to create other users, roles, etc., and source it**, for example, `. zabbix-admin-openrc.sh`.
 >
 > The OpenStack RC file can be obtained from Horizon.
 
-It is assumed that a project, which needs to be monitored, is already present in OpenStack. In the following examples a project named `zabbix` is used:
+The project that needs to be monitored is assumed to be already present in OpenStack. In the following examples, a project named `zabbix` is used:
 
 ```
 # openstack project list
@@ -65,7 +65,7 @@ Repeat User Password:
 +---------------------+----------------------------------+
 ```
 
-2. When the monitoring user is created, it needs to be added to a role. But first, a monitoring-specific role needs to be created:
+2. When the monitoring user is created, it needs to be assigned a role. But first, a monitoring-specific role needs to be created:
 
 ```
 # openstack role create --description "A role for Zabbix monitoring user" monitoring
@@ -85,7 +85,7 @@ Repeat User Password:
 # openstack role add --user zabbix-monitoring --project zabbix monitoring
 ```
 
-4. Verify that the role has been assigned correctly. There should only be one role:
+4. Verify that the role has been assigned correctly. There should be one role only:
 
 ```
 # openstack role assignment list --user zabbix-monitoring --project zabbix --names
@@ -96,7 +96,7 @@ Repeat User Password:
 +------------+---------------------------+-------+----------------+--------+--------+-----------+
 ```
 
-5. Get the OpenStack RC file for the monitoring user in this project, source it and generate application credentials:
+5. Get the OpenStack RC file for the monitoring user in this project, source it, and generate application credentials:
 ```
 # openstack application credential create --description "Application credential for Zabbix monitoring" zabbix-app-cred
   +--------------+----------------------------------------------------------------------------------------+
@@ -124,7 +124,7 @@ Once the application credential is created, the values of `id` and `secret` need
 * value of `secret` in `{$APP.CRED.SECRET}` user macro.
 
 
-At this point the monitoring user will not be able to access any resources on OpenStack, therefore some access rights need to be defined.
+At this point, the monitoring user will not be able to access any resources on OpenStack, therefore some access rights need to be defined.
 Access rights are set using policies. Each service has its own policy file, therefore **further steps for setting up policies, are mentioned in the template documentation of each supported service**, e.g., __OpenStack Nova by HTTP__.
 
 
@@ -133,8 +133,8 @@ Access rights are set using policies. Each service has its own policy file, ther
 |Name|Description|Default|
 |----|-----------|-------|
 |{$OPENSTACK.KEYSTONE.API.ENDPOINT}|<p>API endpoint for Identity Service, e.g., https://local.openstack:5000.</p>||
-|{$OPENSTACK.AUTH.INTERVAL}|<p>Interval in minutes, in which API token will be regenerated. By default, OpenStack API tokens expire after 60m.</p>|`50m`|
-|{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
+|{$OPENSTACK.AUTH.INTERVAL}|<p>API token regeneration interval, in minutes. By default, OpenStack API tokens expire after 60m.</p>|`50m`|
+|{$OPENSTACK.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
 |{$OPENSTACK.APP.CRED.ID}|<p>Application credential ID for monitoring user access.</p>||
 |{$OPENSTACK.APP.CRED.SECRET}|<p>Application credential password for monitoring user access.</p>||
 

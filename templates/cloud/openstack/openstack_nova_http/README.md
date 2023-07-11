@@ -26,7 +26,7 @@ This template is not meant to be used independently. A host with the __OpenStack
 
 If needed, you can specify an HTTP proxy for the template to use by changing the value of `{$OPENSTACK.NOVA.HTTP.PROXY}` user macro.
 
-For tenant usage statistics, a custom time period can be chosen for which the data will be queried. This can be set with the `{$OPENSTACK.NOVA.TENANT.PERIOD}` macro value.
+For tenant usage statistics, it is possible to choose a custom time period for which the data will be queried. This can be set with the `{$OPENSTACK.NOVA.TENANT.PERIOD}` macro value.
 The value can be one of the following:
 
 * `y` - current year until now;
@@ -44,7 +44,7 @@ To filter which servers to monitor, set the `{$OPENSTACK.SERVER.DISCOVERY.NAME.M
 
 For the OpenStack monitoring user to be able to access the API resources used in this template, it is needed to configure the policy file for OpenStack Nova.
 
-On the OpenStack server open the `/etc/nova/policy.json` file in your favourite text editor.
+On the OpenStack server, open the `/etc/nova/policy.json` file in your favorite text editor.
 
 In this file, assign the following target resources to the role that the monitoring user uses:
 ```
@@ -85,10 +85,10 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 |{$OPENSTACK.NOVA.RAM.UTIL.HIGH}|<p>Sets the percentage threshold for creating a high severity event about RAM resource usage.</p>|`90`|
 |{$OPENSTACK.SERVER.DISCOVERY.NAME.MATCHES}|<p>Sets the server name regex filter to use in server discovery for including.</p>|`.*`|
 |{$OPENSTACK.SERVER.DISCOVERY.NAME.NOT_MATCHES}|<p>Sets the server name regex filter to use in server discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}|<p>Sets the host name regex filter to use in Compute services discovery for including.</p>|`.*`|
-|{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}|<p>Sets the host name regex filter to use in Compute services discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
-|{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}|<p>Sets the binary name regex filter to use in Compute services discovery for including.</p>|`.*`|
-|{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}|<p>Sets the binary name regex filter to use in Compute services discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$OPENSTACK.SERVICES.DISCOVERY.HOST.MATCHES}|<p>Sets the host name regex filter to use in compute services discovery for including.</p>|`.*`|
+|{$OPENSTACK.SERVICES.DISCOVERY.HOST.NOT_MATCHES}|<p>Sets the host name regex filter to use in compute services discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
+|{$OPENSTACK.SERVICES.DISCOVERY.BINARY.MATCHES}|<p>Sets the binary name regex filter to use in compute services discovery for including.</p>|`.*`|
+|{$OPENSTACK.SERVICES.DISCOVERY.BINARY.NOT_MATCHES}|<p>Sets the binary name regex filter to use in compute services discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
 |{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.MATCHES}|<p>Sets the hostname regex filter to use in hypervisor discovery for including.</p>|`.*`|
 |{$OPENSTACK.HYPERVISOR.DISCOVERY.HOSTNAME.NOT_MATCHES}|<p>Sets the hostname regex filter to use in hypervisor discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
 |{$OPENSTACK.HYPERVISOR.DISCOVERY.TYPE.MATCHES}|<p>Sets the type regex filter to use in hypervisor discovery for including.</p>|`.*`|
@@ -108,15 +108,15 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 |Nova: Get hypervisors|<p>Gets a list of hypervisors and its data.</p>|HTTP agent|openstack.nova.hypervisors.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisors`</p><p>⛔️Custom on fail: Set error to: `Could not get hypervisors list`</p></li></ul>|
 |Nova: Get availability zones|<p>Gets a list of availability zones and its data.</p>|HTTP agent|openstack.nova.availability_zone.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.availabilityZoneInfo`</p><p>⛔️Custom on fail: Set error to: `Could not get availability zones list`</p></li></ul>|
 |Nova: Get tenants|<p>Gets a list of tenants and its data.</p>|Script|openstack.nova.tenant.get<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tenant_usages`</p><p>⛔️Custom on fail: Set error to: `Could not get tenant list`</p></li></ul>|
-|Nova: Instances count, current|<p>The number of servers in each tenant.</p>|Dependent item|openstack.nova.limits.instances.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalInstancesUsed`</p></li></ul>|
-|Nova: Instances count, max|<p>The number of allowed servers for each tenant.</p>|Dependent item|openstack.nova.limits.instances.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalInstances`</p></li></ul>|
-|Nova: Instances count, free|<p>The number of available servers for each tenant.</p>|Calculated|openstack.nova.limits.instances.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Nova: vCPUs usage, current|<p>The number of used server cores in each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCoresUsed`</p></li></ul>|
-|Nova: vCPUs usage, max|<p>The number of allowed server cores for each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalCores`</p></li></ul>|
-|Nova: vCPUs usage, free|<p>The number of available server cores for each tenant.</p>|Calculated|openstack.nova.limits.vcpu.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Nova: RAM usage, current|<p>The amount of used server RAM.</p>|Dependent item|openstack.nova.limits.ram.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalRAMUsed`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|Nova: RAM usage, max|<p>The amount of allowed server RAM.</p>|Dependent item|openstack.nova.limits.ram.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalRAMSize`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
-|Nova: RAM usage, free|<p>The amount of available server RAM.</p>|Calculated|openstack.nova.limits.ram.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nova: Instances count, current|<p>Number of servers in each tenant.</p>|Dependent item|openstack.nova.limits.instances.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalInstancesUsed`</p></li></ul>|
+|Nova: Instances count, max|<p>Number of allowed servers for each tenant.</p>|Dependent item|openstack.nova.limits.instances.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalInstances`</p></li></ul>|
+|Nova: Instances count, free|<p>Number of available servers for each tenant.</p>|Calculated|openstack.nova.limits.instances.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nova: vCPUs usage, current|<p>Number of used server cores in each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalCoresUsed`</p></li></ul>|
+|Nova: vCPUs usage, max|<p>Number of allowed server cores for each tenant.</p>|Dependent item|openstack.nova.limits.vcpu.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalCores`</p></li></ul>|
+|Nova: vCPUs usage, free|<p>Number of available server cores for each tenant.</p>|Calculated|openstack.nova.limits.vcpu.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nova: RAM usage, current|<p>Amount of used server RAM.</p>|Dependent item|openstack.nova.limits.ram.current<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.totalRAMUsed`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Nova: RAM usage, max|<p>Amount of allowed server RAM.</p>|Dependent item|openstack.nova.limits.ram.max<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.maxTotalRAMSize`</p></li><li><p>Custom multiplier: `1048576`</p></li></ul>|
+|Nova: RAM usage, free|<p>Amount of available server RAM.</p>|Calculated|openstack.nova.limits.ram.free<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -139,7 +139,7 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status|<p>The server status.</p>|HTTP agent|openstack.nova.server.status.get[{#SERVER_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.server.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed server report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Server [{#SERVER_ID}]:[{#SERVER_NAME}]: Status|<p>Server status.</p>|HTTP agent|openstack.nova.server.status.get[{#SERVER_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.server.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed server report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Nova: Servers discovery
 
@@ -152,16 +152,16 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Nova: Compute services discovery|<p>Discovers OpenStack Compute services.</p>|Dependent item|openstack.nova.services.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Nova: Compute services discovery|<p>Discovers OpenStack compute services.</p>|Dependent item|openstack.nova.services.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Nova: Compute services discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Raw data|<p>The raw data of the service.</p>|Dependent item|openstack.nova.services.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li></ul>|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State|<p>The state of the service.</p>|Dependent item|openstack.nova.services.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status|<p>The status of the service.</p>|Dependent item|openstack.nova.services.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabled reason|<p>The reason for disabling a service.</p>|Dependent item|openstack.nova.services.disabled.reason[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled_reason`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Raw data|<p>Raw data of the service.</p>|Dependent item|openstack.nova.services.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li></ul>|
+|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: State|<p>State of the service.</p>|Dependent item|openstack.nova.services.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Status|<p>Status of the service.</p>|Dependent item|openstack.nova.services.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Compute service [{#HOST}]:[{#BINARY}]:[{#ID}]: Disabling reason|<p>Reason for disabling a service.</p>|Dependent item|openstack.nova.services.disabled.reason[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled_reason`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed services report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Nova: Compute services discovery
 
@@ -180,10 +180,10 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: Raw data|<p>The raw data of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li></ul>|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: State|<p>The state of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: Status|<p>The status of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Hypervisor [{#ID}]:[{#HOSTNAME}]: Version|<p>The hypervisor version.</p>|Dependent item|openstack.nova.hypervisors.version[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisor_version`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Hypervisor [{#ID}]:[{#HOSTNAME}]: Raw data|<p>Raw data of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.raw[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.id == "{#ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li></ul>|
+|Hypervisor [{#ID}]:[{#HOSTNAME}]: State|<p>State of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.state[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Hypervisor [{#ID}]:[{#HOSTNAME}]: Status|<p>Status of the hypervisor.</p>|Dependent item|openstack.nova.hypervisors.status[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Hypervisor [{#ID}]:[{#HOSTNAME}]: Version|<p>Hypervisor version.</p>|Dependent item|openstack.nova.hypervisors.version[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.hypervisor_version`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed hypervisor report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Nova: Hypervisor discovery
 
@@ -203,9 +203,9 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Availability zone [{#ZONE_NAME}]: Raw data|<p>The raw data of the availability zone.</p>|Dependent item|openstack.nova.availability_zone.raw[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.zoneName == "{#ZONE_NAME}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li></ul>|
-|Availability zone [{#ZONE_NAME}]: State|<p>The current state of the availability zone.</p>|Dependent item|openstack.nova.availability_zone.state[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.zoneState.available`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Availability zone [{#ZONE_NAME}]: Host count|<p>The count of hosts and service objects under single availability zone.</p>|Dependent item|openstack.nova.availability_zone.host_count[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['hosts'].[*].[*].length()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability zone [{#ZONE_NAME}]: Raw data|<p>Raw data of the availability zone.</p>|Dependent item|openstack.nova.availability_zone.raw[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.zoneName == "{#ZONE_NAME}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li></ul>|
+|Availability zone [{#ZONE_NAME}]: State|<p>Current state of the availability zone.</p>|Dependent item|openstack.nova.availability_zone.state[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.zoneState.available`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li><li>Boolean to decimal</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Availability zone [{#ZONE_NAME}]: Host count|<p>Count of hosts and service objects under single availability zone.</p>|Dependent item|openstack.nova.availability_zone.host_count[{#ZONE_NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['hosts'].[*].[*].length()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed availability zone report`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Nova: Availability zones discovery
 
@@ -223,8 +223,8 @@ Note that a restart of OpenStack Nova services might be needed for these new cha
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Tenant [{#TENANT_ID}]: Raw data|<p>The raw data of a tenant.</p>|Dependent item|openstack.nova.tenant.raw[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.tenant_id == "{#TENANT_ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the tenant report`</p></li></ul>|
-|Tenant [{#TENANT_ID}]: Total hours|<p>The total duration that servers exist (in hours).</p>|Dependent item|openstack.nova.tenant.total_hours[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_hours`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed tenant report`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Tenant [{#TENANT_ID}]: Raw data|<p>Raw data of the tenant.</p>|Dependent item|openstack.nova.tenant.raw[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.tenant_id == "{#TENANT_ID}")].first()`</p><p>⛔️Custom on fail: Set error to: `Could not parse the tenant report`</p></li></ul>|
+|Tenant [{#TENANT_ID}]: Total hours|<p>Total duration that the servers exist (in hours).</p>|Dependent item|openstack.nova.tenant.total_hours[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_hours`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed tenant report`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Tenant [{#TENANT_ID}]: Total vCPUs usage|<p>Total vCPU usage hours for the current tenant (project).</p><p>Multiplying the number of virtual CPUs of the server by hours the server exists, and then adding that all together for each server.</p>|Dependent item|openstack.nova.tenant.total_vcpu[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_vcpus_usage`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed tenant report`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Tenant [{#TENANT_ID}]: Total disk usage|<p>Total disk usage hours for the current tenant (project).</p><p>Multiplying the server disk size (in GiB) by hours the server exists, and then adding that all together for each server.</p>|Dependent item|openstack.nova.tenant.disk_usage[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_local_gb_usage`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed tenant report`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Tenant [{#TENANT_ID}]: Total memory usage|<p>Total memory usage hours for the current tenant (project).</p><p>Multiplying the server memory size (in MiB) by hours the server exists, and then adding that all together for each server.</p>|Dependent item|openstack.nova.tenant.total_memory_mb_usage[{#TENANT_ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.total_memory_mb_usage`</p><p>⛔️Custom on fail: Set error to: `Could not parse the detailed tenant report`</p></li><li><p>JavaScript: `return Math.round(value * 100) / 100;`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-07T13:30:27Z'
+  date: '2023-07-11T13:08:53Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -110,7 +110,7 @@ zabbix_export:
                 // define supported OpenStack services in Zabbix
                 const supported_services = ['nova'];
             
-                // parse the response body and filter out only supported services by Zabbix with only needed data
+                // parse the response body and filter out only the services supported by Zabbix with the needed data only
                 var ret = [];
                 const data = JSON.parse(http_data['response']);
                 // check if service catalog exists
@@ -209,8 +209,8 @@ zabbix_export:
           description: 'Application credential password for monitoring user access.'
         - macro: '{$OPENSTACK.AUTH.INTERVAL}'
           value: 50m
-          description: 'Interval in minutes, in which API token will be regenerated. By default, OpenStack API tokens expire after 60m.'
+          description: 'API token regeneration interval, in minutes. By default, OpenStack API tokens expire after 60m.'
         - macro: '{$OPENSTACK.HTTP.PROXY}'
-          description: 'Sets the HTTP proxy for authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.'
+          description: 'Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.'
         - macro: '{$OPENSTACK.KEYSTONE.API.ENDPOINT}'
           description: 'API endpoint for Identity Service, e.g., https://local.openstack:5000.'
