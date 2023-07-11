@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-05T15:30:13Z'
+  date: '2023-07-11T05:19:22Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -87,7 +87,9 @@ zabbix_export:
               FROM pg_stat_bgwriter) T
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW'
+          description: |
+            Collect all metrics from pg_stat_bgwriter:
+            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW
           tags:
             - tag: component
               value: raw
@@ -185,7 +187,7 @@ zabbix_export:
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
           description: |
-            Collect all metrics from pg_stat_database per database:
+            Collect all metrics from pg_stat_database as sums for all databases:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
           tags:
             - tag: component
@@ -283,6 +285,7 @@ zabbix_export:
           params: 'SELECT 1'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
+          description: 'Used to test a connection to see if it is alive. It is being set to 0 if the query is unsuccessful.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -304,6 +307,7 @@ zabbix_export:
               expression: 'last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"])=0'
               name: 'PostgreSQL: Service is down'
               priority: HIGH
+              description: 'The last test of a connection was unsuccessful.'
               tags:
                 - tag: scope
                   value: availability
@@ -470,6 +474,7 @@ zabbix_export:
           params: 'SELECT date_part(''epoch'', now() - pg_postmaster_start_time())'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
+          description: 'The time since the server started.'
           tags:
             - tag: component
               value: application
@@ -507,20 +512,18 @@ zabbix_export:
               ) T
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collect WAL metrics.'
+          description: 'Collect write-ahead log (WAL) metrics.'
           tags:
             - tag: component
               value: raw
         - uuid: d69d40f3e7064f668b0bf150ff73aafc
-          name: 'Archive: Count of archive files'
+          name: 'Archive: Count of archived files'
           type: DEPENDENT
           key: pgsql.archive.count_archived_files
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: |
-            Collect all metrics from pg_stat_activity:
-            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW
+          description: 'The cound of archived files.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -537,6 +540,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
+          description: 'The cound of files to archive.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -547,15 +551,13 @@ zabbix_export:
             - tag: component
               value: archive
         - uuid: 1ea44a48aaf042debc078ad920dd4f02
-          name: 'Archive: Count of attempts to archive files'
+          name: 'Archive: Count of failed attempts to archive files'
           type: DEPENDENT
           key: pgsql.archive.failed_trying_to_archive
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: |
-            Collect all metrics from pg_stat_activity:
-            https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ARCHIVER-VIEW
+          description: 'The cound of failed attempts to archive files.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -572,7 +574,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'Size of files to archive'
+          description: 'The size of files to archive.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -798,6 +800,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//pgsql.dbstat.sum.blks_hit.rate) * 100 / (last(//pgsql.dbstat.sum.blks_hit.rate) + last(//pgsql.dbstat.sum.blks_read.rate))'
+          description: 'The cache hit ratio.'
           tags:
             - tag: component
               value: cache
@@ -952,8 +955,9 @@ zabbix_export:
             - uuid: 3b6662191c3b46ac930af02797a7162b
               expression: 'min(/PostgreSQL by ODBC/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}'
               name: 'Connections sum: Total number of connections is too high'
-              event_name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN} in 5m)'
+              event_name: 'Connections sum: Total number of connections is too high (over {$PG.CONN_TOTAL_PCT.MAX.WARN}% in 5m)'
               priority: AVERAGE
+              description: 'Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).'
               tags:
                 - tag: scope
                   value: performance
@@ -1376,6 +1380,11 @@ zabbix_export:
               - macro: '{#DBNAME}'
                 value: '{$PG.LLD.FILTER.DBNAME}'
                 formulaid: A
+          description: |
+            Discovers databases (DB) in the database management system (DBMS), except:
+            - templates;
+            - default "postgres" DB;
+            - DBs that do not allow connections.
           item_prototypes:
             - uuid: 98b74e578a3e48f3990bc16eb0217a17
               name: 'DB [{#DBNAME}]: Database age'
@@ -1587,6 +1596,7 @@ zabbix_export:
                   name: 'DB [{#DBNAME}]: Deadlock occurred'
                   event_name: 'DB [{#DBNAME}]: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
+                  description: 'The number of detected deadlocks in this database exceeds the limit of {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}.'
                   tags:
                     - tag: scope
                       value: availability
@@ -2111,6 +2121,7 @@ zabbix_export:
                   name: 'DB [{#DBNAME}]: Too many slow queries'
                   event_name: 'DB [{#DBNAME}]: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
+                  description: 'The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.'
                   tags:
                     - tag: scope
                       value: performance
@@ -2413,6 +2424,7 @@ zabbix_export:
               - macro: '{#APPLICATION_NAME}'
                 value: '{$PG.LLD.FILTER.APPLICATION}'
                 formulaid: A
+          description: 'Discovers replication lag metrics.'
           item_prototypes:
             - uuid: 9e7797789d2c47efb9af2c86f8c6a93e
               name: 'Application [{#APPLICATION_NAME}]: Get replication'
@@ -2422,6 +2434,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
+              description: 'Collect metrics from the "pg_stat_replication" about the application "{#APPLICATION_NAME}" that is connected to this WAL sender, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2442,6 +2455,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written and flushed it (but not yet applied it). This can be used to gauge the delay that synchronous_commit level on incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2461,6 +2475,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written, flushed and applied it. This can be used to gauge the delay that synchronous_commit level remote_apply incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2480,6 +2495,7 @@ zabbix_export:
               history: 7d
               value_type: FLOAT
               units: s
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written it (but not yet flushed it or applied it). This can be used to gauge the delay that synchronous_commit level remote_write incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2517,25 +2533,34 @@ zabbix_export:
       macros:
         - macro: '{$PG.CONFLICTS.MAX.WARN}'
           value: '0'
+          description: 'Maximum number of recovery conflicts for trigger expression.'
         - macro: '{$PG.CONN_TOTAL_PCT.MAX.WARN}'
           value: '90'
+          description: 'Maximum percentage of current connections for trigger expression.'
         - macro: '{$PG.DATABASE}'
           value: postgres
+          description: 'Default PostgreSQL database for the connection.'
         - macro: '{$PG.DEADLOCKS.MAX.WARN}'
           value: '0'
+          description: 'Maximum number of detected deadlocks for trigger expression.'
         - macro: '{$PG.DRIVER}'
           value: '<Set the PostgreSQL driver here>'
           description: 'Name or path to the PostgreSQL driver. For example: `PostgreSQL`, `/usr/lib64/psqlodbcw.so`.'
         - macro: '{$PG.HOST}'
           value: localhost
+          description: 'Hostname or IP of PostgreSQL host.'
         - macro: '{$PG.LLD.FILTER.APPLICATION}'
           value: .+
+          description: 'Filter of discoverable applications.'
         - macro: '{$PG.LLD.FILTER.DBNAME}'
           value: .+
+          description: 'Filter of discoverable databases.'
         - macro: '{$PG.PASSWORD}'
           value: '<Put the password here>'
+          description: 'PostgreSQL user password.'
         - macro: '{$PG.PORT}'
           value: '5432'
+          description: 'PostgreSQL service port.'
         - macro: '{$PG.QUERY_ETIME.MAX.WARN}'
           value: '30'
           description: 'Execution time limit for count of slow queries.'
@@ -2544,6 +2569,7 @@ zabbix_export:
           description: 'Slow queries count threshold for a trigger.'
         - macro: '{$PG.USER}'
           value: zbx_monitor
+          description: 'PostgreSQL username.'
       dashboards:
         - uuid: 6f15f8b6e90b4d09b9e1d4fb323ac438
           name: 'PostgreSQL databases'
