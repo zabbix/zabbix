@@ -362,7 +362,7 @@ static int	DBpatch_6050031(void)
 	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "status", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
 			"auto_compress", "address", "port", NULL);
-	
+
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	proxyid;
@@ -493,7 +493,7 @@ static int	DBpatch_6050044(void)
 			},
 			NULL
 		};
-	
+
 	return DBcreate_table(&table);
 }
 
@@ -517,7 +517,7 @@ static int	DBpatch_6050046(void)
 
 	zbx_db_insert_prepare(&db_insert_rtdata, "proxy_rtdata", "proxyid", "lastaccess", "version", "compatibility",
 			NULL);
-	
+
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		int	hostid, lastaccess, version, compatibility;
@@ -544,7 +544,7 @@ static int	DBpatch_6050047(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from hosts where status in (5,6)"))
 		return FAIL;
-	
+
 	return SUCCEED;
 }
 
@@ -552,7 +552,7 @@ static int	DBpatch_6050048(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from host_rtdata where hostid in (select proxyid from proxy)"))
 		return FAIL;
-	
+
 	return SUCCEED;
 }
 
