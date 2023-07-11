@@ -67,12 +67,10 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		$events = API::Event()->get([
 			'countOutput' => true,
-			'eventids' => $this->getInput('eventids'),
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER
+			'eventids' => $this->getInput('eventids')
 		]);
 
-		return ($events == count($this->getInput('eventids')));
+		return $events == count($this->getInput('eventids'));
 	}
 
 	protected function doAction() {
@@ -105,15 +103,13 @@ class CControllerPopupAcknowledgeEdit extends CController {
 		// Select events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'name', 'objectid', 'acknowledged', 'value', 'r_eventid', 'cause_eventid'],
-			'select_acknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectSuppressionData' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS)
 				? ['maintenanceid', 'suppress_until']
 				: null,
 			'eventids' => $this->getInput('eventids'),
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'preservekeys' => true
 		]);
 

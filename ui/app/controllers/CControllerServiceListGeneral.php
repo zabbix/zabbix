@@ -297,8 +297,6 @@ abstract class CControllerServiceListGeneral extends CController {
 		$events = API::Event()->get([
 			'output' => ['objectid'],
 			'eventids' => $eventids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true
 		]);

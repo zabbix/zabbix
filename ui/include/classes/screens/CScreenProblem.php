@@ -69,8 +69,6 @@ class CScreenProblem extends CScreenBase {
 	private static function getDataEvents(array $options) {
 		return API::Event()->get([
 			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
@@ -516,13 +514,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
-			'select_acknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
+			'selectTags' => ['tag', 'value'],
 			'eventids' => $eventids,
 			'preservekeys' => true
 		]);
@@ -537,8 +533,6 @@ class CScreenProblem extends CScreenBase {
 		$r_events = $r_eventids
 			? API::Event()->get([
 				'output' => ['clock', 'ns', 'correlationid', 'userid'],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
 				'preservekeys' => true
 			])
@@ -664,7 +658,7 @@ class CScreenProblem extends CScreenBase {
 		// get additional data
 		$eventids = array_keys($data['problems']);
 
-		$problems_data = ($filter['show'] == TRIGGERS_OPTION_ALL)
+		$problems_data = $filter['show'] == TRIGGERS_OPTION_ALL
 			? self::getExDataEvents($eventids)
 			: self::getExDataProblems($eventids);
 

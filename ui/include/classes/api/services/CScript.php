@@ -1190,8 +1190,6 @@ class CScript extends CApiService {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'value', 'name', 'severity', 'cause_eventid'],
 			'selectHosts' => ['hostid'],
-			'object' => EVENT_OBJECT_TRIGGER,
-			'source' => EVENT_SOURCE_TRIGGERS,
 			'eventids' => $eventids,
 			'preservekeys' => true
 		]);
@@ -1225,8 +1223,6 @@ class CScript extends CApiService {
 		if ($symptom_cause_eventids) {
 			$cause_events = API::Event()->get([
 				'output' => ['eventid', 'value', 'name', 'severity'],
-				'object' => EVENT_OBJECT_TRIGGER,
-				'source' => EVENT_SOURCE_TRIGGERS,
 				'eventids' => $symptom_cause_eventids,
 				'preservekeys' => true
 			]);
@@ -1364,9 +1360,10 @@ class CScript extends CApiService {
 
 		// Adding actions.
 		if ($options['selectActions'] !== null && $options['selectActions'] !== API_OUTPUT_COUNT) {
-			foreach ($result as $scriptid => &$row) {
+			foreach ($result as &$row) {
 				$row['actions'] = [];
 			}
+			unset($row);
 
 			$action_scriptids = [];
 

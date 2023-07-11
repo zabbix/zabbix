@@ -926,8 +926,6 @@ class CService extends CApiService {
 			$events = API::Event()->get([
 				'output' => ['name'],
 				'eventids' => array_keys($problem_events_ungrouped),
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
 				'value' => TRIGGER_VALUE_TRUE,
 				'nopermissions' => true,
 				'preservekeys' => true

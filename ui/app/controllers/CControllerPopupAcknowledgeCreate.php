@@ -164,12 +164,10 @@ class CControllerPopupAcknowledgeCreate extends CController {
 
 		$events = API::Event()->get([
 			'countOutput' => true,
-			'eventids' => array_keys($eventids),
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER
+			'eventids' => array_keys($eventids)
 		]);
 
-		return ($events == count($eventids));
+		return $events == count($eventids);
 	}
 
 	protected function doAction() {
@@ -302,9 +300,7 @@ class CControllerPopupAcknowledgeCreate extends CController {
 	protected function getRelatedProblemids(array $eventids): array {
 		$events = API::Event()->get([
 			'output' => ['objectid'],
-			'eventids' => array_keys($eventids),
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER
+			'eventids' => array_keys($eventids)
 		]);
 
 		if ($events) {
@@ -333,11 +329,9 @@ class CControllerPopupAcknowledgeCreate extends CController {
 		// Select details for all affected events.
 		$events = API::Event()->get([
 			'output' => ['eventid', 'objectid', 'acknowledged', 'r_eventid'],
-			'select_acknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
+			'selectAcknowledges' => $this->close_problems || $this->suppress || $this->unsuppress ? ['action'] : null,
 			'selectSuppressionData' => $this->unsuppress ? ['maintenanceid'] : null,
 			'eventids' => $eventids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'preservekeys' => true
 		]);
 

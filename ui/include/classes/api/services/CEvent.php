@@ -34,62 +34,127 @@ class CEvent extends CApiService {
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
 	/**
-	 * @throws APIException if the input is invalid.
+	 * @param array $options
+	 *
+	 * @throws APIException
 	 *
 	 * @return array|string
 	 */
-	public function get(array $options = []) {
-		$defOptions = [
-			'eventids'					=> null,
-			'groupids'					=> null,
-			'hostids'					=> null,
-			'objectids'					=> null,
-
-			'editable'					=> false,
-			'object'					=> EVENT_OBJECT_TRIGGER,
-			'source'					=> EVENT_SOURCE_TRIGGERS,
-			'severities'				=> null,
-			'nopermissions'				=> null,
-			// filter
-			'value'						=> null,
-			'time_from'					=> null,
-			'time_till'					=> null,
-			'eventid_from'				=> null,
-			'eventid_till'				=> null,
-			'problem_time_from'			=> null,
-			'problem_time_till'			=> null,
-			'acknowledged'				=> null,
-			'suppressed'				=> null,
-			'symptom'					=> null,
-			'evaltype'					=> TAG_EVAL_TYPE_AND_OR,
-			'tags'						=> null,
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> false,
-			'excludeSearch'				=> false,
-			'searchWildcardsEnabled'	=> null,
-			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectRelatedObject'		=> null,
-			'select_alerts'				=> null,
-			'select_acknowledges'		=> null,
-			'selectSuppressionData'		=> null,
-			'selectTags'				=> null,
-			'countOutput'				=> false,
-			'groupCount'				=> false,
-			'preservekeys'				=> false,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
+	public function get($options = []) {
+		$output_fields = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns', 'name',
+			'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata', 'suppressed',
+			'urls'
 		];
-		$options = zbx_array_merge($defOptions, $options);
+		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action',
+			'old_severity', 'new_severity', 'suppress_until', 'taskid'
+		];
+		$alert_output_fields = ['alertid', 'actionid', 'eventid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject',
+			'message', 'status', 'retries', 'error', 'esc_step', 'alerttype', 'p_eventid', 'acknowledgeid'
+		];
+		$dhost_output_fields = ['dhostid', 'druleid', 'status', 'lastup', 'lastdown'];
+		$dservice_output_fields = ['dserviceid', 'dhostid', 'value', 'port', 'status', 'lastup', 'lastdown', 'dcheckid',
+			'ip', 'dns'
+		];
+		$host_output_fields = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
+			'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
+			'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'inventory_mode', 'active_available'
+		];
+		$item_output_fields = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends',
+			'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
+			'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
+			'description', 'inventory_link', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
+			'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
+			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
+			'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue'
+		];
+		$discovery_rule_output_fields = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'status',
+			'trapper_hosts', 'templateid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
+			'privatekey', 'interfaceid', 'description', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url',
+			'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
+			'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
+			'verify_host', 'allow_traps', 'state', 'error', 'parameters'
+		];
+		$service_output_fields = ['serviceid', 'name', 'status', 'algorithm', 'sortorder', 'weight', 'propagation_rule',
+			'propagation_value', 'description', 'created_at', 'readonly'
+		];
+		$trigger_output_fields = ['triggerid', 'expression', 'description', 'url', 'status', 'value', 'priority',
+			'lastchange', 'comments', 'error', 'templateid', 'type', 'state', 'flags', 'recovery_mode',
+			'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata', 'event_name',
+			'url_name'
+		];
 
-		$this->validateGet($options);
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// filter
+			'eventids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'groupids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'hostids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'objectids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'source' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
+			'object' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE, EVENT_OBJECT_AUTOREGHOST, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
+			'value' =>						['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'source', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE])], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), 'uniq' => true, 'default' => null],
+												['if' => ['field' => 'source', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [0, 1, 2, 3]), 'uniq' => true, 'default' => null],
+												['if' => ['field' => 'source', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [0, 1]), 'uniq' => true, 'default' => null],
+												['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'severities' =>					['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'object', 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_SERVICE])], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
+												['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'eventid_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'eventid_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_from' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_from' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'problem_time_till' =>			['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'acknowledged' =>				['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'suppressed' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
+			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'operator', 'value']], 'default' => [], 'fields' => [
+				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
+				'value' =>						['type' => API_STRING_UTF8]
+			]],
+			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['eventid', 'source', 'object', 'objectid', 'value', 'acknowledged', 'name', 'severity', 'action', 'action_userid', 'cause_eventid']],
+			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
+			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
+			'startSearch' =>				['type' => API_FLAG, 'default' => false],
+			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
+			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
+			// output
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>				['type' => API_FLAG, 'default' => false],
+			'groupCount' =>					['type' => API_FLAG, 'default' => false],
+			'select_acknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
+			'select_alerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectAlerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $alert_output_fields), 'default' => null],
+			'selectHosts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_output_fields), 'default' => null],
+			'selectRelatedObject' =>		['type' => API_MULTIPLE, 'default' => null, 'rules' => [
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $trigger_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $dhost_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $dservice_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_AUTOREGHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => ''],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $item_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $service_output_fields)]
+			]],
+			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
+			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
+			// sort and limit
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
+			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			// flags
+			'editable' =>					['type' => API_BOOLEAN, 'default' => false],
+			'preservekeys' =>				['type' => API_BOOLEAN, 'default' => false],
+			'nopermissions' =>				['type' => API_BOOLEAN, 'default' => false]
+		]];
 
-		if ($options['value'] !== null) {
-			zbx_value2array($options['value']);
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		if (($options['source'] == EVENT_SOURCE_TRIGGERS && $options['object'] == EVENT_OBJECT_TRIGGER)
@@ -123,87 +188,75 @@ class CEvent extends CApiService {
 					}
 					unset($problem);
 
-					$result = array_values($problems + $recovery);
+					$db_events = array_values($problems + $recovery);
 				}
 				else {
-					$result = $problems + $recovery;
+					$db_events = $problems + $recovery;
 				}
 			}
 			else {
-				$result = self::sortResult($problems + $recovery, $options['sortfield'], $options['sortorder']);
+				$db_events = self::sortResult($problems + $recovery, $options['sortfield'], $options['sortorder']);
 
 				if ($options['limit'] !== null) {
-					$result = array_slice($result, 0, $options['limit'], true);
+					$db_events = array_slice($db_events, 0, $options['limit'], true);
 				}
 			}
 		}
 		else {
-			$result = $this->getEvents($options);
+			$db_events = $this->getEvents($options);
 		}
 
 		if ($options['countOutput']) {
-			return is_array($result) ? $result : (string) $result;
+			return is_array($db_events) ? $db_events : (string) $db_events;
 		}
 
-		if ($result) {
-			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['object', 'objectid'], $options['output']);
+		if ($db_events) {
+			$db_events = $this->addRelatedObjects($options, $db_events);
+			$db_events = $this->unsetExtraFields($db_events, ['eventid', 'object', 'objectid'], $options['output']);
 
 			if (!$options['preservekeys']) {
-				$result = array_values($result);
+				$db_events = array_values($db_events);
 			}
 		}
 
-		return $result;
-	}
-
-	/**
-	 * @throws APIException if the input is invalid.
-	 */
-	protected function validateGet(array $options): void {
-		$sourceValidator = new CLimitedSetValidator([
-			'values' => array_keys(eventSource())
-		]);
-		if (!$sourceValidator->validate($options['source'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect source value.'));
-		}
-
-		$objectValidator = new CLimitedSetValidator([
-			'values' => array_keys(eventObject())
-		]);
-		if (!$objectValidator->validate($options['object'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect object value.'));
-		}
-
-		$sourceObjectValidator = new CEventSourceObjectValidator();
-		if (!$sourceObjectValidator->validate(['source' => $options['source'], 'object' => $options['object']])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
-		}
-
-		$evaltype_validator = new CLimitedSetValidator([
-			'values' => [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]
-		]);
-		if (!$evaltype_validator->validate($options['evaltype'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect evaltype value.'));
-		}
+		return $db_events;
 	}
 
 	/**
 	 * Returns the list of events.
+	 *
+	 * @param array $options
+	 *
+	 * @return array|string
 	 */
-	private function getEvents(array $options): array {
-		$sql_parts = [
-			'select'	=> [$this->fieldId('eventid')],
-			'from'		=> ['e' => 'events e'],
-			'where'		=> [],
-			'order'		=> [],
-			'group'		=> [],
-			'limit'		=> null
-		];
+	private function getEvents(array $options) {
+		$db_events = [];
+
+		$res = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
+
+		while ($event = DBfetch($res)) {
+			if ($options['countOutput']) {
+				if ($options['groupCount']) {
+					$db_events[] = $event;
+				}
+				else {
+					$db_events = $event['rowscount'];
+				}
+			}
+			else {
+				$db_events[$event['eventid']] = $event;
+			}
+		}
+
+		return $db_events;
+	}
+
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		// source and object
-		$sql_parts['where'][] = 'e.source='.zbx_dbstr($options['source']);
-		$sql_parts['where'][] = 'e.object='.zbx_dbstr($options['object']);
+		$sql_parts['where'][] = dbConditionInt('e.source', [$options['source']]);
+		$sql_parts['where'][] = dbConditionInt('e.object', [$options['object']]);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -247,20 +300,20 @@ class CEvent extends CApiService {
 				// specific items or LLD rules
 				if ($options['objectids'] !== null) {
 					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$options['objectids'] = API::Item()->get([
+						$options['objectids'] = array_keys(API::Item()->get([
 							'output' => [],
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable'],
 							'preservekeys' => true
-						]);
+						]));
 					}
 					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$options['objectids'] = API::DiscoveryRule()->get([
+						$options['objectids'] = array_keys(API::DiscoveryRule()->get([
 							'output' => [],
 							'itemids' => $options['objectids'],
 							'editable' => $options['editable'],
 							'preservekeys' => true
-						]);
+						]));
 					}
 				}
 				// all items and LLD rules
@@ -319,14 +372,12 @@ class CEvent extends CApiService {
 
 		// eventids
 		if ($options['eventids'] !== null) {
-			zbx_value2array($options['eventids']);
 			$sql_parts['where'][] = dbConditionInt('e.eventid', $options['eventids']);
 		}
 
 		// objectids
 		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
 				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
-			zbx_value2array($options['objectids']);
 			$sql_parts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
 
 			if ($options['groupCount']) {
@@ -336,8 +387,6 @@ class CEvent extends CApiService {
 
 		// groupids
 		if ($options['groupids'] !== null) {
-			zbx_value2array($options['groupids']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['from']['f'] = 'functions f';
@@ -360,8 +409,6 @@ class CEvent extends CApiService {
 
 		// hostids
 		if ($options['hostids'] !== null) {
-			zbx_value2array($options['hostids']);
-
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
 				$sql_parts['from']['f'] = 'functions f';
@@ -379,10 +426,9 @@ class CEvent extends CApiService {
 		}
 
 		// severities
-		if ($options['severities'] !== null) {
+		if (array_key_exists('severities', $options) && $options['severities'] !== null) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
-				zbx_value2array($options['severities']);
 				$sql_parts['where'][] = dbConditionInt('e.severity', $options['severities']);
 			}
 			// ignore this filter for items and lld rules
@@ -415,7 +461,7 @@ class CEvent extends CApiService {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
+		if ($options['tags']) {
 			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
 				'event_tag', 'eventid'
 			);
@@ -442,13 +488,8 @@ class CEvent extends CApiService {
 		}
 
 		// value
-		if ($options['value'] !== null) {
+		if (array_key_exists('value', $options) && $options['value'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('e.value', $options['value']);
-		}
-
-		// search
-		if (is_array($options['search'])) {
-			zbx_db_search('events e', $options, $sql_parts);
 		}
 
 		// filter
@@ -456,31 +497,7 @@ class CEvent extends CApiService {
 			$this->applyFilters($options, $sql_parts);
 		}
 
-		// limit
-		if (zbx_ctype_digit($options['limit']) && $options['limit']) {
-			$sql_parts['limit'] = $options['limit'];
-		}
-
-		$result = [];
-
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $sql_parts['limit']);
-		while ($event = DBfetch($res)) {
-			if ($options['countOutput']) {
-				if ($options['groupCount']) {
-					$result[] = $event;
-				}
-				else {
-					$result = $event['rowscount'];
-				}
-			}
-			else {
-				$result[$event['eventid']] = $event;
-			}
-		}
-
-		return $result;
+		return $sql_parts;
 	}
 
 	/**
@@ -647,9 +664,6 @@ class CEvent extends CApiService {
 			$sql_parts['where']['ese'] = 'es.eventid=e.eventid';
 			$sql_parts['where']['es'] = dbConditionId('es.cause_eventid', $options['filter']['cause_eventid']);
 		}
-
-		// Apply standard filter properties.
-		$this->dbFilter('events e', $options, $sql_parts);
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
@@ -735,306 +749,330 @@ class CEvent extends CApiService {
 	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$eventids = array_keys($result);
+		$this->addRelatedAcknowledges($options, $result);
+		$this->addRelatedAlerts($options, $result);
+		self::addRelatedHosts($options, $result);
+		self::addRelatedObject($options, $result);
+		$this->addRelatedOpdata($options, $result);
+		self::addRelatedSuppressionData($options, $result);
+		$this->addRelatedSuppressed($options, $result);
+		self::addRelatedTags($options, $result);
+		$this->addRelatedUrls($options, $result);
 
-		// Adding operational data.
-		if ($this->outputIsRequested('opdata', $options['output'])) {
-			$events = DBFetchArrayAssoc(DBselect(
-				'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
-				' FROM events e'.
-					' JOIN triggers t'.
-						' ON t.triggerid=e.objectid'.
-				' WHERE '.dbConditionInt('e.eventid', $eventids)
+		return $result;
+	}
+
+	private function addRelatedAcknowledges(array $options, array &$result): void {
+		if ($options['selectAcknowledges'] === null) {
+			return;
+		}
+
+		if ($options['selectAcknowledges'] != API_OUTPUT_COUNT) {
+			foreach ($result as &$row) {
+				$row['acknowledges'] = [];
+			}
+			unset($row);
+
+			$output = $options['selectAcknowledges'] === API_OUTPUT_EXTEND
+				? ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+					'suppress_until', 'taskid'
+				]
+				: array_unique(array_merge(['acknowledgeid', 'eventid'], $options['selectAcknowledges']));
+
+			$sql_options = [
+				'output' => $output,
+				'filter' => ['eventid' => array_keys($result)],
+				'sortfield' => ['clock'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			];
+			$db_acknowledges = DBselect(DB::makeSql('acknowledges', $sql_options));
+
+			while ($db_acknowledge = DBfetch($db_acknowledges)) {
+				$eventid = $db_acknowledge['eventid'];
+
+				unset($db_acknowledge['acknowledgeid'], $db_acknowledge['eventid']);
+
+				$result[$eventid]['acknowledges'][] = $db_acknowledge;
+			}
+		}
+		else {
+			$db_acknowledges = DBFetchArrayAssoc(DBselect(
+				'SELECT a.eventid,COUNT(a.acknowledgeid) AS rowscount'.
+				' FROM acknowledges a'.
+				' WHERE '.dbConditionInt('a.eventid', array_keys($result)).
+				' GROUP BY a.eventid'
 			), 'eventid');
 
 			foreach ($result as $eventid => $event) {
-				$result[$eventid]['opdata'] = array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== ''
-					? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
-					: '';
+				$result[$eventid]['acknowledges'] = array_key_exists($eventid, $db_acknowledges)
+					? $db_acknowledges[$eventid]['rowscount']
+					: '0';
 			}
 		}
+	}
 
-		// adding hosts
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$hosts = [];
-			$relation_map = new CRelationMap();
-
-			// trigger events
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$query = DBselect(
-					'SELECT e.eventid,i.hostid'.
-					' FROM events e,functions f,items i'.
-					' WHERE '.dbConditionInt('e.eventid', $eventids).
-						' AND e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND e.object='.zbx_dbstr($options['object']).
-						' AND e.source='.zbx_dbstr($options['source'])
-				);
-			}
-			// item and LLD rule events
-			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				$query = DBselect(
-					'SELECT e.eventid,i.hostid'.
-					' FROM events e,items i'.
-					' WHERE '.dbConditionInt('e.eventid', $eventids).
-						' AND e.objectid=i.itemid'.
-						' AND e.object='.zbx_dbstr($options['object']).
-						' AND e.source='.zbx_dbstr($options['source'])
-				);
-			}
-
-			while ($relation = DBfetch($query)) {
-				$relation_map->addRelation($relation['eventid'], $relation['hostid']);
-			}
-
-			$related_ids = $relation_map->getRelatedIds();
-
-			if ($related_ids) {
-				$hosts = API::Host()->get([
-					'output' => $options['selectHosts'],
-					'hostids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			$result = $relation_map->mapMany($result, $hosts, 'hosts');
+	private function addRelatedAlerts(array $options, array &$result): void {
+		if ($options['selectAlerts'] === null) {
+			return;
 		}
 
-		// adding the related object
-		if ($options['selectRelatedObject'] !== null && $options['selectRelatedObject'] != API_OUTPUT_COUNT
-				&& $options['object'] != EVENT_OBJECT_AUTOREGHOST) {
+		$alerts = [];
+		$relation_map = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
+		$related_ids = $relation_map->getRelatedIds();
 
-			$relation_map = new CRelationMap();
-			foreach ($result as $event) {
-				$relation_map->addRelation($event['eventid'], $event['objectid']);
-			}
-
-			switch ($options['object']) {
-				case EVENT_OBJECT_TRIGGER:
-					$api = API::Trigger();
-					break;
-				case EVENT_OBJECT_DHOST:
-					$api = API::DHost();
-					break;
-				case EVENT_OBJECT_DSERVICE:
-					$api = API::DService();
-					break;
-				case EVENT_OBJECT_ITEM:
-					$api = API::Item();
-					break;
-				case EVENT_OBJECT_LLDRULE:
-					$api = API::DiscoveryRule();
-					break;
-				case EVENT_OBJECT_SERVICE:
-					$api = API::Service();
-					break;
-			}
-
-			$objects = $api->get([
-				'output' => $options['selectRelatedObject'],
-				$api->pkOption() => $relation_map->getRelatedIds(),
+		if ($related_ids) {
+			$alerts = API::Alert()->get([
+				'output' => $options['selectAlerts'],
+				'alertids' => $related_ids,
+				'sortfield' => 'clock',
+				'sortorder' => ZBX_SORT_DOWN,
 				'nopermissions' => true,
 				'preservekeys' => true
 			]);
-			$result = $relation_map->mapOne($result, $objects, 'relatedObject');
 		}
 
-		// adding alerts
-		if ($options['select_alerts'] !== null && $options['select_alerts'] != API_OUTPUT_COUNT) {
-			$alerts = [];
-			$relation_map = $this->createRelationMap($result, 'eventid', 'alertid', 'alerts');
-			$related_ids = $relation_map->getRelatedIds();
+		$result = $relation_map->mapMany($result, $alerts, 'alerts');
+	}
 
-			if ($related_ids) {
-				$alerts = API::Alert()->get([
-					'output' => $options['select_alerts'],
-					'selectMediatypes' => API_OUTPUT_EXTEND,
-					'alertids' => $related_ids,
-					'nopermissions' => true,
-					'preservekeys' => true,
-					'sortfield' => 'clock',
-					'sortorder' => ZBX_SORT_DOWN
-				]);
-			}
-
-			$result = $relation_map->mapMany($result, $alerts, 'alerts');
+	private static function addRelatedHosts(array $options, array &$result): void {
+		if ($options['selectHosts'] === null) {
+			return;
 		}
 
-		// adding acknowledges
-		if ($options['select_acknowledges'] !== null) {
-			if ($options['select_acknowledges'] != API_OUTPUT_COUNT) {
-				// create the base query
-				$sql_parts = API::getApiService()->createSelectQueryParts('acknowledges', 'a', [
-					'output' => $this->outputExtend($options['select_acknowledges'],
-						['acknowledgeid', 'eventid', 'clock', 'userid']
-					),
-					'filter' => ['eventid' => $eventids]
-				]);
-				$sql_parts['order'][] = 'a.clock DESC';
+		$hosts = [];
+		$relation_map = new CRelationMap();
 
-				$acknowledges = DBFetchArrayAssoc(DBselect(self::createSelectQueryFromParts($sql_parts)), 'acknowledgeid');
-
-				// Add user data if requested via extended output or specified fields.
-				$user_output_options = [];
-				foreach (['username', 'name', 'surname'] as $field) {
-					if ($this->outputIsRequested($field, $options['select_acknowledges'])) {
-						$user_output_options[] = $field;
-					}
-				}
-
-				if ($user_output_options) {
-					$users = API::User()->get([
-						'output' => $user_output_options,
-						'userids' => zbx_objectValues($acknowledges, 'userid'),
-						'preservekeys' => true
-					]);
-
-					foreach ($acknowledges as &$acknowledge) {
-						if (array_key_exists($acknowledge['userid'], $users)) {
-							$acknowledge = array_merge($acknowledge, $users[$acknowledge['userid']]);
-						}
-					}
-					unset($acknowledge);
-				}
-
-				$relation_map = $this->createRelationMap($acknowledges, 'eventid', 'acknowledgeid');
-				$acknowledges = $this->unsetExtraFields($acknowledges, ['eventid', 'acknowledgeid', 'clock', 'userid'],
-					$options['select_acknowledges']
-				);
-				$result = $relation_map->mapMany($result, $acknowledges, 'acknowledges');
-			}
-			else {
-				$acknowledges = DBFetchArrayAssoc(DBselect(
-					'SELECT COUNT(a.acknowledgeid) AS rowscount,a.eventid'.
-					' FROM acknowledges a'.
-					' WHERE '.dbConditionInt('a.eventid', $eventids).
-					' GROUP BY a.eventid'
-				), 'eventid');
-
-				foreach ($result as $eventid => $event) {
-					$result[$eventid]['acknowledges'] = array_key_exists($eventid, $acknowledges)
-						? $acknowledges[$eventid]['rowscount']
-						: '0';
-				}
-			}
+		// trigger events
+		if ($options['object'] == EVENT_OBJECT_TRIGGER) {
+			$query = DBselect(
+				'SELECT e.eventid,i.hostid'.
+				' FROM events e,functions f,items i'.
+				' WHERE '.dbConditionInt('e.eventid', array_keys($result)).
+					' AND e.objectid=f.triggerid'.
+					' AND f.itemid=i.itemid'.
+					' AND e.object='.zbx_dbstr($options['object']).
+					' AND e.source='.zbx_dbstr($options['source'])
+			);
+		}
+		// item and LLD rule events
+		elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
+			$query = DBselect(
+				'SELECT e.eventid,i.hostid'.
+				' FROM events e,items i'.
+				' WHERE '.dbConditionInt('e.eventid', array_keys($result)).
+					' AND e.objectid=i.itemid'.
+					' AND e.object='.zbx_dbstr($options['object']).
+					' AND e.source='.zbx_dbstr($options['source'])
+			);
 		}
 
-		// Adding suppression data.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT) {
-			$suppression_data = API::getApiService()->select('event_suppress', [
-				'output' => $this->outputExtend($options['selectSuppressionData'], ['eventid', 'maintenanceid']),
-				'filter' => ['eventid' => $eventids],
+		while ($relation = DBfetch($query)) {
+			$relation_map->addRelation($relation['eventid'], $relation['hostid']);
+		}
+
+		$related_ids = $relation_map->getRelatedIds();
+
+		if ($related_ids) {
+			$hosts = API::Host()->get([
+				'output' => $options['selectHosts'],
+				'hostids' => $related_ids,
+				'nopermissions' => true,
 				'preservekeys' => true
 			]);
-			$relation_map = $this->createRelationMap($suppression_data, 'eventid', 'event_suppressid');
-			$suppression_data = $this->unsetExtraFields($suppression_data, ['event_suppressid', 'eventid'], []);
-			$result = $relation_map->mapMany($result, $suppression_data, 'suppression_data');
 		}
 
-		// Adding suppressed value.
-		if ($this->outputIsRequested('suppressed', $options['output'])) {
-			$suppressed_eventids = [];
-			foreach ($result as &$event) {
-				if (array_key_exists('suppression_data', $event)) {
-					$event['suppressed'] = $event['suppression_data']
-						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-						: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				else {
-					$suppressed_eventids[] = $event['eventid'];
-				}
-			}
-			unset($event);
+		$result = $relation_map->mapMany($result, $hosts, 'hosts');
+	}
 
-			if ($suppressed_eventids) {
-				$suppressed_events = API::getApiService()->select('event_suppress', [
-					'output' => ['eventid'],
-					'filter' => ['eventid' => $suppressed_eventids]
-				]);
-				$suppressed_eventids = array_flip(zbx_objectValues($suppressed_events, 'eventid'));
-				foreach ($result as &$event) {
-					$event['suppressed'] = array_key_exists($event['eventid'], $suppressed_eventids)
-						? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
-						: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
-				}
-				unset($event);
-			}
+	private static function addRelatedObject(array $options, array &$result): void {
+		if ($options['selectRelatedObject'] === null || $options['object'] == EVENT_OBJECT_AUTOREGHOST) {
+			return;
 		}
 
-		// Remove "maintenanceid" field if it's not requested.
-		if ($options['selectSuppressionData'] !== null && $options['selectSuppressionData'] != API_OUTPUT_COUNT
-				&& !$this->outputIsRequested('maintenanceid', $options['selectSuppressionData'])) {
+		$relation_map = new CRelationMap();
+
+		foreach ($result as $event) {
+			$relation_map->addRelation($event['eventid'], $event['objectid']);
+		}
+
+		switch ($options['object']) {
+			case EVENT_OBJECT_TRIGGER:
+				$api = API::Trigger();
+				break;
+			case EVENT_OBJECT_DHOST:
+				$api = API::DHost();
+				break;
+			case EVENT_OBJECT_DSERVICE:
+				$api = API::DService();
+				break;
+			case EVENT_OBJECT_ITEM:
+				$api = API::Item();
+				break;
+			case EVENT_OBJECT_LLDRULE:
+				$api = API::DiscoveryRule();
+				break;
+			case EVENT_OBJECT_SERVICE:
+				$api = API::Service();
+				break;
+		}
+
+		$objects = $api->get([
+			'output' => $options['selectRelatedObject'],
+			$api->pkOption() => $relation_map->getRelatedIds(),
+			'nopermissions' => true,
+			'preservekeys' => true
+		]);
+
+		$result = $relation_map->mapOne($result, $objects, 'relatedObject');
+	}
+
+	private function addRelatedOpdata(array $options, array &$result): void {
+		if (!$this->outputIsRequested('opdata', $options['output'])) {
+			return;
+		}
+
+		$events = DBFetchArrayAssoc(DBselect(
+			'SELECT e.eventid,e.clock,e.ns,t.triggerid,t.expression,t.opdata'.
+			' FROM events e'.
+				' JOIN triggers t'.
+					' ON t.triggerid=e.objectid'.
+			' WHERE '.dbConditionInt('e.eventid', array_keys($result))
+		), 'eventid');
+
+		foreach ($result as $eventid => $event) {
+			$result[$eventid]['opdata'] = array_key_exists($eventid, $events) && $events[$eventid]['opdata'] !== ''
+				? CMacrosResolverHelper::resolveTriggerOpdata($events[$eventid], ['events' => true])
+				: '';
+		}
+	}
+
+	private static function addRelatedSuppressionData(array $options, array &$result): void {
+		if ($options['selectSuppressionData'] === null) {
+			return;
+		}
+
+		foreach ($result as &$row) {
+			$row['suppression_data'] = [];
+		}
+		unset($row);
+
+		$output = $options['selectSuppressionData'] === API_OUTPUT_EXTEND
+			? ['event_suppressid', 'eventid', 'maintenanceid', 'suppress_until', 'userid']
+			: array_unique(array_merge(['event_suppressid', 'eventid'], $options['selectSuppressionData']));
+
+		$sql_options = [
+			'output' => $output,
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
+
+		while ($db_suppression_data = DBfetch($db_event_suppress)) {
+			$eventid = $db_suppression_data['eventid'];
+
+			unset($db_suppression_data['event_suppressid'], $db_suppression_data['eventid']);
+
+			$result[$eventid]['suppression_data'][] = $db_suppression_data;
+		}
+	}
+
+	private function addRelatedSuppressed(array $options, array &$result): void {
+		if (!$this->outputIsRequested('suppressed', $options['output'])) {
+			return;
+		}
+
+		if ($options['selectSuppressionData'] !== null) {
 			foreach ($result as &$row) {
-				$row['suppression_data'] = $this->unsetExtraFields($row['suppression_data'], ['maintenanceid'], []);
+				$row['suppressed'] = $row['suppression_data']
+					? (string) ZBX_PROBLEM_SUPPRESSED_TRUE
+					: (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
 			}
 			unset($row);
 		}
+		else {
+			foreach ($result as &$row) {
+				$row['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_FALSE;
+			}
+			unset($row);
 
-		// Resolve webhook urls.
-		if ($this->outputIsRequested('urls', $options['output'])) {
-			$tags_options = [
-				'output' => ['eventid', 'tag', 'value'],
-				'filter' => ['eventid' => $eventids]
+			$sql_options = [
+				'output' => ['eventid'],
+				'filter' => ['eventid' => array_keys($result)]
 			];
-			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
+			$db_event_suppress = DBselect(DB::makeSql('event_suppress', $sql_options));
 
-			$events = [];
-
-			foreach ($result as $event) {
-				$events[$event['eventid']]['tags'] = [];
-			}
-
-			while ($tag = DBfetch($tags)) {
-				$events[$tag['eventid']]['tags'][] = [
-					'tag' => $tag['tag'],
-					'value' => $tag['value']
-				];
-			}
-
-			$urls = DB::select('media_type', [
-				'output' => ['event_menu_url', 'event_menu_name'],
-				'filter' => [
-					'type' => MEDIA_TYPE_WEBHOOK,
-					'status' => MEDIA_TYPE_STATUS_ACTIVE,
-					'show_event_menu' => ZBX_EVENT_MENU_SHOW
-				]
-			]);
-
-			$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
-
-			foreach ($events as $eventid => $event) {
-				$result[$eventid]['urls'] = $event['urls'];
+			while ($db_suppression_data = DBfetch($db_event_suppress)) {
+				$result[$db_suppression_data['eventid']]['suppressed'] = (string) ZBX_PROBLEM_SUPPRESSED_TRUE;
 			}
 		}
+	}
 
-		// Adding event tags.
-		if ($options['selectTags'] !== null && $options['selectTags'] != API_OUTPUT_COUNT) {
-			if ($options['selectTags'] === API_OUTPUT_EXTEND) {
-				$options['selectTags'] = ['tag', 'value'];
-			}
-
-			$tags_options = [
-				'output' => $this->outputExtend($options['selectTags'], ['eventid']),
-				'filter' => ['eventid' => $eventids]
-			];
-			$tags = DBselect(DB::makeSql('event_tag', $tags_options));
-
-			foreach ($result as &$event) {
-				$event['tags'] = [];
-			}
-			unset($event);
-
-			while ($tag = DBfetch($tags)) {
-				$event = &$result[$tag['eventid']];
-
-				unset($tag['eventtagid'], $tag['eventid']);
-				$event['tags'][] = $tag;
-			}
-			unset($event);
+	private static function addRelatedTags(array $options, array &$result): void {
+		if ($options['selectTags'] === null) {
+			return;
 		}
 
-		return $result;
+		foreach ($result as &$row) {
+			$row['tags'] = [];
+		}
+		unset($row);
+
+		$output = $options['selectTags'] === API_OUTPUT_EXTEND
+			? ['eventtagid', 'eventid', 'tag', 'value']
+			: array_unique(array_merge(['eventtagid', 'eventid'], $options['selectTags']));
+
+		$sql_options = [
+			'output' => $output,
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_tags = DBselect(DB::makeSql('event_tag', $sql_options));
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$eventid = $db_tag['eventid'];
+
+			unset($db_tag['eventtagid'], $db_tag['eventid']);
+
+			$result[$eventid]['tags'][] = $db_tag;
+		}
+	}
+
+	private function addRelatedUrls(array $options, array &$result): void {
+		if (!$this->outputIsRequested('urls', $options['output'])) {
+			return;
+		}
+
+		$sql_options = [
+			'output' => ['eventid', 'tag', 'value'],
+			'filter' => ['eventid' => array_keys($result)]
+		];
+		$db_tags = DBselect(DB::makeSql('event_tag', $sql_options));
+
+		$events = [];
+
+		foreach ($result as $event) {
+			$events[$event['eventid']]['tags'] = [];
+		}
+
+		while ($db_tag = DBfetch($db_tags)) {
+			$events[$db_tag['eventid']]['tags'][] = [
+				'tag' => $db_tag['tag'],
+				'value' => $db_tag['value']
+			];
+		}
+
+		$urls = DB::select('media_type', [
+			'output' => ['event_menu_url', 'event_menu_name'],
+			'filter' => [
+				'type' => MEDIA_TYPE_WEBHOOK,
+				'status' => MEDIA_TYPE_STATUS_ACTIVE,
+				'show_event_menu' => ZBX_EVENT_MENU_SHOW
+			]
+		]);
+
+		$events = CMacrosResolverHelper::resolveMediaTypeUrls($events, $urls);
+
+		foreach ($events as $eventid => $event) {
+			$result[$eventid]['urls'] = $event['urls'];
+		}
 	}
 
 	/**
@@ -1078,14 +1116,12 @@ class CEvent extends CApiService {
 		$events = $this->get([
 			'output' => ['objectid', 'acknowledged', 'severity', 'r_eventid', 'cause_eventid'],
 			// "acknowledges" used in CEvent::isEventClosed().
-			'select_acknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
+			'selectAcknowledges' => $has_close_action || $has_suppress_action || $has_unsuppress_action
 				? ['action']
 				: null,
 			// "suppression_data" used in CEvent::isEventSuppressed().
 			'selectSuppressionData' => $has_unsuppress_action ? ['maintenanceid'] : null,
 			'eventids' => $data['eventids'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'preservekeys' => true,
 			'nopermissions' => true
@@ -1473,7 +1509,7 @@ class CEvent extends CApiService {
 	 *                                               - 0x80  - ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE
 	 *                                               - 0x100 - ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM
 	 *
-	 * @throws APIException if the input is invalid.
+	 * @throws APIException
 	 */
 	protected function validateAcknowledge(array $data, int $time): void {
 		$fields =  [
