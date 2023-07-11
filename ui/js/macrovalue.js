@@ -32,7 +32,6 @@
 	const ZBX_STYLE_MACRO_VALUE_SECRET = 'macro-value-secret';
 	const ZBX_STYLE_MACRO_VALUE_VAULT = 'macro-value-vault';
 
-	const ZBX_STYLE_ICON_INVISIBLE = 'icon-invisible';
 	const ZBX_STYLE_ICON_SECRET = 'icon-secret';
 
 	function btnUndoFocusEventHandle() {
@@ -78,9 +77,8 @@
 			.trigger('change');
 
 		$('.btn-dropdown-container button', $container)
-			.removeClass('icon-text ' + ZBX_STYLE_ICON_SECRET)
-			.addClass('btn-alt btn-dropdown-toggle ' + ZBX_STYLE_ICON_INVISIBLE);
-
+			.removeClass([ZBX_ICON_TEXT, ZBX_ICON_LOCK])
+			.addClass(['btn-alt', 'btn-dropdown-toggle', ZBX_ICON_EYE_OFF]);
 		$this.hide();
 	}
 

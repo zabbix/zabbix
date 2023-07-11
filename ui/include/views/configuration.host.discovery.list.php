@@ -357,7 +357,7 @@ if ($data['context'] === 'host') {
 			'content' => (new CSimpleButton(_('Execute now')))
 				->onClick('view.massCheckNow(this);')
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 				->setAttribute('data-required', 'execute')
 		]
 	];

@@ -45,7 +45,7 @@ static int	telnet_waitsocket(ZBX_SOCKET socket_fd, short mode)
 	if (0 > (rc = zbx_socket_poll(&pd, 1, 100)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() poll() error rc:%d errno:%d error:[%s]", __func__, rc,
-				zbx_socket_last_error(), strerror_from_system(zbx_socket_last_error()));
+				zbx_socket_last_error(), zbx_strerror_from_system(zbx_socket_last_error()));
 	}
 	else if (0 < rc && POLLIN != (pd.revents & (POLLIN | POLLERR | POLLHUP | POLLNVAL)))
 	{
@@ -74,7 +74,7 @@ static ssize_t	telnet_socket_read(zbx_socket_t *s, void *buf, size_t count)
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__func__, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, zbx_strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -119,7 +119,7 @@ static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t coun
 	{
 		error = zbx_socket_last_error();	/* zabbix_log() resets the error code */
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() rc:%ld errno:%d error:[%s]",
-				__func__, (long int)rc, error, strerror_from_system(error));
+				__func__, (long int)rc, error, zbx_strerror_from_system(error));
 #ifdef _WINDOWS
 		if (WSAEWOULDBLOCK == error)
 #else
@@ -477,7 +477,7 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 		const char	*errmsg;
 
 		if (SUCCEED == zbx_socket_check_deadline(s))
-			errmsg = strerror_from_system(zbx_socket_last_error());
+			errmsg = zbx_strerror_from_system(zbx_socket_last_error());
 		else
 			errmsg = "timeout occurred";
 

@@ -19,8 +19,9 @@
 
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
+#include "win32_cpu.h"
 
-#include "stats.h"
+#include "../common/stats.h"
 #include "perfstat.h"
 
 /* shortcut to avoid extra verbosity */

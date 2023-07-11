@@ -33,7 +33,7 @@ $form = (new CForm('post'))
 	->setName('widget_dialogue_form');
 
 // Enable form submitting on Enter.
-$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $multiselect = (new CMultiSelect([
 	'name' => 'sysmapid',

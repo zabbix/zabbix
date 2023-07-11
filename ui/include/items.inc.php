@@ -1343,7 +1343,7 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 		$css = CSeverityHelper::getStyle((int) $trigger['priority']);
 
 		if ($trigger['problem']['acknowledged'] == 1) {
-			$ack = [' ', (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)];
+			$ack = [' ', (new CSpan())->addClass(ZBX_ICON_CHECK)];
 		}
 	}
 
@@ -1454,6 +1454,17 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 				'is_mapped' => false
 			];
 	}
+}
+
+/**
+ * Check whether the unit of an item is binary or not.
+ *
+ * @param string $units
+ *
+ * @return bool
+ */
+function isBinaryUnits(string $units): bool {
+	return $units === 'B' || $units === 'Bps';
 }
 
 /**

@@ -184,7 +184,8 @@ class CControllerAuthenticationEdit extends CController {
 				'output' => API_OUTPUT_EXTEND,
 				'selectProvisionGroups' => API_OUTPUT_EXTEND,
 				'selectProvisionMedia' => API_OUTPUT_EXTEND,
-				'selectUsrgrps' => API_OUTPUT_COUNT
+				'selectUsrgrps' => API_OUTPUT_COUNT,
+				'sortfield' => ['name']
 			]);
 
 			$saml_configuration = [];

@@ -18,13 +18,10 @@
 **/
 
 #include "zbxsysinfo.h"
+#include "../sysinfo.h"
+#include "agent.h"
 
 #include "modbtype.h"
-
-extern char			*CONFIG_HOSTNAMES;
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
-extern char			*CONFIG_HOST_METADATA;
-extern char			*CONFIG_HOST_METADATA_ITEM;
 
 static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -32,7 +29,7 @@ static int	agent_ping(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_version(AGENT_REQUEST *request, AGENT_RESULT *result);
 static int	agent_variant(AGENT_REQUEST *request, AGENT_RESULT *result);
 
-ZBX_METRIC	parameters_agent[] =
+static zbx_metric_t	parameters_agent[] =
 /*	KEY			FLAG		FUNCTION		TEST PARAMETERS */
 {
 	{"agent.hostname",	0,		agent_hostname,		NULL},
@@ -44,20 +41,25 @@ ZBX_METRIC	parameters_agent[] =
 	{NULL}
 };
 
+zbx_metric_t	*get_parameters_agent(void)
+{
+	return &parameters_agent[0];
+}
+
 static int	agent_hostname(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ZBX_UNUSED(request);
 
-	if (NULL == CONFIG_HOSTNAME)
+	if (NULL == sysinfo_get_config_hostname())
 	{
 		char	*p;
 
-		SET_STR_RESULT(result, NULL != (p = strchr(CONFIG_HOSTNAMES, ',')) ?
-				zbx_dsprintf(NULL, "%.*s", (int)(p - CONFIG_HOSTNAMES), CONFIG_HOSTNAMES) :
-				zbx_strdup(NULL, CONFIG_HOSTNAMES));
+		SET_STR_RESULT(result, NULL != (p = strchr(sysinfo_get_config_hostnames(), ',')) ?
+				zbx_dsprintf(NULL, "%.*s", (int)(p - sysinfo_get_config_hostnames()),
+				sysinfo_get_config_hostnames()) : zbx_strdup(NULL, sysinfo_get_config_hostnames()));
 	}
 	else
-		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOSTNAME));
+		SET_STR_RESULT(result, zbx_strdup(NULL, sysinfo_get_config_hostname()));
 
 	return SYSINFO_RET_OK;
 }
@@ -68,17 +70,18 @@ static int	agent_hostmetadata(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ZBX_UNUSED(request);
 
-	if (NULL != CONFIG_HOST_METADATA)
+	if (NULL != sysinfo_get_config_host_metadata())
 	{
-		SET_STR_RESULT(result, zbx_strdup(NULL, CONFIG_HOST_METADATA));
+		SET_STR_RESULT(result, zbx_strdup(NULL, sysinfo_get_config_host_metadata()));
 	}
-	else if (NULL != CONFIG_HOST_METADATA_ITEM)
+	else if (NULL != sysinfo_get_config_host_metadata_item())
 	{
-		if (SUCCEED != zbx_execute_agent_check(CONFIG_HOST_METADATA_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
-				ZBX_PROCESS_WITH_ALIAS, result) || NULL == ZBX_GET_STR_RESULT(result))
+		if (SUCCEED != zbx_execute_agent_check(sysinfo_get_config_host_metadata_item(),
+				ZBX_PROCESS_LOCAL_COMMAND | ZBX_PROCESS_WITH_ALIAS, result) ||
+				NULL == ZBX_GET_STR_RESULT(result))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get host metadata using item \"%s\"",
-					CONFIG_HOST_METADATA_ITEM));
+					sysinfo_get_config_host_metadata_item()));
 			ret = SYSINFO_RET_FAIL;
 		}
 	}

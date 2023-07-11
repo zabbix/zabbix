@@ -34,14 +34,12 @@ void zbx_log_go_impl(int level, const char *fmt, va_list args)
 	if (zbx_agent_pid == getpid() && -1 != level)
 	{
 		va_list	tmp;
-		char *message = NULL;
-		size_t size;
 
 		va_copy(tmp, args);
-		size = vsnprintf(NULL, 0, fmt, args) + 2;
+		size_t	size = vsnprintf(NULL, 0, fmt, tmp) + 2;
 		va_end(tmp);
 
-		message = (char *)zbx_malloc(NULL, size);
+		char	*message = (char *)zbx_malloc(NULL, size);
 		vsnprintf(message, size, fmt, args);
 
 		handleZabbixLog(level, message);
