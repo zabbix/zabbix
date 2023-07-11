@@ -1545,101 +1545,6 @@ out:
 	return ret;
 }
 
-/* group statuses */
-typedef enum
-{
-	GROUP_STATUS_ACTIVE = 0,
-	GROUP_STATUS_DISABLED
-}
-zbx_group_status_type_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check user permissions to access system.                          *
- *                                                                            *
- * Parameters: userid - [IN]                                                  *
- *                                                                            *
- * Return value: SUCCEED - access allowed, FAIL - otherwise                   *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_user_perm2system(zbx_uint64_t userid)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		res = SUCCEED;
-
-	result = zbx_db_select(
-			"select count(*)"
-			" from usrgrp g,users_groups ug"
-			" where ug.userid=" ZBX_FS_UI64
-				" and g.usrgrpid=ug.usrgrpid"
-				" and g.users_status=%d",
-			userid, GROUP_STATUS_DISABLED);
-
-	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]) && atoi(row[0]) > 0)
-		res = FAIL;
-
-	zbx_db_free_result(result);
-
-	return res;
-}
-
-
-/* user role permissions */
-typedef enum
-{
-	ROLE_PERM_DENY = 0,
-	ROLE_PERM_ALLOW = 1,
-}
-zbx_user_role_permission_t;
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if the user has specific or default access for              *
- *          administration actions                                            *
- *                                                                            *
- * Return value:  SUCCEED - the access is granted                             *
- *                FAIL    - the access is denied                              *
- *                                                                            *
- ******************************************************************************/
-int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule)
-{
-	int		ret = FAIL;
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() userid:" ZBX_FS_UI64 , __func__, user->userid);
-
-	result = zbx_db_select("select value_int,name from role_rule where roleid=" ZBX_FS_UI64
-			" and (name='%s' or name='%s')", user->roleid, role_rule,
-			role_rule_default);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (0 == strcmp(role_rule, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-			else
-				ret = FAIL;
-			break;
-		}
-		else if (0 == strcmp(role_rule_default, row[1]))
-		{
-			if (ROLE_PERM_ALLOW == atoi(row[0]))
-				ret = SUCCEED;
-		}
-		else
-			THIS_SHOULD_NEVER_HAPPEN;
-	}
-	zbx_db_free_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-
-	return ret;
-}
-
 /******************************************************************************
  *                                                                            *
  * Return value: "Name Surname (Alias)" or "unknown" if user not found        *
@@ -1700,24 +1605,6 @@ out:
 	zbx_db_free_result(result);
 
 	return ret;
-}
-
-char	*zbx_db_get_user_timezone(zbx_uint64_t userid)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*user_timezone;
-
-	result = zbx_db_select("select timezone from users where userid=" ZBX_FS_UI64, userid);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		user_timezone = zbx_strdup(NULL, row[0]);
-	else
-		user_timezone = NULL;
-
-	zbx_db_free_result(result);
-
-	return user_timezone;
 }
 
 /******************************************************************************

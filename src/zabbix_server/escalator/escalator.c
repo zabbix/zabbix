@@ -856,7 +856,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 		if (NULL != ack && ack->userid == userid)
 			continue;
 
-		if (SUCCEED != zbx_check_user_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		switch (event->object)
@@ -954,7 +954,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		if (NULL != ack && ack->userid == userid)
 			continue;
 
-		if (SUCCEED != zbx_check_user_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		ZBX_STR2UINT64(mediatypeid, row[1]);
@@ -1048,7 +1048,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 		mediatypeid_prev = mediatypeid;
 		esc_step_prev = esc_step;
 
-		if (SUCCEED != zbx_check_user_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		switch (event->object)
@@ -1128,7 +1128,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		if (ack->userid == userid)
 			continue;
 
-		if (SUCCEED != zbx_check_user_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
