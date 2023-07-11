@@ -113,7 +113,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				" sending notifications."
 		];
 
-		// Maping tables headers.
+		// Mapping tables headers.
 		$mapping_tables = [
 			'User group mapping' => [
 				'id' => 'saml-group-table',

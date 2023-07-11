@@ -1,12 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	logfiles \
-	active_checks
+	active_checks \
+	logfiles
 
 EXTRA_DIST = \
-	eventlog.c \
-	eventlog.h \
+	eventlog \
 	perfstat.c \
 	perfstat.h
 

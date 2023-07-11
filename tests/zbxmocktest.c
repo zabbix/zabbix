@@ -92,10 +92,6 @@ int	CONFIG_MAX_HOUSEKEEPER_DELETE	= 5000;		/* applies for every separate field v
 int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 int	CONFIG_PROBLEMHOUSEKEEPING_FREQUENCY = 60;
 
-int	CONFIG_VMWARE_FREQUENCY		= 60;
-int	CONFIG_VMWARE_PERF_FREQUENCY	= 60;
-int	CONFIG_VMWARE_TIMEOUT		= 10;
-
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 
 zbx_uint64_t	get_zbx_config_value_cache_size(void)
@@ -108,10 +104,8 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 	zbx_config_value_cache_size = cache_size;
 }
 
-zbx_uint64_t	CONFIG_VMWARE_CACHE_SIZE	= 8 * 0;
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
 
-int	CONFIG_LOG_LEVEL		= 0;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 
 char	*CONFIG_SNMPTRAP_FILE		= NULL;
@@ -123,17 +117,11 @@ char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
 
-char	*CONFIG_LOAD_MODULE_PATH	= NULL;
-char	**CONFIG_LOAD_MODULE		= NULL;
-
-char	*CONFIG_USER			= NULL;
-
 /* web monitoring */
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 
-char	*CONFIG_SOCKET_PATH			= NULL;
 char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
@@ -180,18 +168,6 @@ static int	zbx_config_enable_remote_commands = 0;
 int	get_zbx_config_enable_remote_commands(void)
 {
 	return zbx_config_enable_remote_commands;
-}
-
-static int	zbx_config_log_remote_commands = 0;
-int	get_zbx_config_log_remote_commands(void)
-{
-	return zbx_config_log_remote_commands;
-}
-
-static int	zbx_config_unsafe_user_parameters = 0;
-int	get_zbx_config_unsafe_user_parameters(void)
-{
-	return zbx_config_unsafe_user_parameters;
 }
 
 /* test itself */

@@ -17,11 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_GET_HOST_FROM_EVENT_H
-#define ZABBIX_GET_HOST_FROM_EVENT_H
-
-#include "zbxcacheconfig.h"
-
-int	get_host_from_event(const zbx_db_event *event, zbx_dc_host_t *host, char *error, size_t max_error_len);
-
+#ifndef INFORMATION_TYPE
+#	define INFORMATION_TYPE	"Information"
 #endif
+#ifndef WARNING_TYPE
+#	define WARNING_TYPE	"Warning"
+#endif
+#ifndef ERROR_TYPE
+#	define ERROR_TYPE	"Error"
+#endif
+#ifndef AUDIT_FAILURE
+#	define AUDIT_FAILURE	"Failure Audit"
+#endif
+#ifndef AUDIT_SUCCESS
+#	define AUDIT_SUCCESS	"Success Audit"
+#endif
+#ifndef CRITICAL_TYPE
+#	define CRITICAL_TYPE	"Critical"
+#endif
+#ifndef VERBOSE_TYPE
+#	define VERBOSE_TYPE	"Verbose"
+#endif
+
