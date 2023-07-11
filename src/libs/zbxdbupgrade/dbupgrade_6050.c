@@ -354,6 +354,9 @@ static int	DBpatch_6050031(void)
 	zbx_db_insert_t		db_insert_proxies;
 	int			ret;
 
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	result = zbx_db_select("select h.hostid,h.host,h.status,h.description,h.tls_connect,h.tls_accept,h.tls_issuer,"
 			"h.tls_subject,h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,i.useip,i.ip,i.dns,"
 			"i.port from hosts h left join interface i on h.hostid=i.hostid where h.status in (%i,%i)",
@@ -511,6 +514,9 @@ static int	DBpatch_6050046(void)
 	zbx_db_insert_t		db_insert_rtdata;
 	int			ret;
 
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	result = zbx_db_select("select hr.hostid,hr.lastaccess,hr.version,hr.compatibility from host_rtdata hr "
 			"inner join hosts h on hr.hostid=h.hostid where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_ACTIVE, DEPRECATED_STATUS_PROXY_PASSIVE);
@@ -542,6 +548,9 @@ static int	DBpatch_6050046(void)
 
 static int	DBpatch_6050047(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > zbx_db_execute("delete from hosts where status in (5,6)"))
 		return FAIL;
 
@@ -550,6 +559,9 @@ static int	DBpatch_6050047(void)
 
 static int	DBpatch_6050048(void)
 {
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
 	if (ZBX_DB_OK > zbx_db_execute("delete from host_rtdata where hostid in (select proxyid from proxy)"))
 		return FAIL;
 
