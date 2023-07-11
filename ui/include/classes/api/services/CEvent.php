@@ -45,7 +45,7 @@ class CEvent extends CApiService {
 	 *
 	 * @return array|string
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
 			'new_severity', 'suppress_until', 'taskid'
 		];
@@ -629,7 +629,7 @@ class CEvent extends CApiService {
 		}
 	}
 
-	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput']) {

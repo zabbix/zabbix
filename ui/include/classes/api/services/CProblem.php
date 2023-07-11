@@ -44,7 +44,7 @@ class CProblem extends CApiService {
 	 *
 	 * @return array|string
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'eventids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -345,7 +345,7 @@ class CProblem extends CApiService {
 	 *
 	 * @return array
 	 */
-	protected static function addTagFilterSqlParts(array $usrgrpids, array $sql_parts) {
+	protected static function addTagFilterSqlParts(array $usrgrpids, array $sql_parts): array {
 		$tag_filters = CEvent::getTagFilters($usrgrpids);
 
 		if (!$tag_filters) {
@@ -461,8 +461,7 @@ class CProblem extends CApiService {
 		}
 	}
 
-
-	protected function addRelatedObjects(array $options, array $result) {
+	protected function addRelatedObjects(array $options, array $result): array {
 		$result = parent::addRelatedObjects($options, $result);
 
 		$this->addRelatedAcknowledges($options, $result);
