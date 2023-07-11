@@ -990,6 +990,9 @@ class testDashboardGaugeWidget extends CWebTest {
 		));
 	}
 
+	/**
+	 * Test function for assuring that text, log and char items are not available in Gauge widget.
+	 */
 	public function testDashboardGaugeWidget_CheckAvailableItems() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
