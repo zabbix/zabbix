@@ -895,17 +895,26 @@ function sortOperations($eventsource, &$operations): void {
 		foreach ($operations as $key => $operation) {
 			$esc_step_from[$key] = $operation['esc_step_from'];
 			$esc_step_to[$key] = $operation['esc_step_to'];
-			// Try to sort by "esc_period" in seconds, otherwise sort as string in case it's a macro or something invalid.
+			/*
+			 * Try to sort by "esc_period" in seconds, otherwise sort as string in case it's a macro or something
+			 * invalid.
+			 */
 			$esc_period[$key] = ($simple_interval_parser->parse($operation['esc_period']) == CParser::PARSE_SUCCESS)
 				? timeUnitToSeconds($operation['esc_period'])
 				: $operation['esc_period'];
 
 			$operationTypes[$key] = $operation['operationtype'];
 		}
-		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes, SORT_ASC, $operations);
+		array_multisort($esc_step_from, SORT_ASC, $esc_step_to, SORT_ASC, $esc_period, SORT_ASC, $operationTypes,
+			SORT_ASC, $operations
+		);
 	}
 	else {
-		CArrayHelper::sort($operations, ['operationtype']);
+		$order = getAllowedOperations($eventsource)[ACTION_OPERATION];
+
+		usort($operations,
+			static fn($a, $b) => array_search($a['operationtype'], $order) - array_search($b['operationtype'], $order)
+		);
 	}
 }
 
