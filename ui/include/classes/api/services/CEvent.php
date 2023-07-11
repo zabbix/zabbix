@@ -33,6 +33,11 @@ class CEvent extends CApiService {
 	protected $tableAlias = 'e';
 	protected $sortColumns = ['eventid', 'objectid', 'clock'];
 
+	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns',
+		'name', 'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata',
+		'suppressed', 'urls'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -41,48 +46,10 @@ class CEvent extends CApiService {
 	 * @return array|string
 	 */
 	public function get($options = []) {
-		$output_fields = ['eventid', 'source', 'object', 'objectid', 'clock', 'value', 'acknowledged', 'ns', 'name',
-			'severity', 'r_eventid', 'c_eventid', 'correlationid', 'userid', 'cause_eventid', 'opdata', 'suppressed',
-			'urls'
+		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity',
+			'new_severity', 'suppress_until', 'taskid'
 		];
-		$acknowledge_output_fields = ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action',
-			'old_severity', 'new_severity', 'suppress_until', 'taskid'
-		];
-		$alert_output_fields = ['alertid', 'actionid', 'eventid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject',
-			'message', 'status', 'retries', 'error', 'esc_step', 'alerttype', 'p_eventid', 'acknowledgeid'
-		];
-		$dhost_output_fields = ['dhostid', 'druleid', 'status', 'lastup', 'lastdown'];
-		$dservice_output_fields = ['dserviceid', 'dhostid', 'value', 'port', 'status', 'lastup', 'lastdown', 'dcheckid',
-			'ip', 'dns'
-		];
-		$host_output_fields = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
-			'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'inventory_mode', 'active_available'
-		];
-		$item_output_fields = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history', 'trends',
-			'status', 'value_type', 'trapper_hosts', 'units', 'logtimefmt', 'templateid', 'valuemapid', 'params',
-			'ipmi_sensor', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'interfaceid',
-			'description', 'inventory_link', 'jmx_endpoint', 'master_itemid', 'timeout', 'url', 'query_fields', 'posts',
-			'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers', 'retrieve_mode', 'request_method',
-			'output_format', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer', 'verify_host',
-			'allow_traps', 'state', 'error', 'parameters', 'lastclock', 'lastns', 'lastvalue', 'prevvalue'
-		];
-		$discovery_rule_output_fields = ['itemid', 'type', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'status',
-			'trapper_hosts', 'templateid', 'params', 'ipmi_sensor', 'authtype', 'username', 'password', 'publickey',
-			'privatekey', 'interfaceid', 'description', 'lifetime', 'jmx_endpoint', 'master_itemid', 'timeout', 'url',
-			'query_fields', 'posts', 'status_codes', 'follow_redirects', 'post_type', 'http_proxy', 'headers',
-			'retrieve_mode', 'request_method', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'verify_peer',
-			'verify_host', 'allow_traps', 'state', 'error', 'parameters'
-		];
-		$service_output_fields = ['serviceid', 'name', 'status', 'algorithm', 'sortorder', 'weight', 'propagation_rule',
-			'propagation_value', 'description', 'created_at', 'readonly'
-		];
-		$trigger_output_fields = ['triggerid', 'expression', 'description', 'url', 'status', 'value', 'priority',
-			'lastchange', 'comments', 'error', 'templateid', 'type', 'state', 'flags', 'recovery_mode',
-			'recovery_expression', 'correlation_mode', 'correlation_tag', 'manual_close', 'opdata', 'event_name',
-			'url_name'
-		];
+		$alert_output_fields = array_diff(CAlert::OUTPUT_FIELDS, ['eventid']);
 
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
@@ -92,16 +59,8 @@ class CEvent extends CApiService {
 			'objectids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'source' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
 			'object' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE, EVENT_OBJECT_AUTOREGHOST, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
-			'value' =>						['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'source', 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_SERVICE])], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]), 'uniq' => true, 'default' => null],
-												['if' => ['field' => 'source', 'in' => EVENT_SOURCE_DISCOVERY], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [0, 1, 2, 3]), 'uniq' => true, 'default' => null],
-												['if' => ['field' => 'source', 'in' => EVENT_SOURCE_INTERNAL], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', [0, 1]), 'uniq' => true, 'default' => null],
-												['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'severities' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'object', 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_SERVICE])], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
-												['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'value' =>						['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'uniq' => true, 'default' => null],
+			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
 			'eventid_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'eventid_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_from' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
@@ -112,8 +71,8 @@ class CEvent extends CApiService {
 			'suppressed' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'operator', 'value']], 'default' => [], 'fields' => [
-				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'default' => [], 'fields' => [
+				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
 				'value' =>						['type' => API_STRING_UTF8]
 			]],
@@ -124,22 +83,22 @@ class CEvent extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'groupCount' =>					['type' => API_FLAG, 'default' => false],
 			'select_acknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'select_alerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
 			'selectAlerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $alert_output_fields), 'default' => null],
-			'selectHosts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_output_fields), 'default' => null],
+			'selectHosts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
 			'selectRelatedObject' =>		['type' => API_MULTIPLE, 'default' => null, 'rules' => [
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $trigger_output_fields)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $dhost_output_fields)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $dservice_output_fields)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_TRIGGER], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CTrigger::OUTPUT_FIELDS)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDHost::OUTPUT_FIELDS)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_DSERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDService::OUTPUT_FIELDS)],
 												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_AUTOREGHOST], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => ''],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $item_output_fields)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_rule_output_fields)],
-												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $service_output_fields)]
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_ITEM], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CItem::OUTPUT_FIELDS)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_LLDRULE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CDiscoveryRule::OUTPUT_FIELDS)],
+												['if' => ['field' => 'object', 'in' => EVENT_OBJECT_SERVICE], 'type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CService::OUTPUT_FIELDS)]
 			]],
 			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
@@ -426,7 +385,7 @@ class CEvent extends CApiService {
 		}
 
 		// severities
-		if (array_key_exists('severities', $options) && $options['severities'] !== null) {
+		if ($options['severities'] !== null) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				sort($options['severities']);
@@ -794,7 +753,11 @@ class CEvent extends CApiService {
 			while ($db_acknowledge = DBfetch($db_acknowledges)) {
 				$eventid = $db_acknowledge['eventid'];
 
-				unset($db_acknowledge['acknowledgeid'], $db_acknowledge['eventid']);
+				if (!in_array('acknowledgeid', $output)) {
+					unset($db_acknowledge['acknowledgeid']);
+				}
+
+				unset($db_acknowledge['eventid']);
 
 				$result[$eventid]['acknowledges'][] = $db_acknowledge;
 			}
@@ -826,7 +789,9 @@ class CEvent extends CApiService {
 
 		if ($related_ids) {
 			$alerts = API::Alert()->get([
-				'output' => $options['selectAlerts'],
+				'output' => $options['selectAlerts'] === API_OUTPUT_EXTEND
+					? array_diff(CAlert::OUTPUT_FIELDS, ['eventid'])
+					: $options['selectAlerts'],
 				'alertids' => $related_ids,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,

@@ -32,6 +32,11 @@ class CProblem extends CApiService {
 	protected $tableAlias = 'p';
 	protected $sortColumns = ['eventid'];
 
+	public const OUTPUT_FIELDS = ['eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock', 'r_ns',
+		'correlationid', 'userid', 'name', 'acknowledged', 'severity', 'cause_eventid', 'opdata', 'suppressed',
+		'urls'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -40,11 +45,6 @@ class CProblem extends CApiService {
 	 * @return array|string
 	 */
 	public function get($options = []) {
-		$output_fields = ['eventid', 'source', 'object', 'objectid', 'clock', 'ns', 'r_eventid', 'r_clock', 'r_ns',
-			'correlationid', 'userid', 'name', 'acknowledged', 'severity', 'cause_eventid', 'opdata', 'suppressed',
-			'urls'
-		];
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'eventids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -53,10 +53,7 @@ class CProblem extends CApiService {
 			'objectids' =>					['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'source' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE]), 'default' => EVENT_SOURCE_TRIGGERS],
 			'object' =>						['type' => API_INT32, 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE]), 'default' => EVENT_OBJECT_TRIGGER],
-			'severities' =>					['type' => API_MULTIPLE, 'rules' => [
-												['if' => ['field' => 'object', 'in' => implode(',', [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_SERVICE])], 'type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
-												['else' => true, 'type' => API_UNEXPECTED]
-			]],
+			'severities' =>					['type' => API_INTS32, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)), 'uniq' => true, 'default' => null],
 			'eventid_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'eventid_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_from' =>					['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
@@ -66,8 +63,8 @@ class CProblem extends CApiService {
 			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'recent' =>						['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'operator', 'value']], 'default' => [], 'fields' => [
-				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'default' => [], 'fields' => [
+				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
 				'value' =>						['type' => API_STRING_UTF8]
 			]],
@@ -78,9 +75,9 @@ class CProblem extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
+			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['acknowledgeid', 'userid', 'clock', 'message', 'action', 'old_severity', 'new_severity', 'suppress_until', 'taskid']), 'default' => null],
 			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -506,7 +503,11 @@ class CProblem extends CApiService {
 			while ($db_acknowledge = DBfetch($db_acknowledges)) {
 				$eventid = $db_acknowledge['eventid'];
 
-				unset($db_acknowledge['acknowledgeid'], $db_acknowledge['eventid']);
+				if (!in_array('acknowledgeid', $output)) {
+					unset($db_acknowledge['acknowledgeid']);
+				}
+
+				unset($db_acknowledge['eventid']);
 
 				$result[$eventid]['acknowledges'][] = $db_acknowledge;
 			}

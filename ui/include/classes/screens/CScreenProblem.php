@@ -507,7 +507,7 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataEvents(array $eventids) {
 		$events = API::Event()->get([
 			'output' => ['eventid', 'r_eventid', 'acknowledged'],
-			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
@@ -560,7 +560,7 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
-			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
+			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],

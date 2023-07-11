@@ -34,6 +34,10 @@ class CAlert extends CApiService {
 	protected $tableAlias = 'a';
 	protected $sortColumns = ['alertid', 'clock', 'eventid', 'status', 'sendto', 'mediatypeid'];
 
+	public const OUTPUT_FIELDS = ['alertid', 'actionid', 'eventid', 'userid', 'clock', 'mediatypeid', 'sendto',
+		'subject', 'message', 'status', 'retries', 'error', 'esc_step', 'alerttype', 'p_eventid', 'acknowledgeid'
+	];
+
 	/**
 	 * @param array $options
 	 *
@@ -42,25 +46,6 @@ class CAlert extends CApiService {
 	 * @return array|string
 	 */
 	public function get($options = []) {
-		$output_fields = ['alertid', 'actionid', 'eventid', 'userid', 'clock', 'mediatypeid', 'sendto', 'subject',
-			'message', 'status', 'retries', 'error', 'esc_step', 'alerttype', 'p_eventid', 'acknowledgeid'
-		];
-		$host_output_fields = ['hostid', 'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege',
-			'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status', 'maintenance_type',
-			'maintenance_from', 'name', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'inventory_mode', 'active_available'
-		];
-		$mediatype_output_fields = ['mediatypeid', 'type', 'name', 'smtp_server', 'smtp_helo', 'smtp_email',
-			'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_port', 'smtp_security', 'smtp_verify_peer',
-			'smtp_verify_host', 'smtp_authentication', 'maxsessions', 'maxattempts', 'attempt_interval', 'content_type',
-			'script', 'timeout', 'process_tags', 'show_event_menu', 'event_menu_url', 'event_menu_name', 'description',
-			'provider', 'parameters'
-		];
-		$user_output_fields = ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout',
-			'lang', 'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone',
-			'roleid', 'userdirectoryid', 'ts_provisioned'
-		];
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'alertids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -76,12 +61,12 @@ class CAlert extends CApiService {
 			'time_from' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'time_till' =>				['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
 			// output
-			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>					['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
-			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $host_output_fields), 'default' => null],
-			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $mediatype_output_fields), 'default' => null],
-			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $user_output_fields), 'default' => null],
+			'selectHosts' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CHost::OUTPUT_FIELDS), 'default' => null],
+			'selectMediatypes' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CMediatype::OUTPUT_FIELDS), 'default' => null],
+			'selectUsers' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', CUser::OUTPUT_FIELDS), 'default' => null],
 			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['alertid', 'actionid', 'eventid', 'userid', 'mediatypeid', 'status', 'acknowledgeid']],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['sendto', 'subject', 'message', 'error']],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -103,7 +88,7 @@ class CAlert extends CApiService {
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $output_fields;
+			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
 		$res = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
