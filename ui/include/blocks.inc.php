@@ -126,8 +126,6 @@ function getSystemStatusData(array $filter) {
 		'hostids' => $filter_hostids,
 		'evaltype' => $filter_evaltype,
 		'tags' => $filter_tags,
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
 		'suppressed' => false,
 		'symptom' => false,
 		'sortfield' => ['eventid'],
@@ -258,11 +256,11 @@ function getSystemStatusData(array $filter) {
 		// actions & tags
 		$problems_data = API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'clock', 'objectid', 'severity'],
-			'eventids' => array_keys($visible_problems),
 			'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until'
 			],
 			'selectTags' => ['tag', 'value'],
+			'eventids' => array_keys($visible_problems),
 			'preservekeys' => true
 		]);
 

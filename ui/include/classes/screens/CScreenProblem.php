@@ -98,8 +98,6 @@ class CScreenProblem extends CScreenBase {
 	private static function getDataProblems(array $options) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'preservekeys' => true
@@ -567,13 +565,11 @@ class CScreenProblem extends CScreenBase {
 	private static function getExDataProblems(array $eventids) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'r_eventid', 'r_clock', 'r_ns', 'correlationid', 'userid', 'acknowledged'],
-			'selectTags' => ['tag', 'value'],
 			'selectAcknowledges' => ['userid', 'eventid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 				'suppress_until', 'taskid'
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'object' => EVENT_OBJECT_TRIGGER,
+			'selectTags' => ['tag', 'value'],
 			'eventids' => $eventids,
 			'recent' => true,
 			'preservekeys' => true
