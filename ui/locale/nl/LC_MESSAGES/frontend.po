@@ -2436,6 +2436,11 @@ msgstr ""
 msgid "Cannot create discovery rule"
 msgstr "Kan discovery regel niet aanmaken"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Kan icoon map niet aanmaken"
@@ -2471,6 +2476,10 @@ msgstr ""
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
+msgstr ""
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
 msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
@@ -2537,6 +2546,12 @@ msgstr[1] "Kan discovery regel niet verwijderen"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "Kan discovery regels niet verwijderen"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2838,6 +2853,12 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Kan ontdekkings regel niet uitschakelen"
 msgstr[1] "Kan ontdekkings regels niet uitschakelen"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2933,6 +2954,12 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Kan ontdekking regel niet activeren"
 msgstr[1] "Kan ontdekking regels niet activeren"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3933,6 +3960,11 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr ""
@@ -4166,6 +4198,10 @@ msgstr ""
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Kan web scenario niet bijwerken"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5316,6 +5352,10 @@ msgstr ""
 msgid "Create enabled"
 msgstr ""
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Maak grafiek aan"
@@ -6139,6 +6179,10 @@ msgstr ""
 msgid "Delete discovery rule?"
 msgstr "Discovery regel verwijderen?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6269,6 +6313,14 @@ msgstr "Geselecteerde discovery regels verwijderen?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Geselecteerde elementen verwijderen?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6765,6 +6817,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Geselecteerde discovery regeles uitschakelen?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7661,6 +7721,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "Geselecteerde ontdekkingsregels activeren?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7921,10 +7989,45 @@ msgstr "Event erkend"
 msgid "Event correlation"
 msgstr ""
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
 msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
@@ -14037,6 +14140,10 @@ msgstr ""
 msgid "New element"
 msgstr "Nieuw element"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14069,6 +14176,10 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr ""
@@ -14092,6 +14203,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
+msgstr ""
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
 msgstr ""
 
 #: app/views/popup.condition.common.php:120
@@ -17292,6 +17407,17 @@ msgstr ""
 #: app/views/monitoring.widget.problems.view.php:157
 #: include/classes/screens/CScreenProblem.php:988
 msgid "Resolved by correlation rule."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
 msgstr ""
 
 #: app/views/monitoring.widget.problems.view.php:164

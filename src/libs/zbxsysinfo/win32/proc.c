@@ -20,14 +20,14 @@
 #include "zbxsysinfo.h"
 #include "../sysinfo.h"
 
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"
 #include "zbxwin32.h"
 
 #include <tlhelp32.h>
-#include "sddl.h"
+#include <sddl.h> /* ConvertSidToStringSid */
 
 #define MAX_NAME	256
 

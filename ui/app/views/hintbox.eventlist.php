@@ -148,7 +148,7 @@ if (array_key_exists('problems', $data)) {
 		$cell_status = new CSpan($value_str);
 
 		if (isEventUpdating($in_closing, $problem)) {
-			$cell_status->addClass('blink');
+			$cell_status->addClass('js-blink');
 		}
 
 		// Add colors and blinking to span depending on configuration and trigger parameters.
@@ -156,7 +156,7 @@ if (array_key_exists('problems', $data)) {
 
 		if ($data['show_timeline']) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 

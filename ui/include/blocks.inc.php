@@ -639,7 +639,7 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 
 		if ($show_timeline) {
 			if ($data['last_clock'] != 0) {
-				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false);
+				CScreenProblem::addTimelineBreakpoint($table, $data, $problem, false, false);
 			}
 			$data['last_clock'] = $problem['clock'];
 
@@ -669,9 +669,9 @@ function makeProblemsPopup(array $problems, array $triggers, array $actions, arr
 					? getUserFullname($actions['users'][$unsuppression_action['userid']])
 					: _('Inaccessible user');
 
-				$info_icons[] = (new CSimpleButton())
-					->addClass(ZBX_STYLE_ACTION_ICON_UNSUPPRESS)
-					->addClass('blink')
+				$info_icons[] = (new CButtonIcon(ZBX_ICON_EYE))
+					->addClass(ZBX_STYLE_COLOR_ICON)
+					->addClass('js-blink')
 					->setHint(_s('Unsuppressed by: %1$s', $user_unsuppressed));
 			}
 			elseif ($problem['suppression_data']) {

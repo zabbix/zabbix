@@ -213,7 +213,7 @@ int	next_prime(int n)
  *                                                                            *
  * Parameters: value - [IN] value to calculate square root for                *
  *                                                                            *
- * Return value: the integer part of square root                              *
+ * Return value: integer part of square root                                  *
  *                                                                            *
  * Comments: Uses basic digit by digit square root calculation algorithm with *
  *           binary base.                                                     *

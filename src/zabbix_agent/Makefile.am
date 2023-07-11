@@ -1,12 +1,11 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
-	logfiles \
-	active_checks
+	active_checks \
+	logfiles
 
 EXTRA_DIST = \
-	eventlog.c \
-	eventlog.h \
+	eventlog \
 	perfstat.c \
 	perfstat.h
 
@@ -15,23 +14,11 @@ sbin_PROGRAMS = zabbix_agentd
 noinst_LIBRARIES = libzbxagent.a
 
 libzbxagent_a_SOURCES = \
-	cpustat.c \
-	cpustat.h \
-	diskdevices.c \
-	diskdevices.h \
 	listener.c \
 	listener.h \
 	metrics.h \
-	procstat.c \
-	procstat.h \
-	stats.c \
-	stats.h \
-	vmstats.c \
-	vmstats.h \
 	zbxconf.c \
-	zbxconf.h \
-	zbxkstat.c \
-	zbxkstat.h
+	zbxconf.h
 
 libzbxagent_a_CFLAGS = \
 	-DZABBIX_DAEMON \

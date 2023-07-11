@@ -32,7 +32,7 @@ $show_inherited_tags = array_key_exists('show_inherited_tags', $data) && $data['
 $with_automatic = array_key_exists('with_automatic', $data) && $data['with_automatic'];
 
 // form list
-$tags_form_list = new CFormList('tagsFormList');
+$form_grid = (new CFormGrid())->setId('tagsFormList');
 
 $table = (new CTable())
 	->addClass('tags-table')
@@ -154,7 +154,7 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 
 		case 'httptest':
 			$btn_labels = [_('Scenario tags'), _('Inherited and scenario tags')];
-			$on_change = 'window.httpconf.$form.submit()';
+			$on_change = 'this.form.submit()';
 			break;
 
 		case 'item':
@@ -163,14 +163,18 @@ if (in_array($data['source'], ['trigger', 'trigger_prototype', 'item', 'httptest
 			break;
 	}
 
-	$tags_form_list->addRow(null,
-		(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
-			->addValue($btn_labels[0], 0, null, $on_change)
-			->addValue($btn_labels[1], 1, null, $on_change)
-			->setModern(true)
+	$form_grid->addItem(
+		new CFormField(
+			(new CRadioButtonList('show_inherited_tags', (int) $data['show_inherited_tags']))
+				->addValue($btn_labels[0], 0, null, $on_change)
+				->addValue($btn_labels[1], 1, null, $on_change)
+				->setModern()
+		)
 	);
 }
 
-$tags_form_list->addRow(null, $table);
+$form_grid->addItem(
+	new CFormField($table)
+);
 
-$tags_form_list->show();
+$form_grid->show();

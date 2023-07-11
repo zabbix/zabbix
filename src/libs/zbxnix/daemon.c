@@ -23,9 +23,10 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "pid.h"
 #include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20
@@ -351,7 +352,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
+		if (FAIL == zbx_redirect_stdio(ZBX_LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
 			exit(EXIT_FAILURE);
 	}
 

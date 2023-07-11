@@ -21,7 +21,7 @@
 
 #include "../server.h"
 #include "alerter_protocol.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
