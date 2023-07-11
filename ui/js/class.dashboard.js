@@ -178,7 +178,7 @@ class CDashboard {
 		if (!this._is_edit_mode) {
 			this._startConfigurationChecker();
 
-			if (this._data.auto_start === 1 && this._dashboard_pages.size > 1) {
+			if (this._data.auto_start === '1' && this._dashboard_pages.size > 1) {
 				this._startSlideshow();
 			}
 		}
