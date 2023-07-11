@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-17 15:53+0200\n"
-"PO-Revision-Date: 2023-06-03 13:01+0000\n"
+"PO-Revision-Date: 2023-06-20 18:12+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2440,7 +2440,7 @@ msgstr "Impossible de créer une règle de découverte"
 #: app/controllers/CControllerCorrelationCreate.php:48
 #: app/controllers/CControllerCorrelationCreate.php:115
 msgid "Cannot create event correlation"
-msgstr ""
+msgstr "Impossible de créer la corrélation d'événement"
 
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
@@ -2478,6 +2478,10 @@ msgstr "Impossible de créer le fichier de configuration."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "Impossible de créer un rôle utilisateur"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr "Impossible de créer une étape de scénario web"
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2546,8 +2550,8 @@ msgstr "Impossible de supprimer les règles de découverte"
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete event correlation"
 msgid_plural "Cannot delete event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de supprimer la corrélation d'événement"
+msgstr[1] "Impossible de supprimer les corrélations d'événement"
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2851,8 +2855,8 @@ msgstr[1] "Impossible de désactiver les règles de découverte"
 #: app/controllers/CControllerCorrelationDisable.php:76
 msgid "Cannot disable event correlation"
 msgid_plural "Cannot disable event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible de désactiver la corrélation d'événement"
+msgstr[1] "Impossible de désactiver les corrélations d'événement"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
@@ -2953,8 +2957,8 @@ msgstr[1] "Impossible d'activer les règles de découverte"
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable event correlation"
 msgid_plural "Cannot enable event correlations"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Impossible d'activer la corrélation d'événement"
+msgstr[1] "Impossible d'activer les corrélations d'événement"
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3958,7 +3962,7 @@ msgstr[1] "Impossible de mettre à jour les événements"
 #: app/controllers/CControllerCorrelationUpdate.php:49
 #: app/controllers/CControllerCorrelationUpdate.php:117
 msgid "Cannot update event correlation"
-msgstr ""
+msgstr "Impossible de mettre à jour la corrélation d'événement"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
@@ -4190,6 +4194,10 @@ msgstr "Impossible de mettre à jour le rôle utilisateur"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Impossible de mettre à jour le scénario web"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr "Impossible de mettre à jour l'étape du scénario web"
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -5364,7 +5372,7 @@ msgstr "Créer activé"
 
 #: app/views/correlation.list.php:35
 msgid "Create event correlation"
-msgstr ""
+msgstr "Créer une corrélation d'événement"
 
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
@@ -6191,7 +6199,7 @@ msgstr "Supprimer la règle de découverte ?"
 
 #: app/views/correlation.edit.php:330
 msgid "Delete event correlation?"
-msgstr ""
+msgstr "Supprimer la corrélation d'événement ?"
 
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
@@ -6326,11 +6334,11 @@ msgstr "Supprimer les éléments sélectionnés ?"
 
 #: app/views/js/correlation.list.js.php:107
 msgid "Delete selected event correlation?"
-msgstr ""
+msgstr "Supprimer la corrélation d'événement sélectionnée ?"
 
 #: app/views/js/correlation.list.js.php:106
 msgid "Delete selected event correlations?"
-msgstr ""
+msgstr "Supprimer les corrélations d'événement sélectionnées ?"
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6830,11 +6838,11 @@ msgstr "Désactiver les règles de découverte sélectionnées ?"
 
 #: app/views/js/correlation.list.js.php:158
 msgid "Disable selected event correlation?"
-msgstr ""
+msgstr "Désactiver la corrélation d'événement sélectionnée ?"
 
 #: app/views/js/correlation.list.js.php:157
 msgid "Disable selected event correlations?"
-msgstr ""
+msgstr "Désactiver les corrélations d'événement sélectionnées ?"
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7732,11 +7740,11 @@ msgstr "Activer les règles de découverte sélectionnées ?"
 
 #: app/views/js/correlation.list.js.php:132
 msgid "Enable selected event correlation?"
-msgstr ""
+msgstr "Activer la corrélation d'événement sélectionnée ?"
 
 #: app/views/js/correlation.list.js.php:131
 msgid "Enable selected event correlations?"
-msgstr ""
+msgstr "Activer les corrélations d'événement sélectionnées ?"
 
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
@@ -8001,33 +8009,33 @@ msgstr "Corrélation d'événement"
 #: include/classes/api/services/CCorrelation.php:536
 #, c-format
 msgid "Event correlation \"%1$s\" already exists."
-msgstr ""
+msgstr "La corrélation d'événement \"%1$s\" existe déjà."
 
 #: app/controllers/CControllerCorrelationCreate.php:107
 msgid "Event correlation created"
-msgstr ""
+msgstr "Corrélation d'événement créée"
 
 #: app/controllers/CControllerCorrelationDelete.php:60
 msgid "Event correlation deleted"
 msgid_plural "Event correlations deleted"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Corrélation d'événement supprimée"
+msgstr[1] "Corrélations d'événement supprimées"
 
 #: app/controllers/CControllerCorrelationDisable.php:68
 msgid "Event correlation disabled"
 msgid_plural "Event correlations disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Corrélation d'événement désactivée"
+msgstr[1] "Corrélations d'événement désactivées"
 
 #: app/controllers/CControllerCorrelationEnable.php:68
 msgid "Event correlation enabled"
 msgid_plural "Event correlations enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Corrélation d'événement activée"
+msgstr[1] "Corrélations d'événement activées"
 
 #: include/events.inc.php:201
 msgid "Event correlation rule"
-msgstr ""
+msgstr "Règle de corrélation d'événement"
 
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
@@ -8037,7 +8045,7 @@ msgstr "Règles de corrélation d'événement"
 
 #: app/controllers/CControllerCorrelationUpdate.php:109
 msgid "Event correlation updated"
-msgstr ""
+msgstr "Corrélation d'événement mise à jour"
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -14149,7 +14157,7 @@ msgstr "Nouvel élément"
 
 #: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
 msgid "New event correlation"
-msgstr ""
+msgstr "Nouvelle corrélation d'événement"
 
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
@@ -14185,7 +14193,7 @@ msgstr "Nouvelle période de maintenance"
 
 #: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
 msgid "New media type"
-msgstr ""
+msgstr "Nouveau type de média"
 
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
@@ -14211,6 +14219,10 @@ msgstr "Nouveau script"
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
 msgstr "Nouveau service"
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
+msgstr "Nouvelle étape du scénario web"
 
 #: app/views/popup.condition.common.php:120
 msgid "New tag name"
@@ -17416,12 +17428,12 @@ msgstr "Résolu par la règle de corrélation."
 #: widgets/problems/includes/WidgetProblems.php:251
 #, c-format
 msgid "Resolved by event correlation rule \"%1$s\"."
-msgstr ""
+msgstr "Résolu par la règle de corrélation d'événement \"%1$s\"."
 
 #: include/classes/screens/CScreenProblem.php:1411
 #: widgets/problems/includes/WidgetProblems.php:254
 msgid "Resolved by event correlation rule."
-msgstr ""
+msgstr "Résolu par la règle de corrélation d'événement."
 
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995

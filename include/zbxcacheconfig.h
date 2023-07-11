@@ -759,6 +759,7 @@ void	zbx_dc_config_lock_triggers_by_triggerids(zbx_vector_uint64_t *triggerids_i
 void	zbx_dc_config_unlock_triggers(const zbx_vector_uint64_t *triggerids);
 void	zbx_dc_config_unlock_all_triggers(void);
 int	zbx_dc_config_trigger_exists(zbx_uint64_t triggerid);
+int	zbx_config_get_trigger_severity_name(int priority, char **replace_to);
 
 void	zbx_dc_free_triggers(zbx_vector_ptr_t *triggers);
 void	zbx_dc_config_update_interface_snmp_stats(zbx_uint64_t interfaceid, int max_snmp_succeed, int min_snmp_fail);

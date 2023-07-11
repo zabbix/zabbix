@@ -348,7 +348,7 @@ class testFormUserMedia extends CWebTest {
 		// Open the user media tab for user-zabbix user.
 		$user_form = $this->getUserMediaTab('user-zabbix');
 
-		// Check that no medias are configured.
+		// Check that no media are configured.
 		$this->assertTrue($user_form->getField('Media')->getRows()->count() === 0);
 
 		// Add media.
@@ -448,13 +448,13 @@ class testFormUserMedia extends CWebTest {
 			$this->query('id:tab_mediaTab')->waitUntilVisible()->one()->click();
 			$table = $this->query('xpath://ul[@id="userMediaFormList"]//table')->asTable()->one();
 
-			// Change status of one of the medias.
+			// Change status of one of the media.
 			$row = $table->findRow('Send to', 'test@zabbix.com');
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Enabled');
 			$row->getColumn('Status')->click();
 			$this->assertEquals($row->getColumn('Status')->getText(), 'Disabled');
 
-			// Remove one of the medias.
+			// Remove one of the media.
 			$row->getColumn('Action')->query('button:Remove')->one()->click();
 			$this->assertFalse($table->findRow('Send to', 'test@zabbix.com')->isValid());
 

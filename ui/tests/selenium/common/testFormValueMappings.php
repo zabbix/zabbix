@@ -941,7 +941,7 @@ class testFormValueMappings extends CWebTest {
 		}
 		else {
 			$this->page->open($source.'s.php?form=update&'.$source.'id='.$sourceid);
-			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+			$form = $this->query('name:'.$source.'sForm')->asForm(['normalized' => true])->waitUntilVisible()->one();
 		}
 
 		if ($open_tab) {
@@ -1076,7 +1076,7 @@ class testFormValueMappings extends CWebTest {
 		}
 		else {
 			$this->page->login()->open($source.'s.php?form=create');
-			$form = $this->query('name:'.$source.'sForm')->asForm()->waitUntilVisible()->one();
+			$form = $this->query('name:'.$source.'sForm')->asForm(['normalized' => true])->waitUntilVisible()->one();
 		}
 
 		$form->getField(ucfirst($source).' groups')->fill(($source === 'host') ? 'Discovered hosts' : 'Templates');

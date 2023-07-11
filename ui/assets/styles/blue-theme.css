@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1129,6 +1129,8 @@ footer {
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
+      .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+        line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #768d99; }
@@ -3865,7 +3867,7 @@ div.dashboard-widget-map .btn-back-map-container {
   to {
     opacity: 1; } }
 div.dashboard-widget-navtree .navtree .tree .tree-list .margin-lvl {
-  display: inline-block; }
+  flex-shrink: 0; }
 div.dashboard-widget-navtree .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
   width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
@@ -3967,7 +3969,10 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row:hover {
     background-color: #e8f5ff; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content {
-    position: relative; }
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow {
       display: inline-block;
       width: 16px;
@@ -3977,7 +3982,6 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .item-name {
       white-space: nowrap;
       overflow: hidden;
-      margin-right: 5px;
       text-overflow: ellipsis;
       line-height: 1.5; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list {
@@ -3988,7 +3992,8 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {
     padding-left: 10px;
     margin-right: 5px;
-    width: 87px; }
+    width: 87px;
+    white-space: nowrap; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon:not(:first-child) {
       margin-left: 5px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {

@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2023 Zabbix SIA
@@ -18,21 +17,25 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+#ifndef INFORMATION_TYPE
+#	define INFORMATION_TYPE	"Information"
+#endif
+#ifndef WARNING_TYPE
+#	define WARNING_TYPE	"Warning"
+#endif
+#ifndef ERROR_TYPE
+#	define ERROR_TYPE	"Error"
+#endif
+#ifndef AUDIT_FAILURE
+#	define AUDIT_FAILURE	"Failure Audit"
+#endif
+#ifndef AUDIT_SUCCESS
+#	define AUDIT_SUCCESS	"Success Audit"
+#endif
+#ifndef CRITICAL_TYPE
+#	define CRITICAL_TYPE	"Critical"
+#endif
+#ifndef VERBOSE_TYPE
+#	define VERBOSE_TYPE	"Verbose"
+#endif
 
-class testPageWeb extends CLegacyWebTest {
-	public function testPageWeb_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckHeader('Web monitoring');
-		$this->zbxTestTextPresent(['Group', 'Host']);
-		$this->zbxTestTextPresent(['Host', 'Name', 'Number of steps', 'Last check', 'Status']);
-	}
-
-// Check that no real host or template names displayed
-	public function testPageWeb_NoHostNames() {
-		$this->zbxTestLogin('zabbix.php?action=web.view');
-		$this->zbxTestCheckTitle('Web monitoring');
-		$this->zbxTestCheckNoRealHostnames();
-	}
-}
