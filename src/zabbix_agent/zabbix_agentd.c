@@ -351,7 +351,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	char		ch;
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
-	char		*process_name = NULL, *process_path = NULL, *progname_noext = NULL;
+	char		*process_path = NULL, *progname_noext = NULL;
 #endif
 	unsigned short	opt_count[256] = {0};
 
@@ -555,7 +555,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	{
 #ifdef _WINDOWS
 #define PATH_BUF_LEN	4096
-		size_t	alloc_len = 0, offset = 0;
+		size_t	alloc_len, offset;
 		char	*ptr;
 		wchar_t	szProcessName[PATH_BUF_LEN];
 
@@ -567,30 +567,36 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			goto out;
 		}
 
-		process_name = zbx_unicode_to_utf8(szProcessName);
+		process_path = zbx_unicode_to_utf8(szProcessName);
 
-		if (NULL == (ptr = strstr(process_name, progname)))
+		if (NULL == (ptr = strstr(process_path, progname)))
 		{
 			zbx_error("got unexpected Zabbix agent executable file path '%s' while initializing"
-					" default config path", process_name);
+					" default config path", process_path);
 			ret = FAIL;
 			goto out;
 		}
+		else
+		{
+			const char	*ptr_next;
 
-		zbx_strncpy_alloc(&process_path, &alloc_len, &offset, process_name, ptr - process_name);
+			while (NULL != (ptr_next = strstr(ptr + 1, progname)))
+				ptr = ptr_next;
+		}
 
-		if (NULL == (ptr = strstr(progname, ".")))
+		*ptr = '\0';
+
+		progname_noext = strdup(progname);
+
+		if (NULL == (ptr = strstr(progname_noext, ".exe")))
 		{
 			zbx_error("failed to get Zabbix agent executable file name with file extension removed for"
-					" program name '%s' while initializing default config path", progname);
+					" program name '%s' while initializing default config path", progname_noext);
 			ret = FAIL;
 			goto out;
 		}
 
-		zbx_strncpy_alloc(&progname_noext, &alloc_len, &offset, progname,
-				ptr - progname);
-
-		alloc_len = 0, offset = 0;
+		*ptr = '\0';
 
 		zbx_snprintf_alloc(&config_file, &alloc_len, &offset, "%s%s.conf", process_path, progname_noext);
 #undef PATH_BUF_LEN
@@ -600,7 +606,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 out:
 #ifdef _WINDOWS
-	zbx_free(process_name);
 	zbx_free(process_path);
 	zbx_free(progname_noext);
 #endif
