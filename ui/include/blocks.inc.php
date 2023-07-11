@@ -133,13 +133,8 @@ function getSystemStatusData(array $filter) {
 		'preservekeys' => true
 	];
 
-	if (array_key_exists('severities', $filter)) {
-		$filter_severities = implode(',', $filter['severities']);
-		$all_severities = implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
-
-		if ($filter_severities !== '' && $filter_severities !== $all_severities) {
-			$options['severities'] = $filter['severities'];
-		}
+	if (array_key_exists('severities', $filter) && $filter['severities']) {
+		$options['severities'] = $filter['severities'];
 	}
 
 	if (array_key_exists('show_suppressed', $filter) && $filter['show_suppressed']) {

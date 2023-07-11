@@ -265,7 +265,11 @@ class CProblem extends CApiService {
 		if (array_key_exists('severities', $options) && $options['severities'] !== null) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
-				$sql_parts['where'][] = dbConditionInt('p.severity', $options['severities']);
+				sort($options['severities']);
+
+				if ($options['severities'] != range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1)) {
+					$sql_parts['where'][] = dbConditionInt('p.severity', $options['severities']);
+				}
 			}
 			// ignore this filter for items and lld rules
 		}
