@@ -3967,7 +3967,7 @@ div.dashboard-widget-map .btn-back-map-container {
   to {
     opacity: 1; } }
 div.dashboard-widget-navtree .navtree .tree .tree-list .margin-lvl {
-  display: inline-block; }
+  flex-shrink: 0; }
 div.dashboard-widget-navtree .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
   width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
@@ -4069,7 +4069,10 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row:hover {
     background-color: #383838; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content {
-    position: relative; }
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow {
       display: inline-block;
       width: 16px;
@@ -4079,7 +4082,6 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .item-name {
       white-space: nowrap;
       overflow: hidden;
-      margin-right: 5px;
       text-overflow: ellipsis;
       line-height: 1.5; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list {
@@ -4090,7 +4092,8 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {
     padding-left: 10px;
     margin-right: 5px;
-    width: 87px; }
+    width: 87px;
+    white-space: nowrap; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon:not(:first-child) {
       margin-left: 5px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
