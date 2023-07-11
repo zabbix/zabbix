@@ -120,7 +120,7 @@ const char	*get_process_type_string(unsigned char proc_type)
 		case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
 			return "http agent poller";
 		case ZBX_PROCESS_TYPE_AGENT_POLLER:
-			return "zabbix agent poller";
+			return "agent poller";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
