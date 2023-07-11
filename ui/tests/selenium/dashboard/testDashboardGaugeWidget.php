@@ -29,6 +29,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGaugeWidget extends CWebTest {
 
+	use TableTrait;
+
 	CONST HOST = 'Host for gauge widget';
 	CONST DELETE_GAUGE = 'Gauge for deleting';
 
@@ -69,22 +71,23 @@ class testDashboardGaugeWidget extends CWebTest {
 		]);
 		$hostids = CDataHelper::getIds('host');
 
-		CDataHelper::call('item.create', [
-			[
+		// Create triggers based on items.
+		$items_data = [];
+		$value_types = [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_TEXT
+		];
+
+		foreach ($value_types as $i => $type) {
+			$items_data[] = [
 				'hostid' => $hostids['Host for gauge widget'],
-				'name' => '1 Item for gauge widget',
-				'key_' => 'trap1',
+				'name' => $i.' Item for gauge widget',
+				'key_' => 'trap'.$i,
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			],
-			[
-				'hostid' => $hostids['Host for gauge widget'],
-				'name' => '2 Item for gauge widget',
-				'key_' => 'trap2',
-				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => ITEM_VALUE_TYPE_UINT64
-			]
-		]);
+				'value_type' => $type
+			];
+		}
+
+		CDataHelper::call('item.create', $items_data);
 		$itemids = CDataHelper::getIds('name');
 
 		$dashboards = CDataHelper::call('dashboard.create', [
@@ -107,7 +110,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => $itemids['1 Item for gauge widget']
+									'value' => $itemids['0 Item for gauge widget']
 								],
 								[
 									'type' => '1',
@@ -133,7 +136,7 @@ class testDashboardGaugeWidget extends CWebTest {
 								[
 									'type' => '4',
 									'name' => 'itemid',
-									'value' => $itemids['1 Item for gauge widget']
+									'value' => $itemids['0 Item for gauge widget']
 								],
 								[
 									'type' => '1',
@@ -163,7 +166,7 @@ class testDashboardGaugeWidget extends CWebTest {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Add widget', $dialog->getTitle());
 
-		$form->fill(['Type' => 'Gauge']);
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
 		$dialog->waitUntilReady();
 
 		// Check default fields.
@@ -377,7 +380,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 0,
 						'Max' => 0
 					],
@@ -391,7 +394,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 0,
 						'Max' => 0,
 						'id:desc_size' => 0,
@@ -420,7 +423,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => str_repeat(9,255),
 						'Max' => str_repeat(9,255)
 					],
@@ -432,7 +435,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 10,
 						'Max' => 3
 					],
@@ -444,7 +447,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => '',
 						'Max' => '',
 						'id:desc_size' => '',
@@ -477,7 +480,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 'text',
 						'Max' => 'test',
 						'id:desc_size' => 'abc',
@@ -510,7 +513,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => '2t',
 						'Max' => '3y',
 						'id:desc_size' => '1a',
@@ -537,7 +540,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 'そこ',
 						'Max' => 'ߘ',
 						'id:desc_size' => '۞',
@@ -572,7 +575,7 @@ class testDashboardGaugeWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => '𒀐',
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => '😁',
 						'Max' => '🙂',
 						'id:desc_size' => '😅',
@@ -606,7 +609,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'id:decimal_places' => '900',
 						'id:scale_decimal_places' => '900'
 					],
@@ -621,7 +624,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => '😁🙂𒀐',
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'Min' => 99,
 						'Max' => 88888,
 						'xpath:.//input[@id="value_arc_color"]/..' => '64B5F6',
@@ -668,7 +671,7 @@ class testDashboardGaugeWidget extends CWebTest {
 						'Min' => 15,
 						'Max' => 200,
 						'Refresh interval' => '30 seconds',
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'id:units_pos' => 'Before value'
 					],
 					'Thresholds' => [
@@ -682,7 +685,7 @@ class testDashboardGaugeWidget extends CWebTest {
 				[
 					'fields' => [
 						'Name' => 'False default checkboxes',
-						'Item' => '2 Item for gauge widget',
+						'Item' => '1 Item for gauge widget',
 						'id:show_header' => false,
 						'id:value_arc' => false,
 						'id:units_show' => false,
@@ -699,7 +702,7 @@ class testDashboardGaugeWidget extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Item' => '2 Item for gauge widget'
+						'Item' => '1 Item for gauge widget'
 					]
 				]
 			]
@@ -972,8 +975,7 @@ class testDashboardGaugeWidget extends CWebTest {
 	public function testDashboardGaugeWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
-		$dashboard->edit();
-		$this->assertTrue($dashboard->getWidget(self::DELETE_GAUGE)->isEditable());
+		$this->assertTrue($dashboard->edit()->getWidget(self::DELETE_GAUGE)->isEditable());
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$dashboard->save();
 		$this->page->waitUntilReady();
@@ -986,5 +988,37 @@ class testDashboardGaugeWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr(self::DELETE_GAUGE)
 		));
+	}
+
+	public function testDashboardGaugeWidget_CheckAvailableItems() {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->edit()->addWidget()->asForm();
+		$dialog = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$dialog->fill(['Type' => CFormElement::RELOADABLE_FILL('Gauge')]);
+		$dialog->query('button:Select')->one()->waitUntilClickable()->click();
+		$host_item_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+		$table = $host_item_dialog->query('class:list-table')->asTable()->one()->waitUntilVisible();
+		$host_item_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST);
+		$table->waitUntilReloaded();
+
+		$visible_items = [
+			'0 Item for gauge widget',
+			'1 Item for gauge widget'
+		];
+
+		$not_visible_items = [
+			'2 Item for gauge widget',
+			'3 Item for gauge widget',
+			'4 Item for gauge widget'
+		];
+
+		foreach ($visible_items as $visible_item) {
+			$this->assertTrue($host_item_dialog->query('link', $visible_item)->one()->isClickable());
+		}
+
+		foreach ($not_visible_items as $invisible_item) {
+			$this->assertFalse($host_item_dialog->query('link', $invisible_item)->exists());
+		}
 	}
 }
