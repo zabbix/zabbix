@@ -694,7 +694,7 @@ class CConfigurationExportBuilder {
 			return;
 		}
 
-		$filter_object['filter']['conditions'] = CDiscoveryRule::sortFilterConditions(
+		$filter_object['filter']['conditions'] = sortLldRuleFilterConditions(
 			$filter_object['filter']['conditions'],	$filter_object['filter']['evaltype']
 		);
 	}

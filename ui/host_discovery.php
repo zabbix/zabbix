@@ -877,8 +877,18 @@ if (hasRequest('form')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
-		$data['conditions'] = $item['filter']['conditions'];
+		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
+
+		foreach ($item['overrides'] as &$override) {
+			if (array_key_exists('filter', $override)) {
+				$override['filter']['conditions'] = sortLldRuleFilterConditions(
+					$override['filter']['conditions'], $override['filter']['evaltype']
+				);
+			}
+		}
+		unset($override);
+
 		$data['overrides'] = $item['overrides'];
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);

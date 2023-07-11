@@ -2278,3 +2278,44 @@ function normalizeItemPreprocessingSteps(array $preprocessing): array {
 
 	return $preprocessing;
 }
+
+/**
+ * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
+ * Prioritization by non/exist operator applied between matching macros.
+ *
+ * @param array $conditions
+ * @param int   $evaltype
+ *
+ * @return array
+ */
+function sortLldRuleFilterConditions(array $conditions, int $evaltype): array {
+	switch ($evaltype) {
+		case CONDITION_EVAL_TYPE_AND_OR:
+		case CONDITION_EVAL_TYPE_AND:
+		case CONDITION_EVAL_TYPE_OR:
+			usort($conditions, static function(array $condition_a, array $condition_b): int {
+				$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
+
+				if ($comparison != 0) {
+					return $comparison;
+				}
+
+				static $exist_operators = [
+					CONDITION_OPERATOR_NOT_EXISTS,
+					CONDITION_OPERATOR_EXISTS
+				];
+				$existcheck_b = in_array($condition_b['operator'], $exist_operators) ? 1 : 0;
+				$existcheck_a = in_array($condition_a['operator'], $exist_operators) ? -1 : 0;
+				$comparison = $existcheck_b + $existcheck_a;
+
+				return $comparison == 0 ? strnatcasecmp($condition_a['value'], $condition_b['value']) : $comparison;
+			});
+			break;
+
+		case CONDITION_EVAL_TYPE_EXPRESSION:
+			CArrayHelper::sort($conditions, ['formulaid']);
+			break;
+	}
+
+	return array_values($conditions);
+}

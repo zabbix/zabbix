@@ -977,10 +977,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 			// conditions
 			if (array_key_exists('filter', $item)) {
-				$item['filter']['conditions'] = CDiscoveryRule::sortFilterConditions(
-					$item['filter']['conditions'], $item['filter']['evaltype']
-				);
-
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
@@ -1062,10 +1058,6 @@ class CDiscoveryRule extends CItemGeneral {
 						$override['lld_overrideid'] = $overrideids[$ovrd_idx++];
 
 						if (array_key_exists('filter', $override)) {
-							$override['filter']['conditions'] = CDiscoveryRule::sortFilterConditions(
-								$override['filter']['conditions'], $override['filter']['evaltype']
-							);
-
 							foreach ($override['filter']['conditions'] as $condition) {
 								$ovrd_conditions[] = [
 									'macro' => $condition['macro'],
@@ -1333,10 +1325,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 					$newRuleConditions[$item['itemid']][] = $condition;
 				}
-
-				$newRuleConditions[$item['itemid']] = CDiscoveryRule::sortFilterConditions(
-					$newRuleConditions[$item['itemid']], $item['filter']['evaltype']
-				);
 			}
 		}
 
@@ -3207,46 +3195,5 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Apply sorting for discovery rule filter or override filter conditions, if appropriate.
-	 * Prioritization by non/exist operator applied between matching macros.
-	 *
-	 * @param array $conditions
-	 * @param int   $evaltype
-	 *
-	 * @return array
-	 */
-	public static function sortFilterConditions(array $conditions, int $evaltype): array {
-		switch ($evaltype) {
-			case CONDITION_EVAL_TYPE_AND_OR:
-			case CONDITION_EVAL_TYPE_AND:
-			case CONDITION_EVAL_TYPE_OR:
-				usort($conditions, static function(array $condition_a, array $condition_b): int {
-					$comparison = strnatcasecmp($condition_a['macro'], $condition_b['macro']);
-
-					if ($comparison != 0) {
-						return $comparison;
-					}
-
-					static $exist_operators = [
-						CONDITION_OPERATOR_NOT_EXISTS,
-						CONDITION_OPERATOR_EXISTS
-					];
-					$existcheck_b = in_array($condition_b['operator'], $exist_operators) ? 1 : 0;
-					$existcheck_a = in_array($condition_a['operator'], $exist_operators) ? -1 : 0;
-					$comparison = $existcheck_b + $existcheck_a;
-
-					return $comparison == 0 ? strnatcasecmp($condition_a['value'], $condition_b['value']) : $comparison;
-				});
-				break;
-
-			case CONDITION_EVAL_TYPE_EXPRESSION:
-				CArrayHelper::sort($conditions, ['formulaid']);
-				break;
-		}
-
-		return array_values($conditions);
 	}
 }
