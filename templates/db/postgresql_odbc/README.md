@@ -27,7 +27,7 @@ CREATE USER zbx_monitor WITH PASSWORD '<PASSWORD>' INHERIT;
 GRANT pg_monitor TO zbx_monitor;
 ```
 
-3. Edit `pg_hba.conf` to allow TCP connections for user `zbx_monitor`. For example, you could add one of the following rows to allow local connections from the same host:
+2. Edit `pg_hba.conf` to allow TCP connections for user `zbx_monitor`. For example, you could add one of the following rows to allow local connections from the same host:
   
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
@@ -38,13 +38,13 @@ GRANT pg_monitor TO zbx_monitor;
 
 For more information please read the PostgreSQL documentation `https://www.postgresql.org/docs/current/auth-pg-hba-conf.html`.
 
-4. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
+3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
 
-5. Set the ODBC driver with the `{$PG.DRIVER}` macro to the name of the driver which will be used for monitoring (from the `odbcinst.ini` filer) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`).
+4. Set the ODBC driver with the `{$PG.DRIVER}` macro to the name of the driver which will be used for monitoring (from the `odbcinst.ini` file) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`).
 
-6. Specify the host name or IP address in the `{$PG.HOST}` macro.
+5. Specify the host name or IP address in the `{$PG.HOST}` macro.
 
-5. Set the password that you have specified in the step 1 in the macro `{$PG.PASSWORD}`.
+6. Set the password that you have specified in the step 1 in the macro `{$PG.PASSWORD}`.
 
 ### Macros used
 
@@ -121,21 +121,21 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |Connections sum: Idle in transaction (aborted)|<p>Total number of connections in a transaction state, but not executing a query and one of the statements in the transaction caused an error.</p>|Dependent item|pgsql.connections.idle_in_transaction_aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle_in_transaction_aborted`</p></li></ul>|
 |Connections sum: Disabled|<p>Total number of disabled connections.</p>|Dependent item|pgsql.connections.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled`</p></li></ul>|
 |PostgreSQL: Age of oldest xid|<p>Age of oldest xid.</p>|Database monitor|db.odbc.select[pgsql.oldest.xid,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Autovacuum: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
 |PostgreSQL: Cache hit|<p>The cache hit ratio.</p>|Calculated|pgsql.cache.hit["{$PG.URI}","{$PG.USER}","{$PG.PASSWORD}"]|
 |PostgreSQL: Uptime|<p>The time since the server started.</p>|Database monitor|db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Replication: Lag in bytes|<p>Replication lag with Master in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Replication: Lag in seconds|<p>Replication lag with Master in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Replication: Lag in bytes|<p>Replication lag with Master in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Replication: Lag in seconds|<p>Replication lag with Master in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
 |PostgreSQL: Ping|<p>Used to test a connection to see if it is alive. It is being set to 0 if the query is unsuccessful.</p>|Database monitor|db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Connections sum: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
+|PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
 |PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) > 18000000`|Average||
 |PostgreSQL: Service has been restarted||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) < 600`|Average||
 |PostgreSQL: Service is down|<p>The last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"])=0`|High||
@@ -210,7 +210,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|DB [{#DBNAME}]: Too many recovery conflicts|<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p>|`min(/PostgreSQL by ODBC/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}`|Average||
+|DB [{#DBNAME}]: Too many recovery conflicts|<p>The primary and standby servers are in many ways loosely connected. Actions on the primary will have an effect on the standby. As a result, there is potential for negative interactions or conflicts between them.<br>https://www.postgresql.org/docs/current/hot-standby.html#HOT-STANDBY-CONFLICT</p>|`min(/PostgreSQL by ODBC/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}`|Average||
 |DB [{#DBNAME}]: Deadlock occurred|<p>The number of detected deadlocks in this database exceeds the limit of {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}.</p>|`min(/PostgreSQL by ODBC/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}`|High||
 |DB [{#DBNAME}]: Too many slow queries|<p>The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.</p>|`min(/PostgreSQL by ODBC/pgsql.queries.query.slow_count["{#DBNAME}"],5m)>{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}`|Warning||
 
