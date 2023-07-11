@@ -1325,7 +1325,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/2": value is too long.'
 			],
-			'Test third preprocessing parameter (incorrect value) for ZBX_PREPROC_CSV_TO_JSON type' => [
+			'Test third preprocessing parameter (non-integer) for ZBX_PREPROC_CSV_TO_JSON type' => [
 				'discoveryrule' => [
 					'preprocessing' => [
 						[
@@ -1336,7 +1336,20 @@ class testDiscoveryRule extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/3": value must be one of "0", "1".'
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/3": an integer is expected.'
+			],
+			'Test third preprocessing parameter (incorrect value) for ZBX_PREPROC_CSV_TO_JSON type' => [
+				'discoveryrule' => [
+					'preprocessing' => [
+						[
+							'type' => ZBX_PREPROC_CSV_TO_JSON,
+							'params' => "\n\n2",
+							'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+							'error_handler_params' => ''
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/preprocessing/1/params/3": value must be one of '.implode(', ', [ZBX_PREPROC_CSV_NO_HEADER, ZBX_PREPROC_CSV_HEADER]).'.'
 			],
 			'Test non-empty preprocessing parameters for ZBX_PREPROC_XML_TO_JSON type' => [
 				'discoveryrule' => [
@@ -3166,7 +3179,7 @@ class testDiscoveryRule extends CAPITest {
 						]
 					])
 				],
-				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/formula": missing filter condition for the ID "A".'
+				'expected_error' => 'Invalid parameter "/1/overrides/1/filter/formula": missing filter condition "A".'
 			],
 			'Test /1/overrides/1/filter/eval_formula is read_only.' => [
 				'discoveryrules' => [
