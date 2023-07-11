@@ -9632,15 +9632,13 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 
 		for (i = 0; i < items_sync.values_num; )
 		{
-			/* update unchanged item preprocessing revision and remove from sync list */
-			if (items_sync.values[i]->revision <= *revision)
-			{
-				if (NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
+			/* Update unchanged item preprocessing revision and remove from sync list if already synced,  */
+			/* dependent items might have been unchanged but need to be added if their master is enabled. */
+			if (items_sync.values[i]->revision <= *revision &&
+					NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
 						&items_sync.values[i]->itemid)))
-				{
-					pp_item->revision = config->revision.config;
-				}
-
+			{
+				pp_item->revision = config->revision.config;
 				zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
 			}
 			else
