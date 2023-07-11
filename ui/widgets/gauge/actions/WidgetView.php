@@ -30,8 +30,6 @@ use API,
 	CUrl,
 	Manager;
 
-use Widgets\Gauge\Includes\WidgetForm;
-
 use Zabbix\Core\CWidget;
 
 class WidgetView extends CControllerDashboardWidgetView {
