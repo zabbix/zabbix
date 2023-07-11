@@ -44,7 +44,9 @@ $form
 	)
 	->addFieldset(
 		(new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration')))
-			->addField(new CWidgetFieldRadioButtonListView($data['fields']['angle']))
+			->addField(
+				new CWidgetFieldRadioButtonListView($data['fields']['angle'])
+			)
 			->addFieldsGroup(
 				getDescriptionFieldsGroupView($form, $data['fields'])->addRowClass('fields-group-description')
 			)
@@ -77,9 +79,15 @@ $form
 
 function getColorsFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Colors')))
-		->addField(new CWidgetFieldColorView($fields['value_arc_color']))
-		->addField(new CWidgetFieldColorView($fields['empty_color']))
-		->addField(new CWidgetFieldColorView($fields['bg_color']));
+		->addField(
+			new CWidgetFieldColorView($fields['value_arc_color'])
+		)
+		->addField(
+			new CWidgetFieldColorView($fields['empty_color'])
+		)
+		->addField(
+			new CWidgetFieldColorView($fields['bg_color'])
+		);
 }
 
 function getDescriptionFieldsGroupView(CWidgetFormView $form, array $fields): CWidgetFieldsGroupView {
