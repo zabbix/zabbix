@@ -636,6 +636,7 @@ void	zbx_free_tag(zbx_tag_t *tag);
 /* these functions are only for use with zbx_vector_XXX_sort() */
 int	zbx_compare_tags(const void *d1, const void *d2);
 int	zbx_compare_tags_and_values(const void *d1, const void *d2);
+int	zbx_compare_tags_natural(const void *d1, const void *d2);
 
 /* 128 bit unsigned integer handling */
 void	zbx_uinc128_64(zbx_uint128_t *base, zbx_uint64_t value);

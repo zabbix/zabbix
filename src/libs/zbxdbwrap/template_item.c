@@ -19,9 +19,15 @@
 
 #include "zbxdbhigh.h"
 
+#include "template.h"
+
 #include "zbxcacheconfig.h"
+#include "zbxdb.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
+
+#include "zbxalgo.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
@@ -213,7 +219,8 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 				" and hi.hostid=" ZBX_FS_UI64
 			" where",
 			hostid);
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
 	result = zbx_db_select("%s", sql);
 
@@ -2534,7 +2541,8 @@ static void	copy_template_lld_overrides(const zbx_vector_uint64_t *templateids,
 			" from lld_override l,items i"
 			" where l.itemid=i.itemid"
 			" and");
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by l.lld_overrideid");
 
 	result = zbx_db_select("%s", sql);
@@ -2732,7 +2740,8 @@ static void	link_template_items_preproc(const zbx_vector_uint64_t *templateids, 
 			" where ip.itemid=ti.itemid"
 			" and");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
 	result = zbx_db_select("%s", sql);
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -2907,7 +2916,8 @@ static void	link_template_items_tag(const zbx_vector_uint64_t *templateids, zbx_
 			" where it.itemid=ti.itemid"
 			" and");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
 	result = zbx_db_select("%s", sql);
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -3014,7 +3024,8 @@ static void	link_template_items_param(const zbx_vector_uint64_t *templateids, zb
 			" where ip.itemid=ti.itemid"
 			" and");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values,
+			templateids->values_num);
 
 	result = zbx_db_select("%s", sql);
 	while (NULL != (row = zbx_db_fetch(result)))
@@ -3115,7 +3126,8 @@ static void	link_template_lld_macro_paths(const zbx_vector_uint64_t *templateids
 			" where l.itemid=i.itemid"
 			" and");
 
-	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values, templateids->values_num);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "i.hostid", templateids->values,
+			templateids->values_num);
 
 	result = zbx_db_select("%s", sql);
 	while (NULL != (row = zbx_db_fetch(result)))
