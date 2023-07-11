@@ -977,7 +977,7 @@ int	zbx_dbsync_compare_autoreg_host(zbx_dbsync_t *sync)
 	if (NULL == (sync->dbresult = zbx_db_select(
 			"select host,listen_ip,listen_dns,host_metadata,flags,listen_port"
 			" from autoreg_host"
-			" where proxy_hostid is null")))
+			" where proxyid is null")))
 	{
 		return FAIL;
 	}
@@ -1004,7 +1004,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
+			"select h.hostid,h.proxyid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
 				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
 				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,"
 				"h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,h.maintenanceid"
@@ -1013,13 +1013,13 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			PROXY_TYPE_ACTIVE, PROXY_TYPE_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 22, NULL);
 #else
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hostid,h.proxy_hostid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
+			"select h.hostid,h.proxyid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
 				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
 				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,"
 				"h.proxy_address,h.auto_compress,h.maintenanceid"
@@ -1028,7 +1028,7 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
+			PROXY_TYPE_ACTIVE, PROXY_TYPE_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 18, NULL);
@@ -1041,9 +1041,10 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	/* sort by h.proxy_hostid to ensure that proxies are synced before hosts assigned to them */
+	/* sort by h.proxyid to ensure that proxies are synced before hosts assigned to them */
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
+	zabbix_log(1, "DBG sql ='%s'", sql);
 out:
 	zbx_free(sql);
 
@@ -3801,7 +3802,7 @@ int	zbx_dbsync_prepare_drules(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select druleid,proxy_hostid,delay,name,iprange,status,concurrency_max from drules");
+			"select druleid,proxyid,delay,name,iprange,status,concurrency_max from drules");
 
 	dbsync_prepare(sync, 7, NULL);
 

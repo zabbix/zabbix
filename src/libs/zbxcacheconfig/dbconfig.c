@@ -1301,7 +1301,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			else
 				update_index_h = 1;
 		}
-		else if ((HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status) &&
+		else if ((PROXY_TYPE_ACTIVE == status || PROXY_TYPE_PASSIVE == status) &&
 				(0 == found || 0 != strcmp(host->host, row[2])))
 		{
 			if (1 == found)
@@ -1526,8 +1526,8 @@ done:
 		ZBX_STR2UCHAR(host->tls_connect, row[13]);
 		ZBX_STR2UCHAR(host->tls_accept, row[14]);
 
-		if ((HOST_STATUS_PROXY_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
-				(HOST_STATUS_PROXY_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED &
+		if ((PROXY_TYPE_PASSIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED & host->tls_connect)) ||
+				(PROXY_TYPE_ACTIVE == status && 0 != (ZBX_TCP_SEC_UNENCRYPTED &
 				host->tls_accept)))
 		{
 			if (NULL != config_vault->token || NULL != config_vault->name)
@@ -1666,7 +1666,7 @@ done:
 
 		/* proxies */
 
-		if (HOST_STATUS_PROXY_ACTIVE == status || HOST_STATUS_PROXY_PASSIVE == status)
+		if (PROXY_TYPE_ACTIVE == status || PROXY_TYPE_PASSIVE == status)
 		{
 			proxy = (ZBX_DC_PROXY *)DCfind_id(&config->proxies, hostid, sizeof(ZBX_DC_PROXY), &found);
 
@@ -1694,7 +1694,7 @@ done:
 			proxy->auto_compress = atoi(row[16 + ZBX_HOST_TLS_OFFSET]);
 			dc_strpool_replace(found, &proxy->proxy_address, row[15 + ZBX_HOST_TLS_OFFSET]);
 
-			if (HOST_STATUS_PROXY_PASSIVE == status && (0 == found || status != host->status))
+			if (PROXY_TYPE_PASSIVE == status && (0 == found || status != host->status))
 			{
 				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
 						hostid, proxyconfig_frequency, now);
@@ -1705,7 +1705,7 @@ done:
 
 				DCupdate_proxy_queue(proxy);
 			}
-			else if (HOST_STATUS_PROXY_ACTIVE == status && ZBX_LOC_QUEUE == proxy->location)
+			else if (PROXY_TYPE_ACTIVE == status && ZBX_LOC_QUEUE == proxy->location)
 			{
 				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
 				proxy->location = ZBX_LOC_NOWHERE;
@@ -1762,7 +1762,7 @@ done:
 			if (0 != host->proxy_hostid)
 				dc_host_deregister_proxy(host, host->proxy_hostid, revision);
 		}
-		else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
+		else if (PROXY_TYPE_ACTIVE == host->status || PROXY_TYPE_PASSIVE == host->status)
 		{
 			host_p_local.host = host->host;
 			host_p = (ZBX_DC_HOST_H *)zbx_hashset_search(&config->hosts_p, &host_p_local);
@@ -8457,7 +8457,7 @@ int	zbx_dc_check_proxy_permissions(const char *host, const zbx_socket_t *sock, z
 		return FAIL;
 	}
 
-	if (HOST_STATUS_PROXY_ACTIVE != dc_host->status)
+	if (PROXY_TYPE_ACTIVE != dc_host->status)
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode", host);
@@ -11971,7 +11971,7 @@ void	zbx_dc_requeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck, i
 		else if (CONFIG_ERROR == proxy_conn_err)
 			dc_proxy->last_cfg_error_time = (int)now;
 
-		if (HOST_STATUS_PROXY_PASSIVE == dc_host->status)
+		if (PROXY_TYPE_PASSIVE == dc_host->status)
 		{
 			if (0 != (update_nextcheck & ZBX_PROXY_CONFIG_NEXTCHECK))
 			{
@@ -13648,7 +13648,7 @@ int	zbx_dc_get_active_proxy_by_name(const char *name, zbx_dc_proxy_t *proxy, cha
 		goto out;
 	}
 
-	if (HOST_STATUS_PROXY_ACTIVE != dc_host->status)
+	if (PROXY_TYPE_ACTIVE != dc_host->status)
 	{
 		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured for passive mode", name);
 		goto out;
@@ -14751,7 +14751,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 
 		zbx_json_addstring(&json, "name", proxy->name, ZBX_JSON_TYPE_STRING);
 
-		if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+		if (PROXY_TYPE_PASSIVE == proxy->status)
 			zbx_json_addstring(&json, "passive", "true", ZBX_JSON_TYPE_INT);
 		else
 			zbx_json_addstring(&json, "passive", "false", ZBX_JSON_TYPE_INT);
@@ -14768,7 +14768,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 		{
 			unsigned int	encryption;
 
-			if (HOST_STATUS_PROXY_PASSIVE == proxy->status)
+			if (PROXY_TYPE_PASSIVE == proxy->status)
 				encryption = dc_host->tls_connect;
 			else
 				encryption = dc_host->tls_accept;

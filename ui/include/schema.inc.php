@@ -201,7 +201,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
@@ -483,12 +483,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'name' => [
 				'null' => false,
@@ -5218,12 +5218,12 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			],
 			'host' => [
 				'null' => false,
@@ -6838,12 +6838,12 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'proxy_hostid' => [
+			'proxyid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-				'ref_table' => 'hosts',
-				'ref_field' => 'hostid'
+				'ref_table' => 'proxy',
+				'ref_field' => 'proxyid'
 			]
 		]
 	],
@@ -9623,7 +9623,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
-			'host' => [
+			'name' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
@@ -9676,7 +9676,7 @@ return [
 				'length' => 512,
 				'default' => ''
 			],
-			'proxy_address' => [
+			'allowed_addresses' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
@@ -9688,23 +9688,11 @@ return [
 				'length' => 10,
 				'default' => '1'
 			],
-			'useip' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '1'
-			],
-			'ip' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => '127.0.0.1'
-			],
-			'dns' => [
+			'address' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
-				'default' => ''
+				'default' => '127.0.0.1'
 			],
 			'port' => [
 				'null' => false,
