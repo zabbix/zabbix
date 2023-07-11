@@ -1332,7 +1332,7 @@ function getEventDetailsActions(array $event): array {
 			'sendto', 'status', 'subject', 'userid', 'p_eventid', 'acknowledgeid'
 		],
 		'eventids' => $alert_eventids,
-		'config' => $search_limit
+		'limit' => $search_limit
 	]);
 
 	$actions = getSingleEventActions($event, $r_events, $alerts);
