@@ -7586,7 +7586,13 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
 				"\n\n",
 				'/1/params',
-				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+				'Invalid parameter "/1/params/3": an integer is expected.'
+			],
+			[
+				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
+				"\n\nS",
+				'/1/params',
+				'Invalid parameter "/1/params/3": an integer is expected.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
@@ -7598,7 +7604,7 @@ class CApiInputValidatorTest extends TestCase {
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_CSV_TO_JSON]],
 				",\n\"\n2",
 				'/1/params',
-				'Invalid parameter "/1/params/3": value must be one of "0", "1".'
+				'Invalid parameter "/1/params/3": value must be one of 0, 1.'
 			],
 			[
 				['type' => API_PREPROC_PARAMS, 'preproc_type' => ['value' => ZBX_PREPROC_STR_REPLACE]],
