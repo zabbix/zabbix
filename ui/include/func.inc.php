@@ -601,9 +601,8 @@ function convertUnitsS($value, $ignore_millisec = false, $decimals = ZBX_UNITS_R
 	$result = [];
 
 	foreach (array_filter($parts) as $part_unit => $part_value) {
-		$result[] = formatFloat($part_value, ['decimals' => $decimals,
-				'decimals_exact' => $decimals_exact
-			]).$units[$part_unit];
+		$result[] = formatFloat($part_value, ['decimals' => $decimals, 'decimals_exact' => $decimals_exact])
+			.$units[$part_unit];
 	}
 
 	return $result ? ($value < 0 ? '-' : '').implode(' ', $result) : '0';
