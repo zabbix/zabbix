@@ -9629,7 +9629,7 @@ return [
 				'length' => 128,
 				'default' => ''
 			],
-			'status' => [
+			'mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
