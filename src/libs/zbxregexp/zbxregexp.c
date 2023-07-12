@@ -261,17 +261,8 @@ static unsigned long int compute_recursion_limit(void)
 #endif
 }
 
-#if defined(HAVE_PCRE_H)
-static char	*decode_pcre_exec_error(int error_code)
-{
-	char	*err_msg = zbx_dsprintf(NULL, "pcre_exec() returned %d. See PCRE library documentation or"
-			" \"man pcreapi\", section \"Error return values from pcre_exec()\" for explanation"
-			" or /usr/include/pcre.h", error_code);
-
-	return err_msg;
-}
-#elif defined(HAVE_PCRE2_H)
-static char	*decode_pcre2_error(int error_code)
+#if defined(HAVE_PCRE2_H)
+static char	*decode_pcre2_match_error(int error_code)
 {
 	/* 120 code units buffer is recommended in "man pcre2api" */
 	const size_t	err_msg_size = 120 * PCRE2_CODE_UNIT_WIDTH / 8;
@@ -352,7 +343,11 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	else
 	{
 		if (NULL != err_msg)
-			*err_msg = decode_pcre_exec_error(r);
+		{
+			*err_msg = zbx_dsprintf(NULL, "pcre_exec() returned %d. See PCRE library documentation or"
+			" \"man pcreapi\", section \"Error return values from pcre_exec()\" for explanation"
+			" or /usr/include/pcre.h", r);
+		}
 
 		result = FAIL;
 	}
@@ -407,7 +402,7 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 		else
 		{
 			if (NULL != err_msg)
-				*err_msg = decode_pcre2_error(r);
+				*err_msg = decode_pcre2_match_error(r);
 
 			result = FAIL;
 		}
