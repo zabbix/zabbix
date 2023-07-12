@@ -17,18 +17,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_H
-#define ZABBIX_TLS_H
+#ifndef ZABBIX_ASYNCPOLLER_H
+#define ZABBIX_ASYNCPOLLER_H
 
-#include "zbxcomms.h"
+#include "zbxcommon.h"
+#ifdef HAVE_LIBEVENT
+#include <event.h>
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, short *event, char **error);
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error);
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error);
-void	zbx_tls_close(zbx_socket_t *s);
-#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+typedef enum
+{
+	ZBX_ASYNC_TASK_READ,
+	ZBX_ASYNC_TASK_WRITE,
+	ZBX_ASYNC_TASK_STOP,
 
-#endif /* ZABBIX_TLS_H */
+}
+zbx_async_task_state_t;
+
+typedef int (*zbx_async_task_process_cb_t)(short event, void *data);
+typedef void (*zbx_async_task_clear_cb_t)(void *data);
+
+
+void	zbx_async_poller_add_task(struct event_base *ev, int fd, void *data, int timeout,
+		zbx_async_task_process_cb_t process_cb, zbx_async_task_clear_cb_t clear_cb);
+#endif
+#endif
