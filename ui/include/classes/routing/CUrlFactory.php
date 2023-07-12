@@ -64,10 +64,6 @@ class CUrlFactory {
 			'remove' =>  ['triggerid'],
 			'add' => ['parent_discoveryid', 'hostid']
 		],
-		'triggers.php' => [
-			'remove' => ['triggerid'],
-			'add' => ['hostid']
-		],
 		'__default' => [
 			'remove' => ['cancel', 'form', 'delete']
 		]

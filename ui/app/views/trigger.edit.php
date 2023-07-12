@@ -325,7 +325,7 @@ $trigger_form_grid
 	]);
 
 // Append status to form list.
-if (empty($data['triggerid'])) {
+if (!$data['triggerid']) {
 	$status = true;
 }
 else {

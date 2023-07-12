@@ -189,7 +189,7 @@ $tabs = (new CTabView())
 $form->addItem($tabs);
 
 $form->addItem(new CJsScript($this->readJsFile('popup.massupdate.tmpl.js.php')));
-$form->addItem(new CJsScript($this->readJsFile('popup.massupdate.trigger.js.php')));
+$form->addItem(new CJsScript($this->readJsFile('massupdate.trigger.js.php')));
 
 $output = [
 	'header' => $data['title'],

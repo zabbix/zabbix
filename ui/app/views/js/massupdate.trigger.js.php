@@ -50,8 +50,8 @@
 				curl.setArgument('context', '<?= $data['context'] ?>');
 			}
 			else {
-				curl = new Curl('triggers.php');
-				curl.setArgument('form', 'update');
+				curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'trigger.edit');
 				curl.setArgument('triggerid', value.triggerid);
 				curl.setArgument('context', '<?= $data['context'] ?>');
 			}
@@ -60,6 +60,7 @@
 				.querySelector('#dependency-table tr:last-child')
 				.insertAdjacentHTML('afterend', tmpl.evaluate({
 					triggerid: value.triggerid,
+					context: '<?= $data['context'] ?>',
 					name: value.name,
 					url: curl.getUrl()
 				}));
@@ -70,4 +71,32 @@
 		jQuery('#dependency_' + triggerid).remove();
 		jQuery('#dependencies_' + triggerid).remove();
 	}
+
+	document.addEventListener('click', (e) => {
+		if (e.target.classList.contains('js-edit-dependency')) {
+			const massupdate_overlay = overlays_stack.end();
+			overlayDialogueDestroy(massupdate_overlay.dialogueid);
+
+			const trigger_data = {
+				triggerid: e.target.dataset.triggerid,
+				context: e.target.dataset.context
+			};
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+	})
 </script>

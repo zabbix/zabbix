@@ -128,7 +128,8 @@ foreach ($data['hosts'] as $hostid => $host) {
 
 	$trigger_count = CViewHelper::showNum($host['triggers']);
 	$triggers_link = ($host['editable'] && $data['allowed_ui_conf_hosts'])
-		? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+		? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+			->setArgument('action', 'trigger.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$hostid])
 			->setArgument('context', 'host')
@@ -303,7 +304,8 @@ if ($data['admin']) {
 		$items_link = (new CCol($items_link))->addClass(ZBX_STYLE_TABLE_LEFT_BORDER);
 
 		$triggers_link = ($template['editable'] && $data['allowed_ui_conf_templates'])
-			? [new CLink(_('Triggers'), (new CUrl('triggers.php'))
+			? [new CLink(_('Triggers'), (new CUrl('zabbix.php'))
+				->setArgument('action', 'trigger.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$templateid])
 				->setArgument('context', 'template')
