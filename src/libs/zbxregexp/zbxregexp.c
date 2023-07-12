@@ -302,7 +302,6 @@ static char	*decode_pcre2_error(int error_code)
  *     matches        - [OUT] matches (can be NULL if matching results are         *
  *                      not required)                                              *
  *     err_msg        - [OUT] dynamically allocated error message (can be NULL).   *
- *                            Free with zbx_regexp_err_msg_free().                 *
  *                                                                                 *
  * Return value: ZBX_REGEXP_MATCH     - successful match                           *
  *               ZBX_REGEXP_NO_MATCH  - no match                                   *
@@ -370,8 +369,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	PCRE2_SIZE		*ovector = NULL;
 
 	pcre2_set_match_limit(regexp->match_ctx, 1000000);
-	pcre2_set_recursion_limit(regexp->match_ctx, compute_recursion_limit());
-	match_data = pcre2_match_data_create(count, NULL);
+	pcre2_set_recursion_limit(regexp->match_ctx, (uint32_t)compute_recursion_limit());
+	match_data = pcre2_match_data_create((uint32_t)count, NULL);
 
 	if (NULL == match_data)
 	{
