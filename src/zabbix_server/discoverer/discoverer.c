@@ -1028,7 +1028,9 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 		discoverer_queue_unlock(&dmanager.queue);
 		queue_capacity_local = queue_capacity - queue_checks_count;
 
-		if (i != FAIL || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
+		if (FAIL != i || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid) ||
+				FAIL != zbx_vector_discoverer_jobs_ptr_search(jobs, &cmp,
+				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 		{
 			zbx_dc_drule_queue(now, drule->druleid, drule->delay);
 			zbx_discovery_drule_free(drule);
