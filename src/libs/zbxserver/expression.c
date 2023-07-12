@@ -2285,7 +2285,6 @@ static int	get_history_log_value(const char *m, const DB_TRIGGER *trigger, char 
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
 		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
-
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
