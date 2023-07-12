@@ -144,7 +144,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovers replication lag metrics.</p>|Database monitor|db.odbc.select[pgsql.replication.process.discovery,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|Replication discovery|<p>Discovers replication lag metrics.</p>|Database monitor|db.odbc.select[pgsql.replication.process.discovery,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 

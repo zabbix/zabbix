@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-11T13:52:27Z'
+  date: '2023-07-12T14:52:08Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2543,6 +2543,10 @@ zabbix_export:
                   item:
                     host: 'PostgreSQL by ODBC'
                     key: 'pgsql.replication.process.write_lag["{#APPLICATION_NAME}"]'
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       tags:
         - tag: class
           value: database
