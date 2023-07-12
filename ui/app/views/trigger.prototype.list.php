@@ -21,9 +21,10 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
-require_once dirname(__FILE__).'/js/configuration.trigger.prototype.list.js.php';
+$this->includeJsFile('trigger.prototype.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Trigger prototypes'))
@@ -46,22 +47,21 @@ $html_page = (new CHtmlPage())
 	)
 	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-$url = (new CUrl('trigger_prototypes.php'))
+$url = (new CUrl('zabbix.php'))
+	->setArgument('action', 'trigger.prototype.list')
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context'])
 	->getUrl();
 
-// create form
-$triggersForm = (new CForm('post', $url))
-	->setName('triggersForm')
+$trigger_form = (new CForm('post', $url))
+	->setName('trigger_form')
 	->addVar('parent_discoveryid', $data['parent_discoveryid'], 'form_parent_discoveryid')
 	->addVar('context', $data['context'], 'form_context');
 
-// create table
-$triggersTable = (new CTableInfo())
+$trigger_table = (new CTableInfo())
 	->setHeader([
 		(new CColHeader(
-			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+			(new CCheckBox('all_triggers'))->onClick("checkAll('".$trigger_form->getName()."', 'all_triggers', 'g_triggerid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Severity'), 'priority', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder'], $url),
@@ -78,13 +78,12 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'context' => $data['context']
 ]);
 
-$csrf_token = CCsrfTokenHelper::get('trigger_prototypes.php');
+$csrf_token = CCsrfTokenHelper::get('trigger');
 
 foreach ($data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
 	$trigger['discoveryRuleid'] = $data['parent_discoveryid'];
 
-	// description
 	$description = [];
 	$description[] = makeTriggerTemplatePrefix($trigger['triggerid'], $data['parent_templates'],
 		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
@@ -101,42 +100,39 @@ foreach ($data['triggers'] as $trigger) {
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
-		$triggerDependencies = [];
+		$trigger_dependencies = [];
 
 		foreach ($trigger['dependencies'] as $dependency) {
-			$depTrigger = $data['dependencyTriggers'][$dependency['triggerid']];
+			$dep_trigger = $data['dependencyTriggers'][$dependency['triggerid']];
 
-			$depTriggerDescription =
-				implode(', ', zbx_objectValues($depTrigger['hosts'], 'name')).NAME_DELIMITER.$depTrigger['description'];
+			$dep_trigger_description =
+				implode(', ', zbx_objectValues($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
-			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$triggerDependencies[] = (new CLink(
-					$depTriggerDescription,
+			if ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$trigger_dependencies[] = (new CLink(
+					$dep_trigger_description,
 					(new CUrl('trigger_prototypes.php'))
 						->setArgument('form', 'update')
 						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-						->setArgument('triggerid', $depTrigger['triggerid'])
+						->setArgument('triggerid', $dep_trigger['triggerid'])
 						->setArgument('context', $data['context'])
-				))->addClass(triggerIndicatorStyle($depTrigger['status']));
+				))->addClass(triggerIndicatorStyle($dep_trigger['status']));
 			}
-			elseif ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$triggerDependencies[] = (new CLink(
-					$depTriggerDescription,
-					(new CUrl('triggers.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $depTrigger['triggerid'])
-						->setArgument('context', $data['context'])
-				))->addClass(triggerIndicatorStyle($depTrigger['status']));
+			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
+				$trigger_dependencies[] = (new CLink($dep_trigger_description))
+					->setAttribute('data-triggerid', $dep_trigger['triggerid'])
+					->setAttribute('data-context', $data['context'])
+					->addClass(triggerIndicatorStyle($dep_trigger['status']))
+					->addClass('js-trigger-edit');
 			}
 
-			$triggerDependencies[] = BR();
+			$trigger_dependencies[] = BR();
 		}
-		array_pop($triggerDependencies);
+		array_pop($trigger_dependencies);
 
-		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
+		$description = array_merge($description, [(new CDiv($trigger_dependencies))->addClass('dependencies')]);
 	}
 
-	// status
 	$status = (new CLink(
 		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
 		(new CUrl('trigger_prototypes.php'))
@@ -180,10 +176,9 @@ foreach ($data['triggers'] as $trigger) {
 		$expression = $trigger['expression'];
 	}
 
-	// checkbox
 	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);
 
-	$triggersTable->addRow([
+	$trigger_table->addRow([
 		$checkBox,
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
 		$description,
@@ -196,8 +191,8 @@ foreach ($data['triggers'] as $trigger) {
 }
 
 // append table to form
-$triggersForm->addItem([
-	$triggersTable,
+$trigger_form->addItem([
+	$trigger_table,
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
@@ -237,5 +232,5 @@ $triggersForm->addItem([
 ]);
 
 $html_page
-	->addItem($triggersForm)
+	->addItem($trigger_form)
 	->show();

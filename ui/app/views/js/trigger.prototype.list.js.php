@@ -82,4 +82,32 @@
 			}
 		}
 	};
+
+
+	document.addEventListener('click', (e) => {
+		if (e.target.classList.contains('js-trigger-edit')) {
+			clearMessages();
+
+			const trigger_data = {
+				triggerid: e.target.dataset.triggerid,
+				context: e.target.dataset.context
+			};
+
+			const overlay = PopUp('trigger.edit', trigger_data, {
+				dialogueid: 'trigger-edit',
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
+				postMessageOk(e.detail.title);
+
+				if ('messages' in e.detail) {
+					postMessageDetails('success', e.detail.messages);
+				}
+
+				location.href = location.href;
+			});
+		}
+	});
 </script>

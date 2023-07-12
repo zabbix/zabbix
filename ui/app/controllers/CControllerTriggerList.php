@@ -157,7 +157,7 @@ class CControllerTriggerList extends CController {
 		});
 
 		$sort = $this->getInput('sort', CProfile::get($prefix.'trigger.list.sort', 'description'));
-		$sortorder = $this->getInput('sortorder', CProfile::get($prefix.'trigger.list.sortorder', ZBX_SORT_UP));
+		$sort_order = $this->getInput('sortorder', CProfile::get($prefix.'trigger.list.sortorder', ZBX_SORT_UP));
 		$active_tab = CProfile::get($prefix.'trigger.list.filter.active', 1);
 
 		// Get triggers (build options).
@@ -219,15 +219,15 @@ class CControllerTriggerList extends CController {
 
 		$prefetched_triggers = API::Trigger()->get($options);
 		if ($sort === 'status') {
-			orderTriggersByStatus($prefetched_triggers, $sortorder);
+			orderTriggersByStatus($prefetched_triggers, $sort_order);
 		}
 		else {
-			order_result($prefetched_triggers, $sort, $sortorder);
+			order_result($prefetched_triggers, $sort, $sort_order);
 		}
 
 		$page_num = $this->getInput('page', 1);
 		CPagerHelper::savePage('trigger.list', $page_num);
-		$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sortorder, (new CUrl('zabbix.php'))
+		$paging = CPagerHelper::paginate($page_num, $prefetched_triggers, $sort_order, (new CUrl('zabbix.php'))
 			->setArgument('action', 'trigger.list')
 			->setArgument('context', $data['context'])
 		);
@@ -332,7 +332,7 @@ class CControllerTriggerList extends CController {
 		}
 
 		CProfile::update($prefix.'trigger.list.sort', $sort, PROFILE_TYPE_STR);
-		CProfile::update($prefix.'trigger.list.sortorder', $sortorder, PROFILE_TYPE_STR);
+		CProfile::update($prefix.'trigger.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($this->hasInput('filter_set') && $this->getInput('filter_set')) {
 			CProfile::update($prefix.'trigger.list.filter_inherited', $filter_inherited, PROFILE_TYPE_INT);
@@ -406,7 +406,7 @@ class CControllerTriggerList extends CController {
 			'profileIdx' => $prefix.'trigger.list.filter',
 			'active_tab' => $active_tab,
 			'sort' => $sort,
-			'sortorder' => $sortorder,
+			'sortorder' => $sort_order,
 			'filter_groupids_ms' => $ms_groups,
 			'filter_hostids_ms' => $filter_hostids_ms,
 			'filter_name' => $filter_name,
