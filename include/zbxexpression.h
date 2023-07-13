@@ -205,5 +205,4 @@ int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char
 int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
 		zbx_eval_count_pattern_data_t *pdata, char **error);
 void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
-
 #endif

@@ -384,7 +384,7 @@ static void	zbx_extract_functionids(zbx_vector_uint64_t *functionids, zbx_vector
  *             funcs       - [OUT] functions indexed by itemid, name,         *
  *                                 parameter, timestamp                       *
  *             ifuncs      - [OUT] function index by functionid               *
- *             trigger     - [IN] vector of triggers, sorted by triggerid     *
+ *             triggers     - [IN] vector of triggers, sorted by triggerid    *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_populate_function_items(const zbx_vector_uint64_t *functionids, zbx_hashset_t *funcs,

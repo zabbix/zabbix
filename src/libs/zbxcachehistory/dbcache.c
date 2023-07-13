@@ -1793,7 +1793,7 @@ static int	zbx_trigger_topoindex_compare(const void *d1, const void *d2)
  * Purpose: prepare triggers for evaluation.                                  *
  *                                                                            *
  * Parameters: triggers     - [IN] array of zbx_dc_trigger_t pointers         *
- *             triggres_num - [IN] the number of triggers to prepare          *
+ *             triggers_num - [IN] number of triggers to prepare              *
  *                                                                            *
  ******************************************************************************/
 static void	prepare_triggers(zbx_dc_trigger_t **triggers, int triggers_num)

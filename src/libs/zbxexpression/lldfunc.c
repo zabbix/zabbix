@@ -30,15 +30,16 @@
  *                                                                            *
  * Purpose: expand discovery macro in user macro context.                     *
  *                                                                            *
- * Parameters: data          - [IN/OUT] expression containing lld macro       *
- *             token         - [IN/OUT] token with user macro location data   *
- *             jp_row        - [IN] discovery data                            *
- *             error         - [OUT] error buffer                             *
- *             max_error_len - [IN] size of error buffer                      *
+ * Parameters: data            - [IN/OUT] expression containing lld macro     *
+ *             token           - [IN/OUT] token with user macro location data *
+ *             jp_row          - [IN] discovery data                          *
+ *             lld_macro_paths - [IN]                                         *
+ *             error           - [OUT] error buffer                           *
+ *             max_error_len   - [IN] size of error buffer                    *
  *                                                                            *
  ******************************************************************************/
 static int	process_user_macro_token(char **data, zbx_token_t *token, const struct zbx_json_parse *jp_row,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths,  char *error, size_t max_error_len)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char *error, size_t max_error_len)
 {
 	int			force_quote, ret;
 	size_t			context_r;

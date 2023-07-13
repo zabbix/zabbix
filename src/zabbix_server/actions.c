@@ -68,7 +68,8 @@ static void	add_condition_match(const zbx_vector_db_event_t *esc_events, zbx_con
 	int		index;
 	const zbx_db_event	event_search = {.objectid = objectid, .object = object};
 
-	if (FAIL != (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)esc_events, &event_search, compare_events)))
+	if (FAIL != (index = zbx_vector_ptr_bsearch((const zbx_vector_ptr_t *)esc_events, &event_search,
+			compare_events)))
 	{
 		const zbx_db_event	*event = esc_events->values[index];
 		int		i;
@@ -2265,7 +2266,8 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0;
