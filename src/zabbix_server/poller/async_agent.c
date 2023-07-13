@@ -270,7 +270,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != agent_context->interface.addr && SUCCEED != zbx_is_ip(agent_context->interface.addr))
+	if (SUCCEED != zbx_is_ip(agent_context->interface.addr))
 		agent_context->server_name = agent_context->interface.addr;
 	else
 		agent_context->server_name = NULL;

@@ -85,6 +85,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 		goto fail;
 	}
 
+	/* httpagent_context is associated with this curl handle and will be freed when handle is freed */
 	return SUCCEED;
 fail:
 	zbx_async_check_httpagent_clean(httpagent_context);

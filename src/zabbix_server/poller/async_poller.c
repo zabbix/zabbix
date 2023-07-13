@@ -115,12 +115,19 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	zbx_dc_item_context_t	*item_context;
 	zbx_timespec_t		timespec;
 	zbx_poller_config_t	*poller_config;
+	CURLcode		err_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	poller_config = (zbx_poller_config_t *)arg;
 
-	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
+	if (CURLE_OK != (err_info = curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get pointer to private data: %s", curl_easy_strerror(err_info));
+
+		goto fail;
+	}
 
 	zbx_timespec(&timespec);
 
@@ -164,7 +171,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	curl_multi_remove_handle(poller_config->curl_handle, easy_handle);
 	zbx_async_check_httpagent_clean(httpagent_context);
 	zbx_free(httpagent_context);
-
+fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 #endif
