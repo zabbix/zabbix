@@ -268,7 +268,7 @@ static void	async_check_items(evutil_socket_t fd, short events, void *arg)
 	results = zbx_malloc(NULL, (size_t)num * sizeof(AGENT_RESULT));
 	errcodes = zbx_malloc(NULL, (size_t)num * sizeof(int));
 
-	zbx_prepare_items(items, errcodes, num, results, MACRO_EXPAND_YES);
+	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 
 	for (i = 0; i < num; i++)
 	{
