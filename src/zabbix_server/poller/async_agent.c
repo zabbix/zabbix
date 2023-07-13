@@ -36,8 +36,10 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 			return "tls";
 		case ZABBIX_AGENT_STEP_SEND:
 			return "send";
-		default:
+		case ZABBIX_AGENT_STEP_RECV:
 			return "receive";
+		default:
+			return "unknown";
 	}
 }
 

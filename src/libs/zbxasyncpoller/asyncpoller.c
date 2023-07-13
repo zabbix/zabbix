@@ -53,8 +53,10 @@ static const char	*task_state_to_str(zbx_async_task_state_t task_state)
 			return "ZBX_ASYNC_TASK_WRITE";
 		case ZBX_ASYNC_TASK_READ:
 			return "ZBX_ASYNC_TASK_READ";
-		default:
+		case ZBX_ASYNC_TASK_STOP:
 			return "ZBX_ASYNC_TASK_STOP";
+		default:
+			return "unknown";
 	}
 }
 

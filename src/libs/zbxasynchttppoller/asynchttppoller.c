@@ -76,6 +76,9 @@ static void	check_multi_info(zbx_asynchttppoller_config *asynchttppoller_config)
 				asynchttppoller_config->process_httpagent_result(message->easy_handle,
 						message->data.result, asynchttppoller_config->http_agent_arg);
 				break;
+			case CURLMSG_NONE:
+			case CURLMSG_LAST:
+				ZBX_FALLTHROUGH;
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%u", message->msg);
 				break;
