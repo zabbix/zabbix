@@ -17,18 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_H
-#define ZABBIX_TLS_H
+#ifndef ZABBIX_ASYNC_POLLER_H
+#define ZABBIX_ASYNC_POLLER_H
 
-#include "zbxcomms.h"
+#include "zbxalgo.h"
+#include "zbxthreads.h"
+ZBX_VECTOR_DECL(int32, int)
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, short *event, char **error);
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error);
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error);
-void	zbx_tls_close(zbx_socket_t *s);
-#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+typedef struct
+{
+	const zbx_thread_info_t	*info;
+	int			state;
+	unsigned char		poller_type;
+	int			processed;
+	int			queued;
+	int			processing;
+	int			config_unavailable_delay;
+	int			config_unreachable_delay;
+	int			config_unreachable_period;
+	int			config_max_concurrent_checks_per_poller;
+	int			config_timeout;
+	const char		*config_source_ip;
+	struct event		*async_check_items_timer;
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_int32_t	errcodes;
+	zbx_vector_int32_t	lastclocks;
+	struct event_base	*base;
+	zbx_hashset_t		interfaces;
+#ifdef HAVE_LIBCURL
+	CURLM			*curl_handle;
+#endif
+}
+zbx_poller_config_t;
 
-#endif /* ZABBIX_TLS_H */
+
+#endif

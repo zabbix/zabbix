@@ -17,18 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_TLS_H
-#define ZABBIX_TLS_H
+#ifndef ZABBIX_ASYNC_HTTPAGENT_H
+#define ZABBIX_ASYNC_HTTPAGENT_H
 
-#include "zbxcomms.h"
+#include "zbxcacheconfig.h"
+#include "module.h"
+#include "async_poller.h"
+#include "zbxhttp.h"
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
-		const char *server_name, short *event, char **error);
-int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error);
-ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error);
-ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error);
-void	zbx_tls_close(zbx_socket_t *s);
-#endif	/* #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
+#ifdef HAVE_LIBCURL
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	unsigned char	value_type;
+	unsigned char	flags;
+	unsigned char	state;
+	char		*posts;
+	char		*status_codes;
+}
+zbx_dc_item_context_t;
 
-#endif /* ZABBIX_TLS_H */
+typedef struct
+{
+	zbx_http_context_t	http_context;
+	zbx_dc_item_context_t	item_context;
+}
+zbx_httpagent_context;
+
+int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
+		CURLM *curl_handle);
+void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context);
+#endif
+#endif

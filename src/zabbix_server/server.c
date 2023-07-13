@@ -143,8 +143,9 @@ const char	*help_message[] = {
 	"                                  connector manager, connector worker, discovery manager,",
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, preprocessing manager,",
-	"                                  proxy poller, self-monitoring, service manager, snmp trapper,",
+	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., poller,3)",
 	"        pid                       Process identifier",
@@ -155,8 +156,9 @@ const char	*help_message[] = {
 	"                                  connector manager, connector worker, discovery manager,",
 	"                                  escalator, ha manager, history poller, history syncer,",
 	"                                  housekeeper, http poller, icmp pinger, ipmi manager,",
-	"                                  ipmi poller, java poller, odbc poller, poller, preprocessing manager,",
-	"                                  proxy poller, self-monitoring, service manager, snmp trapper,",
+	"                                  ipmi poller, java poller, odbc poller, poller, agent poller,",
+	"                                  http agent poller, preprocessing manager, proxy poller,",
+	"                                  self-monitoring, service manager, snmp trapper,",
 	"                                  task manager, timer, trapper, unreachable poller, vmware collector)",
 	"        process-type,N            Process type and number (e.g., history syncer,1)",
 	"        pid                       Process identifier",
@@ -255,6 +257,8 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_CONNECTORMANAGER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER */
 	0, /* ZBX_PROCESS_TYPE_DISCOVERYMANAGER */
+	1, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
+	1, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -305,8 +309,9 @@ static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_value_cache_size		= 8 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_vmware_cache_size	= 8 * ZBX_MEBIBYTE;
 
-static int	config_unreachable_period	= 45;
-static int	config_unreachable_delay	= 15;
+static int	config_unreachable_period		= 45;
+static int	config_unreachable_delay		= 15;
+static int	config_max_concurrent_checks_per_poller	= 1000;
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
@@ -559,7 +564,16 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_CONNECTORWORKER;
 		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER];
 	}
-
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_HTTPAGENT_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER];
+	}
+	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_AGENT_POLLER;
+		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER];
+	}
 	else
 		return FAIL;
 
@@ -1011,6 +1025,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartConnectors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_CONNECTORWORKER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartHTTPAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartAgentPollers",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"MaxConcurrentChecksPerPoller",	&config_max_concurrent_checks_per_poller,	TYPE_INT,
+			PARM_OPT,	1,			1000},
 		{NULL}
 	};
 
@@ -1383,7 +1403,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_thread_poller_args		poller_args = {&config_comms, get_program_type, ZBX_NO_POLLER,
 							config_startup_time, config_unavailable_delay,
-							config_unreachable_period, config_unreachable_delay};
+							config_unreachable_period, config_unreachable_delay,
+							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_program_type,
 							&events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency};
@@ -1700,6 +1721,16 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				poller_args.poller_type = ZBX_POLLER_TYPE_ODBC;
 				thread_args.args = &poller_args;
 				zbx_thread_start(poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_HTTPAGENT_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_HTTPAGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
+				break;
+			case ZBX_PROCESS_TYPE_AGENT_POLLER:
+				poller_args.poller_type = ZBX_POLLER_TYPE_AGENT;
+				thread_args.args = &poller_args;
+				zbx_thread_start(async_poller_thread, &thread_args, &threads[i]);
 				break;
 		}
 	}
