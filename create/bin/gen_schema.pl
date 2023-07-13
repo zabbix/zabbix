@@ -610,6 +610,8 @@ DECLARE
 	current_timescaledb_version_major	INTEGER;
 	current_timescaledb_version_minor	INTEGER;
 	current_timescaledb_version_full	VARCHAR;
+
+	current_db_extension			VARCHAR;
 BEGIN
 	SELECT 10 INTO minimum_postgres_version_major;
 	SELECT 2 INTO minimum_postgres_version_minor;
@@ -628,9 +630,9 @@ BEGIN
 	IF (current_postgres_version_major < minimum_postgres_version_major OR
 			(current_postgres_version_major = minimum_postgres_version_major AND
 			current_postgres_version_minor < minimum_postgres_version_minor)) THEN
-			RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
-					current_postgres_version_full, minimum_postgres_version_major,
-					minimum_postgres_version_minor;
+		RAISE EXCEPTION 'PostgreSQL version % is NOT SUPPORTED (with TimescaleDB)! Minimum is %.%.0 !',
+				current_postgres_version_full, minimum_postgres_version_major,
+				minimum_postgres_version_minor;
 	ELSE
 		RAISE NOTICE 'PostgreSQL version % is valid', current_postgres_version_full;
 	END IF;
@@ -655,27 +657,46 @@ BEGIN
 	ELSE
 		RAISE NOTICE 'TimescaleDB version % is valid', current_timescaledb_version_full;
 	END IF;
+
+	SELECT db_extension FROM config INTO current_db_extension;
+
 EOF
 	;
+
+	my $flags = "migrate_data => true, if_not_exists => true";
 
 	for ("history", "history_uint", "history_log", "history_text", "history_str")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
 EOF
 	;
+	}
+
+	for ("auditlog")
+	{
+		print<<EOF
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 604800, $flags);
+EOF
 	}
 
 	for ("trends", "trends_uint")
 	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, migrate_data => true);
+	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 2592000, $flags);
 EOF
 	;
 	}
+
 	print<<EOF
-	UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
-	UPDATE config SET compression_status=1,compress_older='7d';
+
+	IF (current_db_extension = 'timescaledb') THEN
+		RAISE NOTICE 'TimescaleDB extension is already installed; not changing configuration';
+	ELSE
+		UPDATE config SET db_extension='timescaledb',hk_history_global=1,hk_trends_global=1;
+		UPDATE config SET compression_status=1,compress_older='7d';
+	END IF;
+
 	RAISE NOTICE 'TimescaleDB is configured successfully';
 END \$\$;
 EOF
