@@ -596,7 +596,7 @@ static int	DBpatch_6050054(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.proxies.filter_status"))
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.proxies.filter_status'"))
 		return FAIL;
 
 	return SUCCEED;
