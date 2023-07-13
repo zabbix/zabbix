@@ -124,6 +124,9 @@ void	zbx_db_trigger_explain_expression(const zbx_db_trigger *trigger, char **exp
 void	zbx_db_trigger_get_function_value(const zbx_db_trigger *trigger, int index, char **value,
 		zbx_trigger_func_t eval_func_cb, int recovery);
 
+int	zbx_db_check_user_perm2system(zbx_uint64_t userid);
+char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
+
 #define ZBX_PROBLEM_SUPPRESSED_FALSE	0
 #define ZBX_PROBLEM_SUPPRESSED_TRUE	1
 

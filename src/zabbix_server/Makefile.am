@@ -163,7 +163,9 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_builddir)/src/libs/zbxversion/libzbxversion.a
+	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
+	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
 endif

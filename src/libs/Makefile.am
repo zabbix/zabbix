@@ -2,6 +2,8 @@
 
 DIST_SUBDIRS = \
 	zbxalgo \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
@@ -74,6 +76,7 @@ DIST_SUBDIRS = \
 
 if SERVER
 SERVER_SUBDIRS = \
+	zbxasynchttppoller \
 	zbxaudit \
 	zbxautoreg \
 	zbxavailability \
@@ -177,6 +180,8 @@ endif
 
 SUBDIRS = \
 	zbxalgo \
+	zbxasyncpoller \
+	zbxasynchttppoller \
 	zbxcommon \
 	zbxcomms \
 	zbxcommshigh \
