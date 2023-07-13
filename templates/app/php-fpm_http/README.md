@@ -26,7 +26,7 @@ This template has been tested on:
 
 ## Setup
 
-Note that depending on your OS distribution, the PHP-FPM executable/service name can vary. RHEL-like distributions usually name both process and service as `php-fpm`, while for Debian/Ubuntu based distributions it may include the version, for example: executable name - `php-fpm8.2`, systemd service name - `php8.2-fpm`. Ajdust the following instructions accordingly if needed.
+Note that depending on your OS distribution, the PHP-FPM executable/service name can vary. RHEL-like distributions usually name both process and service as `php-fpm`, while for Debian/Ubuntu based distributions it may include the version, for example: executable name - `php-fpm8.2`, systemd service name - `php8.2-fpm`. Adjust the following instructions accordingly if needed.
 
 1. Open the PHP-FPM configuration file and enable the status page as shown.
   ```
@@ -122,11 +122,9 @@ If you use Apache, edit the configuration file of the virtual host and add the f
   curl -L 127.0.0.1/ping
   ```
 
-Depending on your OS distribution, the PHP-FPM process name may vary as well. Please check the actual name in the line "Name" from /proc/\<pid\>/status file (https://www.zabbix.com/documentation/6.0/manual/appendix/items/proc_mem_num_notes) and change the {$PHP_FPM.PROCESS.NAME.PARAMETER} macro if needed.
-
 If you use another location of the status/ping pages, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
 
-If you use another web server port for the location of the PHP-FPM status/ping pages, don't forget to change the macro `{$PHP_FPM.PORT}`.
+If you use another web server port or scheme for the location of the PHP-FPM status/ping pages, don't forget to change the macros `{$PHP_FPM.SCHEME}` and `{$PHP_FPM.PORT}`.
 
 ### Macros used
 
