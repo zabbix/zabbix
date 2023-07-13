@@ -6940,7 +6940,7 @@ done:
 		}
 		else if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 			DCsync_proxy_remove(proxy);
-		
+
 		proxy->mode = mode;
 	}
 
