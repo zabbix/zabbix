@@ -60,6 +60,71 @@ class WidgetView extends CControllerDashboardWidgetView {
 	}
 
 	private function getTriggers(): array {
-		return [];
+		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
+			? getSubGroups($this->fields_values['groupids'])
+			: null;
+
+		if ($this->isTemplateDashboard()) {
+			$hostids = [$this->getInput('dynamic_hostid')];
+		}
+		else {
+			$hostids = $this->fields_values['hostids'] ?: null;
+		}
+
+		$range_time_parser = new CRangeTimeParser();
+
+		$range_time_parser->parse($this->getInput('from'));
+		$time_from = $range_time_parser->getDateTime(true)->getTimestamp();
+
+		$range_time_parser->parse($this->getInput('to'));
+		$time_to = $range_time_parser->getDateTime(false)->getTimestamp();
+
+		$db_problems = API::Event()->get([
+			'countOutput' => true,
+			'aggregateOutput' => ['max' => 'severity'],
+			'groupBy' => ['objectid'],
+			'groupids' => $groupids,
+			'hostids' => $hostids,
+			'value' => TRIGGER_VALUE_TRUE,
+			'time_from' => $time_from,
+			'time_till' => $time_to,
+			'search' => [
+				'name' => $this->fields_values['problem'] !== '' ? $this->fields_values['problem'] : null
+			],
+			'severities' => $this->fields_values['severities'] ?: null,
+			'evaltype' => $this->fields_values['evaltype'],
+			'tags' => $this->fields_values['tags'] ?: null,
+			'sortfield' => ['rowscount', 'max_severity'],
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => $this->fields_values['show_lines']
+		]);
+
+		if (!$db_problems) {
+			return [];
+		}
+
+		$db_problems = array_column($db_problems, null, 'objectid');
+
+		$db_triggers = API::Trigger()->get([
+			'output' => ['description'],
+			'selectHosts' => ['hostid', 'name', 'status'],
+			'expandDescription' => true,
+			'triggerids' => array_keys($db_problems),
+			'preservekeys' => true
+		]);
+
+		foreach ($db_triggers as $triggerid => &$trigger) {
+			$trigger['problem_count'] = $db_problems[$triggerid]['rowscount'];
+			$trigger['max_severity'] = $db_problems[$triggerid]['max_severity'];
+		}
+		unset($trigger);
+
+		CArrayHelper::sort($db_triggers, [
+			['field' => 'problem_count', 'order' => ZBX_SORT_DOWN],
+			['field' => 'max_severity', 'order' => ZBX_SORT_DOWN],
+			'description'
+		]);
+
+		return $db_triggers;
 	}
 }
