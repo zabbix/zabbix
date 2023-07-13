@@ -115,9 +115,7 @@ class CAlert extends CApiService {
 
 		if ($db_alerts) {
 			$db_alerts = $this->addRelatedObjects($options, $db_alerts);
-			$db_alerts = $this->unsetExtraFields($db_alerts, ['alertid', 'eventsource', 'eventobject', 'userid',
-				'mediatypeid'
-			], $options['output']);
+			$db_alerts = $this->unsetExtraFields($db_alerts, ['alertid', 'userid', 'mediatypeid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_alerts = array_values($db_alerts);
