@@ -591,6 +591,17 @@ static int	DBpatch_6050053(void)
 	return DBdrop_field("hosts", "auto_compress");
 }
 
+static int	DBpatch_6050054(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from profiles where idx='web.proxies.filter_status"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -652,5 +663,6 @@ DBPATCH_ADD(6050050, 0, 1)
 DBPATCH_ADD(6050051, 0, 1)
 DBPATCH_ADD(6050052, 0, 1)
 DBPATCH_ADD(6050053, 0, 1)
+DBPATCH_ADD(6050054, 0, 1)
 
 DBPATCH_END()
