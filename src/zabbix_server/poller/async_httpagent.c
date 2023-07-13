@@ -17,11 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_agent.h"
 #include "async_httpagent.h"
-
-#include "zbxlog.h"
-#include "zbxsysinfo.h"
 
 #ifdef HAVE_LIBCURL
 static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
@@ -85,6 +81,7 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 		goto fail;
 	}
 
+	/* httpagent_context is associated with this curl handle and will be freed when handle is freed */
 	return SUCCEED;
 fail:
 	zbx_async_check_httpagent_clean(httpagent_context);

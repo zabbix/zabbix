@@ -16,15 +16,13 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-
-#include "checks_agent.h"
 #include "async_agent.h"
-
+#include "checks_agent.h"
 #include "zbxcommon.h"
-#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
+#include "async_poller.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {
@@ -36,8 +34,10 @@ static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 			return "tls";
 		case ZABBIX_AGENT_STEP_SEND:
 			return "send";
-		default:
+		case ZABBIX_AGENT_STEP_RECV:
 			return "receive";
+		default:
+			return "unknown";
 	}
 }
 
@@ -270,7 +270,7 @@ int	zbx_async_check_agent(zbx_dc_item_t *item, AGENT_RESULT *result,  zbx_async_
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != agent_context->interface.addr && SUCCEED != zbx_is_ip(agent_context->interface.addr))
+	if (SUCCEED != zbx_is_ip(agent_context->interface.addr))
 		agent_context->server_name = agent_context->interface.addr;
 	else
 		agent_context->server_name = NULL;

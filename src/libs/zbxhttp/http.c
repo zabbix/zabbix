@@ -444,7 +444,8 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 		case HTTP_REQUEST_POST:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
@@ -454,7 +455,8 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 
@@ -468,14 +470,16 @@ static int	http_prepare_request(CURL *easyhandle, const char *posts, unsigned ch
 		case HTTP_REQUEST_HEAD:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_NOBODY, 1L)))
 			{
-				*error = zbx_dsprintf(*error, "Cannot specify HEAD request: %s", curl_easy_strerror(err));
+				*error = zbx_dsprintf(*error, "Cannot specify HEAD request: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 			break;
 		case HTTP_REQUEST_PUT:
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_POSTFIELDS, posts)))
 			{
-				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s", curl_easy_strerror(err));
+				*error = zbx_dsprintf(*error, "Cannot specify data to POST: %s",
+						curl_easy_strerror(err));
 				return FAIL;
 			}
 
@@ -679,7 +683,8 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(context->header.data) || (NULL != context->body.data && FAIL == zbx_is_utf8(context->body.data)))
+			if (FAIL == zbx_is_utf8(context->header.data) || (NULL != context->body.data &&
+					FAIL == zbx_is_utf8(context->body.data)))
 			{
 				*error = zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence");
 				return FAIL;
@@ -693,7 +698,8 @@ int	zbx_http_handle_response(CURL *easyhandle, zbx_http_context_t *context, CURL
 			{
 				if (NULL != context->body.data)
 				{
-					zbx_strncpy_alloc(&context->header.data, &context->header.allocated, &context->header.offset, context->body.data,
+					zbx_strncpy_alloc(&context->header.data, &context->header.allocated,
+							&context->header.offset, context->body.data,
 							context->body.offset);
 				}
 
@@ -876,7 +882,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 #	if LIBCURL_VERSION_NUM >= 0x075500
 	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
 #	else
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS,
+			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 #	endif
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));

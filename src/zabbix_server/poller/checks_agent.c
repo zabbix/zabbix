@@ -20,10 +20,6 @@
 #include "checks_agent.h"
 
 #include "zbxsysinfo.h"
-#include "zbxasyncpoller.h"
-#include "zbx_availability_constants.h"
-#include "zbx_item_constants.h"
-#include "zbxpreproc.h"
 
 #if !(defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 extern unsigned char	program_type;
