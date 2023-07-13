@@ -474,12 +474,15 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		if (SUCCEED == zbx_socket_check_deadline(s))
-			err_msg = zbx_strerror_from_system(zbx_socket_last_error());
-		else
-			err_msg = "timeout occurred";
+		const char	*err_msg_loc;
 
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", err_msg));
+		if (SUCCEED == zbx_socket_check_deadline(s))
+			err_msg_loc = zbx_strerror_from_system(zbx_socket_last_error());
+		else
+			err_msg_loc = "timeout occurred";
+
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s",
+				err_msg_loc));
 
 		goto fail;
 	}

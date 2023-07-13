@@ -1245,7 +1245,7 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 		}
 	}
 
-	if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL))
+	if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
 	{
 		*error = zbx_strdup(NULL, zbx_strerror_from_system(GetLastError()));
 		return FAIL;
@@ -1299,8 +1299,8 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 
 	if ('\0' == *encoding )
 	{
-		memcpy(out_utf8_string, in, in_size);
-		out_utf8_string[in_size] = '\0';
+		memcpy(*out_utf8_string, in, in_size);
+		*out_utf8_string[in_size] = '\0';
 		return SUCCEED;
 	}
 
