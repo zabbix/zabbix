@@ -66,8 +66,8 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 
 	zbx_http_context_create(&context);
 
-	if (SUCCEED == (ret = zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers, query_fields,
-			str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0, connector.timeout,
+	if (SUCCEED == (ret = zbx_http_request_prepare(&context, HTTP_REQUEST_POST, connector.url, headers,
+			query_fields, str, ZBX_RETRIEVE_MODE_CONTENT, connector.http_proxy, 0, connector.timeout,
 			connector.max_attempts, connector.ssl_cert_file, connector.ssl_key_file,
 			connector.ssl_key_password, connector.verify_peer, connector.verify_host, connector.authtype,
 			connector.username, connector.password, connector.token, ZBX_POSTTYPE_NDJSON,

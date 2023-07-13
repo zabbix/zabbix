@@ -2707,11 +2707,14 @@ void	zbx_tls_free(void)
  *                        (in hex-string) to connect with depending on value  *
  *                        of 'tls_connect'.                                   *
  *     server_name - [IN] optional server name indication for TLS             *
- *     timeout     - [IN] the connection timeout                              *
+ *     event       - [OUT] may be NULL for blocking TLS handshake, otherwise  *
+*                          informs caller to wait for POLLIN or POLLOUT and   *
+*                          retry function to complete async TLS handshake     *
+ *     error       - [OUT] dynamically allocated memory with error message    *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
- *     FAIL - an error occurred                                               *
+ *     FAIL - an error occurred or retry is needed if event is filled         *
  *                                                                            *
  ******************************************************************************/
 #if defined(HAVE_GNUTLS)
@@ -2760,8 +2763,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		s->tls_ctx->psk_server_creds = NULL;
 
 		if (GNUTLS_E_SUCCESS != (res = gnutls_init(&s->tls_ctx->ctx, GNUTLS_CLIENT | GNUTLS_NO_EXTENSIONS)))
-				/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. session */
-				/* tickets and OCSP) */
+				/* GNUTLS_NO_EXTENSIONS is used because we do not currently support extensions (e.g. */
+				/* session tickets and OCSP) */
 		{
 			*error = zbx_dsprintf(*error, "gnutls_init() failed: %d %s", res, gnutls_strerror(res));
 			goto out;
@@ -2771,23 +2774,23 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 		{
 			if (NULL == ciphersuites_cert)
 			{
-				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
-						" loaded");
+				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid"
+						" certificate loaded");
 				goto out;
 			}
 
 			if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_cert)))
 			{
-				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_cert' failed: %d %s",
-						res, gnutls_strerror(res));
+				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_cert' failed:"
+						" %d %s", res, gnutls_strerror(res));
 				goto out;
 			}
 
 			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_CERTIFICATE,
 					my_cert_creds)))
 			{
-				*error = zbx_dsprintf(*error, "gnutls_credentials_set() for certificate failed: %d %s", res,
-						gnutls_strerror(res));
+				*error = zbx_dsprintf(*error, "gnutls_credentials_set() for certificate failed: %d %s",
+						res, gnutls_strerror(res));
 				goto out;
 			}
 		}
@@ -2801,28 +2804,28 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			if (GNUTLS_E_SUCCESS != (res = gnutls_priority_set(s->tls_ctx->ctx, ciphersuites_psk)))
 			{
-				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_psk' failed: %d %s", res,
-						gnutls_strerror(res));
+				*error = zbx_dsprintf(*error, "gnutls_priority_set() for 'ciphersuites_psk' failed: %d"
+						" %s", res, gnutls_strerror(res));
 				goto out;
 			}
 
 			if (NULL == tls_arg2)	/* PSK is not set from DB */
 			{
-				/* set up the PSK from a configuration file (always in agentd and a case in active proxy */
-				/* when it connects to server) */
+				/* set up the PSK from a configuration file (always in agentd and a case in active  */
+				/* proxy when it connects to server) */
 
 				if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
 						my_psk_client_creds)))
 				{
-					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s", res,
-							gnutls_strerror(res));
+					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s",
+							res, gnutls_strerror(res));
 					goto out;
 				}
 			}
 			else
 			{
-				/* PSK comes from a database (case for a server/proxy when it connects to an agent for */
-				/* passive checks, for a server when it connects to a passive proxy) */
+				/* PSK comes from a database (case for a server/proxy when it connects to an agent */
+				/* for passive checks, for a server when it connects to a passive proxy) */
 
 				gnutls_datum_t	key;
 				int		psk_len;
@@ -2837,35 +2840,37 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 				if (GNUTLS_E_SUCCESS != (res = gnutls_psk_allocate_client_credentials(
 						&s->tls_ctx->psk_client_creds)))
 				{
-					*error = zbx_dsprintf(*error, "gnutls_psk_allocate_client_credentials() failed: %d %s",
-							res, gnutls_strerror(res));
+					*error = zbx_dsprintf(*error, "gnutls_psk_allocate_client_credentials() failed:"
+							" %d %s", res, gnutls_strerror(res));
 					goto out;
 				}
 
 				key.data = s->tls_ctx->psk_buf;
 				key.size = (unsigned int)psk_len;
 
-				/* Simplified. 'tls_arg1' (PSK identity) should have been prepared as required by RFC 4518. */
-				if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(s->tls_ctx->psk_client_creds,
-						tls_arg1, &key, GNUTLS_PSK_KEY_RAW)))
+				/* Simplified. 'tls_arg1' (PSK identity) should have been prepared as required by */
+				/* RFC 4518.*/
+				if (GNUTLS_E_SUCCESS != (res = gnutls_psk_set_client_credentials(
+						s->tls_ctx->psk_client_creds, tls_arg1, &key, GNUTLS_PSK_KEY_RAW)))
 				{
-					*error = zbx_dsprintf(*error, "gnutls_psk_set_client_credentials() failed: %d %s", res,
-							gnutls_strerror(res));
+					*error = zbx_dsprintf(*error, "gnutls_psk_set_client_credentials() failed: %d"
+							" %s", res, gnutls_strerror(res));
 					goto out;
 				}
 
 				if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx->ctx, GNUTLS_CRD_PSK,
 						s->tls_ctx->psk_client_creds)))
 				{
-					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s", res,
-							gnutls_strerror(res));
+					*error = zbx_dsprintf(*error, "gnutls_credentials_set() for psk failed: %d %s",
+							res, gnutls_strerror(res));
 					goto out;
 				}
 			}
 		}
 
-		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect && GNUTLS_E_SUCCESS != gnutls_server_name_set(
-				s->tls_ctx->ctx, GNUTLS_NAME_DNS, server_name, strlen(server_name)))
+		if (NULL != server_name && ZBX_TCP_SEC_UNENCRYPTED != tls_connect &&
+				GNUTLS_E_SUCCESS != gnutls_server_name_set( s->tls_ctx->ctx, GNUTLS_NAME_DNS,
+				server_name, strlen(server_name)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot set %s tls host name", server_name);
 		}
@@ -3108,14 +3113,15 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			if (NULL == ctx_cert)
 			{
-				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid certificate"
-						" loaded");
+				*error = zbx_strdup(*error, "cannot connect with TLS and certificate: no valid"
+					" certificate loaded");
 				goto out;
 			}
 
 			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_cert)))
 			{
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection"
+						" context:");
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				goto out;
 			}
@@ -3136,7 +3142,8 @@ int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_a
 
 			if (NULL == (s->tls_ctx->ctx = SSL_new(ctx_psk)))
 			{
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection context:");
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "cannot create connection"
+						" context:");
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				goto out;
 			}
