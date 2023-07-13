@@ -17,11 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_agent.h"
 #include "async_httpagent.h"
-
-#include "zbxlog.h"
-#include "zbxsysinfo.h"
 
 #ifdef HAVE_LIBCURL
 static void	httpagent_context_create(zbx_httpagent_context *httpagent_context)
