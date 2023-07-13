@@ -438,11 +438,11 @@ fail:
 
 int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *result, const char *encoding)
 {
-	char	buf[MAX_BUFFER_LEN];
-	size_t	sz, offset;
-	int	rc, ret = FAIL;
-	char	*command_lf = NULL, *command_crlf = NULL;
-	size_t	i, offset_lf, offset_crlf;
+	char		buf[MAX_BUFFER_LEN];
+	char		*err_msg, *utf8_result, *command_lf = NULL, *command_crlf = NULL;
+	size_t		sz, offset;
+	int		rc, ret = FAIL;
+	size_t		i, offset_lf, offset_crlf;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -474,14 +474,12 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 
 	if (ZBX_PROTO_ERROR == rc)
 	{
-		const char	*errmsg;
-
 		if (SUCCEED == zbx_socket_check_deadline(s))
-			errmsg = zbx_strerror_from_system(zbx_socket_last_error());
+			err_msg = zbx_strerror_from_system(zbx_socket_last_error());
 		else
-			errmsg = "timeout occurred";
+			err_msg = "timeout occurred";
 
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", errmsg));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot find prompt after command execution: %s", err_msg));
 
 		goto fail;
 	}
@@ -516,8 +514,16 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 		offset--;
 	buf[offset] = '\0';
 
-	SET_TEXT_RESULT(result, zbx_convert_to_utf8(buf, offset, encoding));
-	ret = SUCCEED;
+	if (FAIL == zbx_convert_to_utf8(buf, offset, encoding, &utf8_result, &err_msg))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot convert result to utf8: %s.", err_msg));
+		goto fail;
+	}
+	else
+	{
+		SET_TEXT_RESULT(result, utf8_result);
+		ret = SUCCEED;
+	}
 fail:
 	zbx_free(command_lf);
 	zbx_free(command_crlf);
