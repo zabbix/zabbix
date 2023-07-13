@@ -22,8 +22,6 @@
 
 #include "evalfunc.h"
 
-#include "zbxtypes.h"
-
 int	get_function_parameter_uint64(const char *parameters, int Nparam, zbx_uint64_t *value);
 int	get_function_parameter_float(const char *parameters, int Nparam, unsigned char flags, double *value);
 int	get_function_parameter_str(const char *parameters, int Nparam, char **value);

@@ -25,6 +25,10 @@
 #include "zbxeval.h"
 #include "zbxxml.h"
 #include "zbxvariant.h"
+#include "zbxregexp.h"
+#include "zbxstr.h"
+#include "zbxjson.h"
+#include "zbxcacheconfig.h"
 
 /******************************************************************************
  *                                                                            *

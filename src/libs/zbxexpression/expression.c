@@ -22,7 +22,6 @@
 #include "evalfunc.h"
 #include "datafunc.h"
 
-#include "zbxregexp.h"
 #include "zbxvariant.h"
 #include "zbxeval.h"
 #include "zbxdbwrap.h"
@@ -31,14 +30,13 @@
 #include "zbxxml.h"
 #include "zbxstr.h"
 #include "zbxexpr.h"
-#include "zbxnum.h"
 #include "zbxparam.h"
-#include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
-#include "zbx_item_constants.h"
 #include "zbx_expression_constants.h"
 #include "zbxevent.h"
 #include "zbxtime.h"
+#include "zbxjson.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *

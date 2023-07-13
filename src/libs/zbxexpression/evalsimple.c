@@ -22,6 +22,7 @@
 #include "zbxnum.h"
 #include "zbxvariant.h"
 #include "zbxexpr.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *

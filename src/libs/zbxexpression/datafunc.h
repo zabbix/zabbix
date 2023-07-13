@@ -22,7 +22,6 @@
 
 #include "evalfunc.h"
 
-#include "zbxtypes.h"
 #include "zbx_discoverer_constants.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"

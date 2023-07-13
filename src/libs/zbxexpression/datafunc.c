@@ -28,6 +28,9 @@
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
 #include "zbxvariant.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

@@ -22,6 +22,7 @@
 
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxjson.h"
 
 int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_item_t *dc_item,
 		const struct zbx_json_parse *jp_row, const zbx_vector_lld_macro_path_t *lld_macro_paths, int macro_type,

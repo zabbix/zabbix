@@ -27,6 +27,12 @@
 #include "zbx_item_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxvariant.h"
+#include "zbxalgo.h"
+#include "zbxexpr.h"
+#include "zbxeval.h"
+#include "zbxexpression.h"
+#include "zbxnum.h"
+#include "zbxtime.h"
 
 typedef struct
 {
