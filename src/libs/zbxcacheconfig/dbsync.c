@@ -46,8 +46,9 @@
 #define ZBX_DBSYNC_OBJ_HTTPSTEP_ITEM	16
 #define ZBX_DBSYNC_OBJ_CONNECTOR	17
 #define ZBX_DBSYNC_OBJ_CONNECTOR_TAG	18
+#define ZBX_DBSYNC_OBJ_PROXY		19
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		18
+#define ZBX_DBSYNC_OBJ_COUNT		19
 
 #define ZBX_DBSYNC_JOURNAL(X)		(X - 1)
 
@@ -1004,34 +1005,25 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hostid,h.proxyid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
-				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
-				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,h.tls_issuer,h.tls_subject,"
-				"h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,h.maintenanceid"
-			" from hosts h"
-			" left join host_rtdata hr on h.hostid=hr.hostid"
-			" where status in (%d,%d,%d,%d)"
-				" and flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			PROXY_TYPE_ACTIVE, PROXY_TYPE_PASSIVE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,"
+				"maintenance_status,maintenance_type,maintenance_from,status,name,tls_connect,"
+				"tls_accept,tls_issuer,tls_subject,tls_psk_identity,tls_psk,maintenanceid"
+			" from hosts where status in (%d,%d) and flags<>%d",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	dbsync_prepare(sync, 22, NULL);
+	dbsync_prepare(sync, 19, NULL);
 #else
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select h.hostid,h.proxyid,h.host,h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,"
-				"h.ipmi_password,h.maintenance_status,h.maintenance_type,h.maintenance_from,"
-				"h.status,h.name,hr.lastaccess,h.tls_connect,h.tls_accept,"
-				"h.proxy_address,h.auto_compress,h.maintenanceid"
-			" from hosts h"
-			" left join host_rtdata hr on h.hostid=hr.hostid"
-			" where status in (%d,%d,%d,%d)"
+			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
+				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
+				"status,name,tls_connect,tls_accept,"
+				"hostid,maintenanceid"
+			" from hosts"
+			" where status in (%d,%d)"
 				" and flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED,
-			PROXY_TYPE_ACTIVE, PROXY_TYPE_PASSIVE,
-			ZBX_FLAG_DISCOVERY_PROTOTYPE);
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
-	dbsync_prepare(sync, 18, NULL);
+	dbsync_prepare(sync, 16, NULL);
 #endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
@@ -1041,10 +1033,8 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 		goto out;
 	}
 
-	/* sort by h.proxyid to ensure that proxies are synced before hosts assigned to them */
-	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "h.hostid", "and", NULL,
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "hostid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_HOST)]);
-	zabbix_log(1, "DBG sql ='%s'", sql);
 out:
 	zbx_free(sql);
 
@@ -4038,7 +4028,6 @@ out:
 	return ret;
 }
 
-
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
 {
 	char	*sql = NULL;
@@ -4059,6 +4048,34 @@ int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
 
 	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "connector_tagid", "where", NULL,
 			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_CONNECTOR_TAG)]);
+out:
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select p.proxyid,p.name,p.mode,p.description,p.tls_connect,p.tls_accept,p.tls_issuer,"
+			"p.tls_subject,p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,"
+			"pr.lastaccess from proxy p left join proxy_rtdata pr on p.proxyid=pr.proxyid");
+
+	dbsync_prepare(sync, 14, NULL);
+
+	if (ZBX_DBSYNC_INIT == sync->mode)
+	{
+		if (NULL == (sync->dbresult = zbx_db_select("%s", sql)))
+			ret = FAIL;
+		goto out;
+	}
+
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "p.proxyid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_PROXY)]);
 out:
 	zbx_free(sql);
 

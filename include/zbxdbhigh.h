@@ -629,7 +629,7 @@ typedef struct
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, char **username, char **name, char **surname);
 
-void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+void	zbx_db_register_host(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now, const zbx_events_funcs_t *events_cbs);
 
@@ -637,7 +637,7 @@ void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *h
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now);
 
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
 		const zbx_events_funcs_t *events_cbs);
 
 void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts);
@@ -951,7 +951,7 @@ typedef struct
 }
 zbx_autoreg_host_t;
 
-#define PROXY_TYPE_ACTIVE	0
-#define PROXY_TYPE_PASSIVE	1
+#define PROXY_MODE_ACTIVE	0
+#define PROXY_MODE_PASSIVE	1
 
 #endif

@@ -439,7 +439,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char	*poutput = NULL, *perror = NULL;
 		int		audit_res;
 
-		if (0 == host.proxy_hostid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
+		if (0 == host.proxyid || ZBX_SCRIPT_EXECUTE_ON_SERVER == script.execute_on ||
 				ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
 		{
 			ret = zbx_script_execute(&script, &host, webhook_params_json, config_timeout, config_source_ip,
@@ -454,7 +454,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 			perror = error;
 
 		audit_res = zbx_auditlog_global_script(script.type, script.execute_on, script.command_orig, host.hostid,
-				host.name, eventid, host.proxy_hostid, user->userid, user->username, clientip, poutput,
+				host.name, eventid, host.proxyid, user->userid, user->username, clientip, poutput,
 				perror);
 
 		/* At the moment, there is no special processing of audit failures. */

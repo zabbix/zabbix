@@ -985,7 +985,7 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 
 	evaluate_item.itemid = item->itemid;
 	evaluate_item.value_type = item->value_type;
-	evaluate_item.proxy_hostid = item->host.proxy_hostid;
+	evaluate_item.proxyid = item->host.proxyid;
 	evaluate_item.host = item->host.host;
 	evaluate_item.key_orig = item->key_orig;
 

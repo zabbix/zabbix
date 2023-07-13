@@ -62,7 +62,7 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	if (SUCCEED == status)
 	{
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
-		zbx_tm_get_remote_tasks(&tasks, proxy->hostid, proxy->compatibility);
+		zbx_tm_get_remote_tasks(&tasks, proxy->proxyid, proxy->compatibility);
 	}
 	else
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_FAILED, ZBX_JSON_TYPE_STRING);
@@ -73,8 +73,7 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	if (0 != tasks.values_num)
 		zbx_tm_json_serialize_tasks(&json, &tasks);
 
-	if (0 != proxy->auto_compress)
-		flags |= ZBX_TCP_COMPRESS;
+	flags |= ZBX_TCP_COMPRESS;
 
 	if (SUCCEED == (ret = zbx_tcp_send_ext(sock, json.buffer, strlen(json.buffer), 0, flags, config_timeout)))
 	{
@@ -148,7 +147,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zb
 	if (SUCCEED != (status = zbx_proxy_check_permissions(&proxy, sock, &error)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot accept connection from proxy \"%s\" at \"%s\", allowed address:"
-				" \"%s\": %s", proxy.host, sock->peer, proxy.proxy_address, error);
+				" \"%s\": %s", proxy.name, sock->peer, proxy.allowed_addresses, error);
 		goto out;
 	}
 
@@ -162,7 +161,7 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zb
 		goto reply;
 	}
 
-	if (FAIL == (ret = zbx_hc_check_proxy(proxy.hostid)))
+	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)))
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		ret = proxy_data_no_history(jp);
@@ -172,11 +171,11 @@ void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zb
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_TYPE_ACTIVE, events_cbs,
+		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_MODE_ACTIVE, events_cbs,
 				proxydata_frequency, NULL, &error)))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "received invalid proxy data from proxy \"%s\" at \"%s\": %s",
-					proxy.host, sock->peer, error);
+					proxy.name, sock->peer, error);
 			goto out;
 		}
 	}
@@ -203,8 +202,7 @@ out:
 		else
 			lastaccess = ts->sec;
 
-		zbx_update_proxy_data(&proxy, version_str, version_int, lastaccess,
-				(0 != (sock->protocol & ZBX_TCP_COMPRESS) ? 1 : 0), 0);
+		zbx_update_proxy_data(&proxy, version_str, version_int, lastaccess, 0);
 	}
 
 	if (0 == responded)

@@ -313,7 +313,6 @@ static int	DBpatch_6050026(void)
 				{"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0},
 				{"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL | ZBX_PROXY, 0},
 				{"allowed_addresses", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"auto_compress", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 				{"address", "127.0.0.1", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{"port", "10050", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 				{0}
@@ -358,43 +357,42 @@ static int	DBpatch_6050031(void)
 		return SUCCEED;
 
 	result = zbx_db_select("select h.hostid,h.host,h.status,h.description,h.tls_connect,h.tls_accept,h.tls_issuer,"
-			"h.tls_subject,h.tls_psk_identity,h.tls_psk,h.proxy_address,h.auto_compress,i.useip,i.ip,i.dns,"
+			"h.tls_subject,h.tls_psk_identity,h.tls_psk,h.proxy_address,i.useip,i.ip,i.dns,"
 			"i.port from hosts h left join interface i on h.hostid=i.hostid where h.status in (%i,%i)",
 			DEPRECATED_STATUS_PROXY_PASSIVE, DEPRECATED_STATUS_PROXY_ACTIVE);
 
-	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "status", "description", "tls_connect",
+	zbx_db_insert_prepare(&db_insert_proxies, "proxy", "proxyid", "name", "mode", "description", "tls_connect",
 			"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", "allowed_addresses",
-			"auto_compress", "address", "port", NULL);
+			"address", "port", NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	proxyid;
-		int		status, tls_connect, tls_accept, auto_compress;
+		int		status, tls_connect, tls_accept;
 
 		ZBX_STR2UINT64(proxyid, row[0]);
 		status = atoi(row[2]);
 		tls_connect = atoi(row[4]);
 		tls_accept = atoi(row[5]);
-		auto_compress = atoi(row[11]);
 
 		if (DEPRECATED_STATUS_PROXY_ACTIVE == status)
 		{
-			status = PROXY_TYPE_ACTIVE;
+			status = PROXY_MODE_ACTIVE;
 
 			zbx_db_insert_add_values(&db_insert_proxies,
 				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				row[10], auto_compress, NULL, NULL);
+				row[10], NULL, NULL);
 		}
 		else if (DEPRECATED_STATUS_PROXY_PASSIVE == status)
 		{
 			int	useip;
 
-			status = PROXY_TYPE_PASSIVE;
-			useip = atoi(row[12]);
+			status = PROXY_MODE_PASSIVE;
+			useip = atoi(row[11]);
 
 			zbx_db_insert_add_values(&db_insert_proxies,
 				proxyid, row[1], status, row[3], tls_connect, tls_accept, row[6], row[7], row[8], row[9],
-				row[10], auto_compress, (1 == useip ? row[13] : row[14]), row[15]
+				row[10], (1 == useip ? row[12] : row[13]), row[14]
 			);
 		}
 

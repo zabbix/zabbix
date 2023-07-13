@@ -943,7 +943,7 @@ zbx_uint64_t	zbx_script_create_task(const zbx_script_t *script, const zbx_dc_hos
 	taskid = zbx_db_get_maxid("task");
 
 	task = zbx_tm_task_create(taskid, ZBX_TM_TASK_REMOTE_COMMAND, ZBX_TM_STATUS_NEW, now,
-			ZBX_REMOTE_COMMAND_TTL, host->proxy_hostid);
+			ZBX_REMOTE_COMMAND_TTL, host->proxyid);
 
 	task->data = zbx_tm_remote_command_create(script->type, script->command, script->execute_on, port,
 			script->authtype, script->username, script->password, script->publickey, script->privatekey,

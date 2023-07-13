@@ -581,7 +581,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	zbx_dc_item_t	dc_item;
-	zbx_uint64_t	proxy_hostid;
+	zbx_uint64_t	proxyid;
 	int		ret = FAIL, errcode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -612,7 +612,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 	}
 
 	result = zbx_db_select(
-			"select h.proxy_hostid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error"
+			"select h.proxyid,h.description,i.itemid,i.name,i.key_,i.description,i.value_type,ir.error"
 			" from items i"
 				" join hosts h on h.hostid=i.hostid"
 				" left join item_rtdata ir on ir.itemid=i.itemid"
@@ -666,26 +666,26 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 				ret = SUCCEED;
 				break;
 			case ZBX_REQUEST_PROXY_NAME:
-				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+				ZBX_DBROW2UINT64(proxyid, row[0]);
 
-				if (0 == proxy_hostid)
+				if (0 == proxyid)
 				{
 					*replace_to = zbx_strdup(*replace_to, "");
 					ret = SUCCEED;
 				}
 				else
-					ret = DBget_host_value(proxy_hostid, replace_to, "host");
+					ret = DBget_host_value(proxyid, replace_to, "host");
 				break;
 			case ZBX_REQUEST_PROXY_DESCRIPTION:
-				ZBX_DBROW2UINT64(proxy_hostid, row[0]);
+				ZBX_DBROW2UINT64(proxyid, row[0]);
 
-				if (0 == proxy_hostid)
+				if (0 == proxyid)
 				{
 					*replace_to = zbx_strdup(*replace_to, "");
 					ret = SUCCEED;
 				}
 				else
-					ret = DBget_host_value(proxy_hostid, replace_to, "description");
+					ret = DBget_host_value(proxyid, replace_to, "description");
 				break;
 			case ZBX_REQUEST_ITEM_VALUETYPE:
 				*replace_to = zbx_strdup(*replace_to, row[6]);
@@ -3930,34 +3930,34 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_value(proxy_hostid, &replace_to, "host");
+							ret = DBget_host_value(proxyid, &replace_to, "host");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
-							"r.proxy_hostid")))
+							"r.proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = DBget_host_value(proxy_hostid, &replace_to,
+							ret = DBget_host_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -4031,34 +4031,34 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
 					if (SUCCEED == (ret = get_autoreg_value_by_event(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_value(proxy_hostid, &replace_to, "host");
+							ret = DBget_host_value(proxyid, &replace_to, "host");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
 					if (SUCCEED == (ret = get_autoreg_value_by_event(c_event, &replace_to,
-							"proxy_hostid")))
+							"proxyid")))
 					{
-						zbx_uint64_t	proxy_hostid;
+						zbx_uint64_t	proxyid;
 
-						ZBX_DBROW2UINT64(proxy_hostid, replace_to);
+						ZBX_DBROW2UINT64(proxyid, replace_to);
 
-						if (0 == proxy_hostid)
+						if (0 == proxyid)
 						{
 							replace_to = zbx_strdup(replace_to, "");
 						}
 						else
 						{
-							ret = DBget_host_value(proxy_hostid, &replace_to,
+							ret = DBget_host_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -5673,7 +5673,7 @@ static void	zbx_evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_u
 
 		evaluate_item.itemid = item->itemid;
 		evaluate_item.value_type = item->value_type;
-		evaluate_item.proxy_hostid = item->host.proxy_hostid;
+		evaluate_item.proxyid = item->host.proxyid;
 		evaluate_item.host = item->host.host;
 		evaluate_item.key_orig = item->key_orig;
 

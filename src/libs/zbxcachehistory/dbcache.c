@@ -3039,9 +3039,9 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 		DCinventory_value_add(inventory_values, item, h);
 
-		if (0 != item->host.proxy_hostid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
+		if (0 != item->host.proxyid && FAIL == zbx_is_item_processed_by_server(item->type, item->key_orig))
 		{
-			zbx_uint64_pair_t	p = {item->host.proxy_hostid, h->ts.sec};
+			zbx_uint64_pair_t	p = {item->host.proxyid, h->ts.sec};
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}

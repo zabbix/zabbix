@@ -165,4 +165,6 @@ void	zbx_dbsync_clear_user_macros(void);
 int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync);
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync);
 
+int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync);
+
 #endif /* BUILD_SRC_LIBS_ZBXDBCACHE_DBSYNC_H_ */

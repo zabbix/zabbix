@@ -1633,7 +1633,7 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
  * Purpose: register unknown host and generate event                          *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
+void	zbx_db_register_host(zbx_uint64_t proxyid, const char *host, const char *ip, const char *dns,
 		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
 		int now, const zbx_events_funcs_t *events_cbs)
 {
@@ -1642,7 +1642,7 @@ void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const cha
 	zbx_vector_ptr_create(&autoreg_hosts);
 
 	zbx_db_register_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
+	zbx_db_register_host_flush(&autoreg_hosts, proxyid, events_cbs);
 
 	zbx_db_register_host_clean(&autoreg_hosts);
 	zbx_vector_ptr_destroy(&autoreg_hosts);
@@ -1702,12 +1702,12 @@ static void	autoreg_get_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_vector_str_t 
 	}
 }
 
-static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
+static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 	zbx_vector_str_t	hosts;
-	zbx_uint64_t		current_proxy_hostid;
+	zbx_uint64_t		current_proxyid;
 	char			*sql = NULL;
 	size_t			sql_alloc = 256, sql_offset;
 	zbx_autoreg_host_t	*autoreg_host;
@@ -1716,18 +1716,18 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
 	zbx_vector_str_create(&hosts);
 
-	if (0 != proxy_hostid)
+	if (0 != proxyid)
 	{
 		autoreg_get_hosts(autoreg_hosts, &hosts);
 
 		/* delete from vector if already exist in hosts table */
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
+				"select h.host,h.hostid,h.proxyid,a.host_metadata,a.listen_ip,a.listen_dns,"
 					"a.listen_port,a.flags,a.autoreg_hostid"
 				" from hosts h"
 				" left join autoreg_host a"
-					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
+					" on a.proxyid=h.proxyid and a.host=h.host"
 				" where");
 		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
 				(const char **)hosts.values, hosts.values_num);
@@ -1744,9 +1744,9 @@ static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t 
 					continue;
 
 				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
-				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
+				ZBX_DBROW2UINT64(current_proxyid, row[2]);
 
-				if (current_proxy_hostid != proxy_hostid || SUCCEED == zbx_db_is_null(row[8]) ||
+				if (current_proxyid != proxyid || SUCCEED == zbx_db_is_null(row[8]) ||
 						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
 						autoreg_host->flag != atoi(row[7]))
 				{
@@ -1828,7 +1828,7 @@ static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
 	return 0;
 }
 
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
+void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxyid,
 		const zbx_events_funcs_t *events_cbs)
 {
 	zbx_autoreg_host_t	*autoreg_host;
@@ -1841,7 +1841,7 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
+	process_autoreg_hosts(autoreg_hosts, proxyid);
 
 	for (i = 0; i < autoreg_hosts->values_num; i++)
 	{
@@ -1855,7 +1855,7 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 	{
 		autoreg_hostid = zbx_db_get_maxid_num("autoreg_host", create);
 
-		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
+		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxyid", "host", "listen_ip",
 				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
 	}
 
@@ -1875,7 +1875,7 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 		{
 			autoreg_host->autoreg_hostid = autoreg_hostid++;
 
-			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
+			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxyid,
 					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
 					(int)autoreg_host->port, (int)autoreg_host->connection_type,
 					autoreg_host->host_metadata, autoreg_host->flag);
@@ -1894,10 +1894,10 @@ void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t pr
 						"host_metadata='%s',"
 						"tls_accepted='%u',"
 						"flags=%hu,"
-						"proxy_hostid=%s"
+						"proxyid=%s"
 					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
 				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->connection_type,
-				autoreg_host->flag, zbx_db_sql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
+				autoreg_host->flag, zbx_db_sql_id_ins(proxyid), autoreg_host->autoreg_hostid);
 
 			zbx_free(host_metadata_esc);
 			zbx_free(dns_esc);
