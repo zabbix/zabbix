@@ -170,7 +170,7 @@ typedef struct
 #if defined(HAVE_OPENSSL_WITH_PSK)
 	char	psk_buf[HOST_TLS_PSK_LEN / 2];
 	int	psk_len;
-	int	identity_len;
+	size_t	identity_len;
 #endif
 #endif
 } zbx_tls_context_t;

@@ -425,9 +425,6 @@ static int	zbx_socket_pollout(zbx_socket_t *s, char **error)
  *             ip          - [IN] address                                     *
  *             port        - [IN] port                                        *
  *             timeout     - [IN] timeout                                     *
- *             tls_connect - [IN] TLS mode (certificate, PSK or unencrypted)  *
- *             tls_arg1    - [IN] TLS argument (issuer or PSK identity)       *
- *             error       - [OUT] the error message                          *
  *                                                                            *
  * Return value: SUCCEED - connection initiated successfully                  *
  *               FAIL - an error occurred                                     *
@@ -569,14 +566,13 @@ int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char
  *             tls_connect - [IN] TLS mode (certificate, PSK or unencrypted)  *
  *             tls_arg1    - [IN] TLS argument (issuer or PSK identity)       *
  *             tls_arg2    - [IN] TLS argument (subject or PSK)               *
- *             error       - [OUT] the error message                          *
  *                                                                            *
  * Return value: SUCCEED - connected successfully                             *
  *               FAIL - an error occurred                                     *
  *                                                                            *
  ******************************************************************************/
-static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
-		int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
+static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, const char *ip,
+		unsigned short port, int timeout, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2)
 {
 	int		ret = FAIL;
 	char		*error = NULL;
@@ -1901,7 +1897,8 @@ void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv
 #if defined(_WINDOWS)
 	tcp_recv_context->max_len = ZBX_MAX_RECV_DATA_SIZE;
 #else
-	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE : ZBX_MAX_RECV_DATA_SIZE;
+	tcp_recv_context->max_len = 0 != (flags & ZBX_TCP_LARGE) ? ZBX_MAX_RECV_LARGE_DATA_SIZE :
+			ZBX_MAX_RECV_DATA_SIZE;
 #endif
 	zbx_socket_free(s);
 
@@ -2085,7 +2082,8 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 				zabbix_log(LOG_LEVEL_TRACE, "%s(): received " ZBX_FS_SIZE_T " bytes with"
 						" compression ratio %.1f", __func__,
 						(zbx_fs_size_t)(context->buf_stat_bytes + context->buf_dyn_bytes),
-						(double)context->reserved / (double)(context->buf_stat_bytes + context->buf_dyn_bytes));
+						(double)context->reserved / (double)(context->buf_stat_bytes +
+						context->buf_dyn_bytes));
 			}
 			else
 				s->read_bytes = context->buf_stat_bytes + context->buf_dyn_bytes;
@@ -2097,12 +2095,14 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 			if (context->buf_stat_bytes + context->buf_dyn_bytes < context->expected_len)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is shorter than expected " ZBX_FS_UI64
-						" bytes. Message ignored.", s->peer, (zbx_uint64_t)context->expected_len);
+						" bytes. Message ignored.", s->peer,
+						(zbx_uint64_t)context->expected_len);
 			}
 			else
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "Message from %s is longer than expected " ZBX_FS_UI64
-						" bytes. Message ignored.", s->peer, (zbx_uint64_t)context->expected_len);
+						" bytes. Message ignored.", s->peer,
+						(zbx_uint64_t)context->expected_len);
 			}
 
 			nbytes = ZBX_PROTO_ERROR;
@@ -2191,7 +2191,8 @@ ssize_t	zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout)
 	if (0 != timeout)
 		zbx_socket_set_deadline(s, timeout);
 
-	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes, NULL)))
+	while (0 != (nbytes = zbx_tcp_read(s, s->buf_stat + buf_stat_bytes, sizeof(s->buf_stat) - buf_stat_bytes,
+			NULL)))
 	{
 		if (ZBX_PROTO_ERROR == nbytes)
 			goto out;
