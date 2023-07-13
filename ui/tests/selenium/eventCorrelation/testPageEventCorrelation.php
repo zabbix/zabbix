@@ -43,16 +43,16 @@ class testPageEventCorrelation extends CWebTest {
 		];
 	}
 
-	private static $correlation_sql = 'SELECT * FROM correlation ORDER BY correlationid';
-	private static $event_old_operations = 'Event correlation for closing old events';
-	private static $event_new_operations = 'Event correlation for closing new events';
-	private static $event_both_operations = 'Both operations';
-	private static $event_hostgroup = 'Event for host group';
-	private static $event_pair = 'event tag pair';
-	private static $event_old_value = 'Old event tag value';
-	private static $event_new_value = 'New event tag value';
-	private static $multiple_conditions = 'Conditions';
-	private static $event_for_filter = '€√Σnt correlation for filter and deletion';
+	protected static $correlation_sql = 'SELECT * FROM correlation ORDER BY correlationid';
+	protected static $event_old_operations = 'Event correlation for closing old events';
+	protected static $event_new_operations = 'Event correlation for closing new events';
+	protected static $event_both_operations = 'Both operations';
+	protected static $event_hostgroup = 'Event for host group';
+	protected static $event_pair = 'event tag pair';
+	protected static $event_old_value = 'Old event tag value';
+	protected static $event_new_value = 'New event tag value';
+	protected static $multiple_conditions = 'Conditions';
+	protected static $event_for_filter = '€√Σnt correlation for filter and deletion';
 
 	public function prepareEventData() {
 		CDataHelper::call('correlation.create', [
@@ -816,7 +816,7 @@ class testPageEventCorrelation extends CWebTest {
 	 *
 	 * @param array $names	event correlation names, if empty delete will perform for all events
 	 */
-	private function deleteAction($names = []) {
+	protected function deleteAction($names = []) {
 		$plural = (count($names) === 1) ? '' : 's';
 		$all = CDBHelper::getCount(self::$correlation_sql);
 		$this->page->login()->open('zabbix.php?action=correlation.list');
