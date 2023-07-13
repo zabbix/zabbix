@@ -18,10 +18,8 @@
 **/
 
 #include "zbxasyncpoller.h"
-#include "zbxlog.h"
 
 #ifdef HAVE_LIBEVENT
-#	include <event.h>
 
 typedef struct
 {

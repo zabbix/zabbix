@@ -1,8 +1,6 @@
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
-#include <event.h>
-#include <event2/thread.h>
 #include "poller.h"
 #include "zbxserver.h"
 #include "zbx_item_constants.h"
@@ -15,6 +13,13 @@
 #include "async_agent.h"
 #include "zbx_availability_constants.h"
 #include "zbxasynchttppoller.h"
+#include "zbxavailability.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxhttp.h"
+#include "zbxipcservice.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 

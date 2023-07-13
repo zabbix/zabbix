@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlog.h"
-#include "zbxsysinc.h"
 #include "zbxasynchttppoller.h"
+#include "zbxlog.h"
 
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
-#include <event.h>
-#include <event2/thread.h>
 
 typedef struct
 {

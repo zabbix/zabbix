@@ -21,10 +21,10 @@
 #include "async_agent.h"
 
 #include "zbxcommon.h"
-#include "zbxlog.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
+#include "async_poller.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {
