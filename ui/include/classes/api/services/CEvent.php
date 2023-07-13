@@ -85,7 +85,12 @@ class CEvent extends CApiService {
 			// output
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'groupCount' =>					['type' => API_FLAG, 'default' => false],
+			'aggregateOutput' =>			['type' => API_OBJECT, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => [
+				'avg' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity'],
+				'max' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity'],
+				'min' =>	['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => 'severity']
+			]],
+			'groupBy' =>					['type' => API_STRINGS_UTF8, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'in' => 'objectid', 'uniq' => true, 'default' => null],
 			'select_acknowledges' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT | API_DEPRECATED, 'replacement' => 'selectAcknowledges', 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'selectAcknowledges' =>			['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', $acknowledge_output_fields), 'default' => null],
 			'select_alerts' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_DEPRECATED, 'replacement' => 'selectAlerts', 'in' => implode(',', $alert_output_fields), 'default' => null],
@@ -103,7 +108,7 @@ class CEvent extends CApiService {
 			'selectSuppressionData' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['maintenanceid', 'suppress_until', 'userid']), 'default' => null],
 			'selectTags' =>					['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['tag', 'value']), 'default' => null],
 			// sort and limit
-			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
+			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', array_merge($this->sortColumns, ['rowscount', 'avg_severity', 'max_severity', 'min_severity'])), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
 			'limit' =>						['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
 			// flags
@@ -132,16 +137,15 @@ class CEvent extends CApiService {
 				: [];
 
 			if ($options['countOutput']) {
-				$problems = $problems ?: 0;
-				$recovery = $recovery ?: 0;
-
-				if ($options['groupCount']) {
-					$problems = zbx_toHash($problems, 'objectid');
-					$recovery = zbx_toHash($recovery, 'objectid');
+				if ($options['groupBy']) {
+					$problems = array_column($problems, null, 'objectid');
+					$recovery = array_column($recovery, null, 'objectid');
 
 					foreach ($problems as $objectid => &$problem) {
 						if (array_key_exists($objectid, $recovery)) {
-							$problem['rowscount'] += $recovery['rowscount'];
+							$problem['rowscount'] = (string) (
+								$problem['rowscount'] + $recovery[$objectid]['rowscount']
+							);
 							unset($recovery[$objectid]);
 						}
 					}
@@ -150,7 +154,7 @@ class CEvent extends CApiService {
 					$db_events = array_values($problems + $recovery);
 				}
 				else {
-					$db_events = $problems + $recovery;
+					$db_events = (int) $problems + (int) $recovery;
 				}
 			}
 			else {
@@ -165,7 +169,7 @@ class CEvent extends CApiService {
 			$db_events = $this->getEvents($options);
 		}
 
-		if ($options['countOutput']) {
+		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
 			return is_array($db_events) ? $db_events : (string) $db_events;
 		}
 
@@ -195,12 +199,15 @@ class CEvent extends CApiService {
 
 		while ($event = DBfetch($res)) {
 			if ($options['countOutput']) {
-				if ($options['groupCount']) {
+				if ($options['groupBy']) {
 					$db_events[] = $event;
 				}
 				else {
 					$db_events = $event['rowscount'];
 				}
+			}
+			elseif ($options['aggregateOutput'] || $options['groupBy']) {
+				$db_events[] = $event;
 			}
 			else {
 				$db_events[$event['eventid']] = $event;
@@ -338,10 +345,6 @@ class CEvent extends CApiService {
 		if ($options['objectids'] !== null && in_array($options['object'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM,
 				EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
 			$sql_parts['where'][] = dbConditionInt('e.objectid', $options['objectids']);
-
-			if ($options['groupCount']) {
-				$sql_parts['group']['objectid'] = 'e.objectid';
-			}
 		}
 
 		// groupids
@@ -596,6 +599,10 @@ class CEvent extends CApiService {
 	 * ]
 	 */
 	private function applyFilters(array $options, array &$sql_parts): void {
+		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
+			return;
+		}
+
 		// Acknowledge action filter properties.
 		$acknowledge_actions = [
 			'ack.eventid=e.eventid'
@@ -632,43 +639,45 @@ class CEvent extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput']) {
-			// Select fields from event_recovery table using LEFT JOIN.
-			if ($this->outputIsRequested('r_eventid', $options['output'])) {
-				$sql_parts['select']['r_eventid'] = 'er1.r_eventid';
-				$sql_parts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
+		if ($options['countOutput'] || $options['aggregateOutput'] || $options['groupBy']) {
+			return $sql_parts;
+		}
 
-			// Select fields from event_recovery table using LEFT JOIN.
-			$left_join_recovery = false;
-			foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
-				if ($this->outputIsRequested($field, $options['output'])) {
-					$sql_parts['select'][$field] = 'er2.'.$field;
-					$left_join_recovery = true;
-				}
-			}
+		// Select fields from event_recovery table using LEFT JOIN.
+		if ($this->outputIsRequested('r_eventid', $options['output'])) {
+			$sql_parts['select']['r_eventid'] = 'er1.r_eventid';
+			$sql_parts['left_join'][] = ['alias' => 'er1', 'table' => 'event_recovery', 'using' => 'eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
 
-			if ($left_join_recovery) {
-				$sql_parts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		// Select fields from event_recovery table using LEFT JOIN.
+		$left_join_recovery = false;
+		foreach (['c_eventid', 'correlationid', 'userid'] as $field) {
+			if ($this->outputIsRequested($field, $options['output'])) {
+				$sql_parts['select'][$field] = 'er2.'.$field;
+				$left_join_recovery = true;
 			}
+		}
 
-			if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
-				$sql_parts = $this->addQuerySelect('e.object', $sql_parts);
-				$sql_parts = $this->addQuerySelect('e.objectid', $sql_parts);
-			}
+		if ($left_join_recovery) {
+			$sql_parts['left_join'][] = ['alias' => 'er2', 'table' => 'event_recovery', 'using' => 'r_eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
+		}
 
-			$left_join_symptom = false;
-			if ($this->outputIsRequested('cause_eventid', $options['output'])) {
-				$sql_parts['select']['cause_eventid'] = 'es1.cause_eventid';
-				$left_join_symptom = true;
-			}
+		if ($options['selectRelatedObject'] !== null || $options['selectHosts'] !== null) {
+			$sql_parts = $this->addQuerySelect('e.object', $sql_parts);
+			$sql_parts = $this->addQuerySelect('e.objectid', $sql_parts);
+		}
 
-			if ($left_join_symptom) {
-				$sql_parts['left_join'][] = ['alias' => 'es1', 'table' => 'event_symptom', 'using' => 'eventid'];
-				$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-			}
+		$left_join_symptom = false;
+		if ($this->outputIsRequested('cause_eventid', $options['output'])) {
+			$sql_parts['select']['cause_eventid'] = 'es1.cause_eventid';
+			$left_join_symptom = true;
+		}
+
+		if ($left_join_symptom) {
+			$sql_parts['left_join'][] = ['alias' => 'es1', 'table' => 'event_symptom', 'using' => 'eventid'];
+			$sql_parts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 		}
 
 		return $sql_parts;
