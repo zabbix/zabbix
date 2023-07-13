@@ -63,7 +63,7 @@ class CProblem extends CApiService {
 			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'recent' =>						['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'default' => [], 'fields' => [
+			'tags' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
 				'value' =>						['type' => API_STRING_UTF8]
@@ -259,7 +259,7 @@ class CProblem extends CApiService {
 		}
 
 		// severities
-		if (array_key_exists('severities', $options) && $options['severities'] !== null) {
+		if ($options['severities'] !== null) {
 			// triggers
 			if ($options['object'] == EVENT_OBJECT_TRIGGER || $options['object'] == EVENT_OBJECT_SERVICE) {
 				sort($options['severities']);
@@ -293,7 +293,7 @@ class CProblem extends CApiService {
 		}
 
 		// tags
-		if ($options['tags'] !== null && $options['tags']) {
+		if ($options['tags'] !== null) {
 			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'p',
 				'problem_tag', 'eventid'
 			);
@@ -536,7 +536,7 @@ class CProblem extends CApiService {
 			'SELECT p.eventid,p.clock,p.ns,t.triggerid,t.expression,t.opdata'.
 			' FROM problem p'.
 				' JOIN triggers t'.
-					'ON t.triggerid=p.objectid'.
+					' ON t.triggerid=p.objectid'.
 			' WHERE '.dbConditionInt('p.eventid', array_keys($result))
 		), 'eventid');
 

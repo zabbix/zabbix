@@ -71,7 +71,7 @@ class CEvent extends CApiService {
 			'suppressed' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'symptom' =>					['type' => API_BOOLEAN, 'flags' => API_ALLOW_NULL, 'default' => null],
 			'evaltype' =>					['type' => API_INT32, 'in' => implode(',', [TAG_EVAL_TYPE_AND_OR, TAG_EVAL_TYPE_OR]), 'default' => TAG_EVAL_TYPE_AND_OR],
-			'tags' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'default' => [], 'fields' => [
+			'tags' =>						['type' => API_OBJECTS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null, 'fields' => [
 				'tag' =>						['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
 				'operator' =>					['type' => API_INT32, 'in' => implode(',', [TAG_OPERATOR_LIKE, TAG_OPERATOR_EQUAL, TAG_OPERATOR_NOT_LIKE, TAG_OPERATOR_NOT_EQUAL, TAG_OPERATOR_EXISTS, TAG_OPERATOR_NOT_EXISTS])],
 				'value' =>						['type' => API_STRING_UTF8]
@@ -424,7 +424,7 @@ class CEvent extends CApiService {
 		}
 
 		// tags
-		if ($options['tags']) {
+		if ($options['tags'] !== null) {
 			$sql_parts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'e',
 				'event_tag', 'eventid'
 			);
@@ -451,7 +451,7 @@ class CEvent extends CApiService {
 		}
 
 		// value
-		if (array_key_exists('value', $options) && $options['value'] !== null) {
+		if ($options['value'] !== null) {
 			$sql_parts['where'][] = dbConditionInt('e.value', $options['value']);
 		}
 

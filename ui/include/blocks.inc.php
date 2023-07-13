@@ -47,7 +47,7 @@ function getSystemStatusData(array $filter) {
 		? $filter['ext_ack']
 		: EXTACK_OPTION_ALL;
 	$filter_evaltype = array_key_exists('evaltype', $filter) ? $filter['evaltype'] : TAG_EVAL_TYPE_AND_OR;
-	$filter_tags = array_key_exists('tags', $filter) ? $filter['tags'] : [];
+	$filter_tags = array_key_exists('tags', $filter) && $filter['tags'] ? $filter['tags'] : null;
 	$show_opdata = array_key_exists('show_opdata', $filter) && $filter['show_opdata'] != OPERATIONAL_DATA_SHOW_NONE;
 
 	if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {

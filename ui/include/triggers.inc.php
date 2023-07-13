@@ -648,7 +648,9 @@ function getTriggersWithActualSeverity(array $trigger_options, array $problem_op
 			'recent' => $problem_options['show_recent'],
 			'acknowledged' => $problem_options['acknowledged'],
 			'time_from' => $problem_options['time_from'],
-			'tags' => array_key_exists('tags', $problem_options) ? $problem_options['tags'] : null,
+			'tags' => array_key_exists('tags', $problem_options) && $problem_options['tags']
+				? $problem_options['tags']
+				: null,
 			'evaltype' => array_key_exists('evaltype', $problem_options)
 				? $problem_options['evaltype']
 				: TAG_EVAL_TYPE_AND_OR
