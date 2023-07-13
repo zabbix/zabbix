@@ -20,7 +20,6 @@
 #ifndef ZABBIX_CHECKS_AGENT_H
 #define ZABBIX_CHECKS_AGENT_H
 
-#include <sys/types.h>
 #include "module.h"
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
