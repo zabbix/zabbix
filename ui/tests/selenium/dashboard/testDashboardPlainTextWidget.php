@@ -786,7 +786,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						]
@@ -801,17 +801,17 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 08:31:32',
+							'Timestamp' => '2023-05-01 11:31:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain ⓣⓔⓧⓣ'
 						],
 						[
-							'Timestamp' => '2023-05-01 08:30:32',
+							'Timestamp' => '2023-05-01 11:30:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text2'
 						],
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						]
@@ -828,27 +828,27 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '1970-01-01 00:02:01',
+							'Timestamp' => '1970-01-01 03:02:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 00:01:01',
+							'Timestamp' => '1970-01-01 03:01:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '8.44 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 00:01:01',
+							'Timestamp' => '1970-01-01 03:01:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '7.51 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '72.0618 %' // value rounding is expected.
 						]
@@ -867,19 +867,19 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '1970-01-01 00:02:01',
+							'Timestamp' => '1970-01-01 03:02:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 00:01:01',
+							'Timestamp' => '1970-01-01 03:01:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '8.44 GB' // value rounding is expected.
 						]
 					],
 					'displayed_lines' => [
 						[
-							'Timestamp' => '1970-01-01 00:02:01',
+							'Timestamp' => '1970-01-01 03:02:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						]
@@ -896,23 +896,23 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'html_text' => true,
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_128
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						]
 					],
 					'expected_top' => [
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_255
 						]
 					],
@@ -927,34 +927,34 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => '1969-12-31 23:59:59',
+							'Timestamp' => '1970-01-01 02:59:59',
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						]
 					],
 					'expected_host_data' => [
 						[
-							'Timestamp' => '2023-05-01 08:29:32',
+							'Timestamp' => '2023-05-01 11:29:32',
 							'Name' => 'Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						],
 						[
-							'Timestamp' => '1970-01-01 00:00:01',
+							'Timestamp' => '1970-01-01 03:00:01',
 							'Name' => 'Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => '1969-12-31 23:59:59',
+							'Timestamp' => '1970-01-01 02:59:59',
 							'Name' => 'Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						]
