@@ -1192,8 +1192,8 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->version_str);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	dc_strpool_release(host->tls_issuer);
-	dc_strpool_release(host->tls_subject);
+	dc_strpool_release(proxy->tls_issuer);
+	dc_strpool_release(proxy->tls_subject);
 
 	/* Maintain 'psks' index. Unlink and delete the PSK identity. */
 	if (NULL != proxy->tls_dc_psk)
