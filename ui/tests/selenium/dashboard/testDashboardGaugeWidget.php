@@ -976,7 +976,9 @@ class testDashboardGaugeWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
 		$dashboard = CDashboardElement::find()->one();
 		$this->assertTrue($dashboard->edit()->getWidget(self::DELETE_GAUGE)->isEditable());
+		$widget = $dashboard->getWidget(self::DELETE_GAUGE);
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
+		$widget->waitUntilNotPresent();
 		$dashboard->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
