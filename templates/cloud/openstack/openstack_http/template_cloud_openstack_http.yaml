@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-11T13:08:53Z'
+  date: '2023-07-14T12:33:13Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -185,7 +185,7 @@ zabbix_export:
                   value: '{#SERVICE_URL}'
                   description: 'OpenStack Nova service path.'
                 - macro: '{$OPENSTACK.TOKEN}'
-                  type: SECRET_TEXT
+                  value: '{#TOKEN}'
                   description: 'OpenStack authorization token.'
           master_item:
             key: openstack.identity.auth
