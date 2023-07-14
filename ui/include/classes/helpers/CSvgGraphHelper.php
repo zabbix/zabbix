@@ -831,7 +831,7 @@ class CSvgGraphHelper {
 		}
 
 		$options = [
-			'output' => ['objectid', 'name', 'severity', 'clock', 'r_eventid'],
+			'output' => ['eventid', 'objectid', 'name', 'severity', 'clock', 'r_eventid'],
 			'selectAcknowledges' => ['action'],
 			'problem_time_from' => $time_period['time_from'],
 			'problem_time_till' => $time_period['time_to'],
