@@ -303,7 +303,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Items' => 'Linux: Available memory',
-						'Show lines' => '',
+						'Show lines' => ''
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -313,7 +313,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Items' => 'Linux: Available memory',
-						'Show lines' => '0',
+						'Show lines' => '0'
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -323,7 +323,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Items' => 'Linux: Available memory',
-						'Show lines' => '101',
+						'Show lines' => '101'
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -333,7 +333,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Items' => 'Linux: Available memory',
-						'Show lines' => ' ',
+						'Show lines' => ' '
 					],
 					'error' => 'Invalid parameter "Show lines": value must be one of 1-100.'
 				]
@@ -343,7 +343,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Items' => '',
-						'Show lines' => '',
+						'Show lines' => ''
 					],
 					'error' => [
 						'Invalid parameter "Items": cannot be empty.',
