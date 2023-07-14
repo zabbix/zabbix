@@ -55,12 +55,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 	 * because it can change.
 	 */
 	protected $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
-	' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
-	' w.width, w.height'.
-	' FROM widget_field wf'.
-	' INNER JOIN widget w'.
-	' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
-	' wf.value_itemid, wf.value_graphid';
+			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
+			' w.width, w.height'.
+			' FROM widget_field wf'.
+			' INNER JOIN widget w'.
+			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
+			' wf.value_itemid, wf.value_graphid';
 
 	public static function prepareData() {
 		// Create host for widget header and data tests.
@@ -264,12 +264,12 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->assertEquals(['Left', 'Top'], $form->getField('Items location')->getLabels()->asText());
 
 		$refresh_interval = ['Default (1 minute)', 'No refresh', '10 seconds', '30 seconds', '1 minute',
-			'2 minutes', '10 minutes', '15 minutes'];
+				'2 minutes', '10 minutes', '15 minutes'];
 		$this->assertEquals($refresh_interval, $form->getField('Refresh interval')->getOptions()->asText());
 
 		// Check if buttons present and clickable.
 		$this->assertEquals(2, $dialog->query('button', ['Add', 'Cancel'])->all()
-			->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
+				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 		$dialog->close();
 		$dashboard->save();
@@ -278,7 +278,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$host_selector = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 		$this->assertTrue($host_selector->isVisible());
 		$this->assertEquals('No data found.', $dashboard->getWidget(self::$default_widget)
-			->query('class:nothing-to-show')->one()->getText()
+				->query('class:nothing-to-show')->one()->getText()
 		);
 		$dashboard->getWidget(self::$default_widget)->edit();
 		$this->assertEquals('Edit widget', $dialog->getTitle());
@@ -775,7 +775,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		// Check that widget is not present on dashboard.
 		$this->assertFalse($dashboard->getWidget(self::$delete_widget, false)->isValid());
 		$widget_sql = 'SELECT NULL FROM widget_field wf LEFT JOIN widget w ON w.widgetid=wf.widgetid'.
-			' WHERE w.name='.zbx_dbstr(self::$delete_widget);
+				' WHERE w.name='.zbx_dbstr(self::$delete_widget);
 		$this->assertEquals(0, CDBHelper::getCount($widget_sql));
 	}
 
