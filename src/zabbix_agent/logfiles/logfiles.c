@@ -2002,15 +2002,18 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static int	zbx_match_log_rec(const zbx_vector_ptr_t *regexps, const char *value, const char *pattern,
-		const char *output_template, char **output, char **err_msg)
+static void	log_regexp_runtime_error(const char *hostname, const char *key, const char *err_msg,
+		int *runtime_error_logging_allowed)
 {
-	int	ret;
+	/* Simple throttling. Log no more than one regexp runtime error per log*[] item check. */
+	/* Throttling is necessary to allow Zabbix agent monitor its own log file at DebugLevel <= 3. */
 
-	if (FAIL == (ret = regexp_sub_ex(regexps, value, pattern, ZBX_CASE_SENSITIVE, output_template, output)))
-		*err_msg = zbx_dsprintf(*err_msg, "cannot compile regular expression");
+	if (0 == *runtime_error_logging_allowed)
+		return;
 
-	return ret;	/* ZBX_REGEXP_MATCH, ZBX_REGEXP_NO_MATCH or FAIL */
+	*runtime_error_logging_allowed = 0;
+
+	zabbix_log(LOG_LEVEL_WARNING, "host:'%s' item key:'%s': regexp runtime error: %s", hostname, key, err_msg);
 }
 
 /******************************************************************************
@@ -2027,7 +2030,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
-	int				ret, nbytes, regexp_ret;
+	int				ret, nbytes;
 	const char			*cr, *lf, *p_end;
 	char				*p_start, *p, *p_nl, *p_next, *item_value = NULL;
 	size_t				szbyte;
@@ -2041,6 +2044,11 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 #define BUF_SIZE	(256 * ZBX_KIBIBYTE)	/* The longest encodings use 4 bytes for every character. To send */
 						/* up to 64 k characters to Zabbix server a 256 kB buffer might be */
 						/* required. */
+
+	/* Corner case: only one record is allowed to be analyzed per log*[] item check. */
+	/* Disable logging runtime erors for this case. */
+	int	runtime_error_logging_allowed = (1 < *p_count) ? 1 : 0;
+
 	if (NULL == buf)
 		buf = (char *)zbx_malloc(buf, (size_t)(BUF_SIZE + 1));
 
@@ -2109,7 +2117,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					/* database). */
 
 					char	*value;
-					int	send_err;
+					int	send_err, regexp_ret;
 
 					buf[BUF_SIZE] = '\0';
 
@@ -2126,12 +2134,13 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					processed_size = (size_t)offset + (size_t)nbytes;
 					send_err = FAIL;
 
-					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+					regexp_ret = regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret))
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2190,16 +2199,26 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						zbx_free(value);
 
-					if (FAIL == regexp_ret)
+					if (ZBX_REGEXP_COMPILE_FAIL == regexp_ret)
 					{
 						ret = FAIL;
 						goto out;
 					}
 
+					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
+					{
+						/* regexp runtime error does not cause log*[] item state NOTSUPPORTED. */
+						/* Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(hostname, key, *err_msg,
+								&runtime_error_logging_allowed);
+						zbx_free(*err_msg);
+					}
+
 					(*p_count)--;
 
 					if (0 != is_count_item ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret || SUCCEED == send_err)
 					{
 						*lastlogsize = processed_size;
 						*big_rec = 1;	/* ignore the rest of this record */
@@ -2231,7 +2250,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 				if (0 == *big_rec)
 				{
 					char	*value;
-					int	send_err;
+					int	send_err, regexp_ret;
 
 					*p_nl = '\0';
 
@@ -2243,12 +2262,13 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
 
-					regexp_ret = zbx_match_log_rec(regexps, value, pattern,
+					regexp_ret = regexp_sub_ex2(regexps, value, pattern, ZBX_CASE_SENSITIVE,
 							(0 == is_count_item) ? output_template : NULL,
 							(0 == is_count_item) ? &item_value : NULL, err_msg);
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 					if (NULL != persistent_file_name && (ZBX_REGEXP_MATCH == regexp_ret ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret))
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret))
 					{
 						/* Prepare 'prep_vec' element even if the current record won't match. */
 						/* Its mtime and lastlogsize could be sent to server later as */
@@ -2304,16 +2324,26 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						zbx_free(value);
 
-					if (FAIL == regexp_ret)
+					if (ZBX_REGEXP_COMPILE_FAIL == regexp_ret)
 					{
 						ret = FAIL;
 						goto out;
 					}
 
+					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
+					{
+						/* regexp runtime error does not cause log*[] item state NOTSUPPORTED. */
+						/* Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(hostname, key, *err_msg,
+								&runtime_error_logging_allowed);
+						zbx_free(*err_msg);
+					}
+
 					(*p_count)--;
 
 					if (0 != is_count_item ||
-							ZBX_REGEXP_NO_MATCH == regexp_ret || SUCCEED == send_err)
+							ZBX_REGEXP_NO_MATCH == regexp_ret ||
+							ZBX_REGEXP_RUNTIME_FAIL == regexp_ret || SUCCEED == send_err)
 					{
 						*lastlogsize = processed_size;
 					}
