@@ -1003,7 +1003,6 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 	size_t	sql_alloc = 0, sql_offset = 0;
 	int	ret = SUCCEED;
 
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,ipmi_password,"
 				"maintenance_status,maintenance_type,maintenance_from,status,name,tls_connect,"
@@ -1012,19 +1011,6 @@ int	zbx_dbsync_compare_hosts(zbx_dbsync_t *sync)
 			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
 
 	dbsync_prepare(sync, 19, NULL);
-#else
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hostid,proxyid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
-				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
-				"status,name,tls_connect,tls_accept,"
-				"hostid,maintenanceid"
-			" from hosts"
-			" where status in (%d,%d)"
-				" and flags<>%d",
-			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-
-	dbsync_prepare(sync, 16, NULL);
-#endif
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

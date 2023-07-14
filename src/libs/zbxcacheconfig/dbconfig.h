@@ -934,7 +934,7 @@ typedef struct
 	zbx_hashset_t		trigdeps;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
-	zbx_hashset_t		proxies_p;		/* for searching proxies by 'host' name */
+	zbx_hashset_t		proxies_p;		/* for searching proxies by name */
 	zbx_hashset_t		proxies;
 	zbx_hashset_t		autoreg_hosts;
 	zbx_hashset_t		host_inventories;

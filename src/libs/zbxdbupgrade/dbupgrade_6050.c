@@ -412,7 +412,7 @@ static int	DBpatch_6050032(void)
 
 static int	DBpatch_6050033(void)
 {
-	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("hosts", "proxy_hostid", &field);
 }
@@ -431,7 +431,7 @@ static int	DBpatch_6050035(void)
 
 static int	DBpatch_6050036(void)
 {
-	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("drules", "proxy_hostid", &field);
 }
@@ -450,7 +450,7 @@ static int	DBpatch_6050038(void)
 
 static int	DBpatch_6050039(void)
 {
-	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBrename_field("autoreg_host", "proxy_hostid", &field);
 }
@@ -469,7 +469,7 @@ static int	DBpatch_6050041(void)
 
 static int	DBpatch_6050042(void)
 {
-	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBrename_field("task", "proxy_hostid", &field);
 }

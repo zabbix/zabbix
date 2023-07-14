@@ -1538,7 +1538,7 @@ done:
 
 		if (0 == found)
 		{
-			ZBX_DBROW2UINT64(host->maintenanceid, row[15 + ZBX_HOST_TLS_OFFSET]);
+			ZBX_DBROW2UINT64(host->maintenanceid, row[18]);
 			host->maintenance_status = (unsigned char)atoi(row[7]);
 			host->maintenance_type = (unsigned char)atoi(row[8]);
 			host->maintenance_from = atoi(row[9]);
@@ -7955,7 +7955,7 @@ clean:
 
 	zbx_hashset_destroy(&activated_hosts);
 
-	//if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
