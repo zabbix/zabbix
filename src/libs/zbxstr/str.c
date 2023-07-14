@@ -1323,7 +1323,7 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 
 	*p = '\0';
 
-	if ((iconv_t)-1 == iconv_close(cd))
+	if (0 != iconv_close(cd))
 		goto utf8_convert_fail;
 
 	/* remove BOM */
