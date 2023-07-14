@@ -23,6 +23,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
+#include "zbxcachehistory_proxy.h"
 #include "zbxdbupgrade.h"
 #include "zbxlog.h"
 #include "zbxgetopt.h"
@@ -41,7 +42,7 @@
 #include "../zabbix_server/pinger/pinger.h"
 #include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
-#include "../zabbix_server/trapper/proxydata.h"
+#include "../zabbix_server/trapper/trapper_request.h"
 #include "../zabbix_server/snmptrapper/snmptrapper.h"
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
@@ -63,6 +64,7 @@
 #include "../zabbix_server/ipmi/ipmi_manager.h"
 #include "preproc/preproc_proxy.h"
 #include "zbxdiscovery.h"
+#include "zbxproxybuffer.h"
 #include "../zabbix_server/scripts/scripts.h"
 
 #ifdef HAVE_OPENIPMI
@@ -321,6 +323,14 @@ static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 static zbx_vector_addr_ptr_t	config_server_addrs;
+
+#define ZBX_CONFIG_DATA_CACHE_SIZE_MIN		(ZBX_KIBIBYTE * 128)
+#define ZBX_CONFIG_DATA_CACHE_AGE_MIN		(SEC_PER_MIN * 10)
+
+static char		*config_proxy_buffer_mode_str = NULL;
+static int		config_proxy_buffer_mode	= 0;
+static zbx_uint64_t	config_proxy_memory_buffer_size	= 0;
+static int		config_proxy_memory_buffer_age	= 0;
 
 /* proxy has no any events processing */
 static const zbx_events_funcs_t	events_cbs = {
@@ -712,6 +722,73 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 == config_proxyconfig_frequency)
 		config_proxyconfig_frequency = 10;
 
+	if (FAIL == zbx_pb_parse_mode(config_proxy_buffer_mode_str, &config_proxy_buffer_mode))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Invalid \"ProxyBufferMode\" configuration parameter value");
+		err = 1;
+	}
+
+	if (ZBX_PB_MODE_DISK != config_proxy_buffer_mode)
+	{
+		if (0 != config_proxy_local_buffer)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyBufferMode\" configuration parameter cannot be"
+					" \"memory\" or \"hybrid\" when \"ProxyLocalBuffer\" parameter is set");
+			err = 1;
+		}
+
+		if (0 == config_proxy_memory_buffer_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter must be set when"
+					" \"ProxyBufferMode\" parameter is \"memory\" or \"hybrid\"");
+			err = 1;
+		}
+
+		if (0 != config_proxy_memory_buffer_age)
+		{
+			if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_proxy_memory_buffer_age)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferAge\" configuration"
+						" parameter");
+				err = 1;
+			}
+
+			if (config_proxy_memory_buffer_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter cannot be"
+						" greater than \"ProxyOfflineBuffer\" parameter");
+				err = 1;
+			}
+		}
+
+		if (0 != config_proxy_memory_buffer_size &&
+				ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_proxy_memory_buffer_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferSize\" configuration parameter");
+			err = 1;
+
+		}
+	}
+	else
+	{
+		if (0 != config_proxy_memory_buffer_size)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter can be set only"
+					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
+			err = 1;
+		}
+	}
+
+	if (ZBX_PB_MODE_HYBRID != config_proxy_buffer_mode)
+	{
+		if (0 != config_proxy_memory_buffer_age)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter can be set only"
+					" when \"ProxyBufferMode\" is \"hybrid\"");
+			err = 1;
+		}
+	}
+
 	err |= (FAIL == zbx_db_validate_config_features(program_type, zbx_config_dbhigh));
 
 	if (0 != err)
@@ -943,8 +1020,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1,			1000},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],		TYPE_INT,
+		{"StartODBCPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ODBCPOLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"ProxyMemoryBufferSize",	&config_proxy_memory_buffer_size,	TYPE_UINT64,
+			PARM_OPT,	0,	__UINT64_C(2) * ZBX_GIBIBYTE},
+		{"ProxyMemoryBufferAge",	&config_proxy_memory_buffer_age,	TYPE_INT,
+			PARM_OPT,	0,	SEC_PER_DAY * 10},
+		{"ProxyBufferMode",		&config_proxy_buffer_mode_str,		TYPE_STRING,
+			PARM_OPT,	0,	0},
 		{"StartHTTPAgentPollers",	&CONFIG_FORKS[ZBX_PROCESS_TYPE_HTTPAGENT_POLLER],	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"StartAgentPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_AGENT_POLLER],	TYPE_INT,
@@ -1002,6 +1085,8 @@ static void	zbx_on_exit(int ret)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_on_exit() called with ret:%d", ret);
 
+	zbx_pb_disable();
+
 	if (NULL != threads)
 	{
 		/* wait for all child processes to exit */
@@ -1018,6 +1103,8 @@ static void	zbx_on_exit(int ret)
 
 	zbx_db_connect(ZBX_DB_CONNECT_EXIT);
 	zbx_free_database_cache(ZBX_SYNC_ALL, &events_cbs);
+	zbx_pb_flush();
+	zbx_pb_destroy();
 	zbx_free_configuration_cache();
 	zbx_db_close();
 
@@ -1417,7 +1504,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
+	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_proxy_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
@@ -1477,7 +1564,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	proxy_db_init();
 
-	zbx_change_proxy_history_count(zbx_proxy_get_history_count());
+	if (FAIL == zbx_pb_init(config_proxy_buffer_mode, config_proxy_memory_buffer_size,
+			config_proxy_memory_buffer_age, config_proxy_offline_buffer * SEC_PER_HOUR, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize proxy buffer: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
 
 	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
@@ -1530,7 +1623,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	thread_args.info.program_type = program_type;
 
 	if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
-		rtc_process_request_func = rtc_process_request_ex_passive;
+		rtc_process_request_func = rtc_process_request_ex_proxy_passive;
+	else
+		rtc_process_request_func = rtc_process_request_ex_proxy;
 
 	for (i = 0; i < threads_num; i++)
 	{

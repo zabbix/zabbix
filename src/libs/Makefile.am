@@ -5,6 +5,7 @@ DIST_SUBDIRS = \
 	zbxasyncpoller \
 	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcommon \
@@ -50,6 +51,7 @@ DIST_SUBDIRS = \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxregexp \
 	zbxrtc \
 	zbxself \
@@ -76,6 +78,7 @@ if SERVER
 SERVER_SUBDIRS = \
 	zbxasynchttppoller \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
@@ -105,6 +108,7 @@ SERVER_SUBDIRS = \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
@@ -126,6 +130,7 @@ else
 if PROXY
 PROXY_SUBDIRS = \
 	zbxaudit \
+	zbxautoreg \
 	zbxavailability \
 	zbxconnector \
 	zbxcompress \
@@ -153,6 +158,7 @@ PROXY_SUBDIRS = \
 	zbxparam \
 	zbxpreproc \
 	zbxprometheus \
+	zbxproxybuffer \
 	zbxrtc \
 	zbxself \
 	zbxserialize \
