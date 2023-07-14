@@ -3223,6 +3223,61 @@ section {
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
 
+.svg-pie-chart {
+  fill: #ffffff; }
+  .svg-pie-chart .svg-pie-chart-arcs {
+    stroke-linejoin: round; }
+    .svg-pie-chart .svg-pie-chart-arcs path {
+      vector-effect: non-scaling-stroke;
+      stroke: #000000; }
+    .svg-pie-chart .svg-pie-chart-arcs .svg-pie-chart-arc-no-data {
+      vector-effect: non-scaling-stroke;
+      stroke: #ffffff;
+      stroke-width: 1;
+      fill: none; }
+  .svg-pie-chart .svg-pie-chart-total-value {
+    text-anchor: middle; }
+  .svg-pie-chart .svg-pie-chart-total-value-no-data {
+    text-anchor: middle;
+    fill: #cacaca; }
+
+.svg-pie-chart-legend {
+  position: absolute;
+  bottom: 4px;
+  left: 0;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(var(--columns, 4), auto);
+  grid-gap: 0 10px;
+  justify-content: start;
+  max-height: calc(var(--lines) * 18px);
+  margin: 0 10px;
+  overflow: hidden;
+  line-height: 18px; }
+  .svg-pie-chart-legend .svg-pie-chart-legend-item {
+    min-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap; }
+    .svg-pie-chart-legend .svg-pie-chart-legend-item::before {
+      position: relative;
+      top: -3px;
+      content: ' ';
+      display: inline-block;
+      width: 10px;
+      height: 4px;
+      margin-right: 4px;
+      background: var(--color); }
+
+.svg-pie-chart-hintbox {
+  display: flex;
+  align-items: center;
+  white-space: pre; }
+  .svg-pie-chart-hintbox .svg-pie-chart-hintbox-color {
+    width: 10px;
+    height: 10px;
+    margin-right: 10px; }
+
 .filter-container.tabfilter-container {
   padding: 0;
   border: 0 none;
@@ -4115,39 +4170,7 @@ form.dashboard-widget-piechart {
     color: #cacaca; }
 
 div.dashboard-widget-piechart {
-  position: relative;
-  overflow-x: hidden; }
-  div.dashboard-widget-piechart .svg-pie-chart .svg-pie-chart-total-value {
-    fill: #ffffff; }
-  div.dashboard-widget-piechart .svg-pie-chart .svg-pie-chart-no-data {
-    fill: #cacaca; }
-  div.dashboard-widget-piechart .pie-chart-legend {
-    position: absolute;
-    bottom: 4px;
-    left: 0;
-    box-sizing: border-box;
-    display: grid;
-    grid-template-columns: repeat(var(--columns, 4), auto);
-    grid-gap: 0 10px;
-    justify-content: start;
-    max-height: calc(var(--lines) * 18px);
-    margin: 0 10px;
-    overflow: hidden;
-    line-height: 18px; }
-    div.dashboard-widget-piechart .pie-chart-legend .pie-chart-legend-item {
-      min-width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap; }
-      div.dashboard-widget-piechart .pie-chart-legend .pie-chart-legend-item::before {
-        position: relative;
-        top: -3px;
-        content: ' ';
-        display: inline-block;
-        width: 10px;
-        height: 4px;
-        margin-right: 4px;
-        background: var(--color); }
+  overflow: hidden; }
 
 div.dashboard-widget-problemsbysv .by-severity-widget > div {
   min-width: 65px;

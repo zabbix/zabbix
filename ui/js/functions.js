@@ -800,11 +800,11 @@ function makeMessageBox(type, messages, title = null, show_close_box = true, sho
 }
 
 /**
- * Download svg graph as .png image.
+ * Download svg as .png image.
  *
  * @param {SVGElement} svg
- * @param {string}     legend_class
  * @param {string}     file_name
+ * @param {string}     legend_class
  */
 function downloadSvgImage(svg, file_name, legend_class = '') {
 	var $dom_node = jQuery(svg),
@@ -819,7 +819,7 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 		labels_height = labels.length ? labels.height() : 0,
 		context2d;
 
-	// Clone only svg graph styles.
+	// Clone only svg styles.
 	style.innerText = jQuery.map(document.styleSheets[0].cssRules, function (rule) {
 		return rule.selectorText && rule.selectorText.substr(0, 5) == '.svg-' ? rule.cssText : '';
 	}).join('');

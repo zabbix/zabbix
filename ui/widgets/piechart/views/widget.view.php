@@ -28,31 +28,6 @@
 
 $view = new CWidgetView($data);
 
-$svg_container = new CDiv();
-$svg_container->addClass('svg-pie-chart');
-
-if ($data['vars']['legend'] && $data['vars']['legend']['show']){
-	$legend_items = [];
-
-	foreach ($data['vars']['legend']['data'] as $sector) {
-		$legend_item = (new CDiv(new CSpan($sector['name'])))
-			->addClass('pie-chart-legend-item')
-			->setAttribute('style', '--color: ' . $sector['color']);
-		$legend_items[] = $legend_item;
-	}
-
-	$legend_container = (new CDiv($legend_items))
-		->addClass('pie-chart-legend')
-		->addStyle('--lines: ' . $data['vars']['legend']['lines'] . ';')
-		->addStyle('--columns: ' . $data['vars']['legend']['columns'] . ';');
-
-	$view->addItem($svg_container);
-	$view->addItem($legend_container);
-}
-else {
-	$view->addItem($svg_container);
-}
-
 if ($data['info'] !== null) {
 	$view->setVar('info', $data['info']);
 }

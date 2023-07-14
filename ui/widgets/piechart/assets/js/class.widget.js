@@ -28,7 +28,7 @@ class CWidgetPieChart extends CWidget {
 
 	onResize() {
 		if (this._state === WIDGET_STATE_ACTIVE && this.pie_chart !== null) {
-			this.pie_chart.setSize(super._getContentsSize());
+			this.pie_chart.setSize(this.getSize());
 		}
 	}
 
@@ -59,10 +59,16 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	setContents(response) {
-		this._body.innerHTML = response.body;
+		const value_data = {
+			sectors: response.sectors,
+			items: response.legend.data,
+			total_value: response.total_value
+		};
 
 		if (this.pie_chart !== null) {
-			this.pie_chart.setValue(response.sectors);
+			this.setLegend(response.legend);
+
+			this.pie_chart.setValue(value_data);
 
 			return;
 		}
@@ -72,9 +78,61 @@ class CWidgetPieChart extends CWidget {
 			horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
 		};
 
+		this.setLegend(response.legend);
+
 		this.pie_chart = new CSVGPie(this._body, padding, response.config);
-		this.pie_chart.setSize(super._getContentsSize());
-		this.pie_chart.setValue(response.sectors);
+		this.pie_chart.setSize(this.getSize());
+		this.pie_chart.setValue(value_data);
+	}
+
+	setLegend(legend) {
+		if (legend.show && legend.data.length > 0) {
+			let container = this._body.querySelector('.svg-pie-chart-legend');
+
+			if (container === null) {
+				container = document.createElement('div');
+				container.classList.add('svg-pie-chart-legend');
+				container.setAttribute('style', `--lines: ${legend.lines}`);
+				container.setAttribute('style', `--columns: ${legend.columns}`);
+
+				this._body.append(container);
+			}
+
+			container.innerHTML = '';
+
+			for (let i = 0; i < legend.data.length; i++) {
+				const item = document.createElement('div');
+				item.classList.add('svg-pie-chart-legend-item');
+				item.setAttribute('style', `--color: ${legend.data[i].color}`);
+
+				const name = document.createElement('span');
+				name.append(legend.data[i].name);
+
+				item.append(name);
+
+				container.append(item);
+			}
+		}
+	}
+
+	getSize() {
+		const size = super._getContentsSize();
+		console.log('size:', size);
+
+		const legend = this._body.querySelector('.svg-pie-chart-legend');
+
+		if (legend !== null) {
+			const box = legend.getBoundingClientRect();
+			const offset = 8;
+
+			size.contents_height -= box.height + offset;
+
+			if (size.contents_height < 0) {
+				size.contents_height = 0;
+			}
+		}
+
+		return size;
 	}
 
 	getActionsContextMenu({can_paste_widget}) {
@@ -107,7 +165,8 @@ class CWidgetPieChart extends CWidget {
 			label: t('Download image'),
 			disabled: this.pie_chart === null,
 			clickCallback: () => {
-				downloadSvgImage(this.pie_chart.getSVGElement(), 'image.png', '.pie-chart-legend');
+				downloadSvgImage(this.pie_chart.getSVGElement(), 'image.png',
+						'.svg-pie-chart-legend');
 			}
 		});
 

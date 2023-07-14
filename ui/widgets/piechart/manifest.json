@@ -9,6 +9,10 @@
 	"description": "Displays item values as a pie or doughnut chart.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/pie_chart",
 	"widget": {
+		"size": {
+			"width": 8,
+			"height": 5
+		},
 		"js_class": "CWidgetPieChart"
 	},
 	"actions": {
