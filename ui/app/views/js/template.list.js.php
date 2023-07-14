@@ -61,6 +61,21 @@
 			document.getElementById('js-create').addEventListener('click', (e) => {
 				this.#edit({groupids: JSON.parse(e.target.dataset.groupids)})
 			});
+
+			document.getElementById('js-import').addEventListener('click', () => {
+				const overlay = PopUp("popup.import", {
+					rules_preset: "template",
+					<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>: "<?=CCsrfTokenHelper::get('import') ?>"
+				}, {
+					dialogueid: "popup_import",
+					dialogue_class: "modal-popup-generic"
+				});
+
+				overlay.$dialogue[0].addEventListener('submit', (e) => {
+					console.log(e);
+					debugger;
+				})
+			});
 		}
 
 		#initFilter() {

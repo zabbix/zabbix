@@ -57,18 +57,7 @@ class CControllerTemplateList extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
-			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
-			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
-				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
-					continue;
-				}
-
-				$filter_tags['tags'][] = $filter_tag['tag'];
-				$filter_tags['values'][] = $filter_tag['value'];
-				$filter_tags['operators'][] = $filter_tag['operator'];
-			}
-
-			$this->updateProfiles($filter_tags);
+			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
@@ -156,7 +145,7 @@ class CControllerTemplateList extends CController {
 			'selectDashboards' => API_OUTPUT_COUNT,
 			'selectHttpTests' => API_OUTPUT_COUNT,
 			'selectTags' => ['tag', 'value'],
-			'templateids' => zbx_objectValues($templates, 'templateid'),
+			'templateids' => array_column($templates, 'templateid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
@@ -198,6 +187,10 @@ class CControllerTemplateList extends CController {
 			]);
 		}
 
+		if (!$filter['tags']) {
+			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+		}
+
 		$data = [
 			'action' => $this->getAction(),
 			'templates' => $templates,
@@ -229,7 +222,18 @@ class CControllerTemplateList extends CController {
 		$this->setResponse($response);
 	}
 
-	private function updateProfiles($filter_tags): void {
+	private function updateProfiles(): void {
+		$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+		foreach ($this->getInput('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+				continue;
+			}
+
+			$filter_tags['tags'][] = $filter_tag['tag'];
+			$filter_tags['values'][] = $filter_tag['value'];
+			$filter_tags['operators'][] = $filter_tag['operator'];
+		}
+
 		CProfile::update('web.templates.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
 		CProfile::update('web.templates.filter_vendor_name', $this->getInput('filter_vendor_name', ''),
 			PROFILE_TYPE_STR

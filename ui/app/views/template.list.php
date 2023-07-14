@@ -40,29 +40,14 @@ $html_page = (new CHtmlPage())
 				(new CSimpleButton(_('Create template')))
 					->setAttribute('data-groupids', json_encode(array_keys($data['filter']['groups'])))
 					->setId('js-create'))
-			->addItem(
-				(new CButton('form', _('Import')))
-					->onClick('return PopUp("popup.import", {
-						rules_preset: "template", "'.
-						CCsrfTokenHelper::CSRF_TOKEN_NAME.'": "'.CCsrfTokenHelper::get('import').'"
-					}, {
-						dialogueid: "popup_import",
-						dialogue_class: "modal-popup-generic"
-					});')
-					->removeId()
-			)
+			->addItem((new CSimpleButton(_('Import')))->setId('js-import'))
 	))->setAttribute('aria-label', _('Content controls')));
 
 $action_url = (new CUrl('zabbix.php'))->setArgument('action', $data['action']);
 
-$filter_tags = $data['filter']['tags'];
-if (!$filter_tags) {
-	$filter_tags = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
-}
-
 $filter_tags_table = CTagFilterFieldHelper::getTagFilterField([
 	'evaltype' => $data['filter']['evaltype'],
-	'tags' => $filter_tags
+	'tags' => $data['filter']['tags']
 ]);
 
 $filter = (new CFilter())
