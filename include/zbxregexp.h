@@ -23,6 +23,8 @@
 
 #define ZBX_REGEXP_NO_MATCH	0
 #define ZBX_REGEXP_MATCH	1
+#define ZBX_REGEXP_COMPILE_FAIL	-1
+#define ZBX_REGEXP_RUNTIME_FAIL	-2	/* a regexp compiled successfully but an error occurred during matching */
 
 typedef struct zbx_regexp zbx_regexp_t;
 
