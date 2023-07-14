@@ -1174,7 +1174,8 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 
 	if (FAIL == get_codepage(encoding, &codepage))
 	{
-		*error = zbx_strdup(NULL, "Failed to get codepage.");
+		*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Failed to get codepage.",
+				encoding);
 
 		return FAIL;
 	}
