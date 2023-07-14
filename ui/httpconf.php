@@ -287,9 +287,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$httpTest_fields = ['variables', 'headers'];
 
 		foreach ($httpTest_fields as $httpTest_field) {
-			sdii($httpTest_field);
 			foreach ($httpTest[$httpTest_field] as &$field) {
-				sdii($field);
 				$field['name'] = trim($field['name']);
 				$field['value'] = trim($field['value']);
 			}
