@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-07-06T08:29:39Z'
+  date: '2023-07-14T06:43:56Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -25,14 +25,14 @@ zabbix_export:
         - name: 'Templates/Network devices'
       items:
         - uuid: efc5456a02d04ade93cd54b145ebc24d
-          name: 'SD-WAN: Authorization item errors'
+          name: 'SD-WAN: Authentication item errors'
           type: DEPENDENT
           key: sd_wan.auth.errors
           delay: '0'
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering all the data item errors.'
+          description: 'Item for gathering all the data item errors.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -48,7 +48,7 @@ zabbix_export:
           triggers:
             - uuid: 9f98b660a10a4891910b0e3b42f90403
               expression: 'length(last(/Cisco SD-WAN by HTTP/sd_wan.auth.errors))>0'
-              name: 'SD-WAN: Authorization has failed'
+              name: 'SD-WAN: Authentication has failed'
               priority: AVERAGE
               tags:
                 - tag: scope
@@ -118,10 +118,10 @@ zabbix_export:
                 ['username', 'password', 'url'].forEach(function (field) {
                     var macro = '{$SDWAN.API.' + field.toUpperCase() + '}';
                     if (params[field] === macro || params[field] === '') {
-                        throw 'Please change ' + macro + ' macro with the proper value.';
+                        throw 'Please change ' + macro + ' macro to the proper value.';
                     }
                     if (typeof params[field] === 'undefined') {
-                        throw 'Please set \'' + field + '\' script input parameter with ' + macro + ' macro value.';
+                        throw 'Please set \'' + field + '\' script input parameter to ' + macro + ' macro value.';
                     }
                 });
             
@@ -151,8 +151,8 @@ zabbix_export:
             });
           description: |
             Cisco SD-WAN authentication with service account parameters and temporary-generated token usage.
-            Returns an authentication token and session id; is required only once, and is used for all the dependent script items.
-            A session will expire after 30 minutes of inactivity or after 24 hours which is the total lifesapn of a session.
+            Returns an authentication token and session id; it is required only once and is used for all dependent script items.
+            A session will expire after 30 minutes of inactivity or after 24 hours, which is the total lifespan of a session.
             Check the template documentation for the details.
             
           timeout: '{$SDWAN.DATA.TIMEOUT}'
@@ -176,7 +176,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering all devices from Cisco SD-WAN API.'
+          description: 'Item for gathering all devices from Cisco SD-WAN API.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -230,7 +230,7 @@ zabbix_export:
                       });
                   
                       if (url === '{' + '$SDWAN.API.URL}') {
-                          throw 'Please change {' + '$SDWAN.API.URL} macro with the proper value.';
+                          throw 'Please change {' + '$SDWAN.API.URL} macro to the proper value.';
                       }
                   
                       if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
@@ -294,7 +294,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering all the data item errors.'
+          description: 'Item for gathering all the data item errors.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -310,7 +310,7 @@ zabbix_export:
           triggers:
             - uuid: 9cfcfbb6b6264c19a831a71cc47483a9
               expression: 'length(last(/Cisco SD-WAN by HTTP/sd_wan.get.devices.errors))>0'
-              name: 'SD-WAN: There are errors in ''Get devices'' metric'
+              name: 'SD-WAN: There are errors in the ''Get devices'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -462,10 +462,10 @@ zabbix_export:
               macros:
                 - macro: '{$SDWAN.AUTH.SESSION}'
                   value: '{#COOKIE}'
-                  description: 'Cisco SD-WAN authorization session.'
+                  description: 'Cisco SD-WAN authentication session.'
                 - macro: '{$SDWAN.AUTH.TOKEN}'
                   value: '{#TOKEN}'
-                  description: 'Cisco SD-WAN authorization token.'
+                  description: 'Cisco SD-WAN authentication token.'
                 - macro: '{$SDWAN.DEVICE_ID}'
                   value: '{#ID}'
                   description: 'ID of the device.'
@@ -479,6 +479,7 @@ zabbix_export:
                   dns: internal.ip
                 - ip: '{#IP}'
                   dns: external.ip
+              inventory_mode: AUTOMATIC
           master_item:
             key: sd_wan.get.devices
           lld_macro_paths:
@@ -514,24 +515,24 @@ zabbix_export:
           type: SECRET_TEXT
           description: 'Cisco SD-WAN Monitor API password.'
         - macro: '{$SDWAN.API.URL}'
-          description: 'Cisco SD-WAN Monitor API URL. e.g cisco.sdwan.com/'
+          description: 'Cisco SD-WAN Monitor API URL.'
         - macro: '{$SDWAN.API.USERNAME}'
           type: SECRET_TEXT
           description: 'Cisco SD-WAN Monitor API username.'
         - macro: '{$SDWAN.AUTH.FREQUENCY}'
           value: 1h
-          description: 'The update interval for the Cisco SD-WAN Authorization item, which also equals to the access token regeneration request frequency. Check the template documentation notes carefully for more details.'
+          description: 'The update interval for the Cisco SD-WAN Authentication item, which also equals the access token regeneration request frequency. Check the template documentation notes carefully for more details.'
         - macro: '{$SDWAN.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
         - macro: '{$SDWAN.DEVICE.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in device discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.DEVICE.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in devices discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in device discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SDWAN.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
       dashboards:
         - uuid: 63a5053a13114e90b104d189bea96254
           name: 'SD-WAN: Overview'
@@ -644,6 +645,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The architecture of the operating system.'
+          inventory_link: OS_SHORT
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -663,7 +665,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'The validity status of device certificate.'
+          description: 'Validity status of the device certificate.'
           valuemap:
             name: 'Validity status'
           preprocessing:
@@ -797,7 +799,7 @@ zabbix_export:
           trends: 90d
           value_type: FLOAT
           units: '%'
-          description: 'The CPU utilization expressed in %.'
+          description: 'CPU utilization, expressed in %.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -890,6 +892,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The system host name.'
+          inventory_link: NAME
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -939,7 +942,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'The amount of physical memory (in bytes) used by kernel buffers.'
+          description: 'The amount of physical memory (in bytes) used by the kernel buffers.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -975,7 +978,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: B
-          description: 'The total memory expressed in bytes.'
+          description: 'Total memory, expressed in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1012,7 +1015,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//sd_wan.device.memory.used)/last(//sd_wan.device.memory.total)*100'
-          description: 'The calculated memory used percentage in %.'
+          description: 'Calculated percentage of the memory used, in %.'
           tags:
             - tag: component
               value: memory
@@ -1041,6 +1044,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The model name of the device.'
+          inventory_link: MODEL
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1059,6 +1063,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The device operating system.'
+          inventory_link: OS
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1172,6 +1177,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The device serial number.'
+          inventory_link: SERIALNO_A
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1199,7 +1205,7 @@ zabbix_export:
           delay: '0'
           history: 7d
           trends: 90d
-          description: 'The current state of the device.'
+          description: 'The device current state.'
           valuemap:
             name: 'Device state'
           preprocessing:
@@ -1229,7 +1235,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: CHAR
-          description: 'The description of the current state of the device.'
+          description: 'The description of the device current state.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1250,7 +1256,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           units: uptime
-          description: 'The system uptime is calculated by boottime.'
+          description: 'The system uptime is calculated on the basis of boot time.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1283,6 +1289,7 @@ zabbix_export:
           trends: '0'
           value_type: CHAR
           description: 'The version of the device software.'
+          inventory_link: SOFTWARE_FULL
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1339,10 +1346,10 @@ zabbix_export:
                     var macro = '{$SDWAN.' + field.toUpperCase() + '}';
                     var key = field.split('.').slice(-1);
                     if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro with the proper value.';
+                        throw 'Please change ' + macro + ' macro to the proper value.';
                     }
                     if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter with ' + macro + ' macro value.';
+                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
                     }
                 });
             
@@ -1392,7 +1399,7 @@ zabbix_export:
             device_info.error = error_msg;
             
             return JSON.stringify(device_info);
-          description: 'An item for gathering device data from Cisco SD-WAN API.'
+          description: 'Item for gathering device data from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
             - name: url
@@ -1416,7 +1423,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering errors of the device item.'
+          description: 'Item for gathering errors of the device item.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1432,7 +1439,7 @@ zabbix_export:
           triggers:
             - uuid: 7e9b6cee9ddd47428d01d1a8cadb28fc
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.device.errors))>0'
-              name: 'SD-WAN: There are errors in ''Get device data'' metric'
+              name: 'SD-WAN: There are errors in the ''Get device data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1481,10 +1488,10 @@ zabbix_export:
                     var macro = '{$SDWAN.' + field.toUpperCase() + '}';
                     var key = field.split('.').slice(-1);
                     if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro with the proper value.';
+                        throw 'Please change ' + macro + ' macro to the proper value.';
                     }
                     if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter with ' + macro + ' macro value.';
+                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
                     }
                 });
             
@@ -1543,7 +1550,7 @@ zabbix_export:
             result.error = error_msg;
             
             return JSON.stringify(result);
-          description: 'An item for gathering device interfaces from Cisco SD-WAN API.'
+          description: 'Item for gathering device interfaces from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
             - name: url
@@ -1567,7 +1574,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering errors of the device interfaces.'
+          description: 'Item for gathering errors of the device interfaces.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1583,7 +1590,7 @@ zabbix_export:
           triggers:
             - uuid: 03772a571b5c417297b11a612b48cb81
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.interfaces.errors))>0'
-              name: 'SD-WAN: There are errors in ''Get interfaces data'' metric'
+              name: 'SD-WAN: There are errors in the ''Get interfaces data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1639,10 +1646,10 @@ zabbix_export:
                     var macro = '{$SDWAN.' + field.toUpperCase() + '}';
                     var key = field.split('.').slice(-1);
                     if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro with the proper value.';
+                        throw 'Please change ' + macro + ' macro to the proper value.';
                     }
                     if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter with ' + macro + ' macro value.';
+                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
                     }
                 });
             
@@ -1666,7 +1673,7 @@ zabbix_export:
                         params.interval = Number(params.interval.replace('h',''));
                     }
                     catch (error) {
-                        throw 'Please change {' + '$SDWAN.ROUTES.INTERVAL} macro with the proper value.';
+                        throw 'Please change {' + '$SDWAN.ROUTES.INTERVAL} macro to the proper value.';
                     }
                 }
             
@@ -1744,7 +1751,7 @@ zabbix_export:
             result.error = error_msg;
             
             return JSON.stringify(result);
-          description: 'An item for gathering device routes from Cisco SD-WAN API.'
+          description: 'Item for gathering device routes from Cisco SD-WAN API.'
           timeout: '{$SDWAN.DATA.TIMEOUT}'
           parameters:
             - name: url
@@ -1770,7 +1777,7 @@ zabbix_export:
           history: 7d
           trends: '0'
           value_type: TEXT
-          description: 'An item for gathering errors of the device routes.'
+          description: 'Item for gathering errors of the device routes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1786,7 +1793,7 @@ zabbix_export:
           triggers:
             - uuid: edb75d50551643c999da9e93efd0ff1b
               expression: 'length(last(/Cisco SD-WAN device by HTTP/sd_wan.get.routes.errors))>0'
-              name: 'SD-WAN: There are errors in ''Get routes data'' metric'
+              name: 'SD-WAN: There are errors in the ''Get routes data'' metric'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1817,7 +1824,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'The available size of the storage pool in bytes.'
+              description: 'The available size of the storage pool, in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1846,7 +1853,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'An item for gathering data for the {#FSNAME} filesystem.'
+              description: 'Item for gathering data for the {#FSNAME} filesystem.'
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
@@ -1878,7 +1885,7 @@ zabbix_export:
               trends: 90d
               value_type: FLOAT
               units: '%'
-              description: 'The space utilization expressed in %.'
+              description: 'Space utilization, expressed in %.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1928,7 +1935,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'The size of the storage pool in bytes.'
+              description: 'The size of the storage pool, in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1957,7 +1964,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: B
-              description: 'The used size of the dataset in bytes.'
+              description: 'The used size of the dataset, in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2046,7 +2053,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The current admin status of the interface.'
+              description: 'Current admin status of the interface.'
               valuemap:
                 name: 'Admin status'
               preprocessing:
@@ -2080,7 +2087,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'An item for gathering data for the {#IFNAME} interface.'
+              description: 'Item for gathering data for the {#IFNAME} interface.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2100,7 +2107,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The number of inbound packets which were chosen to be discarded.'
+              description: 'The number of inbound packets that were chosen to be discarded.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2121,7 +2128,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The number of inbound packets which were contain errors.'
+              description: 'The number of inbound packets that were contain errors.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2143,7 +2150,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               value_type: FLOAT
-              description: 'The number of inbound IPv6 packets which were chosen to be discarded.'
+              description: 'The number of inbound IPv6 packets that were chosen to be discarded.'
               valuemap:
                 name: 'Not used'
               preprocessing:
@@ -2167,7 +2174,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               value_type: FLOAT
-              description: 'The number of inbound IPv4 packets which were contain errors.'
+              description: 'The number of inbound IPv4 packets that were contain errors.'
               valuemap:
                 name: 'Not used'
               preprocessing:
@@ -2218,7 +2225,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The number of outbound packets which were chosen to be discarded.'
+              description: 'The number of outbound packets that were chosen to be discarded.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2239,7 +2246,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The number of outbound packets which were contain errors.'
+              description: 'The number of outbound packets that were contain errors.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2261,7 +2268,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               value_type: FLOAT
-              description: 'The number of outbound IPv6 packets which were chosen to be discarded.'
+              description: 'The number of outbound IPv6 packets that were chosen to be discarded.'
               valuemap:
                 name: 'Not used'
               preprocessing:
@@ -2285,7 +2292,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               value_type: FLOAT
-              description: 'The number of outbound IPv6 packets which were contain errors.'
+              description: 'The number of outbound IPv6 packets that were contain errors.'
               valuemap:
                 name: 'Not used'
               preprocessing:
@@ -2337,7 +2344,7 @@ zabbix_export:
               history: 7d
               trends: 90d
               units: bps
-              description: 'The current bandwidth of the interface.'
+              description: 'Current bandwidth of the interface.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2359,7 +2366,7 @@ zabbix_export:
               delay: '0'
               history: 7d
               trends: 90d
-              description: 'The current operational status of the interface.'
+              description: 'Current operational status of the interface.'
               valuemap:
                 name: 'Operational status'
               preprocessing:
@@ -2396,11 +2403,11 @@ zabbix_export:
                   priority: AVERAGE
                   description: |
                     This trigger expression works as follows:
-                    1. It can be triggered if the operations status is down.
+                    1. It can be triggered if the operational status is down.
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
-                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, do not fire for the 'eternal off' interfaces.)
+                    3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, it does not fire for the 'eternal off' interfaces).
                     
-                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
+                    WARNING: If closed manually, it will not fire again on the next poll because of .diff.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2574,7 +2581,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: 5242a999e54a430da6d4eedcc5840fb1
-          name: 'Routes discovery'
+          name: 'Route discovery'
           type: DEPENDENT
           key: sd_wan.routes.discovery
           delay: '0'
@@ -2588,7 +2595,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'An item for gathering data for the route {#LOCAL} => {#REMOTE}.'
+              description: 'Item for gathering data for the route {#LOCAL} => {#REMOTE}.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2716,29 +2723,29 @@ zabbix_export:
       macros:
         - macro: '{$IFCONTROL}'
           value: '1'
-          description: 'Macro for operational state of the interface for link down trigger. Can be used with interface name as context.'
+          description: 'Macro for operational state of the interface for the link down trigger. Can be used with the interface name as context.'
         - macro: '{$SDWAN.API.URL}'
-          description: 'Cisco SD-WAN Monitor API URL. e.g cisco.sdwan.com/'
+          description: 'Cisco SD-WAN Monitor API URL.'
         - macro: '{$SDWAN.CPU.UTIL.CRIT}'
           value: '90'
-          description: 'The critical threshold of CPU utilization, expressed in %.'
+          description: 'Critical threshold of the CPU utilization, expressed in %.'
         - macro: '{$SDWAN.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for an API.'
         - macro: '{$SDWAN.FS.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'The critical threshold of the filesystem utilization. Can be used with filesystem name as context.'
+          description: 'Critical threshold of the filesystem utilization. Can be used with the filesystem name as context.'
         - macro: '{$SDWAN.FS.PUSED.MAX.WARN}'
           value: '80'
-          description: 'The warning threshold of the filesystem utilization. Can be used with filesystem name as context.'
+          description: 'Warning threshold of the filesystem utilization. Can be used with the filesystem name as context.'
         - macro: '{$SDWAN.HTTP_PROXY}'
-          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
+          description: 'HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http'
         - macro: '{$SDWAN.IF.ERRORS.WARN}'
           value: '2'
-          description: 'Threshold of error packets rate for warning trigger. Can be used with interface name as context.'
+          description: 'Threshold of the error packets rate for the warning trigger. Can be used with the interface name as context.'
         - macro: '{$SDWAN.IF.UTIL.MAX}'
           value: '90'
-          description: 'This macro is used as a threshold in interface utilization trigger. Can be used with interface name as context.'
+          description: 'This macro is used as a threshold in the interface utilization trigger. Can be used with the interface name as context.'
         - macro: '{$SDWAN.LA.PER.CPU.MAX.WARN}'
           value: '1.5'
           description: 'Load per CPU considered sustainable. Tune if needed.'
@@ -2756,16 +2763,16 @@ zabbix_export:
           description: 'Filter to exclude discoverable interfaces by name.'
         - macro: '{$SDWAN.MEMORY.AVAILABLE.MIN}'
           value: 100K
-          description: 'This macro is used as a threshold in memory available trigger.'
+          description: 'This macro is used as a threshold in the memory available trigger.'
         - macro: '{$SDWAN.MEMORY.UTIL.MAX}'
           value: '90'
-          description: 'The critical threshold of memory utilization, expressed in %.'
+          description: 'Critical threshold of the memory utilization, expressed in %.'
         - macro: '{$SDWAN.ROUTES.FREQUENCY}'
           value: 1h
-          description: 'The update interval for the Routes item expressed in hours.'
+          description: 'Update interval for the Routes item, expressed in hours.'
         - macro: '{$SDWAN.TOKEN}'
           type: SECRET_TEXT
-          description: 'Cisco SD-WAN Monitor API Token.'
+          description: 'Cisco SD-WAN Monitor API token.'
       dashboards:
         - uuid: 45ab5f4b9e9d445b9e774bbfa5cadafb
           name: 'SD-WAN: General'
@@ -3084,7 +3091,7 @@ zabbix_export:
       name: 'SD-WAN: Device state is not green'
       opdata: 'Current state: {ITEM.LASTVALUE1}, Reason: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-      description: 'The current device state is not green.'
+      description: 'The device current state is not green.'
       tags:
         - tag: scope
           value: availability
@@ -3108,7 +3115,7 @@ zabbix_export:
       event_name: 'SD-WAN: Load average is too high (per CPU load over {$SDWAN.LA.PER.CPU.MAX.WARN} for 5m)'
       opdata: 'Load averages(1m 5m 15m): ({ITEM.LASTVALUE1} {ITEM.LASTVALUE3} {ITEM.LASTVALUE4}), # of CPUs: {ITEM.LASTVALUE2}'
       priority: AVERAGE
-      description: 'The load average per CPU is too high. The system may be slow to respond.'
+      description: 'The load average per CPU is too high. The system might be slow to respond.'
       tags:
         - tag: scope
           value: performance
