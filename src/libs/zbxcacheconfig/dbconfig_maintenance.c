@@ -1046,9 +1046,6 @@ static void	dc_get_host_maintenance_updates(zbx_hashset_t *host_maintenances, zb
 	zbx_hashset_iter_reset(&config->hosts, &iter);
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		if (PROXY_MODE_ACTIVE == host->status || PROXY_MODE_PASSIVE == host->status)
-			continue;
-
 		if (NULL != (host_maintenance = zbx_hashset_search(host_maintenances, &host->hostid)))
 		{
 			maintenance_status = HOST_MAINTENANCE_STATUS_ON;
