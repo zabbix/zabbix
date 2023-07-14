@@ -259,15 +259,9 @@
 		}
 	}
 
+	.table-forms,
 	.table-forms-separator {
-		display: inline-flex;
-		line-height: 1.4;
-	}
-
-	.table-forms {
-		th {
-			line-height: $body-line-height;
-		}
+		line-height: $body-line-height;
 
 		td {
 			padding: 5px 5px 0 0;
@@ -282,5 +276,9 @@
 				padding-bottom: 0;
 			}
 		}
+	}
+
+	.table-forms-separator {
+		display: inline-flex;
 	}
 }

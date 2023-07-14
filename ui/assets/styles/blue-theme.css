@@ -1155,17 +1155,20 @@ footer {
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
     grid-column-start: initial;
     grid-column-end: span 1; }
+  .form-grid .table-forms,
   .form-grid .table-forms-separator {
-    display: inline-flex;
-    line-height: 1.4; }
-  .form-grid .table-forms th {
     line-height: 1.4em; }
-  .form-grid .table-forms td {
-    padding: 5px 5px 0 0; }
-    .form-grid .table-forms td:last-child {
-      padding-right: 0; }
-  .form-grid .table-forms tfoot td {
-    padding-bottom: 0; }
+    .form-grid .table-forms td,
+    .form-grid .table-forms-separator td {
+      padding: 5px 5px 0 0; }
+      .form-grid .table-forms td:last-child,
+      .form-grid .table-forms-separator td:last-child {
+        padding-right: 0; }
+    .form-grid .table-forms tfoot td,
+    .form-grid .table-forms-separator tfoot td {
+      padding-bottom: 0; }
+  .form-grid .table-forms-separator {
+    display: inline-flex; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
