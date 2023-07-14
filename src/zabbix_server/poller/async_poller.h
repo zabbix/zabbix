@@ -17,14 +17,38 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_ZABBIX_USERS_H_
-#define ZABBIX_ZABBIX_USERS_H_
+#ifndef ZABBIX_ASYNC_POLLER_H
+#define ZABBIX_ASYNC_POLLER_H
 
-#include "zbxcommon.h"
+#include "zbxalgo.h"
+#include "zbxthreads.h"
+ZBX_VECTOR_DECL(int32, int)
 
-int	check_perm2system(zbx_uint64_t userid);
-char	*get_user_timezone(zbx_uint64_t userid);
-int	zbx_check_user_administration_actions_permissions(const zbx_user_t *user, const char *role_rule_default,
-		const char *role_rule);
+typedef struct
+{
+	const zbx_thread_info_t	*info;
+	int			state;
+	unsigned char		poller_type;
+	int			processed;
+	int			queued;
+	int			processing;
+	int			config_unavailable_delay;
+	int			config_unreachable_delay;
+	int			config_unreachable_period;
+	int			config_max_concurrent_checks_per_poller;
+	int			config_timeout;
+	const char		*config_source_ip;
+	struct event		*async_check_items_timer;
+	zbx_vector_uint64_t	itemids;
+	zbx_vector_int32_t	errcodes;
+	zbx_vector_int32_t	lastclocks;
+	struct event_base	*base;
+	zbx_hashset_t		interfaces;
+#ifdef HAVE_LIBCURL
+	CURLM			*curl_handle;
+#endif
+}
+zbx_poller_config_t;
 
-#endif /* ZABBIX_ZABBIX_USERS_H_ */
+
+#endif
