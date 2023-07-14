@@ -32,7 +32,7 @@ class CProxy extends CApiService {
 	];
 
 	protected $tableName = 'proxy';
-	protected $tableAlias = 'h';
+	protected $tableAlias = 'p';
 	protected $sortColumns = ['proxyid', 'name', 'mode'];
 
 	/**
@@ -125,7 +125,7 @@ class CProxy extends CApiService {
 			$options['filter'] = [];
 		}
 
-		$this->dbFilter('proxy h', $options, $sql_parts);
+		$this->dbFilter('proxy p', $options, $sql_parts);
 
 		$rt_filter = [];
 		foreach (['lastaccess', 'version', 'compatibility'] as $field) {
@@ -135,12 +135,12 @@ class CProxy extends CApiService {
 		}
 
 		if ($rt_filter) {
-			$this->dbFilter('proxy_rtdata hr', ['filter' => $rt_filter] + $options, $sql_parts);
+			$this->dbFilter('proxy_rtdata pr', ['filter' => $rt_filter] + $options, $sql_parts);
 		}
 
 		// search
 		if ($options['search'] !== null) {
-			zbx_db_search('proxy h', $options, $sql_parts);
+			zbx_db_search('proxy p', $options, $sql_parts);
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
@@ -418,7 +418,7 @@ class CProxy extends CApiService {
 			$host_rtdata = false;
 			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
 				if ($this->outputIsRequested($field, $options['output'])) {
-					$sqlParts = $this->addQuerySelect('hr.'.$field, $sqlParts);
+					$sqlParts = $this->addQuerySelect('pr.'.$field, $sqlParts);
 					$host_rtdata = true;
 				}
 
@@ -428,7 +428,7 @@ class CProxy extends CApiService {
 			}
 
 			if ($host_rtdata) {
-				$sqlParts['left_join'][] = ['alias' => 'hr', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
+				$sqlParts['left_join'][] = ['alias' => 'pr', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
 		}
