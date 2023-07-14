@@ -786,13 +786,13 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						]
 					],
 					'item_data' => [
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => '1682929772']
+						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('Now')]
 					]
 				]
 			],
@@ -801,25 +801,25 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 11:31:32',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain ⓣⓔⓧⓣ'
+							'Value' => 'Zabbix plain text'
 						],
 						[
-							'Timestamp' => '2023-05-01 11:30:32',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 minute')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text2'
 						],
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 minutes')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
-							'Value' => 'Zabbix plain text'
+							'Value' => 'Zabbix plain ⓣⓔⓧⓣ'
 						]
 					],
 					'item_data' => [
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => '1682929772'],
-						['itemid' => '42227', 'values' => 'Zabbix plain text2', 'time' => '1682929832'],
-						['itemid' => '42227', 'values' => 'Zabbix plain ⓣⓔⓧⓣ', 'time' => '1682929892']
+						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => 'Zabbix plain text2', 'time' => strtotime('-1 minute')],
+						['itemid' => '42227', 'values' => 'Zabbix plain ⓣⓔⓧⓣ', 'time' => strtotime('-2 minutes')]
 					]
 				]
 			],
@@ -828,37 +828,37 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '1970-01-01 03:02:01',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 03:01:01',
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '8.44 GB' // value rounding is expected.
-						],
-						[
-							'Timestamp' => '1970-01-01 03:01:01',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-30 seconds')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 03:00:01',
-							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
-							'Value' => '7.51 GB' // value rounding is expected.
-						],
-						[
-							'Timestamp' => '1970-01-01 03:00:01',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 minute')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '72.0618 %' // value rounding is expected.
+						],
+						[
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
+							'Value' => '8.44 GB' // value rounding is expected.
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
+							'Value' => '7.51 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
-						['itemid' => '42243', 'values' => '8061078528', 'time' => '1'],
-						['itemid' => '42243', 'values' => '9061078528', 'time' => '61'],
-						['itemid' => '42243', 'values' => '10061078528', 'time' => '121'],
-						['itemid' => '42244', 'values' => '72.061797', 'time' => '1'],
-						['itemid' => '42244', 'values' => '82.061797', 'time' => '61']
+						['itemid' => '42243', 'values' => '8061078528', 'time' => strtotime('-2 hours')],
+						['itemid' => '42243', 'values' => '9061078528', 'time' => strtotime('-1 hour')],
+						['itemid' => '42243', 'values' => '10061078528', 'time' => strtotime('now')],
+						['itemid' => '42244', 'values' => '72.061797', 'time' => strtotime('-1 minute')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-30 seconds')]
 					]
 				]
 			],
@@ -867,26 +867,26 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '1970-01-01 03:02:01',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						],
 						[
-							'Timestamp' => '1970-01-01 03:01:01',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('yesterday')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '8.44 GB' // value rounding is expected.
 						]
 					],
 					'displayed_lines' => [
 						[
-							'Timestamp' => '1970-01-01 03:02:01',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('today + 9 hours')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory',
 							'Value' => '9.37 GB' // value rounding is expected.
 						]
 					],
 					'item_data' => [
-						['itemid' => '42243', 'values' => '9061078528', 'time' => '61'],
-						['itemid' => '42243', 'values' => '10061078528', 'time' => '121']
+						['itemid' => '42243', 'values' => '10061078528', 'time' => strtotime('today + 9 hours')],
+						['itemid' => '42243', 'values' => '9061078528', 'time' => strtotime('yesterday')]
 					]
 				]
 			],
@@ -896,29 +896,29 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'html_text' => true,
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_128
 						],
 						[
-							'Timestamp' => '1970-01-01 03:00:01',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						]
 					],
 					'expected_top' => [
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
 						],
 						[
-							'Timestamp' => '1970-01-01 03:00:01',
+							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Saturday + 3 hours 5 minutes')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_255
 						]
 					],
 					'item_data' => [
-						['itemid' => '42227', 'values' => STRING_128, 'time' => '1682929772'],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => '1']
+						['itemid' => '42227', 'values' => STRING_128, 'time' => strtotime('last Sunday + 7 hours 7 minutes 7 seconds')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('last Saturday + 3 hours 5 minutes')]
 					]
 				]
 			],
@@ -927,47 +927,46 @@ class testDashboardPlainTextWidget extends CWebTest {
 				[
 					'expected' => [
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						],
 						[
-							'Timestamp' => '1970-01-01 03:00:01',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => '1970-01-01 02:59:59',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						]
 					],
 					'expected_host_data' => [
 						[
-							'Timestamp' => '2023-05-01 11:29:32',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
 						],
 						[
-							'Timestamp' => '1970-01-01 03:00:01',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
 							'Name' => 'Linux: Host name of Zabbix agent running',
 							'Value' => STRING_255
 						],
 						[
-							'Timestamp' => '1970-01-01 02:59:59',
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 month')),
 							'Name' => 'Linux: Available memory in %',
 							'Value' => '82.0618 %' // value rounding is expected.
 						]
 					],
 					'item_data' => [
-						['itemid' => '42244', 'values' => '82.061797', 'time' => '-1'],
-						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => '1682929772'],
-						['itemid' => '42227', 'values' => STRING_255, 'time' => '1']
+						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('now')],
+						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
+						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
 					]
 				]
 			]
 		];
-
 	}
 
 	/**
