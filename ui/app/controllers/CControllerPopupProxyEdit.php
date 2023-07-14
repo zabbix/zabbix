@@ -89,7 +89,7 @@ class CControllerPopupProxyEdit extends CController {
 				'form' => [
 					'host' => $this->proxy['host'],
 					'status' => (int) $this->proxy['status'],
-					'interface' => $this->proxy['status'] == HOST_STATUS_PROXY_PASSIVE
+					'interface' => $this->proxy['status'] == PROXY_MODE_PASSIVE
 						? [
 							'dns' => $this->proxy['interface']['dns'],
 							'ip' => $this->proxy['interface']['ip'],
@@ -113,7 +113,7 @@ class CControllerPopupProxyEdit extends CController {
 				'proxyid' => null,
 				'form' => [
 					'host' => '',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'interface' => $default_interface,
 					'proxy_address' => '',
 					'description' => '',

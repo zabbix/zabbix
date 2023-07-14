@@ -65,11 +65,11 @@ class testProxy extends CAPITest {
 		$proxies = [
 			'get_active_defaults' => [
 				'host' => 'API test proxy.get - active',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'get_passive_defaults' => [
 				'host' => 'API test proxy.get - passive',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
@@ -79,27 +79,27 @@ class testProxy extends CAPITest {
 			],
 			'get_version_undefined' => [
 				'host' => 'API test proxy.get for filter - version undefined',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'get_version_current' => [
 				'host' => 'API test proxy.get for filter - version current',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'get_version_outdated' => [
 				'host' => 'API test proxy.get for filter - version outdated',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'get_version_unsupported' => [
 				'host' => 'API test proxy.get for filter - version unsupported',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'update_active_defaults' => [
 				'host' => 'API test proxy.update - active defaults',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'update_passive_defaults' => [
 				'host' => 'API test proxy.update - passive defaults',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
@@ -109,26 +109,26 @@ class testProxy extends CAPITest {
 			],
 			'update_active_psk' => [
 				'host' => 'API test proxy.update - active with PSK-based connections from proxy',
-				'status' => HOST_STATUS_PROXY_ACTIVE,
+				'status' => PROXY_MODE_ACTIVE,
 				'tls_accept' => HOST_ENCRYPTION_PSK,
 				'tls_psk_identity' => 'Test PSK',
 				'tls_psk' => '9b8eafedfaae00cece62e85d5f4792c7d9c9bcc851b23216a1d300311cc4f7cb'
 			],
 			'update_active_cert' => [
 				'host' => 'API test proxy.update - active with certificate-based connections from proxy',
-				'status' => HOST_STATUS_PROXY_ACTIVE,
+				'status' => PROXY_MODE_ACTIVE,
 				'tls_accept' => HOST_ENCRYPTION_CERTIFICATE
 			],
 			'update_active_any' => [
 				'host' => 'API test proxy.update - active with any connections from proxy',
-				'status' => HOST_STATUS_PROXY_ACTIVE,
+				'status' => PROXY_MODE_ACTIVE,
 				'tls_accept' => HOST_ENCRYPTION_NONE + HOST_ENCRYPTION_PSK + HOST_ENCRYPTION_CERTIFICATE,
 				'tls_psk_identity' => 'Test PSK',
 				'tls_psk' => '9b8eafedfaae00cece62e85d5f4792c7d9c9bcc851b23216a1d300311cc4f7cb'
 			],
 			'update_passive_dns' => [
 				'host' => 'API test proxy.update - passive with DNS name',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_DNS,
 					'ip' => '127.0.0.1',
@@ -138,7 +138,7 @@ class testProxy extends CAPITest {
 			],
 			'update_passive_ip' => [
 				'host' => 'API test proxy.update - passive with IP address',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
@@ -148,7 +148,7 @@ class testProxy extends CAPITest {
 			],
 			'update_passive_psk' => [
 				'host' => 'API test proxy.update - passive with PSK-based connections to proxy',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
@@ -159,7 +159,7 @@ class testProxy extends CAPITest {
 			],
 			'update_passive_cert' => [
 				'host' => 'API test proxy.update - passive with certificate-based connections to proxy',
-				'status' => HOST_STATUS_PROXY_PASSIVE,
+				'status' => PROXY_MODE_PASSIVE,
 				'interface' => [
 					'useip' => INTERFACE_USE_IP,
 					'ip' => '127.0.0.1',
@@ -170,31 +170,31 @@ class testProxy extends CAPITest {
 			],
 			'update_hosts' => [
 				'host' => 'API test proxy.update - hosts',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_single' => [
 				'host' => 'API test proxy.delete - single',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_multiple_1' => [
 				'host' => 'API test proxy.delete - multiple 1',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_multiple_2' => [
 				'host' => 'API test proxy.delete - multiple 2',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_used_in_host' => [
 				'host' => 'API test proxy.delete - used in hosts',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_used_in_action' => [
 				'host' => 'API test proxy.delete - used in actions',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			],
 			'delete_used_in_discovery' => [
 				'host' => 'API test proxy.delete - used in discovery rules',
-				'status' => HOST_STATUS_PROXY_ACTIVE
+				'status' => PROXY_MODE_ACTIVE
 			]
 		];
 		$db_proxies = CDataHelper::call('proxy.create', array_values($proxies));
@@ -402,11 +402,11 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					[
 						'host' => 'API create proxy',
-						'status' => HOST_STATUS_PROXY_ACTIVE
+						'status' => PROXY_MODE_ACTIVE
 					],
 					[
 						'host' => 'API create proxy',
-						'status' => HOST_STATUS_PROXY_PASSIVE
+						'status' => PROXY_MODE_PASSIVE
 					]
 				],
 				'expected_error' => 'Invalid parameter "/2": value (host)=(API create proxy) already exists.'
@@ -414,7 +414,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "host" (duplicate)' => [
 				'proxy' => [
 					'host' => 'API test proxy.get - active',
-					'status' => HOST_STATUS_PROXY_ACTIVE
+					'status' => PROXY_MODE_ACTIVE
 				],
 				'expected_error' => 'Proxy "API test proxy.get - active" already exists.'
 			],
@@ -439,14 +439,14 @@ class testProxy extends CAPITest {
 					'status' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
-					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
+					implode(', ', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]).'.'
 			],
 
 			// Check "description".
 			'Test proxy.create: invalid "description" (bool)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'description' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/description": a character string is expected.'
@@ -454,7 +454,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "description" (too long)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'description' => str_repeat('d', DB::getFieldLength('hosts', 'description') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/description": value is too long.'
@@ -464,7 +464,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "proxy_address" (bool)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'proxy_address' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/proxy_address": a character string is expected.'
@@ -472,7 +472,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "proxy_address" (IP address range)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'proxy_address' => '192.168.0-255.0/30'
 				],
 				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "192.168.0-255.0/30".'
@@ -480,7 +480,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "proxy_address" (IPv6 address range)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'proxy_address' => '::ff-0ffff'
 				],
 				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "::ff-0ffff".'
@@ -488,7 +488,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "proxy_address" (user macro)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'proxy_address' => '{$MACRO}'
 				],
 				'expected_error' => 'Invalid parameter "/1/proxy_address": invalid address range "{$MACRO}".'
@@ -496,7 +496,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "proxy_address" (too long)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'proxy_address' => str_repeat('a', DB::getFieldLength('hosts', 'proxy_address') + 1)
 				],
 				'expected_error' => 'Invalid parameter "/1/proxy_address": value is too long.'
@@ -506,7 +506,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "hosts" (string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/hosts": an array is expected.'
@@ -514,7 +514,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "hosts" (array with string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => ['abc']
 				],
 				'expected_error' => 'Invalid parameter "/1/hosts/1": an array is expected.'
@@ -522,7 +522,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: missing "hostid" for "hosts"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => [
 						[]
 					]
@@ -532,7 +532,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: unexpected parameter for "hosts"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => [
 						['abc' => '']
 					]
@@ -542,7 +542,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "hostid" (empty string) for "hosts"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => [
 						['hostid' => '']
 					]
@@ -552,7 +552,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "hostid" (non-existent) for "hosts"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => [
 						['hostid' => self::INVALID_NUMBER]
 					]
@@ -562,7 +562,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "hostid" (duplicate) for "hosts"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'hosts' => [
 						['hostid' => 0],
 						['hostid' => 0]
@@ -575,7 +575,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "interface" (string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'interface' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/interface": an array is expected.'
@@ -583,7 +583,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: unexpected parameter for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'abc' => ''
 					]
@@ -593,7 +593,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "useip" (string) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'useip' => 'abc'
 					]
@@ -603,7 +603,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "useip" (not in range) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'useip' => self::INVALID_NUMBER
 					]
@@ -614,7 +614,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "ip" (string) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'ip' => 'abc'
 					]
@@ -624,7 +624,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "ip" (too long) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'ip' => str_repeat('i', DB::getFieldLength('interface', 'ip') + 1)
 					]
@@ -634,7 +634,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "dns" (bool) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'dns' => false
 					]
@@ -644,7 +644,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "dns" (too long) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'dns' => str_repeat('d', DB::getFieldLength('interface', 'dns') + 1)
 					]
@@ -654,7 +654,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "port" (string) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'port' => 'abc'
 					]
@@ -664,7 +664,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "port" (not in range) for "interface"' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'interface' => [
 						'port' => self::INVALID_NUMBER
 					]
@@ -675,7 +675,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "interface" (not empty)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'interface' => [
 						'port' => 12345
 					]
@@ -688,7 +688,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_connect" (string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_connect' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_connect": an integer is expected.'
@@ -696,7 +696,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_connect" (not in range) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_connect' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be '.HOST_ENCRYPTION_NONE.'.'
@@ -704,7 +704,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_connect" (not in range) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_connect": value must be one of '.
@@ -715,7 +715,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_accept" (string)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_accept": an integer is expected.'
@@ -723,7 +723,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_accept" (not in range) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be one of '.HOST_ENCRYPTION_NONE.'-'.
@@ -732,7 +732,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_accept" (not in range) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_accept' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_accept": value must be '.HOST_ENCRYPTION_NONE.'.'
@@ -742,7 +742,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (bool)' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_psk_identity' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": a character string is expected.'
@@ -750,7 +750,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for active proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_psk_identity' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
@@ -758,7 +758,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for active proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_NONE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -767,7 +767,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for active proxy #3' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -776,7 +776,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for passive proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_psk_identity' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk_identity": value must be empty.'
@@ -784,7 +784,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for passive proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -793,7 +793,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (string) for passive proxy #3' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk_identity' => 'abc'
 				],
@@ -802,7 +802,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (empty string) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => ''
 				],
@@ -811,7 +811,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (empty string) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => ''
 				],
@@ -820,7 +820,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (too long) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('hosts', 'tls_psk_identity') + 1)
 				],
@@ -829,7 +829,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk_identity" (too long) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk_identity' => str_repeat('i', DB::getFieldLength('hosts', 'tls_psk_identity') + 1)
 				],
@@ -840,7 +840,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (bool) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_psk' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": a character string is expected.'
@@ -848,7 +848,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for active proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_psk' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
@@ -856,7 +856,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for active proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_NONE,
 					'tls_psk' => 'abc'
 				],
@@ -865,7 +865,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for active proxy #3' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk' => 'abc'
 				],
@@ -874,7 +874,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for passive proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_psk' => 'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_psk": value must be empty.'
@@ -882,7 +882,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for passive proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_psk' => 'abc'
 				],
@@ -891,7 +891,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (string) for passive proxy #3' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_psk' => 'abc'
 				],
@@ -900,7 +900,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (too short) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => 'abc'
 				],
@@ -910,7 +910,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (too short) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => 'abc'
 				],
@@ -920,7 +920,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (not PSK) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => str_repeat('a', 33)
 				],
@@ -930,7 +930,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_psk" (not PSK) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_psk' => str_repeat('a', 33)
 				],
@@ -942,7 +942,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (bool) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_issuer' => false
 				],
 				'expected_error' => 'Invalid parameter "/1/tls_issuer": a character string is expected.'
@@ -950,7 +950,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (not empty) for active proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_NONE,
 					'tls_issuer' => 'abc'
 				],
@@ -959,7 +959,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (not empty) for active proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_issuer' => 'abc'
 				],
@@ -968,7 +968,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (not empty) for passive proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_issuer' => 'abc'
 				],
@@ -977,7 +977,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (not empty) for passive proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_issuer' => 'abc'
 				],
@@ -986,7 +986,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (too long) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_issuer' => str_repeat('i', DB::getFieldLength('hosts', 'tls_issuer') + 1)
 				],
@@ -995,7 +995,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_issuer" (too long) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_issuer' => str_repeat('i', DB::getFieldLength('hosts', 'tls_issuer') + 1)
 				],
@@ -1006,7 +1006,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (not empty) for active proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_NONE,
 					'tls_subject' => 'abc'
 				],
@@ -1015,7 +1015,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (not empty) for active proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_PSK,
 					'tls_subject' => 'abc'
 				],
@@ -1024,7 +1024,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (not empty) for passive proxy #1' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_subject' => 'abc'
 				],
@@ -1033,7 +1033,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (not empty) for passive proxy #2' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_PSK,
 					'tls_subject' => 'abc'
 				],
@@ -1042,7 +1042,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (too long) for active proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE,
+					'status' => PROXY_MODE_ACTIVE,
 					'tls_accept' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_subject' => str_repeat('i', DB::getFieldLength('hosts', 'tls_subject') + 1)
 				],
@@ -1051,7 +1051,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: invalid "tls_subject" (too long) for passive proxy' => [
 				'proxy' => [
 					'host' => 'API create proxy',
-					'status' => HOST_STATUS_PROXY_PASSIVE,
+					'status' => PROXY_MODE_PASSIVE,
 					'tls_connect' => HOST_ENCRYPTION_CERTIFICATE,
 					'tls_subject' => str_repeat('i', DB::getFieldLength('hosts', 'tls_subject') + 1)
 				],
@@ -1070,7 +1070,7 @@ class testProxy extends CAPITest {
 			'Test proxy.create: single proxy' => [
 				'proxy' => [
 					'host' => 'API create single proxy',
-					'status' => HOST_STATUS_PROXY_ACTIVE
+					'status' => PROXY_MODE_ACTIVE
 				],
 				'expected_error' => null
 			],
@@ -1078,11 +1078,11 @@ class testProxy extends CAPITest {
 				'proxy' => [
 					[
 						'host' => 'API create first proxy',
-						'status' => HOST_STATUS_PROXY_ACTIVE
+						'status' => PROXY_MODE_ACTIVE
 					],
 					[
 						'host' => 'API create second proxy',
-						'status' => HOST_STATUS_PROXY_ACTIVE
+						'status' => PROXY_MODE_ACTIVE
 					]
 				],
 				'expected_error' => null
@@ -1103,7 +1103,7 @@ class testProxy extends CAPITest {
 		}
 
 		$sql_proxies = 'SELECT NULL FROM hosts h WHERE '.dbConditionInt('h.status', [
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE
+			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
 		]);
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 
@@ -1439,7 +1439,7 @@ class testProxy extends CAPITest {
 					'output' => ['host', 'status'],
 					'proxyids' => ['get_active_defaults', 'get_passive_defaults'],
 					'filter' => [
-						'status' => HOST_STATUS_PROXY_ACTIVE
+						'status' => PROXY_MODE_ACTIVE
 					]
 				],
 				'expected_result' => [
@@ -1660,7 +1660,7 @@ class testProxy extends CAPITest {
 					'status' => self::INVALID_NUMBER
 				],
 				'expected_error' => 'Invalid parameter "/1/status": value must be one of '.
-					implode(', ', [HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE]).'.'
+					implode(', ', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]).'.'
 			],
 
 			// Check "host".
@@ -2103,7 +2103,7 @@ class testProxy extends CAPITest {
 		unset($proxy);
 
 		$sql_proxies = 'SELECT NULL FROM hosts h WHERE '.dbConditionInt('h.status', [
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE
+			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
 		]);
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 
@@ -2262,7 +2262,7 @@ class testProxy extends CAPITest {
 		unset($proxyid);
 
 		$sql_proxies = 'SELECT NULL FROM hosts h WHERE '.dbConditionInt('h.status', [
-			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE
+			PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE
 		]);
 		$old_hash_proxies = CDBHelper::getHash($sql_proxies);
 

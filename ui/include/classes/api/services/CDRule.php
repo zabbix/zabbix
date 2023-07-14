@@ -194,7 +194,7 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$proxy_hostids = [];
+		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
@@ -253,15 +253,15 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxy_hostid', $drule)) {
-				if (!zbx_is_int($drule['proxy_hostid'])) {
+			if (array_key_exists('proxyid', $drule)) {
+				if (!zbx_is_int($drule['proxyid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
 					);
 				}
 
-				if ($drule['proxy_hostid'] > 0) {
-					$proxy_hostids[] = $drule['proxy_hostid'];
+				if ($drule['proxyid'] > 0) {
+					$proxyids[] = $drule['proxyid'];
 				}
 			}
 
@@ -295,16 +295,16 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		if ($proxy_hostids) {
+		if ($proxyids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxy_hostids,
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
-			foreach ($proxy_hostids as $proxy_hostid) {
-				if (!array_key_exists($proxy_hostid, $db_proxies)) {
+			foreach ($proxyids as $proxyid) {
+				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
 					);
 				}
 			}
@@ -342,7 +342,7 @@ class CDRule extends CApiService {
 		]);
 
 		$drule_names_changed = [];
-		$proxy_hostids = [];
+		$proxyids = [];
 
 		$ip_range_parser = new CIPRangeParser(['v6' => ZBX_HAVE_IPV6, 'dns' => false, 'max_ipv4_cidr' => 30]);
 
@@ -410,15 +410,15 @@ class CDRule extends CApiService {
 				);
 			}
 
-			if (array_key_exists('proxy_hostid', $drule)) {
-				if (!zbx_is_int($drule['proxy_hostid'])) {
+			if (array_key_exists('proxyid', $drule)) {
+				if (!zbx_is_int($drule['proxyid'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxy_hostid'], 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $drule['proxyid'], 'proxyid')
 					);
 				}
 
-				if ($drule['proxy_hostid'] > 0) {
-					$proxy_hostids[] = $drule['proxy_hostid'];
+				if ($drule['proxyid'] > 0) {
+					$proxyids[] = $drule['proxyid'];
 				}
 			}
 
@@ -456,16 +456,16 @@ class CDRule extends CApiService {
 		}
 
 		// Check proxy IDs.
-		if ($proxy_hostids) {
+		if ($proxyids) {
 			$db_proxies = API::proxy()->get([
 				'output' => ['proxyid'],
-				'proxyids' => $proxy_hostids,
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
-			foreach ($proxy_hostids as $proxy_hostid) {
-				if (!array_key_exists($proxy_hostid, $db_proxies)) {
+			foreach ($proxyids as $proxyid) {
+				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect value "%1$s" for "%2$s" field.', $proxy_hostid, 'proxy_hostid')
+						_s('Incorrect value "%1$s" for "%2$s" field.', $proxyid, 'proxyid')
 					);
 				}
 			}
@@ -690,7 +690,7 @@ class CDRule extends CApiService {
 	 *
 	 * @param array(
 	 *  name => string,
-	 *  proxy_hostid => int,
+	 *  proxyid => int,
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
@@ -744,7 +744,7 @@ class CDRule extends CApiService {
 	 * @param array(
 	 * 	druleid => int,
 	 *  name => string,
-	 *  proxy_hostid => int,
+	 *  proxyid => int,
 	 *  iprange => string,
 	 *  delay => string,
 	 *  status => int,
@@ -775,7 +775,7 @@ class CDRule extends CApiService {
 		$this->validateUpdate($drules);
 
 		$db_drules = API::DRule()->get([
-			'output' => ['druleid', 'proxy_hostid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
+			'output' => ['druleid', 'proxyid', 'name', 'iprange', 'delay', 'status', 'concurrency_max'],
 			'selectDChecks' => ['dcheckid', 'druleid', 'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname',
 				'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol',
 				'snmpv3_privprotocol', 'snmpv3_contextname', 'host_source', 'name_source', 'allow_redirect'

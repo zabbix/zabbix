@@ -65,8 +65,8 @@ $proxy_tab = (new CFormGrid())
 		new CLabel(_('Proxy mode'), 'status'),
 		new CFormField(
 			(new CRadioButtonList('status', $data['form']['status']))
-				->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-				->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+				->addValue(_('Active'), PROXY_MODE_ACTIVE)
+				->addValue(_('Passive'), PROXY_MODE_PASSIVE)
 				->setModern(true)
 		)
 	])

@@ -1070,7 +1070,7 @@ class testProxyConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.create', [
 			'host' => 'Proxy',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'status' => PROXY_MODE_PASSIVE,
 			'hosts' => [],
 			'interface' => [
 				"ip" => "127.0.0.1",

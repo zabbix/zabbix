@@ -1456,7 +1456,7 @@ class testInitialConfSync extends CIntegrationTest
 	{
 		$response = $this->call('proxy.create', [
 			'host' => 'ProxyA',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'status' => PROXY_MODE_ACTIVE,
 			'hosts' => []
 		]);
 		$this->assertArrayHasKey("proxyids", $response['result']);
@@ -1464,7 +1464,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$response = $this->call('proxy.create', [
 			'host' => 'ProxyP',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'status' => PROXY_MODE_PASSIVE,
 			'hosts' => [],
 			'interface' => [
 				"ip" => "127.0.0.1",

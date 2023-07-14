@@ -241,7 +241,7 @@ class testActiveAvailability extends CIntegrationTest {
 	public function testActiveAvailability_activeProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
 			'host' => 'active proxy',
-			'status' => HOST_STATUS_PROXY_ACTIVE,
+			'status' => PROXY_MODE_ACTIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid
@@ -288,7 +288,7 @@ class testActiveAvailability extends CIntegrationTest {
 	public function testActiveAvailability_passiveProxyActiveAvailCheck() {
 		$response = $this->call('proxy.create', [
 			'host' => 'passive proxy',
-			'status' => HOST_STATUS_PROXY_PASSIVE,
+			'status' => PROXY_MODE_PASSIVE,
 			'hosts' => [
 				[
 					"hostid" => self::$hostid

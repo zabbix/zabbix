@@ -51,8 +51,8 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
 						->addValue(_('Any'), -1)
-						->addValue(_('Active'), HOST_STATUS_PROXY_ACTIVE)
-						->addValue(_('Passive'), HOST_STATUS_PROXY_PASSIVE)
+						->addValue(_('Active'), PROXY_MODE_ACTIVE)
+						->addValue(_('Passive'), PROXY_MODE_PASSIVE)
 						->setModern(true)
 				)
 			]),
@@ -147,7 +147,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			: (new CSpan($host['name']))->addClass($style);
 	}
 
-	if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
+	if ($proxy['status'] == PROXY_MODE_PASSIVE) {
 		switch ($proxy['tls_connect']) {
 			case HOST_ENCRYPTION_NONE:
 				$encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
@@ -185,7 +185,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 				->addClass('js-edit-proxy')
 				->setAttribute('data-proxyid', $proxyid)
 		))->addClass(ZBX_STYLE_NOWRAP),
-		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
+		$proxy['status'] == PROXY_MODE_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$info_icons ? [$version, NBSP(), makeInformationList($info_icons)] : $version,
 		$proxy['lastaccess'] == 0

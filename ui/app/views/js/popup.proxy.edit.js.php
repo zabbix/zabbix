@@ -92,7 +92,7 @@ window.proxy_edit_popup = new class {
 	}
 
 	_update() {
-		const status_active = document.querySelector('#status input:checked').value == <?= HOST_STATUS_PROXY_ACTIVE ?>;
+		const status_active = document.querySelector('#status input:checked').value == <?= PROXY_MODE_ACTIVE ?>;
 
 		for (const element of this.form.querySelectorAll('.js-interface')) {
 			element.style.display = status_active ? 'none' : '';

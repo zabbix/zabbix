@@ -38,7 +38,7 @@ class testDataCollection extends CIntegrationTest {
 		// Create proxy "proxy".
 		CDataHelper::call('proxy.create', [
 			'host' => 'proxy',
-			'status' => HOST_STATUS_PROXY_ACTIVE
+			'status' => PROXY_MODE_ACTIVE
 		]);
 
 		$proxyids = CDataHelper::getIds('host');
