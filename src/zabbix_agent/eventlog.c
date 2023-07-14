@@ -546,57 +546,125 @@ out:
 	return ret;
 }
 
+typedef struct {
+	char		*name;
+	EVT_HANDLE	handle;
+} provider_meta_t;
+
+ZBX_VECTOR_DECL(prov_meta, provider_meta_t)
+ZBX_VECTOR_IMPL(prov_meta, provider_meta_t)
+
+static EVT_HANDLE	open_publisher_metadata(const wchar_t *pname, const char* utf8_name)
+{
+	EVT_HANDLE handle;
+
+	if (NULL == (handle = EvtOpenPublisherMetadata(NULL, pname, NULL, 0, 0)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s",
+				utf8_name, zbx_strerror_from_system(GetLastError()));
+	}
+
+	return handle;
+}
+
+static int	get_publisher_metadata(zbx_vector_prov_meta_t *prov_meta, const wchar_t *pname, int force_fetch,
+		EVT_HANDLE *dest)
+{
+	char		*tmp_pname = zbx_unicode_to_utf8(pname);
+	int		index, ret = FAIL;
+	provider_meta_t	p_meta;
+
+	p_meta.name = tmp_pname;
+
+	if (FAIL == (index = zbx_vector_prov_meta_bsearch((const zbx_vector_prov_meta_t *)prov_meta,
+			p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC)))
+	{
+		if (NULL == (*dest = open_publisher_metadata(pname, tmp_pname)))
+			goto out;
+
+		p_meta.name = zbx_strdup(NULL, tmp_pname);
+		p_meta.handle = *dest;
+
+		zbx_vector_prov_meta_insert_sorted(prov_meta, p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC);
+
+		ret = SUCCEED;
+	}
+	else {
+		if (1 == force_fetch)
+		{
+			if (NULL == (*dest = open_publisher_metadata(pname, tmp_pname)))
+				goto out;
+
+			prov_meta->values[index].handle = *dest;
+		}
+		else
+			*dest = prov_meta->values[index].handle;
+
+		ret = SUCCEED;
+	}
+out:
+	zbx_free(tmp_pname);
+
+	return ret;
+}
+
 /* expand the string message from a specific event handler */
-static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event)
+static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_prov_meta_t *prov_meta)
 {
 	wchar_t		*pmessage = NULL;
 	EVT_HANDLE	provider = NULL;
 	DWORD		require = 0;
 	char		*out_message = NULL;
-	char		*tmp_pname = NULL;
+	int		 refetch_done = 0;
+	DWORD		error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == (provider = EvtOpenPublisherMetadata(NULL, pname, NULL, 0, 0)))
-	{
-		tmp_pname = zbx_unicode_to_utf8(pname);
-		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s",
-				tmp_pname, zbx_strerror_from_system(GetLastError()));
-		zbx_free(tmp_pname);
-		goto out;
-	}
+	if (FAIL == get_publisher_metadata(prov_meta, pname, 0, &provider))
+		goto err;
 
-	if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
+	while (0 == refetch_done)
 	{
-		if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+		if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
 		{
-			DWORD	error = ERROR_SUCCESS;
+			int last_err = GetLastError();
 
-			pmessage = zbx_malloc(pmessage, sizeof(WCHAR) * require);
-
-			if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, require,
-					pmessage, &require))
+			if (ERROR_INSUFFICIENT_BUFFER == last_err)
 			{
-				error = GetLastError();
+				error = ERROR_SUCCESS;
+
+				pmessage = zbx_malloc(pmessage, sizeof(WCHAR) * require);
+
+				if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent,
+						require, pmessage, &require))
+				{
+					error = GetLastError();
+				}
+
+				if (ERROR_SUCCESS == error || ERROR_EVT_UNRESOLVED_VALUE_INSERT == error ||
+						ERROR_EVT_UNRESOLVED_PARAMETER_INSERT == error ||
+						ERROR_EVT_MAX_INSERTS_REACHED == error)
+				{
+					out_message = zbx_unicode_to_utf8(pmessage);
+					goto out;
+				}
+				else
+					goto err;
 			}
-
-			if (ERROR_SUCCESS == error || ERROR_EVT_UNRESOLVED_VALUE_INSERT == error ||
-					ERROR_EVT_UNRESOLVED_PARAMETER_INSERT == error ||
-					ERROR_EVT_MAX_INSERTS_REACHED == error)
+			else if (ERROR_INVALID_HANDLE == last_err)
 			{
-				out_message = zbx_unicode_to_utf8(pmessage);
+				refetch_done = 1;
+
+				if (FAIL == get_publisher_metadata(prov_meta, pname, 1, &provider))
+					goto err;
 			}
 			else
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__,
-						zbx_strerror_from_system(error));
-				goto out;
-			}
+				goto err;
 		}
 	}
+err:
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__, zbx_strerror_from_system(error));
 out:
-	if (NULL != provider)
-		EvtClose(provider);
 	zbx_free(pmessage);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, out_message);
@@ -719,7 +787,8 @@ cleanup:
 static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *render_context,
 		EVT_HANDLE *event_bookmark, zbx_uint64_t *which, unsigned short *out_severity,
 		unsigned long *out_timestamp, char **out_provider, char **out_source, char **out_message,
-		unsigned long *out_eventid, zbx_uint64_t *out_keywords, char **error)
+		unsigned long *out_eventid, zbx_uint64_t *out_keywords, zbx_vector_prov_meta_t *prov_meta,
+		int gather_evt_msg, char **error)
 {
 	EVT_VARIANT*		renderedContent = NULL;
 	const wchar_t		*pprovider = NULL;
@@ -767,7 +836,11 @@ static int	zbx_parse_eventlog_message6(const wchar_t *wsource, EVT_HANDLE *rende
 	*out_severity = VAR_LEVEL(renderedContent);
 	*out_timestamp = (unsigned long)((VAR_TIME_CREATED(renderedContent) - sec_1970) / 10000000);
 	*out_eventid = VAR_EVENT_ID(renderedContent);
-	*out_message = expand_message6(pprovider, *event_bookmark);
+
+	if (1 == gather_evt_msg)
+		*out_message = expand_message6(pprovider, *event_bookmark, prov_meta);
+	else
+		*out_message = zbx_strdup(NULL, "");
 
 	if (NULL != *out_message)
 		replace_sids_to_accounts(*event_bookmark, out_message);
@@ -884,7 +957,7 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 		const char *key_severity, const char *key_source, const char *key_logeventid, int rate,
 		zbx_process_value_func_t process_value_cb, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, ZBX_ACTIVE_METRIC *metric,
-		zbx_uint64_t *lastlogsize_sent, char **error)
+		zbx_uint64_t *lastlogsize_sent, zbx_vector_prov_meta_t *prov_meta, char **error)
 {
 #	define EVT_ARRAY_SIZE	100
 
@@ -952,11 +1025,16 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 
 		for (i = 0; i < required_buf_size; i++)
 		{
+			int	gather_evt_msg = 1;
+
+			if (1 == is_count_item && 1 > strlen(pattern))
+				gather_evt_msg = 0;
+
 			lastlogsize += 1;
 
 			if (SUCCEED != zbx_parse_eventlog_message6(eventlog_name_w, render_context, &event_bookmarks[i],
 					&lastlogsize, &evt_severity, &evt_timestamp, &evt_provider, &evt_source,
-					&evt_message, &evt_eventid, &keywords, error))
+					&evt_message, &evt_eventid, &keywords, prov_meta, gather_evt_msg, error))
 			{
 				goto out;
 			}
@@ -1099,7 +1177,7 @@ static int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 			}
 
 			/* do not flood Zabbix server if file grows too fast */
-			if (0 == is_count_item && s_count >= (rate * metric->refresh))
+			if (s_count >= (rate * metric->refresh))
 				break;
 
 			/* do not flood local system if file grows too fast */
@@ -1771,13 +1849,16 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, char **error)
 {
-	int 		ret = FAIL;
-	AGENT_REQUEST	request;
-	const char	*filename, *pattern, *maxlines_persec, *key_severity, *key_source, *key_logeventid, *skip;
-	int		rate;
-	OSVERSIONINFO	versionInfo;
+	int 			ret = FAIL;
+	AGENT_REQUEST		request;
+	const char		*filename, *pattern, *maxlines_persec, *skip;
+	const char		*key_severity, *key_source, *key_logeventid;
+	int			rate;
+	OSVERSIONINFO		versionInfo;
+	zbx_vector_prov_meta_t	prov_meta;
 
 	zbx_init_agent_request(&request);
+	zbx_vector_prov_meta_create(&prov_meta);
 
 	if (SUCCEED != zbx_parse_item_key(metric->key, &request))
 	{
@@ -1891,7 +1972,15 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 					&eventlog6_query, lastlogsize, eventlog6_firstid, eventlog6_lastid, regexps,
 					pattern, key_severity, key_source, key_logeventid, rate, process_value_cb,
 					config_tls, config_timeout, config_source_ip, config_hostname, metric,
-					lastlogsize_sent, error);
+					lastlogsize_sent, &prov_meta, error);
+
+			for (size_t i = 0; i < prov_meta.values_num; i++)
+			{
+				if (NULL != prov_meta.values[i].handle)
+					EvtClose(prov_meta.values[i].handle);
+
+				zbx_free(prov_meta.values[i].name);
+			}
 
 			finalize_eventlog6(&eventlog6_render_context, &eventlog6_query);
 		}
@@ -1907,6 +1996,8 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 				config_hostname, metric, lastlogsize_sent, error);
 	}
 out:
+	zbx_vector_prov_meta_destroy(&prov_meta);
+
 	zbx_free_agent_request(&request);
 
 	return ret;
