@@ -90,9 +90,9 @@ class CProxy extends CApiService {
 		}
 
 		$sql_parts = [
-			'select'	=> ['proxyid' => 'h.proxy'],
-			'from'		=> ['proxy' => 'proxy h'],
-			'where'		=> ['mode' => 'h.mode IN ('.PROXY_MODE_ACTIVE.','.PROXY_MODE_PASSIVE.')'],
+			'select'	=> ['proxyid' => 'p.proxy'],
+			'from'		=> ['proxy' => 'proxy p'],
+			'where'		=> ['mode' => 'p.mode IN ('.PROXY_MODE_ACTIVE.','.PROXY_MODE_PASSIVE.')'],
 			'order'		=> []
 		];
 
@@ -159,7 +159,7 @@ class CProxy extends CApiService {
 
 		if ($db_proxies) {
 			$db_proxies = $this->addRelatedObjects($options, $db_proxies);
-			$db_proxies = $this->unsetExtraFields($db_proxies, [], $options['output']);
+			$db_proxies = $this->unsetExtraFields($db_proxies, ['proxyid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_proxies = array_values($db_proxies);
