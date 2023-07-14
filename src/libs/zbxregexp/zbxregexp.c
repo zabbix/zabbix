@@ -1321,6 +1321,175 @@ out:
 	return ret;
 }
 
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: Test if the string matches regular expression with the specified      *
+ *          case sensitivity option and allocates output variable to store the    *
+ *          result if necessary.                                                  *
+ *                                                                                *
+ * Parameters: regexps         - [IN] the global regular expression array         *
+ *             string          - [IN] the string to check                         *
+ *             pattern         - [IN] the regular expression or global regular    *
+ *                                    expression name (@<global regexp name>).    *
+ *             case_sensitive  - [IN] ZBX_IGNORE_CASE - case insensitive match    *
+ *                                    ZBX_CASE_SENSITIVE - case sensitive match   *
+ *             output_template - [IN] the output string template. For regular     *
+ *                                    expressions (type Result is TRUE) output    *
+ *                                    string is constructed from the template by  *
+ *                                    replacing '\<n>' sequences with the         *
+ *                                    captured regexp group.                      *
+ *                                    If output_template is NULL then the whole   *
+ *                                    matched string is returned.                 *
+ *             output         - [OUT] a reference to the variable where allocated *
+ *                                    memory containing the resulting value       *
+ *                                    (substitution) is stored.                   *
+ *                                    Specify NULL to skip output value creation. *
+ *             err_msg        - [OUT] dynamically allocated error message         *
+ *                                                                                *
+ * Return value: ZBX_REGEXP_MATCH    - the string matches the specified regular   *
+ *                                     expression                                 *
+ *               ZBX_REGEXP_NO_MATCH - the string does not match the specified    *
+ *                                     regular expression                         *
+ *               If errors:                                                       *
+ *               ZBX_REGEXP_COMPILE_FAIL or                                       *
+ *               ZBX_REGEXP_RUNTIME_FAIL with error message in 'err_msg'          *
+ *                                                                                *
+ * Comments: For regular expressions and global regular expressions with 'Result  *
+ *           is TRUE' type the 'output_template' substitution result is stored    *
+ *           into 'output' variable. For other global regular expression types    *
+ *           the whole string is stored into 'output' variable.                   *
+ *                                                                                *
+ **********************************************************************************/
+int	regexp_sub_ex2(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern,
+		int case_sensitive, const char *output_template, char **output, char **err_msg)
+{
+	int	i, ret = ZBX_REGEXP_NO_MATCH;
+	char	*output_accu = NULL;	/* accumulator for 'output' when looping over global regexp subexpressions */
+
+	if (NULL == pattern || '\0' == *pattern)
+	{
+		/* always match when no pattern is specified */
+		ret = ZBX_REGEXP_MATCH;
+		goto out;
+	}
+
+	if ('@' != *pattern)				/* not a global regexp */
+	{
+		ret = regexp_match_ex_regsub2(string, pattern, case_sensitive, output_template, output, err_msg);
+		goto out;
+	}
+
+	pattern++;
+
+	for (i = 0; i < regexps->values_num; i++)	/* loop over global regexp subexpressions */
+	{
+		const zbx_expression_t	*regexp = (const zbx_expression_t *)regexps->values[i];
+
+		if (0 != strcmp(regexp->name, pattern))
+			continue;
+
+		switch (regexp->expression_type)
+		{
+			case EXPRESSION_TYPE_TRUE:
+				if (NULL != output)
+				{
+					char	*output_tmp = NULL;
+
+					if (ZBX_REGEXP_MATCH == (ret = regexp_match_ex_regsub2(string,
+							regexp->expression, regexp->case_sensitive, output_template,
+							&output_tmp, err_msg)))
+					{
+						zbx_free(output_accu);
+						output_accu = output_tmp;
+					}
+				}
+				else
+				{
+					ret = regexp_match_ex_regsub2(string, regexp->expression,
+							regexp->case_sensitive, NULL, NULL, err_msg);
+				}
+
+				if (ZBX_REGEXP_COMPILE_FAIL == ret || ZBX_REGEXP_RUNTIME_FAIL == ret)
+				{
+					zbx_free(output_accu);
+					return ret;
+				}
+
+				break;
+			case EXPRESSION_TYPE_FALSE:
+				ret = regexp_match_ex_regsub2(string, regexp->expression, regexp->case_sensitive,
+						NULL, NULL, err_msg);
+
+				if (ZBX_REGEXP_MATCH == ret)	/* invert output value */
+				{
+					ret = ZBX_REGEXP_NO_MATCH;
+				}
+				else if (ZBX_REGEXP_NO_MATCH == ret)
+				{
+					ret = ZBX_REGEXP_MATCH;
+				}
+				else if (ZBX_REGEXP_COMPILE_FAIL == ret || ZBX_REGEXP_RUNTIME_FAIL == ret)
+				{
+					zbx_free(output_accu);
+					return ret;
+				}
+
+				break;
+			case EXPRESSION_TYPE_INCLUDED:
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
+				break;
+			case EXPRESSION_TYPE_NOT_INCLUDED:
+				ret = regexp_match_ex_substring(string, regexp->expression, regexp->case_sensitive);
+				/* invert output value */
+				ret = (ZBX_REGEXP_MATCH == ret ? ZBX_REGEXP_NO_MATCH : ZBX_REGEXP_MATCH);
+				break;
+			case EXPRESSION_TYPE_ANY_INCLUDED:
+				ret = regexp_match_ex_substring_list(string, regexp->expression, regexp->case_sensitive,
+						regexp->exp_delimiter);
+				break;
+			default:
+				zabbix_log(LOG_LEVEL_WARNING, "%s() Invalid regular expression_type: %d, name:'%s',"
+						" expression:'%s'", __func__, regexp->expression_type, regexp->name,
+						regexp->expression);
+
+				if (NULL != err_msg)
+				{
+					*err_msg = zbx_dsprintf(*err_msg, "Invalid regular expression type: %d",
+							regexp->expression_type);
+				}
+
+				zbx_free(output_accu);
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				return ZBX_REGEXP_COMPILE_FAIL;	/* to make it NOTSUPPORTED */
+		}
+
+		if (ZBX_REGEXP_NO_MATCH == ret)
+		{
+			zbx_free(output_accu);
+			break;
+		}
+	}
+
+	if (ZBX_REGEXP_MATCH == ret && NULL != output_accu)
+	{
+		*output = output_accu;
+		return ZBX_REGEXP_MATCH;
+	}
+out:
+	if (ZBX_REGEXP_MATCH == ret && NULL != output && NULL == *output)
+	{
+		/* Handle output value allocation for global regular expression types   */
+		/* that cannot perform output_template substitution (practically        */
+		/* all global regular expression types except EXPRESSION_TYPE_TRUE).    */
+		size_t	offset = 0, size = 0;
+
+		zbx_strcpy_alloc(output, &size, &offset, string);
+	}
+
+	return ret;
+}
+
 int	regexp_match_ex(const zbx_vector_ptr_t *regexps, const char *string, const char *pattern, int case_sensitive)
 {
 	return regexp_sub_ex(regexps, string, pattern, case_sensitive, NULL, NULL);
