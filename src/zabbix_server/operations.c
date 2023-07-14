@@ -716,7 +716,7 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 
 			if (ZBX_DB_TAG_AUTOMATIC == host_tag->automatic)
 			{
-				zbx_db_tag_t	*auto_tag = zbx_db_tag_create(auto_tag->tag, auto_tag->value);
+				zbx_db_tag_t	*auto_tag = zbx_db_tag_create(host_tag->tag, host_tag->value);
 
 				auto_tag->automatic = ZBX_DB_TAG_AUTOMATIC;
 				zbx_vector_db_tag_ptr_append(&optags, auto_tag);
