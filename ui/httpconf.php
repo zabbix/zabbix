@@ -231,29 +231,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			foreach ($step['variables'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-				$variable['value'] = trim($variable['value']);
-			}
-			unset($variable);
+			$step_fields = ['variables', 'headers', 'post_fields', 'query_fields'];
 
-			foreach ($step['headers'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-				$variable['value'] = trim($variable['value']);
+			foreach ($step_fields as $step_field) {
+				foreach ($step[$step_field] as &$field) {
+					$field['name'] = trim($field['name']);
+					$field['value'] = trim($field['value']);
+				}
+				unset($field);
 			}
-			unset($variable);
 
-			foreach ($step['post_fields'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-				$variable['value'] = trim($variable['value']);
-			}
-			unset($variable);
-
-			foreach ($step['query_fields'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-				$variable['value'] = trim($variable['value']);
-			}
-			unset($variable);
+			$step['posts'] = trim($step['posts']);
 
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
@@ -296,17 +284,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			}
 		}
 
-		foreach ($httpTest['variables'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-			$variable['value'] = trim($variable['value']);
-		}
-		unset($variable);
+		$httpTest_fields = ['variables', 'headers'];
 
-		foreach ($httpTest['headers'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-			$variable['value'] = trim($variable['value']);
+		foreach ($httpTest_fields as $httpTest_field) {
+			sdii($httpTest_field);
+			foreach ($httpTest[$httpTest_field] as &$field) {
+				sdii($field);
+				$field['name'] = trim($field['name']);
+				$field['value'] = trim($field['value']);
+			}
+			unset($field);
 		}
-		unset($variable);
 
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
