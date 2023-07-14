@@ -64,6 +64,31 @@
 	?>
 </script>
 
+<script type="text/x-jquery-tmpl" id="scenario-variables-row">
+	<?= (new CRow([
+		(new CCol([
+			(new CDiv())
+		]))->addClass('td-separator'),
+		(new CTextBox(null, '#{name}'))
+			->setAttribute('placeholder', _('name'))
+			->setAttribute('data-type', 'name')
+			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+		RARR(),
+		(new CTextBox(null, '#{value}'))
+			->setAttribute('placeholder', _('value'))
+			->setAttribute('data-type', 'value')
+			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->addClass('form_row')
+		->toString()
+	?>
+</script>
+
 <script type="text/x-jquery-tmpl" id="scenario-pair-row">
 	<?= (new CRow([
 			(new CCol([
@@ -194,6 +219,7 @@
 		).html());
 
 		window.httpconf.pair_row_template = new Template(jQuery('#scenario-pair-row').html());
+		window.httpconf.variables_row_template = new Template(jQuery('#scenario-variables-row').html());
 		window.httpconf.scenario = new Scenario($('#scenarioTab'), <?= json_encode($this->data['scenario_tab_data']) ?>);
 		window.httpconf.steps = new Steps($('#stepTab'), <?= json_encode(array_values($data['steps'])) ?>);
 		window.httpconf.authentication = new Authentication($('#authenticationTab'));
@@ -598,14 +624,7 @@
 			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
 
 				if (type === 'variables') {
-					var td_element = document.createElement('td');
-
-					td_element.style.paddingLeft = "5px";
-
-					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
-					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
-					e.new_node.classList.remove('sortable');
-					e.new_node.prepend(td_element);
+					e.new_node.querySelector('.td-separator').style.paddingLeft = "5px";
 				}
 
 				if (type === 'variables' || type === 'headers') {
@@ -613,9 +632,10 @@
 				}
 			});
 
+
 			this.pairs[type] = new DynamicRows($table, {
 				add_before: $table.find('.element-table-add').closest('tr')[0],
-				template: httpconf.pair_row_template,
+				template: type === 'variables' ? httpconf.variables_row_template : httpconf.pair_row_template,
 				ensure_min_rows: 1
 			}, config.pairs[type]);
 
@@ -915,14 +935,7 @@
 
 			if (type === 'variables') {
 				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
-					var td_element = document.createElement('td');
-
-					td_element.style.paddingLeft = "5px";
-
-					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
-					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_TD_DRAG_ICON).remove();
-					e.new_node.classList.remove('sortable');
-					e.new_node.prepend(td_element);
+					e.new_node.querySelector('.td-separator').style.paddingLeft = "5px";
 				});
 			}
 
@@ -934,7 +947,7 @@
 
 			var dynamic_rows = new DynamicRows($node, {
 					add_before: $node.find('.element-table-add').closest('tr')[0],
-					template: httpconf.pair_row_template,
+					template: type === 'variables' ? httpconf.variables_row_template : httpconf.pair_row_template,
 					ensure_min_rows: 1
 				}, data);
 
