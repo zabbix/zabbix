@@ -63,7 +63,7 @@ class CControllerProxyConfigRefresh extends CController {
 		$result = (bool) API::Task()->create([
 			'type' => ZBX_TM_DATA_TYPE_PROXYIDS,
 			'request' => [
-				'proxy_hostids' => $this->getInput('proxyids')
+				'proxyids' => $this->getInput('proxyids')
 			]
 		]);
 

@@ -49,7 +49,7 @@ $filter = (new CFilter())
 			->addItem([
 				new CLabel(_('Mode')),
 				new CFormField(
-					(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
+					(new CRadioButtonList('filter_mode', (int) $data['filter']['mode']))
 						->addValue(_('Any'), -1)
 						->addValue(_('Active'), PROXY_MODE_ACTIVE)
 						->addValue(_('Passive'), PROXY_MODE_PASSIVE)
@@ -83,8 +83,8 @@ $proxy_list = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'proxyids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder'], $view_url),
-		make_sorting_header(_('Mode'), 'status', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $view_url),
+		make_sorting_header(_('Mode'), 'mode', $data['sort'], $data['sortorder'], $view_url),
 		make_sorting_header(_('Encryption'), 'tls_accept', $data['sort'], $data['sortorder'], $view_url),
 		make_sorting_header(_('Version'), 'version', $data['sort'], $data['sortorder'], $view_url),
 		make_sorting_header(_('Last seen (age)'), 'lastaccess', $data['sort'], $data['sortorder'], $view_url),
@@ -147,7 +147,7 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 			: (new CSpan($host['name']))->addClass($style);
 	}
 
-	if ($proxy['status'] == PROXY_MODE_PASSIVE) {
+	if ($proxy['mode'] == PROXY_MODE_PASSIVE) {
 		switch ($proxy['tls_connect']) {
 			case HOST_ENCRYPTION_NONE:
 				$encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
@@ -181,11 +181,11 @@ foreach ($data['proxies'] as $proxyid => $proxy) {
 	$proxy_list->addRow([
 		new CCheckBox('proxyids['.$proxyid.']', $proxyid),
 		(new CCol(
-			(new CLink($proxy['host']))
+			(new CLink($proxy['name']))
 				->addClass('js-edit-proxy')
 				->setAttribute('data-proxyid', $proxyid)
 		))->addClass(ZBX_STYLE_NOWRAP),
-		$proxy['status'] == PROXY_MODE_ACTIVE ? _('Active') : _('Passive'),
+		$proxy['mode'] == PROXY_MODE_ACTIVE ? _('Active') : _('Passive'),
 		$encryption,
 		$info_icons ? [$version, NBSP(), makeInformationList($info_icons)] : $version,
 		$proxy['lastaccess'] == 0

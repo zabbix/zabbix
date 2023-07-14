@@ -459,7 +459,7 @@ class CTask extends CApiService {
 				self::addAuditLog(CAudit::ACTION_CONFIG_REFRESH, CAudit::RESOURCE_PROXY, [
 					$proxyid => [
 						'proxyid' => $proxyid,
-						'host' => $proxy['host']
+						'name' => $proxy['name']
 					]
 				]);
 			}

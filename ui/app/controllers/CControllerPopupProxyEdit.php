@@ -57,10 +57,9 @@ class CControllerPopupProxyEdit extends CController {
 
 		if ($this->hasInput('proxyid')) {
 			$this->proxy = API::Proxy()->get([
-				'output' => ['host', 'status', 'proxy_address', 'description', 'tls_connect', 'tls_accept',
-					'tls_issuer', 'tls_subject'
+				'output' => ['name', 'mode', 'allowed_addresses', 'description', 'tls_connect', 'tls_accept',
+					'tls_issuer', 'tls_subject', 'address', 'port'
 				],
-				'selectInterface' => ['dns', 'ip', 'useip', 'port'],
 				'proxyids' => $this->getInput('proxyid'),
 				'editable' => true
 			]);
@@ -77,9 +76,7 @@ class CControllerPopupProxyEdit extends CController {
 
 	protected function doAction(): void {
 		$default_interface = [
-			'dns' => 'localhost',
-			'ip' => '127.0.0.1',
-			'useip' => '1',
+			'address' => '127.0.0.1',
 			'port' => '10051'
 		];
 
@@ -87,17 +84,15 @@ class CControllerPopupProxyEdit extends CController {
 			$data = [
 				'proxyid' => $this->getInput('proxyid'),
 				'form' => [
-					'host' => $this->proxy['host'],
-					'status' => (int) $this->proxy['status'],
-					'interface' => $this->proxy['status'] == PROXY_MODE_PASSIVE
-						? [
-							'dns' => $this->proxy['interface']['dns'],
-							'ip' => $this->proxy['interface']['ip'],
-							'useip' => $this->proxy['interface']['useip'],
-							'port' => $this->proxy['interface']['port']
-						]
-						: $default_interface,
-					'proxy_address' => $this->proxy['proxy_address'],
+					'name' => $this->proxy['name'],
+					'mode' => (int) $this->proxy['mode'],
+					'address' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
+						? $this->proxy['address']
+						: $default_interface['address'],
+					'port' => $this->proxy['mode'] == PROXY_MODE_PASSIVE
+						? $this->proxy['port']
+						: $default_interface['port'],
+					'allowed_addresses' => $this->proxy['allowed_addresses'],
 					'description' => $this->proxy['description'],
 					'tls_connect' => (int) $this->proxy['tls_connect'],
 					'tls_accept' => (int) $this->proxy['tls_accept'],
@@ -112,10 +107,11 @@ class CControllerPopupProxyEdit extends CController {
 			$data = [
 				'proxyid' => null,
 				'form' => [
-					'host' => '',
-					'status' => PROXY_MODE_ACTIVE,
-					'interface' => $default_interface,
-					'proxy_address' => '',
+					'name' => '',
+					'mode' => PROXY_MODE_ACTIVE,
+					'allowed_addresses' => '',
+					'address' => $default_interface['address'],
+					'port' => $default_interface['port'],
 					'description' => '',
 					'tls_connect' => HOST_ENCRYPTION_NONE,
 					'tls_accept' => HOST_ENCRYPTION_NONE,
