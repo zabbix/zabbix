@@ -620,16 +620,16 @@ static ZBX_DC_AUTOREG_HOST	*DCfind_autoreg_host(const char *host)
  * Return value: pointer to record if found or NULL otherwise                 *
  *                                                                            *
  ******************************************************************************/
-static ZBX_DC_HOST	*DCfind_proxy(const char *host)
+static ZBX_DC_PROXY	*DCfind_proxy(const char *name)
 {
-	ZBX_DC_HOST_H	*host_p, host_p_local;
+	zbx_dc_proxy_name_t	*proxy_p, proxy_p_local;
 
-	host_p_local.host = host;
+	proxy_p_local.name = name;
 
-	if (NULL == (host_p = (ZBX_DC_HOST_H *)zbx_hashset_search(&config->proxies_p, &host_p_local)))
+	if (NULL == (proxy_p = (zbx_dc_proxy_name_t *)zbx_hashset_search(&config->proxies_p, &proxy_p_local)))
 		return NULL;
 	else
-		return host_p->host_ptr;
+		return proxy_p->proxy_ptr;
 }
 
 /* private strpool functions */
@@ -13766,26 +13766,19 @@ void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hos
 int	zbx_dc_get_active_proxy_by_name(const char *name, zbx_dc_proxy_t *proxy, char **error)
 {
 	int			ret = FAIL;
-	const ZBX_DC_HOST	*dc_host;
 	const ZBX_DC_PROXY	*dc_proxy;
 
 	RDLOCK_CACHE;
 
-	if (NULL == (dc_host = DCfind_proxy(name)))
+	if (NULL == (dc_proxy = DCfind_proxy(name)))
 	{
 		*error = zbx_dsprintf(*error, "proxy \"%s\" not found", name);
 		goto out;
 	}
 
-	if (PROXY_MODE_ACTIVE != dc_host->status)
+	if (PROXY_MODE_ACTIVE != dc_proxy->mode)
 	{
 		*error = zbx_dsprintf(*error, "proxy \"%s\" is configured for passive mode", name);
-		goto out;
-	}
-
-	if (NULL == (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
-	{
-		*error = zbx_dsprintf(*error, "proxy \"%s\" not found in configuration cache", name);
 		goto out;
 	}
 
@@ -13814,16 +13807,16 @@ out:
 int	zbx_dc_get_proxyid_by_name(const char *name, zbx_uint64_t *proxyid, unsigned char *type)
 {
 	int			ret = FAIL;
-	const ZBX_DC_HOST	*dc_host;
+	const ZBX_DC_PROXY	*dc_proxy;
 
 	RDLOCK_CACHE;
 
-	if (NULL != (dc_host = DCfind_proxy(name)))
+	if (NULL != (dc_proxy = DCfind_proxy(name)))
 	{
 		if (NULL != type)
-			*type = dc_host->status;
+			*type = dc_proxy->mode;
 
-		*proxyid = dc_host->hostid;
+		*proxyid = dc_proxy->proxyid;
 
 		ret = SUCCEED;
 	}
@@ -14753,30 +14746,20 @@ int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodat
  ******************************************************************************/
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error)
 {
-	const ZBX_DC_HOST	*dc_host;
 	const ZBX_DC_PROXY	*dc_proxy;
 	int			ret;
 
 	RDLOCK_CACHE;
-	dc_host = DCfind_proxy(name);
 
-	if (NULL == dc_host)
+	if (NULL == (dc_proxy = DCfind_proxy(name)))
 	{
 		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
 		ret = FAIL;
 	}
 	else
 	{
-		if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
-		{
-			*delay = dc_proxy->proxy_delay;
-			ret = SUCCEED;
-		}
-		else
-		{
-			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
-			ret = FAIL;
-		}
+		*delay = dc_proxy->proxy_delay;
+		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
@@ -14798,30 +14781,20 @@ int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error)
  ******************************************************************************/
 int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, int *lastaccess, char **error)
 {
-	const ZBX_DC_HOST	*dc_host;
 	const ZBX_DC_PROXY	*dc_proxy;
 	int			ret;
 
 	RDLOCK_CACHE;
-	dc_host = DCfind_proxy(name);
 
-	if (NULL == dc_host)
+	if (NULL == (dc_proxy = DCfind_proxy(name)))
 	{
 		*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
 		ret = FAIL;
 	}
 	else
 	{
-		if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &dc_host->hostid)))
-		{
-			*lastaccess = dc_proxy->lastaccess;
-			ret = SUCCEED;
-		}
-		else
-		{
-			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", name);
-			ret = FAIL;
-		}
+		*lastaccess = dc_proxy->lastaccess;
+		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
@@ -14865,7 +14838,6 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 	for (i = 0; i < proxies.values_num; i++)
 	{
 		zbx_cached_proxy_t	*proxy;
-		const ZBX_DC_HOST	*dc_host;
 		const ZBX_DC_PROXY	*dc_proxy;
 
 		proxy = proxies.values[i];
@@ -14879,9 +14851,7 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 		else
 			zbx_json_addstring(&json, "passive", "false", ZBX_JSON_TYPE_INT);
 
-		dc_host = DCfind_proxy(proxy->name);
-
-		if (NULL == dc_host)
+		if (NULL == (dc_proxy = DCfind_proxy(proxy->name)))
 		{
 			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
 			ret = FAIL;
@@ -14892,9 +14862,9 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			unsigned int	encryption;
 
 			if (PROXY_MODE_PASSIVE == proxy->mode)
-				encryption = dc_host->tls_connect;
+				encryption = dc_proxy->tls_connect;
 			else
-				encryption = dc_host->tls_accept;
+				encryption = dc_proxy->tls_accept;
 
 			if (0 < (encryption & ZBX_TCP_SEC_UNENCRYPTED))
 				zbx_json_addstring(&json, "unencrypted", "true", ZBX_JSON_TYPE_INT);
@@ -14911,34 +14881,22 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			else
 				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
 
-			zbx_json_adduint64(&json, "items", dc_host->items_active_normal +
-					dc_host->items_active_notsupported);
+			zbx_json_adduint64(&json, "items", 0);
 
-			if (NULL != (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
-					&dc_host->hostid)))
-			{
-				zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
+			zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
 
-				zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, "version", dc_proxy->version_str, ZBX_JSON_TYPE_STRING);
 
-				zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
+			zbx_json_adduint64(&json, "compatibility", dc_proxy->compatibility);
 
-				if (0 < dc_proxy->lastaccess)
-					zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
-				else
-					zbx_json_addint64(&json, "last_seen", -1);
-
-				zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
-
-				zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
-			}
+			if (0 < dc_proxy->lastaccess)
+				zbx_json_addint64(&json, "last_seen", time(NULL) - dc_proxy->lastaccess);
 			else
-			{
-				*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.",
-					proxy->name);
-				ret = FAIL;
-				goto clean;
-			}
+				zbx_json_addint64(&json, "last_seen", -1);
+
+			zbx_json_adduint64(&json, "hosts", dc_proxy->hosts_monitored);
+
+			zbx_json_addfloat(&json, "requiredperformance", dc_proxy->required_performance);
 		}
 		zbx_json_close(&json);
 	}
