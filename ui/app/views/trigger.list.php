@@ -236,7 +236,8 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 	if ($trigger['discoveryRule']) {
 		$description[] = (new CLink(
 			$trigger['discoveryRule']['name'],
-			(new CUrl('trigger_prototypes.php'))
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'trigger.prototype.list')
 				->setArgument('parent_discoveryid', $trigger['discoveryRule']['itemid'])
 				->setArgument('context', $data['context'])
 		))

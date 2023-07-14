@@ -36,12 +36,9 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					new CRedirectButton(_('Create trigger prototype'),
-						(new CUrl('trigger_prototypes.php'))
-							->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-							->setArgument('form', 'create')
-							->setArgument('context', $data['context'])
-					)
+					(new CButton(_('Create trigger prototype')))
+						->setId('js-create')
+						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -89,14 +86,10 @@ foreach ($data['triggers'] as $trigger) {
 		ZBX_FLAG_DISCOVERY_PROTOTYPE, $data['allowed_ui_conf_templates']
 	);
 
-	$description[] = new CLink(
-		$trigger['description'],
-		(new CUrl('trigger_prototypes.php'))
-			->setArgument('form', 'update')
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('triggerid', $triggerid)
-			->setArgument('context', $data['context'])
-	);
+	$description[] = (new CLink($trigger['description']))
+		->addClass('js-trigger-prototype-edit')
+		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+		->setAttribute('data-triggerid', $triggerid);
 
 	if ($trigger['dependencies']) {
 		$description[] = [BR(), bold(_('Depends on').':')];
@@ -106,17 +99,14 @@ foreach ($data['triggers'] as $trigger) {
 			$dep_trigger = $data['dependencyTriggers'][$dependency['triggerid']];
 
 			$dep_trigger_description =
-				implode(', ', zbx_objectValues($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
+				implode(', ', array_column($dep_trigger['hosts'], 'name')).NAME_DELIMITER.$dep_trigger['description'];
 
 			if ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$trigger_dependencies[] = (new CLink(
-					$dep_trigger_description,
-					(new CUrl('trigger_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-						->setArgument('triggerid', $dep_trigger['triggerid'])
-						->setArgument('context', $data['context'])
-				))->addClass(triggerIndicatorStyle($dep_trigger['status']));
+				$trigger_dependencies[] = (new CLink($dep_trigger_description))
+					->addClass(triggerIndicatorStyle($dep_trigger['status']))
+					->addClass('js-trigger-prototype-edit')
+					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
+					->setAttribute('data-triggerid', $dep_trigger['triggerid']);
 			}
 			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 				$trigger_dependencies[] = (new CLink($dep_trigger_description))
@@ -233,4 +223,13 @@ $trigger_form->addItem([
 
 $html_page
 	->addItem($trigger_form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode([
+		'context' => $data['context'],
+		'hostid' => $data['hostid']
+	]).');
+'))
+	->setOnDocumentReady()
 	->show();

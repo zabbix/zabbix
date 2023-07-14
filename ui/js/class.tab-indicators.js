@@ -64,7 +64,7 @@ class TabIndicators {
 		const SLA = document.querySelector('#sla-form');
 		const TEMPLATE = document.querySelector('#templates-form');
 		const TRIGGER = document.querySelector('#trigger-form');
-		const TRIGGER_PROTOTYPE = document.querySelector('#triggers-prototype-form');
+		const TRIGGER_PROTOTYPE = document.querySelector('#trigger-prototype-form');
 		const USER = document.querySelector('#user-form');
 		const USER_GROUP = document.querySelector('#user-group-form');
 		const WEB_SCENARIO = document.querySelector('#http-form');

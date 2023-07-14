@@ -127,21 +127,27 @@ class CControllerTriggerExpressionConstructor extends CController {
 						list($data['expression_formula'], $data['expression_tree']) = $analyze;
 					}
 					else {
-						error(_s('Cannot build expression tree: %1$s.', $error));
-						show_messages(false, '', _($show_message_text));
+						$data['error'] = [
+							'title' => $show_message_text,
+							'messages' => [_s('Cannot build expression tree: %1$s.', $error)]
+						];
 					}
 
 					$data['expr_temp'] = '';
 				}
 				else {
-					error(_s('Cannot build expression tree: %1$s.', $error));
-					show_messages(false, '', _($show_message_text));
+					$data['error'] = [
+						'title' => $show_message_text,
+						'messages' => [_s('Cannot build expression tree: %1$s.', $error)]
+					];
 				}
 			}
 		}
 		else {
-			error(_s('Cannot build expression tree: %1$s.', $error));
-			show_messages(false, '', _($show_message_text));
+			$data['error'] = [
+				'title' => $show_message_text,
+				'messages' => [_s('Cannot build expression tree: %1$s.', $error)]
+			];
 		}
 
 		return $data;

@@ -22,12 +22,13 @@
 
 	window.trigger_edit_popup = new class {
 
-		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies}) {
+		init({triggerid, expression_popup_parameters, recovery_popup_parameters, readonly, db_dependencies, action}) {
 			this.triggerid = triggerid;
 			this.expression_popup_parameters = expression_popup_parameters;
 			this.recovery_popup_parameters = recovery_popup_parameters;
 			this.readonly = readonly;
 			this.db_dependencies = db_dependencies;
+			this.action = action;
 			this.overlay = overlays_stack.getById('trigger-edit');
 			this.dialogue = this.overlay.$dialogue[0];
 			this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -122,8 +123,13 @@
 					copy_expression(e.target.id, <?= json_encode(TRIGGER_RECOVERY_EXPRESSION) ?>);
 				}
 				else if (e.target.id === 'add-dep-trigger' || e.target.id === 'add-dep-template-trigger'
-						|| e.target.id === 'add_dep_host_trigger') {
-					this.#addDepTrigger(e.target);
+						|| e.target.id === 'add-dep-host-trigger' || e.target.id === 'add-dep-trigger-prototype') {
+					if (this.action === 'trigger.edit') {
+						this.#addDepTrigger(e.target);
+					}
+					else {
+						this.#addDepTriggerPrototype(e.target);
+					}
 				}
 				else if (e.target.classList.contains('js-remove-dependency')) {
 					this.#removeDependency(e.target.dataset.triggerid);
@@ -162,6 +168,39 @@
 			}
 			else {
 				popup_parameters.real_hosts = 1;
+			}
+
+			PopUp('popup.generic', popup_parameters, {dialogue_class: 'modal-popup-generic'});
+		}
+
+		#addDepTriggerPrototype(button) {
+			let popup_parameters = {
+				srcfld1: 'triggerid',
+				reference: 'deptrigger',
+				multiselect: 1
+			};
+
+			if (button.id === 'prototype-add-dep-trigger') {
+				popup_parameters.srctbl = 'triggers';
+				popup_parameters.hostid = button.dataset.hostid;
+				popup_parameters.with_triggers = 1;
+				popup_parameters.real_hosts = 1;
+				popup_parameters.normal_only = 1;
+			}
+			else if (button.id === 'add_dep_trigger_prototype') {
+				popup_parameters.srctbl = 'trigger_prototypes';
+				popup_parameters.parent_discoveryid = button.dataset.parent_discoveryid;
+			}
+			else if (button.id === 'add_dep_trigger_prototype') {
+				popup_parameters.srctbl = 'template_triggers';
+				popup_parameters.templateid = button.dataset.templateid;
+				popup_parameters.with_triggers = 1;
+			}
+			else {
+				popup_parameters.srctbl = 'triggers';
+				popup_parameters.with_triggers = 1;
+				popup_parameters.real_hosts = 1;
+				popup_parameters.normal_only = 1;
 			}
 
 			PopUp('popup.generic', popup_parameters, {dialogue_class: 'modal-popup-generic'});
@@ -380,6 +419,7 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
+
 					if ('error' in response) {
 						throw {error: response.error};
 					}
@@ -399,7 +439,7 @@
 					else {
 						const table = this.form.querySelector('#recovery-expression-table');
 						table.innerHTML = response.body;
-						this.form.querySelector('#recovery-expression-full').value = response.recovery_expression;
+						this.form.querySelector('#recovery-expression-full').value = response.expression;
 
 						if (table.querySelector('tbody').innerHTML !== '') {
 							this.#showRecoveryConstructorAddButton(false);
@@ -428,6 +468,15 @@
 					}
 
 					const message_box = makeMessageBox('bad', messages, title)[0];
+
+					if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
+						this.expression_full.value = exception.error.expression;
+						this.#toggleExpressionConstructor();
+					}
+					else {
+						this.form.querySelector('#recovery-expression-full').value = exception.error.expression;
+						this.#toggleRecoveryExpressionConstructor();
+					}
 
 					this.form.parentNode.insertBefore(message_box, this.form);
 				})
@@ -537,7 +586,7 @@
 			form_refresh.setAttribute('value', 1);
 			this.form.append(form_refresh);
 
-			reloadPopup(this.form, 'trigger.edit');
+			reloadPopup(this.form, this.action);
 		}
 
 		#post(url, data) {
