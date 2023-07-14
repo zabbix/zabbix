@@ -383,7 +383,7 @@ static void	active_checks_calculate_proxy_availability(zbx_avail_active_hb_cache
 		if (proxy_avail->lastaccess + AVAILABILITY_MANAGER_PROXY_ACTIVE_AVAIL_DELAY_SEC <= now)
 		{
 			if (ZBX_DB_OK > zbx_db_execute("update host_rtdata set active_available=%i "
-					"where proxyid in (select hostid from hosts where proxyid=" ZBX_FS_UI64 ")",
+					"where hostid in (select hostid from hosts where proxyid=" ZBX_FS_UI64 ")",
 					ZBX_INTERFACE_AVAILABLE_UNKNOWN, proxy_avail->hostid))
 			{
 				continue;
