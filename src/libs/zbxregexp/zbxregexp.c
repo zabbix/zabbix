@@ -80,7 +80,7 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
 	if (0 > (ret = pcre2_get_error_message(error_code, (PCRE2_UCHAR *)buf, sizeof(buf))))
 		return zbx_dsprintf(NULL, "pcre2_get_error_message(%d, ...) failed with error %d", error_code, ret);
 
-	return zbx_dsprintf(NULL, "%s, position %zu, flags:%d", buf, (size_t)error_offset, flags);
+	return zbx_dsprintf(NULL, "%s, position %zu, flags:0x%x", buf, (size_t)error_offset, (unsigned int)flags);
 #undef BUF_SIZE
 }
 #endif
@@ -142,8 +142,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	{
 		if (NULL != err_msg)
 		{
-			*err_msg = zbx_dsprintf(*err_msg, "%s, position %d, flags:%d", err_msg_static, error_offset,
-					flags);
+			*err_msg = zbx_dsprintf(*err_msg, "%s, position %d, flags:0x%x", err_msg_static, error_offset,
+					(unsigned int)flags);
 		}
 
 		return FAIL;
@@ -157,8 +157,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		{
 			if (NULL != err_msg)
 			{
-				*err_msg = zbx_dsprintf(*err_msg, "pcre_study() error: %s, flags:%d", err_msg_static,
-						flags);
+				*err_msg = zbx_dsprintf(*err_msg, "pcre_study() error: %s, flags:0x%x", err_msg_static,
+						(unsigned int)flags);
 			}
 
 			pcre_free(pcre_regexp);
