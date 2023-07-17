@@ -89,6 +89,11 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			value_type_hint: this.form.querySelector('#js-item-type-hint'),
 			username: this.form.querySelector('[for=username]')
 		};
+
+		if ($('#tabs').tabs('option', 'active') == 1) {
+			// Force dynamicRows event handlers initialization when 'Tags' tab is already active.
+			$(() => $('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
+		}
 	}
 
 	initEvents() {
