@@ -36,7 +36,7 @@ $html_page = (new CHtmlPage())
 		(new CTag('nav', true,
 			(new CList())
 				->addItem(
-					(new CButton(_('Create trigger prototype')))
+					(new CButton('create_trigger',_('Create trigger prototype')))
 						->setId('js-create')
 						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 				)

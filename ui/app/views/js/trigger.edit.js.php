@@ -640,7 +640,16 @@
 			}
 
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', this.triggerid !== null ? 'trigger.update' : 'trigger.create');
+
+			if (this.action === 'trigger.edit') {
+				curl.setArgument('action', this.triggerid !== null ? 'trigger.update' : 'trigger.create');
+			}
+			else {
+				curl.setArgument('action', this.triggerid !== null
+					? 'trigger.prototype.update'
+					: 'trigger.prototype.create'
+				);
+			}
 
 			this.#post(curl.getUrl(), fields);
 		}

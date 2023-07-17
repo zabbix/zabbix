@@ -18,20 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerTriggerPrototypeEdit extends CController {
 
-
 	/**
 	 * @var array
 	 */
-	private array $discovery_rule;
-
-	/**
-	 * @var array
-	 */
-	private array $trigger_prototype;
+	private $trigger_prototype;
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -43,8 +38,6 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'context' =>							'in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
-//			'description' =>						'string',
-//			'expression' =>							'string',
 			'show_inherited_tags' =>				'in 0,1',
 			'form_refresh' =>						'in 0,1',
 			'parent_discoveryid' =>					'required|db items.itemid'
@@ -78,17 +71,22 @@ class CControllerTriggerPrototypeEdit extends CController {
 
 		$this->discovery_rule = reset($discovery_rule);
 
-		$this->trigger_prototype = API::TriggerPrototype()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => ['hostid'],
-			'triggerids' => $this->getInput('triggerid'),
-			'selectItems' => ['itemid', 'templateid', 'flags'],
-			'selectDependencies' => ['triggerid'],
-			'selectTags' => ['tag', 'value']
-		]);
+		if ($this->hasInput('triggerid')) {
+			$this->trigger_prototype = API::TriggerPrototype()->get([
+				'output' => API_OUTPUT_EXTEND,
+				'selectHosts' => ['hostid'],
+				'triggerids' => $this->getInput('triggerid'),
+				'selectItems' => ['itemid', 'templateid', 'flags'],
+				'selectDependencies' => ['triggerid'],
+				'selectTags' => ['tag', 'value']
+			]);
 
-		if (!$this->trigger_prototype) {
-			return false;
+			if (!$this->trigger_prototype) {
+				return false;
+			}
+		}
+		else {
+			$this->trigger_prototype = null;
 		}
 
 		return true;
@@ -120,7 +118,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
 			'form_refresh' => $this->getInput('form_refresh', 0),
 			'templates' => [],
-			'parent_discoveryid' => $this->getInput('parent_discoveryid')
+			'parent_discoveryid' => $this->getInput('parent_discoveryid'),
+			'discover' => ZBX_PROTOTYPE_DISCOVER
 		];
 
 		if ($this->trigger_prototype) {
