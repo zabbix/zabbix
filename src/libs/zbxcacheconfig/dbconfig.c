@@ -1443,7 +1443,7 @@ static void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_
 }
 
 static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *active_avail_diff,
-		zbx_hashset_t *activated_hosts, const zbx_config_vault_t *config_vault, zbx_hashset_t *psk_owners)
+		zbx_hashset_t *activated_hosts, zbx_hashset_t *psk_owners)
 {
 	char				**row;
 	zbx_uint64_t			rowid;
@@ -7068,7 +7068,7 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 
 	sec = zbx_time();
 	zbx_vector_uint64_create(&active_avail_diff);
-	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, config_vault, &psk_owners);
+	DCsync_hosts(&hosts_sync, new_revision, &active_avail_diff, &activated_hosts, &psk_owners);
 	zbx_dbsync_clear_user_macros();
 	hsec2 = zbx_time() - sec;
 
