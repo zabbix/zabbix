@@ -109,9 +109,10 @@ class CControllerItemEdit extends CController {
 			'parent_templates' => [],
 			'discovery_rule' => [],
 			'master_item' => [],
+			'host_interfaces' => [],
 			'types' => item_type2str(),
 			'testable_item_types' => CControllerPopupItemTest::getTestableItemTypes($hostid),
-			'optional_interfaces' => array_keys(itemTypeInterface(), INTERFACE_TYPE_OPT),
+			'interface_types' => itemTypeInterface(),
 			'preprocessing_test_type' => CControllerPopupItemTestEdit::ZBX_TEST_TYPE_ITEM,
 			'preprocessing_types' => CItem::SUPPORTED_PREPROCESSING_TYPES,
 			'config' => [
@@ -139,6 +140,14 @@ class CControllerItemEdit extends CController {
 				'itemids' => $data['form']['master_itemid']
 			]);
 			$data['master_item'] = $master_items ? reset($master_items) : [];
+		}
+
+		if ($this->getInput('context') === 'host') {
+			[$host] = API::Host()->get([
+				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'details', 'type'],
+				'hostids' => [$hostid]
+			]);
+			$data['host_interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		}
 
 		$set_inventory = array_column(API::Item()->get([

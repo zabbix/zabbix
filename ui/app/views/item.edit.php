@@ -119,10 +119,10 @@ $tabs = (new CTabView())
 			'config' => $data['config'],
 			'discovery_rule' => $data['discovery_rule'],
 			'discovered' => (bool) $data['discovery_rule'],
-			'display_interfaces' => $data['display_interfaces'],
 			'form' => $data['form'],
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
+			'host_interfaces' => $data['host_interfaces'],
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
 			'parent_templates' => $data['parent_templates'],
@@ -168,7 +168,8 @@ $output = [
 	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php', [
 		'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
 		'value_type_keys' => $data['value_type_keys'],
-		'optional_interfaces' => $data['optional_interfaces'],
+		'host_interfaces' => array_values($data['host_interfaces']),
+		'interface_types' => $data['interface_types'],
 		'testable_item_types' => $data['testable_item_types'],
 		'type_with_key_select' => $type_with_key_select
 	])

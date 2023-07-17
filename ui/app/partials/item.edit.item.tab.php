@@ -425,54 +425,38 @@ $formgrid = (new CFormGrid())
 		))->setId('js-item-master-item-field')
 	]);
 
-if ($data['display_interfaces']) {
-	// TODO
-	if ($discovered_item) {
-		if ($data['interfaceid'] != 0) {
-			$data['interfaces'] = zbx_toHash($data['interfaces'], 'interfaceid');
-			$interface = $data['interfaces'][$data['interfaceid']];
+if ($data['form']['context'] === 'host') {
+	$interface = $data['host_interfaces'][$data['form']['interfaceid']] ?? [];
 
-			$form->addVar('selectedInterfaceId', $data['interfaceid']);
-			$item_tab->addItem([
-				(new CLabel(_('Host interface'), 'interface'))
-					->setAsteriskMark(itemTypeInterface($data['item']['type']) != INTERFACE_TYPE_OPT)
-					->setId('js-item-interface-label'),
-				(new CFormField((new CTextBox('interface', getHostInterface($interface), true))->setAriaRequired()))
-					->setId('js-item-interface-field')
-			]);
-		}
-		else {
-			$item_tab->addItem([
-				(new CLabel(_('Host interface'), 'interface'))->setId('js-item-interface-label'),
-				(new CFormField(
-					(new CTextBox('interface', _('None'), true))
-						->setAttribute('disabled', 'disabled')
-				))->setId('js-item-interface-field')
-			]);
-		}
+	if ($data['discovered']) {
+		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
+		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
+			->setAttribute('disabled', 'disabled');
+		$label_for = $select_interface->getId();
 	}
 	else {
-		$select_interface = getInterfaceSelect($data['interfaces'])
+		$required = true;
+		$select_interface = getInterfaceSelect($data['host_interfaces'])
 			->setId('interface-select')
 			->setValue($data['form']['interfaceid'])
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
 			->setFocusableElementId('interfaceid')
 			->setAriaRequired();
-
-		$item_tab->addItem([
-			(new CLabel(_('Host interface'), $select_interface->getFocusableElementId()))
-				->setAsteriskMark()
-				->setId('js-item-interface-label'),
-			(new CFormField([
-				$select_interface,
-				(new CSpan(_('No interface found')))
-					->setId('interface_not_defined')
-					->addClass(ZBX_STYLE_RED)
-					->setAttribute('style', 'display: none;')
-			]))->setId('js-item-interface-field')
-		]);
-		$form->addVar('selectedInterfaceId', $data['interfaceid']);
+		$label_for = $select_interface->getFocusableElementId();
 	}
+
+	$formgrid->addItem([
+		(new CLabel(_('Host interface'), $label_for))
+			->setAsteriskMark($required)
+			->setId('js-item-interface-label'),
+		(new CFormField([
+			$select_interface,
+			(new CSpan(_('No interface found')))
+				->setId('interface_not_defined')
+				->addClass(ZBX_STYLE_RED)
+				->addClass(ZBX_STYLE_DISPLAY_NONE)
+		]))->setId('js-item-interface-field')
+	]);
 }
 
 $formgrid

@@ -24,6 +24,9 @@
  */
 
 ?><script>((config) => {
+const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
+const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
+const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
 const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
@@ -32,11 +35,30 @@ const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 
 (new class {
-	init({testable_item_types, optional_interfaces, field_switches, value_type_keys, type_with_key_select}) {
+	init({testable_item_types, host_interfaces, interface_types, field_switches, value_type_keys,
+			type_with_key_select
+		}) {
 		this.testable_item_types = testable_item_types;
-		this.optional_interfaces = optional_interfaces;
+		this.interface_types = interface_types;
+		this.optional_interfaces = [];
+		this.type_interfaceids = {};
 		this.value_type_keys = value_type_keys;
 		this.type_with_key_select = type_with_key_select;
+
+		for (const type in interface_types) {
+			if (interface_types[type] == INTERFACE_TYPE_OPT) {
+				this.optional_interfaces.push(parseInt(type, 10));
+			}
+		}
+
+		for (const host_interface of host_interfaces) {
+			if (host_interface.type in this.type_interfaceids) {
+				this.type_interfaceids[host_interface.type].push(host_interface.interfaceid);
+			}
+			else {
+				this.type_interfaceids[host_interface.type] = [host_interface.interfaceid];
+			}
+		}
 
 		this.overlay = overlays_stack.end();
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -54,12 +76,18 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
 
 		this.field = {
+			interfaceid: this.form.querySelector('[name="interfaceid"]'),
 			key: this.form.querySelector('[name="key"]'),
 			key_button: this.form.querySelector('[name="key"] ~ .js-select-key'),
 			type: this.form.querySelector('[name="type"]'),
 			value_type: this.form.querySelector('[name="value_type"]'),
-			value_type_hint: this.form.querySelector('#js-item-type-hint'),// TODO: do not use id
-			value_type_steps: this.form.querySelector('[name="value_type_steps"]')
+			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
+			username: this.form.querySelector('[name=username]')
+		};
+		this.label = {
+			interfaceid: this.form.querySelector('[for=interfaceid]'),
+			value_type_hint: this.form.querySelector('#js-item-type-hint'),
+			username: this.form.querySelector('[for=username]')
 		};
 	}
 
@@ -134,6 +162,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 	updateFieldsVisibility() {
 		const type = parseInt(this.field.type.value, 10);
 		const key = this.field.key.value;
+		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 
 		if (type == ITEM_TYPE_ZABBIX_ACTIVE) {
@@ -152,15 +181,14 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			// );
 		}
 
-		// this.#field('[for="interfaceid"]')
-		// 	.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
-		// this.#field('input[name=interfaceid]').toggleAttribute('aria-required', !interface_optional);
-
 		this.updateActionButtons();
 		this.#updateValueTypeHintVisibility();
-		this.field.key_button.toggleAttribute('disabled',
-			this.type_with_key_select.indexOf(parseInt(this.field.type.value, 10)) == -1
-		);
+		this.field.key_button.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
+		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
+		this.field.username[username_required ? 'setAttribute' : 'removeAttribute']('aria-required', 'true');
+		this.label.interfaceid.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
+		this.field.interfaceid.toggleAttribute('aria-required', !interface_optional);
+		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
 	}
 
 	#updateValueTypeHintVisibility() {
@@ -168,7 +196,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		const value_type = this.field.value_type.value;
 		const inferred_type = this.#getInferredValueType(key);
 
-		this.field.value_type_hint
+		this.label.value_type_hint
 			.classList.toggle(ZBX_STYLE_DISPLAY_NONE, inferred_type === null || value_type == inferred_type);
 	}
 
@@ -245,7 +273,8 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 })(<?= json_encode([
 	'field_switches' => $data['field_switches'],
 	'value_type_keys' => $data['value_type_keys'],
-	'optional_interfaces' => $data['optional_interfaces'],
+	'host_interfaces' => $data['host_interfaces'],
+	'interface_types' => $data['interface_types'],
 	'testable_item_types' => $data['testable_item_types'],
 	'type_with_key_select' => $data['type_with_key_select']
 ]) ?>);
