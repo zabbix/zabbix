@@ -406,7 +406,9 @@ class testDashboardPages extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here',
+						// TODO: change name after fix ZBX-22972 to
+						// 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here'
+						'Name' => 'long_name',
 						'Page display period' => '2 minutes'
 					]
 				]
@@ -471,14 +473,13 @@ class testDashboardPages extends CWebTest {
 		$next_page = $this->query(self::NEXT_BUTTON)->one();
 		$tab = $this->query('class:selected-tab')->one();
 
-		// If next page button exists press next tab buttun until the required tab is selected.
-		if ($next_page->isVisible()) {
-			while ($tab->getText() !== $data['fields']['Name'] && $next_page->isClickable()) {
+		// If next page button exists and enabled press next tab buttun until the required tab is selected.
+		if ($next_page->isClickable()) {
+			while ($tab->getText() !== $title && $next_page->isClickable()) {
 				$next_page->click();
 				$tab->waitUntilAttributesNotPresent(['class' => 'selected-tab']);
 				$tab->reload();
 			}
-
 		}
 
 		$index = CTestArrayHelper::get($data, 'duplicate', false) ? 2 : 1;
@@ -628,7 +629,7 @@ class testDashboardPages extends CWebTest {
 			foreach ($widget_name as $widget) {
 				$this->assertEquals($widget.' page kiosk', $dashboard->getWidgets()->last()->getHeaderText());
 				$this->query('xpath://button[contains(@class, '.CXPathHelper::escapeQuotes($direction).')]')
-						->one()->click();
+						->one()->hoverMouse()->click();
 			}
 		}
 
