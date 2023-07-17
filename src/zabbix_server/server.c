@@ -1994,6 +1994,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 
+#ifdef HAVE_ORACLE
+	zabbix_log(LOG_LEVEL_INFORMATION, "Oracle DB is deprecated since 7.0");
+#endif
+
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (SUCCEED != zbx_coredump_disable())
 	{
