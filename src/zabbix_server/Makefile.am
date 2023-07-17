@@ -67,6 +67,7 @@ zabbix_server_LDADD = \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_server.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	snmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
@@ -81,6 +82,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_server.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
@@ -99,6 +101,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
+	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
@@ -160,7 +163,9 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxip/libzbxip.a \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
-	$(top_builddir)/src/libs/zbxversion/libzbxversion.a
+	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
+	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
 if HAVE_IPMI
 zabbix_server_LDADD += ipmi/libipmi.a
 endif

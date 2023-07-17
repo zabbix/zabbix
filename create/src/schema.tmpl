@@ -1043,7 +1043,7 @@ FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|value		|t_bin		|''	|NOT NULL	|0
 
 TABLE|proxy_history|id|0
-FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|id		|t_id		|	|NOT NULL	|0
 FIELD		|itemid		|t_id		|	|NOT NULL	|0			|-|items
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|timestamp	|t_time		|'0'	|NOT NULL	|0
@@ -1060,7 +1060,7 @@ FIELD		|write_clock	|t_time		|'0'	|NOT NULL	|0
 INDEX		|1		|clock
 
 TABLE|proxy_dhistory|id|0
-FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|id		|t_id		|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|druleid	|t_id		|	|NOT NULL	|0			|-|drules
 FIELD		|ip		|t_varchar(39)	|''	|NOT NULL	|0
@@ -1161,7 +1161,7 @@ INDEX		|1		|host
 INDEX		|2		|proxyid
 
 TABLE|proxy_autoreg_host|id|0
-FIELD		|id		|t_serial	|	|NOT NULL	|0
+FIELD		|id		|t_id		|	|NOT NULL	|0
 FIELD		|clock		|t_time		|'0'	|NOT NULL	|0
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|listen_ip	|t_varchar(39)	|''	|NOT NULL	|0
@@ -2138,4 +2138,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050053	|6050053
+ROW		|1		|6050057	|6050057

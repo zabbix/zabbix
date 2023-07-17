@@ -36,20 +36,8 @@
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_item_constants.h"
-
-typedef struct
-{
-	char	*host;
-	char	*severity;
-	char	*tags;
-	char	*name;
-	int	clock;
-	int	nseverity;
-}
-zbx_eventdata_t;
-
-ZBX_VECTOR_DECL(eventdata, zbx_eventdata_t)
-ZBX_VECTOR_IMPL(eventdata, zbx_eventdata_t)
+#include "zbx_expression_constants.h"
+#include "zbxevent.h"
 
 /* The following definitions are used to identify the request field */
 /* for various value getters grouped by their scope:                */
@@ -81,153 +69,7 @@ static int	substitute_key_macros_impl(char **data, zbx_uint64_t *hostid, zbx_dc_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	get_trigger_severity_name(int priority, char **replace_to)
-{
-	zbx_config_t	cfg;
-
-	if (TRIGGER_SEVERITY_COUNT <= priority)
-		return FAIL;
-
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
-
-	*replace_to = zbx_strdup(*replace_to, cfg.severity_name[priority]);
-
-	zbx_config_clean(&cfg);
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get human readable list of problem update actions                 *
- *                                                                            *
- * Parameters: ack     - [IN] problem update data                             *
- *             actions - [IN] the required action flags                       *
- *             out     - [OUT] the output buffer                              *
- *                                                                            *
- * Return value: SUCCEED - successfully returned list of problem update       *
- *               FAIL    - no matching actions were made                      *
- *                                                                            *
- ******************************************************************************/
-static int	get_problem_update_actions(const zbx_db_acknowledge *ack, int actions, const char *tz, char **out)
-{
-	const char	*prefixes[] = {"", ", ", ", ", ", ", ", ", ", ", ", ", ", ", ", "};
-	char		*buf = NULL;
-	size_t		buf_alloc = 0, buf_offset = 0;
-	int		i, index, flags;
-
-	if (0 == (flags = ack->action & actions))
-		return FAIL;
-
-	for (i = 0, index = 0; i < ZBX_PROBLEM_UPDATE_ACTION_COUNT; i++)
-	{
-		if (0 != (flags & (1 << i)))
-			index++;
-	}
-
-	if (1 < index)
-		prefixes[index - 1] = " and ";
-
-	index = 0;
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "acknowledged");
-		index++;
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unacknowledged");
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_MESSAGE))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "commented");
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_SEVERITY))
-	{
-		zbx_config_t	cfg;
-		const char	*from = "unknown", *to = "unknown";
-
-		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
-
-		if (TRIGGER_SEVERITY_COUNT > ack->old_severity && 0 <= ack->old_severity)
-			from = cfg.severity_name[ack->old_severity];
-
-		if (TRIGGER_SEVERITY_COUNT > ack->new_severity && 0 <= ack->new_severity)
-			to = cfg.severity_name[ack->new_severity];
-
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "changed severity from %s to %s",
-				from, to);
-
-		zbx_config_clean(&cfg);
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_CLOSE))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "closed");
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_SUPPRESS))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "suppressed ");
-		if (0 == ack->suppress_until)
-		{
-			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "indefinitely");
-		}
-		else
-		{
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "until %s %s",
-					zbx_date2str((time_t)ack->suppress_until, tz),
-					zbx_time2str((time_t)ack->suppress_until, tz));
-		}
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_UNSUPPRESS))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "unsuppressed");
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index++]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as symptom");
-	}
-
-	if (0 != (flags & ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE))
-	{
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, prefixes[index]);
-		zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, "ranked as cause");
-	}
-
-	zbx_free(*out);
-	*out = buf;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: request proxy name by hostid                                       *
+ * Purpose: request host name by hostid                                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
@@ -752,226 +594,6 @@ int	DBget_trigger_value(const zbx_db_trigger *trigger, char **replace_to, int N_
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve number of events (acknowledged or unacknowledged) for a  *
- *          trigger (in an OK or PROBLEM state) which generated an event      *
- *                                                                            *
- * Parameters: triggerid    - [IN] trigger identifier from database           *
- *             replace_to   - [IN/OUT] pointer to result buffer               *
- *             problem_only - [IN] selected trigger status:                   *
- *                             0 - TRIGGER_VALUE_PROBLEM and TRIGGER_VALUE_OK *
- *                             1 - TRIGGER_VALUE_PROBLEM                      *
- *             acknowledged - [IN] acknowledged event or not                  *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_trigger_event_count(zbx_uint64_t triggerid, char **replace_to, int problem_only, int acknowledged)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		value[4];
-	int		ret = FAIL;
-
-	if (problem_only)
-		zbx_snprintf(value, sizeof(value), "%d", TRIGGER_VALUE_PROBLEM);
-	else
-		zbx_snprintf(value, sizeof(value), "%d,%d", TRIGGER_VALUE_PROBLEM, TRIGGER_VALUE_OK);
-
-	result = zbx_db_select(
-			"select count(*)"
-			" from events"
-			" where source=%d"
-				" and object=%d"
-				" and objectid=" ZBX_FS_UI64
-				" and value in (%s)"
-				" and acknowledged=%d",
-			EVENT_SOURCE_TRIGGERS,
-			EVENT_OBJECT_TRIGGER,
-			triggerid,
-			value,
-			acknowledged);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve discovered host value by event and field name            *
- *                                                                            *
- * Parameters:                                                                *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_dhost_value_by_event(const zbx_db_event *event, char **replace_to, const char *fieldname)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-	char		sql[MAX_STRING_LEN];
-
-	switch (event->object)
-	{
-		case EVENT_OBJECT_DHOST:
-			zbx_snprintf(sql, sizeof(sql),
-					"select %s"
-					" from drules r,dhosts h,dservices s"
-					" where r.druleid=h.druleid"
-						" and h.dhostid=s.dhostid"
-						" and h.dhostid=" ZBX_FS_UI64
-					" order by s.dserviceid",
-					fieldname,
-					event->objectid);
-			break;
-		case EVENT_OBJECT_DSERVICE:
-			zbx_snprintf(sql, sizeof(sql),
-					"select %s"
-					" from drules r,dhosts h,dservices s"
-					" where r.druleid=h.druleid"
-						" and h.dhostid=s.dhostid"
-						" and s.dserviceid=" ZBX_FS_UI64,
-					fieldname,
-					event->objectid);
-			break;
-		default:
-			return ret;
-	}
-
-	result = zbx_db_select_n(sql, 1);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve discovery rule check value by event and field name       *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_dchecks_value_by_event(const zbx_db_event *event, char **replace_to, const char *fieldname)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-
-	switch (event->object)
-	{
-		case EVENT_OBJECT_DSERVICE:
-			result = zbx_db_select("select %s from dchecks c,dservices s"
-					" where c.dcheckid=s.dcheckid and s.dserviceid=" ZBX_FS_UI64,
-					fieldname, event->objectid);
-			break;
-		default:
-			return ret;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve discovered service value by event and field name         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_dservice_value_by_event(const zbx_db_event *event, char **replace_to, const char *fieldname)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-
-	switch (event->object)
-	{
-		case EVENT_OBJECT_DSERVICE:
-			result = zbx_db_select("select %s from dservices s where s.dserviceid=" ZBX_FS_UI64,
-					fieldname, event->objectid);
-			break;
-		default:
-			return ret;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)) && SUCCEED != zbx_db_is_null(row[0]))
-	{
-		*replace_to = zbx_strdup(*replace_to, row[0]);
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve discovery rule value by event and field name             *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	DBget_drule_value_by_event(const zbx_db_event *event, char **replace_to, const char *fieldname)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-
-	if (EVENT_SOURCE_DISCOVERY != event->source)
-		return FAIL;
-
-	switch (event->object)
-	{
-		case EVENT_OBJECT_DHOST:
-			result = zbx_db_select("select r.%s from drules r,dhosts h"
-					" where r.druleid=h.druleid and h.dhostid=" ZBX_FS_UI64,
-					fieldname, event->objectid);
-			break;
-		case EVENT_OBJECT_DSERVICE:
-			result = zbx_db_select("select r.%s from drules r,dhosts h,dservices s"
-					" where r.druleid=h.druleid and h.dhostid=s.dhostid and s.dserviceid=" ZBX_FS_UI64,
-					fieldname, event->objectid);
-			break;
-		default:
-			return ret;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
 static const char	*item_logtype_string(unsigned char logtype)
 {
 	switch (logtype)
@@ -1343,370 +965,6 @@ static void	get_escalation_history(zbx_uint64_t actionid, const zbx_db_event *ev
 	*replace_to = buf;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve event acknowledges history                               *
- *                                                                            *
- ******************************************************************************/
-static void	get_event_update_history(const zbx_db_event *event, char **replace_to,
-		const zbx_uint64_t *recipient_userid, const char *tz)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	char		*buf = NULL;
-	size_t		buf_alloc = ZBX_KIBIBYTE, buf_offset = 0;
-
-	buf = (char *)zbx_malloc(buf, buf_alloc);
-	*buf = '\0';
-
-	result = zbx_db_select("select clock,userid,message,action,old_severity,new_severity,suppress_until"
-			" from acknowledges"
-			" where eventid=" ZBX_FS_UI64 " order by clock",
-			event->eventid);
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		const char	*user_name;
-		char		*actions = NULL;
-		zbx_db_acknowledge	ack;
-
-		ack.clock = atoi(row[0]);
-		ZBX_STR2UINT64(ack.userid, row[1]);
-		ack.message = row[2];
-		ack.acknowledgeid = 0;
-		ack.action = atoi(row[3]);
-		ack.old_severity = atoi(row[4]);
-		ack.new_severity = atoi(row[5]);
-		ack.suppress_until = atoi(row[6]);
-
-		if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
-			user_name = zbx_user_string(ack.userid);
-		else
-			user_name = "Inaccessible user";
-
-		zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset,
-				"%s %s \"%s\"\n",
-				zbx_date2str(ack.clock, tz),
-				zbx_time2str(ack.clock, tz),
-				user_name);
-
-		if (SUCCEED == get_problem_update_actions(&ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
-					ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_SEVERITY |
-					ZBX_PROBLEM_UPDATE_SUPPRESS | ZBX_PROBLEM_UPDATE_UNSUPPRESS |
-					ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE | ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM,
-					tz, &actions))
-		{
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "Actions: %s.\n", actions);
-			zbx_free(actions);
-		}
-
-		if ('\0' != *ack.message)
-			zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "%s\n", ack.message);
-
-		zbx_chrcpy_alloc(&buf, &buf_alloc, &buf_offset, '\n');
-	}
-	zbx_db_free_result(result);
-
-	if (0 != buf_offset)
-	{
-		buf_offset -= 2;
-		buf[buf_offset] = '\0';
-	}
-
-	*replace_to = buf;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: request value from autoreg_host table by event                    *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- ******************************************************************************/
-static int	get_autoreg_value_by_event(const zbx_db_event *event, char **replace_to, const char *fieldname)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	int		ret = FAIL;
-
-	result = zbx_db_select(
-			"select %s"
-			" from autoreg_host"
-			" where autoreg_hostid=" ZBX_FS_UI64, fieldname, event->objectid);
-
-	if (NULL != (row = zbx_db_fetch(result)))
-	{
-		*replace_to = zbx_strdup(*replace_to, ZBX_NULL2STR(row[0]));
-		ret = SUCCEED;
-	}
-	zbx_db_free_result(result);
-
-	return ret;
-}
-
-#define MVAR_ACTION			"{ACTION."			/* a prefix for all action macros */
-#define MVAR_ACTION_ID			MVAR_ACTION "ID}"
-#define MVAR_ACTION_NAME		MVAR_ACTION "NAME}"
-#define MVAR_DATE			"{DATE}"
-#define MVAR_EVENT			"{EVENT."			/* a prefix for all event macros */
-#define MVAR_EVENT_ACK_HISTORY		MVAR_EVENT "ACK.HISTORY}"	/* deprecated */
-#define MVAR_EVENT_ACK_STATUS		MVAR_EVENT "ACK.STATUS}"
-#define MVAR_EVENT_AGE			MVAR_EVENT "AGE}"
-#define MVAR_EVENT_DATE			MVAR_EVENT "DATE}"
-#define MVAR_EVENT_DURATION		MVAR_EVENT "DURATION}"
-#define MVAR_EVENT_ID			MVAR_EVENT "ID}"
-#define MVAR_EVENT_NAME			MVAR_EVENT "NAME}"
-#define MVAR_EVENT_STATUS		MVAR_EVENT "STATUS}"
-#define MVAR_EVENT_TAGS			MVAR_EVENT "TAGS}"
-#define MVAR_EVENT_TAGSJSON		MVAR_EVENT "TAGSJSON}"
-#define MVAR_EVENT_TAGS_PREFIX		MVAR_EVENT "TAGS."
-#define MVAR_EVENT_TIME			MVAR_EVENT "TIME}"
-#define MVAR_EVENT_VALUE		MVAR_EVENT "VALUE}"
-#define MVAR_EVENT_SEVERITY		MVAR_EVENT "SEVERITY}"
-#define MVAR_EVENT_NSEVERITY		MVAR_EVENT "NSEVERITY}"
-#define MVAR_EVENT_OBJECT		MVAR_EVENT "OBJECT}"
-#define MVAR_EVENT_SOURCE		MVAR_EVENT "SOURCE}"
-#define MVAR_EVENT_OPDATA		MVAR_EVENT "OPDATA}"
-#define MVAR_EVENT_RECOVERY		MVAR_EVENT "RECOVERY."		/* a prefix for all recovery event macros */
-#define MVAR_EVENT_RECOVERY_DATE	MVAR_EVENT_RECOVERY "DATE}"
-#define MVAR_EVENT_RECOVERY_ID		MVAR_EVENT_RECOVERY "ID}"
-#define MVAR_EVENT_RECOVERY_STATUS	MVAR_EVENT_RECOVERY "STATUS}"	/* deprecated */
-#define MVAR_EVENT_RECOVERY_TAGS	MVAR_EVENT_RECOVERY "TAGS}"
-#define MVAR_EVENT_RECOVERY_TAGSJSON	MVAR_EVENT_RECOVERY "TAGSJSON}"
-#define MVAR_EVENT_RECOVERY_TIME	MVAR_EVENT_RECOVERY "TIME}"
-#define MVAR_EVENT_RECOVERY_VALUE	MVAR_EVENT_RECOVERY "VALUE}"	/* deprecated */
-#define MVAR_EVENT_RECOVERY_NAME	MVAR_EVENT_RECOVERY "NAME}"
-#define MVAR_EVENT_UPDATE		MVAR_EVENT "UPDATE."
-#define MVAR_EVENT_UPDATE_ACTION	MVAR_EVENT_UPDATE "ACTION}"
-#define MVAR_EVENT_UPDATE_DATE		MVAR_EVENT_UPDATE "DATE}"
-#define MVAR_EVENT_UPDATE_HISTORY	MVAR_EVENT_UPDATE "HISTORY}"
-#define MVAR_EVENT_UPDATE_MESSAGE	MVAR_EVENT_UPDATE "MESSAGE}"
-#define MVAR_EVENT_UPDATE_TIME		MVAR_EVENT_UPDATE "TIME}"
-#define MVAR_EVENT_UPDATE_STATUS	MVAR_EVENT_UPDATE "STATUS}"
-#define MVAR_EVENT_UPDATE_NSEVERITY	MVAR_EVENT_UPDATE "NSEVERITY}"
-#define MVAR_EVENT_UPDATE_SEVERITY	MVAR_EVENT_UPDATE "SEVERITY}"
-#define MVAR_EVENT_CAUSE		MVAR_EVENT "CAUSE."		/* a prefix for all event cause macros */
-#define MVAR_EVENT_CAUSE_ACK_STATUS	MVAR_EVENT_CAUSE "ACK.STATUS}"
-#define MVAR_EVENT_CAUSE_AGE		MVAR_EVENT_CAUSE "AGE}"
-#define MVAR_EVENT_CAUSE_DATE		MVAR_EVENT_CAUSE "DATE}"
-#define MVAR_EVENT_CAUSE_DURATION	MVAR_EVENT_CAUSE "DURATION}"
-#define MVAR_EVENT_CAUSE_ID		MVAR_EVENT_CAUSE "ID}"
-#define MVAR_EVENT_CAUSE_NAME		MVAR_EVENT_CAUSE "NAME}"
-#define MVAR_EVENT_CAUSE_STATUS		MVAR_EVENT_CAUSE "STATUS}"
-#define MVAR_EVENT_CAUSE_TAGS		MVAR_EVENT_CAUSE "TAGS}"
-#define MVAR_EVENT_CAUSE_TAGSJSON	MVAR_EVENT_CAUSE "TAGSJSON}"
-#define MVAR_EVENT_CAUSE_TAGS_PREFIX	MVAR_EVENT_CAUSE "TAGS."
-#define MVAR_EVENT_CAUSE_TIME		MVAR_EVENT_CAUSE "TIME}"
-#define MVAR_EVENT_CAUSE_VALUE		MVAR_EVENT_CAUSE "VALUE}"
-#define MVAR_EVENT_CAUSE_SEVERITY	MVAR_EVENT_CAUSE "SEVERITY}"
-#define MVAR_EVENT_CAUSE_NSEVERITY	MVAR_EVENT_CAUSE "NSEVERITY}"
-#define MVAR_EVENT_CAUSE_OBJECT		MVAR_EVENT_CAUSE "OBJECT}"
-#define MVAR_EVENT_CAUSE_SOURCE		MVAR_EVENT_CAUSE "SOURCE}"
-#define MVAR_EVENT_CAUSE_OPDATA		MVAR_EVENT_CAUSE "OPDATA}"
-#define MVAR_EVENT_CAUSE_UPDATE		MVAR_EVENT_CAUSE "UPDATE."
-#define MVAR_EVENT_CAUSE_UPDATE_HISTORY	MVAR_EVENT_CAUSE_UPDATE "HISTORY}"
-#define MVAR_EVENT_SYMPTOMS		MVAR_EVENT "SYMPTOMS}"
-
-#define MVAR_ESC_HISTORY		"{ESC.HISTORY}"
-#define MVAR_PROXY_NAME			"{PROXY.NAME}"
-#define MVAR_PROXY_DESCRIPTION		"{PROXY.DESCRIPTION}"
-#define MVAR_HOST_DNS			"{HOST.DNS}"
-#define MVAR_HOST_CONN			"{HOST.CONN}"
-#define MVAR_HOST_HOST			"{HOST.HOST}"
-#define MVAR_HOST_ID			"{HOST.ID}"
-#define MVAR_HOST_IP			"{HOST.IP}"
-#define MVAR_IPADDRESS			"{IPADDRESS}"			/* deprecated */
-#define MVAR_HOST_METADATA		"{HOST.METADATA}"
-#define MVAR_HOST_NAME			"{HOST.NAME}"
-#define MVAR_HOSTNAME			"{HOSTNAME}"			/* deprecated */
-#define MVAR_HOST_DESCRIPTION		"{HOST.DESCRIPTION}"
-#define MVAR_HOST_PORT			"{HOST.PORT}"
-#define MVAR_HOST_TARGET_DNS		"{HOST.TARGET.DNS}"
-#define MVAR_HOST_TARGET_CONN		"{HOST.TARGET.CONN}"
-#define MVAR_HOST_TARGET_HOST		"{HOST.TARGET.HOST}"
-#define MVAR_HOST_TARGET_IP		"{HOST.TARGET.IP}"
-#define MVAR_HOST_TARGET_NAME		"{HOST.TARGET.NAME}"
-#define MVAR_TIME			"{TIME}"
-#define MVAR_ITEM_LASTVALUE		"{ITEM.LASTVALUE}"
-#define MVAR_ITEM_VALUE			"{ITEM.VALUE}"
-#define MVAR_ITEM_VALUETYPE		"{ITEM.VALUETYPE}"
-#define MVAR_ITEM_ID			"{ITEM.ID}"
-#define MVAR_ITEM_NAME			"{ITEM.NAME}"
-#define MVAR_ITEM_NAME_ORIG		"{ITEM.NAME.ORIG}"
-#define MVAR_ITEM_KEY			"{ITEM.KEY}"
-#define MVAR_ITEM_KEY_ORIG		"{ITEM.KEY.ORIG}"
-#define MVAR_ITEM_STATE			"{ITEM.STATE}"
-#define MVAR_TRIGGER_KEY		"{TRIGGER.KEY}"			/* deprecated */
-#define MVAR_ITEM_DESCRIPTION		"{ITEM.DESCRIPTION}"
-#define MVAR_ITEM_DESCRIPTION_ORIG	"{ITEM.DESCRIPTION.ORIG}"
-#define MVAR_ITEM_LOG			"{ITEM.LOG."
-#define MVAR_ITEM_LOG_DATE		MVAR_ITEM_LOG "DATE}"
-#define MVAR_ITEM_LOG_TIME		MVAR_ITEM_LOG "TIME}"
-#define MVAR_ITEM_LOG_AGE		MVAR_ITEM_LOG "AGE}"
-#define MVAR_ITEM_LOG_SOURCE		MVAR_ITEM_LOG "SOURCE}"
-#define MVAR_ITEM_LOG_SEVERITY		MVAR_ITEM_LOG "SEVERITY}"
-#define MVAR_ITEM_LOG_NSEVERITY		MVAR_ITEM_LOG "NSEVERITY}"
-#define MVAR_ITEM_LOG_EVENTID		MVAR_ITEM_LOG "EVENTID}"
-#define	MVAR_ITEM_STATE_ERROR		"{ITEM.STATE.ERROR}"
-
-#define MVAR_SERVICE				"{SERVICE."
-#define MVAR_SERVICE_NAME			MVAR_SERVICE "NAME}"
-#define MVAR_SERVICE_DESCRIPTION		MVAR_SERVICE "DESCRIPTION}"
-#define MVAR_SERVICE_ROOTCAUSE			MVAR_SERVICE "ROOTCAUSE}"
-#define MVAR_SERVICE_TAGS			MVAR_SERVICE "TAGS}"
-#define MVAR_SERVICE_TAGSJSON			MVAR_SERVICE "TAGSJSON}"
-#define MVAR_SERVICE_TAGS_PREFIX		MVAR_SERVICE "TAGS."
-
-#define MVAR_TRIGGER_DESCRIPTION		"{TRIGGER.DESCRIPTION}"
-#define MVAR_TRIGGER_COMMENT			"{TRIGGER.COMMENT}"		/* deprecated */
-#define MVAR_TRIGGER_ID				"{TRIGGER.ID}"
-#define MVAR_TRIGGER_NAME			"{TRIGGER.NAME}"
-#define MVAR_TRIGGER_NAME_ORIG			"{TRIGGER.NAME.ORIG}"
-#define MVAR_TRIGGER_EXPRESSION			"{TRIGGER.EXPRESSION}"
-#define MVAR_TRIGGER_EXPRESSION_RECOVERY	"{TRIGGER.EXPRESSION.RECOVERY}"
-#define MVAR_TRIGGER_SEVERITY			"{TRIGGER.SEVERITY}"
-#define MVAR_TRIGGER_NSEVERITY			"{TRIGGER.NSEVERITY}"
-#define MVAR_TRIGGER_STATUS			"{TRIGGER.STATUS}"
-#define MVAR_TRIGGER_STATE			"{TRIGGER.STATE}"
-#define MVAR_TRIGGER_TEMPLATE_NAME		"{TRIGGER.TEMPLATE.NAME}"
-#define MVAR_TRIGGER_HOSTGROUP_NAME		"{TRIGGER.HOSTGROUP.NAME}"
-#define MVAR_FUNCTION_VALUE			"{FUNCTION.VALUE}"
-#define MVAR_FUNCTION_RECOVERY_VALUE		"{FUNCTION.RECOVERY.VALUE}"
-#define MVAR_TRIGGER_EXPRESSION_EXPLAIN		"{TRIGGER.EXPRESSION.EXPLAIN}"
-#define MVAR_TRIGGER_EXPRESSION_RECOVERY_EXPLAIN	"{TRIGGER.EXPRESSION.RECOVERY.EXPLAIN}"
-
-#define MVAR_STATUS				"{STATUS}"			/* deprecated */
-#define MVAR_TRIGGER_VALUE			"{TRIGGER.VALUE}"
-#define MVAR_TRIGGER_URL			"{TRIGGER.URL}"
-#define MVAR_TRIGGER_URL_NAME			"{TRIGGER.URL.NAME}"
-
-#define MVAR_TRIGGER_EVENTS_ACK			"{TRIGGER.EVENTS.ACK}"
-#define MVAR_TRIGGER_EVENTS_UNACK		"{TRIGGER.EVENTS.UNACK}"
-#define MVAR_TRIGGER_EVENTS_PROBLEM_ACK		"{TRIGGER.EVENTS.PROBLEM.ACK}"
-#define MVAR_TRIGGER_EVENTS_PROBLEM_UNACK	"{TRIGGER.EVENTS.PROBLEM.UNACK}"
-#define	MVAR_TRIGGER_STATE_ERROR		"{TRIGGER.STATE.ERROR}"
-
-#define MVAR_LLDRULE_DESCRIPTION		"{LLDRULE.DESCRIPTION}"
-#define MVAR_LLDRULE_DESCRIPTION_ORIG		"{LLDRULE.DESCRIPTION.ORIG}"
-#define MVAR_LLDRULE_ID				"{LLDRULE.ID}"
-#define MVAR_LLDRULE_KEY			"{LLDRULE.KEY}"
-#define MVAR_LLDRULE_KEY_ORIG			"{LLDRULE.KEY.ORIG}"
-#define MVAR_LLDRULE_NAME			"{LLDRULE.NAME}"
-#define MVAR_LLDRULE_NAME_ORIG			"{LLDRULE.NAME.ORIG}"
-#define MVAR_LLDRULE_STATE			"{LLDRULE.STATE}"
-#define MVAR_LLDRULE_STATE_ERROR		"{LLDRULE.STATE.ERROR}"
-
-#define MVAR_INVENTORY				"{INVENTORY."			/* a prefix for all inventory macros */
-#define MVAR_INVENTORY_TYPE			MVAR_INVENTORY "TYPE}"
-#define MVAR_INVENTORY_TYPE_FULL		MVAR_INVENTORY "TYPE.FULL}"
-#define MVAR_INVENTORY_NAME			MVAR_INVENTORY "NAME}"
-#define MVAR_INVENTORY_ALIAS			MVAR_INVENTORY "ALIAS}"
-#define MVAR_INVENTORY_OS			MVAR_INVENTORY "OS}"
-#define MVAR_INVENTORY_OS_FULL			MVAR_INVENTORY "OS.FULL}"
-#define MVAR_INVENTORY_OS_SHORT			MVAR_INVENTORY "OS.SHORT}"
-#define MVAR_INVENTORY_SERIALNO_A		MVAR_INVENTORY "SERIALNO.A}"
-#define MVAR_INVENTORY_SERIALNO_B		MVAR_INVENTORY "SERIALNO.B}"
-#define MVAR_INVENTORY_TAG			MVAR_INVENTORY "TAG}"
-#define MVAR_INVENTORY_ASSET_TAG		MVAR_INVENTORY "ASSET.TAG}"
-#define MVAR_INVENTORY_MACADDRESS_A		MVAR_INVENTORY "MACADDRESS.A}"
-#define MVAR_INVENTORY_MACADDRESS_B		MVAR_INVENTORY "MACADDRESS.B}"
-#define MVAR_INVENTORY_HARDWARE			MVAR_INVENTORY "HARDWARE}"
-#define MVAR_INVENTORY_HARDWARE_FULL		MVAR_INVENTORY "HARDWARE.FULL}"
-#define MVAR_INVENTORY_SOFTWARE			MVAR_INVENTORY "SOFTWARE}"
-#define MVAR_INVENTORY_SOFTWARE_FULL		MVAR_INVENTORY "SOFTWARE.FULL}"
-#define MVAR_INVENTORY_SOFTWARE_APP_A		MVAR_INVENTORY "SOFTWARE.APP.A}"
-#define MVAR_INVENTORY_SOFTWARE_APP_B		MVAR_INVENTORY "SOFTWARE.APP.B}"
-#define MVAR_INVENTORY_SOFTWARE_APP_C		MVAR_INVENTORY "SOFTWARE.APP.C}"
-#define MVAR_INVENTORY_SOFTWARE_APP_D		MVAR_INVENTORY "SOFTWARE.APP.D}"
-#define MVAR_INVENTORY_SOFTWARE_APP_E		MVAR_INVENTORY "SOFTWARE.APP.E}"
-#define MVAR_INVENTORY_CONTACT			MVAR_INVENTORY "CONTACT}"
-#define MVAR_INVENTORY_LOCATION			MVAR_INVENTORY "LOCATION}"
-#define MVAR_INVENTORY_LOCATION_LAT		MVAR_INVENTORY "LOCATION.LAT}"
-#define MVAR_INVENTORY_LOCATION_LON		MVAR_INVENTORY "LOCATION.LON}"
-#define MVAR_INVENTORY_NOTES			MVAR_INVENTORY "NOTES}"
-#define MVAR_INVENTORY_CHASSIS			MVAR_INVENTORY "CHASSIS}"
-#define MVAR_INVENTORY_MODEL			MVAR_INVENTORY "MODEL}"
-#define MVAR_INVENTORY_HW_ARCH			MVAR_INVENTORY "HW.ARCH}"
-#define MVAR_INVENTORY_VENDOR			MVAR_INVENTORY "VENDOR}"
-#define MVAR_INVENTORY_CONTRACT_NUMBER		MVAR_INVENTORY "CONTRACT.NUMBER}"
-#define MVAR_INVENTORY_INSTALLER_NAME		MVAR_INVENTORY "INSTALLER.NAME}"
-#define MVAR_INVENTORY_DEPLOYMENT_STATUS	MVAR_INVENTORY "DEPLOYMENT.STATUS}"
-#define MVAR_INVENTORY_URL_A			MVAR_INVENTORY "URL.A}"
-#define MVAR_INVENTORY_URL_B			MVAR_INVENTORY "URL.B}"
-#define MVAR_INVENTORY_URL_C			MVAR_INVENTORY "URL.C}"
-#define MVAR_INVENTORY_HOST_NETWORKS		MVAR_INVENTORY "HOST.NETWORKS}"
-#define MVAR_INVENTORY_HOST_NETMASK		MVAR_INVENTORY "HOST.NETMASK}"
-#define MVAR_INVENTORY_HOST_ROUTER		MVAR_INVENTORY "HOST.ROUTER}"
-#define MVAR_INVENTORY_OOB_IP			MVAR_INVENTORY "OOB.IP}"
-#define MVAR_INVENTORY_OOB_NETMASK		MVAR_INVENTORY "OOB.NETMASK}"
-#define MVAR_INVENTORY_OOB_ROUTER		MVAR_INVENTORY "OOB.ROUTER}"
-#define MVAR_INVENTORY_HW_DATE_PURCHASE		MVAR_INVENTORY "HW.DATE.PURCHASE}"
-#define MVAR_INVENTORY_HW_DATE_INSTALL		MVAR_INVENTORY "HW.DATE.INSTALL}"
-#define MVAR_INVENTORY_HW_DATE_EXPIRY		MVAR_INVENTORY "HW.DATE.EXPIRY}"
-#define MVAR_INVENTORY_HW_DATE_DECOMM		MVAR_INVENTORY "HW.DATE.DECOMM}"
-#define MVAR_INVENTORY_SITE_ADDRESS_A		MVAR_INVENTORY "SITE.ADDRESS.A}"
-#define MVAR_INVENTORY_SITE_ADDRESS_B		MVAR_INVENTORY "SITE.ADDRESS.B}"
-#define MVAR_INVENTORY_SITE_ADDRESS_C		MVAR_INVENTORY "SITE.ADDRESS.C}"
-#define MVAR_INVENTORY_SITE_CITY		MVAR_INVENTORY "SITE.CITY}"
-#define MVAR_INVENTORY_SITE_STATE		MVAR_INVENTORY "SITE.STATE}"
-#define MVAR_INVENTORY_SITE_COUNTRY		MVAR_INVENTORY "SITE.COUNTRY}"
-#define MVAR_INVENTORY_SITE_ZIP			MVAR_INVENTORY "SITE.ZIP}"
-#define MVAR_INVENTORY_SITE_RACK		MVAR_INVENTORY "SITE.RACK}"
-#define MVAR_INVENTORY_SITE_NOTES		MVAR_INVENTORY "SITE.NOTES}"
-#define MVAR_INVENTORY_POC_PRIMARY_NAME		MVAR_INVENTORY "POC.PRIMARY.NAME}"
-#define MVAR_INVENTORY_POC_PRIMARY_EMAIL	MVAR_INVENTORY "POC.PRIMARY.EMAIL}"
-#define MVAR_INVENTORY_POC_PRIMARY_PHONE_A	MVAR_INVENTORY "POC.PRIMARY.PHONE.A}"
-#define MVAR_INVENTORY_POC_PRIMARY_PHONE_B	MVAR_INVENTORY "POC.PRIMARY.PHONE.B}"
-#define MVAR_INVENTORY_POC_PRIMARY_CELL		MVAR_INVENTORY "POC.PRIMARY.CELL}"
-#define MVAR_INVENTORY_POC_PRIMARY_SCREEN	MVAR_INVENTORY "POC.PRIMARY.SCREEN}"
-#define MVAR_INVENTORY_POC_PRIMARY_NOTES	MVAR_INVENTORY "POC.PRIMARY.NOTES}"
-#define MVAR_INVENTORY_POC_SECONDARY_NAME	MVAR_INVENTORY "POC.SECONDARY.NAME}"
-#define MVAR_INVENTORY_POC_SECONDARY_EMAIL	MVAR_INVENTORY "POC.SECONDARY.EMAIL}"
-#define MVAR_INVENTORY_POC_SECONDARY_PHONE_A	MVAR_INVENTORY "POC.SECONDARY.PHONE.A}"
-#define MVAR_INVENTORY_POC_SECONDARY_PHONE_B	MVAR_INVENTORY "POC.SECONDARY.PHONE.B}"
-#define MVAR_INVENTORY_POC_SECONDARY_CELL	MVAR_INVENTORY "POC.SECONDARY.CELL}"
-#define MVAR_INVENTORY_POC_SECONDARY_SCREEN	MVAR_INVENTORY "POC.SECONDARY.SCREEN}"
-#define MVAR_INVENTORY_POC_SECONDARY_NOTES	MVAR_INVENTORY "POC.SECONDARY.NOTES}"
-
-/* PROFILE.* is deprecated, use INVENTORY.* instead */
-#define MVAR_PROFILE			"{PROFILE."			/* prefix for profile macros */
-#define MVAR_PROFILE_DEVICETYPE		MVAR_PROFILE "DEVICETYPE}"
-#define MVAR_PROFILE_NAME		MVAR_PROFILE "NAME}"
-#define MVAR_PROFILE_OS			MVAR_PROFILE "OS}"
-#define MVAR_PROFILE_SERIALNO		MVAR_PROFILE "SERIALNO}"
-#define MVAR_PROFILE_TAG		MVAR_PROFILE "TAG}"
-#define MVAR_PROFILE_MACADDRESS		MVAR_PROFILE "MACADDRESS}"
-#define MVAR_PROFILE_HARDWARE		MVAR_PROFILE "HARDWARE}"
-#define MVAR_PROFILE_SOFTWARE		MVAR_PROFILE "SOFTWARE}"
-#define MVAR_PROFILE_CONTACT		MVAR_PROFILE "CONTACT}"
-#define MVAR_PROFILE_LOCATION		MVAR_PROFILE "LOCATION}"
-#define MVAR_PROFILE_NOTES		MVAR_PROFILE "NOTES}"
-
-#define MVAR_DISCOVERY_RULE_NAME	"{DISCOVERY.RULE.NAME}"
-#define MVAR_DISCOVERY_SERVICE_NAME	"{DISCOVERY.SERVICE.NAME}"
-#define MVAR_DISCOVERY_SERVICE_PORT	"{DISCOVERY.SERVICE.PORT}"
-#define MVAR_DISCOVERY_SERVICE_STATUS	"{DISCOVERY.SERVICE.STATUS}"
-#define MVAR_DISCOVERY_SERVICE_UPTIME	"{DISCOVERY.SERVICE.UPTIME}"
-#define MVAR_DISCOVERY_DEVICE_IPADDRESS	"{DISCOVERY.DEVICE.IPADDRESS}"
-#define MVAR_DISCOVERY_DEVICE_DNS	"{DISCOVERY.DEVICE.DNS}"
-#define MVAR_DISCOVERY_DEVICE_STATUS	"{DISCOVERY.DEVICE.STATUS}"
-#define MVAR_DISCOVERY_DEVICE_UPTIME	"{DISCOVERY.DEVICE.UPTIME}"
-
-#define MVAR_ALERT_SENDTO		"{ALERT.SENDTO}"
-#define MVAR_ALERT_SUBJECT		"{ALERT.SUBJECT}"
-#define MVAR_ALERT_MESSAGE		"{ALERT.MESSAGE}"
-
-#define MVAR_ACK_MESSAGE		"{ACK.MESSAGE}"			/* deprecated */
-#define MVAR_ACK_TIME			"{ACK.TIME}"			/* deprecated */
-#define MVAR_ACK_DATE			"{ACK.DATE}"			/* deprecated */
-#define MVAR_USER_ALIAS			"{USER.ALIAS}"			/* deprecated */
-#define MVAR_USER_USERNAME		"{USER.USERNAME}"
-#define MVAR_USER_NAME			"{USER.NAME}"
-#define MVAR_USER_SURNAME		"{USER.SURNAME}"
-#define MVAR_USER_FULLNAME		"{USER.FULLNAME}"
-
 #define STR_UNKNOWN_VARIABLE		"*UNKNOWN*"
 
 /* macros that can be indexed */
@@ -1967,144 +1225,6 @@ static int	get_host_inventory_by_hostid(const char *macro, zbx_uint64_t hostid, 
 	return FAIL;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: comparison function to sort tags by tag/value                     *
- *                                                                            *
- ******************************************************************************/
-static int	compare_tags(const void *d1, const void *d2)
-{
-	int	ret;
-
-	const zbx_tag_t	*tag1 = *(const zbx_tag_t * const *)d1;
-	const zbx_tag_t	*tag2 = *(const zbx_tag_t * const *)d2;
-
-	if (0 == (ret = zbx_strcmp_natural(tag1->tag, tag2->tag)))
-		ret = zbx_strcmp_natural(tag1->value, tag2->value);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: format event tags string in format <tag1>[:<value1>], ...         *
- *                                                                            *
- * Parameters: event        [IN] the event                                    *
- *             replace_to - [OUT] replacement string                          *
- *                                                                            *
- ******************************************************************************/
-static void	get_event_tags(const zbx_db_event *event, char **replace_to)
-{
-	size_t			replace_to_offset = 0, replace_to_alloc = 0;
-	int			i;
-	zbx_vector_tags_t	tags;
-
-	if (0 == event->tags.values_num)
-	{
-		*replace_to = zbx_strdup(*replace_to, "");
-		return;
-	}
-
-	zbx_free(*replace_to);
-
-	/* copy tags to temporary vector for sorting */
-
-	zbx_vector_tags_create(&tags);
-	zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
-	zbx_vector_tags_sort(&tags, compare_tags);
-
-	for (i = 0; i < tags.values_num; i++)
-	{
-		const zbx_tag_t	*tag = tags.values[i];
-
-		if (0 != i)
-			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ", ");
-
-		zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, tag->tag);
-
-		if ('\0' != *tag->value)
-		{
-			zbx_chrcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, ':');
-			zbx_strcpy_alloc(replace_to, &replace_to_alloc, &replace_to_offset, tag->value);
-		}
-	}
-
-	zbx_vector_tags_destroy(&tags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: format event tags string in JSON format                           *
- *                                                                            *
- * Parameters: event        [IN] the event                                    *
- *             replace_to - [OUT] replacement string                          *
- *                                                                            *
- ******************************************************************************/
-static void	get_event_tags_json(const zbx_db_event *event, char **replace_to)
-{
-	struct zbx_json	json;
-	int		i;
-
-	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
-
-	for (i = 0; i < event->tags.values_num; i++)
-	{
-		const zbx_tag_t	*tag = event->tags.values[i];
-
-		zbx_json_addobject(&json, NULL);
-		zbx_json_addstring(&json, "tag", tag->tag, ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "value", tag->value, ZBX_JSON_TYPE_STRING);
-		zbx_json_close(&json);
-	}
-
-	zbx_json_close(&json);
-	*replace_to = zbx_strdup(*replace_to, json.buffer);
-	zbx_json_free(&json);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get event tag value by name                                       *
- *                                                                            *
- * Parameters: macro      - [IN] the macro                                    *
- *             event      - [IN] event                                        *
- *             replace_to - [OUT] replacement string                          *
- *                                                                            *
- ******************************************************************************/
-static void	get_event_tag_by_name(const char *text, const zbx_db_event *event, char **replace_to)
-{
-	char	*name;
-
-	if (SUCCEED == zbx_str_extract(text, strlen(text) - 1, &name))
-	{
-		if (0 < event->tags.values_num)
-		{
-			int			i;
-			zbx_tag_t		*tag;
-			zbx_vector_tags_t	tags;
-
-			zbx_vector_tags_create(&tags);
-			zbx_vector_tags_append_array(&tags, event->tags.values, event->tags.values_num);
-			zbx_vector_tags_sort(&tags, compare_tags);
-
-			for (i = 0; i < tags.values_num; i++)
-			{
-				tag = tags.values[i];
-
-				if (0 == strcmp(name, tag->tag))
-				{
-					*replace_to = zbx_strdup(*replace_to, tag->value);
-					break;
-				}
-			}
-
-			zbx_vector_tags_destroy(&tags);
-		}
-
-		zbx_free(name);
-	}
-}
-
 static const char	*trigger_state_string(int state)
 {
 	switch (state)
@@ -2197,9 +1317,9 @@ static void	get_recovery_event_value(const char *macro, const zbx_db_event *r_ev
 	else if (EVENT_SOURCE_TRIGGERS == r_event->source || EVENT_SOURCE_SERVICE == r_event->source)
 	{
 		if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGS))
-			get_event_tags(r_event, replace_to);
+			zbx_event_get_str_tags(r_event, replace_to);
 		else if (0 == strcmp(macro, MVAR_EVENT_RECOVERY_TAGSJSON))
-			get_event_tags_json(r_event, replace_to);
+			zbx_event_get_json_tags(r_event, replace_to);
 	}
 }
 
@@ -2223,127 +1343,6 @@ static void	get_current_event_value(const char *macro, const zbx_db_event *event
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request event value by macro                                      *
- *                                                                            *
- ******************************************************************************/
-static void	get_event_value(const char *macro, const zbx_db_event *event, char **replace_to,
-			const zbx_uint64_t *recipient_userid, const zbx_db_event *r_event, const char *tz)
-{
-	if (0 == strcmp(macro, MVAR_EVENT_AGE))
-	{
-		*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_DATE))
-	{
-		*replace_to = zbx_strdup(*replace_to, zbx_date2str(event->clock, tz));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_DURATION))
-	{
-		if (NULL == r_event)
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(time(NULL) - event->clock));
-		else
-			*replace_to = zbx_strdup(*replace_to, zbx_age2str(r_event->clock - event->clock));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_ID))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, ZBX_FS_UI64, event->eventid);
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_TIME))
-	{
-		*replace_to = zbx_strdup(*replace_to, zbx_time2str(event->clock, tz));
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_SOURCE))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", event->source);
-	}
-	else if (0 == strcmp(macro, MVAR_EVENT_OBJECT))
-	{
-		*replace_to = zbx_dsprintf(*replace_to, "%d", event->object);
-	}
-	else if (EVENT_SOURCE_TRIGGERS == event->source)
-	{
-		if (0 == strcmp(macro, MVAR_EVENT_ACK_HISTORY) || 0 == strcmp(macro, MVAR_EVENT_UPDATE_HISTORY))
-		{
-			get_event_update_history(event, replace_to, recipient_userid, tz);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_ACK_STATUS))
-		{
-			*replace_to = zbx_strdup(*replace_to, event->acknowledged ? "Yes" : "No");
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
-		{
-			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)event->severity);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_SEVERITY))
-		{
-			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
-				*replace_to = zbx_strdup(*replace_to, "unknown");
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
-		{
-			get_event_tags(event, replace_to);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
-		{
-			get_event_tags_json(event, replace_to);
-		}
-		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
-		{
-			get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
-		}
-	}
-	else if (EVENT_SOURCE_SERVICE == event->source)
-	{
-		if (0 == strcmp(macro, MVAR_EVENT_NSEVERITY))
-		{
-			*replace_to = zbx_dsprintf(*replace_to, "%d", (int)event->severity);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_SEVERITY))
-		{
-			if (FAIL == get_trigger_severity_name(event->severity, replace_to))
-				*replace_to = zbx_strdup(*replace_to, "unknown");
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGS))
-		{
-			get_event_tags(event, replace_to);
-		}
-		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
-		{
-			get_event_tags_json(event, replace_to);
-		}
-		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
-		{
-			get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
-		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: free memory allocated for temporary event data                    *
- *                                                                            *
- ******************************************************************************/
-static void	eventdata_free(zbx_eventdata_t *eventdata)
-{
-	zbx_free(eventdata->host);
-	zbx_free(eventdata->severity);
-	zbx_free(eventdata->tags);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: compare events to sort by highest severity and host name          *
- *                                                                            *
- ******************************************************************************/
-static int	eventdata_compare(const zbx_eventdata_t *d1, const zbx_eventdata_t *d2)
-{
-	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
-
-	return strcmp(d1->host, d2->host);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: compose temporary vector containing event data                    *
  *                                                                            *
  ******************************************************************************/
@@ -2363,38 +1362,17 @@ static void	eventdata_compose(const zbx_vector_ptr_t *events, zbx_vector_eventda
 			goto fail;
 
 		eventdata.nseverity = event->severity;
-		if (FAIL == (ret = get_trigger_severity_name(event->severity, &eventdata.severity)))
+		if (FAIL == (ret = zbx_config_get_trigger_severity_name(event->severity, &eventdata.severity)))
 			goto fail;
 
-		get_event_tags(event, &eventdata.tags);
+		zbx_event_get_str_tags(event, &eventdata.tags);
 		eventdata.name = event->name;
 		eventdata.clock = event->clock;
 fail:
 		if (FAIL == ret)
-			eventdata_free(&eventdata);
+			zbx_eventdata_free(&eventdata);
 		else
 			zbx_vector_eventdata_append(vect_eventdata, eventdata);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: build string from event data                                      *
- *                                                                            *
- ******************************************************************************/
-static void	eventdata_to_str(const zbx_vector_eventdata_t *eventdata, char **replace_to)
-{
-	int		i;
-	const char	*d = "";
-
-	for (i = 0; i < eventdata->values_num; i++)
-	{
-		zbx_eventdata_t	*e = &eventdata->values[i];
-
-		*replace_to = zbx_strdcatf(*replace_to, "%sHost: \"%s\" Problem name: \"%s\" Severity: \"%s\" Age: %s"
-				" Problem tags: \"%s\"", d, e->host, e->name, e->severity,
-				zbx_age2str(time(NULL) - e->clock), e->tags);
-		d = "\n";
 	}
 }
 
@@ -2411,11 +1389,11 @@ static void	get_rootcause(const zbx_db_service *service, char **replace_to)
 	zbx_vector_eventdata_create(&rootcauses);
 
 	eventdata_compose(&service->events, &rootcauses);
-	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)eventdata_compare);
-	eventdata_to_str(&rootcauses, replace_to);
+	zbx_vector_eventdata_sort(&rootcauses, (zbx_compare_func_t)zbx_eventdata_compare);
+	zbx_eventdata_to_str(&rootcauses, replace_to);
 
 	for (i = 0; i < rootcauses.values_num; i++)
-		eventdata_free(&rootcauses.values[i]);
+		zbx_eventdata_free(&rootcauses.values[i]);
 
 	zbx_vector_eventdata_destroy(&rootcauses);
 }
@@ -2450,11 +1428,11 @@ static void	get_event_symptoms(const zbx_db_event *event, char **replace_to)
 
 		zbx_db_get_events_by_eventids(&symptom_eventids, &symptom_events);
 		eventdata_compose(&symptom_events, &symptoms);
-		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)eventdata_compare);
-		eventdata_to_str(&symptoms, replace_to);
+		zbx_vector_eventdata_sort(&symptoms, (zbx_compare_func_t)zbx_eventdata_compare);
+		zbx_eventdata_to_str(&symptoms, replace_to);
 
 		for (i = 0; i < symptoms.values_num; i++)
-			eventdata_free(&symptoms.values[i]);
+			zbx_eventdata_free(&symptoms.values[i]);
 
 		zbx_vector_eventdata_destroy(&symptoms);
 
@@ -2477,7 +1455,7 @@ static int	get_history_log_value(const char *m, const zbx_db_trigger *trigger, c
 		int clock, int ns, const char *tz)
 {
 	zbx_uint64_t	itemid;
-	int		ret, request;
+	int		ret = FAIL, request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2505,12 +1483,16 @@ static int	get_history_log_value(const char *m, const zbx_db_trigger *trigger, c
 	{
 		request = ZBX_REQUEST_ITEM_LOG_SOURCE;
 	}
-	else	/* MVAR_ITEM_LOG_TIME */
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
+	{
 		request = ZBX_REQUEST_ITEM_LOG_TIME;
+	}
+	else
+		goto out;
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
 		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -2980,7 +1962,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const zb
 
 	if (0 == strcmp(macro, MVAR_EVENT_CAUSE_UPDATE_HISTORY))
 	{
-		get_event_update_history(c_event, replace_to, recipient_userid, tz);
+		zbx_event_db_get_history(c_event, replace_to, recipient_userid, tz);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_ACK_STATUS))
 	{
@@ -3020,17 +2002,17 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const zb
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGS))
 	{
 		zbx_db_get_event_data_tags(c_event);
-		get_event_tags(c_event, replace_to);
+		zbx_event_get_str_tags(c_event, replace_to);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TAGSJSON))
 	{
 		zbx_db_get_event_data_tags(c_event);
-		get_event_tags_json(c_event, replace_to);
+		zbx_event_get_json_tags(c_event, replace_to);
 	}
 	else if (0 == strncmp(macro, MVAR_EVENT_CAUSE_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX)))
 	{
 		zbx_db_get_event_data_tags(c_event);
-		get_event_tag_by_name(macro + ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX), c_event, replace_to);
+		zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_CAUSE_TAGS_PREFIX), c_event, replace_to);
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_TIME))
 	{
@@ -3042,7 +2024,7 @@ static void	get_event_cause_value(const char *macro, char **replace_to, const zb
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_SEVERITY))
 	{
-		if (FAIL == get_trigger_severity_name(c_event->severity, replace_to))
+		if (FAIL == zbx_config_get_trigger_severity_name(c_event->severity, replace_to))
 			*replace_to = zbx_strdup(*replace_to, "unknown");
 	}
 	else if (0 == strcmp(macro, MVAR_EVENT_CAUSE_NSEVERITY))
@@ -3292,7 +2274,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				{
 					if (0 != (macro_type & MACRO_TYPE_MESSAGE_UPDATE) && NULL != ack)
 					{
-						get_problem_update_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
+						zbx_problem_get_actions(ack, ZBX_PROBLEM_UPDATE_ACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE |
 								ZBX_PROBLEM_UPDATE_CLOSE | ZBX_PROBLEM_UPDATE_MESSAGE |
 								ZBX_PROBLEM_UPDATE_SEVERITY | ZBX_PROBLEM_UPDATE_SUPPRESS
@@ -3308,7 +2290,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3434,19 +2416,19 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_ACK))
 				{
-					ret = DBget_trigger_event_count(c_event->objectid, &replace_to, 0, 1);
+					ret = zbx_event_db_count_from_trigger(c_event->objectid, &replace_to, 0, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_ACK))
 				{
-					ret = DBget_trigger_event_count(c_event->objectid, &replace_to, 1, 1);
+					ret = zbx_event_db_count_from_trigger(c_event->objectid, &replace_to, 1, 1);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_PROBLEM_UNACK))
 				{
-					ret = DBget_trigger_event_count(c_event->objectid, &replace_to, 1, 0);
+					ret = zbx_event_db_count_from_trigger(c_event->objectid, &replace_to, 1, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EVENTS_UNACK))
 				{
-					ret = DBget_trigger_event_count(c_event->objectid, &replace_to, 0, 0);
+					ret = zbx_event_db_count_from_trigger(c_event->objectid, &replace_to, 0, 0);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_EXPRESSION))
 				{
@@ -3516,7 +2498,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
-					ret = get_trigger_severity_name(c_event->trigger.priority, &replace_to);
+					ret = zbx_config_get_trigger_severity_name(c_event->trigger.priority, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
 				{
@@ -3620,7 +2602,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -3793,7 +2775,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
-					ret = get_trigger_severity_name(c_event->trigger.priority, &replace_to);
+					ret = zbx_config_get_trigger_severity_name(c_event->trigger.priority, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE))
 				{
@@ -3860,19 +2842,19 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, NULL, tz);
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_IPADDRESS))
 				{
-					ret = DBget_dhost_value_by_event(c_event, &replace_to, "s.ip");
+					ret = zbx_event_db_get_dhost(c_event, &replace_to, "s.ip");
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_DNS))
 				{
-					ret = DBget_dhost_value_by_event(c_event, &replace_to, "s.dns");
+					ret = zbx_event_db_get_dhost(c_event, &replace_to, "s.dns");
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_DEVICE_STATUS))
 				{
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
 							"h.status")))
 					{
 						replace_to = zbx_strdup(replace_to,
@@ -3884,7 +2866,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 					zbx_snprintf(sql, sizeof(sql),
 							"case when h.status=%d then h.lastup else h.lastdown end",
 							DOBJECT_STATUS_UP);
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to, sql)))
+					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to, sql)))
 					{
 						replace_to = zbx_strdup(replace_to,
 								zbx_age2str(time(NULL) - atoi(replace_to)));
@@ -3892,11 +2874,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_RULE_NAME))
 				{
-					ret = DBget_drule_value_by_event(c_event, &replace_to, "name");
+					ret = zbx_event_db_get_drule(c_event, &replace_to, "name");
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_NAME))
 				{
-					if (SUCCEED == (ret = DBget_dchecks_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_dchecks(c_event, &replace_to,
 							"c.type")))
 					{
 						replace_to = zbx_strdup(replace_to,
@@ -3905,11 +2887,11 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_PORT))
 				{
-					ret = DBget_dservice_value_by_event(c_event, &replace_to, "s.port");
+					ret = zbx_event_db_get_dservice(c_event, &replace_to, "s.port");
 				}
 				else if (0 == strcmp(m, MVAR_DISCOVERY_SERVICE_STATUS))
 				{
-					if (SUCCEED == (ret = DBget_dservice_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_dservice(c_event, &replace_to,
 							"s.status")))
 					{
 						replace_to = zbx_strdup(replace_to,
@@ -3921,7 +2903,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 					zbx_snprintf(sql, sizeof(sql),
 							"case when s.status=%d then s.lastup else s.lastdown end",
 							DOBJECT_STATUS_UP);
-					if (SUCCEED == (ret = DBget_dservice_value_by_event(c_event, &replace_to, sql)))
+					if (SUCCEED == (ret = zbx_event_db_get_dservice(c_event, &replace_to, sql)))
 					{
 						replace_to = zbx_strdup(replace_to,
 								zbx_age2str(time(NULL) - atoi(replace_to)));
@@ -3929,7 +2911,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
 							"r.proxyid")))
 					{
 						zbx_uint64_t	proxyid;
@@ -3944,7 +2926,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					if (SUCCEED == (ret = DBget_dhost_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_dhost(c_event, &replace_to,
 							"r.proxyid")))
 					{
 						zbx_uint64_t	proxyid;
@@ -4010,27 +2992,27 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)) &&
 						0 != strcmp(m, MVAR_EVENT_DURATION))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, NULL, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_METADATA))
 				{
-					ret = get_autoreg_value_by_event(c_event, &replace_to, "host_metadata");
+					ret = zbx_event_db_get_autoreg(c_event, &replace_to, "host_metadata");
 				}
 				else if (0 == strcmp(m, MVAR_HOST_HOST))
 				{
-					ret = get_autoreg_value_by_event(c_event, &replace_to, "host");
+					ret = zbx_event_db_get_autoreg(c_event, &replace_to, "host");
 				}
 				else if (0 == strcmp(m, MVAR_HOST_IP) || 0 == strcmp(m, MVAR_IPADDRESS))
 				{
-					ret = get_autoreg_value_by_event(c_event, &replace_to, "listen_ip");
+					ret = zbx_event_db_get_autoreg(c_event, &replace_to, "listen_ip");
 				}
 				else if (0 == strcmp(m, MVAR_HOST_PORT))
 				{
-					ret = get_autoreg_value_by_event(c_event, &replace_to, "listen_port");
+					ret = zbx_event_db_get_autoreg(c_event, &replace_to, "listen_port");
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_NAME))
 				{
-					if (SUCCEED == (ret = get_autoreg_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
 							"proxyid")))
 					{
 						zbx_uint64_t	proxyid;
@@ -4045,7 +3027,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
 				{
-					if (SUCCEED == (ret = get_autoreg_value_by_event(c_event, &replace_to,
+					if (SUCCEED == (ret = zbx_event_db_get_autoreg(c_event, &replace_to,
 							"proxyid")))
 					{
 						zbx_uint64_t	proxyid;
@@ -4126,7 +3108,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -4275,7 +3257,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_HOST_ID))
 				{
@@ -4427,7 +3409,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				{
 					if (NULL != service_alarm)
 					{
-						if (FAIL == get_trigger_severity_name(service_alarm->value,
+						if (FAIL == zbx_config_get_trigger_severity_name(service_alarm->value,
 								&replace_to))
 						{
 							replace_to = zbx_strdup(replace_to, "unknown");
@@ -4460,7 +3442,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strncmp(m, MVAR_EVENT, ZBX_CONST_STRLEN(MVAR_EVENT)))
 				{
-					get_event_value(m, event, &replace_to, userid, r_event, tz);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, r_event, tz);
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_NAME))
 				{
@@ -4476,16 +3458,16 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_TAGS))
 				{
-					get_event_tags(event, &replace_to);
+					zbx_event_get_str_tags(event, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_SERVICE_TAGSJSON))
 				{
-					get_event_tags_json(event, &replace_to);
+					zbx_event_get_json_tags(event, &replace_to);
 				}
 				else if (0 == strncmp(m, MVAR_SERVICE_TAGS_PREFIX,
 						ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX)))
 				{
-					get_event_tag_by_name(m + ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX), event,
+					zbx_event_get_tag(m + ZBX_CONST_STRLEN(MVAR_SERVICE_TAGS_PREFIX), event,
 							&replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_ALERT_SENDTO))
@@ -4692,7 +3674,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 				}
 				else if (0 == strcmp(m, MVAR_EVENT_ID))
 				{
-					get_event_value(m, event, &replace_to, userid, NULL, NULL);
+					zbx_event_get_macro_value(m, event, &replace_to, userid, NULL, NULL);
 				}
 			}
 		}

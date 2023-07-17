@@ -1696,16 +1696,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve single item widget description macros.
+	 * Resolve macros in descriptions of item-based widgets.
 	 *
 	 * @param array  $items
-	 * @param string $items[n]['hostid']
-	 * @param string $items[n]['itemid']
-	 * @param string $items[n]['name']    Field to resolve. Required.
+	 *        string $items[n]['hostid']
+	 *        string $items[n]['itemid']
+	 *        string $items[n]['widget_description']  Field to resolve.
 	 *
-	 * @return array                      Returns array of items with macros resolved.
+	 * @return array  Returns array of items with macros resolved.
 	 */
-	public function resolveWidgetItemNames(array $items) {
+	public function resolveItemWidgetDescriptions(array $items): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}', '{HOST.DESCRIPTION}'],
@@ -1730,7 +1730,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($items as $key => $item) {
-			$matched_macros = self::extractMacros([$item['name']], $types);
+			$matched_macros = self::extractMacros([$item['widget_description']], $types);
 
 			foreach ($matched_macros['macros']['host'] as $token) {
 				if ($token === '{HOST.ID}') {
@@ -1790,7 +1790,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		foreach ($macro_values as $key => $macro_value) {
-			$items[$key]['name'] = strtr($items[$key]['name'], $macro_value);
+			$items[$key]['widget_description'] = strtr($items[$key]['widget_description'], $macro_value);
 		}
 
 		return $items;

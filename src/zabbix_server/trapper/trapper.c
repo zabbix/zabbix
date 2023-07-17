@@ -55,7 +55,6 @@
 #define ZBX_MAX_ENTRY_ATTRIBUTES	3
 
 static zbx_get_program_type_f          zbx_get_program_type_cb = NULL;
-
 extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
@@ -373,7 +372,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			for (i = 0; i < queue.values_num; i++)
 			{
 				zbx_queue_item_t	*item = (zbx_queue_item_t *)queue.values[i];
-				zbx_uint64_t		id = item->type;
+				zbx_uint64_t		id = (zbx_uint64_t)item->type;
 
 				if (NULL == (stats = (zbx_queue_stats_t *)zbx_hashset_search(&queue_stats, &id)))
 				{
@@ -434,7 +433,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 			}
 
 			zbx_json_close(&json);
-			zbx_json_adduint64(&json, "total", queue.values_num);
+			zbx_json_addint64(&json, "total", queue.values_num);
 
 			break;
 	}
@@ -1138,21 +1137,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_TASKS))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_task_data(sock, ts, config_comms);
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_DATA))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-			{
-				zbx_recv_proxy_data(sock, &jp, ts, events_cbs, config_comms->config_timeout,
-						proxydata_frequency);
-			}
-			else if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-				zbx_send_proxy_data(sock, ts, config_comms);
-		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 		{
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
@@ -1203,9 +1187,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = process_active_check_heartbeat(&jp);
 		}
-		else if (SUCCEED != trapper_process_request(value, sock, &jp, config_comms->config_tls, config_vault,
-				zbx_get_program_type_cb, config_comms->config_timeout, config_comms->config_source_ip,
-				config_comms->server))
+		else if (SUCCEED != trapper_process_request(value, sock, &jp, ts, config_comms, config_vault,
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);

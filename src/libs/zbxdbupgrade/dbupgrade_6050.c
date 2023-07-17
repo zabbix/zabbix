@@ -301,6 +301,47 @@ static int	DBpatch_6050025(void)
 
 static int	DBpatch_6050026(void)
 {
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_history", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050027(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_dhistory", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050028(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050029(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'gauge','widgets/gauge',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050030(void)
+{
 	const zbx_db_table_t	table = {"proxy", "proxyid", 0,
 			{
 				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -324,22 +365,22 @@ static int	DBpatch_6050026(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050027(void)
+static int	DBpatch_6050031(void)
 {
 	return DBcreate_index("proxy", "proxy_1", "name", 1);
 }
 
-static int	DBpatch_6050028(void)
+static int	DBpatch_6050032(void)
 {
 	return DBcreate_changelog_insert_trigger("proxy", "proxyid");
 }
 
-static int	DBpatch_6050029(void)
+static int	DBpatch_6050033(void)
 {
 	return DBcreate_changelog_update_trigger("proxy", "proxyid");
 }
 
-static int	DBpatch_6050030(void)
+static int	DBpatch_6050034(void)
 {
 	return DBcreate_changelog_delete_trigger("proxy", "proxyid");
 }
@@ -347,7 +388,7 @@ static int	DBpatch_6050030(void)
 #define DEPRECATED_STATUS_PROXY_ACTIVE	5
 #define DEPRECATED_STATUS_PROXY_PASSIVE	6
 
-static int	DBpatch_6050031(void)
+static int	DBpatch_6050035(void)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -410,83 +451,83 @@ static int	DBpatch_6050031(void)
 	return ret;
 }
 
-static int	DBpatch_6050032(void)
+static int	DBpatch_6050036(void)
 {
 	return DBdrop_foreign_key("hosts", 1);
 }
 
-static int	DBpatch_6050033(void)
+static int	DBpatch_6050037(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("hosts", "proxy_hostid", &field);
 }
 
-static int	DBpatch_6050034(void)
+static int	DBpatch_6050038(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("hosts", 1, &field);
 }
 
-static int	DBpatch_6050035(void)
+static int	DBpatch_6050039(void)
 {
 	return DBdrop_foreign_key("drules", 1);
 }
 
-static int	DBpatch_6050036(void)
+static int	DBpatch_6050040(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("drules", "proxy_hostid", &field);
 }
 
-static int	DBpatch_6050037(void)
+static int	DBpatch_6050041(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("drules", 1, &field);
 }
 
-static int	DBpatch_6050038(void)
+static int	DBpatch_6050042(void)
 {
 	return DBdrop_foreign_key("autoreg_host", 1);
 }
 
-static int	DBpatch_6050039(void)
+static int	DBpatch_6050043(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBrename_field("autoreg_host", "proxy_hostid", &field);
 }
 
-static int	DBpatch_6050040(void)
+static int	DBpatch_6050044(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("autoreg_host", 1, &field);
 }
 
-static int	DBpatch_6050041(void)
+static int	DBpatch_6050045(void)
 {
 	return DBdrop_foreign_key("task", 1);
 }
 
-static int	DBpatch_6050042(void)
+static int	DBpatch_6050046(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBrename_field("task", "proxy_hostid", &field);
 }
 
-static int	DBpatch_6050043(void)
+static int	DBpatch_6050047(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("task", 1, &field);
 }
 
-static int	DBpatch_6050044(void)
+static int	DBpatch_6050048(void)
 {
 	const zbx_db_table_t	table = {"proxy_rtdata", "proxyid", 0,
 			{
@@ -502,14 +543,14 @@ static int	DBpatch_6050044(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050045(void)
+static int	DBpatch_6050049(void)
 {
 	const zbx_db_field_t	field = {"proxyid", NULL, "proxy", "proxyid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("proxy_rtdata", 1, &field);
 }
 
-static int	DBpatch_6050046(void)
+static int	DBpatch_6050050(void)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -553,7 +594,7 @@ static int	DBpatch_6050046(void)
 #undef DEPRECATED_STATUS_PROXY_ACTIVE
 #undef DEPRECATED_STATUS_PROXY_PASSIVE
 
-static int	DBpatch_6050047(void)
+static int	DBpatch_6050051(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -564,32 +605,32 @@ static int	DBpatch_6050047(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050048(void)
+static int	DBpatch_6050052(void)
 {
 	return DBdrop_field("host_rtdata", "lastaccess");
 }
 
-static int	DBpatch_6050049(void)
+static int	DBpatch_6050053(void)
 {
 	return DBdrop_field("host_rtdata", "version");
 }
 
-static int	DBpatch_6050050(void)
+static int	DBpatch_6050054(void)
 {
 	return DBdrop_field("host_rtdata", "compatibility");
 }
 
-static int	DBpatch_6050051(void)
+static int	DBpatch_6050055(void)
 {
 	return DBdrop_field("hosts", "proxy_address");
 }
 
-static int	DBpatch_6050052(void)
+static int	DBpatch_6050056(void)
 {
 	return DBdrop_field("hosts", "auto_compress");
 }
 
-static int	DBpatch_6050053(void)
+static int	DBpatch_6050057(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -661,5 +702,9 @@ DBPATCH_ADD(6050050, 0, 1)
 DBPATCH_ADD(6050051, 0, 1)
 DBPATCH_ADD(6050052, 0, 1)
 DBPATCH_ADD(6050053, 0, 1)
+DBPATCH_ADD(6050054, 0, 1)
+DBPATCH_ADD(6050055, 0, 1)
+DBPATCH_ADD(6050056, 0, 1)
+DBPATCH_ADD(6050057, 0, 1)
 
 DBPATCH_END()

@@ -258,12 +258,10 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				return ZBX_POLLER_TYPE_PINGER;
 			}
 			ZBX_FALLTHROUGH;
-		case ITEM_TYPE_ZABBIX:
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_EXTERNAL:
 		case ITEM_TYPE_SSH:
 		case ITEM_TYPE_TELNET:
-		case ITEM_TYPE_HTTPAGENT:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_INTERNAL:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_POLLER))
@@ -290,6 +288,16 @@ static unsigned char	poller_by_item(unsigned char type, const char *key)
 				break;
 
 			return ZBX_POLLER_TYPE_JAVA;
+		case ITEM_TYPE_HTTPAGENT:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_HTTPAGENT_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_HTTPAGENT;
+		case ITEM_TYPE_ZABBIX:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_AGENT;
 	}
 
 	return ZBX_NO_POLLER;
@@ -9642,15 +9650,13 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 
 		for (i = 0; i < items_sync.values_num; )
 		{
-			/* update unchanged item preprocessing revision and remove from sync list */
-			if (items_sync.values[i]->revision <= *revision)
-			{
-				if (NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
+			/* Update unchanged item preprocessing revision and remove from sync list if already synced,  */
+			/* dependent items might have been unchanged but need to be added if their master is enabled. */
+			if (items_sync.values[i]->revision <= *revision &&
+					NULL != (pp_item = (zbx_pp_item_t *)zbx_hashset_search(items,
 						&items_sync.values[i]->itemid)))
-				{
-					pp_item->revision = config->revision.config;
-				}
-
+			{
+				pp_item->revision = config->revision.config;
 				zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
 			}
 			else
@@ -10683,9 +10689,11 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *                                                                            *
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
- * Parameters: poller_type    - [IN] poller type (ZBX_POLLER_TYPE_...)        *
- *             config_timeout - [IN]                                          *
- *             items          - [OUT] array of items                          *
+ * Parameters: poller_type                  - [IN] poller type                *
+ *             config_timeout               - [IN] timeout                    *
+ *             processing                   - [IN] count of items in progress *
+ *             config_max_concurrent_checks - [IN] max conncurect checks      *
+ *             items                        - [OUT] array of items            *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -10701,9 +10709,10 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, int n
  *           zbx_dc_config_get_ipmi_poller_items() function.                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, zbx_dc_item_t **items)
+int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_item_t **items)
 {
-	int			now, num = 0, max_items;
+	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
@@ -10719,6 +10728,14 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			break;
 		case ZBX_POLLER_TYPE_PINGER:
 			max_items = ZBX_MAX_PINGER_ITEMS;
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+		case ZBX_POLLER_TYPE_AGENT:
+			if (0 == (max_items = config_max_concurrent_checks - processing))
+				goto out;
+
+			items_alloc = max_items;
+			*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
 			break;
 		default:
 			max_items = 1;
@@ -10821,7 +10838,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 				}
 			}
 
-			if (1 < max_items)
+			if (1 < max_items && 0 == items_alloc)
 				*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * max_items);
 		}
 
@@ -10833,7 +10850,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 	}
 
 	UNLOCK_CACHE;
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 
 	return num;

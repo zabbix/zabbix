@@ -22,6 +22,8 @@
 #include "audit/zbxaudit.h"
 #include "audit.h"
 
+#include "zbxalgo.h"
+
 #define PREPARE_UPDATE_JSON_SNMP_INTERFACE_OP(auditentry)							\
 	char	audit_key_version[AUDIT_DETAILS_KEY_LEN], audit_key_bulk[AUDIT_DETAILS_KEY_LEN],		\
 		audit_key_community[AUDIT_DETAILS_KEY_LEN], audit_key_securityname[AUDIT_DETAILS_KEY_LEN],	\
