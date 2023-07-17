@@ -846,7 +846,6 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			char		delim = ' ';
 			zbx_db_tag_t	*tag = upd_tags.values[i];
 
-			sql = (char *)zbx_malloc(sql, sql_alloc);
 			zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update host_tag set");
 
 			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
@@ -868,7 +867,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 					tag->tagid);
 
 			if (FAIL == (res = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-				break;
+				zabbix_log(LOG_LEVEL_WARNING, "failed update tags on a discovered host");
 		}
 
 		if (SUCCEED == res && NULL != sql)
@@ -876,8 +875,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 			/* in ORACLE always present begin..end; */
-			if (16 < sql_offset)
-				zbx_db_execute("%s", sql);
+			if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
+				zabbix_log(LOG_LEVEL_WARNING, "failed update tags on a discovered host");
 		}
 
 		zbx_free(sql);
@@ -886,20 +885,14 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 	if (SUCCEED == res && 0 != del_tagids.values_num)
 	{
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-		char	*sql = (char *)zbx_malloc(NULL, sql_alloc);
-
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+		char	*sql = NULL;
 
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
-		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
 
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		/* in ORACLE always present begin..end; */
-		if (16 < sql_offset)
-			zbx_db_execute("%s", sql);
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host");
 
 		zbx_free(sql);
 	}
