@@ -974,9 +974,11 @@ class testDashboardGaugeWidget extends CWebTest {
 
 	public function testDashboardGaugeWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
-		$this->assertTrue($dashboard->edit()->getWidget(self::DELETE_GAUGE)->isEditable());
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_GAUGE);
+		$this->assertTrue($widget->isEditable());
+		// TODO: should be investigated and removed after DEV-2566, currently failing on Jenkins without sleep
+		sleep(2);
 		$dashboard->deleteWidget(self::DELETE_GAUGE);
 		$widget->waitUntilNotPresent();
 		$dashboard->save();
