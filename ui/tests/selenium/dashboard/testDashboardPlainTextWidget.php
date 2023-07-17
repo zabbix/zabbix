@@ -1025,5 +1025,6 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$form->fill($configuration);
 		$form->submit();
 		$dashboard->save();
+		$this->page->waitUntilReady();
 	}
 }
