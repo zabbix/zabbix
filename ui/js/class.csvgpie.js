@@ -179,11 +179,12 @@ class CSVGPie {
 		const box_height = Math.max(this.#radius_outer * 2, scalable_bbox.height);
 
 		const scale = Math.min(this.#width / box_width, this.#height / box_height);
+		const offset = scale / 10;
 
 		const x = this.#width / 2;
 		const y = (this.#height - scalable_bbox.height * scale) / 2 - scalable_bbox.y * scale;
 
-		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${scale})`);
+		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${scale - offset})`);
 	}
 
 	/**
