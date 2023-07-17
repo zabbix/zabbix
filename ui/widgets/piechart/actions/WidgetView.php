@@ -706,8 +706,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getConfig(): array {
 		$config = [
 			'draw_type' => $this->fields_values['draw_type'],
-			'stroke' => $this->fields_values['stroke'],
-			'space' => $this->fields_values['space'],
+			'space' => $this->fields_values['space']
 		];
 
 		if ($this->fields_values['draw_type'] == PIE_CHART_DRAW_DOUGHNUT) {

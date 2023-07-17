@@ -1513,7 +1513,6 @@ class PieDatasetTabIndicatorItem extends TabIndicatorItem {
 
 class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 
-	static PIE_CHART_STROKE_DEFAULT = 0;
 	static PIE_CHART_SPACE_DEFAULT = 1;
 
 	constructor() {
@@ -1528,12 +1527,6 @@ class PieDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 			if (elem !== null && elem.value > 0) {
 				return true;
 			}
-		}
-
-		const stroke = document.getElementById('stroke');
-
-		if (stroke !== null && stroke.value != PieDisplayOptionsTabIndicatorItem.PIE_CHART_STROKE_DEFAULT) {
-			return true;
 		}
 
 		const space = document.getElementById('space');

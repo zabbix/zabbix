@@ -113,12 +113,6 @@ class WidgetForm extends CWidgetForm {
 					->setDefault(PIE_CHART_WIDTH_DEFAULT)
 			)
 			->addField(
-				(new CWidgetFieldRangeControl('stroke', _('Stroke width'),
-					PIE_CHART_STROKE_MIN, PIE_CHART_STROKE_MAX
-				))
-					->setDefault(PIE_CHART_STROKE_DEFAULT)
-			)
-			->addField(
 				(new CWidgetFieldRangeControl('space', _('Space between sectors'),
 					PIE_CHART_SPACE_MIN, PIE_CHART_SPACE_MAX
 				))
