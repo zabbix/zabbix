@@ -615,7 +615,7 @@ static ZBX_DC_AUTOREG_HOST	*DCfind_autoreg_host(const char *host)
  * Purpose: Find a record with proxy details in configuration cache using the *
  *          proxy name                                                        *
  *                                                                            *
- * Parameters: host - [IN] proxy name                                         *
+ * Parameters: name - [IN] proxy name                                         *
  *                                                                            *
  * Return value: pointer to record if found or NULL otherwise                 *
  *                                                                            *
@@ -13883,16 +13883,16 @@ void	zbx_cached_proxy_free(zbx_cached_proxy_t *proxy)
 int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **name)
 {
 	int		ret = SUCCEED;
-	ZBX_DC_HOST	*dc_host;
+	ZBX_DC_PROXY	*dc_proxy;
 
 	RDLOCK_CACHE;
 
-	if (NULL == (dc_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &proxyid)))
+	if (NULL == (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 		ret = FAIL;
 	else
 	{
-		*status = dc_host->status;
-		*name = zbx_strdup(NULL, dc_host->host);
+		*status = dc_proxy->mode;
+		*name = zbx_strdup(NULL, dc_proxy->name);
 	}
 
 	UNLOCK_CACHE;
@@ -14194,7 +14194,7 @@ void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_
  *                                                                            *
  * Parameter: itemids       - [IN] the item identifiers                       *
  *            nextcheck     - [IN] the scheduled time                         *
- *            proxyids - [OUT] the proxyids of the given itemids    *
+ *            proxyids - [OUT] the proxyids of the given itemids              *
  *                                  (optional, can be NULL)                   *
  *                                                                            *
  * Comments: On server this function reschedules items monitored by server.   *
@@ -14881,7 +14881,8 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			else
 				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
 
-			zbx_json_adduint64(&json, "items", 0);
+			/*zbx_json_adduint64(&json, "items", dc_proxy->items_active_normal +
+					dc_proxy->items_active_notsupported);*/
 
 			zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
 
