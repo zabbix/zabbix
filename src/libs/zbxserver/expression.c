@@ -227,13 +227,13 @@ static int	get_problem_update_actions(const zbx_db_acknowledge *ack, int actions
 
 /******************************************************************************
  *                                                                            *
- * Purpose: request host name by hostid                                       *
+ * Purpose: request proxy name by hostid                                       *
  *                                                                            *
  * Return value: upon successful completion return SUCCEED                    *
  *               otherwise FAIL                                               *
  *                                                                            *
  ******************************************************************************/
-static int	DBget_host_value(zbx_uint64_t hostid, char **replace_to, const char *field_name)
+static int	DBget_proxy_value(zbx_uint64_t proxyid, char **replace_to, const char *field_name)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -241,9 +241,9 @@ static int	DBget_host_value(zbx_uint64_t hostid, char **replace_to, const char *
 
 	result = zbx_db_select(
 			"select %s"
-			" from hosts"
-			" where hostid=" ZBX_FS_UI64,
-			field_name, hostid);
+			" from proxy"
+			" where proxyid=" ZBX_FS_UI64,
+			field_name, proxyid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -674,7 +674,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					ret = SUCCEED;
 				}
 				else
-					ret = DBget_host_value(proxyid, replace_to, "host");
+					ret = DBget_proxy_value(proxyid, replace_to, "name");
 				break;
 			case ZBX_REQUEST_PROXY_DESCRIPTION:
 				ZBX_DBROW2UINT64(proxyid, row[0]);
@@ -685,7 +685,7 @@ static int	DBget_item_value(zbx_uint64_t itemid, char **replace_to, int request)
 					ret = SUCCEED;
 				}
 				else
-					ret = DBget_host_value(proxyid, replace_to, "description");
+					ret = DBget_proxy_value(proxyid, replace_to, "description");
 				break;
 			case ZBX_REQUEST_ITEM_VALUETYPE:
 				*replace_to = zbx_strdup(*replace_to, row[6]);
@@ -3939,7 +3939,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_value(proxyid, &replace_to, "host");
+							ret = DBget_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
@@ -3957,7 +3957,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 						}
 						else
 						{
-							ret = DBget_host_value(proxyid, &replace_to,
+							ret = DBget_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
@@ -4040,7 +4040,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 						if (0 == proxyid)
 							replace_to = zbx_strdup(replace_to, "");
 						else
-							ret = DBget_host_value(proxyid, &replace_to, "host");
+							ret = DBget_proxy_value(proxyid, &replace_to, "name");
 					}
 				}
 				else if (0 == strcmp(m, MVAR_PROXY_DESCRIPTION))
@@ -4058,7 +4058,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx
 						}
 						else
 						{
-							ret = DBget_host_value(proxyid, &replace_to,
+							ret = DBget_proxy_value(proxyid, &replace_to,
 									"description");
 						}
 					}
