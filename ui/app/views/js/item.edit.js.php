@@ -25,6 +25,7 @@
 
 ?><script>((config) => {
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
+const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
@@ -82,12 +83,16 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			type: this.form.querySelector('[name="type"]'),
 			value_type: this.form.querySelector('[name="value_type"]'),
 			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
-			username: this.form.querySelector('[name=username]')
+			username: this.form.querySelector('[name=username]'),
+			history: this.form.querySelector('[name="history"]'),
+			trends: this.form.querySelector('[name="trends"]')
 		};
 		this.label = {
 			interfaceid: this.form.querySelector('[for=interfaceid]'),
 			value_type_hint: this.form.querySelector('#js-item-type-hint'),
-			username: this.form.querySelector('[for=username]')
+			username: this.form.querySelector('[for=username]'),
+			history_hint: this.form.querySelector('#history_mode_hint'),
+			trends_hint: this.form.querySelector('#trends_mode_hint')
 		};
 
 		if ($('#tabs').tabs('option', 'active') == 1) {
@@ -103,6 +108,26 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.field.key_button?.addEventListener('click', e => this.#keySelectClickHandler(e));
 		this.field.type.addEventListener('click', e => this.#typeChangeHandler(e));
 		this.field.value_type.addEventListener('change', e => this.#valueTypeChangeHandler(e));
+		this.form.addEventListener('click', e => {
+			const target = e.target;
+			const disabled = target.value == ITEM_STORAGE_OFF;
+
+			switch (target.getAttribute('name')) {
+				case 'history_mode':
+					this.field.history.toggleAttribute('disabled', disabled);
+					this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+					this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+					break;
+
+				case 'trends_mode':
+					this.field.trends.toggleAttribute('disabled', disabled);
+					this.field.trends.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+					this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
+
+					break;
+			}
+		})
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
