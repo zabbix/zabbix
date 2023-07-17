@@ -6744,12 +6744,12 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		dc_strpool_replace(found, &proxy->name, row[1]);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		dc_strpool_replace(found, &proxy->tls_issuer, row[6]);
-		dc_strpool_replace(found, &proxy->tls_subject, row[7]);
+		dc_strpool_replace(found, &proxy->tls_issuer, row[5]);
+		dc_strpool_replace(found, &proxy->tls_subject, row[6]);
 
 		psk_owner = NULL;
 
-		if ('\0' == *row[8] || '\0' == *row[9])	/* new PSKid or value empty */
+		if ('\0' == *row[7] || '\0' == *row[8])	/* new PSKid or value empty */
 		{
 			/* In case of "impossible" errors ("PSK value without identity" or "PSK identity without */
 			/* value") assume empty PSK identity and value. These errors should have been prevented */
@@ -6780,21 +6780,21 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		/* new PSKid and value non-empty */
 
-		zbx_strlower(row[9]);
+		zbx_strlower(row[8]);
 
 		if (1 == found && NULL != proxy->tls_dc_psk)	/* 'proxy' record has non-empty PSK */
 		{
-			if (0 == strcmp(proxy->tls_dc_psk->tls_psk_identity, row[8]))	/* new PSKid same as */
+			if (0 == strcmp(proxy->tls_dc_psk->tls_psk_identity, row[7]))	/* new PSKid same as */
 											/* old PSKid */
 			{
-				if (0 != strcmp(proxy->tls_dc_psk->tls_psk, row[9]))	/* new PSK value */
+				if (0 != strcmp(proxy->tls_dc_psk->tls_psk, row[8]))	/* new PSK value */
 											/* differs from old */
 				{
 					if (NULL == (psk_owner = (zbx_ptr_pair_t *)zbx_hashset_search(&psk_owners,
 							&proxy->tls_dc_psk->tls_psk_identity)))
 					{
 						/* change underlying PSK value and 'config->psks' is updated, too */
-						dc_strpool_replace(1, &proxy->tls_dc_psk->tls_psk, row[9]);
+						dc_strpool_replace(1, &proxy->tls_dc_psk->tls_psk, row[8]);
 					}
 					else
 					{
@@ -6825,18 +6825,18 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		/* new PSK identity already stored? */
 
-		psk_i_local.tls_psk_identity = row[8];
+		psk_i_local.tls_psk_identity = row[7];
 
 		if (NULL != (psk_i = (ZBX_DC_PSK *)zbx_hashset_search(&config->psks, &psk_i_local)))
 		{
 			/* new PSKid already in psks hashset */
 
-			if (0 != strcmp(psk_i->tls_psk, row[9]))	/* PSKid stored but PSK value is different */
+			if (0 != strcmp(psk_i->tls_psk, row[8]))	/* PSKid stored but PSK value is different */
 			{
 				if (NULL == (psk_owner = (zbx_ptr_pair_t *)zbx_hashset_search(&psk_owners,
 						&psk_i->tls_psk_identity)))
 				{
-					dc_strpool_replace(1, &psk_i->tls_psk, row[9]);
+					dc_strpool_replace(1, &psk_i->tls_psk, row[8]);
 				}
 				else
 				{
@@ -6854,8 +6854,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		/* insert new PSKid and value into psks hashset */
 
-		dc_strpool_replace(0, &psk_i_local.tls_psk_identity, row[8]);
-		dc_strpool_replace(0, &psk_i_local.tls_psk, row[9]);
+		dc_strpool_replace(0, &psk_i_local.tls_psk_identity, row[7]);
+		dc_strpool_replace(0, &psk_i_local.tls_psk, row[8]);
 		psk_i_local.refcount = 1;
 		proxy->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
@@ -6872,8 +6872,8 @@ done:
 			}
 		}
 #endif
-		ZBX_STR2UCHAR(proxy->tls_connect, row[4]);
-		ZBX_STR2UCHAR(proxy->tls_accept, row[5]);
+		ZBX_STR2UCHAR(proxy->tls_connect, row[3]);
+		ZBX_STR2UCHAR(proxy->tls_accept, row[4]);
 
 		if (0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_connect))
 		{
@@ -6903,7 +6903,7 @@ done:
 				proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
 				proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
 				proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
-				proxy->lastaccess = (NULL == row[13] ? 0 : atoi(row[13]));
+				proxy->lastaccess = atoi(row[12]);
 				proxy->last_cfg_error_time = 0;
 				proxy->proxy_delay = 0;
 				proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
@@ -6916,9 +6916,9 @@ done:
 						__config_shmem_realloc_func, __config_shmem_free_func);
 			}
 
-			dc_strpool_replace(found, &proxy->allowed_addresses, row[10]);
-			dc_strpool_replace(found, &proxy->address, row[11]);
-			dc_strpool_replace(found, &proxy->port, row[12]);
+			dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
+			dc_strpool_replace(found, &proxy->address, row[10]);
+			dc_strpool_replace(found, &proxy->port, row[11]);
 
 			if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 			{

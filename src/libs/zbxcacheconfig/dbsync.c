@@ -4014,6 +4014,7 @@ out:
 	return ret;
 }
 
+
 int	zbx_dbsync_compare_connector_tags(zbx_dbsync_t *sync)
 {
 	char	*sql = NULL;
@@ -4047,11 +4048,13 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 	int	ret = SUCCEED;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select p.proxyid,p.name,p.mode,p.description,p.tls_connect,p.tls_accept,p.tls_issuer,"
-			"p.tls_subject,p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,"
-			"pr.lastaccess from proxy p left join proxy_rtdata pr on p.proxyid=pr.proxyid");
+			"select p.proxyid,p.name,p.mode,p.tls_connect,p.tls_accept,p.tls_issuer,p.tls_subject,"
+				"p.tls_psk_identity,p.tls_psk,p.allowed_addresses,p.address,p.port,pr.lastaccess"
+			" from proxy p"
+			" join proxy_rtdata pr"
+				" on p.proxyid=pr.proxyid");
 
-	dbsync_prepare(sync, 14, NULL);
+	dbsync_prepare(sync, 13, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
