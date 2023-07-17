@@ -315,10 +315,8 @@ class CSVGPie {
 					return text;
 				});
 
-			if (total_value.value === null) {
-				this.#total_value_container
-					.attr('class', CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA);
-			}
+			this.#total_value_container
+				.classed(CSVGPie.ZBX_STYLE_TOTAL_VALUE_NO_DATA, total_value.value === null);
 		}
 	}
 
