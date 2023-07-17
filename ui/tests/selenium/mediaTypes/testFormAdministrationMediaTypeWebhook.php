@@ -891,8 +891,8 @@ class testFormAdministrationMediaTypeWebhook extends CWebTest {
 						array_push($expected_params, $parameter);
 						break;
 					case USER_ACTION_UPDATE:
-						$remplacement = [$parameter['index'] => ['Name' => $parameter['Name'], 'Value' => $parameter['Value']]];
-						$expected_params = array_replace($expected_params, $remplacement);
+						$replacement = [$parameter['index'] => ['Name' => $parameter['Name'], 'Value' => $parameter['Value']]];
+						$expected_params = array_replace($expected_params, $replacement);
 						break;
 					case USER_ACTION_REMOVE:
 						$expected_params = array_filter($expected_params, function($p) use ($parameter){

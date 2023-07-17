@@ -26,8 +26,10 @@
 $form = (new CForm())
 	->cleanItems()
 	->setId('popup.operation')
-	->setName('popup.operation')
-	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'));
+	->setName('popup.operation');
+
+// Enable form submitting on Enter.
+$form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
 $form_list = new CFormList();
 

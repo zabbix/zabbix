@@ -21,6 +21,7 @@ package zbxcmd
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -47,7 +48,7 @@ var (
 func execute(s string, timeout time.Duration, path string, strict bool) (out string, err error) {
 	if cmd_path == "" {
 		cmd_exe := "cmd.exe"
-		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil {
+		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil && !errors.Is(err, exec.ErrDot) {
 			return "", fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
 		}
 		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {
@@ -123,7 +124,7 @@ func execute(s string, timeout time.Duration, path string, strict bool) (out str
 func ExecuteBackground(s string) (err error) {
 	if cmd_path == "" {
 		cmd_exe := "cmd.exe"
-		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil {
+		if cmd_exe, err = exec.LookPath(cmd_exe); err != nil && !errors.Is(err, exec.ErrDot) {
 			return fmt.Errorf("Cannot find path to %s command: %s", cmd_exe, err)
 		}
 		if cmd_path, err = filepath.Abs(cmd_exe); err != nil {

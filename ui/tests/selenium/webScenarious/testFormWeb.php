@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -1566,11 +1566,13 @@ class testFormWeb extends CLegacyWebTest {
 	 * @param string    $host    name of a host where web scenarios are opened
 	 */
 	private function filterEntriesAndOpenWeb($host) {
+		$table = $this->query('xpath://table[@class="list-table"]')->waitUntilVisible()->asTable()->one();
 		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $host)
-				->getColumn('Web')->query('link:Web')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $host)->getColumn('Web')->query('link:Web')->waitUntilClickable()->one()->click();
 	}
 }
