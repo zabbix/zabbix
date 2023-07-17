@@ -304,19 +304,19 @@ $form->addItem([
 			'content' => (new CSimpleButton(_('Mass update')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massupdate')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'template.massdelete' => [
 			'content' => (new CSimpleButton(_('Delete')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		],
 		'template.massdeleteclear' => [
 			'content' => (new CSimpleButton(_('Delete and clear')))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->addClass('js-massdelete-clear')
-				->addClass('no-chkbxrange')
+				->addClass('js-no-chkbxrange')
 		]
 	], 'templates')
 ]);

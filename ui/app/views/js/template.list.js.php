@@ -137,11 +137,6 @@
 			});
 		}
 
-		preventNavigation = function(event) {
-			event.preventDefault();
-			event.returnValue = '';
-		};
-
 		#delete(target, templateids, clear) {
 			let confirmation;
 			const curl = new Curl('zabbix.php');
@@ -221,4 +216,3 @@
 		}
 	};
 </script>
-

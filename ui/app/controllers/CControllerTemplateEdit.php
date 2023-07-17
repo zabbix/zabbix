@@ -73,7 +73,7 @@ class CControllerTemplateEdit extends CController {
 
 		if ($this->hasInput('templateid')) {
 			$templates = API::Template()->get([
-				'output' => API_OUTPUT_EXTEND,
+				'output' => [],
 				'templateids' => $this->getInput('templateid'),
 				'editable' => true
 			]);
@@ -147,19 +147,12 @@ class CControllerTemplateEdit extends CController {
 			}
 		}
 
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($data['linked_templates']),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
 		if ($this->hasInput('templateid')) {
 			$dbTemplates = API::Template()->get([
 				'output' => ['host', 'name', 'description', 'vendor_name', 'vendor_version'],
 				'selectTemplateGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => API_OUTPUT_EXTEND,
+				'selectMacros' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type', 'automatic'],
 				'selectTags' => ['tag', 'value'],
 				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
 				'templateids' => $templateid
@@ -225,6 +218,13 @@ class CControllerTemplateEdit extends CController {
 				CArrayHelper::sort($data['linked_templates'], ['name']);
 			}
 		}
+
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys($data['linked_templates']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
 
 		// Configuration for template cloning.
 		if ($clone) {
@@ -304,13 +304,6 @@ class CControllerTemplateEdit extends CController {
 			$data['warnings'] = $warnings;
 			$data['clone_templateid'] = $this->getInput('clone_templateid');
 		}
-
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($data['linked_templates']),
-			'editable' => true,
-			'preservekeys' => true
-		]);
 
 		// Add inherited macros to template macros.
 		if ($data['show_inherited_macros']) {
@@ -417,7 +410,6 @@ class CControllerTemplateEdit extends CController {
 		];
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData($data));
 	}
 }
