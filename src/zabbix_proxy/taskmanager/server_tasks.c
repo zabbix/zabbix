@@ -28,7 +28,7 @@
  * Purpose: get tasks scheduled to be executed on the server                  *
  *                                                                            *
  * Parameters: tasks         - [OUT] tasks to execute                         *
- *             proxyid  - [IN] (ignored)                                 *
+ *             proxyid       - [IN] (ignored)                                 *
  *             compatibility - [IN] (ignored)                                 *
  *                                                                            *
  * Comments: This function is used by proxy to get tasks to be sent to the    *
