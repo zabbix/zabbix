@@ -140,12 +140,27 @@ window.template_edit_popup = new class {
 
 				this.overlay.setProperties(new_data);
 			})
-			.catch(this.ajaxExceptionHandler)
+			.catch((exception) =>  {
+				clearMessages();
+
+				let title, messages;
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				}
+				else {
+					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+				}
+
+				const message_box = makeMessageBox('bad', messages, title);
+
+				addMessage(message_box);
+			})
 			.finally(() => {
 				this.overlay.unsetLoading();
 			});
 	}
-
 
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
