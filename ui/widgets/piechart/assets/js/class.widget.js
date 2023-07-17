@@ -59,14 +59,32 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	setContents(response) {
+		let legend = {...response.legend};
+
+		let total_item = null;
+		let total_item_index = -1;
+
+		for (let i = 0; i < legend.data.length; i++) {
+			if (legend.data[i].is_total) {
+				total_item = legend.data[i];
+				total_item_index = i;
+				break;
+			}
+		}
+
+		if (total_item !== null) {
+			legend.data.splice(total_item_index, 1);
+			legend.data.push(total_item);
+		}
+
 		const value_data = {
 			sectors: response.sectors,
-			items: response.legend.data,
+			items: [...legend.data],
 			total_value: response.total_value
 		};
 
 		if (this.pie_chart !== null) {
-			this.setLegend(response.legend);
+			this.setLegend(legend, total_item);
 
 			this.pie_chart.setValue(value_data);
 
@@ -78,14 +96,14 @@ class CWidgetPieChart extends CWidget {
 			horizontal: CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H,
 		};
 
-		this.setLegend(response.legend);
+		this.setLegend(legend, total_item);
 
 		this.pie_chart = new CSVGPie(this._body, padding, response.config);
 		this.pie_chart.setSize(this.getSize());
 		this.pie_chart.setValue(value_data);
 	}
 
-	setLegend(legend) {
+	setLegend(legend, total_item) {
 		if (legend.show && legend.data.length > 0) {
 			let container = this._body.querySelector('.svg-pie-chart-legend');
 
@@ -99,6 +117,11 @@ class CWidgetPieChart extends CWidget {
 			}
 
 			container.innerHTML = '';
+
+			if (total_item !== null) {
+				legend.data.splice(legend.data.length - 1, 1);
+				legend.data.unshift(total_item);
+			}
 
 			for (let i = 0; i < legend.data.length; i++) {
 				const item = document.createElement('div');
@@ -117,7 +140,6 @@ class CWidgetPieChart extends CWidget {
 
 	getSize() {
 		const size = super._getContentsSize();
-		console.log('size:', size);
 
 		const legend = this._body.querySelector('.svg-pie-chart-legend');
 

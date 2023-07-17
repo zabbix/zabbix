@@ -737,7 +737,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($sectors as $sector) {
 			$legend['data'][] = [
 				'name' => $sector['name'],
-				'color' => $sector['color']
+				'color' => $sector['color'],
+				'is_total' => $sector['is_total']
 			];
 		}
 
@@ -832,7 +833,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		}
 
 		foreach($svg_sectors as &$sector) {
-			unset($sector['value'], $sector['is_total']);
+			unset($sector['value']);
 		}
 
 		return [
