@@ -62,6 +62,7 @@ class CControllerItemEdit extends CController {
 			'tags'					=> 'array',
 			'delay_flex'			=> 'array',
 			'preprocessing'			=> 'array',
+			'parameters'			=> 'array',
 			'form_refresh'			=> 'in 1'
 		];
 
@@ -75,6 +76,14 @@ class CControllerItemEdit extends CController {
 					break;
 				}
 			}
+		}
+
+		$parameters = $this->getInput('parameters', []);
+
+		if ($ret && $parameters) {
+			$ret = array_key_exists('name', $parameters)
+				&& array_key_exists('value', $parameters)
+				&& count($parameters['name']) == count($parameters['value']);
 		}
 
 		if (!$ret) {
@@ -253,6 +262,15 @@ class CControllerItemEdit extends CController {
 		switch ($item['type']) {
 			case ITEM_TYPE_SCRIPT:
 				$item['script'] = $item['params'];
+				$parameters = ['name' => [], 'value' => []];
+
+				foreach ($item['parameters'] as $parameter) {
+					$parameters['name'][] = $parameter['name'];
+					$parameters['value'][] = $parameter['value'];
+				}
+
+				$item['parameters'] = $parameters;
+
 				break;
 
 			case ITEM_TYPE_HTTPAGENT:
@@ -281,7 +299,7 @@ class CControllerItemEdit extends CController {
 			'value_type' => DB::getDefault('items', 'value_type'),
 			'url' => '',
 			'query_fields' => [],
-			'parameters' => [],
+			'parameters' => ['name' => [], 'value' => []],
 			'script' => '',
 			'request_method' => DB::getDefault('items', 'request_method'),
 			'timeout' => DB::getDefault('items', 'timeout'),

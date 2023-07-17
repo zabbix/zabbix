@@ -127,7 +127,12 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 
 					break;
 			}
-		})
+		});
+		jQuery('#parameters_table').dynamicRows({
+			template: '#parameters_table_row',
+			row: '.js-row',
+			allow_empty: true
+		});
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
