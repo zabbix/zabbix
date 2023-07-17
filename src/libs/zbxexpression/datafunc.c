@@ -1153,7 +1153,7 @@ int	expr_get_history_log_value(const char *m, const zbx_db_trigger *trigger, cha
 		int clock, int ns, const char *tz)
 {
 	zbx_uint64_t	itemid;
-	int		ret, request;
+	int		ret = FAIL, request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1181,12 +1181,16 @@ int	expr_get_history_log_value(const char *m, const zbx_db_trigger *trigger, cha
 	{
 		request = ZBX_REQUEST_ITEM_LOG_SOURCE;
 	}
-	else	/* MVAR_ITEM_LOG_TIME */
+	else if (0 == strcmp(m, MVAR_ITEM_LOG_TIME))
+	{
 		request = ZBX_REQUEST_ITEM_LOG_TIME;
+	}
+	else
+		goto out;
 
 	if (SUCCEED == (ret = zbx_db_trigger_get_itemid(trigger, N_functionid, &itemid)))
-		ret = expr_db_get_history_log_value(itemid, replace_to, request, clock, ns, tz);
-
+		ret = DBget_history_log_value(itemid, replace_to, request, clock, ns, tz);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
