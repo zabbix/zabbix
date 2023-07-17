@@ -765,7 +765,7 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
  ******************************************************************************/
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
 {
-	int			i, new_tags = 0, res = SUCCEED;
+	int			i, new_tags_cnt = 0, res = SUCCEED;
 	zbx_vector_db_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t	del_tagids;
 
@@ -779,36 +779,19 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 		zbx_db_tag_t	*tag = host_tags->values[i];
 
 		if (0 == tag->tagid)
-		{
-			new_tags++;
-		}
+			new_tags_cnt++;
 		else if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE))
-		{
-			zbx_audit_host_update_json_update_tag_create_entry(hostid, tag->tagid);
 			zbx_vector_db_tag_ptr_append(&upd_tags, tag);
-
-			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
-			{
-				zbx_audit_host_update_json_update_tag_tag(hostid, tag->tagid, tag->tag_orig, tag->tag);
-			}
-
-			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
-			{
-				zbx_audit_host_update_json_update_tag_value(hostid, tag->tagid, tag->value_orig,
-					tag->value);
-			}
-		}
 		else if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
-		{
-			zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
 			zbx_vector_uint64_append(&del_tagids, tag->tagid);
-		}
 	}
 
-	if (0 != new_tags)
+	if (0 != new_tags_cnt)
 	{
+		zbx_uint64_t	first_hosttagid, hosttagid;
 		zbx_db_insert_t	db_insert_tag;
-		zbx_uint64_t	hosttagid = zbx_db_get_maxid_num("host_tag", new_tags);
+
+		hosttagid = first_hosttagid = zbx_db_get_maxid_num("host_tag", new_tags_cnt);
 
 		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", "automatic",
 				NULL);
@@ -819,19 +802,40 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 			if (0 == tag->tagid)
 			{
-				zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
-						ZBX_DB_TAG_NORMAL);
 				zbx_db_insert_add_values(&db_insert_tag, hosttagid, hostid, tag->tag, tag->value,
 						ZBX_DB_TAG_NORMAL);
 				hosttagid++;
 			}
 		}
 
-		zbx_db_insert_execute(&db_insert_tag);
+		res = zbx_db_insert_execute(&db_insert_tag);
+
 		zbx_db_insert_clean(&db_insert_tag);
+
+		if (SUCCEED == res)
+		{
+			hosttagid = first_hosttagid;
+
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (0 == tag->tagid)
+				{
+					zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
+							ZBX_DB_TAG_NORMAL);
+					hosttagid++;
+				}
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
+					hostid);
+		}
 	}
 
-	if (0 != upd_tags.values_num)
+	if (SUCCEED == res && 0 != upd_tags.values_num)
 	{
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 		char	*value_esc;
@@ -866,8 +870,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hosttagid=" ZBX_FS_UI64 ";\n",
 					tag->tagid);
 
-			if (FAIL == (res = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-				zabbix_log(LOG_LEVEL_WARNING, "failed update tags on a discovered host");
+			if (SUCCEED != (res = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+				break;
 		}
 
 		if (SUCCEED == res && NULL != sql)
@@ -876,10 +880,37 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 			/* in ORACLE always present begin..end; */
 			if (16 < sql_offset && ZBX_DB_OK > zbx_db_execute("%s", sql))
-				zabbix_log(LOG_LEVEL_WARNING, "failed update tags on a discovered host");
+				res = FAIL;
 		}
 
 		zbx_free(sql);
+
+		if (SUCCEED == res)
+		{
+			for (i = 0; i < upd_tags.values_num; i++)
+			{
+				zbx_db_tag_t	*tag = upd_tags.values[i];
+
+				zbx_audit_host_update_json_update_tag_create_entry(hostid, tag->tagid);
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+				{
+					zbx_audit_host_update_json_update_tag_tag(hostid, tag->tagid, tag->tag_orig,
+							tag->tag);
+				}
+
+				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+				{
+					zbx_audit_host_update_json_update_tag_value(hostid, tag->tagid, tag->value_orig,
+						tag->value);
+				}
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to update tags on a discovered host, hostid = "
+					ZBX_FS_UI64, hostid);
+		}
 	}
 
 	if (SUCCEED == res && 0 != del_tagids.values_num)
@@ -892,9 +923,25 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 				del_tagids.values_num);
 
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host");
+			res = FAIL;
 
 		zbx_free(sql);
+
+		if (SUCCEED == res)
+		{
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+					zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
+			}
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
+					ZBX_FS_UI64, hostid);
+		}
 	}
 
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
