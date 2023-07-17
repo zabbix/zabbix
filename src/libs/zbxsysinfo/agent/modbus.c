@@ -461,7 +461,7 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 		if (NULL == endpoint->conn_info.serial.port || '/' != *endpoint->conn_info.serial.port)
 		{
 			endpoint->conn_info.serial.port = zbx_dsprintf(endpoint->conn_info.serial.port, "/dev/%s",
-					endpoint->conn_info.serial.port);
+					ZBX_NULL2EMPTY_STR(endpoint->conn_info.serial.port));
 		}
 #endif
 	}
