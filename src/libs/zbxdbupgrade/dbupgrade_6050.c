@@ -299,18 +299,16 @@ static int	DBpatch_6050025(void)
 
 static int	DBpatch_6050026(void)
 {
-	zbx_db_insert_t	db_insert;
-
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "piechart", "widgets/piechart", 1, "[]");
-	zbx_db_insert_autoincrement(&db_insert, "moduleid");
-	int ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+				" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+		{
+			return FAIL;
+		}
 
-	return ret;
+	return SUCCEED;
 }
 
 #endif
