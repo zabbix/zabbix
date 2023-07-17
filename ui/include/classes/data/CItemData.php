@@ -390,7 +390,10 @@ final class CItemData {
 			'zabbix[vcache,cache,<parameter>]',
 			'zabbix[version]',
 			'zabbix[vmware,buffer,<mode>]',
-			'zabbix[wcache,<cache>,<mode>]'
+			'zabbix[wcache,<cache>,<mode>]',
+			'zabbix[proxy_buffer,buffer,<mode>]',
+			'zabbix[proxy_buffer,state,current]',
+			'zabbix[proxy_buffer,state,changes]'
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
@@ -2816,6 +2819,27 @@ final class CItemData {
 				'value_type' => null,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal#wcache'
+				]
+			],
+			'zabbix[proxy_buffer,buffer,<mode>]' => [
+				'description' => _('Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused).'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
+				]
+			],
+			'zabbix[proxy_buffer,state,current]' => [
+				'description' => _('State of proxy memory buffer.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
+				]
+			],
+			'zabbix[proxy_buffer,state,changes]' => [
+				'description' => _('Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
 				]
 			]
 		];

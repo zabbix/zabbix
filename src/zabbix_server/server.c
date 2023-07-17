@@ -1446,7 +1446,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
+	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);
@@ -2060,7 +2060,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_init_database_cache(get_program_type, config_history_cache_size,
+	if (SUCCEED != zbx_init_database_cache(get_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database cache: %s", error);

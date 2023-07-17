@@ -1365,12 +1365,12 @@ zabbix_export:
           master_item:
             key: vfs.fs.get
           lld_macro_paths:
+            - lld_macro: '{#FSDRIVETYPE}'
+              path: $.fsdrivetype
             - lld_macro: '{#FSNAME}'
               path: $.fsname
             - lld_macro: '{#FSTYPE}'
               path: $.fstype
-            - lld_macro: '{#FSDRIVETYPE}'
-              path: $.fsdrivetype
       tags:
         - tag: class
           value: os
@@ -1429,7 +1429,7 @@ zabbix_export:
           value: '^.*$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.NAME.NOT_MATCHES}'
-          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv)$'
+          value: '^(?:RemoteRegistry|MMCSS|gupdate|SysmonLog|clr_optimization_v.+|sppsvc|gpsvc|Pml Driver HPZ12|Net Driver HPZ12|MapsBroker|IntelAudioService|Intel\(R\) TPM Provisioning Service|dbupdate|DoSvc|CDPUserSvc_.+|WpnUserService_.+|OneSyncSvc_.+|WbioSrvc|BITS|tiledatamodelsvc|GISvc|ShellHWDetection|TrustedInstaller|TabletInputService|CDPSvc|wuauserv|edgeupdate)$'
           description: 'This macro is used in Service discovery. Can be overridden on the host or linked template level.'
         - macro: '{$SERVICE.STARTUPNAME.MATCHES}'
           value: '^(?:automatic|automatic delayed)$'

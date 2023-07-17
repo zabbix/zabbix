@@ -1927,7 +1927,7 @@ static int	rm_report_create_jobs(zbx_rm_t *manager, zbx_rm_report_t *report, int
 
 		zbx_vector_uint64_sort(&job->userids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&job->userids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_list_append(&manager->job_queue, job, NULL);
+		(void)zbx_list_append(&manager->job_queue, job, NULL);
 		job->batchid = batch->batchid;
 	}
 
@@ -2207,7 +2207,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 	{
 		zbx_ipc_client_addref(client);
 		job->client = client;
-		zbx_list_append(&manager->job_queue, job, NULL);
+		(void)zbx_list_append(&manager->job_queue, job, NULL);
 		ret = SUCCEED;
 	}
 	else

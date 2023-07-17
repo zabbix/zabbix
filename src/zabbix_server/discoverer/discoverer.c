@@ -37,6 +37,7 @@
 #include "zbxtimekeeper.h"
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "zbxproxybuffer.h"
 #include "zbx_discoverer_constants.h"
 
 #ifdef HAVE_LDAP
@@ -184,53 +185,6 @@ static int	discoverer_check_count_decrease(zbx_hashset_t *check_counts, zbx_uint
 	check_count->count -= count;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: process new service status                                        *
- *                                                                            *
- * Parameters: service - service info                                         *
- *                                                                            *
- ******************************************************************************/
-static void	proxy_update_service(zbx_uint64_t druleid, zbx_uint64_t dcheckid, const char *ip,
-		const char *dns, int port, int status, const char *value, int now)
-{
-	char	*ip_esc, *dns_esc, *value_esc;
-
-	ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
-	dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", dns);
-	value_esc = zbx_db_dyn_escape_field("proxy_dhistory", "value", value);
-
-	zbx_db_execute("insert into proxy_dhistory (clock,druleid,dcheckid,ip,dns,port,value,status)"
-			" values (%d," ZBX_FS_UI64 "," ZBX_FS_UI64 ",'%s','%s',%d,'%s',%d)",
-			now, druleid, dcheckid, ip_esc, dns_esc, port, value_esc, status);
-
-	zbx_free(value_esc);
-	zbx_free(dns_esc);
-	zbx_free(ip_esc);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: process new service status                                        *
- *                                                                            *
- * Parameters: service - service info                                         *
- *                                                                            *
- ******************************************************************************/
-static void	proxy_update_host(zbx_uint64_t druleid, const char *ip, const char *dns, int status, int now)
-{
-	char	*ip_esc, *dns_esc;
-
-	ip_esc = zbx_db_dyn_escape_field("proxy_dhistory", "ip", ip);
-	dns_esc = zbx_db_dyn_escape_field("proxy_dhistory", "dns", dns);
-
-	zbx_db_execute("insert into proxy_dhistory (clock,druleid,ip,dns,status)"
-			" values (%d," ZBX_FS_UI64 ",'%s','%s',%d)",
-			now, druleid, ip_esc, dns_esc, status);
-
-	zbx_free(dns_esc);
-	zbx_free(ip_esc);
 }
 
 /******************************************************************************
@@ -630,9 +584,9 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 	return checks_count;
 }
 
-static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const char *dns,
-		int now, zbx_uint64_t unique_dcheckid, const zbx_vector_discoverer_services_ptr_t *services,
-		zbx_add_event_func_t add_event_cb)
+static int	process_services(void *handle, zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip,
+		const char *dns, int now, zbx_uint64_t unique_dcheckid,
+		const zbx_vector_discoverer_services_ptr_t *services, zbx_add_event_func_t add_event_cb)
 {
 	int	host_status = -1, i;
 
@@ -645,16 +599,8 @@ static int	process_services(zbx_uint64_t druleid, zbx_db_dhost *dhost, const cha
 		if ((-1 == host_status || DOBJECT_STATUS_UP == service->status) && host_status != service->status)
 			host_status = service->status;
 
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			zbx_discovery_update_service(druleid, service->dcheckid, unique_dcheckid, dhost,
-					ip, dns, service->port, service->status, service->value, now, add_event_cb);
-		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		{
-			proxy_update_service(druleid, service->dcheckid, ip, dns, service->port, service->status,
-					service->value, now);
-		}
+		zbx_discovery_update_service(handle, druleid, service->dcheckid, unique_dcheckid, dhost,
+				ip, dns, service->port, service->status, service->value, now, add_event_cb);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -958,29 +904,36 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	pthread_mutex_unlock(&manager->results_lock);
 
-	for (i = 0; i < results.values_num; i++)
+	if (0 != results.values_num)
 	{
-		zbx_db_dhost	dhost;
-		int		host_status;
 
-		result = results.values[i];
+		void	*handle;
 
-		if (NULL == result->dnsname)
+		handle = zbx_discovery_open();
+
+		for (i = 0; i < results.values_num; i++)
 		{
-			zabbix_log(LOG_LEVEL_WARNING,
-					"Missing 'dnsname', result skipped (druleid=" ZBX_FS_UI64 ", ip: '%s')",
-					result->druleid, result->ip);
-			continue;
-		}
+			zbx_db_dhost	dhost;
+			int		host_status;
 
-		memset(&dhost, 0, sizeof(zbx_db_dhost));
+			result = results.values[i];
 
-		host_status = process_services(result->druleid, &dhost, result->ip, result->dnsname, result->now,
-				result->unique_dcheckid, &result->services, events_cbs->add_event_cb);
+			if (NULL == result->dnsname)
+			{
+				zabbix_log(LOG_LEVEL_WARNING,
+						"Missing 'dnsname', result skipped (druleid=" ZBX_FS_UI64 ", ip: '%s')",
+						result->druleid, result->ip);
+				continue;
+			}
 
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			zbx_discovery_update_host(&dhost, host_status, result->now, events_cbs->add_event_cb);
+			memset(&dhost, 0, sizeof(zbx_db_dhost));
+
+			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
+					result->now, result->unique_dcheckid, &result->services,
+					events_cbs->add_event_cb);
+
+			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
+					host_status, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL);
@@ -988,11 +941,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();
 		}
-		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
-		{
-			proxy_update_host(result->druleid, result->ip, result->dnsname, host_status,
-					result->now);
-		}
+
+		zbx_discovery_close(handle);
 	}
 
 	*unsaved_checks = res_check_total - res_check_count;
@@ -1099,7 +1049,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 			{
 				task_out = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
 				memcpy(task_out, task, sizeof(zbx_discoverer_task_t));
-				zbx_list_append(&job->tasks, task_out, NULL);
+				(void)zbx_list_append(&job->tasks, task_out, NULL);
 			}
 
 			zbx_hashset_destroy(&tasks);

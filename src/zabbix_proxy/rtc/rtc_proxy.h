@@ -22,6 +22,8 @@
 
 #include "zbxrtc.h"
 
-int	rtc_process_request_ex_passive(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result);
+int	rtc_process_request_ex_proxy(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data, char **result);
+int	rtc_process_request_ex_proxy_passive(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigned char *data,
+		char **result);
 int	rtc_process(const char *option, int config_timeout, char **error);
 #endif
