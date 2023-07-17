@@ -785,7 +785,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
 	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
 #	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS_STR, "SMTPS,SMTP")))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "SMTPS,SMTP")))
 #	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_SMTPS | CURLPROTO_SMTP)))
 #	endif
