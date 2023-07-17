@@ -7855,6 +7855,21 @@ static int	__config_host_h_compare(const void *d1, const void *d2)
 	return host_h_1->host == host_h_2->host ? 0 : strcmp(host_h_1->host, host_h_2->host);
 }
 
+static zbx_hash_t	__config_proxy_h_hash(const void *data)
+{
+	const zbx_dc_proxy_name_t	*proxy_h = (const zbx_dc_proxy_name_t *)data;
+
+	return ZBX_DEFAULT_STRING_HASH_ALGO(proxy_h->name, strlen(proxy_h->name), ZBX_DEFAULT_HASH_SEED);
+}
+
+static int	__config_proxy_h_compare(const void *d1, const void *d2)
+{
+	const zbx_dc_proxy_name_t	*proxy_h_1 = (const zbx_dc_proxy_name_t *)d1;
+	const zbx_dc_proxy_name_t	*proxy_h_2 = (const zbx_dc_proxy_name_t *)d2;
+
+	return proxy_h_1->name == proxy_h_2->name ? 0 : strcmp(proxy_h_1->name, proxy_h_2->name);
+}
+
 static zbx_hash_t	__config_autoreg_host_h_hash(const void *data)
 {
 	const ZBX_DC_AUTOREG_HOST	*autoreg_host = (const ZBX_DC_AUTOREG_HOST *)data;
@@ -8227,7 +8242,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 
 	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
-	CREATE_HASHSET_EXT(config->proxies_p, 0, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->proxies_p, 0, __config_proxy_h_hash, __config_proxy_h_compare);//
 	CREATE_HASHSET_EXT(config->autoreg_hosts, 10, __config_autoreg_host_h_hash, __config_autoreg_host_h_compare);
 	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash,
