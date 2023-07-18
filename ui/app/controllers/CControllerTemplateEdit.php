@@ -305,14 +305,6 @@ class CControllerTemplateEdit extends CController {
 			$data['templateid'] = null;
 		}
 
-		// Add inherited macros to template macros.
-		if ($data['show_inherited_macros']) {
-			$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
-		}
-
-		// Sort only after inherited macros are added. Otherwise, the list will look chaotic.
-		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
-
 		// The empty inputs will not be shown if there are inherited macros, for example.
 		if (!$data['macros']) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
@@ -328,6 +320,9 @@ class CControllerTemplateEdit extends CController {
 		if ($data['show_inherited_macros']) {
 			$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
 		}
+
+		// Sort only after inherited macros are added. Otherwise, the list will look chaotic.
+		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
 		foreach ($data['macros'] as &$macro) {
 			$macro['discovery_state'] = CControllerHostMacrosList::DISCOVERY_STATE_MANUAL;

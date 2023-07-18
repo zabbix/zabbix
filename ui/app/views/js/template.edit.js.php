@@ -186,7 +186,6 @@ window.template_edit_popup = new class {
 
 					if (merged_templateids.length > 0) {
 						panel.data('templateids', templateids);
-
 						this.macros_manager.load(
 							this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
 							this.linked_templateids.concat(templateids),
@@ -207,7 +206,7 @@ window.template_edit_popup = new class {
 				}
 				else {
 					this.macros_manager.initMacroTable(
-						this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
+						this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1
 					);
 				}
 
