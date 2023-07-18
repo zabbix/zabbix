@@ -546,10 +546,12 @@ out:
 	return ret;
 }
 
-typedef struct {
+typedef struct
+{
 	char		*name;
 	EVT_HANDLE	handle;
-} provider_meta_t;
+}
+provider_meta_t;
 
 ZBX_VECTOR_DECL(prov_meta, provider_meta_t)
 ZBX_VECTOR_IMPL(prov_meta, provider_meta_t)
@@ -560,8 +562,8 @@ static EVT_HANDLE	open_publisher_metadata(const wchar_t *pname, const char* utf8
 
 	if (NULL == (handle = EvtOpenPublisherMetadata(NULL, pname, NULL, 0, 0)))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s",
-				utf8_name, zbx_strerror_from_system(GetLastError()));
+		zabbix_log(LOG_LEVEL_DEBUG, "provider '%s' could not be opened: %s", utf8_name,
+				zbx_strerror_from_system(GetLastError()));
 	}
 
 	return handle;
@@ -615,7 +617,7 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_
 	EVT_HANDLE	provider = NULL;
 	DWORD		require = 0;
 	char		*out_message = NULL;
-	int		 refetch_done = 0;
+	int		refetch_done = 0;
 	DWORD		error;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -623,7 +625,7 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_
 	if (FAIL == get_publisher_metadata(prov_meta, pname, 0, &provider))
 		goto err;
 
-	while (0 == refetch_done)
+	while (1)
 	{
 		if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
 		{
@@ -649,17 +651,20 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_
 					goto out;
 				}
 				else
-					goto err;
+					break;
 			}
 			else if (ERROR_INVALID_HANDLE == last_err)
 			{
+				if (1 == refetch_done)
+					break;
+
 				refetch_done = 1;
 
 				if (FAIL == get_publisher_metadata(prov_meta, pname, 1, &provider))
-					goto err;
+					break;
 			}
 			else
-				goto err;
+				break;
 		}
 	}
 err:
@@ -1974,7 +1979,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 					config_tls, config_timeout, config_source_ip, config_hostname, metric,
 					lastlogsize_sent, &prov_meta, error);
 
-			for (size_t i = 0; i < prov_meta.values_num; i++)
+			for (int i = 0; i < prov_meta.values_num; i++)
 			{
 				if (NULL != prov_meta.values[i].handle)
 					EvtClose(prov_meta.values[i].handle);

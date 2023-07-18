@@ -425,7 +425,7 @@ void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type va
 void	zbx_vector_ ## __id ## _insert_sorted(zbx_vector_ ## __id ## _t *vector, __type value, 			\
 		zbx_compare_func_t compare_func)								\
 {														\
-	size_t	index;												\
+	int	index;												\
 														\
 	__vector_ ## __id ## _ensure_free_space(vector);							\
 														\
@@ -436,34 +436,12 @@ void	zbx_vector_ ## __id ## _insert_sorted(zbx_vector_ ## __id ## _t *vector, __
 	}													\
 														\
 	if (0 > compare_func(&value, &(vector->values[0])))							\
-	{													\
 		index = 0;											\
-	}													\
 	else													\
-	{													\
-		size_t left = 0, right = vector->values_num -1;							\
+		index = zbx_vector_ ## __id ## _nearestindex(vector, value, compare_func);			\
 														\
-		while (1)											\
-		{												\
-			if (2 > right - left)									\
-			{											\
-				index = right;									\
-				break;										\
-			}											\
-														\
-			index = (right + left) / 2;								\
-														\
-			if(0 < compare_func(&value, &(vector->values[index])))					\
-				left = index;									\
-			else											\
-				right = index;									\
-		}												\
-	}													\
-														\
-	for (size_t i = vector->values_num - 1; i >= index; i--)						\
-	{													\
-		vector->values[i + 1] = vector->values[i];							\
-	}													\
+	memmove(vector->values + index + 1, vector->values + index,						\
+			(vector->values_num - index) * sizeof(__type));						\
 														\
 	vector->values_num++;											\
 	vector->values[index] = value;										\
