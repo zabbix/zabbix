@@ -319,6 +319,7 @@ class CRouter {
 		'trigger.list'								=> ['CControllerTriggerList',							'layout.htmlpage',		'trigger.list'],
 		'trigger.massupdate'						=> ['CControllerTriggerMassupdate',						'layout.json',			'trigger.massupdate'],
 		'trigger.prototype.create'					=> ['CControllerTriggerPrototypeCreate',				'layout.json',			null],
+		'trigger.prototype.delete'					=> ['CControllerTriggerPrototypeDelete',				'layout.json',			null],
 		'trigger.prototype.disable'					=> ['CControllerTriggerPrototypeDisable',				'layout.json',			null],
 		'trigger.prototype.edit'					=> ['CControllerTriggerPrototypeEdit',					'layout.json',			'trigger.prototype.edit'],
 		'trigger.prototype.enable'					=> ['CControllerTriggerPrototypeEnable',				'layout.json',			null],

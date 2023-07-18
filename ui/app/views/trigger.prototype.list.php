@@ -190,11 +190,11 @@ $trigger_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massupdate-trigger')
 			],
-			'triggerprototype.massdelete' => [
-				'name' => _('Delete'),
-				'confirm_singular' => _('Delete selected trigger prototype?'),
-				'confirm_plural' => _('Delete selected trigger prototypes?'),
-				'csrf_token' => $csrf_token
+			'trigger.prototype.massdelete' => [
+				'content' => (new CSimpleButton(_('Delete')))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdelete-trigger')
+					->addClass('js-no-chkbxrange')
 			]
 		],
 		$this->data['parent_discoveryid']

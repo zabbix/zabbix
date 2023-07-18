@@ -76,6 +76,9 @@
 				else if (e.target.classList.contains('js-massupdate-trigger')) {
 					this.#massupdate(e.target);
 				}
+				else if (e.target.classList.contains('js-massdelete-trigger')) {
+					this.#delete(e.target, Object.keys(chkbxRange.getSelectedIds()));
+				}
 			})
 		}
 
@@ -128,7 +131,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.prototype.enable');
 
-			this.#post(target, triggerids, status, discover, curl);
+			this.#post(target, triggerids, curl, status, discover);
 		}
 
 		#disable(target, triggerids, status = null, discover = null) {
@@ -152,7 +155,7 @@
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.prototype.disable');
 
-			this.#post(target, triggerids, status, discover, curl);
+			this.#post(target, triggerids, curl, status, discover);
 		}
 
 		#massupdate(target) {
@@ -164,7 +167,22 @@
 			});
 		}
 
-		#post(target, triggerids, status = null, discover = null, url) {
+		#delete(target, triggerids) {
+			const confirmation = triggerids.length > 1
+				? <?= json_encode(_('Delete selected trigger prototypes?')) ?>
+				: <?= json_encode(_('Delete selected trigger prototype?')) ?>;
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.prototype.delete');
+
+			this.#post(target, triggerids, curl);
+		}
+
+		#post(target, triggerids, url, status = null, discover = null) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			);
