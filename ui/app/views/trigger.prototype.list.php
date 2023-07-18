@@ -124,37 +124,24 @@ foreach ($data['triggers'] as $trigger) {
 	}
 
 	$status = (new CLink(
-		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes'),
-		(new CUrl('trigger_prototypes.php'))
-			->setArgument('action', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
-				? 'triggerprototype.massenable'
-				: 'triggerprototype.massdisable'
+		($trigger['status'] == TRIGGER_STATUS_DISABLED) ? _('No') : _('Yes')))
+			->setAttribute('data-triggerid', $triggerid)
+			->setAttribute('data-status', ($trigger['status'] == TRIGGER_STATUS_DISABLED)
+				? TRIGGER_STATUS_ENABLED
+				: TRIGGER_STATUS_DISABLED
 			)
-			->setArgument('g_triggerid[]', $triggerid)
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->getUrl()
-	))
-		->addCsrfToken($csrf_token)
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->addClass(triggerIndicatorStyle($trigger['status']));
+			->addClass(($trigger['status'] == TRIGGER_STATUS_DISABLED) ? 'js-enable-trigger' : 'js-disable-trigger')
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(triggerIndicatorStyle($trigger['status']));
 
 
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
-	$discover = (new CLink($nodiscover ? _('No') : _('Yes'),
-			(new CUrl('trigger_prototypes.php'))
-				->setArgument('g_triggerid[]', $triggerid)
-				->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-				->setArgument('action',  $nodiscover
-					? 'triggerprototype.discover.enable'
-					: 'triggerprototype.discover.disable'
-				)
-				->setArgument('context', $data['context'])
-				->getUrl()
-		))
-			->addCsrfToken($csrf_token)
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
+	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
+		->setAttribute('data-triggerid', $triggerid)
+		->setAttribute('data-discover', $nodiscover ? ZBX_PROTOTYPE_DISCOVER : ZBX_PROTOTYPE_NO_DISCOVER)
+		->addClass($nodiscover ? 'js-enable-trigger' : 'js-disable-trigger')
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass($nodiscover ? ZBX_STYLE_RED : ZBX_STYLE_GREEN);
 
 	if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
 		$expression = [
@@ -186,29 +173,24 @@ $trigger_form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'g_triggerid',
 		[
-			'triggerprototype.massenable' => [
-				'name' => _('Create enabled'),
-				'confirm_singular' => _('Create triggers from selected prototype as enabled?'),
-				'confirm_plural' => _('Create triggers from selected prototypes as enabled?'),
-				'csrf_token' => $csrf_token
+			'trigger.prototype.massenable' => [
+				'content' => (new CSimpleButton(_('Enable')))
+					->setAttribute('data-status', TRIGGER_STATUS_ENABLED)
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massenable-trigger')
+					->addClass('js-no-chkbxrange')
 			],
-			'triggerprototype.massdisable' => [
-				'name' => _('Create disabled'),
-				'confirm_singular' => _('Create triggers from selected prototype as disabled?'),
-				'confirm_plural' => _('Create triggers from selected prototypes as disabled?'),
-				'csrf_token' => $csrf_token
+			'trigger.prototype.massdisable' => [
+				'content' => (new CSimpleButton(_('Disable')))
+					->setAttribute('data-status', TRIGGER_STATUS_DISABLED)
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->addClass('js-massdisable-trigger')
+					->addClass('js-no-chkbxrange')
 			],
-			'popup.massupdate.triggerprototype' => [
+			'trigger.prototype.massupdate' => [
 				'content' => (new CSimpleButton(_('Mass update')))
 					->addClass(ZBX_STYLE_BTN_ALT)
-					->onClick(
-						"openMassupdatePopup('popup.massupdate.triggerprototype', {".
-							CCsrfTokenHelper::CSRF_TOKEN_NAME.": '".CCsrfTokenHelper::get('triggerprototype').
-						"'}, {
-							dialogue_class: 'modal-popup-static',
-							trigger_element: this
-						});"
-					)
+					->addClass('js-massupdate-trigger')
 			],
 			'triggerprototype.massdelete' => [
 				'name' => _('Delete'),

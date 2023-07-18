@@ -57,6 +57,24 @@
 						context: this.context
 					})
 				}
+				else if (e.target.classList.contains('js-enable-trigger')) {
+					this.#enable(e.target, [e.target.dataset.triggerid], e.target.dataset.status,
+						e.target.dataset.discover
+					);
+				}
+				else if (e.target.classList.contains('js-disable-trigger')) {
+					this.#disable(e.target, [e.target.dataset.triggerid], e.target.dataset.status,
+						e.target.dataset.discover);
+				}
+				else if (e.target.classList.contains('js-massenable-trigger')) {
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), e.target.dataset.status);
+				}
+				else if (e.target.classList.contains('js-massdisable-trigger')) {
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), e.target.dataset.status);
+				}
+				else if (e.target.classList.contains('js-massupdate-trigger')) {
+					this.#massupdate(e.target);
+				}
 			})
 		}
 
@@ -86,6 +104,121 @@
 
 				location.href = location.href;
 			});
+		}
+
+		#enable(target, triggerids, status = null, discover = null) {
+			let confirmation;
+
+			if (status !== null) {
+				confirmation = triggerids.length > 1
+					? <?= json_encode(_('Create triggers from selected prototypes as enabled?')) ?>
+					: <?= json_encode(_('Create triggers from selected prototype as enabled?')) ?>;
+			}
+			else {
+				confirmation = triggerids.length > 1
+					? <?= json_encode(_('Enable selected trigger prototypes?')) ?>
+					: <?= json_encode(_('Enable selected trigger prototype?')) ?>;
+			}
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.prototype.enable');
+
+			this.#post(target, triggerids, status, discover, curl);
+		}
+
+		#disable(target, triggerids, status = null, discover = null) {
+			let confirmation;
+
+			if (status !== null) {
+				confirmation = triggerids.length > 1
+					? <?= json_encode(_('Create triggers from selected prototypes as disabled?')) ?>
+					: <?= json_encode(_('Create triggers from selected prototype as disabled?')) ?>;
+			}
+			else {
+				confirmation = triggerids.length > 1
+					? <?= json_encode(_('Disable selected trigger prototypes?')) ?>
+					: <?= json_encode(_('Disable selected trigger prototype?')) ?>;
+			}
+
+			if (!window.confirm(confirmation)) {
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'trigger.prototype.disable');
+
+			this.#post(target, triggerids, status, discover, curl);
+		}
+
+		#massupdate(target) {
+			openMassupdatePopup('trigger.prototype.massupdate', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
+					<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+			}, {
+				dialogue_class: 'modal-popup-static',
+				trigger_element: target
+			});
+		}
+
+		#post(target, triggerids, status = null, discover = null, url) {
+			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
+				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
+			);
+
+			let fields = {
+				triggerids: triggerids
+			};
+
+			if (status !== null) {
+				fields.status = status;
+			}
+			else {
+				fields.discover = discover;
+			}
+
+			target.classList.add('is-loading');
+
+			return fetch(url.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						if ('title' in response.error) {
+							postMessageError(response.error.title);
+						}
+
+						postMessageDetails('error', response.error.messages);
+
+						uncheckTableRows('trigger', response.keepids ?? []);
+					}
+					else if ('success' in response) {
+						postMessageOk(response.success.title);
+
+						if ('messages' in response.success) {
+							postMessageDetails('success', response.success.messages);
+						}
+
+						uncheckTableRows('trigger');
+					}
+
+					location.href = location.href;
+				})
+				.catch(() => {
+					clearMessages();
+
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+
+					addMessage(message_box);
+				})
+				.finally(() => {
+					target.classList.remove('is-loading');
+				});
 		}
 
 		editHost(e, hostid) {

@@ -191,14 +191,13 @@
 		}
 
 		#massupdate(target) {
-			openMassupdatePopup('massupdate.trigger', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
+			openMassupdatePopup('trigger.massupdate', { <?= json_encode(CCsrfTokenHelper::CSRF_TOKEN_NAME) ?>:
 					<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 				}, {
 				dialogue_class: 'modal-popup-static',
 				trigger_element: target
 			});
 		}
-
 
 		#post(target, triggerids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',

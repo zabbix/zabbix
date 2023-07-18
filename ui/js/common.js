@@ -1086,12 +1086,12 @@ function openMassupdatePopup(action, parameters = {}, {
 			parameters.prototype = 0;
 			break;
 
-		case 'massupdate.trigger':
+		case 'trigger.massupdate':
 			parameters.context = form.querySelector('#form_context').value;
 			break;
 
 		case 'popup.massupdate.itemprototype':
-		case 'popup.massupdate.triggerprototype':
+		case 'trigger.prototype.massupdate':
 			parameters.parent_discoveryid = form.querySelector('#form_parent_discoveryid').value;
 			parameters.context = form.querySelector('#form_context').value;
 			parameters.prototype = 1;

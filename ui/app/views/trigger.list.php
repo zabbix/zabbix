@@ -362,7 +362,7 @@ $triggers_form->addItem([
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->removeId()
 			],
-			'massupdate.trigger' => [
+			'trigger.massupdate' => [
 				'content' => (new CSimpleButton(_('Mass update')))
 					->addClass(ZBX_STYLE_BTN_ALT)
 					->addClass('js-massupdate-trigger')
