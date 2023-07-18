@@ -44,10 +44,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	public function prepareData() {
 		CDataHelper::call('regexp.create', [
 			[
-				'name' => '0_case_1',
+				'name' => '0_case_1 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
 				'expressions' => [
 					[
-						'expression' => 'test',
+						'expression' => 'test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
 						'expression_type' => EXPRESSION_TYPE_INCLUDED
 					]
 				]
@@ -111,19 +111,19 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$expected_data = [
 			[
-				'Name' => '0_case_1',
-				'Expressions' => '1 ⇒ test [Character string included]'
+				'Name' => '0_case_1 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/>',
+				'Expressions' => '1 ⇒ test 🙂🙃 ZaBbiX зАБбИкс āēīõšŗ \n <br/> [Character string included]'
 			],
 			[
 				'Name' => '0_case_2',
 				'Expressions' => "1 ⇒ test [Any character string included]\n".
-					"2 ⇒ test [Character string not included]"
+						'2 ⇒ test [Character string not included]'
 			],
 			[
 				'Name' => '0_case_3',
 				'Expressions' => "1 ⇒ test [Character string included]\n".
-					"2 ⇒ test [Result is TRUE]\n".
-					"3 ⇒ test [Result is FALSE]"
+						"2 ⇒ test [Result is TRUE]\n".
+						'3 ⇒ test [Result is FALSE]'
 			]
 		];
 
