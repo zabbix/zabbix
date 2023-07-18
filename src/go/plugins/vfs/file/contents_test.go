@@ -94,7 +94,7 @@ func TestFileContentsEncoding(t *testing.T) {
 			targetContents: "ロシアデスマン\n\n🌭\nкирпич"},
 		{fileContents: fileSingleCharNoNewLine, targetEncoding: "", targetContents: "a"},
 		{fileContents: fileManyCharsNoNewLine, targetEncoding: "", targetContents: "alphabeta"},
-		// wrong encodings
+		// file contents with wrong encodings
 		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
 		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-16BE", targetContents: "августа"},
 		{fileContents: fileContents_ISO_8859_5, targetEncoding: "UTF-32LE", targetContents: ""},
@@ -103,6 +103,12 @@ func TestFileContentsEncoding(t *testing.T) {
 		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-16BE", targetContents: "慬灨慢整"},
 		{fileContents: fileSingleCharNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
 		{fileContents: fileManyCharsNoNewLine, targetEncoding: "UTF-32LE", targetContents: ""},
+
+		// target encoding wrong, (iconv fails to detect this)
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "ロシアデスマン", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "🌭", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "кирпич", targetContents: "alphabeta"},
+		{fileContents: fileManyCharsNoNewLine, targetEncoding: "ロシавгуста\r\n", targetContents: "alphabeta"},
 	}
 
 	for i, c := range tests {
@@ -131,6 +137,35 @@ func TestFileContentsEncoding(t *testing.T) {
 			t.Errorf(`vfs.file.contents (testCase[%d]) returned invalid result: ->%s<-,
 				expected: ->%s<-, (bytes: %x and %x)`, i, contents, c.targetContents,
 				[]byte(contents), []byte(c.targetContents))
+		}
+	}
+
+	testCasesWrongTargetEncoding := []*testCase{
+		{fileContents: fileContents_UTF_8, targetEncoding: "BADGER", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "a", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-17", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF-", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "UTF", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "U", targetContents: ""},
+		{fileContents: fileContents_UTF_8, targetEncoding: "_UTF-16", targetContents: ""},
+	}
+
+	for i, c := range testCasesWrongTargetEncoding {
+		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
+
+		var err error
+		_, err = impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil);
+		expectedError := "Failed to convert from encoding to utf8: invalid argument"
+
+		if (nil == err) {
+			t.Errorf("vfs.file.contents (testCase[%d]) did not return error: ->%s<- when wrong target " +
+				"encoding:->%s<- was used", i, expectedError, c.targetEncoding)
+			return
+		} else if (err.Error() != expectedError) {
+			t.Errorf("vfs.file.contents (testCase[%d]) expected error: ->%s<-," +
+				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
+				expectedError, err.Error(), c.targetEncoding)
+			return
 		}
 	}
 }
