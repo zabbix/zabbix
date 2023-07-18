@@ -488,7 +488,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'fields' => [
 						'Type' => 'Item value',
 						'Item' => [
-							'values' => 'Available memory',
+							'values' => 'Linux: Available memory',
 							'context' => [
 								'values' => 'ЗАББИКС Сервер',
 								'context' => 'Zabbix servers'

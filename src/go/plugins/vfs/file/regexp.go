@@ -20,12 +20,12 @@
 package file
 
 import (
-	"bufio"
 	"errors"
-	"fmt"
 	"math"
+	"os"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"zabbix.com/pkg/zbxregexp"
@@ -46,9 +46,9 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		return nil, errors.New("Invalid second parameter.")
 	}
 
-	var encoder string
+	var encoding string
 	if len(params) > 2 {
-		encoder = params[2]
+		encoding = params[2]
 	}
 
 	if len(params) < 4 || "" == params[3] {
@@ -75,35 +75,49 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		output = params[5]
 	}
 
-	var rx *regexp.Regexp
-	if rx, err = regexp.Compile(params[1]); err != nil {
+	var compiledRegexp *regexp.Regexp
+	if compiledRegexp, err = regexp.Compile(params[1]); err != nil {
 		return nil, errors.New("Invalid first parameter.")
 	}
 
-	file, err := stdOs.Open(params[0])
-	if err != nil {
-		return nil, fmt.Errorf("Cannot open file %s: %s", params[0], err)
-	}
-	defer file.Close()
+	f, err := os.Open(params[0])
 
-	// Start reading from the file with a reader.
-	scanner := bufio.NewScanner(file)
-	curline = 0
-	for scanner.Scan() {
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	initial := true
+	undecodedBufNumBytes := 0
+	var undecodedBuf []byte
+	for 0 < undecodedBufNumBytes || initial {
 		elapsed := time.Since(start)
+
 		if elapsed.Seconds() > float64(p.options.Timeout) {
 			return nil, errors.New("Timeout while processing item.")
 		}
 
+		initial = false
 		curline++
+		undecodedBuf, undecodedBufNumBytes, encoding, err = p.readTextLineFromFile(f, encoding)
+		if err != nil {
+			return nil, err
+		}
+		utf8_buf, utf8_bufNumBytes := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
+
+		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
+		utf8_bufStr = strings.TrimRight(utf8_bufStr, "\r\n")
+
 		if curline >= startline {
-			if out, ok := zbxregexp.ExecuteRegex(decode(encoder, scanner.Bytes()), rx, []byte(output)); ok {
+			if out, ok := zbxregexp.ExecuteRegex([]byte(utf8_bufStr), compiledRegexp, []byte(output)); ok {
 				return out, nil
 			}
 		}
+
 		if curline >= endline {
 			break
 		}
 	}
+
 	return "", nil
 }

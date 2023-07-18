@@ -114,7 +114,7 @@ $formula = (new CTextBox('formula', $data['action']['filter']['formula'], false,
 	))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+	->setAttribute('placeholder', 'A or (B and C) ...');
 
 $action_tab->addRow(new CLabel(_('Type of calculation'), 'label-evaltype'), [
 	(new CDiv(

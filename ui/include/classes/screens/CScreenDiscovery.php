@@ -210,7 +210,7 @@ class CScreenDiscovery extends CScreenBase {
 
 			if ($discovery_info) {
 				$col = new CCol(
-					[bold($drule['name']), SPACE.'('._n('%d device', '%d devices', count($discovery_info)).')']
+					[bold($drule['name']), NBSP(), '('._n('%d device', '%d devices', count($discovery_info)).')']
 				);
 				$col->setColSpan(count($services) + 3);
 
@@ -223,7 +223,7 @@ class CScreenDiscovery extends CScreenBase {
 				$row = [
 					($h_data['type'] === 'primary')
 						? (new CSpan($ip.$dns))->addClass($h_data['class'])
-						: new CSpan(SPACE.SPACE.$ip.$dns),
+						: new CSpan([NBSP(), NBSP(), $ip.$dns]),
 					new CSpan(array_key_exists('host', $h_data) ? $h_data['host'] : ''),
 					(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 						? ''

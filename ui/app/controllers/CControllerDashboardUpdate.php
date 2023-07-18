@@ -35,6 +35,7 @@ class CControllerDashboardUpdate extends CController {
 			'display_period' =>	'required|db dashboard.display_period|in '.implode(',', DASHBOARD_DISPLAY_PERIODS),
 			'auto_start' =>		'required|db dashboard.auto_start|in 0,1',
 			'pages' =>			'array',
+			'page' =>			'ge 2',
 			'sharing' =>		'array'
 		];
 
@@ -150,6 +151,7 @@ class CControllerDashboardUpdate extends CController {
 			$data['redirect'] = (new CUrl('zabbix.php'))
 				->setArgument('action', 'dashboard.view')
 				->setArgument('dashboardid', $result['dashboardids'][0])
+				->setArgument('page', $this->hasInput('page') ? $this->getInput('page') : null)
 				->getUrl();
 
 			$data['system-message-ok'] = $message;

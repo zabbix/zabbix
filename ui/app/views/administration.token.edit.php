@@ -40,6 +40,9 @@ $token_form = (new CForm())
 	->addVar('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
 	->addVar('tokenid', $data['tokenid']);
 
+// Enable form submitting on Enter.
+$token_form->addItem((new CSubmitButton(null))->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+
 $token_from_list = (new CFormList())
 	->addRow((new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CTextBox('name', $data['name'], false, DB::getFieldLength('token', 'name')))

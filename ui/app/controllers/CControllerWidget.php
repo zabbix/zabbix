@@ -109,11 +109,16 @@ abstract class CControllerWidget extends CController {
 		}
 
 		$ret = $this->validateInput($validation_rules);
+		$widget_name = $this->getDefaultName();
 
 		if ($ret) {
 			$this->form = CWidgetConfig::getForm($this->type, $this->getInput('fields', '{}'),
 				$this->hasInput('templateid') ? $this->getInput('templateid') : null
 			);
+
+			if ($this->getInput('name', '') !== '') {
+				$widget_name = $this->getInput('name');
+			}
 
 			if ($errors = $this->form->validate()) {
 				foreach ($errors as $error) {
@@ -126,7 +131,7 @@ abstract class CControllerWidget extends CController {
 
 		if (!$ret) {
 			$output = [
-				'name' => $this->getDefaultName(),
+				'name' => $widget_name,
 				'messages' => getMessages()->toString()
 			];
 

@@ -1,1 +1,0 @@
-A........T [ZBX-19375] prevented the ability to set a duplicate value for the uuid parameter when updating any of template entities; added possibility to update the uuid parameter for the Service API; fixed duplicate UUIDs in Proxmox VE by HTTP template (aiantsen, vmaksimovs)
