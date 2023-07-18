@@ -738,7 +738,7 @@ static int	elastic_get_values(zbx_history_iface_t *hist, zbx_uint64_t itemid, in
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
 	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
 #	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(data->handle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
 #	else
 	if (CURLE_OK != (err = curl_easy_setopt(data->handle, opt = CURLOPT_PROTOCOLS,
 			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
@@ -1089,7 +1089,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
 	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
 #	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(handle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
 #	else
 	if (CURLE_OK != (err = curl_easy_setopt(handle, opt = CURLOPT_PROTOCOLS,
 			CURLPROTO_HTTP | CURLPROTO_HTTPS)))

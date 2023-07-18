@@ -458,10 +458,10 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 			set_serial_params_default(&endpoint->conn_info.serial);
 		}
 #if !(defined(_WINDOWS) || defined(__MINGW32__))
-		if (NULL == endpoint->conn_info.serial.port || '/' != *endpoint->conn_info.serial.port)
+		if (NULL != endpoint->conn_info.serial.port && '/' != *endpoint->conn_info.serial.port)
 		{
 			endpoint->conn_info.serial.port = zbx_dsprintf(endpoint->conn_info.serial.port, "/dev/%s",
-					ZBX_NULL2EMPTY_STR(endpoint->conn_info.serial.port));
+					endpoint->conn_info.serial.port);
 		}
 #endif
 	}
