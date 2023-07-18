@@ -454,6 +454,9 @@ typedef struct
 	zbx_uint64_t			hosts_monitored;	/* number of enabled hosts assigned to proxy */
 	zbx_uint64_t			hosts_not_monitored;	/* number of disabled hosts assigned to proxy */
 	double				required_performance;
+	zbx_uint64_t			items_active_normal;		/* On enabled hosts these two fields store number of enabled */
+	zbx_uint64_t			items_active_notsupported;	/* and supported items and enabled and not supported items.  */
+	zbx_uint64_t			items_disabled;
 	int				proxy_config_nextcheck;
 	int				proxy_data_nextcheck;
 	int				proxy_tasks_nextcheck;

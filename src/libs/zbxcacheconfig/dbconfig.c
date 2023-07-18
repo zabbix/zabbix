@@ -6767,9 +6767,9 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
-			proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck( proxyid, proxyconfig_frequency,
+			proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(proxyid, proxyconfig_frequency,
 					now);
-			proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck( proxyid, proxyconfig_frequency,
+			proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(proxyid, proxyconfig_frequency,
 					now);
 			proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(proxyid,
 					ZBX_TASK_UPDATE_FREQUENCY, now);
@@ -7549,12 +7549,12 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies    : %d (%d slots)", __func__,
 				config->proxies.num_data, config->proxies.num_slots);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies_p    : %d (%d slots)", __func__,
+				config->proxies_p.num_data, config->proxies_p.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts      : %d (%d slots)", __func__,
 				config->hosts.num_data, config->hosts.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() hosts_h    : %d (%d slots)", __func__,
 				config->hosts_h.num_data, config->hosts_h.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() proxies_p    : %d (%d slots)", __func__,
-				config->proxies_p.num_data, config->proxies_p.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() autoreg_hosts: %d (%d slots)", __func__,
 				config->autoreg_hosts.num_data, config->autoreg_hosts.num_slots);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -12166,10 +12166,6 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy, in
 {
 	int			i;
 	const ZBX_DC_ITEM	*dc_item;
-	ZBX_DC_HOST		*dc_proxy_host = NULL;
-
-	if (0 != dc_host->proxyid)
-		dc_proxy_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_host->proxyid);
 
 	/* loop over items to gather per-host and per-proxy statistics */
 	for (i = 0; i < dc_host->items.values_num; i++)
@@ -12209,14 +12205,14 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy, in
 						case ITEM_STATE_NORMAL:
 							config->status->items_active_normal++;
 							dc_host->items_active_normal++;
-							if (NULL != dc_proxy_host)
-								dc_proxy_host->items_active_normal++;
+							if (NULL != dc_proxy)
+								dc_proxy->items_active_normal++;
 							break;
 						case ITEM_STATE_NOTSUPPORTED:
 							config->status->items_active_notsupported++;
 							dc_host->items_active_notsupported++;
-							if (NULL != dc_proxy_host)
-								dc_proxy_host->items_active_notsupported++;
+							if (NULL != dc_proxy)
+								dc_proxy->items_active_notsupported++;
 							break;
 						default:
 							THIS_SHOULD_NEVER_HAPPEN;
@@ -12227,8 +12223,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy, in
 				ZBX_FALLTHROUGH;
 			case ITEM_STATUS_DISABLED:
 				config->status->items_disabled++;
-				if (NULL != dc_proxy_host)
-					dc_proxy_host->items_disabled++;
+				if (NULL != dc_proxy)
+					dc_proxy->items_disabled++;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -12307,6 +12303,9 @@ static void	dc_status_update(void)
 			dc_proxy->hosts_monitored = 0;
 			dc_proxy->hosts_not_monitored = 0;
 			dc_proxy->required_performance = 0.0;
+			dc_proxy->items_active_normal = 0.0;
+			dc_proxy->items_active_notsupported = 0.0;
+			dc_proxy->items_disabled = 0.0;
 		}
 	}
 
@@ -12541,7 +12540,6 @@ void	zbx_dc_get_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *host
 {
 	zbx_hashset_iter_t	iter;
 	const ZBX_DC_PROXY	*dc_proxy;
-	const ZBX_DC_HOST	*dc_proxy_host;
 
 	WRLOCK_CACHE;
 
@@ -12563,16 +12561,11 @@ void	zbx_dc_get_status(zbx_vector_ptr_t *hosts_monitored, zbx_vector_ptr_t *host
 	{
 		proxy_counter_ui64_push(hosts_monitored, dc_proxy->proxyid, dc_proxy->hosts_monitored);
 		proxy_counter_ui64_push(hosts_not_monitored, dc_proxy->proxyid, dc_proxy->hosts_not_monitored);
-
-		if (NULL != (dc_proxy_host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &dc_proxy->proxyid)))
-		{
-			proxy_counter_ui64_push(items_active_normal, dc_proxy->proxyid,
-					dc_proxy_host->items_active_normal);
-			proxy_counter_ui64_push(items_active_notsupported, dc_proxy->proxyid,
-					dc_proxy_host->items_active_notsupported);
-			proxy_counter_ui64_push(items_disabled, dc_proxy->proxyid, dc_proxy_host->items_disabled);
-		}
-
+		proxy_counter_ui64_push(items_active_normal, dc_proxy->proxyid,
+				dc_proxy->items_active_normal);
+		proxy_counter_ui64_push(items_active_notsupported, dc_proxy->proxyid,
+				dc_proxy->items_active_notsupported);
+		proxy_counter_ui64_push(items_disabled, dc_proxy->proxyid, dc_proxy->items_disabled);
 		proxy_counter_dbl_push(required_performance, dc_proxy->proxyid, dc_proxy->required_performance);
 	}
 
@@ -14748,8 +14741,8 @@ int	zbx_proxy_discovery_get(char **data, char **error)
 			else
 				zbx_json_addstring(&json, "cert", "false", ZBX_JSON_TYPE_INT);
 
-			/*zbx_json_adduint64(&json, "items", dc_proxy->items_active_normal +
-					dc_proxy->items_active_notsupported);*/
+			zbx_json_adduint64(&json, "items", dc_proxy->items_active_normal +
+					dc_proxy->items_active_notsupported);
 
 			zbx_json_addstring(&json, "compression", "true", ZBX_JSON_TYPE_INT);
 
