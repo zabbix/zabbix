@@ -656,6 +656,7 @@ int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *fie
 	return SUCCEED;
 
 #else /* ORACLE */
+	ZBX_UNUSED(field);
 
 	if (SUCCEED != DBdrop_serial_sequence(table_name))
 		return FAIL;
@@ -664,7 +665,6 @@ int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *fie
 		return FAIL;
 
 	return SUCCEED;
-
 #endif
 }
 
