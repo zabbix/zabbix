@@ -34,6 +34,8 @@
 
 /* winevt.h contents START */
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
+
+BOOL WINAPI	EvtClose(EVT_HANDLE Object);
 /* winevt.h contents END */
 
 extern int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;

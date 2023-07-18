@@ -185,6 +185,8 @@ BOOL WINAPI		EvtFormatMessage(EVT_HANDLE PublisherMetadata, EVT_HANDLE Event, DW
 #define	VAR_EVENT_DATA_TYPE(p)			(p[7].Type)
 #define	VAR_EVENT_DATA_COUNT(p)			(p[7].Count)
 
+ZBX_VECTOR_IMPL(prov_meta, provider_meta_t)
+
 /* gets handles of Event Log */
 static int	zbx_get_handle_eventlog6(const wchar_t *wsource, zbx_uint64_t *lastlogsize, EVT_HANDLE *query,
 		char **error)
@@ -440,16 +442,6 @@ out:
 
 	return ret;
 }
-
-typedef struct
-{
-	char		*name;
-	EVT_HANDLE	handle;
-}
-provider_meta_t;
-
-ZBX_VECTOR_DECL(prov_meta, provider_meta_t)
-ZBX_VECTOR_IMPL(prov_meta, provider_meta_t)
 
 static EVT_HANDLE	open_publisher_metadata(const wchar_t *pname, const char* utf8_name)
 {
