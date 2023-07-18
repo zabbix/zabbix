@@ -18,58 +18,113 @@ Zabbix version: 6.0 and higher.
 
 This template has been tested on:
 - PHP 7
+- PHP 8
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
-1. Open the php-fpm configuration file and enable the status page as shown.
-    ```
-    pm.status_path = /status
-    ping.path = /ping
-    ```
-2. Validate the syntax to ensure it is correct, before you reload the service.
-    ```
-    $ php-fpm7 -t
-    ```
-3. Reload the `php-fpm` service to make the change active.
-    ```
-    $ systemctl reload php-fpm
-    ```
-4. Next, edit the configuration file of your Nginx server block (virtual host) and add the location block below it.
-    ```
-    # Enable php-fpm status page
-    location ~ ^/(status|ping)$ {
-    ## disable access logging for request if you prefer
-    access_log off;
+Note that depending on your OS distribution, the PHP-FPM executable/service name can vary. RHEL-like distributions usually name both process and service as `php-fpm`, while for Debian/Ubuntu based distributions it may include the version, for example: executable name - `php-fpm8.2`, systemd service name - `php8.2-fpm`. Adjust the following instructions accordingly if needed.
 
-    ## Only allow trusted IPs for security, deny everyone else
-    # allow 127.0.0.1;
-    # allow 1.2.3.4;    # your IP here
-    # deny all;
+1. Open the PHP-FPM configuration file and enable the status page as shown.
+  ```
+  pm.status_path = /status
+  ping.path = /ping
+  ```
 
-    fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
-    fastcgi_index index.php;
-    include fastcgi_params;
-    ## Now the port or socket of the php-fpm pool we want the status of
-    fastcgi_pass 127.0.0.1:9000;
-    # fastcgi_pass unix:/run/php-fpm/your_socket.sock;
-    }
-    ```
-5. Check the syntax again.
-  ```$ nginx -t```
+2. Validate the syntax to ensure it is correct before you reload the service. Replace the `<version>` in the command if needed.
+  ```
+  $ php-fpm -t
+  ```
+  or
+  ```
+  $ php-fpm<version> -t
+  ```
 
-6. Reload Nginx server.
-  ```$ systemctl reload nginx```
+3. Reload the `php-fpm` service to make the change active. Replace the `<version>` in the command if needed.
+  ```
+  $ systemctl reload php-fpm
+  ```
+  or
+  ```
+  $ systemctl reload php<version>-fpm
+  ```
 
-7. Verify it with this command line.
-  ```curl -L 127.0.0.1/status```
+4. Next, edit the configuration of your web server.
 
-If you use another location of the status/ping page, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
+If you use Nginx, edit the configuration file of your Nginx server block (virtual host) and add the location block below it.
+  ```
+  # Enable php-fpm status page
+  location ~ ^/(status|ping)$ {
+  ## disable access logging for request if you prefer
+  access_log off;
 
-If you use an atypical location for PHP-FPM status-page don't forget to change the macros `{$PHP_FPM.SCHEME}` and `{$PHP_FPM.PORT}`.
+  ## Only allow trusted IPs for security, deny everyone else
+  # allow 127.0.0.1;
+  # allow 1.2.3.4;    # your IP here
+  # deny all;
+
+  fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+  fastcgi_index index.php;
+  include fastcgi_params;
+  ## Now the port or socket of the php-fpm pool we want the status of
+  fastcgi_pass 127.0.0.1:9000;
+  # fastcgi_pass unix:/run/php-fpm/your_socket.sock;
+  }
+  ```
+If you use Apache, edit the configuration file of the virtual host and add the following location blocks.
+  ```
+  <LocationMatch "/status">
+      Require ip 127.0.0.1
+      # Require ip 1.2.3.4    # Your IP here
+      # Adjust the path to the socket if needed
+      ProxyPass "unix:/run/php-fpm/www.sock|fcgi://localhost/status"
+  </LocationMatch>
+
+  <LocationMatch "/ping">
+      Require ip 127.0.0.1
+      # Require ip 1.2.3.4    # Your IP here
+      # Adjust the path to the socket if needed
+      ProxyPass "unix:/run/php-fpm/www.sock|fcgi://localhost/ping"
+  </LocationMatch>
+  ```
+5. Check the web server configuration syntax. The command may vary depending on the OS distribution and web server.
+  ```
+  $ nginx -t
+  ```
+  or
+  ```
+  $ httpd -t
+  ```
+  or
+  ```
+  $ apachectl configtest
+  ```
+
+6. Reload the web server configuration. The command may vary depending on the OS distribution and web server.
+  ```
+  $ systemctl reload nginx
+  ```
+  or
+  ```
+  $ systemctl reload httpd
+  ```
+  or
+  ```
+  $ systemctl reload apache2
+  ```
+
+7. Verify that the pages are available with these commands.
+  ```
+  curl -L 127.0.0.1/status
+  curl -L 127.0.0.1/ping
+  ```
+
+If you use another location of the status/ping pages, don't forget to change the `{$PHP_FPM.STATUS.PAGE}/{$PHP_FPM.PING.PAGE}` macro.
+
+If you use another web server port or scheme for the location of the PHP-FPM status/ping pages, don't forget to change the macros `{$PHP_FPM.SCHEME}` and `{$PHP_FPM.PORT}`.
 
 ### Macros used
 
@@ -116,8 +171,8 @@ If you use an atypical location for PHP-FPM status-page don't forget to change t
 |PHP-FPM: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/PHP-FPM by HTTP/php-fpm.uptime,30m)=1`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>PHP-FPM: Service is down</li></ul>|
 |PHP-FPM: Pool has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/PHP-FPM by HTTP/php-fpm.uptime)<10m`|Info|**Manual close**: Yes|
 |PHP-FPM: Manager changed|<p>The PHP-FPM manager has changed. Acknowledge to close the problem manually.</p>|`last(/PHP-FPM by HTTP/php-fpm.process_manager,#1)<>last(/PHP-FPM by HTTP/php-fpm.process_manager,#2)`|Info|**Manual close**: Yes|
-|PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0`|Warning||
-|PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
+|PHP-FPM: Detected slow requests|<p>The PHP-FPM has detected a slow request. <br>The slow request means that it took more time to execute than expected (defined in the configuration of your pool).</p>|`min(/PHP-FPM by HTTP/php-fpm.slow_requests,#3)>0`|Warning||
+|PHP-FPM: Queue utilization is high|<p>The queue for this pool has reached `{$PHP_FPM.QUEUE.WARN.MAX}%` of its maximum capacity. <br>Items in the queue represent the current number of connections that have been initiated on this pool but not yet accepted.</p>|`min(/PHP-FPM by HTTP/php-fpm.listen_queue_usage,15m) > {$PHP_FPM.QUEUE.WARN.MAX}`|Warning||
 
 ## Feedback
 
