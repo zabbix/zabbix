@@ -279,7 +279,8 @@ class CSVGPie {
 							});
 					}
 				}
-			});
+			})
+			.catch(() => {});
 
 		this.#arcs_container
 			.selectAll('path')
