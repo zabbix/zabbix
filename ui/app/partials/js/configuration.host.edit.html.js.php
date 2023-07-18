@@ -136,19 +136,7 @@
 
 		_initActions() {
 			this.form.addEventListener('click', (e) => {
-				if (e.target.classList.contains('add-interface')) {
-					this.interface_change = true;
-				}
-				else if (e.target.classList.contains('element-table-remove')) {
-					this.remove_element = true;
-				}
-				else if (e.target.classList.contains('interface-btn-remove')) {
-					this.remove_element = true;
-				}
-				else if (e.target.classList.contains('checkbox-radio')) {
-					this.checkbox_change = true;
-				}
-				else if (e.target.classList.contains('js-edit-linked-template')) {
+				if (e.target.classList.contains('js-edit-linked-template')) {
 					if (typeof this.overlay !== 'undefined') {
 						this.dialogue = this.overlay.$dialogue[0];
 
@@ -231,12 +219,10 @@
 			const $template_ms = $('#add_templates_');
 
 			$template_ms.on('change', () => {
-				this.ms_change = true;
 				$template_ms.multiSelect('setDisabledEntries', this.getAllTemplates());
 			});
 
 			$groups_ms.on('change', () => {
-				this.ms_change = true;
 				$groups_ms.multiSelect('setDisabledEntries',
 					[... this.form.querySelectorAll('[name^="groups["]')].map((input) => input.value)
 				);

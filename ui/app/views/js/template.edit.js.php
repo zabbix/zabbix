@@ -392,11 +392,9 @@ window.template_edit_popup = new class {
 
 		$template_ms.on('change', () => {
 			$template_ms.multiSelect('setDisabledEntries', this.#getAllTemplates());
-			this.ms_change = true;
 		});
 
 		$groups_ms.on('change', () => {
-			this.ms_change = true;
 			$groups_ms.multiSelect('setDisabledEntries',
 				[...document.querySelectorAll('[name^="template_groups["], [name^="template_group_links["]')]
 					.map((input) => input.value)
