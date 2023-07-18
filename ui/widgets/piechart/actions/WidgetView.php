@@ -628,7 +628,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			unset($others_formatted_value['is_numeric']);
 
 			$others_metric = [
-				'name' => _('Others'),
+				'name' => _('Other'),
 				'color' => $merge_sectors['color'],
 				'value' => $others_value,
 				'formatted_value' => $others_formatted_value,
