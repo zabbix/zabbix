@@ -6652,18 +6652,18 @@ static void	DCsync_connector_tags(zbx_dbsync_t *sync)
 static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency, zbx_hashset_t *psk_owners)
 {
-	char				**row;
-	zbx_uint64_t			rowid;
-	unsigned char			tag;
+	char			**row;
+	zbx_uint64_t		rowid;
+	unsigned char		tag;
 
-	ZBX_DC_PROXY			*proxy;
-	zbx_dc_proxy_name_t		proxy_p_local, *proxy_p;
+	ZBX_DC_PROXY		*proxy;
+	zbx_dc_proxy_name_t	proxy_p_local, *proxy_p;
 
-	int				found;
-	int				update_index_p, ret;
-	zbx_uint64_t			proxyid;
-	unsigned char			mode;
-	time_t				now;
+	int			found, update_index_p, ret;
+	zbx_uint64_t		proxyid;
+	unsigned char		mode;
+	time_t			now;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
@@ -6680,12 +6680,11 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		proxy = (ZBX_DC_PROXY *)DCfind_id(&config->proxies, proxyid, sizeof(ZBX_DC_PROXY), &found);
 		proxy->revision = revision;
 
-		/* see whether we should and can update 'hosts_h' and 'proxies_p' indexes at this point */
+		/* see whether we should and can update 'proxies_p' indexes at this point */
 
 		update_index_p = 0;
 
-		if ((PROXY_MODE_ACTIVE == mode || PROXY_MODE_PASSIVE == mode) &&
-				(0 == found || 0 != strcmp(proxy->name, row[1])))
+		if (0 == found || 0 != strcmp(proxy->name, row[1]))
 		{
 			if (1 == found)
 			{
@@ -6722,7 +6721,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		ZBX_STR2UCHAR(proxy->tls_connect, row[3]);
 		ZBX_STR2UCHAR(proxy->tls_accept, row[4]);
 
-		if (0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_connect))
+		if ((PROXY_MODE_PASSIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_connect)) ||
+				(PROXY_MODE_ACTIVE == mode && 0 != (ZBX_TCP_SEC_UNENCRYPTED & proxy->tls_accept)))
 		{
 			if (NULL != config_vault->token || NULL != config_vault->name)
 			{
@@ -6740,53 +6740,49 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 			zbx_hashset_insert(&config->proxies_p, &proxy_p_local, sizeof(zbx_dc_proxy_name_t));
 		}
 
-		if (PROXY_MODE_ACTIVE == mode || PROXY_MODE_PASSIVE == mode)
+		if (0 == found)
 		{
-			if (0 == found)
-			{
-				proxy->location = ZBX_LOC_NOWHERE;
-				proxy->revision = revision;
+			proxy->location = ZBX_LOC_NOWHERE;
+			proxy->revision = revision;
 
-				proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
-				proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
-				proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
-				proxy->lastaccess = atoi(row[12]);
-				proxy->last_cfg_error_time = 0;
-				proxy->proxy_delay = 0;
-				proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
-				proxy->nodata_win.values_num = 0;
-				proxy->nodata_win.period_end = 0;
+			proxy->version_int = ZBX_COMPONENT_VERSION_UNDEFINED;
+			proxy->version_str = dc_strpool_intern(ZBX_VERSION_UNDEFINED_STR);
+			proxy->compatibility = ZBX_PROXY_VERSION_UNDEFINED;
+			proxy->lastaccess = atoi(row[12]);
+			proxy->last_cfg_error_time = 0;
+			proxy->proxy_delay = 0;
+			proxy->nodata_win.flags = ZBX_PROXY_SUPPRESS_DISABLE;
+			proxy->nodata_win.values_num = 0;
+			proxy->nodata_win.period_end = 0;
 
-				zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
-						__config_shmem_realloc_func, __config_shmem_free_func);
-				zbx_vector_host_rev_create_ext(&proxy->removed_hosts, __config_shmem_malloc_func,
-						__config_shmem_realloc_func, __config_shmem_free_func);
-			}
-
-			dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
-			dc_strpool_replace(found, &proxy->address, row[10]);
-			dc_strpool_replace(found, &proxy->port, row[11]);
-
-			if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
-			{
-				proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck(
-						proxyid, proxyconfig_frequency, now);
-				proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck(
-						proxyid, proxyconfig_frequency, now);
-				proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(
-						proxyid, ZBX_TASK_UPDATE_FREQUENCY, now);
-
-				DCupdate_proxy_queue(proxy);
-			}
-			else if (PROXY_MODE_ACTIVE == mode && ZBX_LOC_QUEUE == proxy->location)
-			{
-				zbx_binary_heap_remove_direct(&config->pqueue, proxy->proxyid);
-				proxy->location = ZBX_LOC_NOWHERE;
-			}
-			proxy->last_version_error_time = time(NULL);
+			zbx_vector_dc_host_ptr_create_ext(&proxy->hosts, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
+			zbx_vector_host_rev_create_ext(&proxy->removed_hosts, __config_shmem_malloc_func,
+					__config_shmem_realloc_func, __config_shmem_free_func);
 		}
-		else if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
-			DCsync_proxy_remove(proxy);
+
+		dc_strpool_replace(found, &proxy->allowed_addresses, row[9]);
+		dc_strpool_replace(found, &proxy->address, row[10]);
+		dc_strpool_replace(found, &proxy->port, row[11]);
+
+		if (PROXY_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
+		{
+			proxy->proxy_config_nextcheck = (int)calculate_proxy_nextcheck( proxyid, proxyconfig_frequency,
+					now);
+			proxy->proxy_data_nextcheck = (int)calculate_proxy_nextcheck( proxyid, proxyconfig_frequency,
+					now);
+			proxy->proxy_tasks_nextcheck = (int)calculate_proxy_nextcheck(proxyid,
+					ZBX_TASK_UPDATE_FREQUENCY, now);
+
+			DCupdate_proxy_queue(proxy);
+		}
+		else if (PROXY_MODE_ACTIVE == mode && ZBX_LOC_QUEUE == proxy->location)
+		{
+			zbx_binary_heap_remove_direct(&config->pqueue, proxy->proxyid);
+			proxy->location = ZBX_LOC_NOWHERE;
+		}
+
+		proxy->last_version_error_time = time(NULL);
 
 		proxy->mode = mode;
 	}
