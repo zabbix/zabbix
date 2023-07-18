@@ -26,20 +26,21 @@
 
 window.template_edit_popup = new class {
 
-	init({template}) {
+	init({templateid, linked_templates, readonly, parent_hostid, warnings}) {
 		this.overlay = overlays_stack.getById('templates-form');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
-		this.templateid = template.templateid;
-		this.template = template;
-		this.linked_templateids = Object.keys(this.template.linked_templates);
+		this.templateid = templateid;
+		this.linked_templateids = Object.keys(linked_templates);
+		this.readonly = readonly;
+		this.parent_hostid = parent_hostid;
 
-		if (template.warnings && template.warnings.length > 0) {
-			const message_box = template.warnings.length > 1
-				? makeMessageBox('warning', template.warnings,
+		if (warnings && warnings.length > 0) {
+			const message_box = warnings.length > 1
+				? makeMessageBox('warning', warnings,
 					<?= json_encode(_('Cloned template parameter values have been modified.')) ?>, true, false
 				)[0]
-				: makeMessageBox('warning', template.warnings, null, true, false)[0];
+				: makeMessageBox('warning', warnings, null, true, false)[0];
 
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
@@ -164,8 +165,8 @@ window.template_edit_popup = new class {
 
 	#initMacrosTab() {
 		this.macros_manager = new HostMacrosManager({
-			readonly: this.template.readonly,
-			parent_hostid: this.template.parent_hostid ?? null,
+			readonly: this.readonly,
+			parent_hostid: this.parent_hostid,
 			source: 'templates-form'
 		});
 
@@ -201,7 +202,7 @@ window.template_edit_popup = new class {
 				}
 
 				// Initialize macros.
-				if (this.template.readonly) {
+				if (this.readonly) {
 					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', '#template_tbl_macros').textareaFlexible();
 				}
 				else {

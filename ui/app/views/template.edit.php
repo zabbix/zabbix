@@ -338,7 +338,11 @@ $form
 	->addItem(
 		(new CScriptTag('
 			template_edit_popup.init('.json_encode([
-				'template' => $data
+				'templateid' => $data['templateid'],
+				'linked_templates' => $data['linked_templates'],
+				'readonly' => $data['readonly'],
+				'parent_hostid' => $data['parent_hostid'] ?? null,
+				'warnings' => $data['warnings']
 			], JSON_THROW_ON_ERROR).');
 		'))->setOnDocumentReady()
 	);

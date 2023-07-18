@@ -291,14 +291,6 @@ class CControllerTemplateEdit extends CController {
 				}
 			}
 
-			if ($warnings) {
-				if (count($warnings) > 1) {
-					CMessageHelper::setWarningTitle(_('Cloned template parameter values have been modified.'));
-				}
-
-				array_map('CMessageHelper::addWarning', $warnings);
-			}
-
 			$data['macros'] = $macros;
 			$data['warnings'] = $warnings;
 			$data['clone_templateid'] = $this->getInput('templateid');
