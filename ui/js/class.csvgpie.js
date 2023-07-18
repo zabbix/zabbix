@@ -223,7 +223,6 @@ class CSVGPie {
 			.attr('data-hintbox-static', 1)
 			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
-			.attr('data-hintbox-contents', d => this.#setHint(d))
 			.style('fill', d => d.data.color)
 			.style('stroke-width', this.#config.space)
 			.each((d, index, nodes) => nodes[index]._current = d);
@@ -250,9 +249,13 @@ class CSVGPie {
 			.on('start', (d, index, nodes) => {
 				const _this = nodes[index];
 
-				d3.select(_this).on('mouseenter mouseleave', null);
+				const _this_d3 = d3.select(_this);
 
-				d3.select(_this).attr('transform', 'translate(0, 0)');
+				_this_d3.on('mouseenter mouseleave', null);
+
+				_this_d3.attr('transform', 'translate(0, 0)');
+
+				_this_d3.attr('data-hintbox-contents', this.#setHint(d));
 			})
 			.end()
 			.then(() => {

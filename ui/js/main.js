@@ -363,7 +363,7 @@ var hintBox = {
 
 	showHintStart: function (e, $target, delay) {
 		const showHintHandler = function() {
-			hintBox.showHint(e, $target[0], $target.data('hintbox-contents'), $target.data('hintbox-class'),
+			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxContents, $target.data('hintbox-class'),
 				false, $target.data('hintbox-style')
 			);
 		}
