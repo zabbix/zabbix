@@ -1494,8 +1494,7 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 
 		update_index_h = 0;
 
-		if ((HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status) &&
-				(0 == found || 0 != strcmp(host->host, row[2])))
+		if (0 == found || 0 != strcmp(host->host, row[2]))
 		{
 			if (1 == found)
 			{
@@ -1593,26 +1592,23 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			}
 		}
 
-		if (HOST_STATUS_MONITORED == status || HOST_STATUS_NOT_MONITORED == status)
+		if (0 != found && 0 != host->proxyid && host->proxyid != proxyid)
 		{
-			if (0 != found && 0 != host->proxyid && host->proxyid != proxyid)
-			{
-				dc_host_deregister_proxy(host, host->proxyid, revision);
-			}
+			dc_host_deregister_proxy(host, host->proxyid, revision);
+		}
 
-			if (0 != proxyid)
+		if (0 != proxyid)
+		{
+			if (0 == found || host->proxyid != proxyid)
 			{
-				if (0 == found || host->proxyid != proxyid)
+				zbx_vector_dc_host_ptr_append(&proxy_hosts, host);
+			}
+			else
+			{
+				if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
+						&proxyid)))
 				{
-					zbx_vector_dc_host_ptr_append(&proxy_hosts, host);
-				}
-				else
-				{
-					if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
-							&proxyid)))
-					{
-						proxy->revision = revision;
-					}
+					proxy->revision = revision;
 				}
 			}
 		}
