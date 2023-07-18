@@ -104,19 +104,27 @@ class CWidgetPieChart extends CWidget {
 	}
 
 	setLegend(legend, total_item) {
-		if (legend.show && legend.data.length > 0) {
-			let container = this._body.querySelector('.svg-pie-chart-legend');
+		let container = this._body.querySelector('.svg-pie-chart-legend');
 
+		if (container !== null) {
+			if (legend.show) {
+				container.innerHTML = '';
+			}
+			else {
+				container.remove();
+				return;
+			}
+		}
+
+		if (legend.show && legend.data.length > 0) {
 			if (container === null) {
 				container = document.createElement('div');
 				container.classList.add('svg-pie-chart-legend');
-				container.setAttribute('style', `--lines: ${legend.lines}`);
-				container.setAttribute('style', `--columns: ${legend.columns}`);
 
 				this._body.append(container);
 			}
 
-			container.innerHTML = '';
+			container.setAttribute('style', `--lines: ${legend.lines}; --columns: ${legend.columns}`);
 
 			if (total_item !== null) {
 				legend.data.splice(legend.data.length - 1, 1);
