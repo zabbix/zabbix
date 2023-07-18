@@ -2002,8 +2002,7 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static void	log_regexp_runtime_error(const char *hostname, const char *key, const char *err_msg,
-		int *runtime_error_logging_allowed)
+static void	log_regexp_runtime_error(const char *key, const char *err_msg, int *runtime_error_logging_allowed)
 {
 	/* Simple throttling. Log no more than one regexp runtime error per log*[] item check. */
 	/* Throttling is necessary to allow Zabbix agent monitor its own log file at DebugLevel <= 3. */
@@ -2013,7 +2012,7 @@ static void	log_regexp_runtime_error(const char *hostname, const char *key, cons
 
 	*runtime_error_logging_allowed = 0;
 
-	zabbix_log(LOG_LEVEL_WARNING, "host:'%s' item key:'%s': regexp runtime error: %s", hostname, key, err_msg);
+	zabbix_log(LOG_LEVEL_WARNING, "item key:'%s': regexp runtime error: %s", key, err_msg);
 }
 
 /******************************************************************************
@@ -2207,10 +2206,9 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
 					{
-						/* regexp runtime error does not cause log*[] item state NOTSUPPORTED. */
-						/* Log it and continue to analyze log file records. */
-						log_regexp_runtime_error(hostname, key, *err_msg,
-								&runtime_error_logging_allowed);
+						/* regexp runtime error does not cause log*[] item state */
+						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(key, *err_msg, &runtime_error_logging_allowed);
 						zbx_free(*err_msg);
 					}
 
@@ -2332,10 +2330,9 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					if (ZBX_REGEXP_RUNTIME_FAIL == regexp_ret)
 					{
-						/* regexp runtime error does not cause log*[] item state NOTSUPPORTED. */
-						/* Log it and continue to analyze log file records. */
-						log_regexp_runtime_error(hostname, key, *err_msg,
-								&runtime_error_logging_allowed);
+						/* regexp runtime error does not cause log*[] item state */
+						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
+						log_regexp_runtime_error(key, *err_msg, &runtime_error_logging_allowed);
 						zbx_free(*err_msg);
 					}
 
