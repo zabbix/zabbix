@@ -1605,11 +1605,8 @@ static void	DCsync_hosts(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_u
 			}
 			else
 			{
-				if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies,
-						&proxyid)))
-				{
+				if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
 					proxy->revision = revision;
-				}
 			}
 		}
 
