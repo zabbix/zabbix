@@ -337,23 +337,24 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	clastLogsizeLast = clastLogsizeSent
 	cmtimeLast = cmtimeSent
 
-	log.Tracef("Calling C function \"new_log_result()\"")
-	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
-
 	var tlsConfig *tls.Config
 	var err error
 	var ctlsConfig C.zbx_config_tls_t
 	var ctlsConfig_p *C.zbx_config_tls_t
 
 	if tlsConfig, err = agent.GetTLSConfig(&agent.Options); err != nil {
-		result := &LogResult{
+		r := &LogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 
 		return
 	}
+
+	log.Tracef("Calling C function \"new_log_result()\"")
+	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
+
 	if nil != tlsConfig {
 		log.Tracef("Calling C function \"zbx_config_tls_init_for_agent2()\"")
 		C.zbx_config_tls_init_for_agent2(&ctlsConfig, (C.uint)(tlsConfig.Accept), (C.uint)(tlsConfig.Connect),
@@ -422,11 +423,11 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		} else {
 			err = errors.New("Unknown error.")
 		}
-		result := &LogResult{
+		r := &LogResult{
 			Ts:    time.Now(),
 			Error: err,
 		}
-		item.Results = append(item.Results, result)
+		item.Results = append(item.Results, r)
 	} else {
 		log.Tracef("Calling C function \"metric_set_supported()\"")
 		ret := C.metric_set_supported(C.ZBX_ACTIVE_METRIC_LP(data), clastLogsizeSent, cmtimeSent, clastLogsizeLast,
@@ -435,12 +436,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 		if ret == Succeed {
 			log.Tracef("Calling C function \"metric_get_meta()\"")
 			C.metric_get_meta(C.ZBX_ACTIVE_METRIC_LP(data), &clastLogsizeLast, &cmtimeLast)
-			result := &LogResult{
+			r := &LogResult{
 				Ts:          time.Now(),
 				LastLogsize: uint64(clastLogsizeLast),
 				Mtime:       int(cmtimeLast),
 			}
-			item.Results = append(item.Results, result)
+			item.Results = append(item.Results, r)
 		}
 	}
 }

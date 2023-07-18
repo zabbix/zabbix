@@ -164,8 +164,14 @@ typedef struct
 	gnutls_session_t		ctx;
 	gnutls_psk_client_credentials_t	psk_client_creds;
 	gnutls_psk_server_credentials_t	psk_server_creds;
+	unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 #elif defined(HAVE_OPENSSL)
 	SSL				*ctx;
+#if defined(HAVE_OPENSSL_WITH_PSK)
+	char	psk_buf[HOST_TLS_PSK_LEN / 2];
+	int	psk_len;
+	size_t	identity_len;
+#endif
 #endif
 } zbx_tls_context_t;
 #endif
@@ -198,6 +204,34 @@ typedef struct
 }
 zbx_socket_t;
 
+typedef struct
+{
+	size_t		buf_dyn_bytes;
+	size_t		buf_stat_bytes;
+	size_t		offset;
+	zbx_uint64_t	expected_len;
+	zbx_uint64_t	reserved;
+	zbx_uint64_t	max_len;
+	unsigned char	expect;
+	int		protocol_version;
+}
+zbx_tcp_recv_context_t;
+
+#define ZBX_MAX_HEADER_LEN 21
+typedef struct
+{
+	unsigned char	header_buf[ZBX_MAX_HEADER_LEN];
+	size_t		header_len;
+	char		*compressed_data;
+	const char	*data;
+	size_t		send_len;
+	ssize_t		written;
+	ssize_t		written_header;
+}
+zbx_tcp_send_context_t;
+
+#undef ZBX_MAX_HEADER_LEN
+
 const char	*zbx_socket_strerror(void);
 
 #ifndef _WINDOWS
@@ -207,6 +241,12 @@ void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
+
+int	zbx_socket_connect(zbx_socket_t *s, int type, const char *source_ip, const char *ip, unsigned short port,
+		int timeout);
+
+int	zbx_socket_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
+		const char *server_name, short *event, char **error);
 
 #define ZBX_TCP_PROTOCOL		0x01
 #define ZBX_TCP_COMPRESS		0x02
@@ -229,6 +269,10 @@ const char	*zbx_tcp_connection_type_name(unsigned int type);
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, size_t reserved, unsigned char flags,
 		int timeout);
+int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, unsigned char flags,
+		zbx_tcp_send_context_t *context);
+void	zbx_tcp_send_context_clear(zbx_tcp_send_context_t *state);
+int	zbx_tcp_send_context(zbx_socket_t *s, zbx_tcp_send_context_t *context, short *event);
 
 void	zbx_tcp_close(zbx_socket_t *s);
 
@@ -249,11 +293,14 @@ void	zbx_tcp_unaccept(zbx_socket_t *s);
 #define	zbx_tcp_recv_to(s, timeout)		SUCCEED_OR_FAIL(zbx_tcp_recv_ext(s, timeout, 0))
 #define	zbx_tcp_recv_raw(s)			SUCCEED_OR_FAIL(zbx_tcp_recv_raw_ext(s, 0))
 
-ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len);
-ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len);
+ssize_t	zbx_tcp_read(zbx_socket_t *s, char *buf, size_t len, short *events);
+ssize_t	zbx_tcp_write(zbx_socket_t *s, const char *buf, size_t len, short *event);
 ssize_t		zbx_tcp_recv_ext(zbx_socket_t *s, int timeout, unsigned char flags);
 ssize_t		zbx_tcp_recv_raw_ext(zbx_socket_t *s, int timeout);
 const char	*zbx_tcp_recv_line(zbx_socket_t *s);
+
+void	zbx_tcp_recv_context_init(zbx_socket_t *s, zbx_tcp_recv_context_t *tcp_recv_context, unsigned char flags);
+ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, unsigned char flags, short *events);
 
 void	zbx_socket_set_deadline(zbx_socket_t *s, int timeout);
 int	zbx_socket_check_deadline(zbx_socket_t *s);

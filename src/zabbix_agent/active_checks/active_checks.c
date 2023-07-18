@@ -1206,8 +1206,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			config_timeout, 0, level, config_tls)))
 	{
 		zbx_timespec(&ts);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

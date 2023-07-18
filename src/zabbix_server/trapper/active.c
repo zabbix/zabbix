@@ -30,6 +30,7 @@
 #include "zbxversion.h"
 #include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxautoreg.h"
 #include "../scripts/scripts.h"
 
 extern unsigned char	program_type;
@@ -91,22 +92,8 @@ static void	db_register_host(const char *host, const char *ip, unsigned short po
 	/* update before changing database in case Zabbix proxy also changed database and then deleted from cache */
 	zbx_dc_config_update_autoreg_host(host, p_ip, p_dns, port, host_metadata, flag, now);
 
-	do
-	{
-		zbx_db_begin();
-
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
-		{
-			zbx_db_register_host(0, host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now, events_cbs);
-		}
-		else
-		{
-			zbx_db_proxy_register_host(host, p_ip, p_dns, port, connection_type, host_metadata,
-					(unsigned short)flag, now);
-		}
-	}
-	while (ZBX_DB_DOWN == zbx_db_commit());
+	zbx_autoreg_update_host(0, host, p_ip, p_dns, port, connection_type, host_metadata, (unsigned short)flag, now,
+			events_cbs);
 }
 
 static int	zbx_autoreg_host_check_permissions(const char *host, const char *ip, unsigned short port,
