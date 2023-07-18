@@ -143,6 +143,8 @@ class CControllerTopTriggersList extends CController {
 			'groupBy' => ['objectid'],
 			'groupids' => $groupids ?: null,
 			'hostids' => $hostids ?: null,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'time_from' => $filter['timeline']['from_ts'],
 			'time_till' => $filter['timeline']['to_ts'],

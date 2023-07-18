@@ -66,7 +66,7 @@ class WidgetForm extends CWidgetForm {
 				]))->setDefault(TAG_EVAL_TYPE_AND_OR)
 			)
 			->addField(
-				new CWidgetFieldTags('tags', '')
+				new CWidgetFieldTags('tags')
 			)
 			->addField(
 				(new CWidgetFieldIntegerBox('show_lines', _('Trigger count'), ZBX_MIN_WIDGET_LINES,

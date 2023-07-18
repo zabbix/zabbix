@@ -85,6 +85,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			'groupBy' => ['objectid'],
 			'groupids' => $groupids,
 			'hostids' => $hostids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'time_from' => $time_from,
 			'time_till' => $time_to,

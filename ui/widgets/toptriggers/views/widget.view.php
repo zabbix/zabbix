@@ -40,7 +40,7 @@ else {
 		foreach ($trigger['hosts'] as $host) {
 			$hosts[] = (new CLinkAction($host['name']))
 				->addClass(ZBX_STYLE_WORDBREAK)
-				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+				->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_COLOR_NEGATIVE : null)
 				->setMenuPopup(CMenuPopupHelper::getHost($host['hostid']));
 			$hosts[] = ', ';
 		}
