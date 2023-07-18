@@ -2002,7 +2002,8 @@ static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const c
 	}
 }
 
-static void	log_regexp_runtime_error(const char *key, const char *err_msg, int *runtime_error_logging_allowed)
+static void	log_regexp_runtime_error(const char *key, const char *err_msg, zbx_uint64_t itemid,
+		int *runtime_error_logging_allowed)
 {
 	/* Simple throttling. Log no more than one regexp runtime error per log*[] item check. */
 	/* Throttling is necessary to allow Zabbix agent monitor its own log file at DebugLevel <= 3. */
@@ -2012,7 +2013,10 @@ static void	log_regexp_runtime_error(const char *key, const char *err_msg, int *
 
 	*runtime_error_logging_allowed = 0;
 
-	zabbix_log(LOG_LEVEL_WARNING, "item key:'%s': regexp runtime error: %s", key, err_msg);
+	if (0 == itemid)	/* Agent 1, use key.orig to identify item */
+		zabbix_log(LOG_LEVEL_WARNING, "item key '%s': regexp runtime error: %s", key, err_msg);
+	else			/* Agent 2, key.orig not available, use itemid */
+		zabbix_log(LOG_LEVEL_WARNING, "itemid " ZBX_FS_UI64 ": regexp runtime error: %s", itemid, err_msg);
 }
 
 /******************************************************************************
@@ -2025,7 +2029,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		const char *output_template, int *p_count, int *s_count, zbx_process_value_func_t process_value,
 		zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, const char *persistent_file_name,
-		zbx_vector_pre_persistent_t *prep_vec, char **err_msg)
+		zbx_vector_pre_persistent_t *prep_vec, zbx_uint64_t itemid, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2208,7 +2212,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						/* regexp runtime error does not cause log*[] item state */
 						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
-						log_regexp_runtime_error(key, *err_msg, &runtime_error_logging_allowed);
+						log_regexp_runtime_error(key, *err_msg, itemid,
+								&runtime_error_logging_allowed);
 						zbx_free(*err_msg);
 					}
 
@@ -2332,7 +2337,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					{
 						/* regexp runtime error does not cause log*[] item state */
 						/* NOTSUPPORTED. Log it and continue to analyze log file records. */
-						log_regexp_runtime_error(key, *err_msg, &runtime_error_logging_allowed);
+						log_regexp_runtime_error(key, *err_msg, itemid,
+								&runtime_error_logging_allowed);
 						zbx_free(*err_msg);
 					}
 
@@ -2424,6 +2430,8 @@ out:
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec        - [IN/OUT] vector with data for writing into           *
  *                                persistent files                            *
+ *     itemid          - [IN] item id for logging when called from Agent 2.   *
+ *                            It is 0 when called from Agent 1.               *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
@@ -2442,7 +2450,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		int *p_count, int *s_count, zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs,
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, zbx_uint64_t *processed_bytes,
 		zbx_uint64_t seek_offset, const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		char **err_msg)
+		zbx_uint64_t itemid, char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2460,7 +2468,8 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
-				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, err_msg)))
+				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec, itemid,
+				err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3292,6 +3301,8 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *     persistent_file_name - [IN] name of file for saving persistent data    *
  *     prep_vec         - [IN/OUT] vector with data for writing into          *
  *                                 persistent files                           *
+ *     itemid           - [IN] item id for logging when called from Agent 2.  *
+ *                             It is 0 when called from Agent 1.              *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3307,7 +3318,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_process_value_func_t process_value, zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, int *jumped, float max_delay, double *start_time,
 		zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
-		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec)
+		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec, zbx_uint64_t itemid)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3513,7 +3524,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
 						output_template, p_count, s_count, process_value, addrs, agent2_result,
 						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
-						prep_vec, err_msg);
+						prep_vec, itemid, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3852,7 +3863,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
  ******************************************************************************/
 int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
 		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec)
+		int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec, zbx_uint64_t itemid)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4081,7 +4092,7 @@ int	process_log_check(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, 
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
 			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
-			rotation_type, metric->persistent_file_name, prep_vec);
+			rotation_type, metric->persistent_file_name, prep_vec, itemid);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
