@@ -2527,7 +2527,7 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
  * Parameters: parent_hostid    - [IN]                                        *
  *             hosts            - [IN]                                        *
  *             host_proto       - [IN]                                        *
- *             proxyid     - [IN]                                        *
+ *             proxyid          - [IN]                                        *
  *             ipmi_authtype    - [IN]                                        *
  *             ipmi_privilege   - [IN]                                        *
  *             ipmi_username    - [IN]                                        *
