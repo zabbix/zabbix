@@ -285,6 +285,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			if ($problems_per_trigger) {
 				$problems = API::Problem()->get([
 					'output' => ['objectid', 'severity'],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
 					'objectids' => array_keys($problems_per_trigger),
 					'severities' => range($severity_min, TRIGGER_SEVERITY_COUNT - 1),
 					'symptom' => false,
