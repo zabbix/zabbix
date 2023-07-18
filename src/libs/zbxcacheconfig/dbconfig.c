@@ -966,6 +966,19 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 		config->revision.config_table = revision;
 	}
 
+#ifdef HAVE_POSTGRESQL
+	if (ZBX_HK_MODE_DISABLED != config->config->hk.audit_mode &&
+			ZBX_HK_OPTION_ENABLED == config->config->hk.audit &&
+			0 == zbx_strcmp_null(config->config->db.extension, ZBX_DB_EXTENSION_TIMESCALEDB))
+	{
+		if (ZBX_HK_MODE_PARTITION != config->config->hk.audit_mode)
+		{
+			config->config->hk.audit_mode = ZBX_HK_MODE_PARTITION;
+			config->revision.config_table = revision;
+		}
+	}
+#endif
+
 	if (ZBX_HK_OPTION_ENABLED == (value_int = atoi(row[17])) &&
 			SUCCEED != set_hk_opt(&config->config->hk.sessions, 1, SEC_PER_DAY, row[18], revision))
 	{

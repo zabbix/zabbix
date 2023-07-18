@@ -70,6 +70,9 @@ typedef struct
 	/* housekeeping procedures updated to the last 'cutoff' value.                  */
 	int		min_clock;
 
+	/* a reference to the housekeeping configuration mode (enable) option for this table */
+	unsigned char	*poption_mode;
+
 	/* a reference to the settings value specifying number of seconds the records must be kept */
 	int		*phistory;
 }
@@ -520,30 +523,28 @@ static void	hk_history_delete_queue_clear(zbx_hk_history_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: drop appropriate partitions from the history and trends tables    *
+ * Purpose: drop appropriate partitions                                       *
  *                                                                            *
- * Parameters: rules - [IN/OUT] history housekeeping rules                    *
- *             now   - [IN] the current timestamp                             *
+ * Parameters: table_name      - [IN]                                         *
+ *             history_seconds - [IN] history to keep                         *
+ *             now             - [IN] current timestamp                       *
  *                                                                            *
  ******************************************************************************/
-static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
+static void	hk_drop_partition(const char *table_name, int history_seconds, int now)
 {
 #if defined(HAVE_POSTGRESQL)
-	int		history_seconds;
 	zbx_db_result_t	result;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __func__, now);
 
-	history_seconds = *rule->poption;
-
 	if (0 == history_seconds)
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, rule->table);
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s delete all", __func__, table_name);
 
 		result = zbx_db_select(1 == ZBX_DB_TSDB_V1 ?
 				"select drop_chunks(table_name=>'%s',newer_than=>0)" :
 				"select drop_chunks(relation=>'%s',newer_than=>0)",
-				rule->table);
+				table_name);
 	}
 	else
 	{
@@ -551,22 +552,22 @@ static void	hk_drop_partition_for_rule(zbx_hk_history_rule_t *rule, int now)
 
 		if (ZBX_HK_HISTORY_MIN > history_seconds || ZBX_HK_PERIOD_MAX < history_seconds)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", rule->table);
+			zabbix_log(LOG_LEVEL_WARNING, "invalid history storage period for table '%s'", table_name);
 			goto out;
 		}
 
 		keep_from = now - history_seconds;
 
-		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, rule->table, keep_from);
+		zabbix_log(LOG_LEVEL_TRACE, "%s: table=%s keep_from=%d", __func__, table_name, keep_from);
 
 		result = zbx_db_select(1 == ZBX_DB_TSDB_V1 ?
 				"select drop_chunks(table_name=>'%s',older_than=>%d)" :
 				"select drop_chunks(relation=>'%s',older_than=>%d)",
-				rule->table, keep_from);
+				table_name, keep_from);
 	}
 
 	if (NULL == result)
-		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", rule->table);
+		zabbix_log(LOG_LEVEL_ERR, "cannot drop chunks for %s", table_name);
 	else
 		zbx_db_free_result(result);
 out:
@@ -574,7 +575,8 @@ out:
 
 	return;
 #else
-	ZBX_UNUSED(rule);
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(history_seconds);
 	ZBX_UNUSED(now);
 #endif
 }
@@ -652,7 +654,7 @@ static int	housekeeping_history_and_trends(int now)
 		/* 3. config.db.extension must be set to "timescaledb" */
 		if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
 		{
-			hk_drop_partition_for_rule(rule, now);
+			hk_drop_partition(rule->table, *rule->poption, now);
 			goto skip;
 		}
 
@@ -733,6 +735,12 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() table:'%s' field_name:'%s' filter:'%s' min_clock:%d now:%d",
 			__func__, rule->table, rule->field_name, rule->filter, rule->min_clock, now);
+
+	if (ZBX_HK_MODE_PARTITION == *rule->poption_mode)
+	{
+		hk_drop_partition(rule->table, *rule->phistory, now);
+		goto ret;
+	}
 
 	/* NOTE: Do not forget to add here tables whose id column is string-type.                    */
 	/* Now only audit field has string id, if in the future this list of exceptions is increased */
@@ -853,6 +861,7 @@ static int	housekeeping_process_rule(int now, zbx_hk_rule_t *rule)
 	if (HK_MIN_CLOCK_ALWAYS_RECHECK != rule->min_clock)
 		rule->min_clock = min_clock;
 
+ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
 
 	return deleted;
@@ -1104,7 +1113,7 @@ static int	housekeeping_sessions(int now)
 static int	housekeeping_services(int now)
 {
 	static zbx_hk_rule_t	rule = {"service_alarms", "servicealarmid", "", HK_MIN_CLOCK_UNDEFINED,
-			&cfg.hk.services};
+			&cfg.hk.services_mode, &cfg.hk.services};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.services_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -1114,7 +1123,8 @@ static int	housekeeping_services(int now)
 
 static int	housekeeping_audit(int now)
 {
-	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", HK_MIN_CLOCK_UNDEFINED, &cfg.hk.audit};
+	static zbx_hk_rule_t	rule = {"auditlog", "auditid", "", HK_MIN_CLOCK_UNDEFINED, &cfg.hk.audit_mode,
+			&cfg.hk.audit};
 
 	if (ZBX_HK_OPTION_ENABLED == cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, &rule);
@@ -1144,25 +1154,28 @@ static int	housekeeping_events(int now)
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
 			ZBX_HK_EVENT_RULE ZBX_HK_TRIGGER_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK,
-			&cfg.hk.events_trigger},
+			&cfg.hk.events_mode, &cfg.hk.events_trigger},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_TRIGGER)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_ITEM)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_LLDRULE)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_internal},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_internal},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), HK_MIN_CLOCK_UNDEFINED, &cfg.hk.events_discovery},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DHOST), HK_MIN_CLOCK_UNDEFINED, &cfg.hk.events_mode,
+			&cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), HK_MIN_CLOCK_UNDEFINED, &cfg.hk.events_discovery},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_DSERVICE), HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.events_mode, &cfg.hk.events_discovery},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_AUTOREGISTRATION)
-			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), HK_MIN_CLOCK_UNDEFINED, &cfg.hk.events_autoreg},
+			" and events.object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), HK_MIN_CLOCK_UNDEFINED,
+			&cfg.hk.events_mode, &cfg.hk.events_autoreg},
 		{"events", "eventid", "events.source=" ZBX_STR(EVENT_SOURCE_SERVICE)
 			" and events.object=" ZBX_STR(EVENT_OBJECT_SERVICE)
-			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_service},
+			ZBX_HK_EVENT_RULE, HK_MIN_CLOCK_ALWAYS_RECHECK, &cfg.hk.events_mode, &cfg.hk.events_service},
 		{NULL}
 	};
 
