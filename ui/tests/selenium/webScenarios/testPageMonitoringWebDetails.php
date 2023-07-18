@@ -31,21 +31,19 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 	use TableTrait;
 
-	protected const HOST_NAME = 'Host for web scenarios';
-
 	protected static $host_id;
 	protected static $httptest_id;
 
 	public function prepareData() {
 		$response = CDataHelper::createHosts([
 			[
-				'host' => self::HOST_NAME,
+				'host' => 'Host for web scenarios',
 				'groups' => [
 					'groupid' => '6'
 				]
 			]
 		]);
-		self::$host_id = $response['hostids'][self::HOST_NAME];
+		self::$host_id = $response['hostids']['Host for web scenarios'];
 
 		$response = CDataHelper::call('httptest.create', [
 			[
@@ -70,10 +68,16 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->page->login()->open('httpdetails.php?httptestid='.self::$httptest_id)->waitUntilReady();
 
 		// Close Kiosk mode if opened.
-		$wrapper_class = $this->query('class:wrapper')->one()->getAttribute('class');
-		if (str_contains($wrapper_class, 'layout-kioskmode')) {
+		if ($this->query('xpath://button[@title="Normal view"]')->exists()) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
+		}
+
+		// If the time selector is not visible - enable it.
+		$filter_button = $this->query('id:ui-id-1')->one();
+		$filter_button_minimized = $this->query('xpath://li[@aria-labelledby="ui-id-1" and @aria-selected="false"]');
+		if ($filter_button_minimized->exists()) {
+			$filter_button->click();
 		}
 
 		// Assert title and header.
@@ -84,39 +88,48 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertEquals(['Step', 'Speed', 'Response time', 'Response code', 'Status'], $table->getHeadersText());
 
-		// Find and set filter section form.
+		// Check filter layout and values.
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$from_input = $form->query('id:from')->one();
-
-		// Open filter section if needed.
-		if (!$from_input->isDisplayed()) {
-			$this->query('class:btn-time')->one()->click();
-		}
+		$this->assertEquals('now-1h', $form->query('id:from')->one()->getValue());
+		$this->assertEquals('now', $form->query('id:to')->one()->getValue());
+		$this->assertEquals('selected', $form->query('xpath://a[@data-from="now-1h"]')->one()->getAttribute('class'));
+		$this->assertTrue($this->query('xpath://button[@class="btn-time-left"]')->one()->isEnabled());
+		$this->assertTrue($this->query('button:Zoom out')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
 
 		// Set custom time filter.
-		$from_input->fill('now-2h');
-		$form->query('id:to')->one()->fill('now-1h');
+		$form->fill(['id:from' => 'now-2h', 'id:to' => 'now-1h']);
 		$form->query('id:apply')->one()->click();
 		$this->assertGraphSrcContains('from=now-2h&to=now-1h');
+		$this->assertTrue($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
 
 		// Use time filter preset button.
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
 		$this->assertGraphSrcContains('from=now-30d&to=now');
 
-		// Test Kiosk mode ON.
+		// Minimize filter section.
+		$filter_button->click();
+		$this->assertTrue($filter_button_minimized->exists());
+
+		// Test Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
 		$this->page->waitUntilReady();
-		$this->assertEquals('wrapper layout-kioskmode', $this->query('class:wrapper')->one()->getAttribute('class'));
 
-		// Test Kiosk mode OFF.
-		$this->query('xpath://button[@title="Normal view"]')->one()->click();
+		// Check that Header and Filter disappeared.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilNotVisible();
+		$this->assertFalse($this->query('xpath://div[@aria-label="Filter"]')->exists());
+		$this->assertTrue($this->query('class:list-table')->exists());
+
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent()->one()->click(true);
 		$this->page->waitUntilReady();
-		$this->page->assertHeader('Details of web scenario: Layout');
-		$this->assertEquals('sidebar', $this->query('tag:aside')->one()->getAttribute('class'));
+
+		// Check that Header and Filter are visible again.
+		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
+		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+		$this->assertTrue($this->query('class:list-table')->exists());
 	}
 
-	public function getDataDisplayData()
-	{
+	public function getDataDisplayData() {
 		return [
 			[
 				[
@@ -242,7 +255,6 @@ class testPageMonitoringWebDetails extends CWebTest {
 		// Fill in step data so that a web scenario can be created with API.
 		$api_steps = [];
 		foreach ($data['steps'] as $i => $step){
-			$api_step = [];
 			$api_step['name'] = $step['name'] ?? 'Step '.$i + 1;
 			$api_step['url'] = 'http://example.com';
 			$api_step['no'] = $i;
@@ -265,7 +277,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 			$sql = 'SELECT ti.itemid FROM httptestitem ti'.
 					' JOIN items i ON ti.itemid=i.itemid'.
 					' WHERE ti.httptestid='.$httptest_id.
-					' AND ti.type='.$data_type;
+						' AND ti.type='.$data_type;
 			$item_id = CDBHelper::getValue($sql);
 			CDataHelper::addItemData($item_id, $data_value);
 		}
@@ -279,8 +291,8 @@ class testPageMonitoringWebDetails extends CWebTest {
 						' JOIN httpstep s ON si.httpstepid=s.httpstepid'.
 						' JOIN httptest t ON s.httptestid=t.httptestid'.
 						' WHERE t.httptestid='.$httptest_id.
-						' AND s.no='.$i.
-						' AND si.type='.$data_type;
+							' AND s.no='.$i.
+							' AND si.type='.$data_type;
 				$item_id = CDBHelper::getValue($sql);
 				CDataHelper::addItemData($item_id, $data_value);
 			}
@@ -308,7 +320,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 	/**
 	 * Waits for both graphs to reload after a filter change and asserts that their src strings contain some value.
 	 *
-	 * @param string  $expected_src    the value that should be contained within the src parameter
+	 * @param string $expected_src    the value that should be contained within the src parameter
 	 */
 	protected function assertGraphSrcContains($expected_src) {
 		foreach (['graph_in', 'graph_time'] as $i => $graph_id) {
