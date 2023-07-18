@@ -107,6 +107,16 @@ static char	*decode_pcre2_compile_error(int error_code, PCRE2_SIZE error_offset,
  ******************************************************************************/
 static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp, char **err_msg)
 {
+#ifdef HAVE_PCRE_H
+	const char	*err_msg_static = NULL;
+	int		error_offset = -1;
+	pcre		*pcre_regexp;
+#endif
+#ifdef HAVE_PCRE2_H
+	pcre2_code	*pcre2_regexp;
+	int		error = 0;
+	PCRE2_SIZE 	error_offset = 0;
+#endif
 #ifdef ZBX_REGEXP_NO_AUTO_CAPTURE
 	/* If ZBX_REGEXP_NO_AUTO_CAPTURE bit is set in 'flags' but regular expression contains references to numbered */
 	/* capturing groups then reset ZBX_REGEXP_NO_AUTO_CAPTURE bit. */
@@ -134,10 +144,6 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 	}
 #endif
 #ifdef HAVE_PCRE_H
-	const char	*err_msg_static = NULL;
-	int		error_offset = -1;
-	pcre		*pcre_regexp;
-
 	if (NULL == (pcre_regexp = pcre_compile(pattern, flags, &err_msg_static, &error_offset, NULL)))
 	{
 		if (NULL != err_msg)
@@ -173,10 +179,6 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 		pcre_free(pcre_regexp);
 #endif
 #ifdef HAVE_PCRE2_H
-	pcre2_code	*pcre2_regexp;
-	int		error = 0;
-	PCRE2_SIZE 	error_offset = 0;
-
 	*err_msg = NULL;
 
 	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
