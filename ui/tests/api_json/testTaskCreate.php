@@ -924,7 +924,7 @@ class testTaskCreate extends CAPITest {
 								]
 							]
 						],
-						'proxy_hostid' => '01'
+						'proxyid' => '01'
 					]
 				],
 				'expected_results' => [],
@@ -1314,7 +1314,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			],
@@ -1338,7 +1338,7 @@ class testTaskCreate extends CAPITest {
 							]
 						]
 					],
-					'proxy_hostid' => 0
+					'proxyid' => 0
 				],
 				'expected_error' => 'No permissions to call "task.create".'
 			]

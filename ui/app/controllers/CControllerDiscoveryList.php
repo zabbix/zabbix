@@ -83,7 +83,7 @@ class CControllerDiscoveryList extends CController {
 		// Get discovery rules.
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 		$data['drules'] = API::DRule()->get([
-			'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
+			'output' => ['proxyid', 'name', 'status', 'iprange', 'delay'],
 			'selectDChecks' => ['type'],
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name']
@@ -107,8 +107,8 @@ class CControllerDiscoveryList extends CController {
 
 				$data['drules'][$key]['checks'] = $checks;
 
-				$data['drules'][$key]['proxy'] = ($drule['proxy_hostid'] != 0)
-					? get_host_by_hostid($drule['proxy_hostid'])['host']
+				$data['drules'][$key]['proxy'] = ($drule['proxyid'] != 0)
+					? get_host_by_hostid($drule['proxyid'])['host']
 					: '';
 			}
 

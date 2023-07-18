@@ -35,7 +35,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			'templates' => 'array',
 			'inventories' => 'array',
 			'description' => 'string',
-			'proxy_hostid' => 'string',
+			'proxyid' => 'string',
 			'ipmi_username' => 'string',
 			'ipmi_password' => 'string',
 			'tls_issuer' => 'string',
@@ -195,7 +195,7 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 					}
 				}
 
-				$properties = ['description', 'proxy_hostid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+				$properties = ['description', 'proxyid', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 					'ipmi_password'
 				];
 
@@ -544,11 +544,11 @@ class CControllerPopupMassupdateHost extends CControllerPopupMassupdateAbstract 
 			];
 
 			$data['proxies'] = API::Proxy()->get([
-				'output' => ['proxyid', 'host'],
+				'output' => ['proxyid', 'name'],
 				'filter' => [
 					'status' => [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]
 				],
-				'sortfield' => 'host'
+				'sortfield' => 'name'
 			]);
 
 			$data['discovered_host'] = !(bool) API::Host()->get([

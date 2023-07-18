@@ -385,7 +385,7 @@ if (hasRequest('form')) {
 
 	// add parent host
 	$parentHost = API::Host()->get([
-		'output' => ['hostid', 'proxy_hostid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
+		'output' => ['hostid', 'proxyid', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username',
 			'ipmi_password', 'tls_accept', 'tls_connect', 'tls_issuer', 'tls_subject'
 		],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -405,10 +405,10 @@ if (hasRequest('form')) {
 		]);
 	}
 
-	if ($parentHost['proxy_hostid']) {
+	if ($parentHost['proxyid']) {
 		$proxy = API::Proxy()->get([
 			'output' => ['host', 'proxyid'],
-			'proxyids' => $parentHost['proxy_hostid'],
+			'proxyids' => $parentHost['proxyid'],
 			'limit' => 1
 		]);
 		$data['proxy'] = reset($proxy);

@@ -577,7 +577,7 @@ class testPageAdministrationProxies extends CWebTest {
 
 			// Check that hosts are actually enabled/disabled.
 			if ($data['action'] === 'Enable hosts' || $data['action'] === 'Disable hosts') {
-				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxy_hostid IS NOT NULL');
+				$hosts = CDBHelper::getAll('SELECT host, status FROM hosts WHERE proxyid IS NOT NULL');
 
 				// DB check for hosts.
 				foreach ($hosts as $host) {

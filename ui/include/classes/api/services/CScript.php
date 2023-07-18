@@ -67,7 +67,7 @@ class CScript extends CApiService {
 			'password', 'publickey', 'privatekey', 'menu_path', 'url', 'new_window'
 		];
 		$group_fields = ['groupid', 'name', 'flags', 'uuid'];
-		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxy_hostid', 'inventory_mode', 'flags',
+		$host_fields = ['hostid', 'host', 'name', 'description', 'status', 'proxyid', 'inventory_mode', 'flags',
 			'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password', 'maintenanceid', 'maintenance_status',
 			'maintenance_type', 'maintenance_from', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject'
 		];

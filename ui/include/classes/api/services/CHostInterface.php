@@ -288,7 +288,7 @@ class CHostInterface extends CApiService {
 		]);
 
 		$dbProxies = API::Proxy()->get([
-			'output' => ['host'],
+			'output' => ['name'],
 			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true

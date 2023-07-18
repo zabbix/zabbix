@@ -313,7 +313,7 @@ class CHostImporter extends CImporter {
 				}
 			}
 
-			$host['proxy_hostid'] = $proxyid;
+			$host['proxyid'] = $proxyid;
 		}
 
 		$hostid = $this->referencer->findHostidByHost($host['host']);

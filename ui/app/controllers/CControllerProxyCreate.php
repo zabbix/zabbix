@@ -149,7 +149,7 @@ class CControllerProxyCreate extends CController {
 
 		switch ($this->getInput('mode')) {
 			case PROXY_MODE_ACTIVE:
-				$proxy['proxy_address'] = $this->getInput('allowed_addresses', '');
+				$proxy['allowed_addresses'] = $this->getInput('allowed_addresses', '');
 
 				$proxy['tls_accept'] = ($this->hasInput('tls_accept_none') ? HOST_ENCRYPTION_NONE : 0)
 					| ($this->hasInput('tls_accept_psk') ? HOST_ENCRYPTION_PSK : 0)
@@ -176,21 +176,12 @@ class CControllerProxyCreate extends CController {
 
 		$result = API::Proxy()->create($proxy);
 
-		$output = [];
-
-		if ($result) {
-			$output['success']['title'] = _('Proxy added');
-
-			if ($messages = get_and_clear_messages()) {
-				$output['success']['messages'] = array_column($messages, 'message');
-			}
-		}
-		else {
-			$output['error'] = [
-				'title' => _('Cannot add proxy'),
+		$output = $result
+			? ['success' => ['title' => _('Proxy updated')]]
+			: ['error' => [
+				'title' => _('Cannot update proxy'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
-			];
-		}
+			]];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

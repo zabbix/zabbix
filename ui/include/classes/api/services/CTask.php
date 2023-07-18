@@ -146,7 +146,7 @@ class CTask extends CApiService {
 	 * @param array        $tasks[]['request']['preprocessing'] (optional) object of preprocessing data request.
 	 * @param array        $tasks[]['request']['alerting']      (optional) object of alerting data request.
 	 * @param array        $tasks[]['request']['lld']           (optional) object of lld cache data request.
-	 * @param array        $tasks[]['proxyid']             (optional) Proxy to get diagnostic data about.
+	 * @param array        $tasks[]['proxyid']                  (optional) Proxy to get diagnostic data about.
 	 *
 	 * @return array
 	 */
@@ -274,7 +274,7 @@ class CTask extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$this->checkProxyHostids(array_keys($proxyids));
+		$this->checkProxyIds(array_keys($proxyids));
 		$itemids_editable = $this->checkEditableItems(array_keys($itemids_editable));
 
 		return $itemids_editable;
@@ -676,7 +676,7 @@ class CTask extends CApiService {
 	 *
 	 * @throws Exception if proxy doesn't exist.
 	 */
-	protected function checkProxyHostids(array $proxyids): void {
+	protected function checkProxyIds(array $proxyids): void {
 		if (!$proxyids) {
 			return;
 		}

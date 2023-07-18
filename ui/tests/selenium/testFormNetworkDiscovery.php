@@ -580,11 +580,11 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		// Check the results in DB after update.
-		$proxy = DBfetch(DBselect('SELECT proxy_hostid FROM drules WHERE name='.zbx_dbstr($data['name'])));
-		if ($proxy['proxy_hostid']) {
+		$proxy = DBfetch(DBselect('SELECT proxyid FROM drules WHERE name='.zbx_dbstr($data['name'])));
+		if ($proxy['proxyid']) {
 			$discovery_db_data = CDBHelper::getRow('SELECT hosts.host AS proxy, drules.name, iprange, delay'.
 					' FROM drules'.
-					' JOIN hosts ON drules.proxy_hostid=hostid'.
+					' JOIN hosts ON drules.proxyid=hostid'.
 					' WHERE drules.name='.zbx_dbstr($data['name']));
 		}
 		else {
@@ -634,7 +634,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 		}
 
 		if (array_key_exists('proxy', $data)) {
-			$this->zbxTestDropdownSelect('proxy_hostid', $data['proxy']);
+			$this->zbxTestDropdownSelect('proxyid', $data['proxy']);
 		}
 
 		if (array_key_exists('iprange', $data)) {
@@ -773,7 +773,7 @@ class testFormNetworkDiscovery extends CLegacyWebTest {
 
 			$names = [($drule['name']), 'CLONE: '.$drule['name']];
 			foreach ($names as $name) {
-				$sql_drules[] = CDBHelper::getHash('SELECT proxy_hostid, iprange, delay, status'.
+				$sql_drules[] = CDBHelper::getHash('SELECT proxyid, iprange, delay, status'.
 						' FROM drules'.
 						' WHERE name='.zbx_dbstr($name).
 						' ORDER BY druleid'

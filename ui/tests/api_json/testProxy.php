@@ -256,7 +256,7 @@ class testProxy extends CAPITest {
 			'with_proxy' => [
 				'host' => 'api_test_host_with_proxy',
 				'name' => 'API test host - with proxy',
-				'proxy_hostid' => self::$data['proxyids']['delete_used_in_host'],
+				'proxyid' => self::$data['proxyids']['delete_used_in_host'],
 				'groups' => [
 					[
 						'groupid' => self::$data['groupids'][0]
@@ -333,7 +333,7 @@ class testProxy extends CAPITest {
 		$drules = [
 			'name' => 'API test discovery rule',
 			'iprange' => '192.168.1.1-255',
-			'proxy_hostid' => self::$data['proxyids']['delete_used_in_discovery'],
+			'proxyid' => self::$data['proxyids']['delete_used_in_discovery'],
 			'dchecks' => [
 				[
 					'type' => SVC_AGENT,
@@ -1291,7 +1291,7 @@ class testProxy extends CAPITest {
 					'selectHosts' => ['abc']
 				],
 				'expected_result' => [],
-				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "proxy_hostid", "host", "status", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "inventory_mode", "active_available".'
+				'expected_error' => 'Invalid parameter "/selectHosts/1": value must be one of "hostid", "proxyid", "host", "status", "ipmi_authtype", "ipmi_privilege", "ipmi_username", "ipmi_password", "maintenanceid", "maintenance_status", "maintenance_type", "maintenance_from", "name", "flags", "description", "tls_connect", "tls_accept", "tls_issuer", "tls_subject", "inventory_mode", "active_available".'
 			],
 
 			// Check "selectInterface" option.

@@ -434,7 +434,7 @@ class CConfigurationExport {
 	protected function gatherHosts(array $hostIds) {
 		$hosts = API::Host()->get([
 			'output' => [
-				'proxy_hostid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
+				'proxyid', 'host', 'status', 'ipmi_authtype', 'ipmi_privilege', 'ipmi_username', 'ipmi_password',
 				'name', 'description', 'inventory_mode'
 			],
 			'selectInterfaces' => API_OUTPUT_EXTEND,

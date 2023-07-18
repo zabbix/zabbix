@@ -407,27 +407,22 @@ class CProxy extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
-
 		if (!$options['countOutput']) {
 
-			$host_rtdata = false;
+			$proxy_rtdata = false;
+
 			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
 				if ($this->outputIsRequested($field, $options['output'])) {
 					$sqlParts = $this->addQuerySelect('pr.'.$field, $sqlParts);
-					$host_rtdata = true;
+					$proxy_rtdata = true;
 				}
 
 				if (is_array($options['filter']) && array_key_exists($field, $options['filter'])) {
-					$host_rtdata = true;
+					$proxy_rtdata = true;
 				}
 			}
 
-			if ($host_rtdata) {
+			if ($proxy_rtdata) {
 				$sqlParts['left_join'][] = ['alias' => 'pr', 'table' => 'proxy_rtdata', 'using' => 'proxyid'];
 				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
 			}
@@ -439,13 +434,13 @@ class CProxy extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$proxyIds = array_keys($result);
+		$proxyids = array_keys($result);
 
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$hosts = API::Host()->get([
 				'output' => $this->outputExtend($options['selectHosts'], ['hostid', 'proxyid']),
-				'proxyids' => $proxyIds,
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
 
@@ -558,8 +553,7 @@ class CProxy extends CApiService {
 		$options = [
 			'output' => ['name'],
 			'filter' => [
-				'name' => $names,
-				'mode' => [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE]
+				'name' => $names
 			]
 		];
 		$duplicate = DBfetch(DBselect(DB::makeSql('proxy', $options), 1));
@@ -583,12 +577,12 @@ class CProxy extends CApiService {
 				continue;
 			}
 
-			$proxy_hostids = array_column($proxy['hosts'], null, 'hostid');
-			$db_proxy_hostids = $db_proxies !== null
+			$proxyids = array_column($proxy['hosts'], null, 'hostid');
+			$db_proxyids = $db_proxies !== null
 				? array_column($db_proxies[$proxy['proxyid']]['hosts'], null, 'hostid')
 				: [];
 
-			$hostids += array_diff_key($proxy_hostids, $db_proxy_hostids);
+			$hostids += array_diff_key($proxyids, $db_proxyids);
 		}
 
 		if (!$hostids) {
@@ -684,19 +678,18 @@ class CProxy extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$proxies, ?array &$db_proxies): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['proxyid'], ['name']], 'fields' => [
 			'proxyid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'mode' =>				['type' => API_INT32, 'in' => implode(',', [PROXY_MODE_ACTIVE, PROXY_MODE_PASSIVE])],
 			'name' =>				['type' => API_H_NAME, 'length' => DB::getFieldLength('proxy', 'name')],
 			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('proxy', 'description')],
-			'allowed_addresses' =>		['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
+			'allowed_addresses' =>	['type' => API_IP_RANGES, 'flags' => API_ALLOW_DNS, 'length' => DB::getFieldLength('proxy', 'allowed_addresses')],
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
 			'address' => 			['type' => API_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
 			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')]
-			]
-		];
+		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $proxies, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -704,7 +697,7 @@ class CProxy extends CApiService {
 
 		$db_proxies = $this->get([
 			'output' => ['proxyid', 'name', 'mode', 'tls_connect', 'tls_accept', 'tls_issuer', 'tls_subject',
-				'description', 'allowed_addresses','address','port'
+				'description', 'allowed_addresses', 'address', 'port'
 			],
 			'proxyids' => array_column($proxies, 'proxyid'),
 			'editable' => true,
@@ -777,7 +770,6 @@ class CProxy extends CApiService {
 				$proxy += ['tls_issuer' => '', 'tls_subject' => ''];
 			}
 		}
-
 		unset($proxy);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [

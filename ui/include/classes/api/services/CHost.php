@@ -649,7 +649,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']        Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']          Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']      Interface additional fields (optional).
-	 * @param int    $hosts[]['proxyid']               ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['proxyid']                    ID of the proxy used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']              IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']             IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']              IPMI username (optional).
@@ -786,7 +786,7 @@ class CHost extends CHostGeneral {
 	 * @param int    $hosts[]['interfaces']['useip']              Interface should use IP (optional).
 	 * @param string $hosts[]['interfaces']['dns']                Interface should use DNS (optional).
 	 * @param int    $hosts[]['interfaces']['details']            Interface additional fields (optional).
-	 * @param int    $hosts[]['proxyid']                     ID of the proxy that is used to monitor the host (optional).
+	 * @param int    $hosts[]['proxyid']                          ID of the proxy used to monitor the host (optional).
 	 * @param int    $hosts[]['ipmi_authtype']                    IPMI authentication type (optional).
 	 * @param int    $hosts[]['ipmi_privilege']                   IPMI privilege (optional).
 	 * @param string $hosts[]['ipmi_username']                    IPMI username (optional).
@@ -921,7 +921,7 @@ class CHost extends CHostGeneral {
 	 * @param string $hosts['fields']['dns']			DNS. OPTIONAL
 	 * @param string $hosts['fields']['ip']				IP. OPTIONAL
 	 * @param int    $hosts['fields']['details']		Details. OPTIONAL
-	 * @param int    $hosts['fields']['proxyid']	Proxy Host ID. OPTIONAL
+	 * @param int    $hosts['fields']['proxyid']	    Proxy ID. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_authtype']	IPMI authentication type. OPTIONAL
 	 * @param int    $hosts['fields']['ipmi_privilege']	IPMI privilege. OPTIONAL
 	 * @param string $hosts['fields']['ipmi_username']	IPMI username. OPTIONAL

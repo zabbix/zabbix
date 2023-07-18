@@ -104,7 +104,7 @@ class testDataCollection extends CIntegrationTest {
 				'host' => 'proxy_agent',
 				'interfaces' => $interfaces,
 				'groups' => $groups,
-				'proxy_hostid' => $proxyids['proxy'],
+				'proxyid' => $proxyids['proxy'],
 				'status' => HOST_STATUS_NOT_MONITORED,
 				'items' => [
 					[
