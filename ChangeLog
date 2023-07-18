@@ -1,3 +1,32 @@
+Changes for 6.0.20rc1
+
+New features:
+.........T [ZBXNEXT-7944] excluded edgeupdate service from services discovery in Windows by Zabbix agent templates (drasikhov)
+.........T [ZBXNEXT-8422] added AWS ECS templates (egordymov)
+
+Bug fixes:
+........S. [ZBX-23049] fixed default condition for log item macro resolution (kprutkovs)
+.........T [ZBX-21909] updated setup section in README for PHP-FPM templates to include configuration example for Apache (drasikhov)
+...G...... [ZBX-21547] fixed reading of non-UTF-8 encoded files in Zabbix agent 2 (arimdjonoks)
+........S. [ZBX-20148] fixed the issue with housekeeper failing to delete some of the events that required deletion (mprihodko)
+..F....... [ZBX-21970] fixed console error in map nav tree widget; disabled add button on a 10th depth level (acikuns, ashubin)
+A......... [ZBX-19393] fixed undefined index errors in configuration.importcompare (agriscenko)
+..F....... [ZBX-22290] fixed generation of double page headers when general warning appears (epulke)
+...G...... [ZBX-21845] fixed Zabbix agent 2 systemd plugin failing with newer dbus (esneiders)
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
+..F....... [ZBX-22912] fixed not being able to save an event correlation when custom formula was selected but only one condition remained (Ivo)
+.........T [ZBX-21571] updated pod crash loop trigger expressions in Kubernetes nodes and cluster state templates (drasikhov)
+..F....... [ZBX-22369] fixed suffix interpretation in threshold values for "Top hosts" widget (esekace)
+..F....... [ZBX-22825] fixed Zabbix access to the first page for user with specific page access (dpetra)
+..F....... [ZBX-22867] fixed import popup showing circle animation even if PHP code failed (dfofanovs)
+..F....... [ZBX-22711] fixed incorrectly displayed simple graphs with non-numeric items in Host graphs page (kkuzmina)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.19
+
+6.0.19rc1 was released as 6.0.19 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.19rc1
 
 New features:
@@ -2607,6 +2636,14 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
 
 --------------------------------------------------------------------------------
+Changes for 5.0.37rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-22830] fixed free bytes calculation for temporary tablespace in Oracle Zabbix agent 2 plugin (esneiders)
+
+--------------------------------------------------------------------------------
 Changes for 5.0.36
 
 5.0.36rc1 was released as 5.0.36 without any changes
@@ -2637,7 +2674,7 @@ New features:
 
 Bug fixes:
 .......PS. [ZBX-22989] silenced null-dereference warnings for duktape (vso)
-...G...... [ZBX-22797] fixed Zabbix agent 2 PostgresSQL plugin memory leak (esneiders)
+...G...... [ZBX-22797] fixed Zabbix agent 2 PostgreSQL plugin memory leak (esneiders)
 ........S. [ZBX-22688] fixed AlertScriptPath not allowing links (vso)
 ........S. [ZBX-22234] fixed incorrect SNMPINDEX offset retrieval in SNMP discovery (dgoloscapov)
 ..F....... [ZBX-22682] fixed validation rule error in template mass update when linking, replacing or unlinking templates (dpetra)
@@ -5429,6 +5466,13 @@ Changes for 4.2.0alpha1
 New features:
 A.F.I...S. [ZBXNEXT-4853,ZBXNEXT-517] added ability to send email messages in HTML format on demand (MVekslers, vasilijs)
 ..F.....S. [ZBXNEXT-1282,ZBXNEXT-4730] added changes to introduce regex based matching for auto-registration (vasilijs, viktors)
+
+--------------------------------------------------------------------------------
+Changes for 4.0.48rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 4.0.47

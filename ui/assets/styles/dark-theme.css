@@ -781,10 +781,13 @@ footer {
 .btn-add[disabled], .btn-add[disabled]:hover,
 .btn-edit[disabled],
 .btn-edit[disabled]:hover,
+.btn-import[disabled],
+.btn-import[disabled]:hover,
 .btn-remove[disabled],
 .btn-remove[disabled]:hover {
   background-color: transparent;
-  opacity: .25; }
+  opacity: .25;
+  cursor: default; }
 
 .overlay-close-btn {
   position: absolute;
