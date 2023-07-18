@@ -19,7 +19,6 @@
 
 #include "zbxdbhigh.h"
 
-#include "log.h"
 #include "zbxthreads.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
@@ -251,17 +250,11 @@ int	zbx_db_connect(int flag)
 	return err;
 }
 
-int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, unsigned char program, int log_slow_queries, char **error)
+int	zbx_db_init(zbx_dc_get_nextid_func_t cb_nextid, int log_slow_queries, char **error)
 {
 	zbx_cb_nextid = cb_nextid;
 
-	if (ZBX_PROGRAM_TYPE_SERVER != program)
-	{
-		return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(),
-				log_slow_queries, error);
-	}
-
-	return SUCCEED;
+	return zbx_db_init_basic(zbx_cfg_dbhigh->config_dbname, zbx_dbschema_get_schema(), log_slow_queries, error);
 }
 
 void	zbx_db_deinit(void)
@@ -535,8 +528,9 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_SHORTTEXT:
@@ -553,9 +547,10 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 {
 	switch(field->type)
 	{
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
-			return ZBX_SIZE_T_MAX;
+			return 4294967295ul;
 		case ZBX_TYPE_CHAR:
 		case ZBX_TYPE_SHORTTEXT:
 			if (4000 < field->length)
@@ -573,7 +568,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 
 static size_t	get_string_field_chars(const zbx_db_field_t *field)
 {
-	if (ZBX_TYPE_LONGTEXT == field->type && 0 == field->length)
+	if ((ZBX_TYPE_LONGTEXT == field->type || ZBX_TYPE_BLOB == field->type) && 0 == field->length)
 		return ZBX_SIZE_T_MAX;
 	else if (ZBX_TYPE_CUID == field->type)
 		return CUID_LEN - 1;
@@ -813,7 +808,10 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "escalations") ||
 			0 == strcmp(tablename, "autoreg_host") ||
 			0 == strcmp(tablename, "event_suppress") ||
-			0 == strcmp(tablename, "trigger_queue"))
+			0 == strcmp(tablename, "trigger_queue") ||
+			0 == strcmp(tablename, "proxy_history") ||
+			0 == strcmp(tablename, "proxy_dhistory") ||
+			0 == strcmp(tablename, "proxy_autoreg_host"))
 		return zbx_cb_nextid(tablename, num);
 
 	return DBget_nextid(tablename, num);
@@ -1322,25 +1320,25 @@ void	zbx_db_add_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offse
 #endif
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: This function is similar to DBadd_condition_alloc(), except it is *
- *          designed for generating WHERE conditions for strings. Hence, this *
- *          function is simpler, because only IN condition is possible.       *
- *                                                                            *
- * Parameters: sql        - [IN/OUT] buffer for SQL query construction        *
- *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                 *
- *             sql_offset - [IN/OUT] current position in the 'sql' buffer     *
- *             fieldname  - [IN] field name to be used in SQL WHERE condition *
- *             values     - [IN] array of string values                       *
- *             num        - [IN] number of elements in 'values' array         *
- *                                                                            *
- * Comments: To support Oracle empty values are checked separately (is null   *
- *           for Oracle and ='' for the other databases).                     *
- *                                                                            *
- ******************************************************************************/
+/*********************************************************************************
+ *                                                                               *
+ * Purpose: This function is similar to the zbx_db_add_condition_alloc(), except *
+ *          it is designed for generating WHERE conditions for strings. Hence,   *
+ *          this function is simpler, because only IN condition is possible.     *
+ *                                                                               *
+ * Parameters: sql        - [IN/OUT] buffer for SQL query construction           *
+ *             sql_alloc  - [IN/OUT] size of the 'sql' buffer                    *
+ *             sql_offset - [IN/OUT] current position in the 'sql' buffer        *
+ *             fieldname  - [IN] field name to be used in SQL WHERE condition    *
+ *             values     - [IN] array of string values                          *
+ *             num        - [IN] number of elements in 'values' array            *
+ *                                                                               *
+ * Comments: To support Oracle empty values are checked separately (is null      *
+ *           for Oracle and ='' for the other databases).                        *
+ *                                                                               *
+ *********************************************************************************/
 void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
-		const char **values, const int num)
+		const char * const *values, const int num)
 {
 #define MAX_EXPRESSIONS	950
 
@@ -1635,356 +1633,6 @@ const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: register unknown host and generate event                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_register_host(zbx_uint64_t proxy_hostid, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now, const zbx_events_funcs_t *events_cbs)
-{
-	zbx_vector_ptr_t	autoreg_hosts;
-
-	zbx_vector_ptr_create(&autoreg_hosts);
-
-	zbx_db_register_host_prepare(&autoreg_hosts, host, ip, dns, port, connection_type, host_metadata, flag, now);
-	zbx_db_register_host_flush(&autoreg_hosts, proxy_hostid, events_cbs);
-
-	zbx_db_register_host_clean(&autoreg_hosts);
-	zbx_vector_ptr_destroy(&autoreg_hosts);
-}
-
-static void	autoreg_host_free(zbx_autoreg_host_t *autoreg_host)
-{
-	zbx_free(autoreg_host->host);
-	zbx_free(autoreg_host->ip);
-	zbx_free(autoreg_host->dns);
-	zbx_free(autoreg_host->host_metadata);
-	zbx_free(autoreg_host);
-}
-
-void	zbx_db_register_host_prepare(zbx_vector_ptr_t *autoreg_hosts, const char *host, const char *ip, const char *dns,
-		unsigned short port, unsigned int connection_type, const char *host_metadata, unsigned short flag,
-		int now)
-{
-	zbx_autoreg_host_t	*autoreg_host;
-	int			i;
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)	/* duplicate check */
-	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-		if (0 == strcmp(host, autoreg_host->host))
-		{
-			zbx_vector_ptr_remove(autoreg_hosts, i);
-			autoreg_host_free(autoreg_host);
-			break;
-		}
-	}
-
-	autoreg_host = (zbx_autoreg_host_t *)zbx_malloc(NULL, sizeof(zbx_autoreg_host_t));
-	autoreg_host->autoreg_hostid = autoreg_host->hostid = 0;
-	autoreg_host->host = zbx_strdup(NULL, host);
-	autoreg_host->ip = zbx_strdup(NULL, ip);
-	autoreg_host->dns = zbx_strdup(NULL, dns);
-	autoreg_host->port = port;
-	autoreg_host->connection_type = connection_type;
-	autoreg_host->host_metadata = zbx_strdup(NULL, host_metadata);
-	autoreg_host->flag = flag;
-	autoreg_host->now = now;
-
-	zbx_vector_ptr_append(autoreg_hosts, autoreg_host);
-}
-
-static void	autoreg_get_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_vector_str_t *hosts)
-{
-	int	i;
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		zbx_autoreg_host_t	*autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-		zbx_vector_str_append(hosts, autoreg_host->host);
-	}
-}
-
-static void	process_autoreg_hosts(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid)
-{
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_vector_str_t	hosts;
-	zbx_uint64_t		current_proxy_hostid;
-	char			*sql = NULL;
-	size_t			sql_alloc = 256, sql_offset;
-	zbx_autoreg_host_t	*autoreg_host;
-	int			i;
-
-	sql = (char *)zbx_malloc(sql, sql_alloc);
-	zbx_vector_str_create(&hosts);
-
-	if (0 != proxy_hostid)
-	{
-		autoreg_get_hosts(autoreg_hosts, &hosts);
-
-		/* delete from vector if already exist in hosts table */
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select h.host,h.hostid,h.proxy_hostid,a.host_metadata,a.listen_ip,a.listen_dns,"
-					"a.listen_port,a.flags,a.autoreg_hostid"
-				" from hosts h"
-				" left join autoreg_host a"
-					" on a.proxy_hostid=h.proxy_hostid and a.host=h.host"
-				" where");
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "h.host",
-				(const char **)hosts.values, hosts.values_num);
-
-		result = zbx_db_select("%s", sql);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			for (i = 0; i < autoreg_hosts->values_num; i++)
-			{
-				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-				if (0 != strcmp(autoreg_host->host, row[0]))
-					continue;
-
-				ZBX_STR2UINT64(autoreg_host->hostid, row[1]);
-				ZBX_DBROW2UINT64(current_proxy_hostid, row[2]);
-
-				if (current_proxy_hostid != proxy_hostid || SUCCEED == zbx_db_is_null(row[8]) ||
-						0 != strcmp(autoreg_host->host_metadata, row[3]) ||
-						autoreg_host->flag != atoi(row[7]))
-				{
-					break;
-				}
-
-				/* process with autoregistration if the connection type was forced and */
-				/* is different from the last registered connection type               */
-				if (ZBX_CONN_DEFAULT != autoreg_host->flag)
-				{
-					unsigned short	port;
-
-					if (FAIL == zbx_is_ushort(row[6], &port) || port != autoreg_host->port)
-						break;
-
-					if (ZBX_CONN_IP == autoreg_host->flag && 0 != strcmp(row[4], autoreg_host->ip))
-						break;
-
-					if (ZBX_CONN_DNS == autoreg_host->flag && 0 != strcmp(row[5], autoreg_host->dns))
-						break;
-				}
-
-				zbx_vector_ptr_remove(autoreg_hosts, i);
-				autoreg_host_free(autoreg_host);
-
-				break;
-			}
-
-		}
-		zbx_db_free_result(result);
-
-		hosts.values_num = 0;
-	}
-
-	if (0 != autoreg_hosts->values_num)
-	{
-		autoreg_get_hosts(autoreg_hosts, &hosts);
-
-		/* update autoreg_id in vector if already exists in autoreg_host table */
-		sql_offset = 0;
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select autoreg_hostid,host"
-				" from autoreg_host"
-				" where");
-		zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "host",
-				(const char **)hosts.values, hosts.values_num);
-
-		result = zbx_db_select("%s", sql);
-
-		while (NULL != (row = zbx_db_fetch(result)))
-		{
-			for (i = 0; i < autoreg_hosts->values_num; i++)
-			{
-				autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-				if (0 == autoreg_host->autoreg_hostid && 0 == strcmp(autoreg_host->host, row[1]))
-				{
-					ZBX_STR2UINT64(autoreg_host->autoreg_hostid, row[0]);
-					break;
-				}
-			}
-		}
-		zbx_db_free_result(result);
-
-		hosts.values_num = 0;
-	}
-
-	zbx_vector_str_destroy(&hosts);
-	zbx_free(sql);
-}
-
-static int	compare_autoreg_host_by_hostid(const void *d1, const void *d2)
-{
-	const zbx_autoreg_host_t	*p1 = *(const zbx_autoreg_host_t **)d1;
-	const zbx_autoreg_host_t	*p2 = *(const zbx_autoreg_host_t **)d2;
-
-	ZBX_RETURN_IF_NOT_EQUAL(p1->hostid, p2->hostid);
-
-	return 0;
-}
-
-void	zbx_db_register_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_hostid,
-		const zbx_events_funcs_t *events_cbs)
-{
-	zbx_autoreg_host_t	*autoreg_host;
-	zbx_uint64_t		autoreg_hostid = 0;
-	zbx_db_insert_t		db_insert;
-	int			i, create = 0, update = 0;
-	char			*sql = NULL, *ip_esc, *dns_esc, *host_metadata_esc;
-	size_t			sql_alloc = 256, sql_offset = 0;
-	zbx_timespec_t		ts = {0, 0};
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	process_autoreg_hosts(autoreg_hosts, proxy_hostid);
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-		if (0 == autoreg_host->autoreg_hostid)
-			create++;
-	}
-
-	if (0 != create)
-	{
-		autoreg_hostid = zbx_db_get_maxid_num("autoreg_host", create);
-
-		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
-				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
-	}
-
-	if (0 != (update = autoreg_hosts->values_num - create))
-	{
-		sql = (char *)zbx_malloc(sql, sql_alloc);
-		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
-	}
-
-	zbx_vector_ptr_sort(autoreg_hosts, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-		if (0 == autoreg_host->autoreg_hostid)
-		{
-			autoreg_host->autoreg_hostid = autoreg_hostid++;
-
-			zbx_db_insert_add_values(&db_insert, autoreg_host->autoreg_hostid, proxy_hostid,
-					autoreg_host->host, autoreg_host->ip, autoreg_host->dns,
-					(int)autoreg_host->port, (int)autoreg_host->connection_type,
-					autoreg_host->host_metadata, autoreg_host->flag);
-		}
-		else
-		{
-			ip_esc = zbx_db_dyn_escape_string(autoreg_host->ip);
-			dns_esc = zbx_db_dyn_escape_string(autoreg_host->dns);
-			host_metadata_esc = zbx_db_dyn_escape_string(autoreg_host->host_metadata);
-
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update autoreg_host"
-					" set listen_ip='%s',"
-						"listen_dns='%s',"
-						"listen_port=%hu,"
-						"host_metadata='%s',"
-						"tls_accepted='%u',"
-						"flags=%hu,"
-						"proxy_hostid=%s"
-					" where autoreg_hostid=" ZBX_FS_UI64 ";\n",
-				ip_esc, dns_esc, autoreg_host->port, host_metadata_esc, autoreg_host->connection_type,
-				autoreg_host->flag, zbx_db_sql_id_ins(proxy_hostid), autoreg_host->autoreg_hostid);
-
-			zbx_free(host_metadata_esc);
-			zbx_free(dns_esc);
-			zbx_free(ip_esc);
-		}
-	}
-
-	if (0 != create)
-	{
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
-
-	if (0 != update)
-	{
-		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-		zbx_db_execute("%s", sql);
-		zbx_free(sql);
-	}
-
-	zbx_vector_ptr_sort(autoreg_hosts, compare_autoreg_host_by_hostid);
-
-	for (i = 0; i < autoreg_hosts->values_num; i++)
-	{
-		autoreg_host = (zbx_autoreg_host_t *)autoreg_hosts->values[i];
-
-		ts.sec = autoreg_host->now;
-
-		if (NULL != events_cbs->add_event_cb)
-		{
-			events_cbs->add_event_cb(EVENT_SOURCE_AUTOREGISTRATION, EVENT_OBJECT_ZABBIX_ACTIVE,
-					autoreg_host->autoreg_hostid, &ts, TRIGGER_VALUE_PROBLEM, NULL, NULL, NULL, 0,
-					0, NULL, 0, NULL, 0, NULL, NULL, NULL);
-		}
-	}
-
-	if (NULL != events_cbs->process_events_cb)
-		events_cbs->process_events_cb(NULL, NULL);
-
-	if (NULL != events_cbs->clean_events_cb)
-		events_cbs->clean_events_cb();
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-void	zbx_db_register_host_clean(zbx_vector_ptr_t *autoreg_hosts)
-{
-	zbx_vector_ptr_clear_ext(autoreg_hosts, (zbx_mem_free_func_t)autoreg_host_free);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: register unknown host                                             *
- *                                                                            *
- * Parameters: host - host name                                               *
- *                                                                            *
- ******************************************************************************/
-void	zbx_db_proxy_register_host(const char *host, const char *ip, const char *dns, unsigned short port,
-		unsigned int connection_type, const char *host_metadata, unsigned short flag, int now)
-{
-	char	*host_esc, *ip_esc, *dns_esc, *host_metadata_esc;
-
-	host_esc = zbx_db_dyn_escape_field("proxy_autoreg_host", "host", host);
-	ip_esc = zbx_db_dyn_escape_field("proxy_autoreg_host", "listen_ip", ip);
-	dns_esc = zbx_db_dyn_escape_field("proxy_autoreg_host", "listen_dns", dns);
-	host_metadata_esc = zbx_db_dyn_escape_field("proxy_autoreg_host", "host_metadata", host_metadata);
-
-	zbx_db_execute("insert into proxy_autoreg_host"
-			" (clock,host,listen_ip,listen_dns,listen_port,tls_accepted,host_metadata,flags)"
-			" values"
-			" (%d,'%s','%s','%s',%d,%u,'%s',%d)",
-			now, host_esc, ip_esc, dns_esc, (int)port, connection_type, host_metadata_esc,
-			(int)flag);
-
-	zbx_free(host_metadata_esc);
-	zbx_free(dns_esc);
-	zbx_free(ip_esc);
-	zbx_free(host_esc);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: execute a set of SQL statements IF it is big enough               *
  *                                                                            *
  ******************************************************************************/
@@ -2225,7 +1873,9 @@ int	zbx_db_table_exists(const char *table_name)
 
 int	zbx_db_field_exists(const char *table_name, const char *field_name)
 {
+#if (defined(HAVE_MYSQL) || defined(HAVE_ORACLE) || defined(HAVE_POSTGRESQL) || defined(HAVE_SQLITE3))
 	zbx_db_result_t	result;
+#endif
 #if defined(HAVE_MYSQL)
 	char		*field_name_esc;
 	int		ret;
@@ -2900,6 +2550,7 @@ static char	*zbx_db_format_values(zbx_db_field_t **fields, const zbx_db_value_t 
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				zbx_snprintf_alloc(&str, &str_alloc, &str_offset, "'%s'", value->str);
 				break;
 			case ZBX_TYPE_FLOAT:
@@ -2948,7 +2599,9 @@ void	zbx_db_insert_clean(zbx_db_insert_t *self)
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
+				case ZBX_TYPE_BLOB:
 					zbx_free(row[j].str);
+					break;
 			}
 		}
 
@@ -2995,6 +2648,7 @@ void	zbx_db_insert_prepare_dyn(zbx_db_insert_t *self, const zbx_db_table_t *tabl
 	}
 
 	self->autoincrement = -1;
+	self->lastid = 0;
 
 	zbx_vector_ptr_create(&self->fields);
 	zbx_vector_ptr_create(&self->rows);
@@ -3068,7 +2722,7 @@ void	zbx_db_insert_prepare(zbx_db_insert_t *self, const char *table, ...)
  *           for insert preparation functions.                                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **values, int values_num)
+void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, zbx_db_value_t **values, int values_num)
 {
 	int		i;
 	zbx_db_value_t	*row;
@@ -3093,15 +2747,23 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 			case ZBX_TYPE_TEXT:
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 #ifdef HAVE_ORACLE
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_OFF);
 #else
 				row[i].str = DBdyn_escape_field_len(field, value->str, ESCAPE_SEQUENCE_ON);
 #endif
 				break;
-			default:
+			case ZBX_TYPE_INT:
+			case ZBX_TYPE_FLOAT:
+			case ZBX_TYPE_UINT:
+			case ZBX_TYPE_ID:
+			case ZBX_TYPE_SERIAL:
 				row[i] = *value;
 				break;
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
 		}
 	}
 
@@ -3146,6 +2808,7 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 			case ZBX_TYPE_SHORTTEXT:
 			case ZBX_TYPE_LONGTEXT:
 			case ZBX_TYPE_CUID:
+			case ZBX_TYPE_BLOB:
 				value->str = va_arg(args, char *);
 				break;
 			case ZBX_TYPE_INT:
@@ -3168,11 +2831,44 @@ void	zbx_db_insert_add_values(zbx_db_insert_t *self, ...)
 
 	va_end(args);
 
-	zbx_db_insert_add_values_dyn(self, (const zbx_db_value_t **)values.values, values.values_num);
+	zbx_db_insert_add_values_dyn(self, (zbx_db_value_t **)values.values, values.values_num);
 
 	zbx_vector_ptr_clear_ext(&values, zbx_ptr_free);
 	zbx_vector_ptr_destroy(&values);
 }
+
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: decodes Base64 encoded binary data and escapes it allowing it to  *
+ *          be used inside sql statement                                      *
+ *                                                                            *
+ * Parameters: sql_insert_data     - [IN/OUT] base64 encoded unescaped data   *
+ *                                                                            *
+ * Comment: input data is released from memory and replaced with pointer      *
+ *          to the output data.                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	decode_and_escape_binary_value_for_sql(char **sql_insert_data)
+{
+	size_t	binary_data_len;
+	char	*escaped_binary;
+
+	size_t	binary_data_max_len = strlen(*sql_insert_data) * 3 / 4 + 1;
+	char	*binary_data = (char*)zbx_malloc(NULL, binary_data_max_len);
+
+	zbx_base64_decode(*sql_insert_data, binary_data, binary_data_max_len, &binary_data_len);
+#if defined (HAVE_MYSQL)
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	zbx_mysql_escape_bin(binary_data, escaped_binary, binary_data_len);
+#elif defined (HAVE_POSTGRESQL)
+	zbx_postgresql_escape_bin(binary_data, &escaped_binary, binary_data_len);
+#endif
+	zbx_free(binary_data);
+	zbx_free(*sql_insert_data);
+	*sql_insert_data = escaped_binary;
+}
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3220,6 +2916,10 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 
 			values[self->autoincrement].ui64 = id++;
 		}
+
+		self->lastid = id - 1;
+		/* reset autoincrement so execute could be retried with the same ids */
+		self->autoincrement = -1;
 	}
 
 #ifndef HAVE_ORACLE
@@ -3344,7 +3044,7 @@ retry_oracle:
 #	endif
 		for (j = 0; j < self->fields.values_num; j++)
 		{
-			const zbx_db_value_t	*value = &values[j];
+			zbx_db_value_t	*value = &values[j];
 
 			field = (const zbx_db_field_t *)self->fields.values[j];
 
@@ -3358,6 +3058,16 @@ retry_oracle:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					break;
+				case ZBX_TYPE_BLOB:
+					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+					decode_and_escape_binary_value_for_sql(&(value->str));
+#elif defined(HAVE_ORACLE)
+					/* Oracle converts base64 to binary when it formats prepared statement */
+#endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
@@ -3446,6 +3156,16 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: return the last id assigned by autoincrement                      *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self)
+{
+	return self->lastid;
 }
 
 /******************************************************************************
@@ -3841,3 +3561,117 @@ char	*zbx_db_get_schema_esc(void)
 	return name;
 }
 #endif
+
+#if defined(HAVE_ORACLE)
+static int	validate_db_type_name(const int expected_type, const char *type_name,
+		const int type_precision, const int type_length)
+{
+#define COMPAT_TYPE_INT4_STR		"NUMBER"
+#define COMPAT_TYPE_INT8_STR		"NUMBER"
+#define COMPAT_TYPE_VARCHAR_STR		"NVARCHAR2"
+#define COMPAT_TYPE_FLOAT_STR		"BINARY_DOUBLE"
+#define COMPAT_TYPE_BLOB_STR		"BLOB"
+#define COMPAT_TYPE_TEXT_STR		"NCLOB"
+
+#define COMPAT_TYPE_INT4_LEN		10
+#define COMPAT_TYPE_INT8_LEN		20
+#define COMPAT_TYPE_FLOAT_LEN		8
+#define COMPAT_TYPE_SHORTTEXT_LEN	2000
+#define COMPAT_TYPE_TEXT_LEN		4000
+#define COMPAT_TYPE_CUID_LEN		75
+
+	switch(expected_type)
+	{
+		case ZBX_TYPE_UINT:
+		case ZBX_TYPE_ID:
+		case ZBX_TYPE_SERIAL:
+			if (0 == strcmp(COMPAT_TYPE_INT8_STR, type_name) && COMPAT_TYPE_INT8_LEN <= type_precision)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_INT:
+			if (0 == strcmp(COMPAT_TYPE_INT4_STR, type_name) && COMPAT_TYPE_INT4_LEN <= type_precision)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_FLOAT:
+			if (0 == strcmp(COMPAT_TYPE_FLOAT_STR, type_name) && COMPAT_TYPE_FLOAT_LEN <= type_length)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_BLOB:
+			if (0 == strcmp(COMPAT_TYPE_BLOB_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_TEXT:
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name) || COMPAT_TYPE_TEXT_LEN <= type_length)
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_SHORTTEXT:
+			if (COMPAT_TYPE_SHORTTEXT_LEN <= type_length)
+				return SUCCEED;
+			ZBX_FALLTHROUGH;
+		case ZBX_TYPE_CHAR:
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_LONGTEXT:
+			if (0 == strcmp(COMPAT_TYPE_TEXT_STR, type_name))
+				return SUCCEED;
+			break;
+		case ZBX_TYPE_CUID:
+			if (0 == strcmp(COMPAT_TYPE_VARCHAR_STR, type_name) && COMPAT_TYPE_CUID_LEN <= type_length)
+				return SUCCEED;
+			break;
+		default:
+			return FAIL;
+	}
+
+	return FAIL;
+
+#undef COMPAT_TYPE_INT4_STR
+#undef COMPAT_TYPE_INT8_STR
+#undef COMPAT_TYPE_VARCHAR_STR
+#undef COMPAT_TYPE_FLOAT_STR
+#undef COMPAT_TYPE_BLOB_STR
+#undef COMPAT_TYPE_TEXT_STR
+
+#undef COMPAT_TYPE_INT4_LEN
+#undef COMPAT_TYPE_INT8_LEN
+#undef COMPAT_TYPE_FLOAT_LEN
+#undef COMPAT_TYPE_SHORTTEXT_LEN
+#undef COMPAT_TYPE_TEXT_LEN
+#undef COMPAT_TYPE_CUID_LEN
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if the column of specific table in the database has        *
+ *              correct type                                                  *
+ *                                                                            *
+ * Return value: SUCCEED - Column has correct type                            *
+ *               FAIL    - Otherwise                                          *
+ ******************************************************************************/
+int	zbx_db_check_oracle_colum_type(const char *table_name, const char *column_name, int expected_type)
+{
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
+	int		ret = FAIL;
+
+	if (NULL == (result = zbx_db_select(
+			"select data_type,data_precision,data_length "
+				"from user_tab_columns "
+				"where lower(table_name)='%s' and lower(column_name)='%s'",
+			table_name, column_name)))
+	{
+		goto clean;
+	}
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		ret = validate_db_type_name(expected_type, row[0], NULL == row[1] ? 0 : atoi(row[1]),
+				NULL == row[2] ? 0 : atoi(row[2]));
+	}
+clean:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+#endif /* defined(HAVE_ORACLE) */

@@ -145,7 +145,7 @@ class testDashboardGeomapWidget extends CWebTest {
 		$this->assertEquals('Add widget', $dialog->getTitle());
 		$form->fill(['Type' => 'Geomap']);
 		$dialog->waitUntilReady();
-		$this->assertEquals(["Type", "Name", "Refresh interval", "Host groups", "Hosts", "Tags", "Initial view"],
+		$this->assertEquals(['Type', 'Show header', 'Name', 'Refresh interval', 'Host groups', 'Hosts', 'Tags', 'Initial view'],
 				$form->getLabels()->asText()
 		);
 		$form->checkValue(['id:show_header' => true, 'Refresh interval' => 'Default (1 minute)']);
@@ -177,10 +177,10 @@ class testDashboardGeomapWidget extends CWebTest {
 				"\nThe maximum zoom level is \"0\".".
 				"\nInitial view is ignored if the default view is set.";
 
-		$form->query('xpath:.//label[text()="Initial view"]/a')->one()->click();
+		$form->getLabel('Initial view')->query('xpath:./button[@data-hintbox]')->one()->click();
 		$hint = $this->query('xpath://div[@data-hintboxid]')->waitUntilPresent();
 		$this->assertEquals($hint_text, $hint->one()->getText());
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 	}
 

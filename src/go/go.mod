@@ -1,21 +1,21 @@
 module zabbix.com
 
-go 1.18
+go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20230123113819-fed2d1600b4d
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20230609120326-abfec67b29da
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/Microsoft/go-winio v0.6.0
 	github.com/chromedp/cdproto v0.0.0-20230220211738-2b1ec77315c9
 	github.com/chromedp/chromedp v0.8.7
 	github.com/dustin/gomemcached v0.0.0-20160817010731-a2284a01c143
-	github.com/eclipse/paho.mqtt.golang v1.4.1
+	github.com/eclipse/paho.mqtt.golang v1.4.2
 	github.com/fsnotify/fsnotify v1.5.4
 	github.com/go-ldap/ldap v3.0.3+incompatible
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goburrow/modbus v0.1.0
-	github.com/godbus/dbus v4.1.0+incompatible
+	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.34.0
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/mediocregopher/radix/v3 v3.8.1

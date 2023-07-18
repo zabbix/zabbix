@@ -591,6 +591,11 @@ msgstr "Atzītie PROBLEM notikumi"
 msgid "Acknowledged RESOLVED events"
 msgstr "Atzītie RESOLVED notikumi"
 
+#: app/partials/monitoring.problem.filter.php:142
+#: widgets/problems/views/widget.edit.php:103
+msgid "Acknowledgement status"
+msgstr ""
+
 #: app/controllers/CControllerAuditLogList.php:209
 #: app/partials/administration.usergroup.tagfilters.html.php:29
 #: app/partials/configuration.host.edit.html.php:144
@@ -1261,6 +1266,10 @@ msgstr "Atļaut sarakstu"
 msgid "Allow manual close"
 msgstr "Atļaut manuāli aizvērt"
 
+#: app/views/popup.discovery.check.php:125
+msgid "Allow redirect"
+msgstr ""
+
 #: app/views/popup.massupdate.item.php:382
 #: include/views/configuration.host.discovery.edit.php:723
 #: include/views/configuration.item.edit.php:945
@@ -1365,6 +1374,10 @@ msgstr "Un"
 msgid "And/Or"
 msgstr "Un/Vai"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "Ik gadu"
@@ -1439,6 +1452,19 @@ msgstr "Apr"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "Aprīlis"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -1605,6 +1631,10 @@ msgstr "Attiecinājums"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
+msgstr ""
+
+#: app/views/administration.geomaps.edit.php:86
+msgid "Attribution text"
 msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:179
@@ -1864,6 +1894,18 @@ msgstr "Pirms vērtības"
 msgid "Below value"
 msgstr "Zem vērtības"
 
+#: app/partials/configuration.filter.items.php:147
+#: app/views/popup.massupdate.item.php:159 include/items.inc.php:133
+#: include/views/configuration.item.edit.php:126
+#: include/views/configuration.item.prototype.edit.php:112
+msgid "Binary"
+msgstr ""
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1397
+#, c-format
+msgid "Binary item \"%1$s\" cannot be used in trigger"
+msgstr ""
+
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
 msgstr "Bind DN"
@@ -1968,6 +2010,11 @@ msgstr "Bulgāru (bg_BG)"
 #: report2.php:195
 msgid "By host"
 msgstr "Pēc resursdatora"
+
+#: app/partials/monitoring.problem.filter.php:154
+#: widgets/problems/includes/WidgetForm.php:136
+msgid "By me"
+msgstr ""
 
 #: report2.php:196
 msgid "By trigger template"
@@ -2437,6 +2484,11 @@ msgstr "Nevar izveidot atkarību no paša trigera prototipa."
 msgid "Cannot create discovery rule"
 msgstr "Nevar izveidot atklāšanas noteikumu"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Nevar izveidot ikonu karti"
@@ -2473,6 +2525,10 @@ msgstr "Nevar izveidot konfigurācijas failu."
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
 msgstr "Nevar izveidot lietotāja lomu"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
+msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
 msgid "Cannot delete API token"
@@ -2544,6 +2600,13 @@ msgstr[2] "Nevar izdzēst atklāšanas noteikumus"
 msgid "Cannot delete discovery rules"
 msgstr "Nevar izdzēst atklāšanas noteikumus"
 
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: graphs.php:279
 msgid "Cannot delete graph"
 msgstr "Grafiku nav iespējams izdzēst"
@@ -2598,6 +2661,13 @@ msgstr[2] "Nevar izdzēst iekārtu grupas %1$s, jo uzturēšanai \"%2$s\" ir jā
 #: app/controllers/CControllerTemplateGroupDelete.php:39
 msgid "Cannot delete host groups"
 msgstr "Nevar izdzēst iekārtu grupas"
+
+#: host_prototypes.php:293
+msgid "Cannot delete host prototype"
+msgid_plural "Cannot delete host prototypes"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2859,6 +2929,13 @@ msgstr[0] "Nevar atspējot atklāšanas noteikumu"
 msgstr[1] "Nevar atspējot atklāšanas noteikumus"
 msgstr[2] "Nevar atspējot atklāšanas noteikumus"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2969,6 +3046,13 @@ msgstr[0] "Nevar iespējot atklāšanas noteikumu"
 msgstr[1] "Nevar iespējot atklāšanas noteikumus"
 msgstr[2] "Nevar iespējot atklāšanas noteikumus"
 
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
 msgid "Cannot enable host"
@@ -3047,6 +3131,16 @@ msgstr "Nevar izpildīt skriptu."
 #: jsLoader.php:287
 msgid "Cannot expand macros."
 msgstr "Nevar izvērst makro."
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:217
+#, c-format
+msgid "Cannot find SLA \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:241
+#, c-format
+msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3156,9 +3250,24 @@ msgstr ""
 msgid "Cannot find item \"%1$s\" used in dashboard \"%2$s\"."
 msgstr ""
 
+#: include/classes/import/importers/CTemplateDashboardImporter.php:193
+#, c-format
+msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
 msgid "Cannot find map \"%1$s\" used in map \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:253
+#, c-format
+msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:205
+#, c-format
+msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
 msgstr ""
 
 #: include/classes/import/CConfigurationImport.php:1234
@@ -3175,6 +3284,11 @@ msgstr ""
 #: include/classes/import/importers/CMapImporter.php:229
 #, c-format
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
+msgstr ""
+
+#: include/classes/import/importers/CTemplateDashboardImporter.php:229
+#, c-format
+msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
 msgstr ""
 
 #: include/classes/api/services/CUser.php:1510
@@ -3437,6 +3551,11 @@ msgstr ""
 msgid "Cannot link template \"%1$s\" to host \"%2$s\" due to expression of trigger \"%3$s\"."
 msgstr ""
 
+#: include/classes/api/services/CHostBase.php:806
+#, c-format
+msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:644
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because its parent template \"%3$s\" would be linked twice."
@@ -3456,6 +3575,11 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:802
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\" due to expression of trigger \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:803
+#, c-format
+msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:641
@@ -3487,6 +3611,41 @@ msgstr ""
 #: include/classes/api/services/CHostBase.php:502
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because a circular linkage (%3$s) would occur."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:976
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:973
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:970
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:800
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1003
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:1000
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:997
+#, c-format
+msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
 msgstr ""
 
 #: include/classes/api/services/CHostBase.php:638
@@ -3906,6 +4065,11 @@ msgstr[0] "Nevar atjaunināt notikumu"
 msgstr[1] "Nevar atjaunināt notikumus"
 msgstr[2] "Nevar atjaunināt notikumus"
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr ""
@@ -4140,6 +4304,10 @@ msgstr "Nevar atjaunināt lietotāju lomu"
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Nevar atjaunināt tīmekļa scenāriju"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -4447,6 +4615,15 @@ msgstr "Pulksteņa tips"
 msgid "Clone"
 msgstr "Klonēt"
 
+#: app/views/configuration.host.edit.php:61
+#: app/views/js/popup.host.edit.js.php:45 host_prototypes.php:177
+msgid "Cloned host parameter values have been modified."
+msgstr ""
+
+#: templates.php:195
+msgid "Cloned template parameter values have been modified."
+msgstr ""
+
 #: app/views/popup.import.compare.php:162 app/views/popup.token.view.php:86
 #: include/func.inc.php:1723 include/views/js/monitoring.sysmaps.js.php:339
 #: include/views/js/monitoring.sysmaps.js.php:498
@@ -4513,6 +4690,10 @@ msgstr "Krāsa \"%1$s\" nav pareiza: tiek gaidīts heksadecimālais krāsas kods
 #: include/views/js/monitoring.sysmaps.js.php:809
 msgid "Color (OK)"
 msgstr "Krāsa (OK)"
+
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
@@ -5198,6 +5379,10 @@ msgstr ""
 msgid "Count of matched lines in log file monitoring. Returns integer"
 msgstr ""
 
+#: include/classes/data/CItemData.php:1808
+msgid "Count of network checks enqueued in the discovery queue."
+msgstr ""
+
 #: include/classes/data/CItemData.php:1802
 msgid "Count of values enqueued in the connector queue."
 msgstr ""
@@ -5292,6 +5477,10 @@ msgstr "Izveidot atklāšanas noteikumu (vispirms izvēlieties veidni)"
 msgid "Create enabled"
 msgstr "Izveidot iespējotu"
 
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
 msgstr "Izveidot grafiku"
@@ -5321,6 +5510,14 @@ msgstr "Izveidot iekārtu grupu"
 #: include/views/configuration.host.prototype.list.php:36
 msgid "Create host prototype"
 msgstr "Izveidot iekārtu prototipu"
+
+#: include/views/configuration.host.prototype.list.php:205
+msgid "Create hosts from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.host.prototype.list.php:199
+msgid "Create hosts from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.host.prototype.list.php:197
 msgid "Create hosts from selected prototypes as disabled?"
@@ -5353,6 +5550,14 @@ msgstr "Izveidot vienumu (vispirms izvēlieties veidni)"
 #: include/views/configuration.item.prototype.list.php:36
 msgid "Create item prototype"
 msgstr "Izveidot veidni"
+
+#: include/views/configuration.item.prototype.list.php:213
+msgid "Create items from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.item.prototype.list.php:207
+msgid "Create items from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototypes as disabled?"
@@ -5418,6 +5623,14 @@ msgstr "Izveidot trigeri (vispirms izvēlieties veidni)"
 #: include/views/configuration.trigger.prototype.list.php:36
 msgid "Create trigger prototype"
 msgstr "Izveidot trigera prototipu"
+
+#: include/views/configuration.trigger.prototype.list.php:212
+msgid "Create triggers from selected prototype as disabled?"
+msgstr ""
+
+#: include/views/configuration.trigger.prototype.list.php:206
+msgid "Create triggers from selected prototype as enabled?"
+msgstr ""
 
 #: include/views/configuration.trigger.prototype.list.php:205
 msgid "Create triggers from selected prototypes as disabled?"
@@ -6063,6 +6276,10 @@ msgstr "Vai dzēst visus elementus, kas nav iekļauti importēšanas failā?"
 msgid "Delete and clear"
 msgstr "Dzēst un notīrīt"
 
+#: include/views/configuration.template.list.php:320
+msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
+msgstr ""
+
 #: include/views/configuration.template.list.php:294
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Vai dzēst un notīrīt atlasītās veidnes? (Brīdinājums: visas saistītās iekārtas tiks notīrītas!)"
@@ -6088,6 +6305,10 @@ msgstr "Vai dzēst informācijas paneli?"
 msgid "Delete discovery rule?"
 msgstr "Vai dzēst atklāšanas noteikumu?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6103,9 +6324,17 @@ msgstr "Vai dzēst grafika prototipu?"
 msgid "Delete graph?"
 msgstr "Dzēst grafiku?"
 
+#: include/views/configuration.item.list.php:318
+msgid "Delete history of selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:302
 msgid "Delete history of selected items?"
 msgstr "Vai dzēst atlasīto vienumu vēsturi?"
+
+#: include/views/configuration.httpconf.list.php:238
+msgid "Delete history of selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:222
 msgid "Delete history of selected web scenarios?"
@@ -6179,14 +6408,28 @@ msgstr ""
 msgid "Delete selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:159
+msgid "Delete selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:150
 msgid "Delete selected correlations?"
 msgstr "Vai dzēst atlasītās korelācijas?"
 
 #: app/views/configuration.dashboard.list.php:68
 #: app/views/monitoring.dashboard.list.php:125
+msgid "Delete selected dashboard?"
+msgstr ""
+
+#: app/views/configuration.dashboard.list.php:68
+#: app/views/monitoring.dashboard.list.php:125
 msgid "Delete selected dashboards?"
 msgstr "Vai dzēst atlasītos informācijas paneļus?"
+
+#: app/views/js/configuration.discovery.list.js.php:124
+#: include/views/configuration.host.discovery.list.php:369
+msgid "Delete selected discovery rule?"
+msgstr ""
 
 #: app/views/configuration.discovery.list.php:123
 #: include/views/configuration.host.discovery.list.php:337
@@ -6197,9 +6440,25 @@ msgstr "Vai dzēst atlasītos atklāšanas noteikumus?"
 msgid "Delete selected elements?"
 msgstr "Vai dzēst iezīmētos elementus?"
 
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
+
+#: include/views/configuration.graph.list.php:269
+msgid "Delete selected graph prototype?"
+msgstr ""
+
 #: include/views/configuration.graph.list.php:251
 msgid "Delete selected graph prototypes?"
 msgstr "Vai dzēst atlasītos grafiku prototipus?"
+
+#: include/views/configuration.graph.list.php:270
+msgid "Delete selected graph?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:252
 msgid "Delete selected graphs?"
@@ -6244,8 +6503,16 @@ msgstr ""
 msgid "Delete selected image?"
 msgstr "Vai dzēst iezīmēto attēlu?"
 
+#: include/views/configuration.item.prototype.list.php:232
+msgid "Delete selected item prototype?"
+msgstr ""
+
 #: include/views/configuration.item.prototype.list.php:220
 msgid "Delete selected item prototypes?"
+msgstr ""
+
+#: include/views/configuration.item.list.php:361
+msgid "Delete selected item?"
 msgstr ""
 
 #: include/views/configuration.item.list.php:329
@@ -6268,6 +6535,10 @@ msgstr ""
 msgid "Delete selected maps?"
 msgstr "Vai dzēst iezīmētās kartes?"
 
+#: app/views/administration.mediatype.list.php:217
+msgid "Delete selected media type?"
+msgstr ""
+
 #: app/views/administration.mediatype.list.php:191
 msgid "Delete selected media types?"
 msgstr ""
@@ -6278,6 +6549,10 @@ msgstr ""
 
 #: app/views/js/proxy.list.js.php:152 app/views/popup.proxy.edit.php:249
 msgid "Delete selected proxy?"
+msgstr ""
+
+#: app/views/administration.regex.list.php:83
+msgid "Delete selected regular expression?"
 msgstr ""
 
 #: app/views/administration.regex.list.php:82
@@ -6298,6 +6573,10 @@ msgstr ""
 
 #: app/views/reports.scheduledreport.list.php:96
 msgid "Delete selected scheduled reports?"
+msgstr ""
+
+#: app/views/administration.script.list.php:224
+msgid "Delete selected script?"
 msgstr ""
 
 #: app/views/administration.script.list.php:203
@@ -6326,6 +6605,10 @@ msgstr "Vai dzēst atlasīto veidņu grupu?"
 msgid "Delete selected template groups?"
 msgstr "Vai dzēst atlasītās veidņu grupas?"
 
+#: include/views/configuration.template.list.php:313
+msgid "Delete selected template?"
+msgstr ""
+
 #: include/views/configuration.template.list.php:292
 msgid "Delete selected templates?"
 msgstr "Vai dzēst atlasītās veidnes?"
@@ -6340,8 +6623,16 @@ msgstr ""
 msgid "Delete selected tokens?"
 msgstr ""
 
+#: include/views/configuration.trigger.prototype.list.php:231
+msgid "Delete selected trigger prototype?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.list.php:219
 msgid "Delete selected trigger prototypes?"
+msgstr ""
+
+#: include/views/configuration.triggers.list.php:393
+msgid "Delete selected trigger?"
 msgstr ""
 
 #: include/views/configuration.triggers.list.php:359
@@ -6355,6 +6646,10 @@ msgstr "Izdzēst atlasīto lietotāju?"
 #: app/views/administration.user.list.php:251
 msgid "Delete selected users?"
 msgstr "Vai dzēst atlasītos lietotājus?"
+
+#: include/views/configuration.httpconf.list.php:248
+msgid "Delete selected web scenario?"
+msgstr ""
 
 #: include/views/configuration.httpconf.list.php:228
 msgid "Delete selected web scenarios?"
@@ -6482,6 +6777,10 @@ msgstr ""
 msgid "Description"
 msgstr "Apraksts"
 
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr ""
@@ -6564,6 +6863,10 @@ msgstr "Atspējot"
 msgid "Disable debug mode"
 msgstr ""
 
+#: app/views/administration.usergroup.list.php:249
+msgid "Disable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:232
 msgid "Disable debug mode in selected groups?"
 msgstr "Atspējot atkļūdošanas režīmu iezīmētajās grupās?"
@@ -6591,6 +6894,11 @@ msgstr ""
 
 #: app/views/js/proxy.list.js.php:137
 msgid "Disable hosts monitored by selected proxy?"
+msgstr ""
+
+#: app/views/administration.token.list.php:211
+#: app/views/administration.user.token.list.php:164
+msgid "Disable selected API token?"
 msgstr ""
 
 #: app/views/administration.token.list.php:199
@@ -6622,8 +6930,17 @@ msgstr ""
 msgid "Disable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:153
+msgid "Disable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:149
 msgid "Disable selected correlations?"
+msgstr ""
+
+#: app/views/js/configuration.discovery.list.js.php:108
+#: include/views/configuration.host.discovery.list.php:348
+msgid "Disable selected discovery rule?"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:122
@@ -6631,16 +6948,40 @@ msgstr ""
 msgid "Disable selected discovery rules?"
 msgstr "Vai atspējot atlasītos atklāšanas noteikumus?"
 
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
+
+#: app/views/administration.usergroup.list.php:229
+msgid "Disable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:220
 msgid "Disable selected groups?"
+msgstr ""
+
+#: app/views/configuration.host.list.php:534
+msgid "Disable selected host?"
 msgstr ""
 
 #: app/views/configuration.host.list.php:507
 msgid "Disable selected hosts?"
 msgstr ""
 
+#: include/views/configuration.item.list.php:309
+msgid "Disable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:296
 msgid "Disable selected items?"
+msgstr ""
+
+#: app/views/administration.mediatype.list.php:203
+msgid "Disable selected media type?"
 msgstr ""
 
 #: app/views/administration.mediatype.list.php:182
@@ -6655,12 +6996,24 @@ msgstr ""
 msgid "Disable selected modules?"
 msgstr ""
 
+#: app/views/reports.scheduledreport.list.php:96
+msgid "Disable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:91
 msgid "Disable selected scheduled reports?"
 msgstr ""
 
+#: include/views/configuration.triggers.list.php:368
+msgid "Disable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:346
 msgid "Disable selected triggers?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:228
+msgid "Disable selected web scenario?"
 msgstr ""
 
 #: include/views/configuration.httpconf.list.php:215
@@ -7402,6 +7755,10 @@ msgstr "Iespējot apstiprinājumu"
 msgid "Enable debug mode"
 msgstr "Iespējot atkļūdošanas režīmu"
 
+#: app/views/administration.usergroup.list.php:239
+msgid "Enable debug mode in selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:226
 msgid "Enable debug mode in selected groups?"
 msgstr "Iespējot atkļūdošanas režīmu iezīmētajās grupās?"
@@ -7444,6 +7801,11 @@ msgstr ""
 msgid "Enable internal housekeeping"
 msgstr ""
 
+#: app/views/administration.token.list.php:205
+#: app/views/administration.user.token.list.php:158
+msgid "Enable selected API token?"
+msgstr ""
+
 #: app/views/administration.token.list.php:198
 #: app/views/administration.user.token.list.php:150
 msgid "Enable selected API tokens?"
@@ -7473,8 +7835,17 @@ msgstr ""
 msgid "Enable selected connectors?"
 msgstr ""
 
+#: app/views/configuration.correlation.list.php:147
+msgid "Enable selected correlation?"
+msgstr ""
+
 #: app/views/configuration.correlation.list.php:148
 msgid "Enable selected correlations?"
+msgstr ""
+
+#: app/views/js/configuration.discovery.list.js.php:92
+#: include/views/configuration.host.discovery.list.php:342
+msgid "Enable selected discovery rule?"
 msgstr ""
 
 #: app/views/configuration.discovery.list.php:121
@@ -7482,8 +7853,24 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr ""
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
+#: app/views/administration.usergroup.list.php:219
+msgid "Enable selected group?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:214
 msgid "Enable selected groups?"
+msgstr ""
+
+#: app/views/configuration.host.list.php:526
+msgid "Enable selected host?"
 msgstr ""
 
 #: app/views/configuration.host.list.php:500
@@ -7491,8 +7878,16 @@ msgstr ""
 msgid "Enable selected hosts?"
 msgstr ""
 
+#: include/views/configuration.item.list.php:303
+msgid "Enable selected item?"
+msgstr ""
+
 #: include/views/configuration.item.list.php:295
 msgid "Enable selected items?"
+msgstr ""
+
+#: app/views/administration.mediatype.list.php:197
+msgid "Enable selected media type?"
 msgstr ""
 
 #: app/views/administration.mediatype.list.php:181
@@ -7507,12 +7902,24 @@ msgstr ""
 msgid "Enable selected modules?"
 msgstr ""
 
+#: app/views/reports.scheduledreport.list.php:89
+msgid "Enable selected scheduled report?"
+msgstr ""
+
 #: app/views/reports.scheduledreport.list.php:86
 msgid "Enable selected scheduled reports?"
 msgstr ""
 
+#: include/views/configuration.triggers.list.php:362
+msgid "Enable selected trigger?"
+msgstr ""
+
 #: include/views/configuration.triggers.list.php:345
 msgid "Enable selected triggers?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:222
+msgid "Enable selected web scenario?"
 msgstr ""
 
 #: include/views/configuration.httpconf.list.php:214
@@ -7714,10 +8121,48 @@ msgstr "Notikums atzīts"
 msgid "Event correlation"
 msgstr ""
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
 msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
@@ -8440,6 +8885,10 @@ msgstr "GUI"
 #: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI pieeja liegta."
+
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
@@ -9342,6 +9791,11 @@ msgstr ""
 
 #: include/views/monitoring.sysmap.edit.php:180
 msgid "Host label type"
+msgstr ""
+
+#: widgets/dataover/includes/WidgetForm.php:64
+#: widgets/trigover/includes/WidgetForm.php:71
+msgid "Host location"
 msgstr ""
 
 #: app/partials/configuration.host.edit.html.php:341
@@ -12006,6 +12460,10 @@ msgstr ""
 msgid "LLD macros"
 msgstr ""
 
+#: include/classes/api/services/CItemGeneralOld.php:700
+msgid "LLD rule with the same UUID already exists"
+msgstr ""
+
 #: app/partials/popup.operations.php:257
 #: app/views/configuration.correlation.edit.php:59
 #: app/views/popup.lldoverride.php:101 include/maps.inc.php:45
@@ -12946,6 +13404,10 @@ msgstr ""
 msgid "Max zoom level"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:83
+msgid "Maximum concurrent checks"
+msgstr ""
+
 #: include/classes/data/CItemData.php:874
 msgid "Maximum number of opened files supported by OS. Returns integer"
 msgstr ""
@@ -13740,6 +14202,11 @@ msgstr ""
 msgid "Navigate to initial view"
 msgstr ""
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr ""
@@ -13838,9 +14305,18 @@ msgstr ""
 msgid "New dashboard"
 msgstr ""
 
+#: app/views/configuration.discovery.edit.php:234
+#: app/views/configuration.discovery.edit.php:275
+msgid "New discovery rule"
+msgstr ""
+
 #: jsLoader.php:280
 msgid "New element"
 msgstr "Jauns elements"
+
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
 
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
@@ -13874,6 +14350,10 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr ""
@@ -13890,8 +14370,17 @@ msgstr ""
 msgid "New regular expression"
 msgstr ""
 
+#: app/views/administration.script.edit.php:372
+#: app/views/administration.script.edit.php:412
+msgid "New script"
+msgstr ""
+
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
+msgstr ""
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
 msgstr ""
 
 #: app/views/popup.condition.common.php:120
@@ -16260,6 +16749,10 @@ msgstr ""
 msgid "Provision now"
 msgstr ""
 
+#: app/views/administration.user.list.php:304
+msgid "Provision selected LDAP user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:303
 msgid "Provision selected LDAP users?"
 msgstr ""
@@ -17093,6 +17586,17 @@ msgstr ""
 msgid "Resolved by correlation rule."
 msgstr ""
 
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
+
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
@@ -17236,6 +17740,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
 msgstr ""
 
 #: include/classes/data/CItemData.php:850
@@ -17686,6 +18194,15 @@ msgstr "Saglabāt izmaiņas"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Saglabāt to kā \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18385,6 +18902,15 @@ msgstr ""
 msgid "Show"
 msgstr "Parādīt"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
+#: widgets/hostavail/includes/WidgetForm.php:61
+#: widgets/web/includes/WidgetForm.php:65
+msgid "Show data in maintenance"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:182
 #: app/partials/monitoring.problem.filter.php:277
 msgid "Show details"
@@ -18398,6 +18924,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormHostAvail.php:62
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
@@ -18490,6 +19020,10 @@ msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:110
@@ -18789,6 +19323,10 @@ msgstr ""
 msgid "State"
 msgstr ""
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -18797,6 +19335,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
@@ -19700,6 +20242,10 @@ msgstr ""
 msgid "The graph is not discovered anymore and will be deleted the next time discovery rule is processed."
 msgstr ""
 
+#: app/controllers/CControllerHostEdit.php:283 host_prototypes.php:171
+msgid "The host being cloned belongs to a host group you don't have write permissions to. Non-writable group has been removed from the new host."
+msgstr ""
+
 #: include/html.inc.php:637
 #, c-format
 msgid "The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
@@ -19763,6 +20309,10 @@ msgstr ""
 
 #: include/classes/core/CJsonRpc.php:182
 msgid "The requested remote-procedure does not exist / is not available"
+msgstr ""
+
+#: templates.php:181
+msgid "The template being cloned belongs to a template group you don't have write permissions to. Non-writable group has been removed from the new template."
 msgstr ""
 
 #: app/views/popup.token.view.php:64
@@ -20786,6 +21336,10 @@ msgstr ""
 msgid "Unblock"
 msgstr ""
 
+#: app/views/administration.user.list.php:310
+msgid "Unblock selected user?"
+msgstr ""
+
 #: app/views/administration.user.list.php:250
 msgid "Unblock selected users?"
 msgstr "Vai atbloķēt iezīmētos lietotājus?"
@@ -20834,6 +21388,10 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:717
 msgid "Units"
 msgstr "Vienības"
+
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
@@ -22385,6 +22943,10 @@ msgstr ""
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr ""
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr ""
@@ -22453,6 +23015,10 @@ msgstr ""
 
 #: include/actions.inc.php:352
 msgid "Value of tag"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
 msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
@@ -23191,6 +23757,10 @@ msgstr "Zabbix aģents"
 msgid "Zabbix agent (active)"
 msgstr "Zabbix aģents (aktīvs)"
 
+#: app/partials/administration.system.info.php:45
+msgid "Zabbix frontend version"
+msgstr ""
+
 #: include/validate.inc.php:361
 msgid "Zabbix has received an incorrect request."
 msgstr "Zabbix saņēma nepareizi pieprasījumu."
@@ -23249,6 +23819,10 @@ msgstr "Zabbix serveris darbojas"
 #: include/classes/setup/CSetupWizard.php:747
 msgid "Zabbix server name"
 msgstr "Zabbix servera vārds"
+
+#: app/partials/administration.system.info.php:40
+msgid "Zabbix server version"
+msgstr ""
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
@@ -23442,6 +24016,13 @@ msgstr "visi"
 msgid "all media"
 msgstr ""
 
+#: app/views/js/configuration.discovery.edit.js.php:390
+#: include/classes/screens/CScreenDiscovery.php:104
+#: include/classes/screens/CScreenDiscovery.php:207
+#: include/discovery.inc.php:84
+msgid "allow redirect"
+msgstr ""
+
 #: include/classes/api/services/CItemGeneral.php:1877
 msgid "allowed count of dependency levels would be exceeded"
 msgstr ""
@@ -23593,6 +24174,10 @@ msgstr ""
 msgid "atan2() - The arctangent of the ordinate (exprue) and abscissa coordinates specified as an angle, expressed in radians"
 msgstr ""
 
+#: app/controllers/CControllerPopupTriggerExpr.php:367
+msgid "atan2() - The arctangent of the ordinate (value) and abscissa coordinates specified as an angle, expressed in radians"
+msgstr ""
+
 #: include/events.inc.php:63
 msgid "autoregistered host"
 msgstr ""
@@ -23626,6 +24211,19 @@ msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:387
 msgid "between() - Checks if a value belongs to the given range (1 - in range, 0 - otherwise)"
+msgstr ""
+
+#: app/partials/monitoring.latest.view.html.php:149
+#: include/classes/screens/CScreenHistory.php:309
+#: include/classes/screens/CScreenHistory.php:432
+#: include/classes/screens/CScreenHistory.php:518
+#: include/classes/screens/CScreenProblem.php:1794
+#: include/classes/screens/CScreenProblem.php:1818 include/items.inc.php:1352
+#: include/items.inc.php:1445 widgets/item/actions/WidgetView.php:210
+#: widgets/plaintext/actions/WidgetView.php:98
+#: widgets/tophosts/views/widget.view.php:105
+#: widgets/tophosts/views/widget.view.php:106
+msgid "binary value"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:405
@@ -24158,6 +24756,14 @@ msgctxt "item_form"
 msgid "global housekeeping settings"
 msgstr ""
 
+#: include/classes/api/services/CGraphGeneral.php:874
+msgid "graph prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CGraphGeneral.php:868
+msgid "graph with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.usergroupmapping.edit.php:82
 #, c-format
 msgid "group name must match %1$s group name"
@@ -24181,6 +24787,10 @@ msgstr ""
 #: include/classes/api/services/CMap.php:849
 #: include/classes/api/services/CMap.php:1317
 msgid "host group"
+msgstr ""
+
+#: include/classes/api/services/CHostGroup.php:795
+msgid "host group with the same UUID already exists"
 msgstr ""
 
 #: include/classes/widgets/CWidgetHelper.php:799
@@ -24422,6 +25032,14 @@ msgstr ""
 #: include/classes/widgets/CWidgetHelper.php:819
 #: include/classes/widgets/CWidgetHelper.php:1175
 msgid "item pattern"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:486
+msgid "item prototype with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CItemGeneral.php:480
+msgid "item with the same UUID already exists"
 msgstr ""
 
 #: include/classes/parsers/CItemKey.php:54
@@ -25067,6 +25685,10 @@ msgstr ""
 msgid "service"
 msgstr ""
 
+#: include/classes/api/services/CService.php:1411
+msgid "service with the same UUID already exists"
+msgstr ""
+
 #: app/views/popup.sla.excludeddowntime.edit.php:44
 msgid "short description"
 msgstr "īss apraksts"
@@ -25193,6 +25815,18 @@ msgstr ""
 #, c-format
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "veidne ID \"%1$s\" ir nodota %2$s reizes"
+
+#: include/classes/api/services/CTemplateDashboard.php:394
+msgid "template dashboard with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplateGroup.php:594
+msgid "template group with the same UUID already exists"
+msgstr ""
+
+#: include/classes/api/services/CTemplate.php:458
+msgid "template with the same UUID already exists"
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:1577
 #: include/classes/api/services/CItemGeneral.php:1594
@@ -25325,8 +25959,16 @@ msgstr ""
 msgid "trigger prototype cannot be moved to another template or host"
 msgstr ""
 
+#: include/classes/api/services/CTriggerGeneral.php:686
+msgid "trigger prototype with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CTriggerGeneral.php:1888
 msgid "trigger with linkages cannot be moved to another template or host"
+msgstr ""
+
+#: include/classes/api/services/CTriggerGeneral.php:680
+msgid "trigger with the same UUID already exists"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1138
@@ -25558,6 +26200,10 @@ msgstr ""
 msgid "value is too long"
 msgstr ""
 
+#: include/classes/api/services/CValueMap.php:501
+msgid "value map with the same UUID already exists"
+msgstr ""
+
 #: include/classes/api/services/CReport.php:207
 #: include/classes/api/services/CReport.php:603
 #: include/classes/validators/CApiInputValidator.php:579
@@ -25587,6 +26233,11 @@ msgid_plural "value must be empty or one of %1$s"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format
@@ -25662,6 +26313,10 @@ msgstr "caur"
 #: include/func.inc.php:659
 msgctxt "week short"
 msgid "w"
+msgstr ""
+
+#: include/classes/api/services/CHttpTest.php:440
+msgid "web scenario with the same UUID already exists"
 msgstr ""
 
 #: app/views/popup.usergroupmapping.edit.php:83

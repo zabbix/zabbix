@@ -24,11 +24,12 @@
 #include "zbxshmem.h"
 #include "zbxcachehistory.h"
 #include "zbxconnector.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxmutexs.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxpreproc.h"
+#include "zbxproxybuffer.h"
 
 #define ZBX_DIAG_SECTION_MAX	64
 #define ZBX_DIAG_FIELD_MAX	64
@@ -554,13 +555,13 @@ void	zbx_diag_add_locks_info(struct zbx_json *json)
 				"ZBX_MUTEX_CACHE_IDS", "ZBX_MUTEX_SELFMON", "ZBX_MUTEX_CPUSTATS", "ZBX_MUTEX_DISKSTATS",
 				"ZBX_MUTEX_VALUECACHE", "ZBX_MUTEX_VMWARE", "ZBX_MUTEX_SQLITE3",
 				"ZBX_MUTEX_PROCSTAT", "ZBX_MUTEX_PROXY_HISTORY", "ZBX_MUTEX_KSTAT", "ZBX_MUTEX_MODBUS",
-				"ZBX_MUTEX_TREND_FUNC"};
+				"ZBX_MUTEX_TREND_FUNC", "ZBX_MUTEX_REMOTE_COMMANDS", "ZBX_MUTEX_PROXY_BUFFER"};
 #else
 	const char	*names[ZBX_MUTEX_COUNT] = {"ZBX_MUTEX_LOG", "ZBX_MUTEX_CACHE", "ZBX_MUTEX_TRENDS",
 				"ZBX_MUTEX_CACHE_IDS", "ZBX_MUTEX_SELFMON", "ZBX_MUTEX_CPUSTATS", "ZBX_MUTEX_DISKSTATS",
 				"ZBX_MUTEX_VALUECACHE", "ZBX_MUTEX_VMWARE", "ZBX_MUTEX_SQLITE3",
 				"ZBX_MUTEX_PROCSTAT", "ZBX_MUTEX_PROXY_HISTORY", "ZBX_MUTEX_MODBUS",
-				"ZBX_MUTEX_TREND_FUNC"};
+				"ZBX_MUTEX_TREND_FUNC", "ZBX_MUTEX_REMOTE_COMMANDS", "ZBX_MUTEX_PROXY_BUFFER"};
 #endif
 	zbx_json_addarray(json, ZBX_DIAG_LOCKS);
 
@@ -686,6 +687,10 @@ static void	diag_prepare_default_request(struct zbx_json *j, unsigned int flags)
 
 	if (0 != (flags & (1 << ZBX_DIAGINFO_CONNECTOR)))
 		diag_add_section_request(j, ZBX_DIAG_CONNECTOR, "values", NULL);
+
+	if (0 != (flags & (1 << ZBX_DIAGINFO_PROXYBUFFER)))
+		diag_add_section_request(j, ZBX_DIAG_PROXYBUFFER, NULL);
+
 }
 
 /******************************************************************************
@@ -946,6 +951,25 @@ static void	diag_log_connector(struct zbx_json_parse *jp, char **out, size_t *ou
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: log history cache diagnostic information                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	diag_log_proxybuffer(struct zbx_json_parse *jp, char **out, size_t *out_alloc, size_t *out_offset)
+{
+	char	*msg = NULL;
+	size_t	msg_alloc = 0, msg_offset = 0;
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "== proxy buffer diagnostic information ==");
+
+	diag_log_memory_info(jp, "memory", "$.memory", &msg, &msg_alloc, &msg_offset);
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "%s", msg);
+	zbx_free(msg);
+
+	zbx_strlog_alloc(LOG_LEVEL_INFORMATION, out, out_alloc, out_offset, "==");
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: log diagnostic information                                        *
  *                                                                            *
  * Parameters: flags - [IN] flags describing section to log                   *
@@ -1008,6 +1032,8 @@ void	zbx_diag_log_info(unsigned int flags, char **result)
 			}
 			else if (0 == strcmp(section, ZBX_DIAG_CONNECTOR))
 				diag_log_connector(&jp_section, result, &result_alloc, &result_offset);
+			else if (0 == strcmp(section, ZBX_DIAG_PROXYBUFFER))
+				diag_log_proxybuffer(&jp_section, result, &result_alloc, &result_offset);
 		}
 	}
 	else

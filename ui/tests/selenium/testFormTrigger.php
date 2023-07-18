@@ -223,7 +223,7 @@ class testFormTrigger extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestTextPresent('Trigger');
+		$this->assertEquals('Trigger', $this->query('id:triggers-form')->asForm()->waitUntilVisible()->one()->getSelectedTab());
 
 		if (isset($data['templatedHost'])) {
 			$this->zbxTestTextPresent('Parent triggers');
@@ -303,7 +303,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$this->zbxTestAssertVisibleId('comments');
 		$this->zbxTestAssertAttribute("//textarea[@id='comments']", 'rows', 7);
 
-		$form = $this->query('id:triggers-form')->asForm()->one();
+		$form = $this->query('id:triggers-form')->asForm(['normalized' => true])->one();
 		$entry_name = $form->getField('Menu entry name');
 
 		foreach (['placeholder' => 'Trigger URL', 'maxlength' => 64] as $attribute => $value) {
@@ -311,7 +311,7 @@ class testFormTrigger extends CLegacyWebTest {
 		}
 
 		// Check hintbox.
-		$this->query('class:icon-help-hint')->one()->click();
+		$this->query('class:zi-help-filled-small')->one()->click();
 		$hint = $form->query('xpath:.//div[@class="hint-box"]')->waitUntilPresent()->one();
 
 		// Assert text.
@@ -938,14 +938,16 @@ class testFormTrigger extends CLegacyWebTest {
 				}
 				if (isset($constructor['elementError'])) {
 					$count = CTestArrayHelper::get($constructor, 'element_count', 1);
-					$this->assertEquals($count, $this->query('xpath://a[@class="icon-info status-red"]')->all()->count());
+					$this->assertEquals($count,
+							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
+					);
 					$text = $this->query('xpath://tr[1]//div[@class="hint-box"]')->one()->getText();
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
 				}
 				else {
-					$this->zbxTestAssertElementNotPresentXpath('//a[@class="icon-info status-red"]');
+					$this->zbxTestAssertElementNotPresentXpath('//button['.CXPathHelper::fromClass('zi-i-negative').']');
 				}
 			}
 		}
@@ -1023,10 +1025,11 @@ class testFormTrigger extends CLegacyWebTest {
 	* @param string    $name    name of a host or template where triggers are opened
 	*/
 	private function filterEntriesAndOpenTriggers($name, $form) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-			->getColumn('Triggers')->query('link:Triggers')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Triggers')->query('link:Triggers')->one()->click();
 	}
 }

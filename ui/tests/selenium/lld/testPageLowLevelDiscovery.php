@@ -56,8 +56,16 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 		// Check filter collapse/expand.
 		foreach (['true', 'false'] as $status) {
+			$filter_space = $this->query('xpath://div['.CXPathHelper::fromClass('filter-space').']')->one();
 			$filter_tab = $this->query('xpath://a[contains(@class, "filter-trigger")]')->one();
 			$filter_tab->parents('xpath:/li[@aria-expanded="'.$status.'"]')->one()->click();
+
+			if ($status === 'true') {
+				$filter_space->query('id:tab_0')->one()->waitUntilNotVisible();
+			}
+			else {
+				$filter_space->query('id:tab_0')->one()->waitUntilVisible();
+			}
 		}
 
 		// Check all dropdowns.
@@ -287,7 +295,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Template groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 85
+					'rows' => 86
 				]
 			],
 			[
@@ -423,15 +431,15 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'I1-lvl1-agent-num: DR3-I1-dep-agent',
 						'I2-lvl1-trap-num: DR4-I2-dep-trap',
 						'Last error message of scenario "Web scenario for execute now".: DR5-web-dep',
-						'Zabbix server health: Zabbix stats cluster: High availability cluster node discovery',
+						'Zabbix server health: Zabbix server: Zabbix stats cluster: High availability cluster node discovery',
 						'LLD for Discovered host tests',
 						'LLD for host group test',
-						'Linux by Zabbix agent: Get filesystems: Mounted filesystem discovery',
+						'Linux by Zabbix agent: Linux: Get filesystems: Mounted filesystem discovery',
 						'Linux by Zabbix agent: Network interface discovery',
 						'Test of discovered host 1 template for unlink: Template1 discovery rule',
 						'Test of discovered host 2 template for clear: Template2 discovery rule',
 						'Test of discovered host Template: Template discovery rule',
-						'Zabbix server health: Zabbix proxies stats: Zabbix proxy discovery'
+						'Zabbix server health: Zabbix server: Zabbix proxies stats: Zabbix proxy discovery'
 					]
 				]
 			],
@@ -453,7 +461,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Type' => 'Dependent item'
 					],
 					'context' => 'template',
-					'rows' => 16
+					'rows' => 23
 				]
 			],
 			[
@@ -594,7 +602,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'keys' => [
 						'drule-ZBX6663-second'
 					],
-					'message' => 'Cannot delete discovery rules',
+					'message' => 'Cannot delete discovery rule',
 					'details' => 'Cannot delete templated items.',
 					'db_count' => 1
 				]

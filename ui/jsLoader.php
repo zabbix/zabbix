@@ -67,7 +67,6 @@ $available_js = [
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
 	'class.base-component.js' => '',
-	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
 	'class.cdate.js' => '',
 	'class.cdebug.js' => '',
@@ -88,7 +87,9 @@ $available_js = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
+	'class.csvggauge.js' => '',
 	'class.curl.js' => '',
+	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
@@ -117,9 +118,6 @@ $available_js = [
 $translate_strings = [
 	'gtlc.js' => [
 		'S_MINUTE_SHORT' => _x('m', 'minute short')
-	],
-	'class.overlay.js' => [
-		'Operation details' => _('Operation details')
 	],
 	'class.dashboard.js' => [
 		'Actions' => _('Actions'),
@@ -420,7 +418,6 @@ if (empty($_GET['files'])) {
 		'class.menu.js',
 		'class.menu-item.js',
 		'class.rpc.js',
-		'class.bbcode.js',
 		'class.csuggest.js',
 		'class.scrollable.js',
 		'class.sidebar.js',

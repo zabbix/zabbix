@@ -169,12 +169,41 @@ $graph->setHeight(getRequest('height', 200));
 $graph->showLegend(getRequest('legend', 1));
 $graph->showWorkPeriod(getRequest('showworkperiod', 1));
 $graph->showTriggers(getRequest('showtriggers', 1));
-$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
-$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
 $graph->setYAxisMin(getRequest('yaxismin', 0.00));
 $graph->setYAxisMax(getRequest('yaxismax', 100.00));
-$graph->setYMinItemId(getRequest('ymin_itemid', 0));
-$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
+
+$yaxis_items = [
+	'ymin_type' => getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED),
+	'ymax_type' => getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED),
+	'ymin_itemid' => getRequest('ymin_itemid', 0),
+	'ymax_itemid' => getRequest('ymax_itemid', 0)
+];
+
+$graph->setYMinAxisType($yaxis_items['ymin_type']);
+$graph->setYMaxAxisType($yaxis_items['ymax_type']);
+
+$yaxis_items = array_intersect_key($yaxis_items, array_filter([
+	'ymin_itemid' => $yaxis_items['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $yaxis_items['ymin_itemid'] != 0,
+	'ymax_itemid' => $yaxis_items['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $yaxis_items['ymax_itemid'] != 0
+]));
+
+if ($yaxis_items) {
+	$db_items = API::Item()->get([
+		'itemids' => array_values($yaxis_items),
+		'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
+		'webitems' => true,
+		'preservekeys' => true
+	]);
+
+	if (array_key_exists('ymin_itemid', $yaxis_items) && array_key_exists($yaxis_items['ymin_itemid'], $db_items)) {
+		$graph->setYMinItemId($yaxis_items['ymin_itemid']);
+	}
+
+	if (array_key_exists('ymax_itemid', $yaxis_items) && array_key_exists($yaxis_items['ymax_itemid'], $db_items)) {
+		$graph->setYMaxItemId($yaxis_items['ymax_itemid']);
+	}
+}
+
 $graph->setLeftPercentage(getRequest('percent_left', 0));
 $graph->setRightPercentage(getRequest('percent_right', 0));
 $graph->setOuter(getRequest('outer', 0));

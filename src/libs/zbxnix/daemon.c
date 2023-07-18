@@ -23,9 +23,10 @@
 #include "sigcommon.h"
 
 #include "zbxcommon.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "pid.h"
 #include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
 
 #if defined(__linux__)
 #define ZBX_PID_FILE_TIMEOUT 20
@@ -57,16 +58,7 @@ static void	common_sigusr_handler(int flags)
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_LOG_LEVEL_INCREASE:
-			if (SUCCEED != zabbix_increase_log_level())
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot increase log level:"
-						" maximum level has been already set");
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been increased to %s",
-						zabbix_get_log_level_string());
-			}
+			zabbix_increase_log_level();
 			break;
 		case ZBX_RTC_PROF_ENABLE:
 			zbx_prof_enable(ZBX_RTC_GET_SCOPE(flags));
@@ -75,16 +67,7 @@ static void	common_sigusr_handler(int flags)
 			zbx_prof_disable();
 			break;
 		case ZBX_RTC_LOG_LEVEL_DECREASE:
-			if (SUCCEED != zabbix_decrease_log_level())
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "cannot decrease log level:"
-						" minimum level has been already set");
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "log level has been decreased to %s",
-						zabbix_get_log_level_string());
-			}
+			zabbix_decrease_log_level();
 			break;
 		default:
 			if (NULL != sigusr_handler)
@@ -209,18 +192,12 @@ void	zbx_set_sigusr_handler(zbx_signal_handler_f handler)
  ******************************************************************************/
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
+	ZBX_UNUSED(sig);
+	ZBX_UNUSED(context);
+
 #ifdef HAVE_SIGQUEUE
 	int	flags;
-#endif
-	SIG_CHECK_PARAMS(sig, siginfo, context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d,sender_uid:%d,value_int:%d(0x%08x)].",
-			sig, get_signal_name(sig),
-			SIG_CHECKED_FIELD(siginfo, si_pid),
-			SIG_CHECKED_FIELD(siginfo, si_uid),
-			SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT),
-			(unsigned int)SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT));
-#ifdef HAVE_SIGQUEUE
 	flags = SIG_CHECKED_FIELD(siginfo, si_value.ZBX_SIVAL_INT);
 
 	if (!SIG_PARENT_PROCESS)
@@ -230,29 +207,11 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	}
 
 	if (NULL == threads)
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot redirect signal: server is either shutting down"
-				" or is running in standby mode");
 		return;
-	}
 
 	if(signal_redirect_handler != NULL)
 		signal_redirect_handler(flags, sigusr_handler);
 #endif
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: handle pipe signal SIGPIPE                                        *
- *                                                                            *
- ******************************************************************************/
-static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
-{
-	SIG_CHECK_PARAMS(sig, siginfo, context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "Got signal [signal:%d(%s),sender_pid:%d]. Ignoring ...",
-			sig, get_signal_name(sig),
-			SIG_CHECKED_FIELD(siginfo, si_pid));
 }
 
 /******************************************************************************
@@ -273,7 +232,7 @@ static void	set_daemon_signal_handlers(zbx_signal_redirect_f signal_redirect_cb)
 	phan.sa_sigaction = user1_signal_handler;
 	sigaction(SIGUSR1, &phan, NULL);
 
-	phan.sa_sigaction = pipe_signal_handler;
+	phan.sa_handler = SIG_IGN;
 	sigaction(SIGPIPE, &phan, NULL);
 }
 
@@ -393,7 +352,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 			assert(0);
 
-		if (FAIL == zbx_redirect_stdio(LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
+		if (FAIL == zbx_redirect_stdio(ZBX_LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
 			exit(EXIT_FAILURE);
 	}
 

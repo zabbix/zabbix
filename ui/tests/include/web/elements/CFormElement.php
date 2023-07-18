@@ -58,7 +58,7 @@ class CFormElement extends CElement {
 	public static function createInstance(RemoteWebElement $element, $options = []) {
 		$instance = parent::createInstance($element, $options);
 
-		if (get_class($instance) !== CGridFormElement::class) {
+		if (!$instance->normalized && get_class($instance) !== CGridFormElement::class) {
 			$grid = $instance->query('xpath:.//div[contains(@class, "form-grid")]')->one(false);
 			if ($grid->isValid() && !$grid->parents('xpath:*[contains(@class, "table-forms-td-right")]')->exists()) {
 				return $instance->asGridForm($options);
@@ -249,7 +249,7 @@ class CFormElement extends CElement {
 	public function getFields($filter = null, $filter_params = []) {
 		$fields = [];
 
-		foreach ($this->getLabels() as $key => $label) {
+		foreach ($this->getLabels() as $label) {
 			$element = $this->getFieldByLabelElement($label);
 
 			if ($element->isValid()) {

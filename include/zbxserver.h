@@ -55,19 +55,6 @@
 #define MACRO_EXPAND_NO			0
 #define MACRO_EXPAND_YES		1
 
-/* acknowledgment actions (flags) */
-#define ZBX_PROBLEM_UPDATE_CLOSE		0x0001
-#define ZBX_PROBLEM_UPDATE_ACKNOWLEDGE		0x0002
-#define ZBX_PROBLEM_UPDATE_MESSAGE		0x0004
-#define ZBX_PROBLEM_UPDATE_SEVERITY		0x0008
-#define ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE	0x0010
-#define ZBX_PROBLEM_UPDATE_SUPPRESS		0x0020
-#define ZBX_PROBLEM_UPDATE_UNSUPPRESS		0x0040
-#define ZBX_PROBLEM_UPDATE_RANK_TO_CAUSE	0x0080
-#define ZBX_PROBLEM_UPDATE_RANK_TO_SYMPTOM	0x0100
-
-#define ZBX_PROBLEM_UPDATE_ACTION_COUNT	9
-
 /* service supported by discoverer */
 typedef enum
 {
@@ -178,4 +165,26 @@ int	zbx_substitute_macros_in_json_pairs(char **data, const struct zbx_json_parse
 
 int	zbx_substitute_expression_lld_macros(char **data, zbx_uint64_t rules, const struct zbx_json_parse *jp_row,
 		const zbx_vector_ptr_t *lld_macro_paths, char **error);
+
+typedef struct
+{
+	int			op;
+	int			numeric_search;
+	char			*pattern2;
+	zbx_uint64_t		pattern_ui64;
+	zbx_uint64_t		pattern2_ui64;
+	double			pattern_dbl;
+	zbx_vector_expression_t	regexps;
+}
+zbx_eval_count_pattern_data_t;
+
+void	zbx_count_dbl_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern,
+		zbx_vector_dbl_t *values, int *count);
+
+int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
+		int limit, int *count, char **error);
+
+int	zbx_init_count_pattern(char *operator, char *pattern, unsigned char value_type,
+		zbx_eval_count_pattern_data_t *pdata, char **error);
+void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
 #endif

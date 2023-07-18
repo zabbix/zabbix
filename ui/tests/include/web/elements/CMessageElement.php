@@ -18,17 +18,30 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 /**
  * Global message element.
  */
 class CMessageElement extends CElement {
 
 	/**
-	 * @inheritdoc
+	 * Simplified selector for message element that can be located directly on page.
+	 *
+	 * @param string|CElement    $selector    message element search area
+	 * @param boolean            $strict      absolute or relative path to message element
+	 *
+	 * @return CMessageElement
 	 */
-	public static function find() {
-		return (new CElementQuery('xpath:.//output[@role="contentinfo" or '.
-				CXPathHelper::fromClass('msg-global').']'))->waitUntilVisible()->asMessage();
+	public static function find($selector = null, $strict = false) {
+		$prefix = 'xpath:./'.(!$strict ? '/' : '');
+		$query = new CElementQuery($prefix.'output[@role="contentinfo" or '.CXPathHelper::fromClass('msg-global').']');
+		if ($selector) {
+			if (!$selector instanceof CElement) {
+				$selector = (new CElementQuery($selector))->waitUntilPresent()->one();
+			}
+			$query->setContext($selector);
+		}
+		return $query->waitUntilVisible()->asMessage();
 	}
 
 	/**
@@ -65,7 +78,7 @@ class CMessageElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		if ($this->getAttribute('class') === 'msg-bad msg-global'){
+		if ($this->getAttribute('class') === 'msg-global msg-bad'){
 			return strtok($this->getText(), "\n");
 		}
 		else {
@@ -105,7 +118,7 @@ class CMessageElement extends CElement {
 	 * @return $this
 	 */
 	public function close() {
-		$this->query('xpath:.//button[contains(@class, "overlay-close-btn")]')->one()->click();
-		return $this->waitUntilNotPresent();
+		$this->query('xpath:.//button[contains(@class, "btn-overlay-close")]')->one()->click();
+		return $this->waitUntilNotVisible();
 	}
 }

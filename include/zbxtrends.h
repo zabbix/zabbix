@@ -54,14 +54,19 @@ ZBX_DC_TREND;
 int	zbx_trends_parse_base(const char *params, zbx_time_unit_t *base, char **error);
 int	zbx_trends_parse_timeshift(time_t from, const char *timeshift, struct tm *tm, char **error);
 
-int	zbx_trends_parse_range(time_t from, const char *param, int *start, int *end, char **error);
+int	zbx_trends_parse_range(time_t from, const char *param, time_t *start, time_t *end, char **error);
 int	zbx_trends_parse_nextcheck(time_t from, const char *period_shift, time_t *nextcheck, char **error);
 
-int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
-int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, int start, int end, double *value, char **error);
+int	zbx_trends_eval_avg(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error);
+int	zbx_trends_eval_count(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error);
+int	zbx_trends_eval_max(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error);
+int	zbx_trends_eval_min(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error);
+int	zbx_trends_eval_sum(const char *table, zbx_uint64_t itemid, time_t start, time_t end, double *value,
+		char **error);
 
 /* trends function cache */
 typedef struct

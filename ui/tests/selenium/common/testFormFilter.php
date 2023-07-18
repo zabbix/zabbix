@@ -76,7 +76,7 @@ class testFormFilter extends CWebTest {
 				}
 
 				// Checking that dropdown/popup tab works.
-				$dropdown = $this->query('class:btn-widget-expand')->asPopupButton()->waitUntilClickable()->one();
+				$dropdown = $this->query('class:zi-chevron-down')->asPopupButton()->waitUntilClickable()->one();
 				$dropdown->fill($data['filter']['Name']);
 				$this->assertEquals($data['filter']['Name'], $filter->getSelectedTabName());
 				break;

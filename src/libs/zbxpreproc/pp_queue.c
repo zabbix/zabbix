@@ -20,7 +20,6 @@
 #include "pp_queue.h"
 #include "pp_task.h"
 #include "zbxcommon.h"
-#include "log.h"
 #include "zbxalgo.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00
@@ -195,7 +194,7 @@ static zbx_pp_task_t	*pp_task_queue_add_sequence(zbx_pp_queue_t *queue, zbx_pp_t
 
 	zbx_pp_task_sequence_t	*d_seq = (zbx_pp_task_sequence_t *)PP_TASK_DATA(sequence->task);
 
-	zbx_list_append(&d_seq->tasks, task, NULL);
+	(void)zbx_list_append(&d_seq->tasks, task, NULL);
 
 	return new_task;
 }
@@ -227,7 +226,7 @@ void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 			break;
 	}
 
-	zbx_list_append(&queue->immediate, task, NULL);
+	(void)zbx_list_append(&queue->immediate, task, NULL);
 }
 
 /******************************************************************************
@@ -254,7 +253,7 @@ void	pp_task_queue_remove_sequence(zbx_pp_queue_t *queue, zbx_uint64_t itemid)
 void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
 	queue->pending_num++;
-	zbx_list_append(&queue->immediate, task, NULL);
+	(void)zbx_list_append(&queue->immediate, task, NULL);
 }
 
 /******************************************************************************
@@ -275,20 +274,20 @@ void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 
 	if (ITEM_TYPE_INTERNAL != d->preproc->type)
 	{
-		zbx_list_append(&queue->pending, task, NULL);
+		(void)zbx_list_append(&queue->pending, task, NULL);
 		return;
 	}
 
 	if (ZBX_PP_TASK_VALUE == task->type)
 	{
-		zbx_list_append(&queue->immediate, task, NULL);
+		(void)zbx_list_append(&queue->immediate, task, NULL);
 		return;
 	}
 
 	zbx_pp_task_t	*seq_task;
 
 	if (NULL != (seq_task = pp_task_queue_add_sequence(queue, task)))
-		zbx_list_append(&queue->immediate, seq_task, NULL);
+		(void)zbx_list_append(&queue->immediate, seq_task, NULL);
 }
 
 /******************************************************************************
@@ -352,7 +351,7 @@ void	pp_task_queue_push_finished(zbx_pp_queue_t *queue, zbx_pp_task_t *task)
 {
 	queue->finished_num++;
 	queue->processing_num--;
-	zbx_list_append(&queue->finished, task, NULL);
+	(void)zbx_list_append(&queue->finished, task, NULL);
 }
 
 /******************************************************************************

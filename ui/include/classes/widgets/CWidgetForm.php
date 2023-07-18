@@ -26,9 +26,9 @@ class CWidgetForm {
 	protected array $fields = [];
 
 	protected array $values;
-	protected ?string $templateid;
+	private $templateid;
 
-	public function __construct(array $values, ?string $templateid) {
+	public function __construct(array $values, $templateid = null) {
 		$this->values = $this->normalizeValues($values);
 		$this->templateid = $templateid;
 	}
@@ -39,6 +39,8 @@ class CWidgetForm {
 
 	public function addField(?CWidgetField $field): self {
 		if ($field !== null) {
+			$field->setTemplateId($this->templateid);
+
 			$this->fields[$field->getName()] = $field;
 		}
 
@@ -71,6 +73,10 @@ class CWidgetForm {
 		}
 
 		return $this;
+	}
+
+	public function isTemplateDashboard(): bool {
+		return $this->templateid !== null;
 	}
 
 	/**

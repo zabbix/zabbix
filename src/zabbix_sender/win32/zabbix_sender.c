@@ -35,11 +35,12 @@ unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-static int	sender_add_serveractive_host_cb(const zbx_vector_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
+static int	sender_add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames,
+		void *data)
 {
 	ZBX_UNUSED(hostnames);
 
-	zbx_addr_copy((zbx_vector_ptr_t *)data, addrs);
+	zbx_addr_copy((zbx_vector_addr_ptr_t *)data, addrs);
 
 	return SUCCEED;
 }
@@ -48,9 +49,10 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 		const zabbix_sender_value_t *values, int count, char **result)
 {
 	zbx_socket_t					sock;
+	zbx_config_tls_t				config_tls;
 	int						ret, i;
 	struct zbx_json					json;
-	static ZBX_THREAD_LOCAL zbx_vector_ptr_t	zbx_addrs;
+	static ZBX_THREAD_LOCAL zbx_vector_addr_ptr_t	zbx_addrs;
 	static ZBX_THREAD_LOCAL char			*last_address;
 	static unsigned short				last_port;
 
@@ -71,22 +73,22 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 
 	if (NULL == last_address)
-		zbx_vector_ptr_create(&zbx_addrs);
+		zbx_vector_addr_ptr_create(&zbx_addrs);
 
 	if (0 != zbx_strcmp_null(last_address, address) || port != last_port)
 	{
 		last_address = zbx_strdup(last_address, address);
 		last_port = port;
 
-		zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+		zbx_vector_addr_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
 
 		if (FAIL == zbx_set_data_destination_hosts(address, port, "<server>", sender_add_serveractive_host_cb,
 				NULL, &zbx_addrs, result))
 		{
 			zbx_free(last_address);
 			last_port = 0;
-			zbx_vector_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
-			zbx_vector_ptr_destroy(&zbx_addrs);
+			zbx_vector_addr_ptr_clear_ext(&zbx_addrs, zbx_addr_free);
+			zbx_vector_addr_ptr_destroy(&zbx_addrs);
 			return FAIL;
 		}
 	}
@@ -105,8 +107,11 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 	zbx_json_close(&json);
 
+	memset(&config_tls, 0, sizeof(config_tls));
+	config_tls.connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
+
 	if (SUCCEED == (ret = zbx_connect_to_server(&sock, source, &zbx_addrs, GET_SENDER_TIMEOUT, 30,
-		ZBX_TCP_SEC_UNENCRYPTED, 0, 0)))
+		0, 0, &config_tls)))
 	{
 		if (SUCCEED == (ret = zbx_tcp_send(&sock, json.buffer)))
 		{

@@ -21,7 +21,7 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "log.h"
+#include "zbxlog.h"
 #include "zbxjson.h"
 #include "../alerter/alerter.h"
 #include "report_protocol.h"

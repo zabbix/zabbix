@@ -611,9 +611,6 @@ zbx_timekeeper_state_t	*zbx_timekeeper_get_counters(zbx_timekeeper_t *timekeeper
 
 	timekeeper->sync->lock(timekeeper->sync->data);
 
-	if (1 >= timekeeper->count)
-		goto unlock;
-
 	if (1 < timekeeper->count)
 	{
 		if (MAX_HISTORY <= (current = (timekeeper->first + timekeeper->count - 1)))
@@ -627,10 +624,10 @@ zbx_timekeeper_state_t	*zbx_timekeeper_get_counters(zbx_timekeeper_t *timekeeper
 						timekeeper->units[i].h_counter[s][timekeeper->first]);
 			}
 		}
+
+		ret = SUCCEED;
 	}
 
-	ret = SUCCEED;
-unlock:
 	timekeeper->sync->unlock(timekeeper->sync->data);
 
 	if (SUCCEED != ret)

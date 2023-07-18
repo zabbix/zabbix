@@ -21,7 +21,6 @@
 #include "dbupgrade.h"
 #include "zbxdbschema.h"
 
-#include "log.h"
 #include "../../zabbix_server/ha/ha.h"
 #include "zbxtime.h"
 #include "zbxdb.h"
@@ -55,6 +54,7 @@
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
 #	define ZBX_TYPE_UINT_STR		"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR		"longtext"
+#	define ZBX_TYPE_BLOB_STR		"longblob"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
 #elif defined(HAVE_ORACLE)
@@ -62,6 +62,7 @@
 #	define ZBX_TYPE_FLOAT_STR		"binary_double"
 #	define ZBX_TYPE_UINT_STR		"number(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"nclob"
+#	define ZBX_TYPE_BLOB_STR		"blob"
 #	define ZBX_TYPE_SERIAL_STR		"number(20)"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #elif defined(HAVE_POSTGRESQL)
@@ -69,6 +70,7 @@
 #	define ZBX_TYPE_FLOAT_STR		"double precision"
 #	define ZBX_TYPE_UINT_STR		"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"text"
+#	define ZBX_TYPE_BLOB_STR		"bytea"
 #	define ZBX_TYPE_SERIAL_STR		"bigserial"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
@@ -116,6 +118,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_TEXT:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_TEXT_STR);
 			break;
+		case ZBX_TYPE_BLOB:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_BLOB_STR);
+			break;
 		case ZBX_TYPE_CUID:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
@@ -140,6 +145,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_SHORTTEXT:
 		case ZBX_TYPE_TEXT:
+		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_CUID:
 			return;
 		case ZBX_TYPE_SERIAL:
@@ -563,6 +569,16 @@ int	DBcreate_serial_sequence(const char *table_name)
 	return SUCCEED;
 }
 
+int	DBdrop_serial_sequence(const char *table_name)
+{
+	if (ZBX_DB_OK > zbx_db_execute("drop sequence " ZBX_FS_DB_SEQUENCE, table_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 {
 	if (ZBX_DB_OK > zbx_db_execute("create trigger " ZBX_FS_DB_TRIGGER " before insert on %s for each row\n"
@@ -576,6 +592,17 @@ int	DBcreate_serial_trigger(const char *table_name, const char *field_name)
 
 	return SUCCEED;
 }
+
+int	DBdrop_serial_trigger(const char *table_name)
+{
+	if (ZBX_DB_OK > zbx_db_execute("drop trigger " ZBX_FS_DB_TRIGGER, table_name))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 
 #endif
 
@@ -610,6 +637,35 @@ int	DBmodify_field_type(const char *table_name, const zbx_db_field_t *field, con
 	zbx_free(sql);
 
 	return ret;
+}
+
+int	DBdrop_field_autoincrement(const char *table_name, const zbx_db_field_t *field)
+{
+#if defined(HAVE_MYSQL)
+
+	return DBmodify_field_type(table_name, field, NULL);
+
+#elif defined(HAVE_POSTGRESQL)
+
+	if (SUCCEED != DBdrop_default(table_name, field))
+		return FAIL;
+
+	if (ZBX_DB_OK > zbx_db_execute("drop sequence if exists %s_%s_seq", table_name, field->name))
+		return FAIL;
+
+	return SUCCEED;
+
+#else /* ORACLE */
+
+	if (SUCCEED != DBdrop_serial_sequence(table_name))
+		return FAIL;
+
+	if (SUCCEED != DBdrop_serial_trigger(table_name))
+		return FAIL;
+
+	return SUCCEED;
+
+#endif
 }
 
 int	DBset_not_null(const char *table_name, const zbx_db_field_t *field)

@@ -13,15 +13,6 @@ SUBDIRS = \
 
 sbin_PROGRAMS = zabbix_proxy
 
-noinst_LIBRARIES = libzbxproxy.a
-
-libzbxproxy_a_SOURCES = \
-	proxy_lld.c
-
-libzbxproxy_a_CFLAGS = \
-	-DZABBIX_DAEMON \
-	$(TLS_CFLAGS)
-
 zabbix_proxy_SOURCES = proxy.c
 
 zabbix_proxy_LDADD = \
@@ -36,16 +27,19 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/poller/libzbxpoller_proxy.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \
+	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_proxy.a \
 	$(top_builddir)/src/zabbix_server/snmptrapper/libzbxsnmptrapper.a \
 	datasender/libzbxdatasender.a \
 	proxyconfigwrite/libzbxproxyconfigwrite.a \
 	preproc/libpreproc_proxy.a \
 	$(top_builddir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_proxy.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	taskmanager/libzbxtaskmanager.a \
 	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
@@ -60,8 +54,11 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \
 	$(top_builddir)/src/libs/zbxserver/libzbxserver.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory_proxy.a \
 	$(top_builddir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_builddir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_builddir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_builddir)/src/libs/zbxevent/libzbxevent.a \
 	stats/libzbxserver_proxy.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
@@ -115,7 +112,8 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
-	libzbxproxy.a
+	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
 
 zabbix_proxy_LDADD += $(top_builddir)/src/libs/zbxalgo/libzbxalgo.a
 

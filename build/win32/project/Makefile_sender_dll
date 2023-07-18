@@ -41,6 +41,7 @@ OBJS = \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxstr\str.o \
 	..\..\..\src\libs\zbxcommon\common_str.o \
+	..\..\..\src\libs\zbxcommon\common_log.o \
 	..\..\..\src\libs\zbxparam\param.o \
 	..\..\..\src\libs\zbxcommon\components_strings_representations.o \
 	..\..\..\src\libs\zbxcommon\libc_wrappers.o \
@@ -75,7 +76,7 @@ OBJS = \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\zabbix_sender\win32\zabbix_sender.o
 
-LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib shlwapi.lib
 
 !INCLUDE Makefile_pcre.inc
 !INCLUDE Makefile_targets.inc

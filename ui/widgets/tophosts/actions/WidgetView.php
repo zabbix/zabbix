@@ -37,6 +37,14 @@ use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules([
+			'dynamic_hostid' => 'db hosts.hostid'
+		]);
+	}
+
 	protected function doAction(): void {
 		$data = [
 			'name' => $this->getInput('name', $this->widget->getDefaultName()),
@@ -45,7 +53,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 			]
 		];
 
-		$data += $this->getData();
+		// Editing template dashboard?
+		if ($this->isTemplateDashboard() && !$this->hasInput('dynamic_hostid')) {
+			$data['error'] = _('No data.');
+		}
+		else {
+			$data += $this->getData();
+			$data['error'] = null;
+		}
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
@@ -53,8 +68,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 	private function getData(): array {
 		$configuration = $this->fields_values['columns'];
 
-		$groupids = $this->fields_values['groupids'] ? getSubGroups($this->fields_values['groupids']) : null;
-		$hostids = $this->fields_values['hostids'] ?: null;
+		$groupids = !$this->isTemplateDashboard() && $this->fields_values['groupids']
+			? getSubGroups($this->fields_values['groupids'])
+			: null;
+
+		if ($this->isTemplateDashboard()) {
+			$hostids = [$this->getInput('dynamic_hostid')];
+		}
+		else {
+			$hostids = $this->fields_values['hostids'] ?: null;
+		}
 
 		if (array_key_exists('tags', $this->fields_values)) {
 			$hosts = API::Host()->get([
@@ -117,7 +140,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		$master_item_values = array_slice($master_item_values, 0, $this->fields_values['count'], true);
+		$show_lines = $this->isTemplateDashboard() ? 1 : $this->fields_values['show_lines'];
+		$master_item_values = array_slice($master_item_values, 0, $show_lines, true);
 		$master_items = array_intersect_key($master_items, $master_item_values);
 
 		$master_hostids = [];
@@ -126,7 +150,17 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$master_hostids[$master_items[$itemid]['hostid']] = true;
 		}
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
 
 		$item_values = [];
 
@@ -138,38 +172,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-			if ($calc_extremes) {
-				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
-					$column['min'] = $number_parser->calcValue();
-				}
-
-				if ($column['max'] !== '' && $number_parser->parse($column['max']) == CParser::PARSE_SUCCESS) {
-					$column['max'] = $number_parser->calcValue();
-				}
-			}
-
-			if (array_key_exists('thresholds', $column)) {
-				foreach ($column['thresholds'] as &$threshold) {
-					if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
-						$threshold['threshold'] = $number_parser->calcValue();
-					}
-				}
-				unset($threshold);
-			}
-
 			if ($column_index == $this->fields_values['column']) {
 				$column_items = $master_items;
 				$column_item_values = $master_item_values;
-
-				if ($calc_extremes) {
-					if ($column['min'] === '') {
-						$column['min'] = $master_items_min;
-					}
-
-					if ($column['max'] === '') {
-						$column['max'] = $master_items_max;
-					}
-				}
 			}
 			else {
 				$numeric_only = self::isNumericOnlyColumn($column);
@@ -178,14 +183,60 @@ class WidgetView extends CControllerDashboardWidgetView {
 					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 
 				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+			}
 
+			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
+				if ($column['min'] !== '') {
+					$number_parser_binary->parse($column['min']);
+					$column['min_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($column['min']);
+					$column['min'] = $number_parser->calcValue();
+				}
+
+				if ($column['max'] !== '') {
+					$number_parser_binary->parse($column['max']);
+					$column['max_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($column['max']);
+					$column['max'] = $number_parser->calcValue();
+				}
+			}
+
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as &$threshold) {
+					$number_parser_binary->parse($threshold['threshold']);
+					$threshold['threshold_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($threshold['threshold']);
+					$threshold['threshold'] = $number_parser->calcValue();
+				}
+				unset($threshold);
+			}
+
+			if ($column_index == $this->fields_values['column']) {
+				if ($calc_extremes) {
+					if ($column['min'] === '') {
+						$column['min'] = $master_items_min;
+						$column['min_binary'] = $column['min'];
+					}
+
+					if ($column['max'] === '') {
+						$column['max'] = $master_items_max;
+						$column['max_binary'] = $column['max'];
+					}
+				}
+			}
+			else {
 				if ($calc_extremes && $column_item_values) {
 					if ($column['min'] === '') {
 						$column['min'] = min($column_item_values);
+						$column['min_binary'] = $column['min'];
 					}
 
 					if ($column['max'] === '') {
 						$column['max'] = max($column_item_values);
+						$column['max_binary'] = $column['max'];
 					}
 				}
 			}
@@ -196,7 +247,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				if (array_key_exists($column_items[$itemid]['hostid'], $master_hostids)) {
 					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
 						'value' => $column_item_value,
-						'item' => $column_items[$itemid]
+						'item' => $column_items[$itemid],
+						'is_binary_units' => isBinaryUnits($column_items[$itemid]['units'])
 					];
 				}
 			}
@@ -251,7 +303,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						$row[] = array_key_exists($hostid, $item_values[$column_index])
 							? [
 								'value' => $item_values[$column_index][$hostid]['value'],
-								'item' => $item_values[$column_index][$hostid]['item']
+								'item' => $item_values[$column_index][$hostid]['item'],
+								'is_binary_units' => $item_values[$column_index][$hostid]['is_binary_units']
 							]
 							: null;
 

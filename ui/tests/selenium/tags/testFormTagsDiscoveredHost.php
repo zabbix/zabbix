@@ -23,6 +23,7 @@ require_once dirname(__FILE__).'/../common/testFormTags.php';
 
 /**
  * @dataSource DiscoveredHosts
+ *
  * @backup hosts
  */
 class testFormTagsDiscoveredHost extends testFormTags {
@@ -106,14 +107,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	 * Test cloning of Discovered Host with tags.
 	 */
 	public function testFormTagsDiscoveredHost_Clone() {
-		$this->executeCloning('discovered host', 'Clone');
-	}
-
-	/**
-	 * Test full cloning of Discovered Host with tags.
-	 */
-	public function testFormTagsDiscoveredHost_FullClone() {
-		$this->executeCloning('discovered host', 'Full clone');
+		$this->executeCloning('discovered host');
 	}
 
 	/**

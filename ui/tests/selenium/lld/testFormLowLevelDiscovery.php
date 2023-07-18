@@ -351,7 +351,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 		if ($type == 'SSH agent' || $type == 'TELNET agent' || $type == 'JMX agent' || $type == 'Simple check') {
 			$this->zbxTestTextPresent('User name');
 			$this->zbxTestAssertVisibleId('username');
-			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='username']", 'maxlength', 255);
 
 			if (isset($authtype) && $authtype == 'Public key') {
 				$this->zbxTestTextPresent('Key passphrase');
@@ -360,7 +360,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Password');
 			}
 			$this->zbxTestAssertVisibleId('password');
-			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 64);
+			$this->zbxTestAssertAttribute("//input[@id='password']", 'maxlength', 255);
 		}
 		else {
 			$this->zbxTestTextNotVisible(['User name', 'Password', 'Key passphrase']);
@@ -1688,7 +1688,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 			$this->zbxTestClickButton('discoveryrule.massdelete');
 
 			$this->zbxTestAcceptAlert();
-			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rules deleted');
+			$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Discovery rule deleted');
 
 			$sql = "SELECT itemid FROM items WHERE name = '".$name."' and hostid = ".$this->hostid;
 			$this->assertEquals(0, CDBHelper::getCount($sql), 'Discovery rule has not been deleted from DB.');
@@ -2129,9 +2129,10 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 	 * @param string         $name    name of a host or template
 	 */
 	private function filterEntriesAndOpenDiscovery($form, $name) {
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

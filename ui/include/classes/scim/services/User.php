@@ -32,21 +32,7 @@ use SCIM\ScimApiService;
 
 class User extends ScimApiService {
 
-	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'put' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'post' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'patch' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
-	];
-
-	private const SCIM_USER_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
-	private const SCIM_LIST_RESPONSE_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:ListResponse';
-	private const SCIM_PATCH_SCHEMA = 'urn:ietf:params:scim:api:messages:2.0:PatchOp';
-
-	protected array $data = [
-		'schemas' => [self::SCIM_USER_SCHEMA]
-	];
+	public const SCIM_SCHEMA = 'urn:ietf:params:scim:schemas:core:2.0:User';
 
 	/**
 	 * Returns information on specific user or all users if no specific information is requested.
@@ -61,9 +47,9 @@ class User extends ScimApiService {
 	 * @throws Exception
 	 */
 	public function get(array $options = []): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validateGet($options);
+
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 
 		if (array_key_exists('userName', $options)) {
 			$users = APIRPC::User()->get([
@@ -72,25 +58,26 @@ class User extends ScimApiService {
 				'filter' => ['username' => $options['userName']]
 			]);
 
+			if ($users && $users[0]['userdirectoryid'] != $userdirectoryid) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					'User with username '.$options["userName"].' already exists.'
+				);
+			}
+
 			$user_groups = $users ? array_column($users[0]['usrgrps'], 'usrgrpid') : [];
 			$disabled_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
 
 			if (!$users || (count($user_groups) == 1 && $user_groups[0] == $disabled_groupid)) {
-				$this->data += [
-					'totalResults' => 0,
-					'Resources' => []
-				];
+				return [];
 			}
-			elseif ($users[0]['userdirectoryid'] != $userdirectoryid) {
-				self::exception(self::SCIM_ERROR_BAD_REQUEST,
-					'User with username '.$options["userName"].' already exists.'
-				);
-			}
-			else {
-				$this->data = $this->prepareData($users[0]);
-			}
+
+			$user = $users[0];
+			$this->addScimUserAttributes($user, $options);
+
+			return $user;
 		}
-		elseif (array_key_exists('id', $options)) {
+
+		if (array_key_exists('id', $options)) {
 			$users = APIRPC::User()->get([
 				'output' => ['userid', 'username', 'userdirectoryid'],
 				'userids' => $options['id'],
@@ -98,52 +85,33 @@ class User extends ScimApiService {
 			]);
 
 			if (!$users) {
-				self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+				self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 			}
 
-			$this->data = $this->prepareData($users[0]);
-		}
-		else {
-			$userids = APIRPC::User()->get([
-				'output' => ['userid'],
-				'filter' => ['userdirectoryid' => $userdirectoryid]
-			]);
-			$total_users = count($userids);
+			$user = $users[0];
+			$this->addScimUserAttributes($user, $options);
 
-			$this->data = [
-				'schemas' => [self::SCIM_LIST_RESPONSE_SCHEMA],
-				'totalResults' => $total_users,
-				'startIndex' => max($options['startIndex'], 1),
-				'itemsPerPage' => min($total_users, max($options['count'], 0)),
-				'Resources' => []
-			];
-
-			if ($total_users != 0) {
-				$userids = array_slice($userids, $this->data['startIndex'] - 1, $this->data['itemsPerPage']);
-				$userids = array_column($userids, 'userid');
-
-				$users = $userids
-					? APIRPC::User()->get([
-						'output' => ['userid', 'username', 'userdirectoryid'],
-						'userids' => $userids
-					])
-					: [];
-
-				foreach ($users as $user) {
-					$user_data = $this->prepareData($user);
-					unset($user_data['schemas']);
-					$this->data['Resources'][] = $user_data;
-				}
-			}
+			return $user;
 		}
 
-		return $this->data;
+		$users = APIRPC::User()->get([
+			'output' => ['userid', 'username'],
+			'filter' => ['userdirectoryid' => $userdirectoryid]
+		]);
+
+		foreach ($users as &$user) {
+			$user['userdirectoryid'] = $userdirectoryid;
+			$this->addScimUserAttributes($user);
+		}
+		unset($user);
+
+		return $users;
 	}
 
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
 	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
@@ -154,7 +122,7 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 	}
 
@@ -165,11 +133,9 @@ class User extends ScimApiService {
 	 * @param array  $options              Array with different attributes that might be set up in SAML settings.
 	 * @param string $options['userName']  Users user name based on which user will be searched.
 	 *
-	 * @return array                       Returns SCIM data that is necessary for POST request response.
+	 * @return array  Created or updated user data.
 	 */
 	public function post(array $options): array {
-		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-
 		$this->validatePost($options);
 
 		$db_users = APIRPC::User()->get([
@@ -177,6 +143,7 @@ class User extends ScimApiService {
 			'filter' => ['username' => $options['userName']]
 		]);
 
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
 		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 
 		$user_data['userdirectoryid'] = $userdirectoryid;
@@ -189,38 +156,36 @@ class User extends ScimApiService {
 		}
 		elseif ($db_users[0]['userdirectoryid'] == $userdirectoryid) {
 			$user_data['userid'] = $db_users[0]['userid'];
-			$user_data['usrgrps'] = [];
 			$user = APIRPC::User()->updateProvisionedUser($user_data);
-			$user['userid'] = $db_users[0]['userid'];
 		}
 		else {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST,
+			self::exception(ZBX_API_ERROR_PARAMETERS,
 				'User with username '.$options['userName'].' already exists.'
 			);
 		}
 
-		$this->setData($user['userid'], $userdirectoryid, $options);
+		$this->addScimUserAttributes($user, $options);
 
-		return $this->data;
+		return $user;
 	}
 
 	/**
 	 * @param array $options
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
-	private function validatePost(array $options) {
+	private function validatePost(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'userName' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 	}
 
@@ -231,9 +196,9 @@ class User extends ScimApiService {
 	 * @param array  $options
 	 * @param string $options['id']
 	 * @param string $options['userName']
-	 * @param bool   $options['active']  True of false, but sent as string.
+	 * @param bool   $options['active']    True of false, but sent as string.
 	 *
-	 * @return array          Returns SCIM data that is necessary for PUT request response.
+	 * @return array  Array of updated user data.
 	 */
 	public function put(array $options): array {
 		// In order to comply with Azure SCIM without flag "aadOptscim062020", attribute active value is transformed to
@@ -242,7 +207,9 @@ class User extends ScimApiService {
 			$options['active'] = strtolower($options['active']) === 'true';
 		}
 
-		$db_user = $this->validatePut($options);
+		$this->validatePut($options, $db_user);
+
+		$db_user = $db_user[0];
 		$user_group_names = [];
 		$provisioning = CProvisioning::forUserDirectoryId($db_user['userdirectoryid']);
 
@@ -282,22 +249,24 @@ class User extends ScimApiService {
 			$user_data['usrgrps'] = [];
 		}
 
-		APIRPC::User()->updateProvisionedUser($user_data);
-		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $options);
+		$user = APIRPC::User()->updateProvisionedUser($user_data);
 
-		return $this->data;
+		if ($options['active'] == false) {
+			$user['userid'] = $db_user['userid'];
+		}
+
+		$this->addScimUserAttributes($user, $options);
+
+		return $user;
 	}
 
 	/**
 	 * @param array $options
+	 * @param array $db_user
 	 *
-	 * @returns array                Returns user data from the database.
-	 *          ['userid']
-	 *          ['userdirectoryid']
-	 *
-	 * @throws APIException if input is invalid or user cannot be modified.
+	 * @throws APIException
 	 */
-	private function validatePut(array $options): array {
+	private function validatePut(array &$options, ?array &$db_user): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
 			'schemas' =>	['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'id' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -310,31 +279,29 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_USER_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(self::SCIM_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'userdirectoryid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
-
-		return $db_user;
 	}
 
 	/**
 	 * Updates user in the database with newly received information.
 	 *
-	 * @param array  $options                                      Array with data from request.
+	 * @param array  $options
 	 * @param string $options['id']                                User id.
 	 * @param array  $options['Operations']                        List of operations that need to be performed.
 	 * @param string $options['Operations'][]['op']                Operation that needs to be performed -'add',
@@ -347,19 +314,23 @@ class User extends ScimApiService {
 	 *                                                             performed. If operation is 'remove' this can be
 	 *                                                             omitted.
 	 *
-	 * @return array  Returns array with data necessary for SCIM response.
+	 * @return array  Array of updated user data.
 	 *
 	 * @throws APIException
 	 */
 	public function patch(array $options): array {
 		// In order to comply with Azure SCIM without flag "aadOptscim062020", attribute active value is transformed to
 		// boolean.
-		foreach ($options['Operations'] as &$operation) {
-			if ($operation['path'] === 'active') {
-				$operation['value'] = strtolower($operation['value']) === 'true';
+		if (array_key_exists('Operations', $options)) {
+			foreach ($options['Operations'] as &$operation) {
+				if (array_key_exists('path', $operation) && $operation['path'] === 'active'
+						&& !is_bool($operation['value'])
+				) {
+					$operation['value'] = strtolower($operation['value']) === 'true';
+				}
 			}
+			unset($operation);
 		}
-		unset($operation);
 
 		$this->validatePatch($options, $db_user);
 
@@ -396,18 +367,19 @@ class User extends ScimApiService {
 			$new_user_data = array_merge($new_user_data, $provisioning->getUserGroupsAndRole($group_names));
 		}
 
-		APIRPC::User()->updateProvisionedUser($new_user_data);
+		$user= APIRPC::User()->updateProvisionedUser($new_user_data);
+		$user = $user ?: $new_user_data;
 
-		$this->setData($db_user['userid'], $db_user['userdirectoryid'], $user_idp_data);
+		$this->addScimUserAttributes($user, $user_idp_data);
 
-		return $this->data;
+		return $user;
 	}
 
 	/**
 	 * @param array $options
 	 * @param array $db_user
 	 *
-	 * @throws APIException if input is invalid.
+	 * @throws APIException
 	 */
 	private function validatePatch(array &$options, array &$db_user = null): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_ALLOW_UNEXPECTED, 'fields' => [
@@ -425,23 +397,25 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!in_array(self::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, 'Incorrect schema was sent in the request.');
+		if (!in_array(ScimApiService::SCIM_PATCH_SCHEMA, $options['schemas'], true)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, 'Incorrect schema was sent in the request.');
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
-		[$db_user] = APIRPC::User()->get([
+		$db_user = APIRPC::User()->get([
 			'output' => ['userid', 'name', 'surname', 'userdirectoryid', 'roleid'],
 			'userids' => $options['id'],
 			'filter' => ['userdirectoryid' => $userdirectoryid]
 		]);
 
 		if (!$db_user) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
+
+		$db_user = $db_user[0];
 
 		foreach ($options['Operations'] as &$operation) {
 			$operation['op'] = strtolower($operation['op']);
@@ -469,9 +443,7 @@ class User extends ScimApiService {
 
 		DB::delete('user_scim_group', ['userid' => $user_data['userid']]);
 
-		APIRPC::User()->updateProvisionedUser($user_data);
-
-		return $this->data;
+		return APIRPC::User()->updateProvisionedUser($user_data);
 	}
 
 	/**
@@ -485,7 +457,7 @@ class User extends ScimApiService {
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
-			self::exception(self::SCIM_ERROR_BAD_REQUEST, $error);
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
@@ -498,66 +470,41 @@ class User extends ScimApiService {
 		]);
 
 		if (!$db_users) {
-			self::exception(self::SCIM_ERROR_NOT_FOUND, 'No permissions to referred object or it does not exist!');
+			self::exception(ZBX_API_ERROR_NO_ENTITY, 'No permissions to referred object or it does not exist!');
 		}
 	}
 
-	/**
-	 * Updates $this->data parameter with the data that is required by SCIM.
-	 *
-	 * @param string $userid
-	 * @param string $userdirectoryid  SAML userdirectory ID.
-	 * @param array  $options          Optional. User information sent in request from IdP.
-	 *
-	 * @return void
-	 */
-	private function setData(string $userid, string $userdirectoryid, array $options = []): void {
-		$user = APIRPC::User()->get([
-			'output' => ['userid', 'username', 'userdirectoryid'],
-			'userids' => $userid,
-			'filter' => ['userdirectoryid' => $userdirectoryid]
-		]);
+	private function addScimUserAttributes(array &$user, array $options = []): void {
+		$userdirectoryid = CAuthenticationHelper::getSamlUserdirectoryidForScim();
+		$user = array_intersect_key($user, array_flip(['userid', 'username', 'surname', 'name']));
 
-		$this->data += $this->prepareData($user[0], $options);
-	}
+		if (!array_key_exists('username', $user)) {
+			if (array_key_exists('username', $options)) {
+				$user['username'] = $options['userName'];
+			}
+			else {
+				$usernames = APIRPC::User()->get([
+					'output' => ['username'],
+					'userids' => $user['userid'],
+					'filter' => ['userdirectoryid' => $userdirectoryid]
+				]);
+				$user['username'] = $usernames[0]['username'];
+			}
+		}
 
-	/**
-	 * Returns user data that is necessary for SCIM response to IdP and that can be used to update $this->data.
-	 *
-	 * @param array  $user
-	 * @param string $user['userid']
-	 * @param string $user['username']
-	 * @param array  $options                                     Optional. User information sent in request from IdP.
-	 *
-	 * @return array                                              Returns array with data formatted according to SCIM.
-	 *                                                            Attributes might vary based on SAML settings.
-	 *         ['id']
-	 *         ['userName']
-	 *         ['active']
-	 *         ['name']
-	 *         ['attribute']                                      Some other attributes set up in SAML settings.
-	 */
-	private function prepareData(array $user, array $options = []): array {
-		$data = [
-			'schemas'	=> [self::SCIM_USER_SCHEMA],
-			'id' 		=> $user['userid'],
-			'userName'	=> $user['username'],
-			'name' => array_key_exists('name', $options) ? $options['name'] : ['givenName' => '', 'familyName' => '']
-		];
+		// Property 'name' in SCIM response is required for Okta SCIM to work correctly.
+		$user['name'] = array_key_exists('name', $options) ? $options['name'] : ['givenName' => '', 'familyName' => ''];
+		$user['active'] = array_key_exists('active', $options) ? $options['active'] : true;
 
-		$data['active'] = array_key_exists('active', $options) ? $options['active'] : true;
-
-		$provisioning = CProvisioning::forUserDirectoryId($user['userdirectoryid']);
+		$provisioning = CProvisioning::forUserDirectoryId($userdirectoryid);
 		$user_attributes = $provisioning->getUserAttributes($options);
-		$data += $user_attributes;
+		$user += $user_attributes;
 
 		$media_attributes = $provisioning->getUserIdpMediaAttributes();
 		foreach ($media_attributes as $media_attribute) {
 			if (array_key_exists($media_attribute, $options)) {
-				$data[$media_attribute] = $options[$media_attribute];
+				$user[$media_attribute] = $options[$media_attribute];
 			}
 		}
-
-		return $data;
 	}
 }

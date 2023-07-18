@@ -27,13 +27,11 @@ $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
 	'sysmapid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,
-		'isset({form}) && ({form} === "update" || {form} === "full_clone")'
+		'isset({form}) && ({form} === "update" || {form} === "clone")'
 	],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
 	'width' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})', _('Width')],
@@ -110,14 +108,21 @@ else {
 
 $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
+if (!$allowed_edit && array_filter([
+		hasRequest('add') || hasRequest('update'),
+		hasRequest('delete') && hasRequest('sysmapid'),
+		hasRequest('action') && getRequest('action') == 'map.massdelete',
+		hasRequest('form')
+])) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$map = [
 		'name' => getRequest('name'),
 		'width' => getRequest('width'),
@@ -184,7 +189,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		$messageFailed = _('Cannot update network map');
 	}
 	else {
-		if (getRequest('form') === 'full_clone') {
+		if (getRequest('form') === 'clone') {
 			$maps = API::Map()->get([
 				'output' => [],
 				'selectSelements' => ['selementid', 'elements', 'elementtype', 'iconid_off', 'iconid_on', 'label',
@@ -227,15 +232,13 @@ if (hasRequest('add') || hasRequest('update')) {
 }
 elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		|| (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$sysmapIds = getRequest('maps', []);
 
 	if (hasRequest('sysmapid')) {
 		$sysmapIds[] = getRequest('sysmapid');
 	}
+
+	$sysmap_count = count($sysmapIds);
 
 	DBstart();
 
@@ -258,17 +261,17 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 	else {
 		uncheckTableRows(null, zbx_objectValues($maps, 'sysmapid'));
 	}
-	show_messages($result, _('Network map deleted'), _('Cannot delete network map'));
+
+	$messageSuccess = _n('Network map deleted', 'Network maps deleted', $sysmap_count);
+	$messageFailed = _n('Cannot delete network map', 'Cannot delete network maps', $sysmap_count);
+
+	show_messages($result, $messageSuccess, $messageFailed);
 }
 
 /*
  * Display
  */
 if (hasRequest('form')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = $current_userid;
 	$user_groupids = [];

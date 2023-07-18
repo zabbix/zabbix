@@ -267,7 +267,9 @@ class CService extends CApiService {
 
 		self::checkPermissions(self::getPermissions(), $services);
 
-		self::checkAndAddUuid($services);
+		self::addUuid($services);
+
+		self::checkUuidDuplicates($services);
 		self::checkStatusPropagation($services);
 		self::checkChildrenOrProblemTags($services);
 		self::checkChildrenOrProblemTagsInParents($services);
@@ -319,7 +321,8 @@ class CService extends CApiService {
 	 * @throws APIException
 	 */
 	private static function validateUpdate(array &$services, ?array &$db_services): void {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['serviceid']], 'fields' => [
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['serviceid']], 'fields' => [
+			'uuid' =>				['type' => API_UUID],
 			'serviceid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('services', 'name')],
 			'algorithm' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_SERVICE_STATUS_CALC_SET_OK, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ALL, ZBX_SERVICE_STATUS_CALC_MOST_CRITICAL_ONE])],
@@ -359,7 +362,7 @@ class CService extends CApiService {
 		}
 
 		$db_services = DB::select('services', [
-			'output' => ['serviceid', 'name', 'status', 'algorithm', 'sortorder', 'weight', 'propagation_rule',
+			'output' => ['uuid', 'serviceid', 'name', 'status', 'algorithm', 'sortorder', 'weight', 'propagation_rule',
 				'propagation_value', 'description'
 			],
 			'serviceids' => array_column($services, 'serviceid'),
@@ -376,6 +379,7 @@ class CService extends CApiService {
 
 		self::checkPermissions($permissions, $services, $db_services);
 
+		self::checkUuidDuplicates($services, $db_services);
 		self::checkParentChildRelations($services, $db_services);
 		self::checkStatusPropagation($services, $db_services);
 		self::checkChildrenOrProblemTags($services, $db_services);
@@ -1057,7 +1061,7 @@ class CService extends CApiService {
 			' FROM service_alarms sa'.
 			' WHERE '.dbConditionId('sa.serviceid', array_keys($result)).
 				' AND ('.implode(' OR ', $where_or).')'.
-			' ORDER BY sa.clock'
+			' ORDER BY sa.clock, sa.servicealarmid'
 		);
 
 		while ($db_alarm = DBfetch($db_alarms_resource)) {
@@ -1355,27 +1359,57 @@ class CService extends CApiService {
 	}
 
 	/**
+	 * Add the UUID to those of the given services that don't have the 'uuid' parameter set.
+	 *
 	 * @param array $services
-
-	 * @throws APIException
 	 */
-	private static function checkAndAddUuid(array &$services): void {
+	private static function addUuid(array &$services): void {
 		foreach ($services as &$service) {
 			if (!array_key_exists('uuid', $service)) {
 				$service['uuid'] = generateUuidV4();
 			}
 		}
 		unset($service);
+	}
 
-		$db_services = DB::select('services', [
+	/**
+	 * Verify service UUIDs are not repeated.
+	 *
+	 * @param array      $services
+	 * @param array|null $db_services
+	 *
+	 * @throws APIException
+	 */
+	private static function checkUuidDuplicates(array $services, array $db_services = null): void {
+		$service_indexes = [];
+
+		foreach ($services as $i => $service) {
+			if (!array_key_exists('uuid', $service)) {
+				continue;
+			}
+
+			if ($db_services === null || $service['uuid'] !== $db_services[$service['serviceid']]['uuid']) {
+				$service_indexes[$service['uuid']] = $i;
+			}
+		}
+
+		if (!$service_indexes) {
+			return;
+		}
+
+		$duplicates = DB::select('services', [
 			'output' => ['uuid'],
-			'filter' => ['uuid' => array_column($services, 'uuid')],
+			'filter' => [
+				'uuid' => array_keys($service_indexes)
+			],
 			'limit' => 1
 		]);
 
-		if ($db_services) {
+		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Entry with UUID "%1$s" already exists.', $db_services[0]['uuid'])
+				_s('Invalid parameter "%1$s": %2$s.', '/'.($service_indexes[$duplicates[0]['uuid']] + 1),
+					_('service with the same UUID already exists')
+				)
 			);
 		}
 	}

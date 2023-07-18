@@ -32,7 +32,6 @@
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -112,7 +111,6 @@
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -183,7 +181,6 @@
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -255,7 +252,6 @@
 		<?php else: ?>
 			<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
 				<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
-				<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>
 		<?php endif ?>
 			<input type="hidden" id="items_#{number}_gitemid" name="items[#{number}][gitemid]" value="#{gitemid}">
 			<input type="hidden" id="items_#{number}_itemid" name="items[#{number}][itemid]" value="#{itemid}">
@@ -658,12 +654,12 @@
 
 		initSortable() {
 			$('#itemsTable').sortable({
-				disabled: ($('#itemsTable tr.sortable').length < 2),
-				items: 'tbody tr.sortable',
+				disabled: ($('#itemsTable .sortable').length < 2),
+				items: '.sortable',
 				axis: 'y',
 				containment: 'parent',
 				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				handle: '.<?= ZBX_STYLE_DRAG_ICON ?>',
 				tolerance: 'pointer',
 				opacity: 0.6,
 				update: this.recalculateSortOrder,
@@ -671,12 +667,6 @@
 					for (const td of ui.find('>td')) {
 						const $td = $(td);
 						$td.attr('width', $td.width())
-					}
-
-					// When dragging element on safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', (ui.offset().left - 2) + 'px');
 					}
 
 					return ui;

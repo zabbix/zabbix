@@ -275,13 +275,13 @@ class testFormHost extends CWebTest {
 		// Click the "expand" icon (in the 0th column) for the SNMP interface (1st row).
 		$interfaces_form->getRow(1)->getColumn(0)->query('tag:button')->one()->click();
 		$snmp_form = $interfaces_form->getRow(1)->query('xpath:.//div[@class="form-grid"]')->one()->parents()
-				->asForm(['normalized' => true])->one();
+				->asGridForm(['normalized' => true])->one();
 		$data = [
-			'SNMPv1' => ['SNMP version', 'SNMP community'],
-			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count'],
-			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level'],
+			'SNMPv1' => ['SNMP version', 'SNMP community', 'Use combined requests'],
+			'SNMPv2' => ['SNMP version', 'SNMP community', 'Max repetition count', 'Use combined requests'],
+			'SNMPv3' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level', 'Use combined requests'],
 			'authNoPriv' => ['SNMP version', 'Max repetition count', 'Context name', 'Security name', 'Security level',
-				'Authentication protocol', 'Authentication passphrase'
+				'Authentication protocol', 'Authentication passphrase', 'Use combined requests'
 			]
 		];
 
@@ -312,14 +312,14 @@ class testFormHost extends CWebTest {
 		}
 
 		// Check hintbox.
-		$form->query('class:icon-help-hint')->one()->waitUntilClickable()->click();
+		$form->query('class:zi-help-filled-small')->one()->waitUntilClickable()->click();
 		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 
 		// Assert text.
 		$this->assertEquals('Max repetition count is applicable to discovery and walk only.', $hint->one()->getText());
 
 		// Close the hintbox.
-		$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 		$hint->waitUntilNotPresent();
 
 		// Close host form popup to avoid unexpected alert in further cases.
@@ -1762,12 +1762,11 @@ class testFormHost extends CWebTest {
 	}
 
 	/**
-	 * Clone or Full clone a host and compare the data with the original host.
+	 * Clone a host and compare the data with the original host.
 	 *
 	 * @param array     $data		   data provider with fields values
-	 * @param string    $button        Clone or Full clone
 	 */
-	public function cloneHost($data, $button = 'Clone') {
+	public function cloneHost($data) {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($data['host']));
 		$form = $this->openForm(($this->standalone ? 'zabbix.php?action=host.edit&hostid='.$hostid : $this->link), $data['host']);
 
@@ -1776,7 +1775,7 @@ class testFormHost extends CWebTest {
 		$original = $form->getFields()->filter(new CElementFilter(CElementFilter::VISIBLE))->asValues();
 
 		// Clone host.
-		$this->query('button', $button)->waitUntilClickable()->one()->click();
+		$this->query('button', 'Clone')->waitUntilClickable()->one()->click();
 
 		$cloned_form = (!$this->standalone)
 			? COverlayDialogElement::find()->asForm()->waitUntilReady()->one()
@@ -1855,11 +1854,6 @@ class testFormHost extends CWebTest {
 			],
 			[
 				[
-					'action' => 'Full clone'
-				]
-			],
-			[
-				[
 					'action' => 'Delete'
 				]
 			]
@@ -1914,7 +1908,7 @@ class testFormHost extends CWebTest {
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => ['1' => 'default']]);
 		$interfaces_form->fill($interface);
 
-		if (in_array($data['action'], ['Clone', 'Full clone', 'Delete'])) {
+		if (in_array($data['action'], ['Clone', 'Delete'])) {
 			$form_type->query('button', $data['action'])->one()->click();
 		}
 		if ($data['action'] === 'Delete') {
@@ -1923,18 +1917,17 @@ class testFormHost extends CWebTest {
 
 		$this->page->waitUntilReady();
 
-		// Check that the host creation page is open after cloning or full cloning.
-		if ($data['action'] === 'Clone' || $data['action'] === 'Full clone') {
+		// Check that the host creation page is open after cloning.
+		if ($data['action'] === 'Clone') {
 			$form_type->invalidate();
 			$id = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($host));
-			$action = ($data['action'] === 'Clone') ? 'clone' : 'full_clone';
-			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&'.$action.'=1';
+			$expected_url = PHPUNIT_URL.'zabbix.php?action=host.edit&hostid='.$id.'&clone=1';
 
 			$this->assertEquals($expected_url, $this->page->getCurrentUrl());
 			$this->assertFalse($form_type->query("xpath:.//ul[".CXPathHelper::fromClass('filter-breadcrumb')."]")
 					->one(false)->isValid()
 			);
-			$this->assertFalse($form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete'])->one(false)
+			$this->assertFalse($form_type->query('button', ['Update', 'Clone', 'Delete'])->one(false)
 					->isValid()
 			);
 			$this->assertTrue($form_type->query('button', ['Add', 'Cancel'])->one(false)->isValid());
@@ -2128,7 +2121,7 @@ class testFormHost extends CWebTest {
 					$this->assertEquals(self::DISCOVERED_HOST, $form->getField('Visible name')->getAttribute('placeholder'));
 
 					// Check hintbox.
-					$form->query('class:icon-help-hint')->one()->click();
+					$form->query('class:zi-help-filled-small')->one()->click();
 					$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
 					$this->assertEquals("Templates linked by host discovery cannot be unlinked.".
 							"\nUse host prototype configuration form to remove automatically linked templates on upcoming discovery.",
@@ -2136,7 +2129,7 @@ class testFormHost extends CWebTest {
 					);
 
 					// Close the hint-box.
-					$hint->one()->query('xpath:.//button[@class="overlay-close-btn"]')->one()->click();
+					$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 					$hint->waitUntilNotPresent();
 
 					$host_templates = [
@@ -2228,7 +2221,7 @@ class testFormHost extends CWebTest {
 			}
 		}
 
-		$this->assertEquals(5, $form_type->query('button', ['Update', 'Clone', 'Full clone', 'Delete', 'Cancel'])->all()
+		$this->assertEquals(4, $form_type->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 

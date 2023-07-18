@@ -41,7 +41,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->assertTrue($this->zbxTestCheckboxSelected('show_10'));
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
-			'Show suppressed problems', 'Show unacknowledged only', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
+			'Show suppressed problems', 'Acknowledgement status', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
 			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
@@ -57,7 +57,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertNotVisibleId('age_state_0');
 		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
 			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Show unacknowledged only', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
+			'Acknowledgement status', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
 			'Ack', 'Actions', 'Tags']);
 
 		$this->zbxTestCheckNoRealHostnames();
@@ -440,14 +440,14 @@ class testPageProblems extends CLegacyWebTest {
 		// Add tag
 		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
 		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
-		// Check Show unacknowledged only
-		$this->zbxTestCheckboxSelect('unacknowledged_0');
+		// Check Acknowledgement status.
+		$this->zbxTestCheckboxSelect('acknowledgement_status_1_0');
 		// Check Show details
 		$this->zbxTestCheckboxSelect('details_0');
-
 		// Apply filter and check result
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');
@@ -495,7 +495,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
 
 		// Check Show tags 3
 		$this->zbxTestClickXpath('//label[@for="show_tags_30"]');
@@ -508,7 +508,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestTextNotVisible('Tag4');
 		$this->zbxTestTextNotVisible('Tag5: 5');
 		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button[@class="icon-wizard-action"]');
+		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
 	}
 
 	public function getTagPriorityData() {
@@ -683,7 +683,7 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 
 		// Click on suppression icon and check text in hintbox.
-		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/button[@class="icon-action-suppress"]');
+		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/button['.CXPathHelper::fromClass('zi-eye-off').']');
 		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 Maintenance: Maintenance for suppression test');
 	}
 }

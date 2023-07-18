@@ -19,7 +19,6 @@
 
 #include "logfiles.h"
 
-#include "log.h"
 #include "zbxsysinfo.h"
 #include "cfg.h"
 #include "zbxregexp.h"
@@ -32,6 +31,7 @@
 #if defined(_WINDOWS) || defined(__MINGW32__)
 #	include "zbxtypes.h"	/* ssize_t */
 #	include "zbxwin32.h"
+#	include "zbxlog.h"
 #endif /* _WINDOWS */
 
 #define MAX_LEN_MD5	512	/* maximum size of the first and the last blocks of the file to calculate MD5 sum for */
@@ -48,8 +48,6 @@
 #define ZBX_FILE_PLACE_SAME	1	/* both files have the same device and inode numbers */
 
 extern int	CONFIG_MAX_LINES_PER_SECOND;
-
-extern ZBX_THREAD_LOCAL char	*CONFIG_HOSTNAME;
 
 /******************************************************************************
  *                                                                            *
@@ -348,15 +346,16 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 		else
 		{
 			*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain information for file \"%s\": %s",
-					filename, strerror_from_system(GetLastError()));
+					filename, zbx_strerror_from_system(GetLastError()));
 			return ret;
 		}
 	}
 	else if (2 == use_ino)
 	{
-		if (NULL != zbx_GetFileInformationByHandleEx)
+		if (NULL != zbx_get_GetFileInformationByHandleEx())
 		{
-			if (0 != zbx_GetFileInformationByHandleEx((HANDLE)h, zbx_FileIdInfo, &fid, sizeof(fid)))
+			if (0 != (*zbx_get_GetFileInformationByHandleEx())((HANDLE)h, zbx_FileIdInfo, &fid,
+					sizeof(fid)))
 			{
 				*dev = fid.VolumeSerialNumber;
 				*ino_lo = fid.FileId.LowPart;
@@ -365,7 +364,7 @@ static int	file_id(int f, int use_ino, zbx_uint64_t *dev, zbx_uint64_t *ino_lo, 
 			else
 			{
 				*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain extended information for file"
-						" \"%s\": %s", filename, strerror_from_system(GetLastError()));
+						" \"%s\": %s", filename, zbx_strerror_from_system(GetLastError()));
 				return ret;
 			}
 		}
@@ -405,7 +404,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 			sizeof(mount_point) / sizeof(wchar_t)))
 	{
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume mount point for file \"%s\": %s", path,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(path_uni);
 		return FAIL;
 	}
@@ -418,7 +417,7 @@ static int	set_use_ino_by_fs_type(const char *path, int *use_ino, char **err_msg
 	{
 		utf8 = zbx_unicode_to_utf8(mount_point);
 		*err_msg = zbx_dsprintf(*err_msg, "Cannot obtain volume information for directory \"%s\": %s", utf8,
-				strerror_from_system(GetLastError()));
+				zbx_strerror_from_system(GetLastError()));
 		zbx_free(utf8);
 		return FAIL;
 	}
@@ -2038,7 +2037,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		zbx_process_value_func_t process_value, zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		const char *hostname, const char *key, zbx_uint64_t *lastlogsize_sent, int *mtime_sent,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout, char **err_msg)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip, char **err_msg)
 {
 	static ZBX_THREAD_LOCAL char	*buf = NULL;
 
@@ -2176,7 +2175,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
-									config_tls, config_timeout)))
+									config_tls, config_timeout, config_source_ip)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2291,7 +2290,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 									hostname, key, item_value, ITEM_STATE_NORMAL,
 									&processed_size, mtime, NULL, NULL, NULL, NULL,
 									flags | ZBX_METRIC_FLAG_PERSISTENT,
-									config_tls, config_timeout)))
+									config_tls, config_timeout, config_source_ip)))
 							{
 								*lastlogsize_sent = processed_size;
 
@@ -2416,6 +2415,7 @@ out:
  *                                persistent files                            *
  *     config_tls      - [IN]                                                 *
  *     config_timeout  - [IN]                                                 *
+ *     config_source_ip - [IN]                                                *
  *     err_msg         - [IN/OUT] error message why an item became            *
  *                       NOTSUPPORTED                                         *
  *                                                                            *
@@ -2435,7 +2435,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key,
 		zbx_uint64_t *processed_bytes, zbx_uint64_t seek_offset, const char *persistent_file_name,
 		zbx_vector_pre_persistent_t *prep_vec, const zbx_config_tls_t *config_tls, int config_timeout,
-		char **err_msg)
+		const char *config_source_ip, char **err_msg)
 {
 	int	f, ret = FAIL;
 
@@ -2454,7 +2454,7 @@ static int	process_log(unsigned char flags, struct st_logfile *logfile, zbx_uint
 		if (SUCCEED == (ret = zbx_read2(f, flags, logfile, lastlogsize, mtime, big_rec, encoding, regexps,
 				pattern, output_template, p_count, s_count, process_value, addrs, agent2_result,
 				hostname, key, lastlogsize_sent, mtime_sent, persistent_file_name, prep_vec,
-				config_tls, config_timeout, err_msg)))
+				config_tls, config_timeout, config_source_ip, err_msg)))
 		{
 			*processed_bytes = *lastlogsize - seek_offset;
 		}
@@ -3288,6 +3288,7 @@ static int	update_new_list_from_old(zbx_log_rotation_options_t rotation_type, st
  *                                 persistent files                           *
  *     config_tls       - [IN]                                                *
  *     config_timeout   - [IN]                                                *
+ *     config_source_ip - [IN]                                                *
  *                                                                            *
  * Return value: returns SUCCEED on successful reading,                       *
  *               FAIL on other cases                                          *
@@ -3304,7 +3305,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 		zbx_vector_ptr_t *agent2_result, const char *hostname, const char *key, int *jumped, float max_delay,
 		double *start_time, zbx_uint64_t *processed_bytes, zbx_log_rotation_options_t rotation_type,
 		const char *persistent_file_name, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip)
 {
 	int			i, start_idx, ret = FAIL, logfiles_num = 0, logfiles_alloc = 0, seq = 1,
 				from_first_file = 1, last_processed, limit_reached = 0, res;
@@ -3510,7 +3511,7 @@ static int	process_logrt(unsigned char flags, const char *filename, zbx_uint64_t
 						mtime_sent, skip_old_data, big_rec, encoding, regexps, pattern,
 						output_template, p_count, s_count, process_value, addrs, agent2_result,
 						hostname, key, &processed_bytes_tmp, seek_offset, persistent_file_name,
-						prep_vec, config_tls, config_timeout, err_msg);
+						prep_vec, config_tls, config_timeout, config_source_ip, err_msg);
 
 				/* process_log() advances 'lastlogsize' only on success therefore */
 				/* we do not check for errors here */
@@ -3840,7 +3841,7 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 
 /******************************************************************************
  *                                                                            *
- * Comments: Function body is thread-safe if CONFIG_HOSTNAME is not updated   *
+ * Comments: Function body is thread-safe if config_hostname is not updated   *
  *           while log checks are running. Uses callback function             *
  *           process_value_cb, so overall thread-safety depends on caller.    *
  *           Otherwise supposed to be thread-safe, see pick_logfiles()        *
@@ -3850,7 +3851,8 @@ static int	init_persistent_dir_parameter(const char *server, unsigned short port
 int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
-		const zbx_config_tls_t *config_tls, int config_timeout)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname)
 {
 	AGENT_REQUEST			request;
 	const char			*filename, *regexp, *encoding, *skip, *output_template;
@@ -4077,9 +4079,10 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	ret = process_logrt(metric->flags, filename, &metric->lastlogsize, &metric->mtime, lastlogsize_sent, mtime_sent,
 			&metric->skip_old_data, &metric->big_rec, &metric->use_ino, error, &metric->logfiles,
 			metric->logfiles_num, &logfiles_new, &logfiles_num_new, encoding, regexps, regexp,
-			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, CONFIG_HOSTNAME,
+			output_template, &p_count, &s_count, process_value_cb, addrs, agent2_result, config_hostname,
 			metric->key_orig, &jumped, max_delay, &metric->start_time, &metric->processed_bytes,
-			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout);
+			rotation_type, metric->persistent_file_name, prep_vec, config_tls, config_timeout,
+			config_source_ip);
 
 	if (0 == is_count_item && NULL != logfiles_new)
 	{
@@ -4105,10 +4108,10 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 			zbx_snprintf(buf, sizeof(buf), "%d", match_count);
 
-			if (SUCCEED == process_value_cb(addrs, agent2_result, CONFIG_HOSTNAME, metric->key_orig, buf,
+			if (SUCCEED == process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 					ITEM_STATE_NORMAL, &metric->lastlogsize, &metric->mtime, NULL, NULL, NULL, NULL,
-					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout) ||
-					0 != jumped)
+					metric->flags | ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout,
+					config_source_ip) || 0 != jumped)
 			{
 				/* if process_value() fails (i.e. log(rt).count result cannot be sent to server) but */
 				/* a jump took place to meet <maxdelay> then we discard the result and keep the state */

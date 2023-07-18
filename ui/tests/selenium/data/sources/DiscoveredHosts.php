@@ -136,15 +136,12 @@ class DiscoveredHosts {
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID2).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".$hostgroupid.")"
+==== BASE ====
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", 4)"
+==== BASE ====
 		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".zbx_dbstr(self::DISCOVERED_GROUPID).")"
-		);
-		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID2).
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).",".zbx_dbstr(self::DISCOVERED_GROUPID2).")"
-		);
-		// Add tags for discovered hosts.
+==== BASE ====
+==== BASE ====
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
 				zbx_dbstr(self::DISCOVERED_HOSTID).", 'action', 'update')"
 		);
@@ -214,7 +211,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template1 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery2',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]
@@ -239,7 +236,7 @@ class DiscoveredHosts {
 				'discoveryrules' => [
 					[
 						'name' => 'Template2 discovery rule',
-						'key_' => 'vfs.fs.discovery',
+						'key_' => 'vfs.fs.discovery3',
 						'type' => ITEM_TYPE_TRAPPER
 					]
 				]

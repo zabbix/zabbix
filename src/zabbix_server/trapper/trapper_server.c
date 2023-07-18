@@ -19,7 +19,6 @@
 
 #include "trapper_request.h"
 
-#include "log.h"
 #include "cfg.h"
 #include "trapper_auth.h"
 #include "zbxdbhigh.h"
@@ -29,6 +28,7 @@
 #include "zbxcommshigh.h"
 #include "zbxnum.h"
 #include "proxyconfigread/proxyconfig_read.h"
+#include "proxydata.h"
 
 extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
@@ -77,7 +77,7 @@ out:
  *              jp    - [IN] the request data                                 *
  *                                                                            *
  ******************************************************************************/
-static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp)
+static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -200,7 +200,7 @@ fail:
 	if (NULL != debug)
 		zbx_json_addraw(&json, "debug", debug);
 
-	(void)zbx_tcp_send(sock, json.buffer);
+	(void)zbx_tcp_send_to(sock, json.buffer, config_timeout);
 
 	zbx_free(params);
 	zbx_free(message);
@@ -217,26 +217,31 @@ fail:
 }
 
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_tls_t *config_tls, const zbx_config_vault_t *config_vault,
-		zbx_get_program_type_f get_program_type_cb, int config_timeout, const char *server)
+		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
+		const zbx_config_vault_t *config_vault, int proxydata_frequency,
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs)
 {
-	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(get_program_type_cb);
-	ZBX_UNUSED(server);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
-		trapper_process_report_test(sock, jp, config_timeout);
+		trapper_process_report_test(sock, jp, config_comms->config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
 	{
-		trapper_process_alert_send(sock, jp);
+		trapper_process_alert_send(sock, jp, config_comms->config_timeout);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
-		zbx_send_proxyconfig(sock, jp, config_vault, config_timeout);
+		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
+				config_comms->config_source_ip);
+		return SUCCEED;
+	}
+	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_DATA))
+	{
+		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 		return SUCCEED;
 	}
 
