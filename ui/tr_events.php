@@ -67,6 +67,8 @@ $events = API::Event()->get([
 		'suppress_until'
 	],
 	'selectTags' => ['tag', 'value'],
+	'source' => EVENT_SOURCE_TRIGGERS,
+	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid'),
 	'value' => TRIGGER_VALUE_TRUE
@@ -93,6 +95,8 @@ $event['comments'] = ($trigger['comments'] !== '')
 if ($event['r_eventid'] != 0) {
 	$r_events = API::Event()->get([
 		'output' => ['correlationid', 'userid'],
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'eventids' => [$event['r_eventid']],
 		'objectids' => getRequest('triggerid')
 	]);

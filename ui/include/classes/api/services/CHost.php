@@ -2557,6 +2557,8 @@ class CHost extends CHostGeneral {
 			$problems = API::Problem()->get([
 				'output' => ['objectid'],
 				'objectids' => array_keys($triggers),
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'suppressed' => $options['withProblemsSuppressed'],
 				'severities' => $options['severities'],
 				'nopermissions' => true

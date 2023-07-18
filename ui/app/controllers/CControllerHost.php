@@ -198,6 +198,8 @@ abstract class CControllerHost extends CController {
 
 		$problems = API::Problem()->get([
 			'output' => ['eventid', 'objectid', 'severity'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
 			'suppressed' => ($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
 			'symptom' => false

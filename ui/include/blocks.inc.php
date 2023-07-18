@@ -126,6 +126,8 @@ function getSystemStatusData(array $filter) {
 		'hostids' => $filter_hostids,
 		'evaltype' => $filter_evaltype,
 		'tags' => $filter_tags,
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'suppressed' => false,
 		'symptom' => false,
 		'sortfield' => ['eventid'],

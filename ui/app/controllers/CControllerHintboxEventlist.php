@@ -111,6 +111,8 @@ class CControllerHintboxEventlist extends CController {
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'clock', 'ns', 'acknowledged', 'cause_eventid'],
 			'selectAcknowledges' => ['action', 'taskid'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => $trigger['triggerid'],
 			'eventid_till' => $this->getInput('eventid_till'),
 			'value' => TRIGGER_VALUE_TRUE,
@@ -140,6 +142,8 @@ class CControllerHintboxEventlist extends CController {
 		$r_events = $r_eventids
 			? API::Event()->get([
 				'output' => ['clock', 'correlationid', 'userid'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
 				'preservekeys' => true
 			])

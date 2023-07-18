@@ -110,6 +110,8 @@ class CControllerNotificationsGet extends CController {
 		// Select problem events.
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'severities' => array_keys($this->settings['triggers.severities']),
 			'suppressed' => $this->settings['show_suppressed'] ? null : false,
 			'symptom' => false,

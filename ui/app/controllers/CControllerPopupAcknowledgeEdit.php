@@ -67,7 +67,9 @@ class CControllerPopupAcknowledgeEdit extends CController {
 
 		$events = API::Event()->get([
 			'countOutput' => true,
-			'eventids' => $this->getInput('eventids')
+			'eventids' => $this->getInput('eventids'),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER
 		]);
 
 		return $events == count($this->getInput('eventids'));
@@ -110,6 +112,8 @@ class CControllerPopupAcknowledgeEdit extends CController {
 				? ['maintenanceid', 'suppress_until']
 				: null,
 			'eventids' => $this->getInput('eventids'),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'preservekeys' => true
 		]);
 

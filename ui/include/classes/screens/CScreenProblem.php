@@ -69,6 +69,8 @@ class CScreenProblem extends CScreenBase {
 	private static function getDataEvents(array $options) {
 		return API::Event()->get([
 			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'value' => TRIGGER_VALUE_TRUE,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
@@ -98,6 +100,8 @@ class CScreenProblem extends CScreenBase {
 	private static function getDataProblems(array $options) {
 		return API::Problem()->get([
 			'output' => ['eventid', 'objectid', 'clock', 'ns', 'name', 'severity', 'cause_eventid'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'sortfield' => ['eventid'],
 			'sortorder' => ZBX_SORT_DOWN,
 			'preservekeys' => true
@@ -512,6 +516,8 @@ class CScreenProblem extends CScreenBase {
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
 			'selectTags' => ['tag', 'value'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
 			'preservekeys' => true
 		]);
@@ -526,6 +532,8 @@ class CScreenProblem extends CScreenBase {
 		$r_events = $r_eventids
 			? API::Event()->get([
 				'output' => ['clock', 'ns', 'correlationid', 'userid'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
 				'eventids' => array_keys($r_eventids),
 				'preservekeys' => true
 			])
@@ -565,6 +573,8 @@ class CScreenProblem extends CScreenBase {
 			],
 			'selectSuppressionData' => ['maintenanceid', 'userid', 'suppress_until'],
 			'selectTags' => ['tag', 'value'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => $eventids,
 			'recent' => true,
 			'preservekeys' => true
@@ -1009,7 +1019,7 @@ class CScreenProblem extends CScreenBase {
 					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
-			// There might be cause events without symptoms or only symptoms.
+			// There might because events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
 				$col_header = new CColHeader();
 

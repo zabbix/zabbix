@@ -64,6 +64,8 @@ function get_events_unacknowledged($db_element, $value_trigger = null, $value_ev
 	$triggerids = API::Trigger()->get($options);
 
 	return API::Event()->get([
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'countOutput' => true,
 		'objectids' => zbx_objectValues($triggerids, 'triggerid'),
 		'filter' => [
@@ -347,8 +349,10 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 		'selectAcknowledges' => ['userid', 'clock', 'message', 'action', 'old_severity', 'new_severity',
 			'suppress_until', 'taskid'
 		],
-		'objectids' => $startEvent['objectid'],
+		'source' => EVENT_SOURCE_TRIGGERS,
+		'object' => EVENT_OBJECT_TRIGGER,
 		'value' => TRIGGER_VALUE_TRUE,
+		'objectids' => $startEvent['objectid'],
 		'eventid_till' => $startEvent['eventid'],
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN,
@@ -366,6 +370,8 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 	$r_events = $r_eventids
 		? API::Event()->get([
 			'output' => ['clock'],
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'eventids' => array_keys($r_eventids),
 			'preservekeys' => true
 		])
@@ -407,7 +413,6 @@ function make_small_eventlist(array $startEvent, array $allowed) {
 
 		if ($event['r_eventid'] != 0) {
 			$value = TRIGGER_VALUE_FALSE;
-			$value_str = _('RESOLVED');
 			$value_clock = $event['r_clock'];
 			$can_be_closed = false;
 		}
