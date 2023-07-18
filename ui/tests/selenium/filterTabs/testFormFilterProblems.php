@@ -329,7 +329,7 @@ class testFormFilterProblems extends testFormFilter {
 	 */
 	public function testFormFilterProblems_TimePeriod($data) {
 		$this->createFilter($data, 'Admin', 'zabbix');
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 		$form = $filter->getForm();
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -349,10 +349,11 @@ class testFormFilterProblems extends testFormFilter {
 		else {
 			// Changing time period from timeselector tab.
 			$form->fill(['Show' => 'History']);
-			$this->query('xpath://a[@class="tabfilter-item-link btn-time"]')->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_RIGHT);
+			$filter->selectTab('Last 1 hour');
 			$this->query('xpath://input[@id="from"]')->one()->fill('now-2y');
-			$this->query('id:apply')->one()->click();
-			$filter->getTab($data['filter']['Name'])->click(true);
+			$filter->query('id:apply')->one()->click();
+			$filter->setContext(CFilterElement::CONTEXT_LEFT)->selectTab($data['filter']['Name']);
 			$this->query('button:Update')->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 			$table->waitUntilReloaded();

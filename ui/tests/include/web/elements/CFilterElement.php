@@ -28,6 +28,33 @@ require_once dirname(__FILE__).'/../CElement.php';
 class CFilterElement extends CElement {
 
 	/**
+	 * Filter with multitab on the left, such as on the Problems, Hosts and Latest Data pages in the Monitoring section.
+	 */
+	const CONTEXT_LEFT = 0;
+
+	/**
+	 * Filter with "Filter" and/or time tabs on the right.
+	 */
+	const CONTEXT_RIGHT = 1;
+
+	protected $context = self::CONTEXT_RIGHT;
+
+	/**
+	 * Set filter context.
+	 *
+	 * @param integer $context    CONTEXT_LEFT or CONTEXT_RIGHT
+	 */
+	public function setContext($context) {
+		$this->context = $context;
+
+		if (!in_array($this->context, [self::CONTEXT_LEFT, self::CONTEXT_RIGHT])) {
+			throw new Exception('Unknown context is set for filter element.');
+		}
+
+		return $this;
+	}
+
+	/**
 	 * @inheritdoc
 	 */
 	public static function find() {
@@ -46,30 +73,43 @@ class CFilterElement extends CElement {
 	}
 
 	/*
-	 * Get data depending on the filter type. It can be a simple filter with "Filter" and time tabs on the right, or
-	 * a filter with multitab, such as on the Problems, Hosts and Latest Data pages in the Monitoring section.
+	 * Get data depending on the filter type.
 	 *
 	 * @return array
 	 */
 	public function getFilterType() {
-		if ($this->query('xpath:./nav')->one(false)->isValid()) {
-			// Multitab filter.
-			$selected_tab = $this->query('xpath:./nav/ul/li/ul/li['.CXPathHelper::fromClass('selected').']')->one();
-			$attribute = 'data-target';
-			$is_expanded = $selected_tab->hasClass('expanded');
+		if ($this->context === self::CONTEXT_LEFT) {
+			return [
+				'selected_tab' => $this->query('xpath:./nav/ul/li/ul['.CXPathHelper::fromClass('ui-sortable-container').
+						']/li['.CXPathHelper::fromClass('selected').']')->one(),
+				'attribute' => 'data-target',
+				'is_expanded' => function ($target) {
+					$target->hasClass('expanded');
+				}
+			];
 		}
 		else {
-			// Last selected tab. It can be closed or open.
-			$selected_tab = $this->query('xpath:./ul/li[@tabindex="0"]')->one();
-			$attribute = 'aria-controls';
-			$is_expanded = filter_var($selected_tab->getAttribute('aria-expanded'), FILTER_VALIDATE_BOOLEAN);
-		}
+			// Time tab on the right side in multitab filter.
+			if ($this->query('xpath:./nav')->one(false)->isValid()) {
+				return [
+					'selected_tab' => $this->query('xpath:./nav/ul/li/ul[not(contains(@class,"ui-sortable-container"))]'.
+							'/li['.CXPathHelper::fromClass('selected').']')->one(),
+					'attribute' => 'data-target',
+					'is_expanded' => function ($target) {
+						$target->hasClass('expanded');
+					}
+				];
+			}
 
-		return [
-			'selected_tab' => $selected_tab,
-			'attribute' => $attribute,
-			'is_expanded' => $is_expanded,
-		];
+			return [
+				// Last selected tab. It can be closed or open.
+				'selected_tab' => $this->query('xpath:./ul/li[@tabindex="0"]')->one(),
+				'attribute' => 'aria-controls',
+				'is_expanded' =>  function ($target) {
+					filter_var($target->getAttribute('aria-expanded'), FILTER_VALIDATE_BOOLEAN);
+				}
+			];
+		}
 	}
 
 	/**
@@ -80,27 +120,25 @@ class CFilterElement extends CElement {
 	 * @return CElement
 	 */
 	public function getTab($name = null) {
-		if ($name === null) {
-			return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
-					->one();
+		if ($this->context === self::CONTEXT_LEFT) {
+			if ($name === null) {
+				return $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and @aria-label="Home"]')
+						->one();
+			}
+
+			// TODO: check git-hook
+			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+
+			if (!$tab->isValid() && is_numeric($name)) {
+				$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);
+			}
 		}
 		else {
-			if ($this->query('xpath:./nav')->one(false)->isValid()) {
-				$tab = $this->query('xpath:.//a[@class="tabfilter-item-link" and text()='.
-						CXPathHelper::escapeQuotes($name).']')->one(false);
+			$tab = $this->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
+		}
 
-				if (!$tab->isValid() && is_numeric($name)) {
-					$tab = $this->query('xpath:(.//a[@class="tabfilter-item-link"])['.$name.']')->one(false);
-				}
-			}
-			else {
-				$tab = $this->query('xpath:.//a[text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
-			}
-
-			if (!$tab->isValid()) {
-				throw new \Exception('Failed to find tab "'.$name.'"');
-			}
-
+		if (!$tab->isValid()) {
+			throw new \Exception('Failed to find tab "'.$name.'"');
 		}
 
 		return $tab;
@@ -143,14 +181,10 @@ class CFilterElement extends CElement {
 	 * @return CElement
 	 */
 	public function getSelectedTab() {
-		if ($this->query('xpath:./nav')->one(false)->isValid()) {
-			$tab = $this->query('xpath:.//li[contains(@class, "tabfilter-item-label") and contains(@class, "selected")]');
+		$filter = $this->getFilterType();
 
-			if ($tab->all()->count() > 1) {
-				CTest::zbxAddWarning('More than one tab selected: '.implode(', ', $tab->all()->asText()));
-			}
-
-			return $tab->one();
+		if ($this->context === self::CONTEXT_LEFT || $this->query('xpath:./nav')->one(false)->isValid()) {
+			return $filter['selected_tab'];
 		}
 
 		// Selected and expanded tab.
@@ -188,7 +222,13 @@ class CFilterElement extends CElement {
 	 * @return boolean
 	 */
 	public function isTabSelected($name = null, $selected = true) {
-		return ($this->getSelectedTabName() === $name) === $selected;
+		$tab = $this->getTab($name)->parents('tag:li')->one();
+
+		if ($this->query('xpath:./nav')->one(false)->isValid()) {
+			return $tab->hasClass('selected') === $selected;
+		}
+
+		return $tab->getAttribute('aria-selected') === json_encode($selected);
 	}
 
 	/**
@@ -200,7 +240,15 @@ class CFilterElement extends CElement {
 	 */
 	public function selectTab($name = null) {
 		if ($this->isTabSelected($name)) {
-			return $this;
+			$selected = true;
+			// Check that time filter tab is not open.
+			if ($this->context === self::CONTEXT_LEFT && $this->query('id:tabfilter_timeselector')->one()->isVisible()) {
+				$selected = false;
+			}
+
+			if ($selected) {
+				return $this;
+			}
 		}
 
 		$tab = $this->getTab($name);
@@ -255,7 +303,7 @@ class CFilterElement extends CElement {
 	public function expand($expand = true) {
 		$filter = $this->getFilterType();
 
-		if ($filter['is_expanded'] === $expand) {
+		if (call_user_func($filter['is_expanded'], $filter['selected_tab']) === $expand) {
 			return $this;
 		}
 

@@ -45,7 +45,7 @@ class testFormFilter extends CWebTest {
 	 * @param array $data  given data provider
 	 */
 	public function checkFilters($data, $table_selector) {
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
@@ -97,7 +97,7 @@ class testFormFilter extends CWebTest {
 	 */
 	public function checkRememberedFilters($data, $table_selector = 'class:list-table') {
 		$this->page->login()->open($this->url.'&filter_reset=1')->waitUntilReady();
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		// Checking if home tab is selected.
 		if ($filter->getSelectedTabName() !== 'Home') {
@@ -140,7 +140,7 @@ class testFormFilter extends CWebTest {
 		$this->page->open($this->url)->waitUntilReady();
 
 		// Changing filter data.
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 		$filter->selectTab('update_tab');
 		$form = $filter->getForm();
 		$result_before = $this->getTableResults($table_selector);
@@ -193,7 +193,7 @@ class testFormFilter extends CWebTest {
 	public function updateFilterProperties($user, $password) {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		// Checking that filter result amount displayed.
 		$this->assertTrue($this->query('xpath://li[@data-target="tabfilter_1"]/a[@data-counter]')->exists());
@@ -227,7 +227,7 @@ class testFormFilter extends CWebTest {
 	public function deleteFilter($user, $password) {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		$tabs = $filter->getTabTitles();
 		foreach ($tabs as $tab) {
@@ -261,7 +261,7 @@ class testFormFilter extends CWebTest {
 	public function createFilter($data, $user, $password, $table_selector = 'class:list-table') {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		// Checking if home tab is selected.
 		if ($filter->getSelectedTabName() !== 'Home') {
@@ -321,7 +321,7 @@ class testFormFilter extends CWebTest {
 	 * @param string $filter_name	filter name, that need to be checked in properties, droplist and tab list
 	 */
 	public function checkName($filter_name) {
-		$filter = CFilterElement::find()->one();
+		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 
 		// Checking that name of filter displayed on the tab.
 		$this->assertEquals($filter_name, $filter->getSelectedTabName());
