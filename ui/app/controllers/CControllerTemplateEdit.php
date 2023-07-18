@@ -321,14 +321,11 @@ class CControllerTemplateEdit extends CController {
 		}
 		unset($macro);
 
-		if ($templateid !== null) {
-			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
-		}
-		elseif ($clone) {
-			$groups = $this->getInput('groups', []);
-		}
-		else {
+		if ($templateid === null) {
 			$groups = $this->getInput('groupids', []);
+		}
+		elseif ($templateid !== null && !$clone) {
+			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
 		}
 
 		$groupids = [];
