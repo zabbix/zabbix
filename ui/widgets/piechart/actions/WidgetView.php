@@ -511,7 +511,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private static function getSectorsData(array &$metrics, array &$total_value, array $merge_sectors,
 			array $total_config, array $units_config, string $templateid): void {
-		$set_default_item = true;
+		$set_default_unit = true;
+		$default_unit = '';
 		$raw_total_value = 0;
 		$others_value = 0;
 		$below_threshold_count = 0;
@@ -556,9 +557,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				$metric['item']['units'] = '';
 			}
 
-			if ($set_default_item && isset($metric['item'])) {
-				$default_item = $metric['item'];
-				$set_default_item = false;
+			if ($set_default_unit && isset($metric['item'])) {
+				$default_unit = $metric['item']['units'];
+				$set_default_unit = false;
 			}
 
 			$formatted_value = convertUnitsRaw([
@@ -573,6 +574,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'name' => $metric['name'],
 				'color' => $metric['options']['color'],
 				'value' => $metric['value'],
+				'units' => $metric['item']['units'],
 				'formatted_value' => $formatted_value,
 				'is_total' => $is_total
 			];
@@ -588,6 +590,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($metrics as $metric) {
 			if ($metric['is_total']) {
 				$raw_total_value = ($metric['value'] <= 0) ? 0 : $metric['value'];
+				$default_unit = $metric['units'];
 				break;
 			}
 		}
@@ -614,6 +617,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 					$to_remove[] = &$metric;
 				}
 			}
+
+			unset($metric['units']);
 		}
 
 		unset($metric);
@@ -621,7 +626,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		if ($below_threshold_count >= 2) {
 			$others_formatted_value = convertUnitsRaw([
 				'value' => $others_value,
-				'units' => $default_item['units'],
+				'units' => $default_unit,
 				'small_scientific' => false,
 				'zero_as_zero' => false
 			]);
@@ -655,7 +660,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			$formatted_total_value = convertUnitsRaw([
 				'value' => $raw_total_value,
-				'units' => $default_item['units'] ?? '',
+				'units' => $default_unit,
 				'decimals' => $total_config['decimal_places'],
 				'decimals_exact' => true,
 				'small_scientific' => false,
