@@ -825,16 +825,11 @@ finish:
 		char	buf[ZBX_MAX_UINT64_LEN];
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
+		*lastlogsize_sent = lastlogsize = metric->lastlogsize = 0;
 
 		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
-
-		if (SUCCEED == send_err)
-		{
-			*lastlogsize_sent = lastlogsize;
-			metric->lastlogsize = lastlogsize;
-		}
 	}
 out:
 	zbx_close_eventlog(eventlog_handle);
