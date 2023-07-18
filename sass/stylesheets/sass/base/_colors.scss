@@ -319,6 +319,12 @@ $clock-hand-color: #1f2c33 !default;
 $clock-hand-sec-color: #0275b8 !default;
 $clock-lines-color: #acbbc2 !default;
 
+// Gauge arcs and needle.
+$gauge-empty-color: #ebebeb !default;
+$gauge-fill-color: #0275b8 !default;
+$gauge-needle-fill-color: #1f2c33 !default;
+$gauge-needle-stroke-color: #1f2c33 !default;
+
 // Pie chart.
 $pie-chart-no-data-stroke-color: #1f2c33 !default;
 

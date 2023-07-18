@@ -81,6 +81,10 @@ static zbx_get_config_int_f	get_config_enable_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_log_remote_commands_cb = NULL;
 static zbx_get_config_int_f	get_config_unsafe_user_parameters_cb = NULL;
 static zbx_get_config_str_f	get_config_source_ip_cb = NULL;
+static zbx_get_config_str_f	get_config_hostname_cb = NULL;
+static zbx_get_config_str_f	get_config_hostnames_cb = NULL;
+static zbx_get_config_str_f	get_config_host_metadata_cb = NULL;
+static zbx_get_config_str_f	get_config_host_metadata_item_cb = NULL;
 
 #define ZBX_COMMAND_ERROR		0
 #define ZBX_COMMAND_WITHOUT_PARAMS	1
@@ -157,13 +161,19 @@ static int	add_to_metrics(zbx_metric_t **metrics, zbx_metric_t *metric, char *er
 void	zbx_init_library_sysinfo(zbx_get_config_int_f get_config_timeout_f, zbx_get_config_int_f
 		get_config_enable_remote_commands_f, zbx_get_config_int_f get_config_log_remote_commands_f,
 		zbx_get_config_int_f get_config_unsafe_user_parameters_f, zbx_get_config_str_f
-		get_config_source_ip_f)
+		get_config_source_ip_f, zbx_get_config_str_f get_config_hostname_f, zbx_get_config_str_f
+		get_config_hostnames_f, zbx_get_config_str_f get_config_host_metadata_f, zbx_get_config_str_f
+		get_config_host_metadata_item_f)
 {
 	get_config_timeout_cb = get_config_timeout_f;
 	get_config_enable_remote_commands_cb = get_config_enable_remote_commands_f;
 	get_config_log_remote_commands_cb = get_config_log_remote_commands_f;
 	get_config_unsafe_user_parameters_cb = get_config_unsafe_user_parameters_f;
 	get_config_source_ip_cb = get_config_source_ip_f;
+	get_config_hostname_cb = get_config_hostname_f;
+	get_config_hostnames_cb = get_config_hostnames_f;
+	get_config_host_metadata_cb = get_config_host_metadata_f;
+	get_config_host_metadata_item_cb = get_config_host_metadata_item_f;
 }
 
 /******************************************************************************
@@ -287,25 +297,20 @@ void	zbx_set_metrics(zbx_metric_t *metrics)
 }
 #endif
 
-int	sysinfo_get_config_timeout(void)
-{
-	return get_config_timeout_cb();
+#define GET_CONFIG_VAR(type, varname) \
+type	sysinfo_get_config_##varname(void) \
+{ \
+	return get_config_##varname##_cb(); \
 }
-
-const char	*sysinfo_get_config_source_ip(void)
-{
-	return get_config_source_ip_cb();
-}
-
-int	sysinfo_get_config_log_remote_commands(void)
-{
-	return get_config_log_remote_commands_cb();
-}
-
-int	sysinfo_get_config_unsafe_user_parameters(void)
-{
-	return get_config_unsafe_user_parameters_cb();
-}
+GET_CONFIG_VAR(int, timeout)
+GET_CONFIG_VAR(int, log_remote_commands)
+GET_CONFIG_VAR(int, unsafe_user_parameters)
+GET_CONFIG_VAR(const char *, source_ip)
+GET_CONFIG_VAR(const char *, hostname)
+GET_CONFIG_VAR(const char *, hostnames)
+GET_CONFIG_VAR(const char *, host_metadata)
+GET_CONFIG_VAR(const char *, host_metadata_item)
+#undef GET_CONFIG_VAR
 
 void	zbx_init_metrics(void)
 {
@@ -1854,6 +1859,7 @@ out:
  ******************************************************************************/
 void	zbx_mpoints_free(zbx_mpoint_t *mpoint)
 {
+	zbx_free(mpoint->options);
 	zbx_free(mpoint);
 }
 

@@ -58,6 +58,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/service/info";
 @import "components/status-container";
 @import "components/subfilter";
+@import "components/svg-gauge";
 @import "components/svg-graph";
 @import "components/svg-piechart";
 @import "components/tabfilter";
@@ -67,6 +68,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-select";
 
 @import "components/dashboard/widget-clock";
+@import "components/dashboard/widget-gauge";
 @import "components/dashboard/widget-hostavail";
 @import "components/dashboard/widget-inaccessible";
 @import "components/dashboard/widget-item";

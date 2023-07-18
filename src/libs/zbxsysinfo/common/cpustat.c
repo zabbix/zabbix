@@ -23,6 +23,7 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #	include "../win32/win32_cpu.h"
+#	include <strsafe.h> /* StringCchPrintf */
 #endif
 #include "zbxmutexs.h"
 
