@@ -162,17 +162,17 @@ class CSVGPie {
 	/**
 	 * Set size of the root SVG element and re-position the elements.
 	 *
-	 * @param {number} contents_width
-	 * @param {number} contents_height
+	 * @param {number} width
+	 * @param {number} height
 	 */
-	setSize({contents_width, contents_height}) {
-		this.#width = contents_width - (this.#padding.horizontal) * 2;
-		this.#height = contents_height - (this.#padding.vertical) * 2;
+	setSize({width, height}) {
+		this.#width = width - (this.#padding.horizontal) * 2;
+		this.#height = height - (this.#padding.vertical) * 2;
 
 		this.#svg
-			.attr('width', contents_width)
-			.attr('height', contents_height)
-			.attr('viewBox', `0 0 ${contents_width} ${contents_height}`)
+			.attr('width', width)
+			.attr('height', height)
+			.attr('viewBox', `0 0 ${width} ${height}`)
 
 		const scalable_bbox = this.#g_scalable.node().getBBox();
 		const box_width = Math.max(this.#radius_outer, -scalable_bbox.x, scalable_bbox.width + scalable_bbox.x) * 2;

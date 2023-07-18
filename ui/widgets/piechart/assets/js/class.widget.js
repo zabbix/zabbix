@@ -147,10 +147,10 @@ class CWidgetPieChart extends CWidget {
 			const box = legend.getBoundingClientRect();
 			const offset = 8;
 
-			size.contents_height -= box.height + offset;
+			size.height -= box.height + offset;
 
-			if (size.contents_height < 0) {
-				size.contents_height = 0;
+			if (size.height < 0) {
+				size.height = 0;
 			}
 		}
 
