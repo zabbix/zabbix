@@ -202,7 +202,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			if ($total_item_count > 0) {
 				foreach ($value as $data) {
 					if ($data['dataset_aggregation'] !== AGGREGATE_NONE) {
-						$errors[] = _('Cannot set "Dataset aggregation" when item with type "Total" is added to the chart');
+						$errors[] = _('Cannot set "Dataset aggregation" when item with type "Total" is added to the chart.');
 						break;
 					}
 				}
