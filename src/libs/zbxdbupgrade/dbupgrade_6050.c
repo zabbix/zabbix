@@ -299,18 +299,57 @@ static int	DBpatch_6050025(void)
 
 static int	DBpatch_6050026(void)
 {
-	zbx_db_insert_t	db_insert;
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
 
+	return DBdrop_field_autoincrement("proxy_history", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050027(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_dhistory", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050028(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050029(void)
+{
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	zbx_db_insert_prepare(&db_insert, "module", "moduleid", "id", "relative_path", "status", "config", NULL);
-	zbx_db_insert_add_values(&db_insert, __UINT64_C(0), "toptriggers", "widgets/toptriggers", 1, "[]");
-	zbx_db_insert_autoincrement(&db_insert, "moduleid");
-	int	ret = zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'gauge','widgets/gauge',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
 
-	return ret;
+	return SUCCEED;
+}
+
+static int	DBpatch_6050030(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'toptriggers','widgets/toptriggers',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
 
 #endif
@@ -346,5 +385,9 @@ DBPATCH_ADD(6050023, 0, 1)
 DBPATCH_ADD(6050024, 0, 1)
 DBPATCH_ADD(6050025, 0, 1)
 DBPATCH_ADD(6050026, 0, 1)
+DBPATCH_ADD(6050027, 0, 1)
+DBPATCH_ADD(6050028, 0, 1)
+DBPATCH_ADD(6050029, 0, 1)
+DBPATCH_ADD(6050030, 0, 1)
 
 DBPATCH_END()

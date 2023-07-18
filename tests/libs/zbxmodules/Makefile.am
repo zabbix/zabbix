@@ -17,6 +17,7 @@ COMMON_LIBS1 = \
 	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a
 
 COMMON_LIBS2 = \
+	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \

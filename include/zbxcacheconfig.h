@@ -37,7 +37,9 @@
 #define	ZBX_POLLER_TYPE_JAVA		4
 #define	ZBX_POLLER_TYPE_HISTORY		5
 #define	ZBX_POLLER_TYPE_ODBC		6
-#define	ZBX_POLLER_TYPE_COUNT		7	/* number of poller types */
+#define	ZBX_POLLER_TYPE_HTTPAGENT	7
+#define	ZBX_POLLER_TYPE_AGENT		8
+#define	ZBX_POLLER_TYPE_COUNT		9	/* number of poller types */
 
 typedef enum
 {
@@ -51,6 +53,9 @@ zbx_session_type_t;
 #define ZBX_MAX_SNMP_ITEMS		128
 #define ZBX_MAX_POLLER_ITEMS		128	/* MAX(ZBX_MAX_JAVA_ITEMS, ZBX_MAX_SNMP_ITEMS) */
 #define ZBX_MAX_PINGER_ITEMS		128
+#define ZBX_MAX_HTTPAGENT_ITEMS		1000
+#define ZBX_MAX_AGENT_ITEMS		1000
+#define ZBX_MAX_ITEMS			1000
 
 #define ZBX_SNMPTRAP_LOGGING_ENABLED	1
 
@@ -762,7 +767,8 @@ int	zbx_dc_config_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk);
 int	zbx_dc_config_get_interface_by_type(zbx_dc_interface_t *interface, zbx_uint64_t hostid, unsigned char type);
 int	zbx_dc_config_get_interface(zbx_dc_interface_t *interface, zbx_uint64_t hostid, zbx_uint64_t itemid);
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
-int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, zbx_dc_item_t **items);
+int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
+		int config_max_concurrent_checks, zbx_dc_item_t **items);
 #ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);

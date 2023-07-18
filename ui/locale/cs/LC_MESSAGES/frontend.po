@@ -1372,6 +1372,10 @@ msgstr "A"
 msgid "And/Or"
 msgstr "A/Nebo"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "Každoročně"
@@ -1446,6 +1450,19 @@ msgstr "Dub"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "Duben"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4672,6 +4689,10 @@ msgstr "Barva „%1$s“ není správná: očekává se hexadecimální kód bar
 msgid "Color (OK)"
 msgstr "Barva (OK)"
 
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
 msgid "Columns"
@@ -6769,6 +6790,10 @@ msgstr "Zrušená skupina uživatelů nemůže být povolena."
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Popis"
+
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -8874,6 +8899,10 @@ msgstr "GUI"
 #: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI přístup vypnut."
+
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
@@ -14187,6 +14216,11 @@ msgstr "Přejít na výchozí zobrazení"
 msgid "Navigate to initial view"
 msgstr "Přejít na prvotní zobrazení"
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "Perioda ukládání dat pro zjišťování sítě"
@@ -17722,6 +17756,10 @@ msgstr "Vrátí počet TCP socketů které odpovídají parametrům. Vrátí cel
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "Vrátí počet UDP socketů které odpovídají parametrům. Vrátí celé číslo"
 
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
+msgstr ""
+
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Vrátí procento ztracených ICMP ping paketů."
@@ -18170,6 +18208,15 @@ msgstr "Ulož změny"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Uložte jej jako \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18869,6 +18916,10 @@ msgstr "Zkrácený"
 msgid "Show"
 msgstr "Zobrazit"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18888,6 +18939,10 @@ msgstr "Zobrazit záhlaví"
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "Zobrazit hostitele v servisním okně"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18980,6 +19035,10 @@ msgstr "Zobrazit jen nepotvrzené"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "Ukaž nedostupné mapy"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -19278,6 +19337,10 @@ msgstr "Čas startu Zabbix serveru, Unix timestamp."
 msgid "State"
 msgstr "Stav"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -19287,6 +19350,10 @@ msgstr "Statický"
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Statistiky a dostupnost mezipaměti pro zápis Zabbix. Cache - jedna z hodnot (typu: all, float, uint, str, log, text, nepodporováno), historie (typ: pfree, free, total, used, pussed), index (typ: pfree, free, total, used , pussed), trend (typ: pfree, free, total, used, pussed)."
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -21336,6 +21403,10 @@ msgstr "Nečekaná chyba serveru."
 msgid "Units"
 msgstr "Jednotky"
 
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -22886,6 +22957,10 @@ msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Hodnota \"%1$s\" je příliš dlouhá pro pole \"%2$s\" - %3$d znaků. Povolená délka je do %4$d znaků."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Využití cache hodnot. Platné parametry jsou: requests, hits a misses."
@@ -22955,6 +23030,10 @@ msgstr "Hodnota staré značky události"
 #: include/actions.inc.php:352
 msgid "Value of tag"
 msgstr "Hodnota značky"
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
+msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
 msgid "Value: no data"
@@ -26168,6 +26247,11 @@ msgid_plural "value must be empty or one of %1$s"
 msgstr[0] "hodnota musí být prázdná nebo %1$s"
 msgstr[1] "hodnota musí být prázdná nebo jedna z %1$s"
 msgstr[2] "hodnota musí být prázdná nebo jedna z %1$s"
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

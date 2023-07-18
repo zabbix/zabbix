@@ -28,7 +28,6 @@
 #include "../scripts/scripts.h"
 #include "zbxcrypto.h"
 #include "zbxevent.h"
-#include "../../libs/zbxserver/zabbix_users.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
@@ -856,7 +855,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 		if (NULL != ack && ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		switch (event->object)
@@ -875,7 +874,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, ZBX_
 					goto clean;
 				break;
 			default:
-				user_timezone = get_user_timezone(userid);
+				user_timezone = zbx_db_get_user_timezone(userid);
 		}
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, service_alarm, service,
@@ -954,7 +953,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 		if (NULL != ack && ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		ZBX_STR2UINT64(mediatypeid, row[1]);
@@ -975,7 +974,7 @@ static void	add_sentusers_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid, zb
 					goto clean;
 				break;
 			default:
-				user_timezone = get_user_timezone(userid);
+				user_timezone = zbx_db_get_user_timezone(userid);
 		}
 
 		add_user_msgs(userid, operationid, mediatypeid, user_msg, actionid, event, r_event, ack, service_alarm,
@@ -1048,7 +1047,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 		mediatypeid_prev = mediatypeid;
 		esc_step_prev = esc_step;
 
-		if (SUCCEED != check_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		switch (event->object)
@@ -1067,7 +1066,7 @@ static void	add_sentusers_msg_esc_cancel(ZBX_USER_MSG **user_msg, zbx_uint64_t a
 					goto clean;
 				break;
 			default:
-				user_timezone = get_user_timezone(userid);
+				user_timezone = zbx_db_get_user_timezone(userid);
 		}
 
 		message_dyn = zbx_dsprintf(NULL, "NOTE: Escalation canceled: %s\nLast message sent:\n%s", error,
@@ -1128,7 +1127,7 @@ static void	add_sentusers_ack_msg(ZBX_USER_MSG **user_msg, zbx_uint64_t actionid
 		if (ack->userid == userid)
 			continue;
 
-		if (SUCCEED != check_perm2system(userid))
+		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
 		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
