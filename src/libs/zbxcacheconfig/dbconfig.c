@@ -7001,6 +7001,11 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	hsec = zbx_time() - sec;
 
 	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_proxies(&proxy_sync))
+		goto out;
+	proxy_sec = zbx_time() - sec;
+
+	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_host_inventory(&hi_sync))
 		goto out;
 	hisec = zbx_time() - sec;
@@ -7049,11 +7054,6 @@ void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synce
 	if (FAIL == zbx_dbsync_compare_connector_tags(&connector_tag_sync))
 		goto out;
 	connector_sec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_proxies(&proxy_sync))
-		goto out;
-	proxy_sec = zbx_time() - sec;
 
 	zbx_hashset_create(&psk_owners, 0, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
