@@ -1184,7 +1184,7 @@ static void	DCsync_autoreg_host(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static void	dc_psk_unlink(ZBX_DC_PSK *tls_dc_psk)
 {
 	/* Maintain 'psks' index. Unlink and delete the PSK identity. */
@@ -1380,7 +1380,7 @@ done:
 
 	return tls_dc_psk;
 }
-
+#endif
 static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 {
 	zbx_dc_proxy_name_t	*proxy_p, proxy_p_local;
