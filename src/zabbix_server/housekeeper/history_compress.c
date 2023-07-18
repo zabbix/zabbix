@@ -34,8 +34,8 @@
 
 typedef enum
 {
-	ZBX_COMPRESS_TABLE_HISTORY = 0,
-	ZBX_COMPRESS_TABLE_TRENDS
+	ZBX_COMPRESS_TABLE_CLOCKNS = 0,
+	ZBX_COMPRESS_TABLE_CLOCK
 } zbx_compress_table_t;
 
 typedef struct
@@ -45,13 +45,14 @@ typedef struct
 } zbx_history_table_compression_options_t;
 
 static zbx_history_table_compression_options_t	compression_tables[] = {
-	{"history",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_uint",	ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_str",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_text",	ZBX_COMPRESS_TABLE_HISTORY},
-	{"history_log",		ZBX_COMPRESS_TABLE_HISTORY},
-	{"trends",		ZBX_COMPRESS_TABLE_TRENDS},
-	{"trends_uint",		ZBX_COMPRESS_TABLE_TRENDS}
+	{"history",		ZBX_COMPRESS_TABLE_CLOCKNS},
+	{"history_uint",	ZBX_COMPRESS_TABLE_CLOCKNS},
+	{"history_str",		ZBX_COMPRESS_TABLE_CLOCKNS},
+	{"history_text",	ZBX_COMPRESS_TABLE_CLOCKNS},
+	{"history_log",		ZBX_COMPRESS_TABLE_CLOCKNS},
+	{"trends",		ZBX_COMPRESS_TABLE_CLOCK},
+	{"trends_uint",		ZBX_COMPRESS_TABLE_CLOCK},
+	{"auditlog",		ZBX_COMPRESS_TABLE_CLOCK}
 };
 
 static unsigned char	compression_status_cache = 0;
@@ -98,7 +99,7 @@ static void	hk_check_table_segmentation(const char *table_name, zbx_compress_tab
 	{
 		zbx_db_execute("alter table %s set (timescaledb.compress,timescaledb.compress_segmentby='%s',"
 				"timescaledb.compress_orderby='%s')", table_name, ZBX_TS_SEGMENT_BY,
-				(ZBX_COMPRESS_TABLE_HISTORY == type) ? "clock,ns" : "clock");
+				(ZBX_COMPRESS_TABLE_CLOCKNS == type) ? "clock,ns" : "clock");
 	}
 
 	zbx_db_free_result(result);
