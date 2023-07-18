@@ -222,7 +222,7 @@ class ZBarGauge extends HTMLElement {
 	}
 
 	_getThresholdColorByValue(value) {
-		let color = BAR_GAUGE_BAR_DEFAULT_COLOR;
+		let color = this._fill;
 
 		for (const threshold of Object.keys(this._thresholds).sort((a, b) => (a - b))) {
 			if (threshold <= value) {
