@@ -24,6 +24,7 @@
 #include "zbxtime.h"
 #include "zbxconnector.h"
 #include "../ha/ha.h"
+#include "zbxproxybuffer.h"
 
 #include "checks_internal.h"
 #include "../lld/lld_protocol.h"
@@ -275,3 +276,18 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 out:
 	return ret;
 }
+
+int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
+{
+	ZBX_UNUSED(error);
+
+	memset(info, 0, sizeof(zbx_pb_mem_info_t));
+
+	return SUCCEED;
+}
+
+void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
+{
+	memset(info, 0, sizeof(zbx_pb_state_info_t));
+}
+
