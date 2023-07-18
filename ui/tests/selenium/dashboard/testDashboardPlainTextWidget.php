@@ -176,7 +176,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
-								'height' => 5,
+								'height' => 6,
 								'fields' => [
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -197,6 +197,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemids',
 										'value' => $itemids['Test plain text']
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemids',
+										'value' => '99142'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -896,6 +901,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 					'html_text' => true,
 					'expected' => [
 						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Name' => 'Test item host: Master item',
+							'Value' => '1' // value rounding is expected.
+						],
+						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => STRING_128
@@ -908,6 +918,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 					],
 					'expected_top' => [
 						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
+							'Test item host: Master item' => '1'
+						],
+						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('last Sunday + 7 hours 7 minutes 7 seconds')),
 							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => STRING_128
 						],
@@ -917,6 +931,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						]
 					],
 					'item_data' => [
+						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => STRING_128, 'time' => strtotime('last Sunday + 7 hours 7 minutes 7 seconds')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('last Saturday + 3 hours 5 minutes')]
 					]
@@ -930,6 +945,11 @@ class testDashboardPlainTextWidget extends CWebTest {
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
 							'Value' => 'Zabbix plain text'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-80 seconds')),
+							'Name' => 'Test item host: Master item',
+							'Value' => '7.7778' // value rounding is expected.
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 week')),
@@ -961,6 +981,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					],
 					'item_data' => [
 						['itemid' => '42227', 'values' => 'Zabbix plain text', 'time' => strtotime('now')],
+						['itemid' => '99142', 'values' => '7.777777', 'time' => strtotime('-80 seconds')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-1 week')],
 						['itemid' => '42244', 'values' => '82.061797', 'time' => strtotime('-1 month')]
 					]
