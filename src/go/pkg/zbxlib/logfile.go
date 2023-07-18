@@ -214,9 +214,8 @@ import (
 	"errors"
 	"time"
 	"unsafe"
-
-	"zabbix.com/pkg/itemutil"
 	"git.zabbix.com/ap/plugin-support/log"
+	"zabbix.com/pkg/itemutil"
 )
 
 const (
