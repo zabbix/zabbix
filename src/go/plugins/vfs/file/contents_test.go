@@ -27,21 +27,22 @@ import (
 	"testing"
 )
 
+type testCase struct {
+	fileContents   []byte
+	targetEncoding string
+	targetContents string
+}
+
+const filename = "/tmp/zbx_vfs_file_contents_test.dat"
+const expectedErrorUTF8Convert = "Failed to convert from encoding to utf8: invalid argument"
+
+// августа\r\n
+var fileContents_UTF_8 = []byte{
+	0xfe, 0xff, 0x04, 0x30, 0x04, 0x32, 0x04, 0x33, 0x04, 0x43, 0x04, 0x41, 0x04, 0x42, 0x04, 0x30,
+	0x00, 0x0d, 0x00, 0x0a}
+
 func TestFileContentsEncoding(t *testing.T) {
 	impl.options.Timeout = 3
-
-	filename := "/tmp/zbx_vfs_file_contents_test.dat"
-
-	type testCase struct {
-		fileContents   []byte
-		targetEncoding string
-		targetContents string
-	}
-
-	// августа\r\n
-	fileContents_UTF_8 := []byte{
-		0xfe, 0xff, 0x04, 0x30, 0x04, 0x32, 0x04, 0x33, 0x04, 0x43, 0x04, 0x41, 0x04, 0x42, 0x04, 0x30,
-		0x00, 0x0d, 0x00, 0x0a}
 
 	fileContents_2_UTF_8 := []byte{
 		208, 176, 208, 178, 208, 179, 209, 131, 209, 129, 209, 130, 208, 176, 13, 10}
@@ -139,7 +140,9 @@ func TestFileContentsEncoding(t *testing.T) {
 				[]byte(contents), []byte(c.targetContents))
 		}
 	}
+}
 
+func TestFileContentsWrongTargetEncoding(t *testing.T) {
 	testCasesWrongTargetEncoding := []*testCase{
 		{fileContents: fileContents_UTF_8, targetEncoding: "BADGER", targetContents: ""},
 		{fileContents: fileContents_UTF_8, targetEncoding: "a", targetContents: ""},
@@ -154,17 +157,18 @@ func TestFileContentsEncoding(t *testing.T) {
 		stdOs.(std.MockOs).MockFile(filename, c.fileContents)
 
 		var err error
-		_, err = impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil);
-		expectedError := "Failed to convert from encoding to utf8: invalid argument"
+		_, err = impl.Export("vfs.file.contents", []string{filename, c.targetEncoding}, nil)
 
-		if (nil == err) {
-			t.Errorf("vfs.file.contents (testCase[%d]) did not return error: ->%s<- when wrong target " +
-				"encoding:->%s<- was used", i, expectedError, c.targetEncoding)
+		if nil == err {
+			t.Errorf("vfs.file.contents (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
 			return
-		} else if (err.Error() != expectedError) {
-			t.Errorf("vfs.file.contents (testCase[%d]) expected error: ->%s<-," +
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.contents (testCase[%d]) expected error: ->%s<-,"+
 				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
-				expectedError, err.Error(), c.targetEncoding)
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
 			return
 		}
 	}

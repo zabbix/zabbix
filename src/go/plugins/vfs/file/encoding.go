@@ -29,10 +29,10 @@ package file
 import "C"
 
 import (
+	"fmt"
 	"git.zabbix.com/ap/plugin-support/log"
 	"syscall"
 	"unsafe"
-	"fmt"
 )
 
 func findEncodingFromBOM(encoding string, inbuf []byte, bytecount int) string {

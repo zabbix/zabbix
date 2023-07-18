@@ -247,17 +247,18 @@ func TestFileRegmatch(t *testing.T) {
 
 		var err error
 		_, err = impl.Export("vfs.file.regmatch", []string{filename, c.targetSearch, c.targetEncoding,
-				c.lineStart, c.lineEnd}, nil);
-		expectedError := "Failed to convert from encoding to utf8: invalid argument"
+			c.lineStart, c.lineEnd}, nil)
 
-		if (nil == err) {
-			t.Errorf("vfs.file.regmatch (testCase[%d]) did not return error: ->%s<- when wrong target " +
-				"encoding:->%s<- was used", i, expectedError, c.targetEncoding)
+		if nil == err {
+			t.Errorf("vfs.file.regmatch (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
 			return
-		} else if (err.Error() != expectedError) {
-			t.Errorf("vfs.file.regmatch (testCase[%d]) expected error: ->%s<-," +
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.regmatch (testCase[%d]) expected error: ->%s<-,"+
 				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
-				expectedError, err.Error(), c.targetEncoding)
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
 			return
 		}
 	}

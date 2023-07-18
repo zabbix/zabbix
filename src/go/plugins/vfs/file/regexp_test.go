@@ -318,8 +318,8 @@ func TestFileRegexpOutput(t *testing.T) {
 		{fileContents: fileContents_UTF_16LE, targetSearch: "выхухоль2\n", targetEncoding: "-",
 			lineStart: "", lineEnd: "2", targetStringGroup: "", targetContents: ""},
 
-		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BEUTF-32BE", lineStart: "2",
-			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
+		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "UTF-32BEUTF-32BE",
+			lineStart: "2", lineEnd: "", targetStringGroup: "", targetContents: "выхухоль2"},
 
 		{fileContents: fileContents_UTF_32BE, targetSearch: "хух", targetEncoding: "-UTF-32BE", lineStart: "1",
 			lineEnd: "", targetStringGroup: "", targetContents: "выхухоль"}}
@@ -333,17 +333,18 @@ func TestFileRegexpOutput(t *testing.T) {
 
 		var err error
 		_, err = impl.Export("vfs.file.regexp", []string{filename, c.targetSearch, c.targetEncoding,
-				c.lineStart, c.lineEnd, c.targetStringGroup}, nil);
-		expectedError := "Failed to convert from encoding to utf8: invalid argument"
+			c.lineStart, c.lineEnd, c.targetStringGroup}, nil)
 
-		if (nil == err) {
-			t.Errorf("vfs.file.regexp (testCase[%d]) did not return error: ->%s<- when wrong target " +
-				"encoding:->%s<- was used", i, expectedError, c.targetEncoding)
+		if nil == err {
+			t.Errorf("vfs.file.regexp (testCase[%d]) did not return error: ->%s<- when wrong target "+
+				"encoding:->%s<- was used", i, expectedErrorUTF8Convert, c.targetEncoding)
+
 			return
-		} else if (err.Error() != expectedError) {
-			t.Errorf("vfs.file.regexp (testCase[%d]) expected error: ->%s<-," +
+		} else if err.Error() != expectedErrorUTF8Convert {
+			t.Errorf("vfs.file.regexp (testCase[%d]) expected error: ->%s<-,"+
 				"but it instead returned: %s when wrong target encoding: ->%s<- was used", i,
-				expectedError, err.Error(), c.targetEncoding)
+				expectedErrorUTF8Convert, err.Error(), c.targetEncoding)
+
 			return
 		}
 	}

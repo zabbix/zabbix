@@ -21,13 +21,13 @@ package file
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
 	"time"
-	"fmt"
 
 	"zabbix.com/pkg/zbxregexp"
 )
@@ -106,7 +106,7 @@ func (p *Plugin) exportRegexp(params []string) (result interface{}, err error) {
 		}
 		utf8_buf, utf8_bufNumBytes, err := decodeToUTF8(encoding, undecodedBuf, undecodedBufNumBytes)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to convert from encoding to utf8: %s", err)
+			return nil, fmt.Errorf("Failed to convert from encoding to utf8: %w", err)
 		}
 
 		utf8_bufStr := string(utf8_buf[:utf8_bufNumBytes])
