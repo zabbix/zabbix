@@ -36,7 +36,8 @@ class CControllerTriggerPrototypeList extends CController {
 			'page' =>						'ge 1',
 			'parent_discoveryid' =>			'required|db items.itemid',
 			'sort' =>						'in '.implode(',', ['description', 'priority', 'status']),
-			'sortorder' =>					'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN])
+			'sortorder' =>					'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
+			'uncheck' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -71,7 +72,8 @@ class CControllerTriggerPrototypeList extends CController {
 			'hostid' => $this->discovery_rule['hostid'],
 			'triggers' => [],
 			'dependency_triggers' => [],
-			'context' => $this->getInput('context')
+			'context' => $this->getInput('context'),
+			'uncheck' => $this->hasInput('uncheck')
 		];
 
 		$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';

@@ -27,6 +27,10 @@
 $this->addJsFile('class.tagfilteritem.js');
 $this->includeJsFile('trigger.list.js.php');
 
+if ($data['uncheck']) {
+	uncheckTableRows('trigger');
+}
+
 $hg_ms_params = $data['context'] === 'host' ? ['with_hosts' => true] : ['with_templates' => true];
 
 $filter_column1 = (new CFormGrid())

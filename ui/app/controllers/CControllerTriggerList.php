@@ -44,7 +44,8 @@ class CControllerTriggerList extends CController {
 			'filter_value' =>				'in '.implode(',', [-1, TRIGGER_VALUE_FALSE, TRIGGER_VALUE_TRUE]),
 			'sort' =>						'in '.implode(',', ['description', 'priority', 'status']),
 			'sortorder' =>					'in '.implode(',', [ZBX_SORT_UP, ZBX_SORT_DOWN]),
-			'page' =>						'ge 1'
+			'page' =>						'ge 1',
+			'uncheck' =>					'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -62,7 +63,8 @@ class CControllerTriggerList extends CController {
 
 	protected function doAction() {
 		$data = [
-			'context' => $this->getInput('context')
+			'context' => $this->getInput('context'),
+			'uncheck' => $this->hasInput('uncheck')
 		];
 		$prefix = ($data['context'] === 'host') ? 'web.hosts.' : 'web.templates.';
 		$filter_hostids_ms = [];

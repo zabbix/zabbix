@@ -26,6 +26,10 @@
 
 $this->includeJsFile('trigger.prototype.list.js.php');
 
+if ($data['uncheck']) {
+	uncheckTableRows($data['parent_discoveryid']);
+}
+
 $html_page = (new CHtmlPage())
 	->setTitle(_('Trigger prototypes'))
 	->setDocUrl(CDocHelper::getUrl($data['context'] === 'host'
@@ -35,11 +39,7 @@ $html_page = (new CHtmlPage())
 	->setControls(
 		(new CTag('nav', true,
 			(new CList())
-				->addItem(
-					(new CButton('create_trigger',_('Create trigger prototype')))
-						->setId('js-create')
-						->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
-				)
+				->addItem((new CButton('create_trigger',_('Create trigger prototype')))->setId('js-create'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->setNavigation(getHostNavigation('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
@@ -88,7 +88,6 @@ foreach ($data['triggers'] as $trigger) {
 
 	$description[] = (new CLink($trigger['description']))
 		->addClass('js-trigger-prototype-edit')
-		->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 		->setAttribute('data-triggerid', $triggerid);
 
 	if ($trigger['dependencies']) {
@@ -105,7 +104,6 @@ foreach ($data['triggers'] as $trigger) {
 				$trigger_dependencies[] = (new CLink($dep_trigger_description))
 					->addClass(triggerIndicatorStyle($dep_trigger['status']))
 					->addClass('js-trigger-prototype-edit')
-					->setAttribute('data-parent_discoveryid', $data['parent_discoveryid'])
 					->setAttribute('data-triggerid', $dep_trigger['triggerid']);
 			}
 			elseif ($dep_trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
@@ -210,7 +208,8 @@ $html_page
 (new CScriptTag('
 	view.init('.json_encode([
 		'context' => $data['context'],
-		'hostid' => $data['hostid']
+		'hostid' => $data['hostid'],
+		'parent_discoveryid' => $data['parent_discoveryid']
 	]).');
 '))
 	->setOnDocumentReady()

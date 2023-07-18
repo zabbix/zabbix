@@ -50,6 +50,11 @@
 
 			// Form fields should be collected after dependency table is loaded.
 			this.initial_form_fields = getFormFields(this.form);
+
+			if ($('#tabs').tabs('option', 'active') == 1) {
+				// Force dynamicRows event handlers initialization when 'Tags' tab is already active.
+				$(() => $('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
+			}
 		}
 
 		#initActions() {

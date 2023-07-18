@@ -26,9 +26,10 @@
 
 <script>
 	const view = new class {
-		init({context, hostid}) {
+		init({context, hostid, parent_discoveryid}) {
 			this.context = context;
 			this.hostid = hostid;
+			this.parent_discoveryid = parent_discoveryid;
 
 			this.#initActions();
 		}
@@ -44,14 +45,14 @@
 				}
 				else if (e.target.id === 'js-create') {
 					this.#edit('trigger.prototype.edit', {
-						parent_discoveryid: e.target.dataset.parent_discoveryid,
+						parent_discoveryid: this.parent_discoveryid,
 						hostid: this.hostid,
 						context: this.context
 					})
 				}
 				else if (e.target.classList.contains('js-trigger-prototype-edit')) {
 					this.#edit('trigger.prototype.edit', {
-						parent_discoveryid: e.target.dataset.parent_discoveryid,
+						parent_discoveryid: this.parent_discoveryid,
 						triggerid: e.target.dataset.triggerid,
 						hostid: this.hostid,
 						context: this.context
@@ -195,7 +196,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('trigger', response.keepids ?? []);
+						uncheckTableRows(this.parent_discoveryid, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -204,7 +205,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('trigger');
+						uncheckTableRows(this.parent_discoveryid);
 					}
 
 					location.href = location.href;
