@@ -766,6 +766,7 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
 {
 	int			i, new_tags_cnt = 0, res = SUCCEED;
+	char			*sql = NULL;
 	zbx_vector_db_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t	del_tagids;
 
@@ -812,34 +813,32 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 		zbx_db_insert_clean(&db_insert_tag);
 
-		if (SUCCEED == res)
-		{
-			hosttagid = first_hosttagid;
-
-			for (i = 0; i < host_tags->values_num; i++)
-			{
-				zbx_db_tag_t	*tag = host_tags->values[i];
-
-				if (0 == tag->tagid)
-				{
-					zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
-							ZBX_DB_TAG_NORMAL);
-					hosttagid++;
-				}
-			}
-		}
-		else
+		if (SUCCEED != res)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
 					hostid);
+			goto out;
+		}
+
+		hosttagid = first_hosttagid;
+
+		for (i = 0; i < host_tags->values_num; i++)
+		{
+			zbx_db_tag_t	*tag = host_tags->values[i];
+
+			if (0 == tag->tagid)
+			{
+				zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
+						ZBX_DB_TAG_NORMAL);
+				hosttagid++;
+			}
 		}
 	}
 
-	if (SUCCEED == res && 0 != upd_tags.values_num)
+	if (0 != upd_tags.values_num)
 	{
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 		char	*value_esc;
-		char	*sql = NULL;
 
 		zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -883,67 +882,56 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 				res = FAIL;
 		}
 
-		zbx_free(sql);
-
-		if (SUCCEED == res)
-		{
-			for (i = 0; i < upd_tags.values_num; i++)
-			{
-				zbx_db_tag_t	*tag = upd_tags.values[i];
-
-				zbx_audit_host_update_json_update_tag_create_entry(hostid, tag->tagid);
-
-				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
-				{
-					zbx_audit_host_update_json_update_tag_tag(hostid, tag->tagid, tag->tag_orig,
-							tag->tag);
-				}
-
-				if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
-				{
-					zbx_audit_host_update_json_update_tag_value(hostid, tag->tagid, tag->value_orig,
-						tag->value);
-				}
-			}
-		}
-		else
+		if (SUCCEED != res)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to update tags on a discovered host, hostid = "
 					ZBX_FS_UI64, hostid);
+			goto out;
+		}
+
+		for (i = 0; i < upd_tags.values_num; i++)
+		{
+			zbx_db_tag_t	*tag = upd_tags.values[i];
+
+			zbx_audit_host_update_json_update_tag_create_entry(hostid, tag->tagid);
+
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_TAG))
+				zbx_audit_host_update_json_update_tag_tag(hostid, tag->tagid, tag->tag_orig, tag->tag);
+
+			if (0 != (tag->flags & ZBX_FLAG_DB_TAG_UPDATE_VALUE))
+			{
+				zbx_audit_host_update_json_update_tag_value(hostid, tag->tagid, tag->value_orig,
+					tag->value);
+			}
 		}
 	}
 
-	if (SUCCEED == res && 0 != del_tagids.values_num)
+	if (0 != del_tagids.values_num)
 	{
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
-		char	*sql = NULL;
 
+		zbx_free(sql);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
 
 		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			res = FAIL;
-
-		zbx_free(sql);
-
-		if (SUCCEED == res)
-		{
-			for (i = 0; i < host_tags->values_num; i++)
-			{
-				zbx_db_tag_t	*tag = host_tags->values[i];
-
-				if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
-					zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
-			}
-		}
-		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
 					ZBX_FS_UI64, hostid);
+			goto out;
+		}
+
+		for (i = 0; i < host_tags->values_num; i++)
+		{
+			zbx_db_tag_t	*tag = host_tags->values[i];
+
+			if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+				zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
 		}
 	}
-
+out:
+	zbx_free(sql);
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_tagids);
 
