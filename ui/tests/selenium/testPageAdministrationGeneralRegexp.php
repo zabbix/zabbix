@@ -25,6 +25,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup regexps
+ *
+ * @onBefore prepareData
  */
 class testPageAdministrationGeneralRegexp extends CWebTest {
 
@@ -37,6 +39,52 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		return [
 			'class' => CMessageBehavior::class
 		];
+	}
+
+	public function prepareData() {
+		CDataHelper::call('regexp.create', [
+			[
+				'name' => '0_case_1',
+				'expressions' => [
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_INCLUDED
+					]
+				]
+			],
+			[
+				'name' => '0_case_2',
+				'expressions' => [
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_ANY_INCLUDED,
+						'case_sensitive' => 1
+					],
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_NOT_INCLUDED,
+						'case_sensitive' => 0
+					]
+				]
+			],
+			[
+				'name' => '0_case_3',
+				'expressions' => [
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_INCLUDED
+					],
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_TRUE
+					],
+					[
+						'expression' => 'test',
+						'expression_type' => EXPRESSION_TYPE_FALSE
+					]
+				]
+			]
+		]);
 	}
 
 	/**
@@ -61,20 +109,33 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		// Check the data table.
 		$this->assertEquals(['', 'Name', 'Expressions'], $this->query('class:list-table')->asTable()->one()->getHeadersText());
 
-		$name_list = [];
-		foreach (CDBHelper::getColumn('SELECT name FROM regexps', 'name') as $name){
-			$name_list[] = ["Name" => $name];
-		}
+		$expected_data = [
+			[
+				'Name' => '0_case_1',
+				'Expressions' => '1 ⇒ test [Character string included]'
+			],
+			[
+				'Name' => '0_case_2',
+				'Expressions' => "1 ⇒ test [Any character string included]\n".
+					"2 ⇒ test [Character string not included]"
+			],
+			[
+				'Name' => '0_case_3',
+				'Expressions' => "1 ⇒ test [Character string included]\n".
+					"2 ⇒ test [Result is TRUE]\n".
+					"3 ⇒ test [Result is FALSE]"
+			]
+		];
 
-		$this->assertTableHasData($name_list);
+		$this->assertTableHasData($expected_data);
 
 		// Check regexp counter and Delete button status.
 		$selected_counter = $this->query('id:selected_count')->one();
 		$this->assertEquals('0 selected', $selected_counter->getText());
 		$this->assertFalse($this->query('button:Delete')->one()->isEnabled());
 
-		$this->query('xpath://td/input[@type="checkbox"]')->one()->click();
-		$this->assertEquals('1 selected', $selected_counter->getText());
+		$this->query('id:all-regexes')->asCheckbox()->one()->set(true);
+		$this->assertEquals(CDBHelper::getCount('SELECT NULL FROM regexps').' selected', $selected_counter->getText());
 		$this->assertTrue($this->query('button:Delete')->one()->isEnabled());
 	}
 
@@ -82,8 +143,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	 * Test pressing mass delete button but then cancelling.
 	 */
 	public function testPageAdministrationGeneralRegexp_DeleteCancel() {
-		$hash_regexps = CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid');
-		$hash_expressions = CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid');
+		$hash_sql = 'SELECT * FROM expressions e INNER JOIN regexps r ON r.regexpid = e.regexpid';
+		$db_hash = CDBHelper::getHash($hash_sql);
 
 		// Cancel delete.
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
@@ -93,83 +154,89 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 
 		// Make sure nothing has been deleted.
-		$this->assertEquals($hash_regexps, CDBHelper::getHash('SELECT * FROM regexps ORDER BY regexpid'));
-		$this->assertEquals($hash_expressions, CDBHelper::getHash('SELECT * FROM expressions ORDER BY expressionid'));
+		$this->assertEquals($db_hash, CDBHelper::getHash($hash_sql));
 	}
 
-	public static function getDeleteData()
-	{
+	public static function getDeleteData() {
 		return [
-			// #0 Delete one regex.
 			[
 				[
-					'regex_name' => ['1_regexp_1'],
-					'message_title' => 'Regular expression deleted'
+					'regex_name' => ['1_regexp_1']
 				]
 			],
-			// #1 Delete several regexes.
 			[
 				[
-					'regex_name' => ['1_regexp_2', '2_regexp_1', '2_regexp_2'],
-					'message_title' => 'Regular expressions deleted'
-				]
-			],
-			// #2 Delete ALL regexes.
-			[
-				[
-					'regex_name' => [''],
-					'message_title' => 'Regular expressions deleted'
+					'regex_name' => ['1_regexp_2', '2_regexp_1', '2_regexp_2']
 				]
 			]
 		];
 	}
 
 	/**
-	 * Test regexp delete functionality.
+	 * Test delete separately.
 	 *
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageAdministrationGeneralRegexp_Delete($data) {
-		// Delete a regexp.
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
-		// The list of expected regexes to be shown after deletion.
+		// Variables for checks after deletion
 		$expected_regexps = $this->getTableColumnData('Name');
+		$regex_ids = [];
 
-		$regexids = [];
 		foreach ($data['regex_name'] as $regex) {
-			if ($regex === '') {
-				$this->query('name:all-regexes')->asCheckbox()->one()->check();
-			}
-			else {
-				$regexids[] = CDBHelper::getValue('SELECT regexpid FROM regexps WHERE name='.zbx_dbstr($regex));
-				$this->query('class:list-table')->asTable()->one()->findRow('Name', $regex)->select();
+			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $regex);
+			$row->select();
+			$regex_ids[] = $row->query('tag:input')->one()->getAttribute('value');
+			$this->query('class:list-table')->asTable()->one()->findRow('Name', $regex)->select();
 
-				// Remove this regexp from the expected values.
-				$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
-			}
+			// Remove this regexp from the expected values.
+			$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
 		}
+
+		// Press Delete and confirm
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+
+		// Assert the results.
+		$this->page->assertTitle('Configuration of regular expressions');
+
+		$message = (count(CTestArrayHelper::get($data, 'regex_name', [])) === 1)
+			? 'Regular expression deleted'
+			: 'Regular expressions deleted';
+
+		$this->assertMessage(TEST_GOOD, $message);
+
+		foreach ($regex_ids as $regex_id) {
+			$sql = 'SELECT * FROM expressions e FULL OUTER JOIN regexps r ON r.regexpid=e.regexpid WHERE '.
+				zbx_dbstr($regex_id).' IN (r.regexpid, e.regexpid)';
+			$this->assertEquals(0, CDBHelper::getCount($sql));
+		}
+
+		$this->assertTableDataColumn($expected_regexps);
+	}
+
+	/**
+	 * Test delete all.
+	 *
+	 * @return void
+	 */
+	public function testPageAdministrationGeneralRegexp_DeleteAll() {
+		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
+
+		$this->query('name:all-regexes')->asCheckbox()->one()->check();
 
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 
-		// Check the result.
+		// Assert the results.
 		$this->page->assertTitle('Configuration of regular expressions');
-		$this->assertMessage(TEST_GOOD, $data['message_title']);
+		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
 
-		if ($data['regex_name'] === ['']) {
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps'));
-			$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM expressions'));
-			$this->assertTableData();
-		}
-		else {
-			foreach ($regexids as $regexid) {
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM regexps WHERE regexpid='.zbx_dbstr($regexid)));
-				$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM expressions WHERE regexpid='.zbx_dbstr($regexid)));
-			}
-
-			$this->assertTableDataColumn($expected_regexps);
-		}
+		$sql = 'SELECT * FROM expressions e FULL OUTER JOIN regexps r ON r.regexpid = e.regexpid';
+		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->assertTableData();
 	}
 }
