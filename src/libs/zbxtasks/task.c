@@ -271,7 +271,7 @@ zbx_tm_data_result_t	*zbx_tm_data_result_create(zbx_uint64_t parent_taskid, int 
  *             status       - [IN] the task status (see ZBX_TM_STATUS_*)      *
  *             clock        - [IN] the task creation time                     *
  *             ttl          - [IN] the task expiration period in seconds      *
- *             proxyid - [IN] the destination proxy identifier (or 0)    *
+ *             proxyid      - [IN] the destination proxy identifier (or 0)    *
  *                                                                            *
  * Return value: The created task.                                            *
  *                                                                            *
