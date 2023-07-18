@@ -795,7 +795,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 		}
 
-		if ($total_percentage_used < 100) {
+		if (round($total_percentage_used, 6) <= 100) {
 			foreach ($svg_sectors as &$sector) {
 				if ($sector['is_total']) {
 					$sector['percent_of_total'] -= $total_percentage_used;
