@@ -31,8 +31,6 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	protected function checkInput() {
-		sdff($this->getInputAll());
-		sdff('CONTROLLLLLLLLLL');
 		$fields = [
 			'usrgrpid' =>					'db usrgrp.usrgrpid',
 			'name' =>						'db usrgrp.name',
