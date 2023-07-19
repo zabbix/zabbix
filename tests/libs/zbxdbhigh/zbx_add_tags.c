@@ -152,19 +152,19 @@ static void	read_tags(const char *path, zbx_vector_db_tag_ptr_t *tags)
 void	zbx_mock_test_entry(void **state)
 {
 	int			i;
-	zbx_vector_db_tag_ptr_t	host_tags, del_tags, out_host_tags;
+	zbx_vector_db_tag_ptr_t	host_tags, add_tags, out_host_tags;
 
 	ZBX_UNUSED(state);
 
 	zbx_vector_db_tag_ptr_create(&host_tags);
-	zbx_vector_db_tag_ptr_create(&del_tags);
+	zbx_vector_db_tag_ptr_create(&add_tags);
 	zbx_vector_db_tag_ptr_create(&out_host_tags);
 
 	read_tags("in.host_tags", &host_tags);
-	read_tags("in.del_tags", &del_tags);
+	read_tags("in.add_tags", &add_tags);
 	read_tags("out.host_tags", &out_host_tags);
 
-	zbx_del_tags(&host_tags, &del_tags);
+	zbx_add_tags(&host_tags, &add_tags);
 
 	zbx_mock_assert_int_eq("Unexpected host tag count", out_host_tags.values_num, host_tags.values_num);
 
@@ -183,8 +183,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 
-	zbx_vector_db_tag_ptr_clear_ext(&del_tags, zbx_db_tag_free);
-	zbx_vector_db_tag_ptr_destroy(&del_tags);
+	zbx_vector_db_tag_ptr_clear_ext(&add_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&add_tags);
 
 	zbx_vector_db_tag_ptr_clear_ext(&out_host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&out_host_tags);

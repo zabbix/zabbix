@@ -3,7 +3,8 @@ noinst_PROGRAMS = \
 	DBselect_uint64 \
 	DBadd_condition_alloc \
 	zbx_merge_tags \
-	zbx_del_tags
+	zbx_del_tags \
+	zbx_add_tags
 else
 if PROXY
 noinst_PROGRAMS = \
@@ -144,6 +145,20 @@ zbx_del_tags_LDADD += @SERVER_LIBS@
 zbx_del_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
 zbx_del_tags_CFLAGS = $(COMMON_FLAGS)
+
+zbx_add_tags_SOURCES = \
+	zbx_add_tags.c \
+	$(COMMON_SRC)
+
+zbx_add_tags_LDADD = \
+	$(SERVER_COMMON_LIB) \
+	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a
+
+zbx_add_tags_LDADD += @SERVER_LIBS@
+
+zbx_add_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_add_tags_CFLAGS = $(COMMON_FLAGS)
 
 else
 if PROXY
