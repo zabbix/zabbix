@@ -68,7 +68,9 @@ class CControllerProxyCreate extends CController {
 
 				case PROXY_MODE_PASSIVE:
 					if ($this->getInput('address', '')	== '') {
-						info(_s('Incorrect value for field "%1$s": %2$s.', _('IP or DNS address'), _('cannot be empty')));
+						info(
+							_s('Incorrect value for field "%1$s": %2$s.', _('IP or DNS address'), _('cannot be empty'))
+						);
 
 						$ret = false;
 					}
