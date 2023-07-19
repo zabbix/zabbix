@@ -84,6 +84,7 @@ ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 ZBX_VECTOR_IMPL(host_rev, zbx_host_rev_t)
 ZBX_PTR_VECTOR_IMPL(dc_connector_tag, zbx_dc_connector_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_dcheck_ptr, zbx_dc_dcheck_t *)
+ZBX_PTR_VECTOR_IMPL(dc_drule_ptr, zbx_dc_drule_t *)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -15428,18 +15429,16 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get next drule to be processed                                    *
+ * Purpose: get drules ready to be processed                                  *
  *                                                                            *
  * Parameter: now       - [IN] the current timestamp                          *
+ *            drules    - [IN/OUT] drules ready to be processed               *
  *            nextcheck - [OUT] the timestamp of next drule to be processed,  *
  *                              if there is no rule to be processed now and   *
  *                              the queue is not empty. 0 otherwise           *
  *                                                                            *
- * Return value: drule   - the drule was returned successfully                *
- *               NULL    - no drules are scheduled at current time            *
- *                                                                            *
  ******************************************************************************/
-zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
+void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck)
 {
 	zbx_binary_heap_elem_t	*elem;
 	zbx_dc_drule_t		*drule, *drule_out = NULL;
@@ -15448,7 +15447,7 @@ zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 
 	WRLOCK_CACHE;
 
-	if (FAIL == zbx_binary_heap_empty(&config->drule_queue))
+	while (FAIL == zbx_binary_heap_empty(&config->drule_queue))
 	{
 		elem = zbx_binary_heap_find_min(&config->drule_queue);
 		drule = (zbx_dc_drule_t *)elem->data;
@@ -15511,14 +15510,16 @@ zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck)
 			}
 
 			zbx_vector_dc_dcheck_ptr_sort(&drule_out->dchecks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+			zbx_vector_dc_drule_ptr_append(drules, drule_out);
 		}
 		else
+		{
 			*nextcheck = drule->nextcheck;
+			break;
+		}
 	}
 
 	UNLOCK_CACHE;
-
-	return drule_out;
 }
 
 /******************************************************************************
