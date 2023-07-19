@@ -466,7 +466,7 @@ class CProxy extends CApiService {
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'address' => 			['type' => API_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+			'address' => 			['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
 			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')],
 			'tls_connect' =>		['type' => API_MULTIPLE, 'default' => HOST_ENCRYPTION_NONE, 'rules' => [
 										['if' => ['field' => 'mode', 'in' => PROXY_MODE_ACTIVE], 'type' => API_INT32, 'in' => HOST_ENCRYPTION_NONE],
@@ -687,7 +687,7 @@ class CProxy extends CApiService {
 			'hosts' =>				['type' => API_OBJECTS, 'uniq' => [['hostid']], 'fields' => [
 				'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'address' => 			['type' => API_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
+			'address' => 			['type' => API_HOST_ADDRESS, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'address')],
 			'port' =>				['type' => API_PORT, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('proxy', 'port')]
 		]];
 

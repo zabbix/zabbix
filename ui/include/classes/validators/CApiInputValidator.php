@@ -195,8 +195,8 @@ class CApiInputValidator {
 			case API_DNS:
 				return self::validateDns($rule, $data, $path, $error);
 
-			case API_ADDRESS:
-				return self::validateAddress($rule, $data, $path, $error);
+			case API_HOST_ADDRESS:
+				return self::validateHostAddress($rule, $data, $path, $error);
 
 			case API_PORT:
 				return self::validatePort($rule, $data, $path, $error);
@@ -325,7 +325,7 @@ class CApiInputValidator {
 			case API_IP:
 			case API_IP_RANGES:
 			case API_DNS:
-			case API_ADDRESS:
+			case API_HOST_ADDRESS:
 			case API_PORT:
 			case API_TRIGGER_EXPRESSION:
 			case API_EVENT_NAME:
@@ -2706,41 +2706,28 @@ class CApiInputValidator {
 		return true;
 	}
 
-	private static function validateAddress($rule, &$data, $path, &$error): bool {
-		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+	/**
+	 * Proxy host address validator.
+	 *
+	 * @param array  $rule
+	 * @param int    $rule['flags']   (optional) API_NOT_EMPTY, API_ALLOW_USER_MACRO, API_ALLOW_LLD_MACRO,
+	 *                                API_ALLOW_MACRO
+	 * @param int    $rule['length']  (optional)
+	 * @param mixed  $data
+	 * @param string $path
+	 * @param string $error
+	 *
+	 * @return bool
+	 */
 
-		if (self::checkStringUtf8($flags & API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
-
-		if (($flags & API_NOT_EMPTY) == 0 && $data === '') {
+	private static function validateHostAddress($rule, &$data, $path, &$error): bool {
+		if (self::validateIp($rule, $data, $path, $error) || self::validateDns($rule, $data, $path, $error)) {
 			return true;
 		}
 
-		if (array_key_exists('length', $rule) && mb_strlen($data) > $rule['length']) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('value is too long'));
-			return false;
-		}
+		$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP or DNS is expected'));
 
-		$dns_parser = new CDnsParser([
-			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'macros' => ($flags & API_ALLOW_MACRO)
-		]);
-
-		$ip_parser = new CIPParser([
-			'v6' => ZBX_HAVE_IPV6,
-			'usermacros' => ($flags & API_ALLOW_USER_MACRO),
-			'lldmacros' => ($flags & API_ALLOW_LLD_MACRO),
-			'macros' => ($flags & API_ALLOW_MACRO)
-		]);
-
-		if ($dns_parser->parse($data) != CParser::PARSE_SUCCESS && $ip_parser->parse($data) != CParser::PARSE_SUCCESS) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an IP or DNS is expected'));
-			return false;
-		}
-
-		return true;
+		return false;
 	}
 
 	/**
