@@ -1455,8 +1455,8 @@ class CSla extends CApiService {
 				$period_from = $week_period_from
 					->modify((int) ($schedule_row['period_from'] / SEC_PER_DAY).' day')
 					->setTime(
-						($schedule_row['period_from'] / SEC_PER_HOUR) % 24,
-						($schedule_row['period_from'] / SEC_PER_MIN) % 60,
+						(int) ($schedule_row['period_from'] / SEC_PER_HOUR) % 24,
+						(int) ($schedule_row['period_from'] / SEC_PER_MIN) % 60,
 						$schedule_row['period_from'] % 60
 					)
 					->getTimestamp();
@@ -1464,8 +1464,8 @@ class CSla extends CApiService {
 				$period_to = $week_period_from
 					->modify((int) ($schedule_row['period_to'] / SEC_PER_DAY).' day')
 					->setTime(
-						($schedule_row['period_to'] / SEC_PER_HOUR) % 24,
-						($schedule_row['period_to'] / SEC_PER_MIN) % 60,
+						(int) ($schedule_row['period_to'] / SEC_PER_HOUR) % 24,
+						(int) ($schedule_row['period_to'] / SEC_PER_MIN) % 60,
 						$schedule_row['period_to'] % 60
 					)
 					->getTimestamp();
