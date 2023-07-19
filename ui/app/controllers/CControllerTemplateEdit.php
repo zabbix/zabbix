@@ -81,7 +81,7 @@ class CControllerTemplateEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$templateid = $this->getInput('templateid');
+		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
 		$clone = $this->hasInput('clone');
 		$templates = [];
 		$warnings = [];
@@ -380,7 +380,7 @@ class CControllerTemplateEdit extends CController {
 
 	private function getDefaultTemplateData(): array {
 		return [
-			'templateid' => $this->getInput('templateid'),
+			'templateid' => $this->hasInput('templateid') ? $this->getInput('templateid') : null,
 			'template_name' => '',
 			'visible_name' => '',
 			'linked_templates' => [],
