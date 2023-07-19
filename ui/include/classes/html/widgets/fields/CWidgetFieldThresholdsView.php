@@ -48,9 +48,7 @@ class CWidgetFieldThresholdsView extends CWidgetFieldView {
 			);
 		}
 
-		return (new CDiv($thresholds_table))
-			->addClass('table-forms-separator')
-			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		return (new CDiv($thresholds_table))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	public function getJavaScript(): string {

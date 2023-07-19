@@ -59,6 +59,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		'Discovery status' => 'Displays the status summary of the active network discovery rules.',
 		'Favorite graphs' => 'Displays shortcuts to the most needed graphs (marked as favorite).',
 		'Favorite maps' => 'Displays shortcuts to the most needed network maps (marked as favorite).',
+		'Gauge' => 'Displays the value of a single item as gauge.',
 		'Geomap' => 'Displays hosts as markers on a geographical map.',
 		'Graph' => 'Displays data of up to 50 items as line, points, staircase, or bar charts.',
 		'Graph (classic)' => 'Displays a single custom graph or a simple graph.',

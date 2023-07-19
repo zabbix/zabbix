@@ -1,0 +1,26 @@
+{
+	"manifest_version": 2.0,
+	"id": "gauge",
+	"type": "widget",
+	"name": "Gauge",
+	"namespace": "Gauge",
+	"version": "1.0",
+	"author": "Zabbix",
+	"description": "Displays the value of a single item as gauge.",
+	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/gauge",
+	"widget": {
+		"size": {
+			"width": 6,
+			"height": 5
+		},
+		"js_class": "CWidgetGauge"
+	},
+	"actions": {
+		"widget.gauge.view": {
+			"class": "WidgetView"
+		}
+	},
+	"assets": {
+		"js": ["class.widget.js"]
+	}
+}

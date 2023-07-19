@@ -110,7 +110,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 *******************************************************************************/
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job)
 {
-	zbx_list_append(&queue->jobs, job, NULL);
+	(void)zbx_list_append(&queue->jobs, job, NULL);
 }
 
 /******************************************************************************

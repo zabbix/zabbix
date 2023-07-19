@@ -297,7 +297,48 @@ static int	DBpatch_6050025(void)
 	return SUCCEED;
 }
 
-static int  DBpatch_6050026(void)
+static int	DBpatch_6050026(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_history", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050027(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_dhistory", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050028(void)
+{
+	const zbx_db_field_t	field = {"id", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBdrop_field_autoincrement("proxy_autoreg_host", &field);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050029(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'gauge','widgets/gauge',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int  DBpatch_6050030(void)
 {
 	const zbx_db_table_t table =
 			{"optag", "optagid", 0,
@@ -314,12 +355,12 @@ static int  DBpatch_6050026(void)
 	return DBcreate_table(&table);
 }
 
-static int  DBpatch_6050027(void)
+static int  DBpatch_6050031(void)
 {
 	return DBcreate_index("optag", "optag_1", "operationid", 0);
 }
 
-static int	DBpatch_6050028(void)
+static int	DBpatch_6050032(void)
 {
 	const zbx_db_field_t	field = {"operationid", NULL, "operations", "operationid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -362,5 +403,9 @@ DBPATCH_ADD(6050025, 0, 1)
 DBPATCH_ADD(6050026, 0, 1)
 DBPATCH_ADD(6050027, 0, 1)
 DBPATCH_ADD(6050028, 0, 1)
+DBPATCH_ADD(6050029, 0, 1)
+DBPATCH_ADD(6050030, 0, 1)
+DBPATCH_ADD(6050031, 0, 1)
+DBPATCH_ADD(6050032, 0, 1)
 
 DBPATCH_END()
