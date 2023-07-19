@@ -727,6 +727,7 @@ static void tls_description(tls_t *tls, char **desc)
 	*desc = strdup(buf);
 	free(peer_issuer);
 	free(peer_subject);
+	X509_free(cert);
 }
 
 //*****************************************************************************
