@@ -324,6 +324,19 @@ static int	DBpatch_6050028(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_6050029(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
+			" (" ZBX_FS_UI64 ",'gauge','widgets/gauge',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
 
 #endif
 
@@ -360,5 +373,6 @@ DBPATCH_ADD(6050025, 0, 1)
 DBPATCH_ADD(6050026, 0, 1)
 DBPATCH_ADD(6050027, 0, 1)
 DBPATCH_ADD(6050028, 0, 1)
+DBPATCH_ADD(6050029, 0, 1)
 
 DBPATCH_END()
