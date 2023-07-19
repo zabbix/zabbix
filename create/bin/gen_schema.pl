@@ -597,6 +597,38 @@ sub process_row($)
 sub timescaledb()
 {
 	print<<EOF
+CREATE OR REPLACE FUNCTION base36_decode(IN base36 varchar)
+RETURNS bigint AS \$\$
+DECLARE
+	a char[];
+	ret bigint;
+	i int;
+	val int;
+	chars varchar;
+BEGIN
+	chars := '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+	FOR i IN REVERSE char_length(base36)..1 LOOP
+		a := a || substring(upper(base36) FROM i FOR 1)::char;
+	END LOOP;
+	i := 0;
+	ret := 0;
+	WHILE i < (array_length(a, 1)) LOOP
+		val := position(a[i + 1] IN chars) - 1;
+		ret := ret + (val * (36 ^ i));
+		i := i + 1;
+	END LOOP;
+
+	RETURN ret;
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION cuid_timestamp(cuid varchar(25)) RETURNS bigint AS \$\$
+BEGIN
+	RETURN base64_decode(substring(\$1 FROM 1 FOR 8));
+END;
+\$\$ LANGUAGE 'plpgsql' IMMUTABLE;
+
 DO \$\$
 DECLARE
 	minimum_postgres_version_major		INTEGER;
@@ -673,12 +705,11 @@ EOF
 	;
 	}
 
-	for ("auditlog")
-	{
 		print<<EOF
-	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 604800, $flags);
+	PERFORM create_hypertable('auditlog', 'auditid', chunk_time_interval => 604800,
+			time_partitioning_func => 'cuid_timestamp', $flags);
 EOF
-	}
+	;
 
 	for ("trends", "trends_uint")
 	{
