@@ -214,17 +214,19 @@ class testPageHostGroups extends CWebTest {
 		$this->page->assertTitle('Configuration of host groups');
 
 		// Check filter.
-		$filter = CFilterContainerElement::find()->one();
-		$form = $filter->getFilterForm();
+		$filter = CFilterElement::find()->one();
+		$form = $filter->getForm();
 		$this->assertEquals(['Name'], $form->getLabels()->asText());
 		$this->assertTrue($form->getField('Name')->isAttributePresent(['value' => '', 'maxlength' => '255']));
 
 		// Check displaying and hiding the filter container.
+		$this->assertTrue($filter->isExpanded());
 		foreach ([false, true] as $state) {
 			$filter->expand($state);
+			// Leave the page and reopen the previous page to make sure the filter state is still saved..
 			$this->page->open('zabbix.php?action=report.status')->waitUntilReady();
 			$this->page->open(self::LINK)->waitUntilReady();
-			$filter->checkIfExpanded($state);
+			$this->assertTrue($filter->isExpanded($state));
 		}
 
 		// Check buttons.
@@ -336,7 +338,7 @@ class testPageHostGroups extends CWebTest {
 					'filter_set=1&filter_groups%5B0%5D='.$group_id, $this->page->getCurrentUrl()
 			);
 			$this->page->assertHeader($object);
-			$filter_form = CFilterContainerElement::find()->one()->getFilterForm();
+			$filter_form = CFilterElement::find()->one()->getForm();
 			$filter_form->checkValue(['Host groups' => $data['name']]);
 			$this->assertTableStats($count);
 			$this->page->open(self::LINK)->waitUntilReady();
@@ -484,7 +486,7 @@ class testPageHostGroups extends CWebTest {
 
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
-		$form = CFilterContainerElement::find()->one()->getFilterForm();
+		$form = CFilterElement::find()->one()->getForm();
 		$form->fill(['Name' => $data['Name']]);
 		$form->submit();
 		$table->waitUntilReloaded();

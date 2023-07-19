@@ -301,25 +301,14 @@ trait CastableTrait {
 	}
 
 	/**
-	 * Cast object to FilterForm element.
+	 * Cast object to Filter element.
 	 *
 	 * @param array $options    additional casting options
 	 *
-	 * @return CFilterContainerElement
+	 * @return CFilterElement
 	 */
-	public function asFilterForm($options = []) {
-		return $this->cast(CFilterContainerElement::class, $options);
-	}
-
-	/**
-	 * Cast object to FilterTab element.
-	 *
-	 * @param array $options    additional casting options
-	 *
-	 * @return CFilterTabElement
-	 */
-	public function asFilterTab($options = []) {
-		return $this->cast(CFilterTabElement::class, $options);
+	public function asFilterElement($options = []) {
+		return $this->cast(CFilterElement::class, $options);
 	}
 
 	/**
