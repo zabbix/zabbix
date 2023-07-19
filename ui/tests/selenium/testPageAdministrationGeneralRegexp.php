@@ -162,8 +162,8 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->assertMessage(TEST_GOOD, $message);
 
 		foreach ($regex_ids as $regex_id) {
-			$sql = 'SELECT * FROM expressions e FULL OUTER JOIN regexps r ON r.regexpid=e.regexpid WHERE '.
-				zbx_dbstr($regex_id).' IN (r.regexpid, e.regexpid)';
+			$sql = 'SELECT * FROM expressions e CROSS JOIN regexps r'.
+					' WHERE '.zbx_dbstr($regex_id).' IN (r.regexpid, e.regexpid)';
 			$this->assertEquals(0, CDBHelper::getCount($sql));
 		}
 
@@ -188,7 +188,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
 
-		$sql = 'SELECT * FROM expressions e FULL OUTER JOIN regexps r ON r.regexpid = e.regexpid';
+		$sql = 'SELECT * FROM expressions e CROSS JOIN regexps r';
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$this->assertTableData();
 	}
