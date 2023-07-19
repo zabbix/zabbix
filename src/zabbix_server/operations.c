@@ -747,7 +747,6 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
 static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
 {
 	int			i, new_tags_cnt = 0, res = SUCCEED;
-	char			*sql = NULL;
 	zbx_vector_db_tag_ptr_t	upd_tags;
 	zbx_vector_uint64_t	del_tagids;
 
@@ -792,54 +791,57 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 		zbx_db_insert_clean(&db_insert_tag);
 
-		if (SUCCEED != res)
+		if (SUCCEED == res)
+		{
+			hosttagid = first_hosttagid;
+
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (0 == tag->tagid)
+				{
+					zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
+							ZBX_DB_TAG_NORMAL);
+					hosttagid++;
+				}
+			}
+		}
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to add tags to discovered host, hostid = " ZBX_FS_UI64,
 					hostid);
-			goto out;
-		}
-
-		hosttagid = first_hosttagid;
-
-		for (i = 0; i < host_tags->values_num; i++)
-		{
-			zbx_db_tag_t	*tag = host_tags->values[i];
-
-			if (0 == tag->tagid)
-			{
-				zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
-						ZBX_DB_TAG_NORMAL);
-				hosttagid++;
-			}
 		}
 	}
 
-	if (0 != del_tagids.values_num)
+	if (SUCCEED == res && 0 != del_tagids.values_num)
 	{
+		char	*sql = NULL;
 		size_t	sql_alloc = ZBX_KIBIBYTE, sql_offset = 0;
 
-		zbx_free(sql);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from host_tag where");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hosttagid", del_tagids.values,
 				del_tagids.values_num);
 
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		if (ZBX_DB_OK == zbx_db_execute("%s", sql))
+		{
+			for (i = 0; i < host_tags->values_num; i++)
+			{
+				zbx_db_tag_t	*tag = host_tags->values[i];
+
+				if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
+					zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
+			}
+		}
+		else
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to delete tags from a discovered host, hostid = "
 					ZBX_FS_UI64, hostid);
-			goto out;
 		}
 
-		for (i = 0; i < host_tags->values_num; i++)
-		{
-			zbx_db_tag_t	*tag = host_tags->values[i];
-
-			if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
-				zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
-		}
+		zbx_free(sql);
 	}
-out:
-	zbx_free(sql);
+
 	zbx_vector_db_tag_ptr_destroy(&upd_tags);
 	zbx_vector_uint64_destroy(&del_tagids);
 
@@ -1228,8 +1230,7 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 
 	if (0 != new_optagids->values_num)
 		hostid = add_discovered_host(event, &status, cfg);
-
-	if (0 == hostid && 0 != del_optagids->values_num)
+	else
 		hostid = select_discovered_host(event, &hostname);
 
 	if (0 == hostid)
@@ -1256,6 +1257,7 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 
 	if (0 != new_optagids->values_num)
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_ADD, new_optagids, &host_tags);
+
 	if (0 != del_optagids->values_num)
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_DEL, del_optagids, &host_tags);
 

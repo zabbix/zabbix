@@ -447,7 +447,6 @@ void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *de
 {
 	int		i, j;
 
-
 	for (i = 0; i < deltags->values_num; i++)
 	{
 		zbx_db_tag_t	*deltag = deltags->values[i];
@@ -468,6 +467,7 @@ void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *de
 				}
 				else
 					hosttag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+
 				break;
 			}
 		}
