@@ -846,8 +846,9 @@ void	zbx_item_param_free(zbx_item_param_t *param);
 
 
 int	zbx_merge_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *src, const char *owner, char **error);
-void	zbx_del_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *del);
 int	zbx_merge_item_params(zbx_vector_item_param_ptr_t *dst, zbx_vector_item_param_ptr_t *src, char **error);
+void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *addtags);
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *deltags);
 
 typedef enum
 {

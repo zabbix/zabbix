@@ -394,30 +394,85 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: mark tags for deletion on exact match of name and value pairs     *
+ * Purpose: add a new tag if a tag with the same name and value is not        *
+ *          present on the host                                               *
  *                                                                            *
- * Parameters: dst - [IN/OUT] vector of existing tags                         *
- *             del - [IN] vector of tags to be deleted                        *
+ * Parameters: hosttags - [IN/OUT]                                            *
+ *             addtags  - [IN]                                                *
  *                                                                            *
  * Comments: Tag without a value is in fact a tag with empty value.           *
  *           Tags discovered during LLD should not be removed.                *
  *                                                                            *
  ******************************************************************************/
-void	zbx_del_tags(zbx_vector_db_tag_ptr_t *dst, zbx_vector_db_tag_ptr_t *del)
+void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *addtags)
 {
-	int	i, j;
+	int		i, j;
 
-	for (i = 0; i < dst->values_num; i++)
+	for (i = 0; i < addtags->values_num; i++)
 	{
-		if (ZBX_DB_TAG_AUTOMATIC == dst->values[i]->automatic)
-			continue;
+		int		found = 0;
+		zbx_db_tag_t	*addtag = addtags->values[i];
 
-		for (j = 0; j < del->values_num; j++)
+		for (j = 0; j < hosttags->values_num; j++)
 		{
-			if (0 == strcmp(dst->values[i]->tag, del->values[j]->tag) &&
-					0 == strcmp(dst->values[i]->value, del->values[j]->value))
+			zbx_db_tag_t	*hosttag = hosttags->values[j];
+
+			if (0 == strcmp(addtag->tag, hosttag->tag) && 0 == strcmp(addtag->value, hosttag->value))
 			{
-				dst->values[i]->flags = ZBX_FLAG_DB_TAG_REMOVE;
+				found = 1;
+				break;
+			}
+		}
+
+		if (0 == found)
+		{
+			zbx_db_tag_t	*new_tag;
+
+			new_tag = zbx_db_tag_create(addtag->tag, addtag->value);
+			new_tag->automatic = ZBX_DB_TAG_NORMAL;
+			zbx_vector_db_tag_ptr_append(hosttags, new_tag);
+		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: mark tags for deletion on exact match of name and value pairs     *
+ *                                                                            *
+ * Parameters: hosttags - [IN/OUT]                                            *
+ *             deltags  - [IN]                                                *
+ *                                                                            *
+ * Comments: Tag without a value is in fact a tag with empty value.           *
+ *           Tags discovered during LLD should not be removed.                *
+ *           A tag having tagid = 0 is not present in database yet.           *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_del_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *deltags)
+{
+	int		i, j;
+
+
+	for (i = 0; i < deltags->values_num; i++)
+	{
+		zbx_db_tag_t	*deltag = deltags->values[i];
+
+		for (j = 0; j < hosttags->values_num; j++)
+		{
+			zbx_db_tag_t	*hosttag = hosttags->values[j];
+
+			if (ZBX_DB_TAG_AUTOMATIC == hosttag->automatic)
+				continue;
+
+			if (0 == strcmp(deltag->tag, hosttag->tag) && 0 == strcmp(deltag->value, hosttag->value))
+			{
+				if (0 == hosttag->tagid)
+				{
+					zbx_db_tag_free(hosttag);
+					zbx_vector_db_tag_ptr_remove_noorder(hosttags, j);
+				}
+				else
+					hosttag->flags = ZBX_FLAG_DB_TAG_REMOVE;
+				break;
 			}
 		}
 	}
