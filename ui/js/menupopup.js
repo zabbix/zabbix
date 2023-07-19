@@ -1209,16 +1209,22 @@ function getMenuPopupItemPrototype(options) {
 		const trigger_prototypes = [];
 
 		for (const value of options.trigger_prototypes) {
-			url = new Curl('trigger_prototypes.php');
-			url.setArgument('form', 'update');
-			url.setArgument('parent_discoveryid', options.parent_discoveryid);
-			url.setArgument('triggerid', value.triggerid)
-			url.setArgument('context', options.context);
-			url.setArgument('backurl', options.backurl);
+			url = new Curl('zabbix.php');
+			url.setArgument('action', 'trigger.prototype.edit');
 
 			trigger_prototypes.push({
 				label: value.description,
-				url: url.getUrl()
+				url: url.getUrl(),
+				clickCallback: function(e) {
+					e.preventDefault();
+					jQuery(this).closest('.menu-popup-top').menuPopup('close', null)
+
+					view.editTriggerPrototype({
+						triggerid: value.triggerid,
+						parent_discoveryid: options.parent_discoveryid,
+						context: options.context
+					});
+				}
 			});
 		}
 
@@ -1229,17 +1235,23 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push(config_triggers);
 
-	url = new Curl('trigger_prototypes.php');
-	url.setArgument('parent_discoveryid', options.parent_discoveryid);
-	url.setArgument('form', 'create');
-	url.setArgument('description', options.name);
-	url.setArgument('expression', 'func(/' + options.host + '/' + options.key + ')');
-	url.setArgument('context', options.context);
-	url.setArgument('backurl', options.backurl);
+	url = new Curl('zabbix.php');
+	url.setArgument('action', 'trigger.prototype.edit')
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		url: url.getUrl()
+		url: url.getUrl(),
+		clickCallback: function(e) {
+			e.preventDefault();
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+			view.editTriggerPrototype({
+				parent_discoveryid: options.parent_discoveryid,
+				description: options.name,
+				expression: 'func(/' + options.host + '/' + options.key + ')',
+				context: options.context
+			});
+		}
 	});
 
 	url = new Curl('disc_prototypes.php');

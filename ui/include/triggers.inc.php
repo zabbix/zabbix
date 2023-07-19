@@ -2194,7 +2194,8 @@ function makeTriggerTemplatePrefix($triggerid, array $parent_templates, $flag, b
 	foreach ($templates as $template) {
 		if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 			if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('trigger_prototypes.php'))
+				$url = (new CUrl('zabbix.php'))
+					->setArgument('action', 'trigger.prototype.list')
 					->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
 					->setArgument('context', 'template');
 			}
@@ -2254,23 +2255,20 @@ function makeTriggerTemplatesHtml($triggerid, array $parent_templates, $flag, bo
 		foreach ($templates as $template) {
 			if ($provide_links && $template['permission'] == PERM_READ_WRITE) {
 				if ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-					$url = (new CUrl('trigger_prototypes.php'))
-						->setArgument('form', 'update')
-						->setArgument('triggerid', $parent_templates['links'][$triggerid]['triggerid'])
-						->setArgument('parent_discoveryid', $parent_templates['links'][$triggerid]['lld_ruleid'])
-						->setArgument('context', 'template');
-
 					$attribute_name = 'data-parent_discoveryid';
 					$attribute_value = $parent_templates['links'][$triggerid]['lld_ruleid'];
+					$prototype = '1';
 				}
 				// ZBX_FLAG_DISCOVERY_NORMAL
 				else {
 					$attribute_name = 'data-hostid';
 					$attribute_value = $template['hostid'];
+					$prototype = '0';
 				}
 
 				$name = (new CLink($template['name']))
 					->addClass('js-related-trigger-edit')
+					->setAttribute('data-prototype', $prototype)
 					->setAttribute('data-triggerid', $parent_templates['links'][$triggerid]['triggerid'])
 					->setAttribute('data-context', 'template')
 					->setAttribute($attribute_name, $attribute_value);

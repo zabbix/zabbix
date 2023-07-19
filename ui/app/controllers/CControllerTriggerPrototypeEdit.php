@@ -38,6 +38,8 @@ class CControllerTriggerPrototypeEdit extends CController {
 			'context' =>							'in '.implode(',', ['host', 'template']),
 			'hostid' =>								'db hosts.hostid',
 			'triggerid' =>							'db triggers.triggerid',
+			'description' =>						'string',
+			'expression' =>							'string',
 			'show_inherited_tags' =>				'in 0,1',
 			'form_refresh' =>						'in 0,1',
 			'parent_discoveryid' =>					'required|db items.itemid'

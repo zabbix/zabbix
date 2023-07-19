@@ -101,7 +101,7 @@
 	<tr id="dependency_#{triggerid}" data-triggerid="#{triggerid}">
 		<td>
 			<input type="hidden" name="dependencies[]" id="dependencies_#{triggerid}" value="#{triggerid}">
-			<a class="js-edit-dependency" data-triggerid="#{triggerid}" data-context="#{context}" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
+			<a class="js-edit-dependency" data-triggerid="#{triggerid}" data-context="#{context}" data-parent_discoveryid="#{parent_discoveryid}" data-prototype="#{prototype}" rel="noopener<?= ZBX_NOREFERER ? ' noreferrer' : '' ?>">#{name}</a>
 		</td>
 		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<?= (new CButton('remove', _('Remove')))

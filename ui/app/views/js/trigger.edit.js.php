@@ -541,13 +541,21 @@
 				}
 			}
 
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'trigger.edit');
+			const action = data.prototype === '1' ? 'trigger.prototype.edit' : 'trigger.edit';
 
-			const fields = {
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', action);
+
+			let fields = {
 				triggerid: data.triggerid,
-				hostid: data.hostid,
 				context: data.context
+			}
+
+			if (data.prototype === '1') {
+				fields.parent_discoveryid = data.parent_discoveryid;
+			}
+			else {
+				fields.hostid = data.hostid;
 			}
 
 			fetch(curl.getUrl(), {

@@ -385,8 +385,7 @@ class CRouter {
 		'sysmaps.php'					=> ['CLegacyAction', null, null],
 		'templates.php' 				=> ['CLegacyAction', null, null],
 		'toptriggers.php'				=> ['CLegacyAction', null, null],
-		'tr_events.php'					=> ['CLegacyAction', null, null],
-		'trigger_prototypes.php'		=> ['CLegacyAction', null, null]
+		'tr_events.php'					=> ['CLegacyAction', null, null]
 	];
 
 	private const DASHBOARD_ACTIONS = [

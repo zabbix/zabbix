@@ -66,14 +66,14 @@ if ($data['templates']) {
 
 if ($discovered_trigger) {
 	$trigger_form_grid->addItem([new CLabel(_('Discovered by')), new CFormField(
-		new CLink($data['discoveryRule']['name'],
-			(new CUrl('trigger_prototypes.php'))
-				->setArgument('form', 'update')
-				->setArgument('parent_discoveryid', $data['discoveryRule']['itemid'])
-				->setArgument('triggerid', $data['triggerDiscovery']['parent_triggerid'])
-				->setArgument('context', $data['context'])
+		(new CLink($data['discoveryRule']['name']))
+			->setAttribute('data-parent_discoveryid', $data['discoveryRule']['itemid'])
+			->setAttribute('data-triggerid', $data['triggerDiscovery']['parent_triggerid'])
+			->setAttribute('data-context', $data['context'])
+			->setAttribute('data-prototype', '1')
+			->addClass('js-related-trigger-edit')
 		)
-	)]);
+	]);
 }
 
 $trigger_form_grid

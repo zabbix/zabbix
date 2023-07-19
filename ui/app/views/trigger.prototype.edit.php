@@ -53,7 +53,7 @@ if ($data['limited']) {
 }
 
 $trigger_form_grid = new CFormGrid();
-if (!empty($data['templates'])) {
+if ($data['templates']) {
 	$trigger_form_grid->addItem([new CLabel(_('Parent triggers')), new CFormField($data['templates'])]);
 }
 
