@@ -45,7 +45,7 @@ class CAlert extends CApiService {
 	 *
 	 * @return array|string
 	 */
-	public function get($options = []) {
+	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'alertids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],

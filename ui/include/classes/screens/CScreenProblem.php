@@ -1019,7 +1019,7 @@ class CScreenProblem extends CScreenBase {
 					$header[] = $col_header_2->addClass(ZBX_STYLE_CELL_WIDTH);
 				}
 			}
-			// There might because events without symptoms or only symptoms.
+			// There might be cause events without symptoms or only symptoms.
 			elseif ($symptom_cause_eventids) {
 				$col_header = new CColHeader();
 

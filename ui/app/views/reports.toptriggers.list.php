@@ -66,7 +66,7 @@ $filter = (new CFilter())
 				new CFormField(
 					(new CMultiSelect([
 						'name' => 'filter_hostids[]',
-						'object_name' => 'hostGroup',
+						'object_name' => 'hosts',
 						'data' => $data['filter']['hosts'],
 						'popup' => [
 							'filter_preselect' => [
