@@ -112,10 +112,11 @@ class CSVGPie {
 
 	/**
 	 * Outer radius of pie chart.
+	 * It is large number because SVG works more precise that way (later it will be scaled according to widget size).
 	 *
 	 * @type {number}
 	 */
-	#radius_outer = 1;
+	#radius_outer = 1000;
 
 	/**
 	 * Inner radius of pie chart.
