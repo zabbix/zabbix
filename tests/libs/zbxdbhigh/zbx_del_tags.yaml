@@ -1,11 +1,32 @@
 ---
-test case: "Delete all tags from a host"
+test case: "Delete all tags from a host, tags are not in database yet"
 in:
   host_tags:
-    - tag: tag1
+    - tagid: 0
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 0
+      tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
+  del_tags:
+    - tag: tag1
+      value: value1
     - tag: tag2
+      value: value2
+out:
+  host_tags: []
+---
+test case: "Delete all tags from a host, tags are already in database"
+in:
+  host_tags:
+    - tagid: 1
+      tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
   del_tags:
@@ -15,11 +36,13 @@ in:
       value: value2
 out:
   host_tags:
-    - tag: tag1
+    - tagid: 1
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
-    - tag: tag2
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
@@ -27,16 +50,20 @@ out:
 test case: "Delete normal tags from a host while keeping automatic tags"
 in:
   host_tags:
-    - tag: tag1
+    - tagid: 1
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
-    - tag: tag2
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
-    - tag: tag3
+    - tagid: 3
+      tag: tag3
       value: value3
       automatic: ZBX_DB_TAG_AUTOMATIC
-    - tag: tag4
+    - tagid: 4
+      tag: tag4
       value: value4
       automatic: ZBX_DB_TAG_NORMAL
   del_tags:
@@ -50,19 +77,23 @@ in:
       value: value4
 out:
   host_tags:
-    - tag: tag1
+    - tagid: 1
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
-    - tag: tag2
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
-    - tag: tag3
+    - tagid: 3
+      tag: tag3
       value: value3
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
-    - tag: tag4
+    - tagid: 4
+      tag: tag4
       value: value4
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
@@ -70,10 +101,12 @@ out:
 test case: "Tags that are listed for deletion are not present on a host"
 in:
   host_tags:
-    - tag: tag1
+    - tagid: 1
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
-    - tag: tag2
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
   del_tags:
@@ -83,11 +116,13 @@ in:
       value: value33
 out:
   host_tags:
-    - tag: tag1
+    - tagid: 1
+      tag: tag1
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
-    - tag: tag2
+    - tagid: 2
+      tag: tag2
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]

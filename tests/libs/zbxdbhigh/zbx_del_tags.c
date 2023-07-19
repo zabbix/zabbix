@@ -112,6 +112,19 @@ static void	read_tags(const char *path, zbx_vector_db_tag_ptr_t *tags)
 
 		db_tag = zbx_db_tag_create(tag_str, value_str);
 
+		/* tagid */
+		mock_err = zbx_mock_object_member(htag, "tagid", &hid);
+
+		if (ZBX_MOCK_SUCCESS == mock_err)
+		{
+			if (ZBX_MOCK_SUCCESS != (mock_err = zbx_mock_uint64(hid, &db_tag->tagid)))
+				fail_msg("Cannot read '%s[%d].tagid': %s", path, i, zbx_mock_error_string(mock_err));
+		}
+		else if (ZBX_MOCK_NO_SUCH_MEMBER != mock_err)
+		{
+			fail_msg("Cannot read '%s[%d].tagid': %s", path, i, zbx_mock_error_string(mock_err));
+		}
+
 		/* automatic */
 		mock_err = zbx_mock_object_member(htag, "automatic", &hauto);
 
