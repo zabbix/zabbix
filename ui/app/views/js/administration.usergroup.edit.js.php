@@ -39,14 +39,14 @@
 			this.tag_filter_template = new Template(document.getElementById('tab-filter-row-template').innerHTML);
 			this.tag_filter_counter = 0;
 
-			const permissionTypes = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
+			const permission_types = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
 
-			permissionTypes.forEach(permissionType => {
-				if (this.templategroup_rights[permissionType]) {
-					this.#addTemplateRow(this.templategroup_rights[permissionType], permissionType)
+			permission_types.forEach(permission_type => {
+				if (this.templategroup_rights[permission_type]) {
+					this.#addTemplateRow(this.templategroup_rights[permission_type], permission_type)
 				}
-				if (this.hostgroup_rights[permissionType]) {
-					this.#addHostRow(this.hostgroup_rights[permissionType], permissionType)
+				if (this.hostgroup_rights[permission_type]) {
+					this.#addHostRow(this.hostgroup_rights[permission_type], permission_type)
 				}
 			})
 
@@ -77,9 +77,10 @@
 				'rowid': rowid
 			};
 
-			document
-				.getElementById('new-templategroup-right-table')
-				.insertAdjacentHTML('beforeend', this.template_permission_template.evaluate(data));
+			const new_row = this.template_permission_template.evaluate(data);
+
+			const placeholder_row = document.querySelector('.templategroup-placeholder-row');
+			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_new_templategroup_right_groupids_'+rowid+'_');
 			$(ms).multiSelect();
@@ -96,10 +97,14 @@
 				$(ms).multiSelect('addData', [groups]);
 			}
 
-			const permission_radio = document
-				.querySelector('input[name="new_templategroup_right[permission][' + rowid + ']"][value="' + permission + '"]')
-				.closest('li');
-			permission_radio.querySelector('input[type="radio"]').checked = true;
+			if (templategroup_rights.length > 0) {
+				const permission_radio = document
+					.querySelector('input[name="new_templategroup_right[permission][' + rowid + ']"][value="' + permission + '"]')
+					.closest('li');
+				permission_radio.querySelector('input[type="radio"]').checked = true;
+			}
+
+			document.dispatchEvent(new Event('tab-indicator-update'));
 
 			document.getElementById('user-group-form').addEventListener('click', event => {
 				if (event.target.classList.contains('element-table-remove')) {
@@ -114,9 +119,10 @@
 				'rowid': rowid
 			};
 
-			document
-				.getElementById('new-group-right-table')
-				.insertAdjacentHTML('beforeend', this.host_permission_template.evaluate(data));
+			const new_row = this.host_permission_template.evaluate(data);
+
+			const placeholder_row = document.querySelector('.group-placeholder-row');
+			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_new_group_right_groupids_'+rowid+'_');
 			$(ms).multiSelect();
@@ -133,10 +139,14 @@
 				$(ms).multiSelect('addData', [groups]);
 			}
 
-			const permission_radio = document
-				.querySelector('input[name="new_group_right[permission][' + rowid + ']"][value="' + permission + '"]')
-				.closest('li');
-			permission_radio.querySelector('input[type="radio"]').checked = true;
+			if (hostgroup_rights.length > 0) {
+				const permission_radio = document
+					.querySelector('input[name="new_group_right[permission][' + rowid + ']"][value="' + permission + '"]')
+					.closest('li');
+				permission_radio.querySelector('input[type="radio"]').checked = true;
+			}
+
+			document.dispatchEvent(new Event('tab-indicator-update'));
 
 			document.getElementById('user-group-form').addEventListener('click', event => {
 				if (event.target.classList.contains('element-table-remove')) {
@@ -151,9 +161,10 @@
 				'rowid': rowid
 			};
 
-			document
-				.getElementById('new-tag-filter-table')
-				.insertAdjacentHTML('beforeend', this.tag_filter_template.evaluate(data));
+			const new_row = this.tag_filter_template.evaluate(data);
+
+			const placeholder_row = document.querySelector('.tag-filter-placeholder-row');
+			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
 			const ms = document.getElementById('ms_new_tag_filter_groupids_'+rowid+'_');
 			$(ms).multiSelect();
@@ -172,6 +183,8 @@
 				document.getElementById(value_id).value = tag_filter['value'];
 			}
 
+			document.dispatchEvent(new Event('tab-indicator-update'));
+
 			document.getElementById('user-group-form').addEventListener('click', event => {
 				if (event.target.classList.contains('element-table-remove')) {
 					this.#removeRow(event.target);
@@ -183,11 +196,10 @@
 			button
 				.closest('tr')
 				.remove();
+
+			document.dispatchEvent(new Event('tab-indicator-update'));
 		}
 	};
-</script>
-
-<script type="text/javascript">
 
 	jQuery(function($) {
 		let $form = $('form[name="user_group_form"]'),

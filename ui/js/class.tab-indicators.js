@@ -1008,8 +1008,8 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#tag-filter-table tbody tr')
-			.length > 0;
+			.querySelectorAll('#new-tag-filter-table tbody tr')
+			.length > 2;
 	}
 
 	initObserver() {
@@ -1414,13 +1414,13 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#templategroup-right-table tbody tr')
-			.length > 1;
+			.querySelectorAll('#new-templategroup-right-table tbody tr')
+			.length > 2;
 	}
 
-	initObserver(element) {
+	initObserver() {
 		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes(element);
+			this.addAttributes();
 		});
 	}
 }
@@ -1433,8 +1433,8 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 
 	getValue() {
 		return document
-			.querySelectorAll('#group-right-table tbody tr')
-			.length > 1;
+			.querySelectorAll('#new-group-right-table tbody tr')
+			.length > 2;
 	}
 
 	initObserver() {
