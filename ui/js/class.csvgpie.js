@@ -296,7 +296,8 @@ class CSVGPie {
 						.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_NO_DATA}`)
 						.style('display', '');
 				}
-			});
+			})
+			.catch(() => {});
 
 		if (this.#config.total_value?.show) {
 			this.#total_value_container
