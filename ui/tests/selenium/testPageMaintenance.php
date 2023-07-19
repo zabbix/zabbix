@@ -47,7 +47,7 @@ class testPageMaintenance extends CWebTest {
 	protected static $approaching_maintenance = 'Approaching maintenance';
 	protected static $host_maintenance = 'Maintenance with assigned host';
 	protected static $multiple_group_maintenance = 'Maintenance with 2 host groups';
-	protected static $filter_name_maintenance = 'Maintenance для фильтра - $¢Řĩ₱₮';
+	protected static $filter_name_maintenance = 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲȼ€';
 	protected static $active_maintenance = 'Active maintenance';
 
 	public function prepareMaintenanceData() {
@@ -220,7 +220,7 @@ class testPageMaintenance extends CWebTest {
 						'Host group' => ['Zabbix servers', 'Discovered hosts']
 					],
 					[
-						'Name' => 'Maintenance для фильтра - $¢Řĩ₱₮',
+						'Name' => 'Maintenance для фильтра - ʍąɨɲţ€ɲąɲȼ€',
 						'Maintenance type' => 'With data collection',
 						'Active since' => '2023-06-06 00:00',
 						'Active till' => '2023-07-06 00:00',
@@ -279,7 +279,7 @@ class testPageMaintenance extends CWebTest {
 		);
 
 	// Name validation
-		$this->assertEquals(255, $form->getField('id:filter_name')->getAttribute('maxlength'));
+		$this->assertEquals(255, $form->getField('Name')->getAttribute('maxlength'));
 
 	// State check
 		$this->assertEquals(['Any', 'Active', 'Approaching', 'Expired'], $form->getField('State')->asSegmentedRadio()
@@ -343,7 +343,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => '  '
+						'Name' => '  '
 					],
 					'expected' => [
 						self::$active_maintenance,
@@ -363,7 +363,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => '$¢Řĩ₱₮'
+						'Name' => 'ʍąɨɲţ€ɲąɲȼ€'
 					],
 					'expected' => [
 						self::$filter_name_maintenance
@@ -434,7 +434,7 @@ class testPageMaintenance extends CWebTest {
 			[
 				[
 					'filter' => [
-						'id:filter_name' => 'Host',
+						'Name' => 'Host',
 						'State' => 'Expired',
 						'Host groups' => 'Zabbix servers'
 					],
