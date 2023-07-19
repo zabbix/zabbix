@@ -55,31 +55,6 @@ class CItem extends CItemGeneral {
 	/**
 	 * @inheritDoc
 	 */
-	protected const PREPROC_TYPES_WITH_PARAMS = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_RTRIM, ZBX_PREPROC_LTRIM, ZBX_PREPROC_TRIM, ZBX_PREPROC_REGSUB,
-		ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH, ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX,
-		ZBX_PREPROC_VALIDATE_NOT_REGEX, ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML,
-		ZBX_PREPROC_ERROR_FIELD_REGEX, ZBX_PREPROC_THROTTLE_TIMED_VALUE, ZBX_PREPROC_SCRIPT,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_STR_REPLACE, ZBX_PREPROC_SNMP_WALK_VALUE, ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
-	protected const PREPROC_TYPES_WITH_ERR_HANDLING = [
-		ZBX_PREPROC_MULTIPLIER, ZBX_PREPROC_REGSUB, ZBX_PREPROC_BOOL2DEC, ZBX_PREPROC_OCT2DEC, ZBX_PREPROC_HEX2DEC,
-		ZBX_PREPROC_DELTA_VALUE, ZBX_PREPROC_DELTA_SPEED, ZBX_PREPROC_XPATH, ZBX_PREPROC_JSONPATH,
-		ZBX_PREPROC_VALIDATE_RANGE, ZBX_PREPROC_VALIDATE_REGEX, ZBX_PREPROC_VALIDATE_NOT_REGEX,
-		ZBX_PREPROC_ERROR_FIELD_JSON, ZBX_PREPROC_ERROR_FIELD_XML, ZBX_PREPROC_ERROR_FIELD_REGEX,
-		ZBX_PREPROC_PROMETHEUS_PATTERN, ZBX_PREPROC_PROMETHEUS_TO_JSON, ZBX_PREPROC_CSV_TO_JSON,
-		ZBX_PREPROC_VALIDATE_NOT_SUPPORTED, ZBX_PREPROC_XML_TO_JSON, ZBX_PREPROC_SNMP_WALK_VALUE,
-		ZBX_PREPROC_SNMP_WALK_TO_JSON
-	];
-
-	/**
-	 * @inheritDoc
-	 */
 	public const SUPPORTED_ITEM_TYPES = [
 		ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
 		ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_CALCULATED,
@@ -585,7 +560,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items);
 		self::checkHostInterfaces($items);
 		self::checkDependentItems($items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -728,7 +702,6 @@ class CItem extends CItemGeneral {
 		self::checkInventoryLinks($items, $db_items);
 		self::checkHostInterfaces($items, $db_items);
 		self::checkDependentItems($items, $db_items);
-		self::checkPreprocessingSteps($items);
 	}
 
 	/**
@@ -839,7 +812,7 @@ class CItem extends CItemGeneral {
 	 */
 	public static function updateForce(array &$items, array &$db_items): void {
 		// Helps to avoid deadlocks.
-		CArrayHelper::sort($items, ['itemid'], ZBX_SORT_DOWN);
+		CArrayHelper::sort($items, ['itemid']);
 
 		self::addFieldDefaultsByType($items, $db_items);
 
@@ -1044,7 +1017,7 @@ class CItem extends CItemGeneral {
 	 * @param array $tpl_links
 	 * @param array $hostids
 	 */
-	protected static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
+	private static function inheritChunk(array $items, array $db_items, array $tpl_links, array $hostids): void {
 		$items_to_link = [];
 		$items_to_update = [];
 
@@ -1360,7 +1333,6 @@ class CItem extends CItemGeneral {
 		while ($row = DBfetch($result)) {
 			$item = [
 				'itemid' => $row['itemid'],
-				'type' => $row['type'],
 				'templateid' => 0
 			];
 
@@ -1374,9 +1346,13 @@ class CItem extends CItemGeneral {
 				if ($row['host_status'] == HOST_STATUS_TEMPLATE) {
 					$tpl_itemids[$i] = $row['itemid'];
 					$item += array_intersect_key($row,
-						array_flip(['key_', 'hostid', 'host_status', 'value_type'])
+						array_flip(['type', 'key_', 'hostid', 'host_status', 'value_type'])
 					);
 				}
+			}
+
+			if ($row['host_status'] != HOST_STATUS_TEMPLATE) {
+				unset($row['type']);
 			}
 
 			$items[$i++] = $item;
@@ -1857,10 +1833,10 @@ class CItem extends CItemGeneral {
 	 */
 	public static function deleteForce(array $db_items): void {
 		self::addInheritedItems($db_items);
-		self::addDependentItems($db_items, $del_ruleids, $db_item_prototypes);
+		self::addDependentItems($db_items, $db_lld_rules, $db_item_prototypes);
 
-		if ($del_ruleids) {
-			CDiscoveryRuleManager::delete($del_ruleids);
+		if ($db_lld_rules) {
+			CDiscoveryRule::deleteForce($db_lld_rules);
 		}
 
 		if ($db_item_prototypes) {
@@ -1898,12 +1874,12 @@ class CItem extends CItemGeneral {
 	 * prototypes to the given appropriate variables.
 	 *
 	 * @param array      $db_items
-	 * @param array|null $del_ruleids
+	 * @param array|null $db_lld_rules
 	 * @param array|null $db_item_prototypes
 	 */
-	protected static function addDependentItems(array &$db_items, array &$del_ruleids = null,
+	protected static function addDependentItems(array &$db_items, array &$db_lld_rules = null,
 			array &$db_item_prototypes = null): void {
-		$del_ruleids = [];
+		$db_lld_rules = [];
 		$db_item_prototypes = [];
 
 		$master_itemids = array_keys($db_items);
@@ -1919,7 +1895,7 @@ class CItem extends CItemGeneral {
 
 			while ($row = DBfetch($result)) {
 				if ($row['flags'] == ZBX_FLAG_DISCOVERY_RULE) {
-					$del_ruleids[] = $row['itemid'];
+					$db_lld_rules[$row['itemid']] = array_diff_key($row, array_flip(['flags']));
 				}
 				elseif ($row['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
 					$master_itemids[] = $row['itemid'];

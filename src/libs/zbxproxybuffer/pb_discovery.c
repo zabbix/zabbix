@@ -618,7 +618,7 @@ int	zbx_pb_discovery_get_rows(struct zbx_json *j, zbx_uint64_t *lastid, int *mor
 
 	pb_unlock();
 
-	if (PB_DATABASE == state)
+	if (PB_MEMORY != state)
 		ret = pb_get_discovery_db(j, lastid, more);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() rows:%d", __func__, ret);

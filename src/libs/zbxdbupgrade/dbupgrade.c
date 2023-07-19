@@ -569,7 +569,7 @@ int	DBcreate_serial_sequence(const char *table_name)
 	return SUCCEED;
 }
 
-int	DBdrop_serial_sequence(const char *table_name)
+static int	DBdrop_serial_sequence(const char *table_name)
 {
 	if (ZBX_DB_OK > zbx_db_execute("drop sequence " ZBX_FS_DB_SEQUENCE, table_name))
 	{

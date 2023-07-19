@@ -1490,14 +1490,17 @@ class CHost extends CHostGeneral {
 		$hostids = array_keys($db_hosts);
 
 		// delete the discovery rules first
-		$del_rules = API::DiscoveryRule()->get([
-			'output' => [],
-			'hostids' => $hostids,
-			'nopermissions' => true,
+		$db_lld_rules = DB::select('items', [
+			'output' => ['itemid', 'name'],
+			'filter' => [
+				'hostid' => $hostids,
+				'flags' => ZBX_FLAG_DISCOVERY_RULE
+			],
 			'preservekeys' => true
 		]);
-		if ($del_rules) {
-			CDiscoveryRuleManager::delete(array_keys($del_rules));
+
+		if ($db_lld_rules) {
+			CDiscoveryRule::deleteForce($db_lld_rules);
 		}
 
 		// delete the items
