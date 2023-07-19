@@ -668,7 +668,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 				[
 					'username' => 'admin-zabbix',
 					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
-					'regular_login' => true,
+//					'regular_login' => true,
 					'header' => 'Top 100 triggers'
 				]
 			],
@@ -678,7 +678,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 					'username' => 'admin-zabbix',
 					'url' => 'zabbix.php?action=service.list',
 					// Remove the 'regular_login' flag when ZBX-17663 is fixed.
-					'regular_login' => true,
+//					'regular_login' => true,
 					'header' => 'Services'
 				]
 			],
