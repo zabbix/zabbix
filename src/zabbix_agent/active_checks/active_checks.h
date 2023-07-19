@@ -43,6 +43,7 @@ typedef struct
 	const char		*config_host_interface_item;
 	int			config_buffer_send;
 	int			config_buffer_size;
+	int			config_eventlog_max_lines_per_second;
 }
 zbx_thread_activechk_args;
 

@@ -1477,7 +1477,7 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname, char **error)
+		const char *config_hostname, int config_eventlog_max_lines_per_second, char **error)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1489,6 +1489,7 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 	ZBX_UNUSED(config_timeout);
 	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_hostname);
+	ZBX_UNUSED(config_eventlog_max_lines_per_second);
 	ZBX_UNUSED(error);
 
 	return FAIL;
@@ -1497,7 +1498,8 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, char **error);
+		const char *config_source_ip, const char *config_hostname, int config_eventlog_max_lines_per_second,
+		char **error);
 #endif
 
 static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
@@ -1619,7 +1621,7 @@ static void	process_active_commands(zbx_vector_addr_ptr_t *addrs, const zbx_conf
 
 static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_tls_t *config_tls,
 		int config_timeout, const char *config_source_ip, const char *config_hostname, int config_buffer_send,
-		int config_buffer_size)
+		int config_buffer_size, int config_eventlog_max_lines_per_second)
 {
 	char	*error = NULL;
 	int	i, now;
@@ -1661,7 +1663,8 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					config_tls, config_timeout, config_source_ip, config_hostname, &error);
+					config_tls, config_timeout, config_source_ip, config_hostname,
+					config_eventlog_max_lines_per_second, &error);
 		}
 		else
 			ret = process_common_check(addrs, metric, config_tls, config_timeout, config_source_ip,
@@ -1939,7 +1942,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			process_active_checks(&activechk_args.addrs, activechks_args_in->zbx_config_tls,
 					activechks_args_in->config_timeout, activechks_args_in->config_source_ip,
 					config_hostname, activechks_args_in->config_buffer_send,
-					activechks_args_in->config_buffer_size);
+					activechks_args_in->config_buffer_size,
+					activechks_args_in->config_eventlog_max_lines_per_second);
 
 			if (activechks_args_in->config_buffer_size / 2 <= buffer.pcount)
 			{

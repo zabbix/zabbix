@@ -36,7 +36,7 @@
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
 /* winevt.h contents END */
 
-extern int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
+/* extern int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND; */
 
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 {
@@ -72,7 +72,8 @@ LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_source_ip, const char *config_hostname, char **error)
+		const char *config_source_ip, const char *config_hostname, int config_eventlog_max_lines_per_second,
+		char **error)
 {
 	int		rate, ret = FAIL;
 	AGENT_REQUEST	request;
@@ -147,7 +148,7 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 
 	if (NULL == (maxlines_persec = get_rparam(&request, 5)) || '\0' == *maxlines_persec)
 	{
-		rate = CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
+		rate = config_eventlog_max_lines_per_second;
 	}
 	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
 	{

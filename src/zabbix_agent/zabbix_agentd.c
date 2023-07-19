@@ -57,7 +57,7 @@ int	zbx_config_buffer_size		= 100;
 int	zbx_config_buffer_send		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND		= 20;
-int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND	= 20;
+int	zbx_config_eventlog_max_lines_per_second = 20;
 
 char	*CONFIG_LOAD_MODULE_PATH	= NULL;
 
@@ -733,7 +733,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	if (0 != err)
 		exit(EXIT_FAILURE);
 
-	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND = CONFIG_MAX_LINES_PER_SECOND;
+	zbx_config_eventlog_max_lines_per_second = CONFIG_MAX_LINES_PER_SECOND;
 }
 
 static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
@@ -766,10 +766,10 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 		config_active_args[forks].config_heartbeat_frequency = zbx_config_heartbeat_frequency;
 		config_active_args[forks].config_host_interface = zbx_config_host_interface;
 		config_active_args[forks].config_host_interface_item = zbx_config_host_interface_item;
-
 		config_active_args[forks].config_buffer_send = zbx_config_buffer_send;
 		config_active_args[forks].config_buffer_size = zbx_config_buffer_size;
-
+		config_active_args[forks].config_eventlog_max_lines_per_second =
+				zbx_config_eventlog_max_lines_per_second;
 	}
 
 	return SUCCEED;
