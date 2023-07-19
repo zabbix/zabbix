@@ -461,18 +461,18 @@ class CWidgetHelper {
 			] + $field->getFilterParameters());
 	}
 
-	public static function getSelectResource($field, $caption, $form_name) {
-		return [
-			(new CTextBox($field->getName().'_caption', $caption, true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(self::isAriaRequired($field)),
-			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('select', _('Select')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->onClick('return PopUp("popup.generic", '.json_encode($field->getPopupOptions($form_name)).',
-					{dialogue_class: "modal-popup-generic"}
-				);')
-		];
+	/**
+	 * @param CWidgetFieldMsSysmap $field
+	 * @param array $captions
+	 * @param string $form_name
+	 *
+	 * @return CMultiSelect
+	 */
+	public static function getSysmap($field, $captions, $form_name) {
+		return self::getMultiselectField($field, $captions, $form_name, 'sysmaps', [
+			'srctbl' => 'sysmaps',
+			'srcfld1' => 'sysmapid'
+		] + $field->getFilterParameters());
 	}
 
 	/**

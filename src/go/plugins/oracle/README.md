@@ -76,7 +76,6 @@ To configure plugins, Zabbix agent 2 configuration file is used.
 The connection can be configured using either key parameters or named sessions.
 
 *Notes*:  
-* It is not allowed to use both configuration types simultaneously. You should use either named sessions or key parameters.
 * You can leave any connection parameter value empty; in this case the default, hard-coded value, will be used.
 * Embedded URI credentials (e.g. user credentials) are not supported and will be ignored. It is not possible to override the credentials this way: 
   

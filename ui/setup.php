@@ -157,7 +157,7 @@ $setup_wizard = (new CSetupWizard())->cleanItems();
 
 // page title
 (new CPageHeader(_('Installation'), substr($default_lang, 0, strpos($default_lang, '_'))))
-	->addCssFile('assets/styles/'.CHtml::encode($default_theme).'.css')
+	->addCssFile('assets/styles/'.$default_theme.'.css')
 	->addJsFile((new CUrl('js/browsers.js'))->getUrl())
 	->addJsFile((new CUrl('jsLoader.php'))
 		->setArgument('ver', ZABBIX_VERSION)

@@ -533,7 +533,7 @@ void	zbx_db_validate_config(void);
 
 #ifdef HAVE_ORACLE
 void	DBstatement_prepare(const char *sql);
-void	zbx_db_table_prepare(const char *tablename, struct zbx_json *j);
+void	zbx_db_table_prepare(const char *tablename, struct zbx_json *json);
 #endif
 int		DBexecute(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 int		DBexecute_once(const char *fmt, ...) __zbx_attr_format_printf(1, 2);

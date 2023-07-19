@@ -33,6 +33,8 @@ class CTrigger extends CTriggerGeneral {
 		'deletedependencies' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
+	protected const FLAGS = ZBX_FLAG_DISCOVERY_NORMAL;
+
 	protected $tableName = 'triggers';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['triggerid', 'description', 'status', 'priority', 'lastchange', 'hostname'];
@@ -849,7 +851,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $options['expandDescription'] !== null) {
+		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
 			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 		}
 

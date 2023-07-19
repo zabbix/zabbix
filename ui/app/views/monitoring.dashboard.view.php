@@ -115,7 +115,7 @@ $widget = (new CWidget())
 							->setAttribute('aria-disabled', !$data['dashboard']['editable'] ? 'true' : null)
 					)
 					->addItem(
-						(new CButton('', '&nbsp;'))
+						(new CButton(null, NBSP()))
 							->addClass(ZBX_STYLE_BTN_ACTION)
 							->setId('dashboard-actions')
 							->setTitle(_('Actions'))
@@ -140,7 +140,7 @@ $widget = (new CWidget())
 							[(new CSpan())->addClass(ZBX_STYLE_PLUS_ICON), _('Add')]
 						))->addClass(ZBX_STYLE_BTN_ALT))
 						->addItem(
-							(new CButton('dashboard-add', '&#8203;'))
+							(new CButton('dashboard-add', ZWSPACE()))
 								->addClass(ZBX_STYLE_BTN_ALT)
 								->addClass(ZBX_STYLE_BTN_TOGGLE_CHEVRON)
 						),
