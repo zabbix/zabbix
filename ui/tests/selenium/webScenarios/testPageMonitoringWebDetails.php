@@ -93,15 +93,15 @@ class testPageMonitoringWebDetails extends CWebTest {
 		$this->assertEquals('now-1h', $form->query('id:from')->one()->getValue());
 		$this->assertEquals('now', $form->query('id:to')->one()->getValue());
 		$this->assertEquals('selected', $form->query('xpath://a[@data-from="now-1h"]')->one()->getAttribute('class'));
-		$this->assertTrue($this->query('xpath://button[@class="btn-time-left"]')->one()->isEnabled());
+		$this->assertTrue($this->query('xpath://button[contains(@class, "js-btn-time-left")]')->one()->isEnabled());
 		$this->assertTrue($this->query('button:Zoom out')->one()->isEnabled());
-		$this->assertFalse($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
+		$this->assertFalse($this->query('xpath://button[contains(@class, "js-btn-time-right")]')->one()->isEnabled());
 
 		// Set custom time filter.
 		$form->fill(['id:from' => 'now-2h', 'id:to' => 'now-1h']);
 		$form->query('id:apply')->one()->click();
 		$this->assertGraphSrcContains('from=now-2h&to=now-1h');
-		$this->assertTrue($this->query('xpath://button[@class="btn-time-right"]')->one()->isEnabled());
+		$this->assertTrue($this->query('xpath://button[contains(@class, "js-btn-time-right")]')->one()->isEnabled());
 
 		// Use time filter preset button.
 		$form->query('xpath://a[@data-from="now-30d"]')->one()->click();
