@@ -259,12 +259,16 @@
 		}
 	}
 
+	.table-forms,
 	.table-forms-separator {
-		display: inline-flex;
-		line-height: 1.4;
+		line-height: $body-line-height;
 
 		td {
 			padding: 5px 5px 0 0;
+
+			&:last-child {
+				padding-right: 0;
+			}
 		}
 
 		tfoot {
@@ -272,5 +276,9 @@
 				padding-bottom: 0;
 			}
 		}
+	}
+
+	.table-forms-separator {
+		display: inline-flex;
 	}
 }

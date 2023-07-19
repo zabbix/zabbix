@@ -21,27 +21,18 @@
 
 #include "zbxdbwrap.h"
 #include "zbxcachehistory.h"
-#include "zbxtasks.h"
-#include "zbxmutexs.h"
 #include "zbxnix.h"
-#include "zbxcompress.h"
 #include "zbxcommshigh.h"
-#include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "../taskmanager/taskmanager.h"
-
-extern unsigned char	program_type;
-static zbx_mutex_t	proxy_lock = ZBX_MUTEX_NULL;
-
-#define	LOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_lock(proxy_lock)
-#define	UNLOCK_PROXY_HISTORY	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE)) zbx_mutex_unlock(proxy_lock)
 
 int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock, const char *info, int status,
 		int upload_status, int config_timeout)
 {
 	struct zbx_json		json;
 	zbx_vector_tm_task_t	tasks;
-	int			ret, flags = ZBX_TCP_PROTOCOL;
+	int			ret;
+	unsigned char		flags = ZBX_TCP_PROTOCOL;
 
 	zbx_vector_tm_task_create(&tasks);
 
@@ -129,7 +120,7 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-void	zbx_recv_proxy_data(zbx_socket_t *sock, struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
@@ -199,7 +190,7 @@ out:
 		int	lastaccess;
 
 		if (ZBX_PROXY_UPLOAD_DISABLED == upload_status)
-			lastaccess = time(NULL);
+			lastaccess = (int)time(NULL);
 		else
 			lastaccess = ts->sec;
 
@@ -221,265 +212,4 @@ out:
 	zbx_free(version_str);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sends data from proxy to server                                   *
- *                                                                            *
- * Parameters: sock            - [IN] the connection socket                   *
- *             buffer          -                                              *
- *             buffer_size     -                                              *
- *             reserved        -                                              *
- *             config_timeout  - [IN]                                         *
- *             error           - [OUT] the error message                      *
- *                                                                            *
- ******************************************************************************/
-static int	send_data_to_server(zbx_socket_t *sock, char **buffer, size_t buffer_size, size_t reserved,
-		int config_timeout, char **error)
-{
-	if (SUCCEED != zbx_tcp_send_ext(sock, *buffer, buffer_size, reserved, ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS,
-			config_timeout))
-	{
-		*error = zbx_strdup(*error, zbx_socket_strerror());
-		return FAIL;
-	}
-
-	zbx_free(*buffer);
-
-	if (SUCCEED != zbx_recv_response(sock, config_timeout, error))
-		return FAIL;
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sends 'proxy data' request to server                              *
- *                                                                            *
- * Parameters: sock             - [IN] connection socket                      *
- *             ts               - [IN] connection timestamp                   *
- *             config_comms     - [IN] proxy configuration for communication  *
- *                                     with server                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_send_proxy_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms)
-{
-	struct zbx_json		j;
-	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
-	char			*error = NULL, *buffer = NULL;
-	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay;
-	zbx_vector_tm_task_t	tasks;
-	struct zbx_json_parse	jp, jp_tasks;
-	size_t			buffer_size, reserved;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
-	{
-		/* do not send any reply to server in this case as the server expects proxy data */
-		goto out;
-	}
-
-	LOCK_PROXY_HISTORY;
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_SESSION, zbx_dc_get_session_token(), ZBX_JSON_TYPE_STRING);
-	zbx_get_interface_availability_data(&j, &availability_ts);
-	zbx_proxy_get_hist_data(&j, &history_lastid, &more_history);
-	zbx_proxy_get_dhis_data(&j, &discovery_lastid, &more_discovery);
-	zbx_proxy_get_areg_data(&j, &areg_lastid, &more_areg);
-	zbx_proxy_get_host_active_availability(&j);
-
-	zbx_vector_tm_task_create(&tasks);
-	zbx_tm_get_remote_tasks(&tasks, 0, 0);
-
-	if (0 != tasks.values_num)
-		zbx_tm_json_serialize_tasks(&j, &tasks);
-
-	if (ZBX_PROXY_DATA_MORE == more_history || ZBX_PROXY_DATA_MORE == more_discovery ||
-			ZBX_PROXY_DATA_MORE == more_areg)
-	{
-		zbx_json_adduint64(&j, ZBX_PROTO_TAG_MORE, ZBX_PROXY_DATA_MORE);
-	}
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
-
-	if (0 != history_lastid && 0 != (proxy_delay = zbx_proxy_get_delay(history_lastid)))
-		zbx_json_adduint64(&j, ZBX_PROTO_TAG_PROXY_DELAY, proxy_delay);
-
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
-	{
-		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-		goto clean;
-	}
-
-	reserved = j.buffer_size;
-	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
-
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
-			&error))
-	{
-		zbx_set_availability_diff_ts(availability_ts);
-
-		zbx_db_begin();
-
-		if (0 != history_lastid)
-		{
-			zbx_uint64_t	history_maxid;
-			zbx_db_result_t	result;
-			zbx_db_row_t	row;
-
-			result = zbx_db_select("select max(id) from proxy_history");
-
-			if (NULL == (row = zbx_db_fetch(result)) || SUCCEED == zbx_db_is_null(row[0]))
-				history_maxid = history_lastid;
-			else
-				ZBX_STR2UINT64(history_maxid, row[0]);
-
-			zbx_db_free_result(result);
-
-			zbx_reset_proxy_history_count(history_maxid - history_lastid);
-			zbx_proxy_set_hist_lastid(history_lastid);
-		}
-
-		if (0 != discovery_lastid)
-			zbx_proxy_set_dhis_lastid(discovery_lastid);
-
-		if (0 != areg_lastid)
-			zbx_proxy_set_areg_lastid(areg_lastid);
-
-		if (0 != tasks.values_num)
-		{
-			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
-			zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
-		}
-
-		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
-		{
-			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
-			{
-				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-				zbx_tm_save_tasks(&tasks);
-			}
-		}
-
-		zbx_db_commit();
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send proxy data to server at \"%s\": %s", sock->peer, error);
-		zbx_free(error);
-	}
-clean:
-	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
-	zbx_vector_tm_task_destroy(&tasks);
-
-	zbx_json_free(&j);
-	UNLOCK_PROXY_HISTORY;
-out:
-	zbx_free(buffer);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sends 'proxy data' request to server                              *
- *                                                                            *
- * Parameters: sock             - [IN] connection socket                      *
- *             ts               - [IN] connection timestamp                   *
- *             config_comms     - [IN] proxy configuration for communication  *
- *                                     with server                            *
- *                                                                            *
- ******************************************************************************/
-void	zbx_send_task_data(zbx_socket_t *sock, zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms)
-{
-	struct zbx_json		j;
-	char			*error = NULL, *buffer = NULL;
-	zbx_vector_tm_task_t	tasks;
-	struct zbx_json_parse	jp, jp_tasks;
-	size_t			buffer_size, reserved;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != zbx_check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "proxy data request",
-			config_comms->config_tls, config_comms->config_timeout, config_comms->server))
-	{
-		/* do not send any reply to server in this case as the server expects proxy data */
-		goto out;
-	}
-
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-
-	zbx_vector_tm_task_create(&tasks);
-	zbx_tm_get_remote_tasks(&tasks, 0, 0);
-
-	if (0 != tasks.values_num)
-		zbx_tm_json_serialize_tasks(&j, &tasks);
-
-	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_CLOCK, ts->sec);
-	zbx_json_adduint64(&j, ZBX_PROTO_TAG_NS, ts->ns);
-
-	if (SUCCEED != zbx_compress(j.buffer, j.buffer_size, &buffer, &buffer_size))
-	{
-		zabbix_log(LOG_LEVEL_ERR,"cannot compress data: %s", zbx_compress_strerror());
-		goto clean;
-	}
-
-	reserved = j.buffer_size;
-	zbx_json_free(&j);	/* json buffer can be large, free as fast as possible */
-
-	if (SUCCEED == send_data_to_server(sock, &buffer, buffer_size, reserved, config_comms->config_timeout,
-			&error))
-	{
-		zbx_db_begin();
-
-		if (0 != tasks.values_num)
-		{
-			zbx_tm_update_task_status(&tasks, ZBX_TM_STATUS_DONE);
-			zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
-		}
-
-		if (SUCCEED == zbx_json_open(sock->buffer, &jp))
-		{
-			if (SUCCEED == zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_TASKS, &jp_tasks))
-			{
-				zbx_tm_json_deserialize_tasks(&jp_tasks, &tasks);
-				zbx_tm_save_tasks(&tasks);
-			}
-		}
-
-		zbx_db_commit();
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send task data to server at \"%s\": %s", sock->peer, error);
-		zbx_free(error);
-	}
-clean:
-	zbx_vector_tm_task_clear_ext(&tasks, zbx_tm_task_free);
-	zbx_vector_tm_task_destroy(&tasks);
-
-	zbx_json_free(&j);
-out:
-	zbx_free(buffer);
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-int	init_proxy_history_lock(char **error)
-{
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-		return zbx_mutex_create(&proxy_lock, ZBX_MUTEX_PROXY_HISTORY, error);
-
-	return SUCCEED;
-}
-
-void	free_proxy_history_lock(void)
-{
-	if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
-		zbx_mutex_destroy(&proxy_lock);
 }

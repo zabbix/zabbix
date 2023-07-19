@@ -1,9 +1,28 @@
+/*
+** Zabbix
+** Copyright (C) 2001-2023 Zabbix SIA
+**
+** This program is free software; you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation; either version 2 of the License, or
+** (at your option) any later version.
+**
+** This program is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with this program; if not, write to the Free Software
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+**/
+#include "poller.h"
+#include "async_httpagent.h"
+#include "async_agent.h"
+#include "zbxasynchttppoller.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxcommon.h"
-#include <event.h>
-#include <event2/thread.h>
-#include "poller.h"
 #include "zbxserver.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
@@ -11,10 +30,14 @@
 #include "zbxnix.h"
 #include "zbx_rtc_constants.h"
 #include "zbxrtc.h"
-#include "async_httpagent.h"
-#include "async_agent.h"
 #include "zbx_availability_constants.h"
-#include "zbxasynchttppoller.h"
+#include "zbxavailability.h"
+#include "zbxcacheconfig.h"
+#include "zbxcomms.h"
+#include "zbxhttp.h"
+#include "zbxipcservice.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 ZBX_VECTOR_IMPL(int32, int)
 
@@ -115,12 +138,19 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	zbx_dc_item_context_t	*item_context;
 	zbx_timespec_t		timespec;
 	zbx_poller_config_t	*poller_config;
+	CURLcode		err_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	poller_config = (zbx_poller_config_t *)arg;
 
-	curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context);
+	if (CURLE_OK != (err_info = curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &httpagent_context)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get pointer to private data: %s", curl_easy_strerror(err_info));
+
+		goto fail;
+	}
 
 	zbx_timespec(&timespec);
 
@@ -164,7 +194,7 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 	curl_multi_remove_handle(poller_config->curl_handle, easy_handle);
 	zbx_async_check_httpagent_clean(httpagent_context);
 	zbx_free(httpagent_context);
-
+fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 #endif

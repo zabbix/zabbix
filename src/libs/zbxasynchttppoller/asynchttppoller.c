@@ -17,13 +17,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxlog.h"
-#include "zbxsysinc.h"
 #include "zbxasynchttppoller.h"
+#include "zbxlog.h"
 
 #if defined(HAVE_LIBCURL) && defined(HAVE_LIBEVENT)
-#include <event.h>
-#include <event2/thread.h>
 
 typedef struct
 {
@@ -76,6 +73,8 @@ static void	check_multi_info(zbx_asynchttppoller_config *asynchttppoller_config)
 				asynchttppoller_config->process_httpagent_result(message->easy_handle,
 						message->data.result, asynchttppoller_config->http_agent_arg);
 				break;
+			case CURLMSG_NONE:
+			case CURLMSG_LAST:
 			default:
 				zabbix_log(LOG_LEVEL_DEBUG, "curl message:%u", message->msg);
 				break;
