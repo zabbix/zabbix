@@ -31,6 +31,8 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	protected function checkInput() {
+		sdff($this->getInputAll());
+		sdff('CONTROLLLLLLLLLL');
 		$fields = [
 			'usrgrpid' =>					'db usrgrp.usrgrpid',
 			'name' =>						'db usrgrp.name',
@@ -42,10 +44,6 @@ class CControllerUsergroupEdit extends CController {
 			'group_rights' =>				'array',
 			'templategroup_rights' =>		'array',
 			'tag_filters' =>				'array',
-
-			'new_group_right' =>			'array',
-			'new_templategroup_right' =>	'array',
-			'new_tag_filter' =>				'array',
 
 			'form_refresh' =>				'int32'
 		];
@@ -108,35 +106,7 @@ class CControllerUsergroupEdit extends CController {
 		$data['group_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
 
-		$groupedTemplateRights = [];
-		foreach ($data['templategroup_rights'] as $id => $right) {
-			if ($right['permission'] == PERM_NONE) {
-				continue;
-			}
-			switch ($right['permission']) {
-				case PERM_DENY:
-					$group = PERM_DENY;
-					break;
-				case PERM_READ:
-					$group = PERM_READ;
-					break;
-				case PERM_READ_WRITE:
-					$group = PERM_READ_WRITE;
-					break;
-				default:
-					$group = PERM_NONE;
-			}
-
-			if (!isset($groupedTemplateRights[$group])) {
-				$groupedTemplateRights[$group] = [];
-			}
-
-			$groupedTemplateRights[$group][$id] = $right;
-		}
-
-		$data['templategroup_rights'] = $groupedTemplateRights;
-
-		$groupedHostRights = [];
+		$grouped_hostgroup_rights = [];
 		foreach ($data['group_rights'] as $id => $right) {
 			if ($right['permission'] == PERM_NONE) {
 				continue;
@@ -152,43 +122,45 @@ class CControllerUsergroupEdit extends CController {
 					$group = PERM_READ_WRITE;
 					break;
 				default:
-					$group = PERM_NONE;
+					$group = PERM_DENY;
 			}
 
-			if (!isset($groupedHostRights[$group])) {
-				$groupedHostRights[$group] = [];
+			if (!isset($grouped_hostgroup_rights[$group])) {
+				$grouped_hostgroup_rights[$group] = [];
 			}
 
-			$groupedHostRights[$group][$id] = $right;
+			$grouped_hostgroup_rights[$group][$id] = $right;
 		}
 
-		$data['group_rights'] = $groupedHostRights;
+		$data['group_rights'] = $grouped_hostgroup_rights;
 
-		$data['new_group_right'] = $this->getInput('new_group_right', []) + [
-			'groupids' => [],
-			'permission' => PERM_NONE,
-			'include_subgroups' => '0'
-		];
-		$data['new_templategroup_right'] = $this->getInput('new_templategroup_right', []) + [
-			'groupids' => [],
-			'permission' => PERM_NONE,
-			'include_subgroups' => '0'
-		];
+		$grouped_templategroup_rights = [];
+		foreach ($data['templategroup_rights'] as $id => $right) {
+			switch ($right['permission']) {
+				case PERM_DENY:
+					$group = PERM_DENY;
+					break;
+				case PERM_READ:
+					$group = PERM_READ;
+					break;
+				case PERM_READ_WRITE:
+					$group = PERM_READ_WRITE;
+					break;
+				default:
+					$group = PERM_DENY;
+			}
+
+			if (!isset($grouped_templategroup_rights[$group])) {
+				$grouped_templategroup_rights[$group] = [];
+			}
+
+			$grouped_templategroup_rights[$group][$id] = $right;
+		}
+
+		$data['templategroup_rights'] = $grouped_templategroup_rights;
 
 		$data['tag_filters'] = $this->getTagFilters();
-		$data['new_tag_filter'] = $this->getInput('new_tag_filter', []) + [
-			'groupids' => [],
-			'tag' => '',
-			'value' => '',
-			'include_subgroups' => '0'
-		];
 
-		$data['host_groups_ms'] = self::getHostGroupsMs(
-			array_merge($data['new_group_right']['groupids'], $data['new_tag_filter']['groupids'])
-		);
-		$data['template_groups_ms'] = self::getTemplateGroupsMs(
-			$data['new_templategroup_right']['groupids']
-		);
 		$data['users_ms'] = $this->getUsersMs();
 
 		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
@@ -251,51 +223,7 @@ class CControllerUsergroupEdit extends CController {
 	}
 
 	/**
-	 * Returns all needed host groups formatted for multiselector.
-	 *
-	 * @param array $groupids
-	 *
-	 * @return array
-	 */
-	private static function getHostGroupsMs(array $groupids) {
-		if (!$groupids) {
-			return [];
-		}
-
-		$host_groups = API::HostGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $groupids,
-			'preservekeys' => true
-		]);
-		CArrayHelper::sort($host_groups, ['name']);
-
-		return CArrayHelper::renameObjectsKeys($host_groups, ['groupid' => 'id']);
-	}
-
-	/**
-	 * Returns all needed template groups formatted for multiselector.
-	 *
-	 * @param array $groupids
-	 *
-	 * @return array
-	 */
-	private static function getTemplateGroupsMs(array $groupids) {
-		if (!$groupids) {
-			return [];
-		}
-
-		$template_groups = API::TemplateGroup()->get([
-			'output' => ['groupid', 'name'],
-			'groupids' => $groupids,
-			'preservekeys' => true
-		]);
-		CArrayHelper::sort($template_groups, ['name']);
-
-		return CArrayHelper::renameObjectsKeys($template_groups, ['groupid' => 'id']);
-	}
-
-	/**
-	 * Returns all needed user formatted for multiselector.
+	 * Returns all needed users formatted for multiselector.
 	 *
 	 * @return array
 	 */

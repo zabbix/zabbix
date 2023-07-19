@@ -50,8 +50,24 @@
 				}
 			})
 
-			this.tag_filters.forEach(tagFilter => {
-				this.#addTagFilterRow(tagFilter);
+			const grouped_tag_filters = [];
+
+			tag_filters.forEach(tag_filter => {
+				const matching_index = grouped_tag_filters.findIndex(grouped_filter => (
+					grouped_filter.some(filter => (
+						filter.tag === tag_filter.tag && filter.value === tag_filter.value
+					))
+				));
+
+				if (matching_index !== -1) {
+					grouped_tag_filters[matching_index].push(tag_filter);
+				} else {
+					grouped_tag_filters.push([tag_filter]);
+				}
+			});
+
+			grouped_tag_filters.forEach(group => {
+				this.#addTagFilterRow(group);
 			});
 
 			document.querySelector('.add-new-template-row').addEventListener('click', () => this.#addTemplateRow());
@@ -155,7 +171,7 @@
 			});
 		}
 
-		#addTagFilterRow(tag_filter = []) {
+		#addTagFilterRow(tag_filter_group = []) {
 			const rowid = this.tag_filter_counter++;
 			const data = {
 				'rowid': rowid
@@ -169,18 +185,23 @@
 			const ms = document.getElementById('ms_new_tag_filter_groupids_'+rowid+'_');
 			$(ms).multiSelect();
 
-			if (tag_filter.length != 0) {
-				const filter = {
-					'id': tag_filter['groupid'],
-					'name': tag_filter['name']
-				};
-				$(ms).multiSelect('addData', [filter]);
+			for (const id in tag_filter_group) {
+				if (tag_filter_group.hasOwnProperty(id)) {
+					const groups = {
+						'id': tag_filter_group[id]['groupid'],
+						'name': tag_filter_group[id]['name']
+					};
+					$(ms).multiSelect('addData', [groups]);
+				}
+			}
+
+			if (tag_filter_group.length > 0) {
 
 				const tag_id = 'new_tag_filter_tag_'+rowid;
-				document.getElementById(tag_id).value = tag_filter['tag'];
+				document.getElementById(tag_id).value = tag_filter_group[0]['tag'];
 
 				const value_id = 'new_tag_filter_value_'+rowid;
-				document.getElementById(value_id).value = tag_filter['value'];
+				document.getElementById(value_id).value = tag_filter_group[0]['value'];
 			}
 
 			document.dispatchEvent(new Event('tab-indicator-update'));

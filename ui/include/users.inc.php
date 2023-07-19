@@ -353,16 +353,17 @@ function collapseTagFilters(array $tag_filters) {
 			'preservekeys' => true
 		]);
 
+		$sorted_tag_filters = [];
 		foreach ($tag_filters as $key => $tag_filter) {
 			if (array_key_exists($tag_filter['groupid'], $groups)) {
-				$tag_filters[$key]['name'] = $groups[$tag_filter['groupid']]['name'];
-			}
-			else {
-				unset($tag_filters[$key]);
+				$tag_filter['name'] = $groups[$tag_filter['groupid']]['name'];
+				$sorted_tag_filters[] = $tag_filter;
 			}
 		}
 
-		CArrayHelper::sort($tag_filters, ['name', 'tag', 'value']);
+		CArrayHelper::sort($sorted_tag_filters, ['name', 'tag', 'value']);
+
+		return array_values($sorted_tag_filters);
 	}
 
 	return $tag_filters;
