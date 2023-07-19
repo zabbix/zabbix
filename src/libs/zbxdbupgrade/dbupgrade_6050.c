@@ -344,10 +344,10 @@ static int	DBpatch_6050030(void)
 		return SUCCEED;
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into module (moduleid,id,relative_path,status,config) values"
-				" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
-		{
-			return FAIL;
-		}
+			" (" ZBX_FS_UI64 ",'piechart','widgets/piechart',%d,'[]')", zbx_db_get_maxid("module"), 1))
+	{
+		return FAIL;
+	}
 
 	return SUCCEED;
 }
