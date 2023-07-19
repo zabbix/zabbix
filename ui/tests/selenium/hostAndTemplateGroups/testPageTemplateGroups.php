@@ -52,6 +52,9 @@ class testPageTemplateGroups extends testPageGroups {
 			],
 			[
 				'name' => self::GROUP2
+			],
+			[
+				'name' => 'Group 3 for Delete test'
 			]
 		]);
 		$template_groupids = CDataHelper::getIds('name');

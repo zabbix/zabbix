@@ -53,6 +53,10 @@ class testPageGroups extends CWebTest {
 	const DELETE_ONE_GROUP = 'One group belongs to one object for Delete test';
 	const DELETE_EMPTY_GROUP = 'Group empty for Delete test';
 	const DELETE_GROUP2 = 'First group to one object for Delete test';
+
+	/**
+	 * The group was created in host/template page test for multiple group deletion.
+	 */
 	const DELETE_GROUP3 = 'Group 3 for Delete test';
 
 	/**
@@ -137,13 +141,15 @@ class testPageGroups extends CWebTest {
 		// Check hintbox of discovered host group in info column.
 		if ($this->object === 'host') {
 			$row = $table->findRow('Name', self::LLD.': '.self::DISCOVERED_GROUP);
-			$row->query('xpath://a[@class="icon-info status-yellow"]')->one()->click();
-			$hintbox = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
+			$icon = $row->getColumn('Info')->query('tag:button')->one();
+			$this->assertTrue($icon->hasClass('zi-i-warning'));
+			$icon->click();
+			$hintbox = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilVisible();
 			$this->assertEquals('The host group is not discovered anymore and will be deleted the next time discovery'.
 					' rule is processed.',
 					$hintbox->one()->getText()
 			);
-			$hintbox->query('class:overlay-close-btn')->one()->click()->waitUntilNotPresent();
+			$hintbox->query('class:btn-overlay-close')->one()->click()->waitUntilNotPresent();
 		}
 
 		// Check related links of group in table row.
@@ -171,7 +177,7 @@ class testPageGroups extends CWebTest {
 		else {
 			$this->assertStringContainsString('templates.php?form=update&templateid='.$id, $this->page->getCurrentUrl());
 			$this->page->assertHeader('Templates');
-			$this->query('id:templates-form')->asForm()->waitUntilVisible()->one()
+			$this->query('id:templates-form')->asForm(['normalized' =>true])->waitUntilVisible()->one()
 					->checkValue(['Template name' => $links['host_template']]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('templates.php', $this->page->getCurrentUrl());
@@ -203,7 +209,7 @@ class testPageGroups extends CWebTest {
 					$this->page->getCurrentUrl()
 			);
 			$this->page->assertHeader('Host prototypes');
-			$this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one()
+			$this->query('id:host-prototype-form')->asForm(['normalized' =>true])->waitUntilVisible()->one()
 					->checkValue(['Host name' => self::HOST_PROTOTYPE]);
 			$this->query('button:Cancel')->one()->click();
 			$this->assertStringContainsString('host_prototypes.php?cancel=1&parent_discoveryid=',

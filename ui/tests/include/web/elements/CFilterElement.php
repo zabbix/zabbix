@@ -126,7 +126,7 @@ class CFilterElement extends CElement {
 						->one();
 			}
 
-			// TODO: check git-hook
+			// TODO: fix after git-hook improvements DEV-2396
 			$tab = $this->query('xpath:.//a[('.CXPathHelper::fromClass('tabfilter-item-link').') and text()='.CXPathHelper::escapeQuotes($name).']')->one(false);
 
 			if (!$tab->isValid() && is_numeric($name)) {
@@ -276,7 +276,8 @@ class CFilterElement extends CElement {
 			$this->selectTab($name);
 		}
 
-		$this->getSelectedTab()->query('xpath:.//a[@class="icon-edit"]')->one()->waitUntilClickable()->click(true);
+		// TODO: fix after git-hook improvements DEV-2396
+		$this->getSelectedTab()->query('xpath:.//a['.CXPathHelper::fromClass('tabfilter-edit').']')->one()->waitUntilClickable()->click(true);
 
 		return COverlayDialogElement::find()->one()->waitUntilReady();
 	}

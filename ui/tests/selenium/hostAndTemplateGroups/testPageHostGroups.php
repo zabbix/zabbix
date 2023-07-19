@@ -57,6 +57,9 @@ class testPageHostGroups extends testPageGroups {
 			],
 			[
 				'name' => 'Group with two enabled hosts testPageHostGroup'
+			],
+			[
+				'name' => 'Group 3 for Delete test'
 			]
 		]);
 		$host_groupids = CDataHelper::getIds('name');

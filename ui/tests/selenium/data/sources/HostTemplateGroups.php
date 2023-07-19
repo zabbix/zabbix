@@ -38,9 +38,6 @@ class HostTemplateGroups {
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
-			],
-			[
-				'name' => 'Group 3 for Delete test'
 			]
 		]);
 		$template_groupids = CDataHelper::getIds('name');
@@ -73,9 +70,6 @@ class HostTemplateGroups {
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
-			],
-			[
-				'name' => 'Group 3 for Delete test'
 			],
 			[
 				'name' => 'Group for Script'

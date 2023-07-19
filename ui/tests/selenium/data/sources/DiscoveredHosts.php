@@ -136,12 +136,15 @@ class DiscoveredHosts {
 				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".$hostgroupid.")"
 		);
 		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUPID2).
-==== BASE ====
-				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", 4)"
-==== BASE ====
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).", ".$hostgroupid.")"
 		);
-==== BASE ====
-==== BASE ====
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID).
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID).", ".zbx_dbstr(self::DISCOVERED_GROUPID).")"
+		);
+		DBexecute("INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (".zbx_dbstr(self::DISCOVERED_HOST_GROUP_PROTOTYPEID2).
+				", ".zbx_dbstr(self::DISCOVERED_HOSTID2).",".zbx_dbstr(self::DISCOVERED_GROUPID2).")"
+		);
+		// Add tags for discovered hosts.
 		DBexecute("INSERT INTO host_tag (hosttagid, hostid, tag, value) VALUES (90000082, ".
 				zbx_dbstr(self::DISCOVERED_HOSTID).", 'action', 'update')"
 		);
