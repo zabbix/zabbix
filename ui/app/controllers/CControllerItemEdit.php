@@ -64,6 +64,7 @@ class CControllerItemEdit extends CController {
 			'preprocessing'			=> 'array',
 			'parameters'			=> 'array',
 			'query_fields'			=> 'array',
+			'headers'				=> 'array',
 			'form_refresh'			=> 'in 1'
 		];
 
@@ -92,6 +93,14 @@ class CControllerItemEdit extends CController {
 			$ret = array_key_exists('sortorder', $query_fields)
 				&& array_key_exists('name', $query_fields)
 				&& array_key_exists('value', $query_fields);
+		}
+
+		$headers = $this->getInput('headers', []);
+
+		if ($ret && $headers) {
+			$ret = array_key_exists('sortorder', $headers)
+				&& array_key_exists('name', $headers)
+				&& array_key_exists('value', $headers);
 		}
 
 		if (!$ret) {
@@ -279,7 +288,7 @@ class CControllerItemEdit extends CController {
 				$item['http_password'] = $item['password'];
 				$query_fields = [];
 
-				foreach ($item['query_fields'] as $i => $query_field) {
+				foreach ($item['query_fields'] as $query_field) {
 					$query_fields[] = [
 						'name' => key($query_field),
 						'value' => reset($query_field)
@@ -287,6 +296,16 @@ class CControllerItemEdit extends CController {
 				}
 
 				$item['query_fields'] = $query_fields;
+				$headers = [];
+
+				foreach ($item['headers'] as $header => $value) {
+					$headers[] = [
+						'name' => $header,
+						'value' => $value
+					];
+				}
+
+				$item['headers'] = $headers;
 
 				break;
 		}
@@ -297,6 +316,10 @@ class CControllerItemEdit extends CController {
 
 		if (!$item['query_fields']) {
 			$item['query_fields'] = [['name' => '', 'value' => '']];
+		}
+
+		if (!$item['headers']) {
+			$item['headers'] = [['name' => '', 'value' => '']];
 		}
 
 		return $item;
@@ -362,7 +385,8 @@ class CControllerItemEdit extends CController {
 			'status' => DB::getDefault('items', 'status'),
 			'show_inherited_tags' => 0,
 			'tags' => [],
-			'preprocessing' => []
+			'preprocessing' => [],
+			'headers' => []
 		];
 		$this->getInputs($form, array_keys($form));
 		// TODO: item with preprocessing trigger undefined index for error_handler, error_handler_params
@@ -370,7 +394,7 @@ class CControllerItemEdit extends CController {
 		if ($form['query_fields']) {
 			$query_fields = [];
 
-			foreach ($form['query_fields']['sortorder'] as $order => $index) {
+			foreach ($form['query_fields']['sortorder'] as $index) {
 				$query_fields[] = [
 					'name' => $form['query_fields']['name'][$index],
 					'value' => $form['query_fields']['value'][$index]
@@ -378,6 +402,19 @@ class CControllerItemEdit extends CController {
 			}
 
 			$form['query_fields'] = $query_fields;
+		}
+
+		if ($form['headers']) {
+			$headers = [];
+
+			foreach ($form['headers']['sortorder'] as $index) {
+				$headers[] = [
+					'name' => $form['headers']['name'][$index],
+					'value' => $form['headers']['value'][$index]
+				];
+			}
+
+			$form['headers'] = $headers;
 		}
 
 		return $form;

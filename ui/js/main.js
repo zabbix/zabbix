@@ -953,6 +953,7 @@ function getConditionFormula(conditions, evalType) {
 						}
 					}
 
+					table.trigger('afterremove.dynamicRows', options);
 					table.trigger('change');
 
 					return table;

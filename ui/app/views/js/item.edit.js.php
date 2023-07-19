@@ -112,6 +112,11 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			template: '#query-field-row-tmpl',
 			rows: this.form_data.query_fields
 		});
+		jQuery('#headers-table').dynamicRows({
+			sortable: true,
+			template: '#header-row-tmpl',
+			rows: this.form_data.headers
+		});
 	}
 
 	#showErrorDialog(body, trigger_element) {

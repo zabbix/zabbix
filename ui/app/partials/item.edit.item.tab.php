@@ -244,42 +244,37 @@ $formgrid = (new CFormGrid())
 		))->setId('js-item-posts-field')
 	])
 	->addItem([
-		(new CLabel(_('Headers'), 'headers_pairs'))->setId('js-item-headers-label'),
+		(new CLabel(_('Headers'), 'headers-table'))->setId('js-item-headers-label'),
 		(new CFormField((new CDiv([
 				(new CTable())
+					->setId('headers-table')
 					->setAttribute('style', 'width: 100%;')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-					->setFooter(new CRow(
-						(new CCol(
+					->setFooter((new CCol(
 							(new CButtonLink(_('Add')))
+								->addClass('element-table-add')
 								->setEnabled(!$data['readonly'])
-								->setAttribute('data-row-action', 'add_row')
 						))->setColSpan(5)
-					)),
-				// (new CTag('script', true))
-				// 	->setAttribute('type', 'text/x-jquery-tmpl')
-				// 	->addItem(new CRow([
-				// 		(new CCol([
-				// 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-				// 			new CVar('headers[sortorder][#{index}]', '#{sortorder}')
-				// 		]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				// 		(new CTextBox('headers[name][#{index}]', '#{name}', $data['readonly']))
-				// 			->setAttribute('placeholder', _('name'))
-				// 			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-				// 		RARR(),
-				// 		(new CTextBox('headers[value][#{index}]', '#{value}', $data['readonly'], 2000))
-				// 			->setAttribute('placeholder', _('value'))
-				// 			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-				// 		(new CButtonLink(_('Remove')))
-				// 			->setEnabled(!$data['readonly'])
-				// 			->setAttribute('data-row-action', 'remove_row')
-				// 	])),
-				// $headers
+					),
+				new CTemplateTag('header-row-tmpl',
+					(new CRow([
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('headers[sortorder][]', '#{rowNum}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CTextBox('headers[name][#{rowNum}]', '#{name}', $data['readonly']))
+							->setAttribute('placeholder', _('name'))
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+						RARR(),
+						(new CTextBox('headers[value][#{rowNum}]', '#{value}', $data['readonly'], 2000))
+							->setAttribute('placeholder', _('value'))
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+
+					]))->addClass('form_row')
+				),
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('headers_pairs')
-				->setAttribute('data-sortable-pairs-table', $data['readonly'] ? '0': '1')
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 		))->setId('js-item-headers-field')
 	])
