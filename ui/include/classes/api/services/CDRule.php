@@ -147,6 +147,7 @@ class CDRule extends CApiService {
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$dbRes = DBselect(self::createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
+
 		while ($drule = DBfetch($dbRes)) {
 			if ($options['countOutput']) {
 				if ($options['groupCount']) {
@@ -673,6 +674,7 @@ class CDRule extends CApiService {
 			$dcheck += $default_values;
 			unset($dcheck['dcheckid'], $dcheck['uniq']);
 		}
+
 		unset($dcheck);
 
 		while ($current = array_pop($dchecks)) {
@@ -924,6 +926,7 @@ class CDRule extends CApiService {
 				' AND '.dbConditionString('c.value', $dCheckIds).
 			' ORDER BY c.actionid'
 		);
+
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionIds[] = $dbAction['actionid'];
 		}
