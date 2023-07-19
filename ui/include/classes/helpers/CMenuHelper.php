@@ -497,16 +497,25 @@ class CMenuHelper {
 
 		foreach (CRoleHelper::getUiSectionsLabels(CWebUser::$data['type']) as $section_label) {
 			$section_submenu = $menu->find($section_label);
-			if ($section_submenu instanceof CMenuItem  && !$section_submenu->hasSubMenu()) {
+
+			if ($section_submenu instanceof CMenuItem && !$section_submenu->hasSubMenu()) {
 				return $menu->getMenuItems()[0];
 			}
 			elseif ($section_submenu instanceof CMenuItem) {
 				$menu = $section_submenu
 					->getSubMenu()
 					->getMenuItems();
+
+				if ($menu[0]->hasSubMenu()) {
+					$menu = $menu[0]
+						->getSubMenu()
+						->getMenuItems();
+				}
+
 				return $menu[0];
 			}
 		}
+
 		return $menu->getMenuItems()[0];
 	}
 

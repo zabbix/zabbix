@@ -9,8 +9,6 @@ libzbxtrapper_a_SOURCES = \
 	trapper_auth.h \
 	nodecommand.c \
 	nodecommand.h \
-	proxydata.c \
-	proxydata.h \
 	trapper_preproc.c \
 	trapper_preproc.h \
 	trapper_expressions_evaluate.c \
@@ -23,7 +21,9 @@ libzbxtrapper_a_SOURCES = \
 
 libzbxtrapper_server_a_SOURCES = \
 	trapper_server.c \
-	trapper_request.h
+	trapper_request.h \
+	proxydata.c \
+	proxydata.h
 
 libzbxtrapper_proxy_a_SOURCES = \
 	trapper_proxy.c \

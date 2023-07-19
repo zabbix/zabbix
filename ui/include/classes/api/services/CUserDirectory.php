@@ -31,6 +31,7 @@ class CUserDirectory extends CApiService {
 
 	protected $tableName = 'userdirectory';
 	protected $tableAlias = 'ud';
+	protected $sortColumns = ['name'];
 
 	/**
 	 * Common UserDirectory properties.

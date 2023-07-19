@@ -24,6 +24,7 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxself.h"
+#include "zbxproxybuffer.h"
 
 static zbx_get_program_type_f			get_program_type_cb;
 static zbx_vector_stats_ext_func_t		stats_ext_funcs;
@@ -215,6 +216,35 @@ void	zbx_zabbix_stats_get(struct zbx_json *json, int config_startup_time)
 		zbx_json_adduint64(json, "used", wcache_info.trend_total - wcache_info.trend_free);
 		zbx_json_addfloat(json, "pused", 100 * (double)(wcache_info.trend_total - wcache_info.trend_free) /
 				(double)wcache_info.trend_total);
+		zbx_json_close(json);
+	}
+
+	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_PROXY))
+	{
+		zbx_pb_mem_info_t	mem;
+		zbx_pb_state_info_t	state;
+		char			*error = NULL;
+
+		zbx_json_addobject(json, "proxy buffer");
+
+		if (SUCCEED == zbx_pb_get_mem_info(&mem, &error))
+		{
+			zbx_json_addobject(json, "memory");
+			zbx_json_addfloat(json, "pfree", 100 * (double)(mem.mem_total - mem.mem_used) /
+					(double)mem.mem_total);
+			zbx_json_adduint64(json, "free", mem.mem_total - mem.mem_used);
+			zbx_json_adduint64(json, "total", mem.mem_total);
+			zbx_json_adduint64(json, "used", mem.mem_used);
+			zbx_json_addfloat(json, "pused", 100 * (double)mem.mem_used / (double)mem.mem_total);
+			zbx_json_close(json);
+		}
+		else
+			zbx_free(error);
+
+		zbx_pb_get_state_info(&state);
+		zbx_json_addint64(json, "state", state.state);
+		zbx_json_adduint64(json, "state change", state.changes_num);
+
 		zbx_json_close(json);
 	}
 

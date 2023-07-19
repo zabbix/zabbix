@@ -17,11 +17,36 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_GET_HOST_FROM_EVENT_H
-#define ZABBIX_GET_HOST_FROM_EVENT_H
+#ifndef ZABBIX_ASYNC_HTTPAGENT_H
+#define ZABBIX_ASYNC_HTTPAGENT_H
 
 #include "zbxcacheconfig.h"
+#include "module.h"
+#include "async_poller.h"
+#include "zbxhttp.h"
 
-int	get_host_from_event(const zbx_db_event *event, zbx_dc_host_t *host, char *error, size_t max_error_len);
+#ifdef HAVE_LIBCURL
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	hostid;
+	unsigned char	value_type;
+	unsigned char	flags;
+	unsigned char	state;
+	char		*posts;
+	char		*status_codes;
+}
+zbx_dc_item_context_t;
 
+typedef struct
+{
+	zbx_http_context_t	http_context;
+	zbx_dc_item_context_t	item_context;
+}
+zbx_httpagent_context;
+
+int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
+		CURLM *curl_handle);
+void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context);
+#endif
 #endif

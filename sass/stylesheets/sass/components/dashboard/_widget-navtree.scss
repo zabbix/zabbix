@@ -16,7 +16,7 @@ div.dashboard-widget-navtree {
 		.tree {
 			.tree-list {
 				.margin-lvl {
-					display: inline-block;
+					flex-shrink: 0;
 				}
 
 				&.root > .tree-item > .tree-row > .content > .margin-lvl {
@@ -77,6 +77,9 @@ div.dashboard-widget-navtree {
 
 					.content {
 						position: relative;
+						display: flex;
+						align-items: center;
+						min-width: 0;
 
 						.arrow {
 							display: inline-block;
@@ -91,7 +94,6 @@ div.dashboard-widget-navtree {
 						> .item-name {
 							white-space: nowrap;
 							overflow: hidden;
-							margin-right: 5px;
 							text-overflow: ellipsis;
 							line-height: 1.5;
 						}
@@ -110,6 +112,7 @@ div.dashboard-widget-navtree {
 						padding-left: 10px;
 						margin-right: 5px;
 						width: 87px;
+						white-space: nowrap;
 
 						.btn-icon {
 							@extend %button-size-medium;

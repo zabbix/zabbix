@@ -1201,8 +1201,8 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 			config_timeout, 0, level, config_tls)))
 	{
 		zbx_timespec(&ts);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
-		zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
+		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 
@@ -1472,7 +1472,8 @@ static int	need_meta_update(ZBX_ACTIVE_METRIC *metric, zbx_uint64_t lastlogsize_
 static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regular_expressions, ZBX_ACTIVE_METRIC *metric,
 		zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
-		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_hostname, char **error)
+		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
+		const char *config_hostname, char **error)
 {
 	ZBX_UNUSED(addrs);
 	ZBX_UNUSED(agent2_result);
@@ -1480,10 +1481,11 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 	ZBX_UNUSED(metric);
 	ZBX_UNUSED(process_value_cb);
 	ZBX_UNUSED(lastlogsize_sent);
-	ZBX_UNUSED(error);
 	ZBX_UNUSED(config_tls);
 	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(config_source_ip);
 	ZBX_UNUSED(config_hostname);
+	ZBX_UNUSED(error);
 
 	return FAIL;
 }
@@ -1491,7 +1493,7 @@ static int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t
 int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result,
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
-		const char *config_hostname, char **error);
+		const char *config_source_ip, const char *config_hostname, char **error);
 #endif
 
 static int	process_common_check(zbx_vector_addr_ptr_t *addrs, ZBX_ACTIVE_METRIC *metric,
@@ -1652,7 +1654,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 		else if (0 != (ZBX_METRIC_FLAG_LOG_EVENTLOG & metric->flags))
 		{
 			ret = process_eventlog_check(addrs, NULL, &regexps, metric, process_value, &lastlogsize_sent,
-					config_tls, config_timeout, config_hostname, &error);
+					config_tls, config_timeout, config_source_ip, config_hostname, &error);
 		}
 		else
 			ret = process_common_check(addrs, metric, config_tls, config_timeout, config_source_ip,
@@ -1841,7 +1843,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_vector_addr_ptr_create(&activechk_args.addrs);
 
 	zbx_addr_copy(&activechk_args.addrs, &(activechks_args_in->addrs));
-	const char	*config_hostname = zbx_strdup(NULL, activechks_args_in->hostname);
+	const char	*config_hostname = zbx_strdup(NULL, activechks_args_in->config_hostname);
 
 	zbx_free(args);
 

@@ -4748,7 +4748,7 @@ return [
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'itemid' => [
@@ -4836,7 +4836,7 @@ return [
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'clock' => [
@@ -5285,7 +5285,7 @@ return [
 		'fields' => [
 			'id' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
+				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'clock' => [

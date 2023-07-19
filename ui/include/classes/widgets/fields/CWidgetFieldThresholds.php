@@ -21,8 +21,7 @@
 
 namespace Zabbix\Widgets\Fields;
 
-use CArrayHelper,
-	CNumberParser,
+use CNumberParser,
 	CParser;
 
 use Zabbix\Widgets\CWidgetField;
@@ -31,7 +30,7 @@ class CWidgetFieldThresholds extends CWidgetField {
 
 	public const DEFAULT_VALUE = [];
 
-	private bool $is_binary_units = false;
+	private bool $is_binary_units;
 
 	/**
 	 * Create widget field for Thresholds selection.
@@ -90,6 +89,11 @@ class CWidgetFieldThresholds extends CWidgetField {
 				return $threshold_1['threshold_value'] <=> $threshold_2['threshold_value'];
 			}
 		);
+
+		foreach ($thresholds as &$threshold) {
+			unset($threshold['threshold_value']);
+		}
+		unset($threshold);
 
 		$thresholds = array_values($thresholds);
 
