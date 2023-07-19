@@ -23,11 +23,6 @@ require_once __DIR__ .'/../../include/forms.inc.php';
 
 class CControllerTemplateEdit extends CController {
 
-	/**
-	 * @var mixed
-	 */
-	private $template = [];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 		$this->disableCsrfValidation();
@@ -36,17 +31,17 @@ class CControllerTemplateEdit extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'templateid' =>				'db hosts.hostid',
-			'groupids' =>				'array_db hosts_groups.groupid',
 			'template_name' =>			'db hosts.host',
 			'visiblename' =>			'db hosts.name',
+			'templates' =>				'array_db hosts.hostid',
+			'add_templates' =>			'array_db hosts.hostid',
+			'groupids' =>				'array_db hosts_groups.groupid',
 			'groups' =>					'array',
 			'description' =>			'db hosts.description',
 			'tags' =>					'array',
 			'macros' =>					'array',
-			'valuemaps' =>				'array',
-			'templates' =>				'array_db hosts.hostid',
-			'add_templates' =>			'array_db hosts.hostid',
 			'show_inherited_macros' =>	'in 0,1',
+			'valuemaps' =>				'array',
 			'clone' =>					'in 1'
 		];
 
@@ -80,51 +75,40 @@ class CControllerTemplateEdit extends CController {
 			if (!$templates) {
 				return false;
 			}
-
-			$this->template = $templates[0];
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$templateid = $this->hasInput('templateid') ? $this->getInput('templateid') : null;
+		$templateid = $this->getInput('templateid');
 		$clone = $this->hasInput('clone');
-
-		// Remove inherited macros data.
-		$macros = cleanInheritedMacros($this->getInput('macros', []));
-
-		// Remove empty new macro lines.
-		$macros = array_filter($macros, function($macro) {
-			$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
-
-			return (bool) array_filter(array_intersect_key($macro, $keys));
-		});
-
-		$data = [
-			'templateid' => $templateid,
-			'template_name' =>$this->getInput('template_name', ''),
-			'visible_name' => $this->getInput('visiblename', ''),
-			'description' => $this->getInput('description', ''),
-			'groups_ms' => [],
-			'linked_templates' => $this->getInput('linked_templates', []),
-			'templates' => $this->getInput('templates', []),
-			'add_templates' => [],
-			'original_templates' => $this->getInput('original_templates', []),
-			'macros' => $macros,
-			'tags' => $this->getInput('tags', []),
-			'valuemaps' => $this->getInput('valuemaps', []),
-			'readonly' => false,
-			'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
-			'vendor' => [],
-			'clone' => $this->hasInput('clone')
-		];
-
-		// Add already linked and new templates when cloning element.
 		$templates = [];
+		$warnings = [];
+		$groupids = [];
 
 		if ($clone) {
-			$request_linked_templates = $this->getInput('templates', $data['original_templates']);
+			$data = [
+				'templateid' => null,
+				'clone_templateid' => $templateid,
+				'template_name' =>$this->getInput('template_name', ''),
+				'visible_name' => $this->getInput('visiblename', ''),
+				'description' => $this->getInput('description', ''),
+				'groups_ms' => [],
+				'linked_templates' => $this->getInput('linked_templates', []),
+				'templates' => $this->getInput('templates', []),
+				'add_templates' => [],
+				'original_templates' => [],
+				'tags' => $this->getInput('tags', []),
+				'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
+				'valuemaps' => $this->getInput('valuemaps', []),
+				'readonly' => false,
+				'vendor' => [],
+				'clone' => true
+			];
+
+			// Add already linked and new templates when cloning element.
+			$request_linked_templates = $this->getInput('templates', []);
 			$request_add_templates = $this->getInput('add_templates', []);
 
 			if ($request_linked_templates || $request_add_templates) {
@@ -144,90 +128,16 @@ class CControllerTemplateEdit extends CController {
 				}
 				unset($template);
 			}
-		}
 
-		if ($this->hasInput('templateid')) {
-			$dbTemplates = API::Template()->get([
-				'output' => ['host', 'name', 'description', 'vendor_name', 'vendor_version'],
-				'selectTemplateGroups' => ['groupid'],
-				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type', 'automatic'],
-				'selectTags' => ['tag', 'value'],
-				'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
-				'templateids' => $templateid
-			]);
+			// Prepare macros data.
+			$macros = cleanInheritedMacros(getRequest('macros', []));
 
-			$data['dbTemplate'] = reset($dbTemplates);
+			// Remove empty macro lines.
+			$macros = array_filter($macros, function($macro) {
+				$keys = array_flip(['hostmacroid', 'macro', 'value', 'description']);
 
-			if (!$clone) {
-				$data['vendor'] = array_filter([
-					'name' => $data['dbTemplate']['vendor_name'],
-					'version' => $data['dbTemplate']['vendor_version']
-				], 'strlen');
-			}
-
-			foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
-				$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
-			}
-
-			$data['tags'] = $data['dbTemplate']['tags'];
-			$data['macros'] = $data['dbTemplate']['macros'];
-
-			CArrayHelper::sort($data['dbTemplate']['valuemaps'], ['name']);
-
-			$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
-			$data['template_name'] = $data['dbTemplate']['host'];
-			$data['visible_name'] = $data['dbTemplate']['name'];
-
-			// Display empty visible name if equal to host name.
-			if ($data['visible_name'] === $data['template_name']) {
-				$data['visible_name'] = '';
-			}
-		}
-
-		// Add description.
-		$data['description'] = ($data['templateid'] !== null)
-			? $data['dbTemplate']['description']
-			: $this->getInput('description', '');
-
-		// Insert empty tag row when no tags are present.
-		if (count($data['tags']) == 0) {
-			$data['tags'][] = ['tag' => '', 'value' => ''];
-		}
-
-		CArrayHelper::sort($data['tags'], ['tag', 'value']);
-
-		// Add already linked templates.
-		if (!$clone && array_key_exists('dbTemplate', $data)) {
-			$templates = [];
-			$linked_templates = $data['dbTemplate']['parentTemplates'];
-
-			foreach ($linked_templates as $template) {
-				$linked_template_ids[$template['templateid']] = $template['templateid'];
-			}
-
-			if ($linked_templates) {
-				$templates = API::Template()->get([
-					'output' => ['templateid', 'name'],
-					'templateids' => $linked_template_ids,
-					'preservekeys' => true
-				]);
-
-				$data['linked_templates'] = array_intersect_key($templates, array_flip($linked_template_ids));
-				CArrayHelper::sort($data['linked_templates'], ['name']);
-			}
-		}
-
-		$data['writable_templates'] = API::Template()->get([
-			'output' => ['templateid'],
-			'templateids' => array_keys($data['linked_templates']),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		// Configuration for template cloning.
-		if ($clone) {
-			$warnings = [];
+				return (bool) array_filter(array_intersect_key($macro, $keys));
+			});
 
 			// Reset macro type and value.
 			foreach ($macros as &$macro) {
@@ -237,6 +147,7 @@ class CControllerTemplateEdit extends CController {
 					unset($macro['allow_revert']);
 				}
 			}
+			unset($macro);
 
 			$secret_macro_reset = false;
 
@@ -262,8 +173,10 @@ class CControllerTemplateEdit extends CController {
 				return array_diff_key($macro, array_flip(['hostmacroid']));
 			}, $macros);
 
+			$data['macros'] = $macros;
+
+			// Prepare groups data.
 			$groups = $this->getInput('groups', []);
-			$groupids = [];
 
 			// Remove inaccessible groups from request, but leave "new".
 			foreach ($groups as $group) {
@@ -290,14 +203,76 @@ class CControllerTemplateEdit extends CController {
 					}
 				}
 			}
+		}
+		else {
+			$data = $this->getDefaultTemplateData();
 
-			$data['macros'] = $macros;
-			$data['warnings'] = $warnings;
-			$data['clone_templateid'] = $this->getInput('templateid');
-			$data['templateid'] = null;
+			if ($templateid !== null) {
+				$dbTemplates = API::Template()->get([
+					'output' => ['host', 'name', 'description', 'vendor_name', 'vendor_version'],
+					'selectTemplateGroups' => ['groupid'],
+					'selectParentTemplates' => ['templateid'],
+					'selectMacros' => ['hostmacroid', 'hostid', 'macro', 'value', 'description', 'type', 'automatic'],
+					'selectTags' => ['tag', 'value'],
+					'selectValueMaps' => ['valuemapid', 'name', 'mappings'],
+					'templateids' => $templateid
+				]);
+
+				$data['dbTemplate'] = reset($dbTemplates);
+
+				$data['template_name'] = $data['dbTemplate']['host'];
+				$data['visible_name'] = $data['dbTemplate']['name'];
+
+				// Display empty visible name if equal to host name.
+				if ($data['visible_name'] === $data['template_name']) {
+					$data['visible_name'] = '';
+				}
+
+				$data['description'] = $data['dbTemplate']['description'];
+				$data['tags'] = $data['dbTemplate']['tags'];
+				$data['macros'] = $data['dbTemplate']['macros'];
+
+				CArrayHelper::sort($data['dbTemplate']['valuemaps'], ['name']);
+
+				$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
+
+				$data['vendor'] = array_filter([
+					'name' => $data['dbTemplate']['vendor_name'],
+					'version' => $data['dbTemplate']['vendor_version']
+				], 'strlen');
+
+				foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
+					$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
+				}
+
+				// Add already linked templates.
+				$linked_templates = $data['dbTemplate']['parentTemplates'];
+
+				foreach ($linked_templates as $template) {
+					$linked_template_ids[$template['templateid']] = $template['templateid'];
+				}
+
+				if ($linked_templates) {
+					$templates = API::Template()->get([
+						'output' => ['templateid', 'name'],
+						'templateids' => $linked_template_ids,
+						'preservekeys' => true
+					]);
+
+					$data['linked_templates'] = array_intersect_key($templates, array_flip($linked_template_ids));
+					CArrayHelper::sort($data['linked_templates'], ['name']);
+				}
+			}
 		}
 
-		// The empty inputs will not be shown if there are inherited macros, for example.
+		// Insert empty tag row when no tags are present.
+		if (!$data['tags']) {
+			$data['tags'][] = ['tag' => '', 'value' => ''];
+		}
+
+		CArrayHelper::sort($data['tags'], ['tag', 'value']);
+
+		// Insert empty row when no macros are present.
 		if (!$data['macros']) {
 			$macro = ['macro' => '', 'value' => '', 'description' => '', 'type' => ZBX_MACRO_TYPE_TEXT];
 
@@ -313,7 +288,6 @@ class CControllerTemplateEdit extends CController {
 			$data['macros'] = mergeInheritedMacros($data['macros'], getInheritedMacros(array_keys($templates)));
 		}
 
-		// Sort only after inherited macros are added. Otherwise, the list will look chaotic.
 		$data['macros'] = array_values(order_macros($data['macros'], 'macro'));
 
 		foreach ($data['macros'] as &$macro) {
@@ -321,14 +295,35 @@ class CControllerTemplateEdit extends CController {
 		}
 		unset($macro);
 
+		// Enable revert button for secret text macros when editing template.
+		foreach ($data['macros'] as &$macro) {
+			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
+				&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
+				$macro['allow_revert'] = true;
+			}
+		}
+		unset($macro);
+
+		$data['macros_tab'] = [
+			'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
+			'add_templates' => array_map('strval', array_keys($data['add_templates']))
+		];
+
+		// Retrieve writable templates.
+		$data['writable_templates'] = API::Template()->get([
+			'output' => ['templateid'],
+			'templateids' => array_keys($data['linked_templates']),
+			'editable' => true,
+			'preservekeys' => true
+		]);
+
+		// Prepare groups data based on permissions and accessibility.
 		if ($templateid === null) {
 			$groups = $this->getInput('groupids', []);
 		}
 		elseif ($templateid !== null && !$clone) {
 			$groups = array_column($data['dbTemplate']['templategroups'], 'groupid');
 		}
-
-		$groupids = [];
 
 		foreach ($groups as $group) {
 			if (is_array($group) && array_key_exists('new', $group)) {
@@ -379,21 +374,30 @@ class CControllerTemplateEdit extends CController {
 
 		CArrayHelper::sort($data['groups_ms'], ['name']);
 
-		foreach ($data['macros'] as &$macro) {
-			if ($macro['type'] == ZBX_MACRO_TYPE_SECRET
-				&& !array_key_exists('deny_revert', $macro) && !array_key_exists('value', $macro)) {
-				$macro['allow_revert'] = true;
-			}
-		}
-		unset($macro);
-
-		// This data is used in template.edit.js.php.
-		$data['macros_tab'] = [
-			'linked_templates' => array_map('strval', array_keys($data['linked_templates'])),
-			'add_templates' => array_map('strval', array_keys($data['add_templates']))
-		];
-
+		$data['warnings'] = $warnings;
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+
 		$this->setResponse(new CControllerResponseData($data));
+	}
+
+	private function getDefaultTemplateData(): array {
+		return [
+			'templateid' => $this->getInput('templateid'),
+			'template_name' => '',
+			'visible_name' => '',
+			'linked_templates' => [],
+			'add_templates' => [],
+			'original_templates' => [],
+			'groups_ms' => [],
+			'templates' => [],
+			'description' => '',
+			'tags' => [],
+			'macros' => [],
+			'show_inherited_macros' => 0,
+			'valuemaps' => [],
+			'readonly' => false,
+			'vendor' => [],
+			'clone' => false
+		];
 	}
 }
