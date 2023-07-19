@@ -1,16 +1,16 @@
 ---
-test case: "Add tags to a host having no tags"
+test case: "Add tags to destination with no tags"
 in:
-  host_tags: []
+  dst_tags: []
   src_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_NORMAL
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 0
       tag: tag1
       tag_orig: null
@@ -24,9 +24,9 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Perform exact tag + value match (host tags: NORMAL, new tags NORMAL)"
+test case: "Perform exact tag + value match (dst tags: NORMAL, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -38,14 +38,14 @@ in:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_NORMAL
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -59,9 +59,10 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Perform exact tag + value match (host tags: NORMAL, new tags AUTOMATIC)"
+test case: "Perform exact tag + value match
+  (dst tags: NORMAL, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -73,14 +74,14 @@ in:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_AUTOMATIC
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -94,9 +95,10 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
 ---
-test case: "Perform exact tag + value match (host tags: AUTOMATIC, new tags NORMAL)"
+test case: "Perform exact tag + value match
+  (dst tags: AUTOMATIC, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -108,14 +110,14 @@ in:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_NORMAL
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -129,9 +131,10 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
 ---
-test case: "Perform exact tag + value match (host tags: AUTOMATIC, new tags AUTOMATIC)"
+test case: "Perform exact tag + value match
+  (dst tags: AUTOMATIC, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -143,14 +146,14 @@ in:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_AUTOMATIC
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -164,9 +167,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Perform tag match (host tags: AUTOMATIC, new tags NORMAL)"
+test case: "Perform tag match (dst tags: AUTOMATIC, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -178,14 +181,14 @@ in:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value11
-    automatic: ZBX_DB_TAG_NORMAL
-  - tag: tag2
-    value: value22
-    automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -199,9 +202,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
 ---
-test case: "Perform tag match (host tags: AUTOMATIC, new tags AUTOMATIC)"
+test case: "Perform tag match (dst tags: AUTOMATIC, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -213,14 +216,14 @@ in:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
   src_tags:
-  - tag: tag1
-    value: value11
-    automatic: ZBX_DB_TAG_AUTOMATIC
-  - tag: tag2
-    value: value22
-    automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag1
+      value: value11
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value22
+      automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -234,9 +237,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
 ---
-test case: "Update rest of the tags (host tags: AUTOMATIC, new tags NORMAL)"
+test case: "Update rest of the tags (dst tags: AUTOMATIC, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -287,7 +290,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -325,9 +328,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
 ---
-test case: "Create leftover tags (host tags: AUTOMATIC, new tags NORMAL)"
+test case: "Create leftover tags (dst tags: AUTOMATIC, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -363,7 +366,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -401,9 +404,9 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Create leftover tags (host tags: AUTOMATIC, new tags AUTOMATIC)"
+test case: "Create leftover tags (dst tags: AUTOMATIC, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -439,7 +442,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -477,18 +480,19 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Non-empty host tags, empty new tags, remove automatic tags from host"
+test case: "Non-empty dst tags, empty src tags, remove automatic tags from
+  destination"
 in:
-  host_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_AUTOMATIC
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_AUTOMATIC
+  dst_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_AUTOMATIC
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_AUTOMATIC
   src_tags: []
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -502,18 +506,19 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
 ---
-test case: "Non-empty host tags, empty new tags, remove normal (manual) tags from host"
+test case: "Non-empty dst tags, empty src tags, remove normal (manual) tags
+  from destination"
 in:
-  host_tags:
-  - tag: tag1
-    value: value1
-    automatic: ZBX_DB_TAG_NORMAL
-  - tag: tag2
-    value: value2
-    automatic: ZBX_DB_TAG_NORMAL
+  dst_tags:
+    - tag: tag1
+      value: value1
+      automatic: ZBX_DB_TAG_NORMAL
+    - tag: tag2
+      value: value2
+      automatic: ZBX_DB_TAG_NORMAL
   src_tags: []
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -527,9 +532,9 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Append tags (host tags: NORMAL, new tags NORMAL)"
+test case: "Append tags (dst tags: NORMAL, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -556,7 +561,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -594,9 +599,9 @@ out:
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Append tags (host tags: NORMAL, new tags AUTOMATIC)"
+test case: "Append tags (dst tags: NORMAL, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -623,7 +628,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       tag_orig: null
@@ -661,9 +666,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
 ---
-test case: "Replace tags (host tags: AUTOMATIC, new tags NORMAL)"
+test case: "Replace tags (dst tags: AUTOMATIC, src tags NORMAL)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -690,7 +695,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_NORMAL
 out:
-  host_tags:
+  dst_tags:
     - tagid: 0
       tag: tag44
       tag_orig: null
@@ -710,9 +715,9 @@ out:
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
 ---
-test case: "Replace tags (host tags: AUTOMATIC, new tags AUTOMATIC)"
+test case: "Replace tags (dst tags: AUTOMATIC, src tags AUTOMATIC)"
 in:
-  host_tags:
+  dst_tags:
     - tagid: 1
       tag: tag1
       value: value1
@@ -739,7 +744,7 @@ in:
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
 out:
-  host_tags:
+  dst_tags:
     - tagid: 0
       tag: tag44
       tag_orig: null

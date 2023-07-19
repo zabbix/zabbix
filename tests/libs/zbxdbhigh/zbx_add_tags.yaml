@@ -55,7 +55,8 @@ out:
       value: value4
       automatic: ZBX_DB_TAG_NORMAL
 ---
-test case: "No changes are expected, if tags having the same name and values are added"
+test case: "No changes are expected, if tags having the same name and values
+  are added"
 in:
   host_tags:
     - tagid: 1

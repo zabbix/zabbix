@@ -24,7 +24,6 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
-
 static int	compare_db_tags_and_values(const void *d1, const void *d2)
 {
 	int ret;
@@ -196,53 +195,53 @@ static void	read_tags(const char *path, zbx_vector_db_tag_ptr_t *tags)
 void	zbx_mock_test_entry(void **state)
 {
 	int			i;
-	zbx_vector_db_tag_ptr_t	host_tags, src_tags, out_host_tags;
+	zbx_vector_db_tag_ptr_t	dst_tags, src_tags, expected_dst_tags;
 
 	ZBX_UNUSED(state);
 
-	zbx_vector_db_tag_ptr_create(&host_tags);
+	zbx_vector_db_tag_ptr_create(&dst_tags);
 	zbx_vector_db_tag_ptr_create(&src_tags);
-	zbx_vector_db_tag_ptr_create(&out_host_tags);
+	zbx_vector_db_tag_ptr_create(&expected_dst_tags);
 
-	read_tags("in.host_tags", &host_tags);
+	read_tags("in.dst_tags", &dst_tags);
 	read_tags("in.src_tags", &src_tags);
-	read_tags("out.host_tags", &out_host_tags);
+	read_tags("out.dst_tags", &expected_dst_tags);
 
-	(void)zbx_merge_tags(&host_tags, &src_tags, NULL, NULL);
+	(void)zbx_merge_tags(&dst_tags, &src_tags, NULL, NULL);
 
-	zbx_mock_assert_int_eq("Unexpected host tag count", out_host_tags.values_num, host_tags.values_num);
-	zbx_vector_db_tag_ptr_sort(&host_tags, compare_db_tags_and_values);
+	zbx_mock_assert_int_eq("Unexpected host tag count", expected_dst_tags.values_num, dst_tags.values_num);
+	zbx_vector_db_tag_ptr_sort(&dst_tags, compare_db_tags_and_values);
 
-	for (i = 0; i < host_tags.values_num; i++)
+	for (i = 0; i < dst_tags.values_num; i++)
 	{
-		zbx_mock_assert_str_eq("Unexpected tag name", out_host_tags.values[i]->tag,
-				host_tags.values[i]->tag);
-		zbx_mock_assert_str_eq("Unexpected tag value", out_host_tags.values[i]->value,
-				host_tags.values[i]->value);
+		zbx_mock_assert_str_eq("Unexpected tag name", expected_dst_tags.values[i]->tag,
+				dst_tags.values[i]->tag);
+		zbx_mock_assert_str_eq("Unexpected tag value", expected_dst_tags.values[i]->value,
+				dst_tags.values[i]->value);
 		/*
 		Disabled because order of tags is not guaranteed
-		zbx_mock_assert_str_eq("Unexpected tag name orig", ZBX_NULL2STR(out_host_tags.values[i]->tag_orig),
-				ZBX_NULL2STR(host_tags.values[i]->tag_orig));
-		zbx_mock_assert_str_eq("Unexpected tag value orig", ZBX_NULL2STR(out_host_tags.values[i]->value_orig),
-				ZBX_NULL2STR(host_tags.values[i]->value_orig));
+		zbx_mock_assert_str_eq("Unexpected tag name orig", ZBX_NULL2STR(expected_dst_tags.values[i]->tag_orig),
+				ZBX_NULL2STR(dst_tags.values[i]->tag_orig));
+		zbx_mock_assert_str_eq("Unexpected tag value orig", ZBX_NULL2STR(expected_dst_tags.values[i]->value_orig),
+				ZBX_NULL2STR(dst_tags.values[i]->value_orig));
 		*/
-		zbx_mock_assert_int_eq("Unexpected automatic", out_host_tags.values[i]->automatic,
-				host_tags.values[i]->automatic);
+		zbx_mock_assert_int_eq("Unexpected automatic", expected_dst_tags.values[i]->automatic,
+				dst_tags.values[i]->automatic);
 		/*
 		Disabled because order of tags is not guaranteed
-		zbx_mock_assert_uint64_eq("Unexpected tagid", out_host_tags.values[i]->tagid,
-				host_tags.values[i]->tagid); */
-		zbx_mock_assert_uint64_eq("Unexpected flags", out_host_tags.values[i]->flags,
-				host_tags.values[i]->flags);
+		zbx_mock_assert_uint64_eq("Unexpected tagid", expected_dst_tags.values[i]->tagid,
+				dst_tags.values[i]->tagid); */
+		zbx_mock_assert_uint64_eq("Unexpected flags", expected_dst_tags.values[i]->flags,
+				dst_tags.values[i]->flags);
 
 	}
 
-	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
-	zbx_vector_db_tag_ptr_destroy(&host_tags);
+	zbx_vector_db_tag_ptr_clear_ext(&dst_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&dst_tags);
 
 	zbx_vector_db_tag_ptr_clear_ext(&src_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&src_tags);
 
-	zbx_vector_db_tag_ptr_clear_ext(&out_host_tags, zbx_db_tag_free);
-	zbx_vector_db_tag_ptr_destroy(&out_host_tags);
+	zbx_vector_db_tag_ptr_clear_ext(&expected_dst_tags, zbx_db_tag_free);
+	zbx_vector_db_tag_ptr_destroy(&expected_dst_tags);
 }
