@@ -410,7 +410,6 @@ void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *ad
 
 	for (i = 0; i < addtags->values_num; i++)
 	{
-		int		found = 0;
 		zbx_db_tag_t	*addtag = addtags->values[i];
 
 		for (j = 0; j < hosttags->values_num; j++)
@@ -418,13 +417,10 @@ void	zbx_add_tags(zbx_vector_db_tag_ptr_t *hosttags, zbx_vector_db_tag_ptr_t *ad
 			zbx_db_tag_t	*hosttag = hosttags->values[j];
 
 			if (0 == strcmp(addtag->tag, hosttag->tag) && 0 == strcmp(addtag->value, hosttag->value))
-			{
-				found = 1;
 				break;
-			}
 		}
 
-		if (0 == found)
+		if (j == hosttags->values_num)
 		{
 			zbx_db_tag_t	*new_tag;
 
