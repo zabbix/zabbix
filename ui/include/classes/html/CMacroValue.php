@@ -121,7 +121,7 @@ class CMacroValue extends CInput {
 		$name = $this->getAttribute('name');
 		$value_type = $this->getAttribute('type');
 		$value = $this->getAttribute('value');
-		$readonly = $this->getAttribute('readonly');
+		$readonly = (bool) $this->getAttribute('readonly');
 		$elements = [];
 
 		if ($value_type == ZBX_MACRO_TYPE_TEXT) {
@@ -132,7 +132,7 @@ class CMacroValue extends CInput {
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
-				->setReadonly((bool) $readonly);
+				->setReadonly($readonly);
 		}
 		elseif ($value_type == ZBX_MACRO_TYPE_VAULT) {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
@@ -142,7 +142,7 @@ class CMacroValue extends CInput {
 				->setMaxlength($this->maxlength)
 				->setAttribute('placeholder', _('value'))
 				->disableSpellcheck()
-				->setReadonly((bool) $readonly);
+				->setReadonly($readonly);
 		}
 		else {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_SECRET;
@@ -150,7 +150,7 @@ class CMacroValue extends CInput {
 
 			$elements[] = (new CInputSecret($name.'[value]', $value, $this->add_post_js))
 				->setAttribute('maxlength', $this->maxlength)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
+				->setAttribute('disabled', $readonly ? 'disabled' : null)
 				->setAttribute('placeholder', _('value'));
 		}
 
@@ -164,7 +164,7 @@ class CMacroValue extends CInput {
 				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
 			]))
 				->addClass($dropdown_btn_class)
-				->setAttribute('disabled', ($readonly !== null) ? 'disabled' : null)
+				->setAttribute('disabled', $readonly ? 'disabled' : null)
 				->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
