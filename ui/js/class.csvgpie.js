@@ -171,18 +171,15 @@ class CSVGPie {
 
 		this.#svg
 			.attr('width', width)
-			.attr('height', height)
-			.attr('viewBox', `0 0 ${width} ${height}`)
+			.attr('height', height);
 
-		const scalable_bbox = this.#g_scalable.node().getBBox();
-		const box_width = Math.max(this.#radius_outer, -scalable_bbox.x, scalable_bbox.width + scalable_bbox.x) * 2;
-		const box_height = Math.max(this.#radius_outer * 2, scalable_bbox.height);
+		const box_size = this.#radius_outer * 2;
 
-		const scale = Math.min(this.#width / box_width, this.#height / box_height);
+		const scale = Math.min(this.#width / box_size, this.#height / box_size);
 		const offset = scale / 10;
 
 		const x = this.#width / 2;
-		const y = (this.#height - scalable_bbox.height * scale) / 2 - scalable_bbox.y * scale;
+		const y = (this.#height - box_size * scale) / 2 + this.#radius_outer * scale;
 
 		this.#g_scalable.attr('transform', `translate(${x} ${y}) scale(${scale - offset})`);
 	}
