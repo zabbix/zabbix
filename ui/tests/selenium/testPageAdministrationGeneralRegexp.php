@@ -77,15 +77,6 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			[
 				'Name' => '4_regexp_1',
 				'Expressions' => '1 ⇒ abcd [Result is TRUE]'
-			],
-			[
-				'Name' => 'Network interfaces for discovery',
-				'Expressions' => "1 ⇒ ^[Ll]o[0-9.]*$ [Result is FALSE]\n".
-						"2 ⇒ ^NULL[0-9.]*$ [Result is FALSE]\n".
-						"3 ⇒ ^(In)?[Ll]oop[Bb]ack[0-9._]*$ [Result is FALSE]\n".
-						"4 ⇒ ^Software Loopback Interface [Result is FALSE]\n".
-						"5 ⇒ ^[Ss]ystem$ [Result is FALSE]\n".
-						'6 ⇒ ^Nu[0-9.]*$ [Result is FALSE]'
 			]
 		];
 
