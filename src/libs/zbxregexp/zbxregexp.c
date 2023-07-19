@@ -484,6 +484,28 @@ int     zbx_regexp_match_precompiled(const char *string, const zbx_regexp_t *reg
 	return (ZBX_REGEXP_MATCH == regexp_exec(string, regexp, 0, 0, NULL, NULL)) ? 0 : -1;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if string matches a precompiled regular expression without *
+ *          returning matching groups                                         *
+ *                                                                            *
+ * Parameters: string - [IN] string to be matched                             *
+ *             regex  - [IN] precompiled regular expression                   *
+ *           err_msg  - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: ZBX_REGEXP_MATCH     - successful match                      *
+ *               ZBX_REGEXP_NO_MATCH  - no match                              *
+ *               FAIL                 - error occurred                        *
+ *                                                                            *
+ * Comments: use this function for better performance if many strings need to *
+ *           be matched against the same regular expression                   *
+ *                                                                            *
+ ******************************************************************************/
+int     zbx_regexp_match_precompiled2(const char *string, const zbx_regexp_t *regexp, char **err_msg)
+{
+	return regexp_exec(string, regexp, 0, 0, NULL, err_msg);
+}
+
 /****************************************************************************************************
  *                                                                                                  *
  * Purpose: compiles and executes a regexp                                                          *

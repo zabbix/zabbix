@@ -1575,31 +1575,48 @@ void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int
  *     logfiles       - [IN/OUT] pointer to the list of logfiles              *
  *     logfiles_alloc - [IN/OUT] number of logfiles memory was allocated for  *
  *     logfiles_num   - [IN/OUT] number of already inserted logfiles          *
+ *     err_msg        - [OUT] dynamically allocated error message             *
+ *                                                                            *
+ * Return value: SUCCEED or FAIL                                              *
  *                                                                            *
  * Comments: This is a helper function for pick_logfiles()                    *
  *                                                                            *
  ******************************************************************************/
-static void	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
-		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num)
+static int	pick_logfile(const char *directory, const char *filename, int mtime, const zbx_regexp_t *re,
+		struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num, char **err_msg)
 {
 	char		*logfile_candidate;
 	zbx_stat_t	file_buf;
+	int		ret = SUCCEED;
 
 	logfile_candidate = zbx_dsprintf(NULL, "%s%s", directory, filename);
 
 	if (0 == zbx_stat(logfile_candidate, &file_buf))
 	{
-		if (S_ISREG(file_buf.st_mode) &&
-				mtime <= file_buf.st_mtime &&
-				0 == zbx_regexp_match_precompiled(filename, re))
+		if (S_ISREG(file_buf.st_mode) && mtime <= file_buf.st_mtime)
 		{
-			add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
+			char	*error = NULL;
+			int	res;
+
+			if (ZBX_REGEXP_MATCH == (res = zbx_regexp_match_precompiled2(filename, re, &error)))
+			{
+				add_logfile(logfiles, logfiles_alloc, logfiles_num, logfile_candidate, &file_buf);
+			}
+			else if (FAIL == res)
+			{
+				*err_msg = zbx_dsprintf(*err_msg, "error occurred while matching file name pattern"
+						" regular expression: %s", error);
+				zbx_free(error);
+				ret = FAIL;
+			}
 		}
 	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot process entry '%s': %s", logfile_candidate, zbx_strerror(errno));
 
 	zbx_free(logfile_candidate);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -1657,7 +1674,16 @@ static int	pick_logfiles(const char *directory, int mtime, const zbx_regexp_t *r
 	{
 		char	*file_name_utf8 = zbx_unicode_to_utf8(find_data.name);
 
-		pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc, logfiles_num);
+		if (SUCCEED != pick_logfile(directory, file_name_utf8, mtime, re, logfiles, logfiles_alloc,
+				logfiles_num, err_msg))
+		{
+			zbx_free(find_wpath);
+			zbx_free(find_path);
+			zbx_free(file_name_utf8);
+			_findclose(find_handle);	/* ignore _findclose() error, report pick_logfile() error */
+			return FAIL;
+		}
+
 		zbx_free(file_name_utf8);
 	}
 	while (0 == _wfindnext(find_handle, &find_data));
@@ -1689,7 +1715,14 @@ clean:
 	*use_ino = 1;
 
 	while (NULL != (d_ent = readdir(dir)))
-		pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc, logfiles_num);
+	{
+		if (SUCCEED != pick_logfile(directory, d_ent->d_name, mtime, re, logfiles, logfiles_alloc,
+				logfiles_num, err_msg))
+		{
+			closedir(dir);	/* ignore closedir() error, report pick_logfile() error */
+			return FAIL;
+		}
+	}
 
 	if (-1 == closedir(dir))
 	{
