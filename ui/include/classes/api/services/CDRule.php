@@ -275,6 +275,7 @@ class CDRule extends CApiService {
 
 		// Check drule name duplicates in input data.
 		$duplicate = CArrayHelper::findDuplicate($drules, 'name');
+
 		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
@@ -436,6 +437,7 @@ class CDRule extends CApiService {
 		if ($drule_names_changed) {
 			// Check drule name duplicates in input data.
 			$duplicate = CArrayHelper::findDuplicate($drule_names_changed, 'name');
+
 			if ($duplicate) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Discovery rule "%1$s" already exists.', $duplicate['name'])
@@ -550,6 +552,7 @@ class CDRule extends CApiService {
 					_s('Incorrect value "%1$s" for "%2$s" field.', $dcheck['type'], 'type')
 				);
 			}
+
 			switch ($dcheck['type']) {
 				case SVC_AGENT:
 					if (!array_key_exists('key_', $dcheck)) {
@@ -568,6 +571,7 @@ class CDRule extends CApiService {
 
 					$length = mb_strlen($dcheck['key_']);
 					$max_length = DB::getFieldLength('dchecks', 'key_');
+
 					if ($length > $max_length) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Incorrect value for field "%1$s": %2$s.', 'key_',
@@ -730,6 +734,7 @@ class CDRule extends CApiService {
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $drules);
 
 		$create_dchecks = [];
+
 		foreach ($drules as $dnum => $drule) {
 			foreach ($drule['dchecks'] as $dcheck) {
 				$dcheck['druleid'] = $druleids[$dnum];
@@ -842,6 +847,7 @@ class CDRule extends CApiService {
 	 */
 	public function delete(array $druleids) {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
 		if (!CApiInputValidator::validate($api_input_rules, $druleids, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -993,6 +999,7 @@ class CDRule extends CApiService {
 						'dhostids' => $related_ids,
 						'preservekeys' => true
 					]);
+
 					if (!is_null($options['limitSelects'])) {
 						order_result($dhosts, 'dhostid');
 					}
