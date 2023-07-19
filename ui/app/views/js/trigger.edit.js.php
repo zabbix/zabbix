@@ -383,6 +383,12 @@
 		}
 
 		#expressionConstructor(fields = {}, expression_type = <?= TRIGGER_EXPRESSION ?>) {
+			if (fields.remove_expression !== undefined) {
+				if (!window.confirm(<?= json_encode(_('Delete expression?')) ?>)) {
+					return;
+				}
+			}
+
 			if (expression_type === <?= TRIGGER_EXPRESSION ?>) {
 				if (Object.keys(fields).length === 0 || fields.add_expression) {
 					fields.expression = this.expression.value;
@@ -682,8 +688,10 @@
 		}
 
 		delete() {
+			const action = this.action === 'trigger.edit' ? 'trigger.delete' : 'trigger.prototype.delete';
+
 			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'trigger.delete');
+			curl.setArgument('action', action);
 			curl.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			);

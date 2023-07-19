@@ -446,7 +446,7 @@ else {
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete trigger?'),
+			'confirmation' => _('Delete trigger prototype?'),
 			'class' => ZBX_STYLE_BTN_ALT,
 			'keepOpen' => true,
 			'isSubmit' => false,

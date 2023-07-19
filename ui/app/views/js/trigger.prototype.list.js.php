@@ -59,19 +59,16 @@
 					})
 				}
 				else if (e.target.classList.contains('js-enable-trigger')) {
-					this.#enable(e.target, [e.target.dataset.triggerid], e.target.dataset.status,
-						e.target.dataset.discover
-					);
+					this.#enable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-disable-trigger')) {
-					this.#disable(e.target, [e.target.dataset.triggerid], e.target.dataset.status,
-						e.target.dataset.discover);
+					this.#disable(e.target, [e.target.dataset.triggerid]);
 				}
 				else if (e.target.classList.contains('js-massenable-trigger')) {
-					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()), e.target.dataset.status);
+					this.#enable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massdisable-trigger')) {
-					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()), e.target.dataset.status);
+					this.#disable(e.target, Object.keys(chkbxRange.getSelectedIds()));
 				}
 				else if (e.target.classList.contains('js-massupdate-trigger')) {
 					this.#massupdate(e.target);
@@ -110,52 +107,42 @@
 			});
 		}
 
-		#enable(target, triggerids, status = null, discover = null) {
+		#enable(target, triggerids) {
 			let confirmation;
 
-			if (status !== null) {
+			if (target.dataset.status !== null && target.classList.contains('js-massenable-trigger')) {
 				confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as enabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as enabled?')) ?>;
-			}
-			else {
-				confirmation = triggerids.length > 1
-					? <?= json_encode(_('Enable selected trigger prototypes?')) ?>
-					: <?= json_encode(_('Enable selected trigger prototype?')) ?>;
-			}
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.prototype.enable');
 
-			this.#post(target, triggerids, curl, status, discover);
+			this.#post(target, triggerids, curl);
 		}
 
-		#disable(target, triggerids, status = null, discover = null) {
+		#disable(target, triggerids) {
 			let confirmation;
 
-			if (status !== null) {
+			if (target.dataset.status !== null && target.classList.contains('js-massdisable-trigger')) {
 				confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as disabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as disabled?')) ?>;
-			}
-			else {
-				confirmation = triggerids.length > 1
-					? <?= json_encode(_('Disable selected trigger prototypes?')) ?>
-					: <?= json_encode(_('Disable selected trigger prototype?')) ?>;
-			}
 
-			if (!window.confirm(confirmation)) {
-				return;
+				if (!window.confirm(confirmation)) {
+					return;
+				}
 			}
 
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'trigger.prototype.disable');
 
-			this.#post(target, triggerids, curl, status, discover);
+			this.#post(target, triggerids, curl);
 		}
 
 		#massupdate(target) {
@@ -182,7 +169,7 @@
 			this.#post(target, triggerids, curl);
 		}
 
-		#post(target, triggerids, url, status = null, discover = null) {
+		#post(target, triggerids, url) {
 			url.setArgument('<?= CCsrfTokenHelper::CSRF_TOKEN_NAME ?>',
 				<?= json_encode(CCsrfTokenHelper::get('trigger')) ?>
 			);
@@ -191,11 +178,11 @@
 				triggerids: triggerids
 			};
 
-			if (status !== null) {
-				fields.status = status;
+			if (target.dataset.status !== null) {
+				fields.status = target.dataset.status;
 			}
 			else {
-				fields.discover = discover;
+				fields.discover = target.dataset.discover;
 			}
 
 			target.classList.add('is-loading');
