@@ -301,6 +301,7 @@ class CDRule extends CApiService {
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
+
 			foreach ($proxyids as $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -462,6 +463,7 @@ class CDRule extends CApiService {
 				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
+
 			foreach ($proxyids as $proxyid) {
 				if (!array_key_exists($proxyid, $db_proxies)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -672,12 +674,14 @@ class CDRule extends CApiService {
 		while ($current = array_pop($dchecks)) {
 			foreach ($dchecks as $dcheck) {
 				$equal = true;
+
 				foreach ($dcheck as $field => $value) {
 					if (array_key_exists($field, $current) && (strcmp($value, $current[$field]) !== 0)) {
 						$equal = false;
 						break;
 					}
 				}
+
 				if ($equal) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Checks should be unique.'));
 				}
@@ -965,7 +969,9 @@ class CDRule extends CApiService {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
+
 				$dchecks = zbx_toHash($dchecks, 'druleid');
+
 				foreach ($result as $druleid => $drule) {
 					$result[$druleid]['dchecks'] = array_key_exists($druleid, $dchecks)
 						? $dchecks[$druleid]['rowscount']
@@ -1000,7 +1006,9 @@ class CDRule extends CApiService {
 					'countOutput' => true,
 					'groupCount' => true
 				]);
+
 				$dhosts = zbx_toHash($dhosts, 'druleid');
+
 				foreach ($result as $druleid => $drule) {
 					$result[$druleid]['dhosts'] = array_key_exists($druleid, $dhosts)
 						? $dhosts[$druleid]['rowscount']
