@@ -49,6 +49,7 @@ class testPageHostGroups extends CWebTest {
 	const HOST2 = 'Two disabled host testPageHostGroups';
 	const TEMPLATE = 'Template with hosts in group testPageHostGroups';
 	const GROUP_ENABLED = 'Group with two enabled hosts testPageHostGroups';
+	const DELETE_GROUP3 = 'Group 3 for Delete test';
 
 	/**
 	 * Objects created in dataSource DiscoveredHosts.
@@ -62,10 +63,10 @@ class testPageHostGroups extends CWebTest {
 	/**
 	 * Objects created in dataSource HostGroups for Delete test.
 	 */
-	const DELETE_ONE_GROUP = 'One group belongs to one object for Delete test';
+	const DELETE_ONE_HOST_GROUP = 'One group belongs to one host for Delete test';
+	const DELETE_ONE_TEMPLATE_GROUP = 'One group belongs to one template for Delete test';
 	const DELETE_EMPTY_GROUP = 'Group empty for Delete test';
 	const DELETE_GROUP2 = 'First group to one object for Delete test';
-	const DELETE_GROUP3 = 'Group 3 for Delete test';
 
 	/**
 	 * SQL query to get groups and hosts to compare hash values.
@@ -96,7 +97,7 @@ class testPageHostGroups extends CWebTest {
 				'name' => self::GROUP_ENABLED
 			],
 			[
-				'name' => 'Group with template testPageHostGroups'
+				'name' => self::DELETE_GROUP3
 			]
 		]);
 		$groupids = CDataHelper::getIds('name');
@@ -163,12 +164,6 @@ class testPageHostGroups extends CWebTest {
 				'groups' => [
 					'groupid' => $groupids[self::GROUP_DISABLED]
 				]
-			],
-			[
-				'host' => 'One template in group testPageHostGroups',
-				'groups' => [
-					'groupid' => $groupids['Group with template testPageHostGroups']
-				]
 			]
 		]);
 	}
@@ -192,10 +187,10 @@ class testPageHostGroups extends CWebTest {
 						'Info' => ''
 					],
 					[
-						'Name' => 'Group with template testPageHostGroups',
+						'Name' => self::DELETE_ONE_TEMPLATE_GROUP,
 						'Hosts' => 'Hosts',
 						'Templates' => 'Templates 1',
-						'Members' => 'One template in group testPageHostGroups',
+						'Members' => 'Template for host group testing',
 						'Info' => ''
 					],
 					[
@@ -290,8 +285,8 @@ class testPageHostGroups extends CWebTest {
 			],
 			[
 				[
-					'name' => 'Group with template testPageHostGroups',
-					'template' => 'One template in group testPageHostGroups'
+					'name' => self::DELETE_ONE_TEMPLATE_GROUP,
+					'template' => 'Template for host group testing'
 				]
 			]
 		];
@@ -422,8 +417,8 @@ class testPageHostGroups extends CWebTest {
 			],
 			[
 				[
-					'Name' => 'Group with template testPageHostGroups',
-					'expected' => ['Group with template testPageHostGroups']
+					'Name' => self::DELETE_ONE_TEMPLATE_GROUP,
+					'expected' => [self::DELETE_ONE_TEMPLATE_GROUP]
 				]
 			],
 			// Partial match.
@@ -733,7 +728,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => [self::DELETE_ONE_GROUP, self::LLD.': '.self::DISCOVERED_GROUP],
+					'groups' => [self::DELETE_ONE_HOST_GROUP, self::LLD.': '.self::DISCOVERED_GROUP],
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
@@ -741,15 +736,15 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => self::DELETE_ONE_GROUP,
+					'groups' => self::DELETE_ONE_HOST_GROUP,
 					'error' => 'Host "Host for host group testing" cannot be without host group.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'groups' => 'Group with template testPageHostGroups',
-					'error' => 'Template "One template in group testPageHostGroups" cannot be without host group.'
+					'groups' => self::DELETE_ONE_TEMPLATE_GROUP,
+					'error' => 'Template "Template for host group testing" cannot be without host group.'
 				]
 			],
 			// Group used in other elements can't be deleted.
@@ -800,7 +795,7 @@ class testPageHostGroups extends CWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'groups' => [self::DELETE_GROUP2, self::DELETE_GROUP3]
+					'groups' => [self::DELETE_GROUP2, self::DELETE_GROUP3, 'Group for Action']
 				]
 			]
 		];

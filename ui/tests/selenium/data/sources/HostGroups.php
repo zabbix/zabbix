@@ -30,16 +30,16 @@ class HostGroups {
 				'name' => 'Group empty for Delete test'
 			],
 			[
-				'name' => 'One group belongs to one object for Delete test'
+				'name' => 'One group belongs to one host for Delete test'
+			],
+			[
+				'name' => 'One group belongs to one template for Delete test'
 			],
 			[
 				'name' => 'First group to one object for Delete test'
 			],
 			[
 				'name' => 'Second group to one object for Delete test'
-			],
-			[
-				'name' => 'Group 3 for Delete test'
 			],
 			[
 				'name' => 'Group for Script'
@@ -60,12 +60,22 @@ class HostGroups {
 		$groupids = CDataHelper::getIds('name');
 
 		// Create elements with host groups.
+		CDataHelper::createTemplates([
+			[
+				'host' => 'Template for host group testing',
+				'groups' => [
+					'groupid' => $groupids['One group belongs to one template for Delete test']
+				]
+			]
+		]);
+
+
 		$host = CDataHelper::createHosts([
 			[
 				'host' => 'Host for host group testing',
 				'interfaces' => [],
 				'groups' => [
-					'groupid' => $groupids['One group belongs to one object for Delete test']
+					'groupid' => $groupids['One group belongs to one host for Delete test']
 				]
 			],
 			[
