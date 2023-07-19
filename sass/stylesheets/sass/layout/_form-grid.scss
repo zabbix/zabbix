@@ -188,8 +188,11 @@
 			width: auto;
 		}
 
+		.form_row td {
+			line-height: 24px;
+		}
+
 		.sortable td {
-			padding-bottom: 0;
 			line-height: 24px;
 
 			&.td-drag-icon {
@@ -198,7 +201,7 @@
 
 			&.wordbreak,
 			&.wordwrap {
-				line-height: 1.4;
+				line-height: $body-line-height;
 			}
 		}
 
@@ -268,12 +271,6 @@
 
 			&:last-child {
 				padding-right: 0;
-			}
-		}
-
-		tfoot {
-			td {
-				padding-bottom: 0;
 			}
 		}
 	}
