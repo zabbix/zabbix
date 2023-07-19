@@ -63,6 +63,7 @@ class CControllerItemEdit extends CController {
 			'delay_flex'			=> 'array',
 			'preprocessing'			=> 'array',
 			'parameters'			=> 'array',
+			'query_fields'			=> 'array',
 			'form_refresh'			=> 'in 1'
 		];
 
@@ -81,9 +82,16 @@ class CControllerItemEdit extends CController {
 		$parameters = $this->getInput('parameters', []);
 
 		if ($ret && $parameters) {
-			$ret = array_key_exists('name', $parameters)
-				&& array_key_exists('value', $parameters)
-				&& count($parameters['name']) == count($parameters['value']);
+			$ret = count($parameters) == count(array_column($parameters, 'name'))
+				&& count($parameters) == count(array_column($parameters, 'value'));
+		}
+
+		$query_fields = $this->getInput('query_fields', []);
+
+		if ($ret && $query_fields) {
+			$ret = array_key_exists('sortorder', $query_fields)
+				&& array_key_exists('name', $query_fields)
+				&& array_key_exists('value', $query_fields);
 		}
 
 		if (!$ret) {
@@ -262,14 +270,6 @@ class CControllerItemEdit extends CController {
 		switch ($item['type']) {
 			case ITEM_TYPE_SCRIPT:
 				$item['script'] = $item['params'];
-				$parameters = ['name' => [], 'value' => []];
-
-				foreach ($item['parameters'] as $parameter) {
-					$parameters['name'][] = $parameter['name'];
-					$parameters['value'][] = $parameter['value'];
-				}
-
-				$item['parameters'] = $parameters;
 
 				break;
 
@@ -277,7 +277,26 @@ class CControllerItemEdit extends CController {
 				$item['http_authtype'] = $item['authtype'];
 				$item['http_username'] = $item['username'];
 				$item['http_password'] = $item['password'];
+				$query_fields = [];
+
+				foreach ($item['query_fields'] as $i => $query_field) {
+					$query_fields[] = [
+						'name' => key($query_field),
+						'value' => reset($query_field)
+					];
+				}
+
+				$item['query_fields'] = $query_fields;
+
 				break;
+		}
+
+		if (!$item['parameters']) {
+			$item['parameters'] = [['name' => '', 'value' => '']];
+		}
+
+		if (!$item['query_fields']) {
+			$item['query_fields'] = [['name' => '', 'value' => '']];
 		}
 
 		return $item;
@@ -299,7 +318,7 @@ class CControllerItemEdit extends CController {
 			'value_type' => DB::getDefault('items', 'value_type'),
 			'url' => '',
 			'query_fields' => [],
-			'parameters' => ['name' => [], 'value' => []],
+			'parameters' => [['name' => '', 'value' => '']],
 			'script' => '',
 			'request_method' => DB::getDefault('items', 'request_method'),
 			'timeout' => DB::getDefault('items', 'timeout'),
@@ -347,6 +366,19 @@ class CControllerItemEdit extends CController {
 		];
 		$this->getInputs($form, array_keys($form));
 		// TODO: item with preprocessing trigger undefined index for error_handler, error_handler_params
+
+		if ($form['query_fields']) {
+			$query_fields = [];
+
+			foreach ($form['query_fields']['sortorder'] as $order => $index) {
+				$query_fields[] = [
+					'name' => $form['query_fields']['name'][$index],
+					'value' => $form['query_fields']['value'][$index]
+				];
+			}
+
+			$form['query_fields'] = $query_fields;
+		}
 
 		return $form;
 	}

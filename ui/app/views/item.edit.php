@@ -167,11 +167,12 @@ $output = [
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php', [
 		'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
-		'value_type_keys' => $data['value_type_keys'],
+		'form_data' => $data['form'],
 		'host_interfaces' => array_values($data['host_interfaces']),
 		'interface_types' => $data['interface_types'],
 		'testable_item_types' => $data['testable_item_types'],
-		'type_with_key_select' => $type_with_key_select
+		'type_with_key_select' => $type_with_key_select,
+		'value_type_keys' => $data['value_type_keys']
 	])
 ];
 

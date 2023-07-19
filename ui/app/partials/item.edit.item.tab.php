@@ -102,72 +102,82 @@ $formgrid = (new CFormGrid())
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			(new CButton('httpcheck_parseurl', _('Parse')))
+			(new CSimpleButton(_('Parse')))
 				->addClass(ZBX_STYLE_BTN_GREY)
+				->setAttribute('name', 'parseurl')
+				->setAttribute('error-message', _('Failed to parse URL.').BR().BR()._('URL is not properly encoded.'))
 				->setEnabled(!$data['readonly'])
-				->setAttribute('data-action', 'parse_url')
 		]))->setId('js-item-url-field')
 	])
 	->addItem([
-		(new CLabel(_('Query fields'), 'query_fields_pairs'))->setId('js-item-query-fields-label'),
-		(new CFormField((new CDiv([
+		(new CLabel(_('Query fields')))->setId('js-item-query-fields-label'),
+		(new CFormField(
+			(new CDiv([
 				(new CTable())
-					->setAttribute('style', 'width: 100%;')
+					->setId('query-fields-table')
 					->setHeader(['', _('Name'), '', _('Value'), ''])
-					// ->addRow((new CRow)->setAttribute('data-insert-point', 'append'))
-					->setFooter(new CRow(
-						(new CCol(
-							(new CButtonLink(_('Add')))
-								->setEnabled(!$data['readonly'])
-								->setAttribute('data-row-action', 'add_row')
+					->setFooter((new CCol(
+						(new CButtonLink(_('Add')))
+							->addClass('element-table-add')
+							->setEnabled(!$data['readonly'])
 						))->setColSpan(5)
-					)),
-				// TODO: find other places with query fields implementation
-				// (new CTag('script', true))
-				// 	->setAttribute('type', 'text/x-jquery-tmpl')
-				// 	->addItem(new CRow([
-				// 		(new CCol([
-				// 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
-				// 			new CVar('query_fields[sortorder][#{index}]', '#{sortorder}')
-				// 		]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-				// 		(new CTextBox('query_fields[name][#{index}]', '#{name}', $data['readonly']))
-				// 			->setAttribute('placeholder', _('name'))
-				// 			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-				// 		RARR(),
-				// 		(new CTextBox('query_fields[value][#{index}]', '#{value}', $data['readonly']))
-				// 			->setAttribute('placeholder', _('value'))
-				// 			->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-				// 		(new CButtonLink(_('Remove')))
-				// 			->setEnabled(!$data['readonly'])
-				// 			->setAttribute('data-row-action', 'remove_row')
-				// 	])),
-				// $query_fields
+					),
+				new CTemplateTag('query-field-row-tmpl', (new CRow([
+						(new CCol([
+							(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON),
+							new CVar('query_fields[sortorder][]', '#{rowNum}')
+						]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+						(new CTextBox('query_fields[name][#{rowNum}]', '#{name}', $data['readonly']))
+							->setAttribute('placeholder', _('name'))
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+						RARR(),
+						(new CTextBox('query_fields[value][#{rowNum}]', '#{value}', $data['readonly']))
+							->setAttribute('placeholder', _('value'))
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('query_fields_pairs')
-				->setAttribute('data-sortable-pairs-table', $data['readonly'] ? '0': '1')
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH . 'px;')
 		))->setId('js-item-query-fields-field')
 	])
 	->addItem([
-		(new CLabel(_('Parameters'), 'parameters_table'))->setId('js-item-parameters-label'),
-		(new CFormField((new CDiv(
-			(new CTable())
-				->setId('parameters_table')
-				->setAttribute('style', 'width: 100%;')
-				->setHeader([
-					(new CColHeader(_('Name')))->setWidth('50%'),
-					(new CColHeader(_('Value')))->setWidth('50%'),
-					_('Action')
-				])
-				->addRow((new CButton('parameter_add', _('Add')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-add')
-					->setEnabled(!$data['readonly'])
+		(new CLabel(_('Parameters'), 'parameters-table'))->setId('js-item-parameters-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('parameters-table')
+					->setHeader([
+						(new CColHeader(_('Name')))->setWidth('50%'),
+						(new CColHeader(_('Value')))->setWidth('50%'),
+						_('Action')
+					])
+					->setFooter((new CCol(
+						(new CButtonLink(_('Add')))
+							->addClass('element-table-add')
+							->setEnabled(!$data['readonly'])
+						))->setColSpan(3)
+					),
+				new CTemplateTag('parameter-row-tmpl', (new CRow([
+						(new CTextBox('parameters[#{rowNum}][name]', '#{name}', false,
+							DB::getFieldLength('item_parameter', 'name')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CTextBox('parameters[#{rowNum}][value]', '#{value}', false,
+							DB::getFieldLength('item_parameter', 'value')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
+					]))->addClass('form_row')
 				)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-parameters-field')
 	])
 	->addItem([

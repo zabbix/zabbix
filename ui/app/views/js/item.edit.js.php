@@ -36,9 +36,11 @@ const ZBX_STYLE_DISPLAY_NONE = <?= json_encode(ZBX_STYLE_DISPLAY_NONE) ?>;
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_ASTERISK) ?>;
 
 (new class {
+
 	init({testable_item_types, host_interfaces, interface_types, field_switches, value_type_keys,
-			type_with_key_select
+			type_with_key_select, form_data
 		}) {
+		this.form_data = form_data;
 		this.testable_item_types = testable_item_types;
 		this.interface_types = interface_types;
 		this.optional_interfaces = [];
@@ -77,28 +79,53 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		new CViewSwitcher('allow_traps', 'change', field_switches.for_traps);
 
 		this.field = {
+			history: this.form.querySelector('[name="history"]'),
 			interfaceid: this.form.querySelector('[name="interfaceid"]'),
 			key: this.form.querySelector('[name="key"]'),
 			key_button: this.form.querySelector('[name="key"] ~ .js-select-key'),
+			trends: this.form.querySelector('[name="trends"]'),
 			type: this.form.querySelector('[name="type"]'),
-			value_type: this.form.querySelector('[name="value_type"]'),
-			value_type_steps: this.form.querySelector('[name="value_type_steps"]'),
+			url: this.form.querySelector('[name="url"]'),
 			username: this.form.querySelector('[name=username]'),
-			history: this.form.querySelector('[name="history"]'),
-			trends: this.form.querySelector('[name="trends"]')
+			value_type: this.form.querySelector('[name="value_type"]'),
+			value_type_steps: this.form.querySelector('[name="value_type_steps"]')
 		};
 		this.label = {
 			interfaceid: this.form.querySelector('[for=interfaceid]'),
-			value_type_hint: this.form.querySelector('#js-item-type-hint'),
+			value_type_hint: this.form.querySelector('#js-item-type-hint'),// remove id
 			username: this.form.querySelector('[for=username]'),
-			history_hint: this.form.querySelector('#history_mode_hint'),
-			trends_hint: this.form.querySelector('#trends_mode_hint')
+			history_hint: this.form.querySelector('#history_mode_hint'),// remove id [for="history"] > :has([data-hintbox])
+			trends_hint: this.form.querySelector('#trends_mode_hint') // remove id
 		};
 
-		if ($('#tabs').tabs('option', 'active') == 1) {
+		if (jQuery('#tabs').tabs('option', 'active') == 1) {
 			// Force dynamicRows event handlers initialization when 'Tags' tab is already active.
-			$(() => $('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
+			jQuery(() => jQuery('#tabs').trigger('tabscreate.tags-tab', {panel: $('#tags-tab')}));
 		}
+
+		jQuery('#parameters-table').dynamicRows({
+			template: '#parameter-row-tmpl',
+			rows: this.form_data.parameters
+		});
+		jQuery('#query-fields-table').dynamicRows({
+			sortable: true,
+			template: '#query-field-row-tmpl',
+			rows: this.form_data.query_fields
+		});
+	}
+
+	#showErrorDialog(body, trigger_element) {
+		overlayDialogue({
+			title: t('Error'),
+			class: 'modal-popup position-middle',
+			content: jQuery('<span>').html(body),
+			buttons: [{
+				title: ('Ok'),
+				class: 'btn-alt',
+				focused: true,
+				action: function() {}
+			}]
+		}, jQuery(trigger_element));
 	}
 
 	initEvents() {
@@ -126,12 +153,27 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 					this.label.trends_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 
 					break;
+
+				case 'parseurl':
+					const url = parseUrlString(this.field.url.value);
+
+					if (url === false) {
+						return this.#showErrorDialog(target.getAttribute('error-message'), target);
+					}
+
+					if (url.pairs.length) {
+						const dynamic_rows = jQuery('#query-fields-table').dynamicRows();
+
+						dynamic_rows.addRows(url.pairs);
+						dynamic_rows.removeRows(row => [...row.querySelectorAll('[type="text"]')]
+							.filter(input => input.value === '').length == 2
+						);
+					}
+
+					this.field.url.value = url.url;
+
+					break;
 			}
-		});
-		jQuery('#parameters_table').dynamicRows({
-			template: '#parameters_table_row',
-			row: '.js-row',
-			allow_empty: true
 		});
 
 		// Tags tab events.
@@ -307,11 +349,12 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 }).init(config);
 })(<?= json_encode([
 	'field_switches' => $data['field_switches'],
-	'value_type_keys' => $data['value_type_keys'],
+	'form_data' => $data['form_data'],
 	'host_interfaces' => $data['host_interfaces'],
 	'interface_types' => $data['interface_types'],
 	'testable_item_types' => $data['testable_item_types'],
-	'type_with_key_select' => $data['type_with_key_select']
+	'type_with_key_select' => $data['type_with_key_select'],
+	'value_type_keys' => $data['value_type_keys']
 ]) ?>);
 
 // function updateItemFormElements(){}// common.item.edit.js.php TODO: remove when prototype will be moved to popup
