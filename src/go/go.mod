@@ -15,7 +15,7 @@ require (
 	github.com/go-ole/go-ole v1.2.6
 	github.com/go-sql-driver/mysql v1.6.0
 	github.com/goburrow/modbus v0.1.0
-	github.com/godbus/dbus v4.1.0+incompatible
+	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.34.0
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/mediocregopher/radix/v3 v3.8.1
