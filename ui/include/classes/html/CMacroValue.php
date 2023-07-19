@@ -159,13 +159,13 @@ class CMacroValue extends CInput {
 		}
 
 		$elements[] = (new CButtonDropdown($name.'[type]',  $value_type, [
-				['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_ICON_TEXT],
-				['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_ICON_EYE_OFF],
-				['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
-			]))
-				->addClass($dropdown_btn_class)
-				->setAttribute('disabled', $readonly ? 'disabled' : null)
-				->setAttribute('aria-label', _('Change type'));
+			['label' => _('Text'), 'value' => ZBX_MACRO_TYPE_TEXT, 'class' => ZBX_ICON_TEXT],
+			['label' => _('Secret text'), 'value' => ZBX_MACRO_TYPE_SECRET, 'class' => ZBX_ICON_EYE_OFF],
+			['label' => _('Vault secret'), 'value' => ZBX_MACRO_TYPE_VAULT, 'class' => ZBX_ICON_LOCK]
+		]))
+			->addClass($dropdown_btn_class)
+			->setAttribute('disabled', $readonly ? 'disabled' : null)
+			->setAttribute('aria-label', _('Change type'));
 
 		$node = (new CDiv())
 			->addClass($wrapper_class)
