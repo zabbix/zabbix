@@ -38,6 +38,11 @@ typedef struct
 	const char		*config_hostname;
 	const char		*config_host_metadata;
 	const char		*config_host_metadata_item;
+	int			config_heartbeat_frequency;
+	const char		*config_host_interface;
+	const char		*config_host_interface_item;
+	int			config_buffer_send;
+	int			config_buffer_size;
 }
 zbx_thread_activechk_args;
 

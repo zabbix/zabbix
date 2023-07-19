@@ -36,8 +36,8 @@ char	*CONFIG_HOSTNAME_ITEM		= NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
 
-char	*CONFIG_HOST_INTERFACE		= NULL;
-char	*CONFIG_HOST_INTERFACE_ITEM	= NULL;
+char	*zbx_config_host_interface = NULL;
+char	*zbx_config_host_interface_item	= NULL;
 
 ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, NULL)
 
@@ -53,8 +53,8 @@ ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
 
 int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
 
-int	CONFIG_BUFFER_SIZE		= 100;
-int	CONFIG_BUFFER_SEND		= 5;
+int	zbx_config_buffer_size		= 100;
+int	zbx_config_buffer_send		= 5;
 
 int	CONFIG_MAX_LINES_PER_SECOND		= 20;
 int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND	= 20;
@@ -81,7 +81,7 @@ static zbx_config_tls_t	*zbx_config_tls = NULL;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
 
-int	CONFIG_HEARTBEAT_FREQUENCY	= 60;
+int	zbx_config_heartbeat_frequency	= 60;
 
 #ifndef _WINDOWS
 #	include "../libs/zbxnix/control.h"
@@ -605,10 +605,10 @@ static void	set_defaults(void)
 				zbx_config_host_metadata);
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && NULL != CONFIG_HOST_INTERFACE_ITEM)
+	if (NULL != zbx_config_host_interface && NULL != zbx_config_host_interface_item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "both HostInterface and HostInterfaceItem defined, using [%s]",
-				CONFIG_HOST_INTERFACE);
+				zbx_config_host_interface);
 	}
 
 #ifndef _WINDOWS
@@ -675,7 +675,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		}
 	}
 
-	if (NULL != CONFIG_HOST_INTERFACE && HOST_INTERFACE_LEN < zbx_strlen_utf8(CONFIG_HOST_INTERFACE))
+	if (NULL != zbx_config_host_interface && HOST_INTERFACE_LEN < zbx_strlen_utf8(zbx_config_host_interface))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostInterface\" configuration parameter cannot be longer"
 				" than %d characters", HOST_INTERFACE_LEN);
@@ -763,6 +763,13 @@ static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vect
 				0 < hostnames->values_num ? hostnames->values[i] : "");
 		config_active_args[forks].config_host_metadata = zbx_config_host_metadata;
 		config_active_args[forks].config_host_metadata_item = zbx_config_host_metadata_item;
+		config_active_args[forks].config_heartbeat_frequency = zbx_config_heartbeat_frequency;
+		config_active_args[forks].config_host_interface = zbx_config_host_interface;
+		config_active_args[forks].config_host_interface_item = zbx_config_host_interface_item;
+
+		config_active_args[forks].config_buffer_send = zbx_config_buffer_send;
+		config_active_args[forks].config_buffer_size = zbx_config_buffer_size;
+
 	}
 
 	return SUCCEED;
@@ -856,17 +863,17 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostMetadata",		&zbx_config_host_metadata,			TYPE_STRING,
+		{"HostMetadata",		&zbx_config_host_metadata,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostMetadataItem",		&zbx_config_host_metadata_item,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterface",		&CONFIG_HOST_INTERFACE,			TYPE_STRING,
+		{"HostInterface",		&zbx_config_host_interface,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"HostInterfaceItem",		&CONFIG_HOST_INTERFACE_ITEM,		TYPE_STRING,
+		{"HostInterfaceItem",		&zbx_config_host_interface_item,	TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"BufferSize",			&CONFIG_BUFFER_SIZE,			TYPE_INT,
+		{"BufferSize",			&zbx_config_buffer_size,		TYPE_INT,
 			PARM_OPT,	2,			65535},
-		{"BufferSend",			&CONFIG_BUFFER_SEND,			TYPE_INT,
+		{"BufferSend",			&zbx_config_buffer_send,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
@@ -961,7 +968,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
-		{"HeartbeatFrequency",		&CONFIG_HEARTBEAT_FREQUENCY,		TYPE_INT,
+		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	TYPE_INT,
 			PARM_OPT,	0,			3600},
 		{NULL}
 	};

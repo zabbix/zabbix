@@ -63,7 +63,7 @@ typedef int	(*zbx_process_value_func_t)(zbx_vector_addr_ptr_t *addrs, zbx_vector
 		const char *host, const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize,
 		const int *mtime, const unsigned long *timestamp, const char *source, const unsigned short *severity,
 		const unsigned long *logeventid, unsigned char flags, const zbx_config_tls_t *config_tls,
-		int config_timeout, const char *config_source_ip);
+		int config_timeout, const char *config_source_ip, int config_buffer_send, int config_buffer_size);
 
 void	destroy_logfile_list(struct st_logfile **logfiles, int *logfiles_alloc, int *logfiles_num);
 
@@ -71,7 +71,7 @@ int	process_log_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		zbx_vector_expression_t *regexps, ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb,
 		zbx_uint64_t *lastlogsize_sent, int *mtime_sent, char **error, zbx_vector_pre_persistent_t *prep_vec,
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
-		const char *config_hostname);
+		const char *config_hostname, int config_buffer_send, int config_buffer_size);
 
 struct st_logfile	*find_last_processed_file_in_logfiles_list(struct st_logfile *logfiles, int logfiles_num);
 #endif
