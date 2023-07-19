@@ -52,13 +52,12 @@ window.template_edit_popup = new class {
 	#initActions() {
 		this.#initMacrosTab();
 		this.#updateMultiselect();
-		this.unlink_clear_templateids = {};
 
 		this.form.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-edit-linked')) {
 				this.#editLinkedTemplate({templateid: e.target.dataset.templateid});
 			}
-			else if (e.target.classList.contains('unlink')) {
+			else if (e.target.classList.contains('js-unlink')) {
 				e.target.closest('tr').remove();
 
 				this.linked_templateids = this.linked_templateids.filter(value =>
@@ -68,7 +67,7 @@ window.template_edit_popup = new class {
 				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
 				$('#template_add_templates_').trigger('change');
 			}
-			else if (e.target.classList.contains('unlink-and-clear')) {
+			else if (e.target.classList.contains('js-unlink-and-clear')) {
 				e.target.closest('tr').remove();
 
 				this.linked_templateids = this.linked_templateids.filter(value =>
@@ -76,7 +75,6 @@ window.template_edit_popup = new class {
 				);
 
 				this.form.querySelector('#show_inherited_template_macros').dispatchEvent(new Event('change'));
-				this.unlink_clear_templateids[`${e.target.dataset.templateid}`] = e.target.dataset.templateid;
 				this.#unlinkAndClearTemplate(e.target.dataset.templateid);
 				$('#template_add_templates_').trigger('change');
 			}

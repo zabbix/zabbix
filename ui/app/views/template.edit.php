@@ -29,18 +29,13 @@ $form = (new CForm())
 	->setId('templates-form')
 	->setName('template-edit-form')
 	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
-	->addVar('clone_templateid', $data['clone_templateid'] ?? null);
-
-if ($data['clone']) {
-	$form->addVar('clone', $data['clone']);
-}
+	->addVar('clone_templateid', $data['clone_templateid'] ?? null)
+	->addVar('clone', $data['clone'] ?: null);
 
 // Template tab.
 $template_tab = (new CFormGrid())
 	->addItem([
-		(new CLabel(_('Template name'), 'template_name'))
-			->addStyle('min-width: 150px;')
-			->setAsteriskMark(),
+		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
 		new CFormField(
 			(new CTextBox('template_name', $data['template_name'], false, DB::getFieldLength('hosts', 'host')))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -75,19 +70,17 @@ if ($data['linked_templates']) {
 			$template_link = new CSpan($template['name']);
 		}
 
-		$template_link->addClass(ZBX_STYLE_WORDWRAP);
-
 		$linked_templates->addRow([
-			$template_link,
+			$template_link->addClass(ZBX_STYLE_WORDWRAP),
 			(new CCol(
 				new CHorList([
 					(new CButtonLink(_('Unlink')))
 						->setAttribute('data-templateid', $template['templateid'])
-						->addClass('unlink'),
+						->addClass('js-unlink'),
 					(array_key_exists($template['templateid'], $data['original_templates']))
 						? (new CButtonLink(_('Unlink and clear')))
 							->setAttribute('data-templateid', $template['templateid'])
-							->addClass('unlink-and-clear')
+							->addClass('js-unlink-and-clear')
 						: null
 				])
 			))

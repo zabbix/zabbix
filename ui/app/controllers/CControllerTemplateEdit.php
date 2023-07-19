@@ -93,12 +93,12 @@ class CControllerTemplateEdit extends CController {
 				'clone_templateid' => $templateid,
 				'template_name' =>$this->getInput('template_name', ''),
 				'visible_name' => $this->getInput('visiblename', ''),
-				'description' => $this->getInput('description', ''),
-				'groups_ms' => [],
 				'linked_templates' => $this->getInput('linked_templates', []),
 				'templates' => $this->getInput('templates', []),
 				'add_templates' => [],
 				'original_templates' => [],
+				'groups_ms' => [],
+				'description' => $this->getInput('description', ''),
 				'tags' => $this->getInput('tags', []),
 				'show_inherited_macros' => $this->getInput('show_inherited_macros', 0),
 				'valuemaps' => $this->getInput('valuemaps', []),
@@ -354,8 +354,6 @@ class CControllerTemplateEdit extends CController {
 
 		// Prepare data for multiselect.
 		foreach ($groups as $group) {
-			$disabled = (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) && !array_key_exists($group, $groups_rw);
-
 			if (is_array($group) && array_key_exists('new', $group)) {
 				$data['groups_ms'][] = [
 					'id' => $group['new'],
@@ -367,7 +365,7 @@ class CControllerTemplateEdit extends CController {
 				$data['groups_ms'][] = [
 					'id' => $group,
 					'name' => $groups_all[$group]['name'],
-					'disabled' => $disabled
+					'disabled' => CWebUser::getType() != USER_TYPE_SUPER_ADMIN && !array_key_exists($group, $groups_rw)
 				];
 			}
 		}
@@ -388,8 +386,8 @@ class CControllerTemplateEdit extends CController {
 			'linked_templates' => [],
 			'add_templates' => [],
 			'original_templates' => [],
-			'groups_ms' => [],
 			'templates' => [],
+			'groups_ms' => [],
 			'description' => '',
 			'tags' => [],
 			'macros' => [],
