@@ -92,9 +92,12 @@ struct _zbx_active_command_t
 };
 ZBX_PTR_VECTOR_IMPL(active_command_ptr, zbx_active_command_t *)
 
+ZBX_PTR_VECTOR_DECL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
+ZBX_PTR_VECTOR_IMPL(active_metrics_ptr, ZBX_ACTIVE_METRIC *)
+
 static ZBX_THREAD_LOCAL active_buffer_t			buffer;
 static ZBX_THREAD_LOCAL	zbx_vector_command_result_ptr_t	command_results;
-static ZBX_THREAD_LOCAL zbx_vector_ptr_t		active_metrics;
+static ZBX_THREAD_LOCAL zbx_vector_active_metrics_ptr_t	active_metrics;
 static ZBX_THREAD_LOCAL	zbx_vector_active_command_ptr_t	active_commands;
 static ZBX_THREAD_LOCAL zbx_hashset_t			commands_hash;
 static ZBX_THREAD_LOCAL zbx_vector_expression_t		regexps;
@@ -135,7 +138,7 @@ static void	init_active_metrics(int config_buffer_size)
 	}
 
 	zbx_vector_command_result_ptr_create(&command_results);
-	zbx_vector_ptr_create(&active_metrics);
+	zbx_vector_active_metrics_ptr_create(&active_metrics);
 	zbx_vector_active_command_ptr_create(&active_commands);
 	zbx_hashset_create(&commands_hash, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_expression_create(&regexps);
@@ -212,7 +215,7 @@ static void	free_active_metrics(void)
 	zbx_vector_expression_destroy(&regexps);
 
 	zbx_vector_ptr_clear_ext(&active_metrics, (zbx_clean_func_t)free_active_metric);
-	zbx_vector_ptr_destroy(&active_metrics);
+	zbx_vector_active_metrics_ptr_destroy(&active_metrics);
 
 	zbx_vector_command_result_ptr_clear_ext(&command_results, (zbx_clean_func_t)free_command_result);
 	zbx_vector_command_result_ptr_destroy(&command_results);
@@ -257,7 +260,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		metric = active_metrics.values[i];
 
 		if (0 != strcmp(metric->key_orig, key_orig))
 			continue;
@@ -357,7 +360,7 @@ static void	add_check(const char *key, const char *key_orig, int refresh, zbx_ui
 	metric->processed_bytes = 0;
 	metric->persistent_file_name = NULL;	/* initialized but not used on Microsoft Windows */
 
-	zbx_vector_ptr_append(&active_metrics, metric);
+	zbx_vector_active_metrics_ptr_append(&active_metrics, metric);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -421,23 +424,23 @@ static int	mode_parameter_is_skip(unsigned char flags, const char *itemkey)
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parses list of active checks received from server                 *
- *                                                                            *
- * Parameters: str - [IN] NULL terminated string received from server         *
- *             host - [IN] address of host                                    *
- *             port - [IN] port number on host                                *
- *             config_revision_local - [IN/OUT] revision of processed         *
- *                                              configuration                 *
- *                                                                            *
- * Comments:                                                                  *
- *    String is represented as "ZBX_EOF" termination list, with '\n'          *
- *    delimiter between elements.                                             *
- *    Each element represented as:                                            *
- *           <key>:<refresh time>:<last log size>:<modification time>         *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: parses list of active checks received from server                   *
+ *                                                                              *
+ * Parameters:                                                                  *
+ *     str                   - [IN] NULL terminated string received from server *
+ *     host                  - [IN] address of host                             *
+ *     port                  - [IN] port number on host                         *
+ *     config_revision_local - [IN/OUT] revision of processed configuration     *
+ *                                                                              *
+ * Comments:                                                                    *
+ *    String is represented as "ZBX_EOF" termination list, with '\n'            *
+ *    delimiter between elements.                                               *
+ *    Each element represented as:                                              *
+ *           <key>:<refresh time>:<last log size>:<modification time>           *
+ *                                                                              *
+ ********************************************************************************/
 static int	parse_list_of_checks(char *str, const char *host, unsigned short port,
 		zbx_uint32_t *config_revision_local)
 {
@@ -572,7 +575,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 	{
 		int	found = 0;
 
-		metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		metric = active_metrics.values[i];
 
 		/* 'Do-not-delete' exception for log[] and log.count[] items with <mode> parameter set */
 		/* to 'skip'. */
@@ -604,7 +607,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 						metric->persistent_file_name);
 			}
 #endif
-			zbx_vector_ptr_remove_noorder(&active_metrics, i);
+			zbx_vector_active_metrics_ptr_remove_noorder(&active_metrics, i);
 			free_active_metric(metric);
 			i--;	/* consider the same index on the next run */
 		}
@@ -765,17 +768,18 @@ out:
 	return ret;
 }
 
-/*********************************************************************************************
- *                                                                                           *
- * Purpose: processes configuration item and sets its value to respective parameter          *
- *                                                                                           *
- * Parameters: json - [OUT] pointer to JSON structure where to put resulting value           *
- *             config - [IN] pointer to configuration parameter                              *
- *             length - [IN] length of configuration parameter                               *
- *             proto - [IN] configuration parameter prototype                                *
- *             config_host_metadata_item - [IN]                                              *
- *                                                                                           *
- *********************************************************************************************/
+/************************************************************************************************
+ *                                                                                              *
+ * Purpose: processes configuration item and sets its value to respective parameter             *
+ *                                                                                              *
+ * Parameters:                                                                                  *
+ *     json                      - [OUT] pointer to JSON structure where to put resulting value *
+ *     config                    - [IN] pointer to configuration parameter                      *
+ *     length                    - [IN] length of configuration parameter                       *
+ *     proto                     - [IN] configuration parameter prototype                       *
+ *     config_host_metadata_item - [IN]                                                         *
+ *                                                                                              *
+ ************************************************************************************************/
 static void	process_config_item(struct zbx_json *json, const char *config, size_t length, const char *proto,
 		const char *config_host_metadata_item)
 {
@@ -1563,20 +1567,20 @@ static void	process_command(zbx_active_command_t *command)
 }
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
-/******************************************************************************
- *                                                                            *
- * Purpose: initializes element of preparation vector with available data     *
- *                                                                            *
- * Parameters: lastlogsize - [IN] lastlogize value to write into persistent   *
- *                                data file                                   *
- *             mtime - [IN] mtime value to write into persistent data file    *
- *             prep_vec_elem - [IN/OUT] element of vector to initialize       *
- *                                                                            *
- * Comments: This is a minimal initialization for using before sending status *
- *           updates or meta-data. It initializes only 2 attributes to be     *
- *           usable without any data about log files.                         *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: initializes element of preparation vector with available data       *
+ *                                                                              *
+ * Parameters:                                                                  *
+ *     lastlogsize   - [IN] lastlogize value to write into persistent data file *
+ *     mtime         - [IN] mtime value to write into persistent data file      *
+ *     prep_vec_elem - [IN/OUT] element of vector to initialize                 *
+ *                                                                              *
+ * Comments: This is a minimal initialization for using before sending status   *
+ *           updates or meta-data. It initializes only 2 attributes to be       *
+ *           usable without any data about log files.                           *
+ *                                                                              *
+ ********************************************************************************/
 static void	zbx_minimal_init_prep_vec_data(zbx_uint64_t lastlogsize, int mtime, zbx_pre_persistent_t *prep_vec_elem)
 {
 	if (NULL != prep_vec_elem->filename)
@@ -1638,7 +1642,7 @@ static void	process_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config
 	{
 		zbx_uint64_t		lastlogsize_last, lastlogsize_sent;
 		int			mtime_last, mtime_sent, ret;
-		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		ZBX_ACTIVE_METRIC	*metric = active_metrics.values[i];
 
 		if (metric->nextcheck > now)
 			continue;
@@ -1776,7 +1780,7 @@ static void	update_schedule(int delta)
 
 	for (i = 0; i < active_metrics.values_num; i++)
 	{
-		ZBX_ACTIVE_METRIC	*metric = (ZBX_ACTIVE_METRIC *)active_metrics.values[i];
+		ZBX_ACTIVE_METRIC	*metric = active_metrics.values[i];
 		metric->nextcheck += delta;
 	}
 

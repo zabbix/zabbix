@@ -36,8 +36,6 @@
 typedef HANDLE EVT_HANDLE, *PEVT_HANDLE;
 /* winevt.h contents END */
 
-/* extern int	CONFIG_EVENTLOG_MAX_LINES_PER_SECOND; */
-
 LONG WINAPI	DelayLoadDllExceptionFilter(PEXCEPTION_POINTERS excpointers)
 {
 	LONG		disposition = EXCEPTION_EXECUTE_HANDLER;
