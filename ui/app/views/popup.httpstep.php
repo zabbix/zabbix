@@ -109,8 +109,11 @@ $http_popup_form_list->addRow(_('Post fields'),
 		'post-fields-row'
 );
 
-$http_popup_form_list->addRow(_('Raw post'), (new CTextArea('posts', $options['posts']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'post-raw-row'
+$http_popup_form_list->addRow(_('Raw post'),
+	(new CTextArea('posts', $options['posts']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->disableSpellcheck(),
+	'post-raw-row'
 );
 
 $http_popup_form_list->addRow(_('Variables'),
