@@ -26,7 +26,7 @@
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
 
-static zbx_uint64_t	flags_get(zbx_mock_handle_t	htag)
+static zbx_uint64_t	flags_get(zbx_mock_handle_t htag)
 {
 	zbx_mock_handle_t	hflags, hflag;
 	int			flags_num = 1;
