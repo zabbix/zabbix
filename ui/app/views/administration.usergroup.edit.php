@@ -178,7 +178,7 @@ $templates_multiselect = (new CMultiSelect([
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $template_permissions_row_template = (new CTemplateTag('template-permissions-row-template'))->addItem(
-	new CRow([
+	(new CRow([
 		$templates_multiselect,
 		(new CCol(
 			(new CRadioButtonList('new_templategroup_right[permission][#{rowid}]', PERM_DENY))
@@ -192,7 +192,8 @@ $template_permissions_row_template = (new CTemplateTag('template-permissions-row
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		))->setAttribute('style', 'vertical-align: top')
-	])
+	]))
+		->addClass('form_row')
 );
 
 $template_permissions_form_grid->addItem($template_permissions_row_template);
@@ -235,7 +236,7 @@ $hosts_multiselect = (new CMultiSelect([
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $host_permissions_row_template = (new CTemplateTag('host-permissions-row-template'))->addItem(
-	new CRow([
+	(new CRow([
 		$hosts_multiselect,
 		(new CCol(
 			(new CRadioButtonList('new_group_right[permission][#{rowid}]', PERM_DENY))
@@ -249,7 +250,8 @@ $host_permissions_row_template = (new CTemplateTag('host-permissions-row-templat
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		))->setAttribute('style', 'vertical-align: top')
-	])
+	]))
+		->addClass('form_row')
 );
 
 $host_permissions_form_grid->addItem($host_permissions_row_template);
@@ -292,7 +294,7 @@ $tag_filter_multiselect = (new CMultiSelect([
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 $tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addItem(
-	new CRow([
+	(new CRow([
 		$tag_filter_multiselect,
 		(new CCol(
 			(new CTextBox('new_tag_filter[tag][#{rowid}]'))
@@ -309,7 +311,8 @@ $tag_filter_row_template = (new CTemplateTag('tab-filter-row-template'))->addIte
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-remove')
 		))->setAttribute('style', 'vertical-align: top')
-	])
+	]))
+		->addClass('form_row')
 );
 
 $tag_filter_form_grid->addItem($tag_filter_row_template);

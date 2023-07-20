@@ -1007,15 +1007,30 @@ class TagFilterTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#new-tag-filter-table tbody tr')
-			.length > 2;
+		return [...document.querySelectorAll('#new-tag-filter-table .form_row')]
+			.filter((row) => {
+				const liElements = row.querySelectorAll('.multiselect-list li');
+
+				return liElements.length > 0;
+			})
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('new-tag-filter-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1413,15 +1428,30 @@ class TemplatePermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#new-templategroup-right-table tbody tr')
-			.length > 2;
+		return [...document.querySelectorAll('#new-templategroup-right-table .form_row')]
+			.filter((row) => {
+				const liElements = row.querySelectorAll('.multiselect-list li');
+
+				return liElements.length > 0;
+			})
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('new-templategroup-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
@@ -1432,15 +1462,30 @@ class HostPermissionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#new-group-right-table tbody tr')
-			.length > 2;
+		return [...document.querySelectorAll('#new-group-right-table .form_row')]
+			.filter((row) => {
+				const liElements = row.querySelectorAll('.multiselect-list li');
+
+				return liElements.length > 0;
+			})
+			.length;
 	}
 
 	initObserver() {
-		document.addEventListener(TAB_INDICATOR_UPDATE_EVENT, () => {
-			this.addAttributes();
-		});
+		const target_node = document.getElementById('new-group-right-table');
+
+		if (target_node !== null) {
+			const observer = new MutationObserver(() => {
+				this.addAttributes();
+			});
+
+			observer.observe(target_node, {
+				childList: true,
+				attributes: true,
+				attributeFilter: ['value', 'style'],
+				subtree: true
+			});
+		}
 	}
 }
 
