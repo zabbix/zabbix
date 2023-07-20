@@ -614,7 +614,9 @@ class C52ImportConverter extends CConverter {
 				if ($expression_parser->parse($new_trigger_expression) == CParser::PARSE_SUCCESS) {
 					foreach ($expression_parser->getResult()->getHosts() as $old_name) {
 						$new_name = self::prepareTemplateName($old_name);
-						$new_trigger_expression = triggerExpressionReplaceHost($new_trigger_expression, $old_name, $new_name);
+						$new_trigger_expression = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+							$new_trigger_expression, $old_name, $new_name
+						);
 					}
 				}
 
@@ -626,8 +628,8 @@ class C52ImportConverter extends CConverter {
 					if ($expression_parser->parse($new_trigger_recovery_expression) == CParser::PARSE_SUCCESS) {
 						foreach ($expression_parser->getResult()->getHosts() as $old_name) {
 							$new_name = self::prepareTemplateName($old_name);
-							$new_trigger_recovery_expression = triggerExpressionReplaceHost($new_trigger_recovery_expression,
-								$old_name, $new_name
+							$new_trigger_recovery_expression = CTriggerGeneralHelper::getExpressionWithReplacedHost(
+								$new_trigger_recovery_expression, $old_name, $new_name
 							);
 						}
 					}

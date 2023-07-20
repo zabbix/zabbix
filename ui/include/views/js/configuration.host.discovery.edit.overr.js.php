@@ -519,21 +519,17 @@
 			frag.appendChild(hiddenInput('name', override.data.name, prefix_override));
 			frag.appendChild(hiddenInput('stop', override.data.stop, prefix_override));
 
-			if (override.data.overrides_filters.length > 0) {
-				frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
+			frag.appendChild(hiddenInput('evaltype', override.data.overrides_evaltype, prefix_filter));
+			frag.appendChild(hiddenInput('formula', override.data.overrides_formula, prefix_filter));
 
-				if (override.data.overrides_evaltype == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
-					frag.appendChild(hiddenInput('formula', override.data.overrides_formula, prefix_filter));
-				}
+			override.data.overrides_filters.forEach(function(override_filter) {
+				var prefix = prefix_filter + '[conditions][' + (iter_filters++) + ']';
 
-				override.data.overrides_filters.forEach(function(override_filter) {
-					var prefix = prefix_filter + '[conditions][' + (iter_filters++) + ']';
-					frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
-					frag.appendChild(hiddenInput('macro', override_filter.macro, prefix));
-					frag.appendChild(hiddenInput('value', override_filter.value, prefix));
-					frag.appendChild(hiddenInput('operator', override_filter.operator, prefix));
-				});
-			}
+				frag.appendChild(hiddenInput('formulaid', override_filter.formulaid, prefix));
+				frag.appendChild(hiddenInput('macro', override_filter.macro, prefix));
+				frag.appendChild(hiddenInput('value', override_filter.value, prefix));
+				frag.appendChild(hiddenInput('operator', override_filter.operator, prefix));
+			});
 
 			override.data.operations.forEach(function(operation) {
 				var prefix = prefix_override + '[operations][' + (iter_operations++) + ']';
@@ -820,16 +816,10 @@
 		this.$form.trimValues(['input[type="text"]']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
-		var form_data = this.$form.serializeJSON();
-		if (Object.keys(form_data.overrides_filters).length <= 1) {
-			delete form_data.overrides_formula;
-			delete form_data.overrides_evaltype;
-		}
-
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: form_data,
+			data: this.$form.serializeJSON(),
 			dataType: 'json',
 			type: 'post'
 		})
@@ -864,6 +854,25 @@
 		this.data = {};
 		this.new_id = 0;
 		this.sort_index = [];
+
+		operations.sort((a, b) => {
+			const a_operator = this.operatorName(a.operator);
+			const b_operator = this.operatorName(b.operator);
+
+			if (a.operationobject < b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator < b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value < b.value)) {
+				return -1;
+			}
+
+			if (a.operationobject > b.operationobject
+					|| (a.operationobject === b.operationobject && a_operator > b_operator)
+					|| (a.operationobject === b.operationobject && a_operator === b_operator && a.value > b.value)) {
+				return 1;
+			}
+
+			return 0;
+		});
 
 		operations.forEach(function(operation, no) {
 			this.data[no + 1] = new Operation(operation, no + 1);

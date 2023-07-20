@@ -667,6 +667,8 @@ typedef struct
 }
 zbx_dc_drule_t;
 
+ZBX_PTR_VECTOR_DECL(dc_drule_ptr, zbx_dc_drule_t *)
+
 int	zbx_is_item_processed_by_server(unsigned char type, const char *key);
 int	zbx_is_counted_in_item_queue(unsigned char type, const char *key);
 int	zbx_in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
@@ -1182,9 +1184,9 @@ int	zbx_dc_get_proxy_name_type_by_id(zbx_uint64_t proxyid, int *status, char **n
 /* special item key used for ICMP ping loss packages */
 #define ZBX_SERVER_ICMPPINGLOSS_KEY	"icmppingloss"
 
-zbx_dc_drule_t	*zbx_dc_drule_next(time_t now, time_t *nextcheck);
-void		zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
-void		zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
+void	zbx_dc_drules_get(time_t now, zbx_vector_dc_drule_ptr_t *drules, time_t *nextcheck);
+void	zbx_dc_drule_queue(time_t now, zbx_uint64_t druleid, int delay);
+void	zbx_dc_drule_revisions_get(zbx_vector_uint64_pair_t *revisions);
 
 int	zbx_dc_httptest_next(time_t now, zbx_uint64_t *httptestid, time_t *nextcheck);
 void	zbx_dc_httptest_queue(time_t now, zbx_uint64_t httptestid, int delay);

@@ -79,12 +79,14 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -126,13 +128,15 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('post_fields[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('post_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -151,6 +155,7 @@ $form_grid = (new CFormGrid())
 			(new CTextArea('posts', $data['form']['posts']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setMaxlength(DB::getFieldLength('httpstep', 'posts'))
+				->disableSpellcheck()
 		))->addClass('js-field-posts')
 	])
 	->addItem([
@@ -171,13 +176,15 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('variables[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
@@ -208,13 +215,15 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
-							->setAttribute('placeholder', _('name')),
+							->setAttribute('placeholder', _('name'))
+							->disableSpellcheck(),
 						RARR(),
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
 							->setMaxlength(2000)
-							->setAttribute('placeholder', _('value')),
+							->setAttribute('placeholder', _('value'))
+							->disableSpellcheck(),
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
