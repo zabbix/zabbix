@@ -113,7 +113,7 @@ class CControllerDiscoveryList extends CController {
 				: [];
 
 			foreach ($data['drules'] as &$drule) {
-				$drule['proxy'] = (array_key_exists($drule['proxyid'], $proxies))
+				$drule['proxy'] = array_key_exists($drule['proxyid'], $proxies)
 					? $drule['proxy'] = $proxies[$drule['proxyid']]['name']
 					: '';
 
