@@ -1100,14 +1100,13 @@ footer {
     width: 100%; }
     .form-grid table.table-initial-width {
       width: auto; }
-    .form-grid table .form_row td {
-      line-height: 24px; }
+    .form-grid table .form_row td,
     .form-grid table .sortable td {
       line-height: 24px; }
-      .form-grid table .sortable td.td-drag-icon {
-        line-height: inherit; }
-      .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
-        line-height: 1.4em; }
+    .form-grid table .sortable td.td-drag-icon {
+      line-height: inherit; }
+    .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+      line-height: 1.4em; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #cacaca; }

@@ -188,13 +188,14 @@
 			width: auto;
 		}
 
-		.form_row td {
-			line-height: 24px;
+		.form_row,
+		.sortable {
+			td {
+				line-height: 24px;
+			}
 		}
 
 		.sortable td {
-			line-height: 24px;
-
 			&.td-drag-icon {
 				line-height: inherit;
 			}
