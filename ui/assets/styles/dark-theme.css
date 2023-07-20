@@ -4,7 +4,7 @@
   .timeline-axis::before {
     background-color: #454f55 !important; }
 
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -1131,10 +1131,11 @@ footer {
       width: auto; }
     .form-grid table .sortable td {
       padding-bottom: 0;
-      vertical-align: middle;
       line-height: 24px; }
       .form-grid table .sortable td.td-drag-icon {
         line-height: inherit; }
+      .form-grid table .sortable td.wordbreak, .form-grid table .sortable td.wordwrap {
+        line-height: 1.4; }
   .form-grid th {
     padding: 0 5px 0 0;
     color: #737373; }
@@ -1159,13 +1160,20 @@ footer {
   .form-grid.form-grid-1-1 .form-field:not(.field-fluid), .form-grid.form-grid-3-1 .form-field:not(.field-fluid) {
     grid-column-start: initial;
     grid-column-end: span 1; }
+  .form-grid .table-forms,
   .form-grid .table-forms-separator {
-    display: inline-flex;
-    line-height: 1.4; }
+    line-height: 1.4em; }
+    .form-grid .table-forms td,
     .form-grid .table-forms-separator td {
-      padding: 5px 5px 5px 0; }
+      padding: 5px 5px 0 0; }
+      .form-grid .table-forms td:last-child,
+      .form-grid .table-forms-separator td:last-child {
+        padding-right: 0; }
+    .form-grid .table-forms tfoot td,
     .form-grid .table-forms-separator tfoot td {
       padding-bottom: 0; }
+  .form-grid .table-forms-separator {
+    display: inline-flex; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
@@ -3219,6 +3227,41 @@ section {
   .subfilter-enabled sup {
     color: #8f8f8f; }
 
+.svg-gauge {
+  fill: #f2f2f2; }
+  .svg-gauge .svg-gauge-description {
+    text-anchor: middle; }
+  .svg-gauge .svg-gauge-thresholds-arc-sector,
+  .svg-gauge .svg-gauge-empty-arc-sector {
+    fill: #383838; }
+  .svg-gauge .svg-gauge-value-arc-sector {
+    fill: #69808d; }
+  .svg-gauge .svg-gauge-value-arc-sector,
+  .svg-gauge .svg-gauge-empty-arc-sector {
+    transition: fill 0.5s ease-in-out; }
+  .svg-gauge .svg-gauge-needle {
+    fill: #f2f2f2;
+    stroke: #f2f2f2;
+    vector-effect: non-scaling-stroke;
+    transition: fill 0.5s ease-in-out, stroke 0.5s ease-in-out; }
+    .svg-gauge .svg-gauge-needle.svg-gauge-needle-light {
+      stroke: rgba(0, 0, 0, 0.2); }
+    .svg-gauge .svg-gauge-needle.svg-gauge-needle-dark {
+      stroke: rgba(255, 255, 255, 0.3); }
+  .svg-gauge .svg-gauge-label-left {
+    text-anchor: end; }
+  .svg-gauge .svg-gauge-label-center {
+    text-anchor: middle; }
+  .svg-gauge .svg-gauge-value,
+  .svg-gauge .svg-gauge-units {
+    text-anchor: middle; }
+  .svg-gauge .svg-gauge-no-data {
+    text-anchor: middle;
+    fill: #737373; }
+
+.svg-gauge .svg-gauge-needle.svg-gauge-needle-dark {
+  stroke: rgba(255, 255, 255, 0.2); }
+
 .svg-graph {
   display: block; }
 
@@ -3681,6 +3724,56 @@ div.dashboard-widget-clock .clock-digital {
     color: #737373;
     font-weight: bold; }
 
+form.dashboard-widget-gauge .fields-group.fields-group-colors, form.dashboard-widget-gauge .fields-group.fields-group-description, form.dashboard-widget-gauge .fields-group.fields-group-value, form.dashboard-widget-gauge .fields-group.fields-group-needle, form.dashboard-widget-gauge .fields-group.fields-group-scale, form.dashboard-widget-gauge .fields-group.fields-group-thresholds {
+  display: grid;
+  grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
+  align-items: center;
+  column-gap: 10px;
+  row-gap: 5px; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors label, form.dashboard-widget-gauge .fields-group.fields-group-description label, form.dashboard-widget-gauge .fields-group.fields-group-value label, form.dashboard-widget-gauge .fields-group.fields-group-needle label, form.dashboard-widget-gauge .fields-group.fields-group-scale label, form.dashboard-widget-gauge .fields-group.fields-group-thresholds label {
+    text-align: right; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors hr, form.dashboard-widget-gauge .fields-group.fields-group-description hr, form.dashboard-widget-gauge .fields-group.fields-group-value hr, form.dashboard-widget-gauge .fields-group.fields-group-needle hr, form.dashboard-widget-gauge .fields-group.fields-group-scale hr, form.dashboard-widget-gauge .fields-group.fields-group-thresholds hr {
+    grid-column: 1 / -1;
+    margin: 0;
+    width: 100%;
+    border: solid #383838;
+    border-width: 1px 0 0 0; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-description .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-value .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-fluid, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-fluid {
+    grid-column: 2 / -1; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-description .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-value .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-needle .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-scale .offset-3, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .offset-3 {
+    grid-column-start: 3; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-description .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-value .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-needle .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-scale .field-size input, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .field-size input {
+    margin-right: 5px; }
+  form.dashboard-widget-gauge .fields-group.fields-group-colors .form-field, form.dashboard-widget-gauge .fields-group.fields-group-description .form-field, form.dashboard-widget-gauge .fields-group.fields-group-value .form-field, form.dashboard-widget-gauge .fields-group.fields-group-needle .form-field, form.dashboard-widget-gauge .fields-group.fields-group-scale .form-field, form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field {
+    line-height: 24px; }
+form.dashboard-widget-gauge .fields-group.fields-group-colors {
+  grid-template-columns: repeat(3, minmax(100px, max-content) 1fr); }
+form.dashboard-widget-gauge .fields-group.fields-group-description .form-field:nth-child(1) {
+  grid-column: 1 / -1; }
+form.dashboard-widget-gauge .fields-group.fields-group-value .units-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-value .units-show label[for='units'] {
+    width: 100%; }
+form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-needle .needle-show label[for='lbl_needle_color'] {
+    width: 100%; }
+form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show {
+  display: flex; }
+  form.dashboard-widget-gauge .fields-group.fields-group-scale .scale-show label[for='scale_show_units'] {
+    width: 100%; }
+form.dashboard-widget-gauge .fields-group.fields-group-thresholds .form-field:first-child {
+  grid-column: 1 / -1; }
+
+div.dashboard-widget-gauge {
+  overflow-x: hidden; }
+  div.dashboard-widget-gauge .dashboard-grid-widget-body a {
+    display: block; }
+    div.dashboard-widget-gauge .dashboard-grid-widget-body a:hover, div.dashboard-widget-gauge .dashboard-grid-widget-body a:focus, div.dashboard-widget-gauge .dashboard-grid-widget-body a:active {
+      border: 0; }
+    div.dashboard-widget-gauge .dashboard-grid-widget-body a svg {
+      display: block; }
+
 div.dashboard-widget-hostavail .host-avail-widget td:not(:first-child) {
   border-left: 1px dotted #383838; }
 div.dashboard-widget-hostavail .host-avail-widget .host-avail-true {
@@ -3702,7 +3795,7 @@ div.dashboard-widget-hostavail .host-avail-widget .host-avail-total {
 
 form.dashboard-widget-item .fields-group.fields-group-description, form.dashboard-widget-item .fields-group.fields-group-value, form.dashboard-widget-item .fields-group.fields-group-time, form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   display: grid;
-  grid-template-columns: minmax(100px, max-content) 3fr max-content auto;
+  grid-template-columns: minmax(100px, max-content) 1fr max-content minmax(95px, max-content);
   align-items: center;
   column-gap: 10px;
   row-gap: 5px; }
@@ -3722,12 +3815,10 @@ form.dashboard-widget-item .fields-group.fields-group-description, form.dashboar
     line-height: 24px; }
 form.dashboard-widget-item .fields-group.fields-group-description .form-field:nth-child(1) {
   grid-column: 1 / -1; }
-form.dashboard-widget-item .fields-group.fields-group-value {
-  grid-template-columns: minmax(100px, max-content) 3fr max-content auto; }
-  form.dashboard-widget-item .fields-group.fields-group-value .units-show {
-    display: flex; }
-    form.dashboard-widget-item .fields-group.fields-group-value .units-show label[for='units'] {
-      width: 100%; }
+form.dashboard-widget-item .fields-group.fields-group-value .units-show {
+  display: flex; }
+  form.dashboard-widget-item .fields-group.fields-group-value .units-show label[for='units'] {
+    width: 100%; }
 form.dashboard-widget-item .fields-group.fields-group-change-indicator {
   grid-template-columns: repeat(3, max-content 96px); }
   form.dashboard-widget-item .fields-group.fields-group-change-indicator .input-color-picker {
@@ -3871,7 +3962,7 @@ div.dashboard-widget-map .btn-back-map-container {
   to {
     opacity: 1; } }
 div.dashboard-widget-navtree .navtree .tree .tree-list .margin-lvl {
-  display: inline-block; }
+  flex-shrink: 0; }
 div.dashboard-widget-navtree .navtree .tree .tree-list.root > .tree-item > .tree-row > .content > .margin-lvl {
   width: 15px; }
 div.dashboard-widget-navtree .navtree .tree .tree-list > .tree-item.ui-sortable-helper .content {
@@ -3973,7 +4064,10 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row:hover {
     background-color: #383838; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content {
-    position: relative; }
+    position: relative;
+    display: flex;
+    align-items: center;
+    min-width: 0; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content .arrow {
       display: inline-block;
       width: 16px;
@@ -3983,7 +4077,6 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .content > .item-name {
       white-space: nowrap;
       overflow: hidden;
-      margin-right: 5px;
       text-overflow: ellipsis;
       line-height: 1.5; }
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .problem-icon-list {
@@ -3994,7 +4087,8 @@ div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row {
   div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools {
     padding-left: 10px;
     margin-right: 5px;
-    width: 87px; }
+    width: 87px;
+    white-space: nowrap; }
     div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon:not(:first-child) {
       margin-left: 5px; }
 div.dashboard-widget-navtree .navtree .tree .tree-item.is-parent > .tree-row > .content > .arrow > .treeview {
@@ -5388,10 +5482,8 @@ z-select button.focusable,
   .overlay-dialogue .table-paging {
     border: 0;
     border-top: 1px solid #383838; }
-  .overlay-dialogue .table-forms-td-right td {
-    vertical-align: middle; }
-    .overlay-dialogue .table-forms-td-right td label {
-      display: block; }
+  .overlay-dialogue .table-forms-td-right td label {
+    display: block; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -6690,6 +6782,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
 .form-grid .subscriptions-table .icon {
   margin-right: 3px;
   vertical-align: text-bottom; }
+.form-grid .tags-table {
+  width: auto; }
+  .form-grid .tags-table tr:not(.form_row) td {
+    padding-top: 0; }
 
 .import-compare {
   display: flex;
@@ -6711,6 +6807,10 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty),
     float: left;
     margin-left: -1em; }
 
+.overlay-dialogue #host-form #tagsFormList .form-field,
+.overlay-dialogue #host-form #macrosFormList .form-field,
+.overlay-dialogue #host-form #valuemap-formlist .form-field {
+  grid-column-start: 1; }
 .overlay-dialogue #host-form #tagsFormList .table-forms-td-left,
 .overlay-dialogue #host-form #macrosFormList .table-forms-td-left,
 .overlay-dialogue #host-form #valuemap-formlist .table-forms-td-left {

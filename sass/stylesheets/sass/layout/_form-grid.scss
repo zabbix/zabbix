@@ -190,11 +190,15 @@
 
 		.sortable td {
 			padding-bottom: 0;
-			vertical-align: middle;
 			line-height: 24px;
 
 			&.td-drag-icon {
 				line-height: inherit;
+			}
+
+			&.wordbreak,
+			&.wordwrap {
+				line-height: 1.4;
 			}
 		}
 
@@ -255,12 +259,16 @@
 		}
 	}
 
+	.table-forms,
 	.table-forms-separator {
-		display: inline-flex;
-		line-height: 1.4;
+		line-height: $body-line-height;
 
 		td {
-			padding: 5px 5px 5px 0;
+			padding: 5px 5px 0 0;
+
+			&:last-child {
+				padding-right: 0;
+			}
 		}
 
 		tfoot {
@@ -268,5 +276,9 @@
 				padding-bottom: 0;
 			}
 		}
+	}
+
+	.table-forms-separator {
+		display: inline-flex;
 	}
 }

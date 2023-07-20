@@ -1353,6 +1353,10 @@ msgstr "Og"
 msgid "And/Or"
 msgstr "Og/Eller"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr ""
@@ -1427,6 +1431,19 @@ msgstr "Apr"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "April"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -2438,6 +2455,11 @@ msgstr "Kan ikke opprette avhengighet av selve utløserprototypen."
 msgid "Cannot create discovery rule"
 msgstr "Kan ikke opprette oppdagelsesregel"
 
+#: app/controllers/CControllerCorrelationCreate.php:48
+#: app/controllers/CControllerCorrelationCreate.php:115
+msgid "Cannot create event correlation"
+msgstr ""
+
 #: app/controllers/CControllerIconMapCreate.php:56
 msgid "Cannot create icon map"
 msgstr "Kan ikke opprette ikonskart"
@@ -2473,6 +2495,10 @@ msgstr "Kan ikke opprette konfigurasjonsfil."
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
+msgstr ""
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:56
+msgid "Cannot create web scenario step"
 msgstr ""
 
 #: app/controllers/CControllerTokenDelete.php:76
@@ -2540,6 +2566,12 @@ msgstr[1] "Kan ikke slette gjenkjenningsregel"
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
 msgstr "Kan ikke slette gjenkjenningsregler"
+
+#: app/controllers/CControllerCorrelationDelete.php:68
+msgid "Cannot delete event correlation"
+msgid_plural "Cannot delete event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: graphs.php:279
 msgid "Cannot delete graph"
@@ -2841,6 +2873,12 @@ msgid_plural "Cannot disable discovery rules"
 msgstr[0] "Kan ikke deaktivere oppdagelsesregel"
 msgstr[1] "Kan ikke deaktivere oppdagelsesregler"
 
+#: app/controllers/CControllerCorrelationDisable.php:76
+msgid "Cannot disable event correlation"
+msgid_plural "Cannot disable event correlations"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
 msgid "Cannot disable host"
@@ -2936,6 +2974,12 @@ msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] "Kan ikke aktivere oppdagelsesregel"
 msgstr[1] "Kan ikke aktivere oppdagelsesregler"
+
+#: app/controllers/CControllerCorrelationEnable.php:76
+msgid "Cannot enable event correlation"
+msgid_plural "Cannot enable event correlations"
+msgstr[0] ""
+msgstr[1] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -3936,6 +3980,11 @@ msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerCorrelationUpdate.php:49
+#: app/controllers/CControllerCorrelationUpdate.php:117
+msgid "Cannot update event correlation"
+msgstr ""
+
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:134
 msgid "Cannot update events"
 msgstr ""
@@ -4166,6 +4215,10 @@ msgstr ""
 #: httpconf.php:194
 msgid "Cannot update web scenario"
 msgstr "Kan ikke oppdatere webscenario"
+
+#: app/controllers/CControllerWebScenarioStepCheck.php:57
+msgid "Cannot update web scenario step"
+msgstr ""
 
 #: app/views/administration.regex.edit.php:51
 msgid "Case sensitive"
@@ -4547,6 +4600,10 @@ msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:809
 msgid "Color (OK)"
+msgstr ""
+
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
 msgstr ""
 
 #: include/classes/widgets/forms/CWidgetForm.php:71
@@ -5316,6 +5373,10 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.list.php:201
 msgid "Create enabled"
 msgstr "Opprett aktivert"
+
+#: app/views/correlation.list.php:35
+msgid "Create event correlation"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:62
 msgid "Create graph"
@@ -6140,6 +6201,10 @@ msgstr "Slett dashbord?"
 msgid "Delete discovery rule?"
 msgstr "Slett oppdagelsesregel?"
 
+#: app/views/correlation.edit.php:330
+msgid "Delete event correlation?"
+msgstr ""
+
 #: include/views/configuration.trigger.prototype.edit.php:252
 #: include/views/configuration.trigger.prototype.edit.php:452
 #: include/views/configuration.triggers.edit.php:276
@@ -6270,6 +6335,14 @@ msgstr "Slett valgte registreringsregler?"
 #: jsLoader.php:273
 msgid "Delete selected elements?"
 msgstr "Slett valgte elementer?"
+
+#: app/views/js/correlation.list.js.php:107
+msgid "Delete selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:106
+msgid "Delete selected event correlations?"
+msgstr ""
 
 #: include/views/configuration.graph.list.php:269
 msgid "Delete selected graph prototype?"
@@ -6600,6 +6673,10 @@ msgstr ""
 msgid "Description"
 msgstr "Beskrivelse"
 
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
 msgstr ""
@@ -6766,6 +6843,14 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:329
 msgid "Disable selected discovery rules?"
 msgstr "Deaktivere utvalgte oppdagelsesregler?"
+
+#: app/views/js/correlation.list.js.php:158
+msgid "Disable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:157
+msgid "Disable selected event correlations?"
+msgstr ""
 
 #: app/views/administration.usergroup.list.php:229
 msgid "Disable selected group?"
@@ -7662,6 +7747,14 @@ msgstr ""
 msgid "Enable selected discovery rules?"
 msgstr "Aktiver valgte registreringsregler?"
 
+#: app/views/js/correlation.list.js.php:132
+msgid "Enable selected event correlation?"
+msgstr ""
+
+#: app/views/js/correlation.list.js.php:131
+msgid "Enable selected event correlations?"
+msgstr ""
+
 #: app/views/administration.usergroup.list.php:219
 msgid "Enable selected group?"
 msgstr ""
@@ -7923,11 +8016,46 @@ msgstr "Hendelse bekreftet"
 msgid "Event correlation"
 msgstr "Hendelse korrelasjon"
 
+#: include/classes/api/services/CCorrelation.php:536
+#, c-format
+msgid "Event correlation \"%1$s\" already exists."
+msgstr ""
+
+#: app/controllers/CControllerCorrelationCreate.php:107
+msgid "Event correlation created"
+msgstr ""
+
+#: app/controllers/CControllerCorrelationDelete.php:60
+msgid "Event correlation deleted"
+msgid_plural "Event correlations deleted"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationDisable.php:68
+msgid "Event correlation disabled"
+msgid_plural "Event correlations disabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerCorrelationEnable.php:68
+msgid "Event correlation enabled"
+msgid_plural "Event correlations enabled"
+msgstr[0] ""
+msgstr[1] ""
+
+#: include/events.inc.php:201
+msgid "Event correlation rule"
+msgstr ""
+
 #: app/controllers/CControllerCorrelationEdit.php:114
 #: app/controllers/CControllerCorrelationList.php:128
 #: app/views/configuration.correlation.edit.php:30
 msgid "Event correlation rules"
 msgstr "Hendelse korrelasjonsregler"
+
+#: app/controllers/CControllerCorrelationUpdate.php:109
+msgid "Event correlation updated"
+msgstr ""
 
 #: tr_events.php:29 tr_events.php:176 tr_events.php:195
 msgid "Event details"
@@ -8648,6 +8776,10 @@ msgstr "GUI"
 #: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "GUI-tilgang deaktivert."
+
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
@@ -13931,6 +14063,11 @@ msgstr ""
 msgid "Navigate to initial view"
 msgstr ""
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "Nettverksforskjell datalagringsperiode"
@@ -14038,6 +14175,10 @@ msgstr ""
 msgid "New element"
 msgstr "Nytt element"
 
+#: app/views/correlation.edit.php:310 app/views/correlation.edit.php:340
+msgid "New event correlation"
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:54
 #: include/classes/helpers/CCorrelationHelper.php:129
 msgid "New event host group"
@@ -14070,6 +14211,10 @@ msgstr ""
 msgid "New maintenance period"
 msgstr ""
 
+#: app/views/mediatype.edit.php:507 app/views/mediatype.edit.php:546
+msgid "New media type"
+msgstr ""
+
 #: app/views/popup.mediatypemapping.edit.php:73
 msgid "New media type mapping"
 msgstr ""
@@ -14093,6 +14238,10 @@ msgstr ""
 
 #: app/views/popup.service.edit.php:372 app/views/popup.service.edit.php:400
 msgid "New service"
+msgstr ""
+
+#: app/views/webscenario.step.edit.php:286
+msgid "New step of web scenario"
 msgstr ""
 
 #: app/views/popup.condition.common.php:120
@@ -17295,6 +17444,17 @@ msgstr "Løst av korrelasjonsregel \"%1$s\"."
 msgid "Resolved by correlation rule."
 msgstr "Løst av korrelasjonsregel."
 
+#: include/classes/screens/CScreenProblem.php:1408
+#: widgets/problems/includes/WidgetProblems.php:251
+#, c-format
+msgid "Resolved by event correlation rule \"%1$s\"."
+msgstr ""
+
+#: include/classes/screens/CScreenProblem.php:1411
+#: widgets/problems/includes/WidgetProblems.php:254
+msgid "Resolved by event correlation rule."
+msgstr ""
+
 #: app/views/monitoring.widget.problems.view.php:164
 #: include/classes/screens/CScreenProblem.php:995
 msgid "Resolved by inaccessible user."
@@ -17438,6 +17598,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:974
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
+msgstr ""
+
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
 msgstr ""
 
 #: include/classes/data/CItemData.php:850
@@ -17885,6 +18049,15 @@ msgstr "Lagre endringer"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "Lagre det som \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18580,6 +18753,10 @@ msgstr ""
 msgid "Show"
 msgstr "Vis"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18599,6 +18776,10 @@ msgstr ""
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "Vis verter under vedlikehold"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18691,6 +18872,10 @@ msgstr "Vis kun ubekreftet"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "Vis utilgjengelige kart"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -18989,6 +19174,10 @@ msgstr "Oppstartstid for Zabbix server, Unix tidsstempel."
 msgid "State"
 msgstr "Tilstand"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -18997,6 +19186,10 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
+msgstr ""
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
 msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
@@ -21040,6 +21233,10 @@ msgstr ""
 msgid "Units"
 msgstr "Enheter"
 
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -22584,6 +22781,10 @@ msgstr "Verdi \"%1$s\" er ugyldig for parameter \"grid_show\". Valg er: \"%2$s\"
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "Verdien \"%1$s\" er for lang for felt \"%2$s\" %3$d tegn. Tillatt lengde er %4$d tegn."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Verdi cache effektivitet. Gyldige parametere er: forespørsler, treff og savner."
@@ -22652,6 +22853,10 @@ msgstr ""
 
 #: include/actions.inc.php:352
 msgid "Value of tag"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
 msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
@@ -25857,6 +26062,11 @@ msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] ""
 msgstr[1] ""
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

@@ -1390,12 +1390,12 @@ zabbix_export:
           master_item:
             key: node_exporter.get
           lld_macro_paths:
+            - lld_macro: '{#IFNAME}'
+              path: $.labels.device
             - lld_macro: '{#HELP}'
               path: $.help
             - lld_macro: '{#IFALIAS}'
               path: $.labels.ifalias
-            - lld_macro: '{#IFNAME}'
-              path: $.labels.device
             - lld_macro: '{#IFOPERSTATUS}'
               path: $.labels.operstate
           preprocessing:
@@ -1899,12 +1899,12 @@ zabbix_export:
           master_item:
             key: node_exporter.get
           lld_macro_paths:
-            - lld_macro: '{#FSDEVICE}'
-              path: $.labels.device
-            - lld_macro: '{#FSNAME}'
-              path: $.labels.mountpoint
             - lld_macro: '{#FSTYPE}'
               path: $.labels.fstype
+            - lld_macro: '{#FSNAME}'
+              path: $.labels.mountpoint
+            - lld_macro: '{#FSDEVICE}'
+              path: $.labels.device
             - lld_macro: '{#HELP}'
               path: $.help
           preprocessing:

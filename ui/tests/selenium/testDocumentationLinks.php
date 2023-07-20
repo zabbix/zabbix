@@ -913,11 +913,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'
@@ -1266,11 +1266,11 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[@id="tab_stepTab"]'
+							'element' => 'xpath://a[@id="tab_steps-tab"]'
 						],
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://div[@id="stepTab"]//button[text()="Add"]'
+							'element' => 'xpath://div[@id="steps-tab"]//button[text()="Add"]'
 						]
 					],
 					'doc_link' => '/en/manual/web_monitoring#configuring-steps'

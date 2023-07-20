@@ -2155,6 +2155,39 @@ zabbix_export:
             - name: Hardware
               widgets:
                 - type: graph
+                  'y': '20'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Disk: r/w IOPS, rate'
+                - type: graph
+                  'y': '25'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: INTEGER
+                      name: source_type
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'CockroachDB by HTTP'
+                        key: cockroachdb.disk.iops.in_progress.rate
+                - type: graph
+                  'y': '30'
+                  width: '24'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'CockroachDB by HTTP'
+                        name: 'CockroachDB: Network traffic'
+                - type: graph
                   width: '24'
                   height: '5'
                   fields:
@@ -2202,39 +2235,6 @@ zabbix_export:
                       value:
                         host: 'CockroachDB by HTTP'
                         name: 'CockroachDB: Disk: r/w, rate'
-                - type: graph
-                  'y': '20'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'CockroachDB by HTTP'
-                        name: 'CockroachDB: Disk: r/w IOPS, rate'
-                - type: graph
-                  'y': '25'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: source_type
-                      value: '1'
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'CockroachDB by HTTP'
-                        key: cockroachdb.disk.iops.in_progress.rate
-                - type: graph
-                  'y': '30'
-                  width: '24'
-                  height: '5'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'CockroachDB by HTTP'
-                        name: 'CockroachDB: Network traffic'
         - uuid: 41dce007bcf54762ad321ac944a8b63e
           name: Replication
           pages:

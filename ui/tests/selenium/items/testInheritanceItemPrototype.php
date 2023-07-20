@@ -80,7 +80,7 @@ class testInheritanceItemPrototype extends CLegacyWebTest {
 					'errors' => [
 						'Cannot inherit item prototype with key "item-prototype-test5[{#KEY}]" of template '.
 							'"Inheritance test template" to host "Template inheritance test host", because an item '.
-							'with the same key is already inherited from template "Inheritance test template 2".'
+							'prototype with the same key is already inherited from template "Inheritance test template 2".'
 					]
 				]
 			]
