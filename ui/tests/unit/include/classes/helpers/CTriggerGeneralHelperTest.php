@@ -21,7 +21,7 @@
 
 use PHPUnit\Framework\TestCase;
 
-class triggerExpressionReplaceHostTest extends TestCase {
+class CTriggerGeneralHelperTest extends TestCase {
 
 	/**
 	 * An array of trigger functions and parsed results.
@@ -73,7 +73,9 @@ class triggerExpressionReplaceHostTest extends TestCase {
 	 * @param string $source
 	 * @param string  $expected
 	*/
-	public function testTriggerExpressionReplaceHost($source, $src_host, $dst_host, $expected) {
-		$this->assertSame($expected, triggerExpressionReplaceHost($source, $src_host, $dst_host));
+	public function testExpressionWithReplacedHost($source, $src_host, $dst_host, $expected) {
+		$this->assertSame(
+			$expected, CTriggerGeneralHelper::getExpressionWithReplacedHost($source, $src_host, $dst_host)
+		);
 	}
 }
