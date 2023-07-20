@@ -23,10 +23,9 @@
 <script type="text/javascript">
 	const view = new class {
 
-		init({connect_timeout, default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions,
-				item_test_timeout, login_attempts, login_block, media_type_test_timeout, report_test_timeout,
-				script_timeout, snmptrap_logging, socket_timeout, uri_valid_schemes, url, validate_uri_schemes,
-				vault_provider, x_frame_options}) {
+		init({default_inventory_mode, iframe_sandboxing_enabled, iframe_sandboxing_exceptions, login_attempts,
+				login_block, snmptrap_logging, uri_valid_schemes, url, validate_uri_schemes, vault_provider,
+				x_frame_options}) {
 			$('#validate_uri_schemes').change(function() {
 				$('#uri_valid_schemes').prop('disabled', !this.checked);
 			});
@@ -79,14 +78,6 @@
 									.prop('checked', iframe_sandboxing_enabled == 0 ? 'false' : 'true')
 									.change();
 								$('#iframe_sandboxing_exceptions').val(iframe_sandboxing_exceptions);
-
-								// Communication with Zabbix server.
-								$('#socket_timeout').val(socket_timeout);
-								$('#connect_timeout').val(connect_timeout);
-								$('#media_type_test_timeout').val(media_type_test_timeout);
-								$('#script_timeout').val(script_timeout);
-								$('#item_test_timeout').val(item_test_timeout);
-								$('#report_test_timeout').val(report_test_timeout);
 							}
 						}
 					]

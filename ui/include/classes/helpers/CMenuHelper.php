@@ -341,6 +341,8 @@ class CMenuHelper {
 							->setAction('gui.edit'),
 						(new CMenuItem(_('Autoregistration')))
 							->setAction('autoreg.edit'),
+						(new CMenuItem(_('Timeouts')))
+							->setAction('timeouts.edit'),
 						(new CMenuItem(_('Images')))
 							->setAction('image.list')
 							->setAliases(['image.edit']),

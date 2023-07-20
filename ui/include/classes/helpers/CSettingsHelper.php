@@ -87,6 +87,15 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const GEOMAPS_ATTRIBUTION = 'geomaps_attribution';
 	public const HA_FAILOVER_DELAY = 'ha_failover_delay';
 	public const VAULT_PROVIDER = 'vault_provider';
+	public const TIMEOUT_ZABBIX_AGENT = 'timeout_zabbix_agent';
+	public const TIMEOUT_SIMPLE_CHECK = 'timeout_simple_check';
+	public const TIMEOUT_SNMP_AGENT = 'timeout_snmp_agent';
+	public const TIMEOUT_EXTERNAL_CHECK = 'timeout_external_check';
+	public const TIMEOUT_DB_MONITOR = 'timeout_db_monitor';
+	public const TIMEOUT_HTTP_AGENT = 'timeout_http_agent';
+	public const TIMEOUT_SSH_AGENT = 'timeout_ssh_agent';
+	public const TIMEOUT_TELNET_AGENT = 'timeout_telnet_agent';
+	public const TIMEOUT_SCRIPT = 'timeout_script';
 
 	/**
 	 * Settings API object parameters array.
