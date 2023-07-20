@@ -71,8 +71,6 @@ class CControllerTriggerPrototypeEdit extends CController {
 			return false;
 		}
 
-		$this->discovery_rule = reset($discovery_rule);
-
 		if ($this->hasInput('triggerid')) {
 			$this->trigger_prototype = API::TriggerPrototype()->get([
 				'output' => API_OUTPUT_EXTEND,

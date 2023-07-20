@@ -77,7 +77,9 @@ class CControllerTriggerPrototypeDisable extends CController {
 		$output = [];
 
 		if ($result) {
-			$output['success']['title'] = _n('Trigger prototype updated', 'Trigger prototypes updated', $triggers_count);
+			$output['success']['title'] = _n('Trigger prototype updated', 'Trigger prototypes updated',
+				$triggers_count
+			);
 
 			if ($messages = get_and_clear_messages()) {
 				$output['success']['messages'] = array_column($messages, 'message');

@@ -80,24 +80,24 @@ else {
 				new CRow([
 					!$data['readonly']
 						? (new CCheckBox(($data['expression_type'] === TRIGGER_EXPRESSION)
-						? 'expr_target_single' : 'recovery_expr_target_single', $e['id']
-					))
-						->setChecked($i == 0)
-						->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
-							? 'js-check-target'
-							: 'js-check-recovery-target'
-						)
-						->removeId()
+							? 'expr_target_single' : 'recovery_expr_target_single', $e['id']
+						))
+							->setChecked($i == 0)
+							->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
+								? 'js-check-target'
+								: 'js-check-recovery-target'
+							)
+							->removeId()
 						: null,
 					(new CDiv($e['list']))->addClass(ZBX_STYLE_WORDWRAP),
 					!$data['readonly']
 						? (new CCol((new CButtonLink(_('Remove')))
-						->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
-							? 'js_remove_expression'
-							: 'js_remove_recovery_expression'
-						)
-						->setAttribute('data-id', $e['id']))
-					)->addClass(ZBX_STYLE_NOWRAP)
+							->addClass(($data['expression_type'] === TRIGGER_EXPRESSION)
+								? 'js_remove_expression'
+								: 'js_remove_recovery_expression'
+							)
+							->setAttribute('data-id', $e['id']))
+						)->addClass(ZBX_STYLE_NOWRAP)
 						: null,
 					makeInformationList($info_icons)
 				])

@@ -60,10 +60,6 @@ class CUrlFactory {
 		'templates.php' => [
 			'remove' => ['templateid']
 		],
-		'trigger_prototypes.php' => [
-			'remove' =>  ['triggerid'],
-			'add' => ['parent_discoveryid', 'hostid']
-		],
 		'__default' => [
 			'remove' => ['cancel', 'form', 'delete']
 		]

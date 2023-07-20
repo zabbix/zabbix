@@ -115,7 +115,6 @@ $expression_row[] = (new CButton('insert_macro', _('Insert expression')))
 	->setEnabled(!$data['limited']);
 
 $expression_constructor_buttons = [];
-
 // Append "Add" button.
 $expression_constructor_buttons[] = (new CButton('add_expression', _('Add')))
 	->addStyle('display: none')

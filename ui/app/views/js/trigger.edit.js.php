@@ -149,7 +149,7 @@
 					this.#openRelatedTrigger(e.target.dataset);
 				}
 				else if (e.target.name === 'show_inherited_tags') {
-					this.#toggleInheritedTags(e.target.value);
+					this.#toggleInheritedTags();
 				}
 			});
 		}
@@ -185,18 +185,18 @@
 				multiselect: 1
 			};
 
-			if (button.id === 'prototype-add-dep-trigger') {
+			if (button.id === 'add-dep-trigger') {
 				popup_parameters.srctbl = 'triggers';
 				popup_parameters.hostid = button.dataset.hostid;
 				popup_parameters.with_triggers = 1;
 				popup_parameters.real_hosts = 1;
 				popup_parameters.normal_only = 1;
 			}
-			else if (button.id === 'add_dep_trigger_prototype') {
+			else if (button.id === 'add-dep-trigger-prototype') {
 				popup_parameters.srctbl = 'trigger_prototypes';
 				popup_parameters.parent_discoveryid = button.dataset.parent_discoveryid;
 			}
-			else if (button.id === 'add_dep_trigger_prototype') {
+			else if (button.id === 'add-dep-template-trigger') {
 				popup_parameters.srctbl = 'template_triggers';
 				popup_parameters.templateid = button.dataset.templateid;
 				popup_parameters.with_triggers = 1;
@@ -597,7 +597,7 @@
 				});
 		}
 
-		#toggleInheritedTags(value) {
+		#toggleInheritedTags() {
 			const form_refresh = document.createElement('input');
 
 			form_refresh.setAttribute('type', 'hidden');

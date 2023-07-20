@@ -108,10 +108,8 @@
 		}
 
 		#enable(target, triggerids) {
-			let confirmation;
-
 			if (target.dataset.status !== null && target.classList.contains('js-massenable-trigger')) {
-				confirmation = triggerids.length > 1
+				const confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as enabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as enabled?')) ?>;
 
@@ -127,10 +125,8 @@
 		}
 
 		#disable(target, triggerids) {
-			let confirmation;
-
 			if (target.dataset.status !== null && target.classList.contains('js-massdisable-trigger')) {
-				confirmation = triggerids.length > 1
+				const confirmation = triggerids.length > 1
 					? <?= json_encode(_('Create triggers from selected prototypes as disabled?')) ?>
 					: <?= json_encode(_('Create triggers from selected prototype as disabled?')) ?>;
 
@@ -181,7 +177,7 @@
 			if (target.dataset.status !== null) {
 				fields.status = target.dataset.status;
 			}
-			else {
+			else if (target.dataset.discover !== null) {
 				fields.discover = target.dataset.discover;
 			}
 

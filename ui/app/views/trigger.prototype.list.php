@@ -132,7 +132,6 @@ foreach ($data['triggers'] as $trigger) {
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(triggerIndicatorStyle($trigger['status']));
 
-
 	$nodiscover = ($trigger['discover'] == ZBX_PROTOTYPE_NO_DISCOVER);
 	$discover = (new CLink($nodiscover ? _('No') : _('Yes')))
 		->setAttribute('data-triggerid', $triggerid)

@@ -94,13 +94,12 @@ class CControllerTriggerPrototypeUpdate extends CController {
 		if (!$db_trigger_prototypes) {
 			return false;
 		}
-		else {
-			$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
-				['sources' => ['expression', 'recovery_expression']]
-			);
 
-			$this->db_trigger_prototype = reset($db_trigger_prototypes);
-		}
+		$db_trigger_prototypes = CMacrosResolverHelper::resolveTriggerExpressions($db_trigger_prototypes,
+			['sources' => ['expression', 'recovery_expression']]
+		);
+
+		$this->db_trigger_prototype = reset($db_trigger_prototypes);
 
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
@@ -122,6 +121,7 @@ class CControllerTriggerPrototypeUpdate extends CController {
 				case ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION:
 					$trigger_prototype['recovery_expression'] = $this->getInput('recovery_expression', '');
 				// break; is not missing here.
+
 				case ZBX_RECOVERY_MODE_EXPRESSION:
 					$trigger_prototype['correlation_mode'] = $this->getInput('correlation_mode', ZBX_TRIGGER_CORRELATION_NONE);
 

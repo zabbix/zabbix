@@ -90,15 +90,16 @@ class CControllerTriggerList extends CController {
 			$filter_name = '';
 			$filter_priority = [];
 			$filter_groupids = [];
-			$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray($prefix.'trigger.list.filter_hostids', []));
-			if (count($filter_hostids) != 1) {
-				$filter_hostids = [];
-			}
 			$filter_state = -1;
 			$filter_status = -1;
 			$filter_value = -1;
 			$filter_evaltype = TAG_EVAL_TYPE_AND_OR;
 			$filter_tags = [];
+			$filter_hostids = $this->getInput('filter_hostids', CProfile::getArray($prefix.'trigger.list.filter_hostids', []));
+
+			if (count($filter_hostids) != 1) {
+				$filter_hostids = [];
+			}
 		}
 		else {
 			$filter_inherited = CProfile::get($prefix.'trigger.list.filter_inherited', -1);
@@ -112,7 +113,6 @@ class CControllerTriggerList extends CController {
 			$filter_status = CProfile::get($prefix.'trigger.list.filter_status', -1);
 			$filter_value = CProfile::get($prefix.'trigger.list.filter_value', -1);
 			$filter_evaltype = CProfile::get($prefix.'trigger.list.filter.evaltype', TAG_EVAL_TYPE_AND_OR);
-
 			$filter_tags = [];
 
 			foreach (CProfile::getArray($prefix.'trigger.list.filter.tags.tag', []) as $i => $tag) {
@@ -193,6 +193,7 @@ class CControllerTriggerList extends CController {
 		if ($filter_name !== '') {
 			$options['search']['description'] = $filter_name;
 		}
+
 		if ($filter_priority) {
 			$options['filter']['priority'] = $filter_priority;
 		}
@@ -220,6 +221,7 @@ class CControllerTriggerList extends CController {
 		}
 
 		$prefetched_triggers = API::Trigger()->get($options);
+
 		if ($sort === 'status') {
 			orderTriggersByStatus($prefetched_triggers, $sort_order);
 		}
@@ -435,6 +437,5 @@ class CControllerTriggerList extends CController {
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of triggers'));
 		$this->setResponse($response);
-
 	}
 }

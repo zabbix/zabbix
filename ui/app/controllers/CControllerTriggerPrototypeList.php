@@ -98,6 +98,7 @@ class CControllerTriggerPrototypeList extends CController {
 			'sortfield' => $sort_field,
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
+
 		$data['triggers'] = API::TriggerPrototype()->get($options);
 
 		order_result($data['triggers'], $sort_field, $sort_order);
@@ -118,6 +119,7 @@ class CControllerTriggerPrototypeList extends CController {
 			'selectTags' => ['tag', 'value'],
 			'triggerids' => array_column($data['triggers'], 'triggerid')
 		]);
+
 		order_result($data['triggers'], $sort_field, $sort_order);
 
 		$data['tags'] = makeTags($data['triggers'], true, 'triggerid');
@@ -130,9 +132,6 @@ class CControllerTriggerPrototypeList extends CController {
 		}
 
 		if ($dep_trigger_ids) {
-			$dependency_triggers = [];
-			$dependency_trigger_prototypes = [];
-
 			$dep_trigger_ids = array_keys($dep_trigger_ids);
 
 			$dependency_triggers = API::Trigger()->get([

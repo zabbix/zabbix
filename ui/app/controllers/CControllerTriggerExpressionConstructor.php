@@ -112,7 +112,7 @@ class CControllerTriggerExpressionConstructor extends CController {
 		$analyze = analyzeExpression($data['expression'], $expression_type, $error);
 
 		if ($analyze !== false) {
-			list($data['expression_formula'], $data['expression_tree']) = $analyze;
+			[$data['expression_formula'], $data['expression_tree']] = $analyze;
 
 			if ($data['expression_action'] !== '' && $data['expression_tree'] !== null) {
 				$new_expr = remakeExpression($data['expression'], $data['expr_target_single'],
@@ -124,7 +124,7 @@ class CControllerTriggerExpressionConstructor extends CController {
 					$analyze = analyzeExpression($data['expression'], TRIGGER_EXPRESSION, $error);
 
 					if ($analyze !== false) {
-						list($data['expression_formula'], $data['expression_tree']) = $analyze;
+						[$data['expression_formula'], $data['expression_tree']] = $analyze;
 					}
 					else {
 						$data['error'] = [
