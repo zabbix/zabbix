@@ -1165,7 +1165,7 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 	{
 		utf8_size = (int)in_size + 1;
 		out_utf8_string = zbx_malloc(out_utf8_string, utf8_size);
-		memcpy(*out_utf8_string, in, in_size);
+		memcpy(out_utf8_string, in, in_size);
 		out_utf8_string[in_size] = '\0';
 
 		goto out;
