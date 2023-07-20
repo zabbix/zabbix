@@ -113,8 +113,6 @@ zbx_snmp_oid_t;
 ZBX_PTR_VECTOR_DECL(snmp_oid, zbx_snmp_oid_t *)
 ZBX_PTR_VECTOR_IMPL(snmp_oid, zbx_snmp_oid_t *)
 
-typedef void*	zbx_snmp_sess_t;
-
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
 static pthread_rwlock_t			snmp_exec_rwlock;
@@ -493,7 +491,7 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	return ret;
 }
 
-static zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
+zbx_snmp_sess_t	zbx_snmp_open_session(const zbx_dc_item_t *item, char *error, size_t max_error_len,
 		int config_timeout, const char *config_source_ip)
 {
 /* item snmpv3 privacy protocol */
