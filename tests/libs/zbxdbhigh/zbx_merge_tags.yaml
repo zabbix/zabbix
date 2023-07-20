@@ -13,13 +13,11 @@ out:
   dst_tags:
     - tagid: 0
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -48,13 +46,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -84,13 +80,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
@@ -120,13 +114,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UPDATE_AUTOMATIC]
@@ -156,13 +148,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -191,13 +181,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value11
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value22
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
@@ -226,13 +214,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value11
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value22
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_VALUE]
@@ -293,37 +279,31 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 3
       tag: tag3
-      tag_orig: null
       value: value3
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 4
       tag: tag44
-      tag_orig: tag4
       value: value44
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 5
       tag: tag55
-      tag_orig: tag5
       value: value55
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 6
       tag: tag66
-      tag_orig: tag6
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
@@ -369,37 +349,31 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 3
       tag: tag3
-      tag_orig: null
       value: value3
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -445,37 +419,31 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 3
       tag: tag3
-      tag_orig: null
       value: value3
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -495,13 +463,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_REMOVE]
@@ -521,13 +487,11 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -564,37 +528,31 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 3
       tag: tag3
-      tag_orig: null
       value: value3
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -631,37 +589,31 @@ out:
   dst_tags:
     - tagid: 1
       tag: tag1
-      tag_orig: null
       value: value1
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 2
       tag: tag2
-      tag_orig: null
       value: value2
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 3
       tag: tag3
-      tag_orig: null
       value: value3
       automatic: ZBX_DB_TAG_NORMAL
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UNSET]
@@ -698,19 +650,16 @@ out:
   dst_tags:
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
@@ -747,19 +696,16 @@ out:
   dst_tags:
     - tagid: 0
       tag: tag44
-      tag_orig: null
       value: value44
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 0
       tag: tag55
-      tag_orig: null
       value: value55
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]
     - tagid: 0
       tag: tag66
-      tag_orig: null
       value: value66
       automatic: ZBX_DB_TAG_AUTOMATIC
       flags: [ZBX_FLAG_DB_TAG_UPDATE_TAG, ZBX_FLAG_DB_TAG_UPDATE_VALUE]

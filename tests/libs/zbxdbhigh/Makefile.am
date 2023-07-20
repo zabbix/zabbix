@@ -119,6 +119,7 @@ DBadd_condition_alloc_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAG
 DBadd_condition_alloc_CFLAGS = $(COMMON_FLAGS)
 
 zbx_merge_tags_SOURCES = \
+	dbhigh_test.c \
 	zbx_merge_tags.c \
 	$(COMMON_SRC)
 
@@ -133,6 +134,7 @@ zbx_merge_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 zbx_merge_tags_CFLAGS = $(COMMON_FLAGS)
 
 zbx_del_tags_SOURCES = \
+	dbhigh_test.c \
 	zbx_del_tags.c \
 	$(COMMON_SRC)
 
@@ -147,6 +149,7 @@ zbx_del_tags_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 zbx_del_tags_CFLAGS = $(COMMON_FLAGS)
 
 zbx_add_tags_SOURCES = \
+	dbhigh_test.c \
 	zbx_add_tags.c \
 	$(COMMON_SRC)
 
