@@ -474,7 +474,8 @@ static int	get_publisher_metadata(zbx_vector_prov_meta_t *prov_meta, const wchar
 		p_meta.name = zbx_strdup(NULL, tmp_pname);
 		p_meta.handle = *dest;
 
-		zbx_vector_prov_meta_insert_sorted(prov_meta, p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		index = zbx_vector_prov_meta_nearestindex(prov_meta, p_meta, ZBX_DEFAULT_STR_COMPARE_FUNC);
+		zbx_vector_prov_meta_insert(prov_meta, p_meta, index);
 
 		ret = SUCCEED;
 	}
@@ -516,7 +517,7 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_
 	{
 		if (TRUE != EvtFormatMessage(provider, event, 0, 0, NULL, EvtFormatMessageEvent, 0, NULL, &require))
 		{
-			int last_err = GetLastError();
+			int	last_err = GetLastError();
 
 			if (ERROR_INSUFFICIENT_BUFFER == last_err)
 			{
@@ -553,6 +554,8 @@ static char	*expand_message6(const wchar_t *pname, EVT_HANDLE event, zbx_vector_
 			else
 				break;
 		}
+		else
+			goto out;
 	}
 err:
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot format message: %s", __func__, zbx_strerror_from_system(error));
@@ -665,6 +668,7 @@ cleanup:
  *             event_bookmark - [IN/OUT] handle of Event record for parsing   *
  *             which          - [IN/OUT] position of Event Log record         *
  *             ...            - [OUT] ELR detail                              *
+ *             prov_meta      - [IN/OUT] provider metadata cache              *
  *             error          - [OUT] error message in case of failure        *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -833,6 +837,7 @@ out:
  *             metric           - [IN/OUT] parameters for Event Log process   *
  *             lastlogsize_sent - [OUT] position of last record sent to       *
  *                                      server                                *
+ *             prov_meta        - [IN/OUT] provider metadata cache            *
  *             error            - [OUT] error message in case of failure      *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *
@@ -847,10 +852,12 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 		zbx_uint64_t *lastlogsize_sent, zbx_vector_prov_meta_t *prov_meta, char **error)
 {
 #define EVT_ARRAY_SIZE	100
+#define EVT_LOG_ITEM 0
+#define EVT_LOG_COUNT_ITEM 1
 	const char	*str_severity;
 	zbx_uint64_t	keywords, i, reading_startpoint = 0;
 	wchar_t		*eventlog_name_w = NULL;
-	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED, is_count_item;
+	int		s_count = 0, p_count = 0, send_err = SUCCEED, ret = FAIL, match = SUCCEED, evt_item_type;
 	DWORD		required_buf_size = 0, error_code = ERROR_SUCCESS;
 
 	unsigned long	evt_timestamp, evt_eventid = 0;
@@ -863,9 +870,9 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 			LastID);
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
-		is_count_item = 1;
+		evt_item_type = EVT_LOG_COUNT_ITEM;
 	else
-		is_count_item = 0;
+		evt_item_type = EVT_LOG_ITEM;
 
 	/* update counters */
 	if (1 == metric->skip_old_data)
@@ -913,7 +920,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 		{
 			int	gather_evt_msg = 1;
 
-			if (1 == is_count_item && 1 > strlen(pattern))
+			if (EVT_LOG_COUNT_ITEM == evt_item_type && 1 > strlen(pattern))
 				gather_evt_msg = 0;
 
 			lastlogsize += 1;
@@ -1032,7 +1039,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 
 			if (1 == match)
 			{
-				if (0 == is_count_item)
+				if (EVT_LOG_ITEM == evt_item_type)
 				{
 					send_err = process_value_cb(addrs, agent2_result, config_hostname,
 							metric->key_orig, evt_message, ITEM_STATE_NORMAL, &lastlogsize,
@@ -1055,7 +1062,7 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 			zbx_free(evt_provider);
 			zbx_free(evt_message);
 
-			if (0 == is_count_item)
+			if (EVT_LOG_ITEM == evt_item_type)
 			{
 				if (SUCCEED == send_err)
 				{
@@ -1084,16 +1091,20 @@ int	process_eventslog6(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_re
 finish:
 	ret = SUCCEED;
 
-	if (p_count > 0 && 0 != is_count_item)
+	if (EVT_LOG_COUNT_ITEM == evt_item_type)
 	{
 		char	buf[ZBX_MAX_UINT64_LEN];
 
 		zbx_snprintf(buf, sizeof(buf), "%d", s_count);
-		*lastlogsize_sent = lastlogsize = metric->lastlogsize = 0;
-
 		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+
+		if (SUCCEED == send_err)
+		{
+			*lastlogsize_sent = lastlogsize;
+			metric->lastlogsize = lastlogsize;
+		}
 	}
 out:
 	for (i = 0; i < required_buf_size; i++)
@@ -1107,4 +1118,6 @@ out:
 
 	return ret;
 #undef EVT_ARRAY_SIZE
+#undef EVT_LOG_COUNT_ITEM
+#undef EVT_LOG_ITEM
 }

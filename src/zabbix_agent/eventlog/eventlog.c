@@ -76,11 +76,10 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		zbx_uint64_t *lastlogsize_sent, const zbx_config_tls_t *config_tls, int config_timeout,
 		const char *config_source_ip, const char *config_hostname, char **error)
 {
-	int 			ret = FAIL;
+	int 			ret = FAIL, rate, max_rate = MAX_VALUE_LINES;
 	AGENT_REQUEST		request;
-	const char		*filename, *pattern, *maxlines_persec, *skip;
-	const char		*key_severity, *key_source, *key_logeventid;
-	int			rate;
+	const char		*filename, *pattern, *maxlines_persec, *skip,*key_severity, *key_source,
+				*key_logeventid;
 	OSVERSIONINFO		versionInfo;
 	zbx_vector_prov_meta_t	prov_meta;
 
@@ -151,14 +150,16 @@ int	process_eventlog_check(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent
 		goto out;
 	}
 
+	max_rate *= 0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags) ? MAX_VALUE_LINES_MULTIPLIER : 1;
+
 	if (NULL == (maxlines_persec = get_rparam(&request, 5)) || '\0' == *maxlines_persec)
 	{
 		rate = CONFIG_EVENTLOG_MAX_LINES_PER_SECOND;
 
 		if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
-			rate *= 10;
+			rate *= MAX_VALUE_LINES_MULTIPLIER;
 	}
-	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || MAX_VALUE_LINES < rate)
+	else if (MIN_VALUE_LINES > (rate = atoi(maxlines_persec)) || max_rate < rate)
 	{
 		*error = zbx_strdup(*error, "Invalid sixth parameter.");
 		goto out;

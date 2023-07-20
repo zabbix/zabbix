@@ -308,8 +308,7 @@ void	zbx_vector_ ## __id ## _create_ext(zbx_vector_ ## __id ## _t *vector,					\
 void	zbx_vector_ ## __id ## _destroy(zbx_vector_ ## __id ## _t *vector);					\
 														\
 void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type value);			\
-void	zbx_vector_ ## __id ## _insert_sorted(zbx_vector_ ## __id ## _t *vector, __type value,			\
-		zbx_compare_func_t compare_func);								\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index);	\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value);			\
 void	zbx_vector_ ## __id ## _append_array(zbx_vector_ ## __id ## _t *vector, __type const *values,		\
 									int values_num);			\
@@ -422,29 +421,18 @@ void	zbx_vector_ ## __id ## _append(zbx_vector_ ## __id ## _t *vector, __type va
 	vector->values[vector->values_num++] = value;								\
 }														\
 														\
-void	zbx_vector_ ## __id ## _insert_sorted(zbx_vector_ ## __id ## _t *vector, __type value, 			\
-		zbx_compare_func_t compare_func)								\
+void	zbx_vector_ ## __id ## _insert(zbx_vector_ ## __id ## _t *vector, __type value, int before_index)	\
 {														\
-	int	index;												\
-														\
 	__vector_ ## __id ## _ensure_free_space(vector);							\
 														\
-	if (0 == vector->values_num || 0 <= compare_func(&value, &(vector->values[vector->values_num - 1])))	\
+	if (0 < vector->values_num - before_index)								\
 	{													\
-		vector->values[vector->values_num++] = value;							\
-		return;												\
+		memmove(vector->values + before_index + 1, vector->values + before_index,			\
+				(vector->values_num - before_index) * sizeof(__type));				\
 	}													\
 														\
-	if (0 > compare_func(&value, &(vector->values[0])))							\
-		index = 0;											\
-	else													\
-		index = zbx_vector_ ## __id ## _nearestindex(vector, value, compare_func);			\
-														\
-	memmove(vector->values + index + 1, vector->values + index,						\
-			(vector->values_num - index) * sizeof(__type));						\
-														\
 	vector->values_num++;											\
-	vector->values[index] = value;										\
+	vector->values[before_index] = value;									\
 }														\
 														\
 void	zbx_vector_ ## __id ## _append_ptr(zbx_vector_ ## __id ## _t *vector, __type *value)			\

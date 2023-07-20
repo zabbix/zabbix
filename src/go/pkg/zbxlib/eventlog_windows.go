@@ -149,7 +149,7 @@ int	process_eventlog_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *ag
 	return SUCCEED;
 }
 
-int	process_eventlog_count_value(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
+int	process_eventlog_count_value_cb(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, const char *host,
 		const char *key, const char *value, unsigned char state, zbx_uint64_t *lastlogsize, const int *mtime,
 		unsigned long *timestamp, const char *source, unsigned short *severity, unsigned long *logeventid,
 		unsigned char flags)
@@ -239,7 +239,7 @@ func ProcessEventLogCheck(data unsafe.Pointer, item *EventLogItem, refresh int, 
 
 	procValueFunc := C.process_eventlog_value_cb
 	if isCountItem {
-		procValueFunc = C.process_eventlog_count_value
+		procValueFunc = C.process_eventlog_count_value_cb
 	}
 
 	var cerrmsg *C.char

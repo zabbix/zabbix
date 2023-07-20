@@ -520,13 +520,15 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 		const zbx_config_tls_t *config_tls, int config_timeout, const char *config_source_ip,
 		const char *config_hostname, ZBX_ACTIVE_METRIC *metric, zbx_uint64_t *lastlogsize_sent, char **error)
 {
+#define EVT_LOG_ITEM 0
+#define EVT_LOG_COUNT_ITEM 1
 	HANDLE		eventlog_handle = NULL;
 	wchar_t		*eventlog_name_w;
 	zbx_uint64_t	FirstID, LastID, lastlogsize;
 	DWORD		num_bytes_read = 0, required_buf_size, ReadDirection, error_code;
 	BYTE		*pELRs = NULL;
 	int		ret = FAIL, send_err = SUCCEED, match = SUCCEED, buffer_size = 64 * ZBX_KIBIBYTE, s_count,
-			p_count, is_count_item;
+			p_count, evt_item_type;
 	unsigned long	timestamp = 0;
 	char		*source;
 
@@ -544,9 +546,9 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 	/* numbers and then converting to DWORD values.                                                     */
 
 	if (0 != (ZBX_METRIC_FLAG_LOG_COUNT & metric->flags))
-		is_count_item = 1;
+		evt_item_type = EVT_LOG_COUNT_ITEM;
 	else
-		is_count_item = 0;
+		evt_item_type = EVT_LOG_ITEM;
 
 	if (NULL == eventlog_name || '\0' == *eventlog_name)
 	{
@@ -766,7 +768,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 
 				if (1 == match)
 				{
-					if (0 == is_count_item)
+					if (EVT_LOG_ITEM == evt_item_type)
 					{
 						send_err = process_value_cb(addrs, agent2_result, config_hostname,
 								metric->key_orig, value, ITEM_STATE_NORMAL,
@@ -788,7 +790,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 				zbx_free(source);
 				zbx_free(value);
 
-				if (0 == is_count_item)
+				if (EVT_LOG_ITEM == evt_item_type)
 				{
 					if (SUCCEED == send_err)
 					{
@@ -820,7 +822,7 @@ int	process_eventslog(zbx_vector_addr_ptr_t *addrs, zbx_vector_ptr_t *agent2_res
 finish:
 	ret = SUCCEED;
 
-	if (p_count > 0 && 0 != is_count_item)
+	if (EVT_LOG_COUNT_ITEM == evt_item_type)
 	{
 		char	buf[ZBX_MAX_UINT64_LEN];
 
@@ -830,6 +832,12 @@ finish:
 		send_err = process_value_cb(addrs, agent2_result, config_hostname, metric->key_orig, buf,
 				ITEM_STATE_NORMAL, &lastlogsize, NULL, NULL, NULL, NULL, NULL, metric->flags |
 				ZBX_METRIC_FLAG_PERSISTENT, config_tls, config_timeout, config_source_ip);
+
+		if (SUCCEED == send_err)
+		{
+			*lastlogsize_sent = lastlogsize;
+			metric->lastlogsize = lastlogsize;
+		}
 	}
 out:
 	zbx_close_eventlog(eventlog_handle);
@@ -838,4 +846,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#undef EVT_LOG_COUNT_ITEM
+#undef EVT_LOG_ITEM
 }
