@@ -1130,14 +1130,13 @@ void	zbx_strupper(char *str)
 }
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
-int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **out_utf8_string, char **error)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error)
 {
 #define STATIC_SIZE	1024
+	char		*out_utf8_string = NULL;
 	wchar_t		wide_string_static[STATIC_SIZE], *wide_string = NULL;
 	int		wide_size, utf8_size, bom_detected = 0;
 	unsigned int	codepage;
-
-	*out_utf8_string = NULL;
 
 	/* try to guess encoding using BOM if it exists */
 	if (3 <= in_size && 0 == strncmp("\xef\xbb\xbf", in, 3))
@@ -1169,7 +1168,7 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 		memcpy(*out_utf8_string, in, in_size);
 		(*out_utf8_string)[in_size] = '\0';
 
-		return SUCCEED;
+		goto out;
 	}
 
 	if (FAIL == get_codepage(encoding, &codepage))
@@ -1177,7 +1176,7 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 		*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Failed to get codepage.",
 				encoding);
 
-		return FAIL;
+		goto out;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "zbx_convert_to_utf8() in_size:%d encoding:'%s' codepage:%u", in_size, encoding,
@@ -1259,26 +1258,25 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
 
-	return SUCCEED;
+	goto out;
 utf8_convert_fail:
 	zbx_free(*out_utf8_string);
 	*out_utf8_string = NULL;
 	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
 			zbx_strerror_from_system(GetLastError()));
-	return FAIL;
+out:
+	return out_utf8_string;
 }
 #elif defined(HAVE_ICONV)
-int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **out_utf8_string, char **error)
+char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **error)
 {
 	iconv_t		cd;
 	size_t		in_size_left, out_size_left, sz, out_alloc = 0;
 	const char	to_code[] = "UTF-8";
-	char		*p;
-
-	*out_utf8_string = NULL;
+	char		*p, *out_utf8_string = NULL;
 
 	out_alloc = in_size + 1;
-	p = *out_utf8_string = (char *)zbx_malloc(out_utf8_string, out_alloc);
+	p = out_utf8_string = (char *)zbx_malloc(out_utf8_string, out_alloc);
 
 	/* try to guess encoding using BOM if it exists */
 	if ('\0' == *encoding)
@@ -1299,9 +1297,9 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 
 	if ('\0' == *encoding )
 	{
-		memcpy(*out_utf8_string, in, in_size);
-		(*out_utf8_string)[in_size] = '\0';
-		return SUCCEED;
+		memcpy(out_utf8_string, in, in_size);
+		out_utf8_string[in_size] = '\0';
+		goto out;
 	}
 
 	if ((iconv_t)-1 == (cd = iconv_open(to_code, encoding)))
@@ -1315,10 +1313,10 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 		if (E2BIG != errno)
 			break;
 
-		sz = (size_t)(p - *out_utf8_string);
+		sz = (size_t)(p - out_utf8_string);
 		out_alloc += in_size;
 		out_size_left += in_size;
-		p = *out_utf8_string = (char *)zbx_realloc(*out_utf8_string, out_alloc);
+		p = out_utf8_string = (char *)zbx_realloc(out_utf8_string, out_alloc);
 		p += sz;
 	}
 
@@ -1328,16 +1326,17 @@ int	zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char **o
 		goto utf8_convert_fail;
 
 	/* remove BOM */
-	if (3 <= p - *out_utf8_string && 0 == strncmp("\xef\xbb\xbf", *out_utf8_string, 3))
-		memmove(*out_utf8_string, *out_utf8_string + 3, (size_t)(p - *out_utf8_string - 2));
+	if (3 <= p - out_utf8_string && 0 == strncmp("\xef\xbb\xbf", out_utf8_string, 3))
+		memmove(out_utf8_string, out_utf8_string + 3, (size_t)(p - out_utf8_string - 2));
 
-	return SUCCEED;
+	goto out;
 utf8_convert_fail:
-	zbx_free(*out_utf8_string);
-	*out_utf8_string = NULL;
+	zbx_free(out_utf8_string);
+	out_utf8_string = NULL;
 	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
 			zbx_strerror(errno));
-	return FAIL;
+out:
+	return out_utf8_string;
 }
 #endif	/* HAVE_ICONV */
 

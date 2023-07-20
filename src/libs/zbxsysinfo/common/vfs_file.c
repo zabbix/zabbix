@@ -446,7 +446,7 @@ int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		char	*err_msg;
 
-		if (FAIL == zbx_convert_to_utf8(contents, contents_offset, encoding, &utf8, &err_msg))
+		if (NULL == (utf8 = zbx_convert_to_utf8(contents, contents_offset, encoding, &err_msg)))
 		{
 			zbx_free(contents);
 			SET_MSG_RESULT(result, err_msg);
@@ -556,7 +556,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (FAIL == zbx_convert_to_utf8(buf, nbytes, encoding, &utf8, &err_msg))
+		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;
@@ -690,7 +690,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (FAIL == zbx_convert_to_utf8(buf, nbytes, encoding, &utf8, &err_msg))
+		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;

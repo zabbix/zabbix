@@ -2129,8 +2129,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					if ('\0' != *encoding)
 					{
-						if (FAIL == zbx_convert_to_utf8(buf, (size_t)BUF_SIZE, encoding, &value,
-								err_msg))
+						if (NULL == (value = zbx_convert_to_utf8(buf, (size_t)BUF_SIZE,
+								encoding, err_msg)))
 						{
 							ret = FAIL;
 							goto out;
@@ -2259,8 +2259,8 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 
 					if ('\0' != *encoding)
 					{
-						if (FAIL == zbx_convert_to_utf8(p_start, (size_t)(p_nl - p_start),
-								encoding, &value, err_msg))
+						if (NULL == (value = zbx_convert_to_utf8(p_start,
+								(size_t)(p_nl - p_start), encoding, err_msg)))
 						{
 							ret = FAIL;
 							goto out;

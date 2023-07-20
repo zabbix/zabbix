@@ -517,7 +517,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 		}
 	}
 
-	if (FAIL == zbx_convert_to_utf8(buffer, offset, encoding, &output, &err_msg))
+	if (NULL == (output = zbx_convert_to_utf8(buffer, offset, encoding, &err_msg)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot convert result from SSH server"
 				" to utf8: %s", err_msg));

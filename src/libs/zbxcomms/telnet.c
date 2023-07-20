@@ -517,7 +517,7 @@ int	zbx_telnet_execute(zbx_socket_t *s, const char *command, AGENT_RESULT *resul
 		offset--;
 	buf[offset] = '\0';
 
-	if (FAIL == zbx_convert_to_utf8(buf, offset, encoding, &utf8_result, &err_msg))
+	if (NULL == (utf8_result = zbx_convert_to_utf8(buf, offset, encoding, &err_msg)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot convert result to utf8: %s.", err_msg));
 		goto fail;
