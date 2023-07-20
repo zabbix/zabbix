@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @backup items, interface, hosts, dashboard
+ * @backup hosts, dashboard
  *
  * @onBefore prepareSelectedHostdata
  */
@@ -38,17 +38,12 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 */
 	protected static $dashboardid;
 
-	/**
-	 * @return array
-	 */
 	public static function prepareSelectedHostdata() {
-		$hostgroupid = CDataHelper::call('hostgroup.create',
-				[['name' => 'Host group for Graph widgets selected hosts']])['groupids'][0];
+		$hostgroupid = CDataHelper::call('hostgroup.create',	[['name' => 'Suggestion list group']])['groupids'][0];
 
 		CDataHelper::createHosts([
 			[
 				'host' => 'Host for widget 1',
-				'interfaces' => [],
 				'groups' => [
 					'groupid' => $hostgroupid
 				],
@@ -88,7 +83,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			],
 			[
 				'host' => 'Host for widget 2',
-				'interfaces' => [],
 				'groups' => [
 					'groupid' => $hostgroupid
 				],
@@ -128,7 +122,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			],
 			[
 				'host' => 'Host for widget 3',
-				'interfaces' => [],
 				'groups' => [
 					'groupid' => $hostgroupid
 				],
@@ -168,7 +161,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			],
 			[
 				'host' => 'Host for widget 4',
-				'interfaces' => [],
 				'groups' => [
 					'groupid' => $hostgroupid
 				],
@@ -208,7 +200,6 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 			],
 			[
 				'host' => 'Host for widget 5',
-				'interfaces' => [],
 				'groups' => [
 					'groupid' => $hostgroupid
 				],
@@ -263,7 +254,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		self::$dashboardid = array_values(CDataHelper::getIds('name'))[0];
 	}
 
-	public static function getData() {
+	public static function getDatasetData() {
 		return [
 			[
 				[
@@ -276,14 +267,15 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Host for widget 3',
 						'Host for widget 4',
 						'Host for widget 5'
-					]
+					],
+					'Arrow Key' => 'no'
 				]
 			],
 			[
 				[
 					'Data set' => [
 						'host' => 'Host for widget 1',
-						'item' => 'Item'
+						'item' => 'Item for'
 					],
 					'expected' => [
 						'Item for Graph 1_1',
@@ -291,7 +283,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 1_3',
 						'Item for Graph 1_4',
 						'Item for Graph 1_5'
-					]
+					],
+					'Arrow Key' => 'no'
 				]
 			],
 			[
@@ -320,7 +313,8 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_2',
 						'Item for Graph 4_3',
 						'Item for Graph 4_4'
-					]
+					],
+					'Arrow Key' => 'no'
 				]
 			],
 			[
@@ -342,8 +336,11 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 2_2',
 						'Item for Graph 2_3',
 						'Item for Graph 2_4',
-						'Item for Graph 2_5',
-					]
+						'Item for Graph 2_5'
+					],
+					'Arrow Key' => 'yes',
+					'Focus' => 'Item for Graph 2_5',
+					'Not Present' => 'yes'
 				]
 			],
 			[
@@ -365,8 +362,9 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 						'Item for Graph 4_2',
 						'Item for Graph 4_3',
 						'Item for Graph 4_4',
-						'Item for Graph 4_5',
-					]
+						'Item for Graph 4_5'
+					],
+					'Arrow Key' => 'no'
 				]
 			]
 		];
@@ -376,7 +374,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 	 * Function checks using arrow keys if Graph Widget is correctly selecting and displaying hosts, their items
 	 * in suggestion list.
 	 *
-	 * @dataProvider getData
+	 * @dataProvider getDatasetData
 	 */
 	public function testDashboardGraphWidgetSelectedHosts_CheckSuggestionList($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
@@ -384,33 +382,32 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$form->fill(['Type' => 'Graph']);
 
 		// Change mapping of associative arrays from data set.
-		foreach ([$data['Data set']] as $data_set) {
-			if (array_key_exists('item', $data_set)) {
-				$field_data = [
-					'xpath://div[@id="ds_0_hosts_"]/..' => $data_set['host'],
-					'xpath://input[@placeholder="item pattern"]' => $data_set['item']
-				];
-			}
-			else {
-				$field_data = [
-					'xpath://input[@placeholder="host pattern"]' => $data_set['host']
-				];
-			}
+		if (array_key_exists('item', $data['Data set'])) {
+			$field_data = [
+				'xpath:.//div[@id="ds_0_hosts_"]/..' => $data['Data set']['host'],
+				'xpath:.//input[@placeholder="item pattern"]' => $data['Data set']['item']
+			];
+		}
+		else {
+			$field_data = [
+				'xpath:.//input[@placeholder="host pattern"]' => $data['Data set']['host']
+			];
+		}
 
-			$form->fill($field_data);
-			$this->checkSuggestionListCommon($data_set, $data, $form);
-			$this->checkSuggestionListWithArrowKeys($data_set, $data);
+		$form->fill($field_data);
+		$this->checkSuggestionListCommon($data, $form);
+
+		if ($data['Arrow Key'] === 'yes') {
+			$this->checkSuggestionListWithKeyboardNavigation($data['Data set'], $data, $form);
 		}
 	}
 
-	private function checkSuggestionListCommon ($data_set, $data, $form) {
+	private function checkSuggestionListCommon ($data, $form) {
 		$this->query('class', 'multiselect-suggest')->waitUntilVisible();
-		$field = $form->getField('xpath://div[@id="ds_0_hosts_"]/..');
-		$result = $field->getSuggestions();
-		$this->assertEquals($data['expected'], $result);
+		$this->assertEquals($data['expected'], $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
 	}
 
-	private function checkSuggestionListWithArrowKeys($data_set, $data){
+	private function checkSuggestionListWithKeyboardNavigation($data_set, $data, $form) {
 		$merged_text = [];
 		/**
 		 * In case created API data under section "Data set" there's more than two or exactly two array keys,
@@ -420,7 +417,7 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 		$get_text = $this->query('xpath://div[@id="ds_0_'.$id.'_"]//div[@aria-live="assertive"]')
 				->one()->waitUntilTextPresent('use down,up arrow keys and enter to select')->getText();
 
-		//	Count words in text, accept that numbers are words.
+		// Count words in text, accept that numbers are words.
 		$count = str_word_count($get_text, 1, '1234567890');
 
 		// Check if third key in string is '20', after that assign index.
@@ -449,6 +446,20 @@ class testDashboardGraphWidgetSelectedHosts extends CWebTest {
 				array_push($merged_text, $suggestion_text);
 			}
 			$this->assertEquals($data['expected'], $merged_text);
+		}
+
+		if (array_key_exists('Focus', $data)) {
+			$this->page->pressKey(WebDriverKeys::ENTER);
+			$this->assertTrue($this->query('xpath://div[@id="ds_0_items_"]//ul[@class="multiselect-list"]//span[@title="'.
+				$data['Focus'].'"]')->exists()
+			);
+		}
+
+		if (array_key_exists('Not Present', $data)) {
+			$form->fill(['xpath:.//input[@placeholder="item pattern"]' => 'item']);
+			$comperable = array_slice($data['expected'],0,9);
+			$this->query('class', 'multiselect-suggest')->waitUntilVisible();
+			$this->assertEquals($comperable, $form->getField('xpath://div[@id="ds_0_hosts_"]/..')->getSuggestions());
 		}
 	}
 }

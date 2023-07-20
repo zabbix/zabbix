@@ -374,11 +374,9 @@ class CMultiselectElement extends CElement {
 	}
 
 	/**
-	 * @inheritdoc
+	 *	Get list of suggested values.
 	 */
 	public function getSuggestions() {
-		$prefix = '//ul[@class="multiselect-suggest"]/li';
-		$result = $this->query('xpath', $prefix)->all()->asText();
-		return $result;
+		return $this->query('xpath://ul[@class="multiselect-suggest"]/li[not(@class="suggest-hover")]')->all()->asText();
 	}
 }
