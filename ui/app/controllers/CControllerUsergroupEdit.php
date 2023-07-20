@@ -33,16 +33,6 @@ class CControllerUsergroupEdit extends CController {
 	protected function checkInput() {
 		$fields = [
 			'usrgrpid' =>					'db usrgrp.usrgrpid',
-			'name' =>						'db usrgrp.name',
-			'userids' =>					'array_db users.userid',
-			'gui_access' =>					'db usrgrp.gui_access|in '.implode(',', [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP, GROUP_GUI_ACCESS_DISABLED]),
-			'users_status' =>				'db usrgrp.users_status|in '.GROUP_STATUS_ENABLED.','.GROUP_STATUS_DISABLED,
-			'debug_mode' =>					'db usrgrp.debug_mode|in '.GROUP_DEBUG_MODE_ENABLED.','.GROUP_DEBUG_MODE_DISABLED,
-
-			'group_rights' =>				'array',
-			'templategroup_rights' =>		'array',
-			'tag_filters' =>				'array',
-
 			'form_refresh' =>				'int32'
 		];
 
@@ -99,72 +89,16 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
 		}
 
-		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode', 'form_refresh']);
-
 		$data['group_rights'] = $this->getGroupRights();
 		$data['templategroup_rights'] = $this->getTemplategroupRights();
-
-		$grouped_hostgroup_rights = [];
-		foreach ($data['group_rights'] as $id => $right) {
-			if ($right['permission'] == PERM_NONE) {
-				continue;
-			}
-			switch ($right['permission']) {
-				case PERM_DENY:
-					$group = PERM_DENY;
-					break;
-				case PERM_READ:
-					$group = PERM_READ;
-					break;
-				case PERM_READ_WRITE:
-					$group = PERM_READ_WRITE;
-					break;
-				default:
-					$group = PERM_DENY;
-			}
-
-			if (!isset($grouped_hostgroup_rights[$group])) {
-				$grouped_hostgroup_rights[$group] = [];
-			}
-
-			$grouped_hostgroup_rights[$group][$id] = $right;
-		}
-
-		$data['group_rights'] = $grouped_hostgroup_rights;
-
-		$grouped_templategroup_rights = [];
-		foreach ($data['templategroup_rights'] as $id => $right) {
-			if ($right['permission'] == PERM_NONE) {
-				continue;
-			}
-			switch ($right['permission']) {
-				case PERM_DENY:
-					$group = PERM_DENY;
-					break;
-				case PERM_READ:
-					$group = PERM_READ;
-					break;
-				case PERM_READ_WRITE:
-					$group = PERM_READ_WRITE;
-					break;
-				default:
-					$group = PERM_DENY;
-			}
-
-			if (!isset($grouped_templategroup_rights[$group])) {
-				$grouped_templategroup_rights[$group] = [];
-			}
-
-			$grouped_templategroup_rights[$group][$id] = $right;
-		}
-
-		$data['templategroup_rights'] = $grouped_templategroup_rights;
-
 		$data['tag_filters'] = $this->getTagFilters();
 
 		$data['users_ms'] = $this->getUsersMs();
 
-		$data['can_update_group'] = (!$this->hasInput('usrgrpid') || granted2update_group($this->getInput('usrgrpid')));
+		$data['can_update_group'] = (
+			!$this->hasInput('usrgrpid')
+			|| granted2update_group($this->getInput('usrgrpid'))
+		);
 
 		if ($data['can_update_group']) {
 			$userdirectories = API::UserDirectory()->get([
@@ -186,13 +120,11 @@ class CControllerUsergroupEdit extends CController {
 	 * @return array
 	 */
 	private function getGroupRights() {
-		if ($this->hasInput('group_rights')) {
-			return $this->getInput('group_rights');
-		}
-
-		return collapseGroupRights(
+		$group_rights = collapseGroupRights(
 			getHostGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
 		);
+
+		return $this->sortGroupRights($group_rights);
 	}
 
 	/**
@@ -201,13 +133,48 @@ class CControllerUsergroupEdit extends CController {
 	 * @return array
 	 */
 	private function getTemplategroupRights() {
-		if ($this->hasInput('templategroup_rights')) {
-			return $this->getInput('templategroup_rights');
-		}
-
-		return collapseGroupRights(
+		$group_rights = collapseGroupRights(
 			getTemplateGroupsRights($this->hasInput('usrgrpid') ? [$this->user_group['usrgrpid']] : [])
 		);
+
+		return $this->sortGroupRights($group_rights);
+	}
+
+	/**
+	 * Returns the sorted host or template group rights by permission type.
+	 *
+	 * @return array
+	 */
+	private function sortGroupRights($group_rights) {
+		$sorted_group_rights = [];
+
+		foreach ($group_rights as $id => $right) {
+			if ($right['permission'] == PERM_NONE) {
+				continue;
+			}
+
+			switch ($right['permission']) {
+				case PERM_DENY:
+					$group = PERM_DENY;
+					break;
+				case PERM_READ:
+					$group = PERM_READ;
+					break;
+				case PERM_READ_WRITE:
+					$group = PERM_READ_WRITE;
+					break;
+				default:
+					$group = PERM_DENY;
+			}
+
+			if (!isset($sorted_group_rights[$group])) {
+				$sorted_group_rights[$group] = [];
+			}
+
+			$sorted_group_rights[$group][$id] = $right;
+		}
+
+		return $sorted_group_rights;
 	}
 
 	/**
