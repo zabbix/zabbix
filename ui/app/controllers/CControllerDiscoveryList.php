@@ -108,7 +108,10 @@ class CControllerDiscoveryList extends CController {
 				$data['drules'][$key]['checks'] = $checks;
 
 				$data['drules'][$key]['proxy'] = ($drule['proxyid'] != 0)
-					? get_host_by_hostid($drule['proxyid'])['host']
+					? API::Proxy()->get([
+						'output' => ['name'],
+						'proxyids' => [$drule['proxyid']]
+					])
 					: '';
 			}
 
