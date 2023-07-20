@@ -1164,9 +1164,9 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 	if ('\0' == *encoding)
 	{
 		utf8_size = (int)in_size + 1;
-		*out_utf8_string = zbx_malloc(*out_utf8_string, utf8_size);
+		out_utf8_string = zbx_malloc(out_utf8_string, utf8_size);
 		memcpy(*out_utf8_string, in, in_size);
-		(*out_utf8_string)[in_size] = '\0';
+		out_utf8_string[in_size] = '\0';
 
 		goto out;
 	}
@@ -1245,23 +1245,21 @@ char	*zbx_convert_to_utf8(char *in, size_t in_size, const char *encoding, char *
 	if (0 == (utf8_size = WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, NULL, 0, NULL, NULL)))
 		goto utf8_convert_fail;
 
-	*out_utf8_string = (char *)zbx_malloc(*out_utf8_string, (size_t)utf8_size + 1/* '\0' */);
+	out_utf8_string = (char *)zbx_malloc(out_utf8_string, (size_t)utf8_size + 1/* '\0' */);
 
 	/* convert from 'wide_string' to 'utf8_string' */
-	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, *out_utf8_string, utf8_size, NULL, NULL))
-	{
+	if (0 == WideCharToMultiByte(CP_UTF8, 0, wide_string, wide_size, out_utf8_string, utf8_size, NULL, NULL))
 		goto utf8_convert_fail;
-	}
 
-	(*out_utf8_string)[utf8_size] = '\0';
+	out_utf8_string[utf8_size] = '\0';
 
 	if (wide_string != wide_string_static && wide_string != (wchar_t *)in)
 		zbx_free(wide_string);
 
 	goto out;
 utf8_convert_fail:
-	zbx_free(*out_utf8_string);
-	*out_utf8_string = NULL;
+	zbx_free(out_utf8_string);
+	out_utf8_string = NULL;
 	*error = zbx_dsprintf(NULL, "Failed to convert from encoding %s to utf8. Error: %s.", encoding,
 			zbx_strerror_from_system(GetLastError()));
 out:
