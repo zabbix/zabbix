@@ -987,7 +987,7 @@ static int	process_discovery(time_t *nextcheck, int config_timeout, zbx_hashset_
 
 		delay_str = zbx_strdup(delay_str, drule->delay_str);
 		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&delay_str, MACRO_TYPE_COMMON, NULL, 0);
+				&delay_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
 
 		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 		{
