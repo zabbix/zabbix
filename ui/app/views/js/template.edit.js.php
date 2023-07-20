@@ -163,7 +163,7 @@ window.template_edit_popup = new class {
 		this.macros_manager = new HostMacrosManager({
 			readonly: this.readonly,
 			parent_hostid: null,
-			source: 'templates-form'
+			container: $('#template_macros_container .table-forms-td-right')
 		});
 
 		$('#template-tabs').on('tabscreate tabsactivate', (event, ui) => {
@@ -214,8 +214,7 @@ window.template_edit_popup = new class {
 		this.form.querySelector('#show_inherited_template_macros').onchange = () => {
 			this.macros_manager.load(
 				this.form.querySelector('input[name=show_inherited_template_macros]:checked').value == 1,
-				this.linked_templateids.concat(this.#getAddTemplates()),
-				'templates-form'
+				this.linked_templateids.concat(this.#getAddTemplates())
 			);
 		}
 	}

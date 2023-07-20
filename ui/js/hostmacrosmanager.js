@@ -31,19 +31,13 @@ class HostMacrosManager {
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
 
-	constructor({readonly, parent_hostid, source}) {
+	constructor({readonly, parent_hostid, container = null}) {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
-
-		if (source == 'templates-form') {
-			this.$container = $('#template_macros_container .table-forms-td-right');
-		}
-		else {
-			this.$container = $('#macros_container .table-forms-td-right');
-		}
+		this.$container = container ?? $('#macros_container .table-forms-td-right')
 	}
 
-	load(show_inherited_macros, templateids, source) {
+	load(show_inherited_macros, templateids) {
 		const url = new Curl('zabbix.php');
 		url.setArgument('action', 'hostmacros.list');
 
@@ -53,10 +47,6 @@ class HostMacrosManager {
 			templateids: templateids,
 			readonly: this.readonly ? 1 : 0
 		};
-
-		if (source == 'templates-form') {
-			this.$container = $('#template_macros_container .table-forms-td-right');
-		}
 
 		if (this.parent_hostid !== null) {
 			post_data.parent_hostid = this.parent_hostid;
