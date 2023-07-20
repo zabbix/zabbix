@@ -674,7 +674,6 @@ class CDRule extends CApiService {
 			$dcheck += $default_values;
 			unset($dcheck['dcheckid'], $dcheck['uniq']);
 		}
-
 		unset($dcheck);
 
 		while ($current = array_pop($dchecks)) {

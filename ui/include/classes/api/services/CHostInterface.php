@@ -282,19 +282,20 @@ class CHostInterface extends CApiService {
 
 		$dbHosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => zbx_objectValues($interfaces, 'hostid'),
+			'hostids' => array_collumn($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$dbProxies = API::Proxy()->get([
 			'output' => ['name'],
-			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
+			'proxyids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
 
 		$check_have_items = [];
+
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));

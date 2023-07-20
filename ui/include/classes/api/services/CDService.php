@@ -272,7 +272,7 @@ class CDService extends CApiService {
 					' AND (dr.proxyid=h.proxyid OR (dr.proxyid IS NULL AND h.proxyid IS NULL))'.
 					' AND h.hostid=i.hostid'.
 					' AND ds.ip=i.ip'.
-					' AND '.dbConditionInt('ds.dserviceid', $dserviceIds)
+					' AND '.dbConditionId('ds.dserviceid', $dserviceIds)
 			);
 
 			$host_services = [];

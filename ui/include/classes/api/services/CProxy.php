@@ -408,7 +408,6 @@ class CProxy extends CApiService {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
 		if (!$options['countOutput']) {
-
 			$proxy_rtdata = false;
 
 			foreach (['lastaccess', 'version', 'compatibility'] as $field) {
@@ -434,13 +433,11 @@ class CProxy extends CApiService {
 	protected function addRelatedObjects(array $options, array $result) {
 		$result = parent::addRelatedObjects($options, $result);
 
-		$proxyids = array_keys($result);
-
 		// selectHosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$hosts = API::Host()->get([
 				'output' => $this->outputExtend($options['selectHosts'], ['hostid', 'proxyid']),
-				'proxyids' => $proxyids,
+				'proxyids' => array_keys($result),
 				'preservekeys' => true
 			]);
 

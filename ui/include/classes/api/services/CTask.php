@@ -670,11 +670,11 @@ class CTask extends CApiService {
 	}
 
 	/**
-	 * Function to check if specified proxies exists.
+	 * Function to check if specified proxies exist.
 	 *
 	 * @param array $proxyids  Proxy IDs to check.
 	 *
-	 * @throws Exception if proxy doesn't exist.
+	 * @throws Exception
 	 */
 	protected function checkProxyIds(array $proxyids): void {
 		if (!$proxyids) {

@@ -339,8 +339,8 @@ class CControllerHostList extends CController {
 
 		if ($proxyids) {
 			$proxies = API::Proxy()->get([
-				'proxyids' => $proxyids,
 				'output' => ['name'],
+				'proxyids' => $proxyids,
 				'preservekeys' => true
 			]);
 		}
@@ -354,7 +354,7 @@ class CControllerHostList extends CController {
 				'proxyids' => $filter['proxyids']
 			]);
 
-			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id', 'name' => 'name']);
+			$proxies_ms = CArrayHelper::renameObjectsKeys($filter_proxies, ['proxyid' => 'id']);
 		}
 
 		$db_maintenances = [];
