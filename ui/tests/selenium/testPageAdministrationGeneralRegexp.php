@@ -133,7 +133,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 	public function testPageAdministrationGeneralRegexp_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=regex.list')->waitUntilReady();
 
-		// Variables for checks after deletion
+		// Variables for checks after deletion.
 		$expected_regexps = $this->getTableColumnData('Name');
 		$regex_ids = [];
 
@@ -141,13 +141,12 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $regex);
 			$row->select();
 			$regex_ids[] = $row->query('tag:input')->one()->getAttribute('value');
-			$this->query('class:list-table')->asTable()->one()->findRow('Name', $regex)->select();
 
 			// Remove this regexp from the expected values.
 			$expected_regexps = array_values(array_diff($expected_regexps, [$regex]));
 		}
 
-		// Press Delete and confirm
+		// Press Delete and confirm.
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -161,11 +160,10 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 
 		$this->assertMessage(TEST_GOOD, $message);
 
-		foreach ($regex_ids as $regex_id) {
-			$sql = 'SELECT * FROM expressions e CROSS JOIN regexps r'.
-					' WHERE '.zbx_dbstr($regex_id).' IN (r.regexpid, e.regexpid)';
-			$this->assertEquals(0, CDBHelper::getCount($sql));
-		}
+		$id_list = implode(', ', $regex_ids);
+		$sql = 'SELECT NULL FROM expressions e CROSS JOIN regexps r'.
+			' WHERE e.regexpid IN ('.$id_list.') OR r.regexpid IN ('.$id_list.')';
+		$this->assertEquals(0, CDBHelper::getCount($sql));
 
 		$this->assertTableDataColumn($expected_regexps);
 	}
@@ -188,7 +186,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->page->assertTitle('Configuration of regular expressions');
 		$this->assertMessage(TEST_GOOD, 'Regular expressions deleted');
 
-		$sql = 'SELECT * FROM expressions e CROSS JOIN regexps r';
+		$sql = 'SELECT NULL FROM expressions e CROSS JOIN regexps r';
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 		$this->assertTableData();
 	}
