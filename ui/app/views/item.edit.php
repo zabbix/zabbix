@@ -37,7 +37,8 @@ $form = (new CForm('post'))
 	->addItem(getMessages())
 	->addVar('context', $data['form']['context'])
 	->addVar('hostid', $data['form']['hostid'])
-	->addVar('itemid', $data['form']['itemid'] ? $data['form']['itemid'] : null);
+	->addVar('itemid', $data['form']['itemid'] ? $data['form']['itemid'] : null)
+	->addVar('templateid', $data['form']['itemid'] ? $data['form']['templateid'] : null);
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
@@ -118,11 +119,10 @@ $tabs = (new CTabView())
 		new CPartial('item.edit.item.tab', [
 			'config' => $data['config'],
 			'discovery_rule' => $data['discovery_rule'],
-			'discovered' => (bool) $data['discovery_rule'],
+			'discovered' => (bool) $data['discovery_rule'],// make correct check for discovered
 			'form' => $data['form'],
 			'form_name' => $form->getName(),
 			'host' => $data['host'],
-			'host_interfaces' => $data['host_interfaces'],
 			'inventory_fields' => $data['inventory_fields'],
 			'master_item' => $data['master_item'],
 			'parent_templates' => $data['parent_templates'],
@@ -139,7 +139,7 @@ $tabs = (new CTabView())
 			'show_inherited_tags' => $data['form']['show_inherited_tags'],
 			'source' => 'item',
 			'tabs_id' => 'tabs',
-			'tags' => $data['form']['tags'] ? $data['form']['tags'] : [['tag' => '', 'value' => '']],
+			'tags' => $data['form']['tags'],
 			'tags_tab_id' => 'tags-tab'
 		]),
 		TAB_INDICATOR_TAGS
@@ -168,8 +168,9 @@ $output = [
 	'script_inline' => getPagePostJs().$this->readJsFile('item.edit.js.php', [
 		'field_switches' => CItemData::fieldSwitchingConfiguration(['is_discovery_rule' => false]),
 		'form_data' => $data['form'],
-		'host_interfaces' => array_values($data['host_interfaces']),
+		'host_interfaces' => array_values($data['host']['interfaces']),
 		'interface_types' => $data['interface_types'],
+		'readonly' => $data['readonly'],
 		'testable_item_types' => $data['testable_item_types'],
 		'type_with_key_select' => $type_with_key_select,
 		'value_type_keys' => $data['value_type_keys']

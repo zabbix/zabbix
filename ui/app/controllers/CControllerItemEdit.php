@@ -40,6 +40,7 @@ class CControllerItemEdit extends CController {
 			'type'					=> 'db items.type',
 			'trends_mode'			=> 'int32',
 			'trends'				=> 'db items.trends',
+			'templateid'			=> 'id',
 			'value_type'			=> 'db items.value_type',
 			'valuemapid'			=> 'id',
 			'authtype'				=> 'db items.authtype',
@@ -66,6 +67,7 @@ class CControllerItemEdit extends CController {
 			'query_fields'			=> 'array',
 			'headers'				=> 'array',
 			'delay_flex'			=> 'array',
+			'show_inherited_tags'	=> 'in 0,1',
 			'form_refresh'			=> 'in 1'
 		];
 
@@ -135,10 +137,11 @@ class CControllerItemEdit extends CController {
 	public function doAction() {
 		$hostid = $this->getInput('hostid');
 		$form_refresh = $this->hasInput('form_refresh');
+		$host = $this->getInput('context') === 'host' ? $this->getHost($hostid) : $this->getTemplate($hostid);
 		$data = [
 			'action' => $this->getAction(),
-			'readonly' => false,
-			'host' => $this->getHostOrTemplate($this->getInput('context')),
+			'readonly' => false,// TODO
+			'host' => $host,
 			'valuemap' => [],
 			'inventory_fields' => [],
 			'form' => $form_refresh ? $this->getFormData() : $this->getItemData(),
@@ -180,12 +183,28 @@ class CControllerItemEdit extends CController {
 			$data['master_item'] = $master_items ? reset($master_items) : [];
 		}
 
-		if ($this->getInput('context') === 'host') {
-			[$host] = API::Host()->get([
-				'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'details', 'type'],
-				'hostids' => [$hostid]
+		if ($this->getInput('show_inherited_tags', 0)) {
+			$item = $data['form'];
+			$item['discoveryRule'] = [];
+
+			if ($item['itemid']) {
+				$db_items = API::Item()->get([
+					'output' => [],
+					'selectDiscoveryRule' => ['itemid', 'name', 'templateid'],
+					'itemids' => [$item['itemid']]
+				]);
+
+				if ($db_items) {
+					$item += reset($db_items);
+				}
+			}
+
+			$data['form']['tags'] = $this->getInheritedTags([
+				'item' => $item,
+				'itemid' => $item['itemid'],
+				'tags' => $item['tags'],
+				'hostid' => $this->getInput('hostid')
 			]);
-			$data['host_interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
 		}
 
 		$set_inventory = array_column(API::Item()->get([
@@ -222,25 +241,40 @@ class CControllerItemEdit extends CController {
 	}
 
 	/**
-	 * Get host or template, according to context, 'name' and 'flags' fields.
+	 * Get host data.
 	 *
-	 * @param string $context  Available values: 'host', 'template'.
-	 * @return array
+	 * @param string $hostid
 	 */
-	protected function getHostOrTemplate(string $context): array {
-		if ($context === 'host') {
-			[$host] = API::Host()->get([
-				'output' => ['name', 'flags'],
-				'hostids' => $this->getInput('hostid')
-			]);
-
-			return $host;
-		}
-
-		[$template] = API::Template()->get([
-			'output' => ['name', 'flags'],
-			'templateids' => $this->getInput('hostid')
+	protected function getHost($hostid): array {
+		[$host] = API::Host()->get([
+			'output' => ['name', 'flags', 'status'],
+			'selectInterfaces' => ['interfaceid', 'ip', 'port', 'dns', 'useip', 'details', 'type', 'main'],
+			'hostids' => [$hostid]
 		]);
+
+		$host['interfaces'] = array_column($host['interfaces'], null, 'interfaceid');
+		// Sort interfaces to be listed starting with one selected as 'main'.
+		CArrayHelper::sort($host['interfaces'], [
+			['field' => 'main', 'order' => ZBX_SORT_DOWN],
+			['field' => 'interfaceid','order' => ZBX_SORT_UP]
+		]);
+
+		return $host;
+	}
+
+	/**
+	 * Get template data.
+	 *
+	 * @param string $templateid
+	 */
+	protected function getTemplate($templateid): array {
+		$options = [
+			'output' => ['name', 'flags'],
+			'templateids' => [$templateid]
+		];
+
+		[$template] = API::Template()->get($options);
+		$template['interfaces'] = [];
 
 		return $template;
 	}
@@ -377,6 +411,10 @@ class CControllerItemEdit extends CController {
 			$item['headers'] = [['name' => '', 'value' => '']];
 		}
 
+		if (!$item['tags']) {
+			$item['tags'] = [['tag' => '', 'value' => '']];
+		}
+
 		return $item;
 	}
 
@@ -388,6 +426,8 @@ class CControllerItemEdit extends CController {
 	protected function getFormData(): array {
 		$form = [
 			'itemid' => 0,
+			'templateid' => 0,
+			'interfaceid' => 0,
 			'hostid' => 0,
 			'context' => '',
 			'name' => '',
@@ -407,9 +447,9 @@ class CControllerItemEdit extends CController {
 			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
 			'output_format' => DB::getDefault('items', 'output_format'),
 			'http_proxy' => DB::getDefault('items', 'http_proxy'),
-			'http_authtype' => ZBX_HTTP_AUTH_NONE,// do not have default in db (no field?)
-			'http_username' => '',// do not have default in db (no field?)
-			'http_password' => '',// do not have default in db (no field?)
+			'http_authtype' => ZBX_HTTP_AUTH_NONE,
+			'http_username' => '',
+			'http_password' => '',
 			'verify_peer' => DB::getDefault('items', 'verify_peer'),
 			'verify_host' => DB::getDefault('items', 'verify_host'),
 			'ssl_cert_file' => DB::getDefault('items', 'ssl_cert_file'),
@@ -445,7 +485,6 @@ class CControllerItemEdit extends CController {
 			'delay_flex' => []
 		];
 		$this->getInputs($form, array_keys($form));
-		// TODO: item with preprocessing trigger undefined index for error_handler, error_handler_params
 
 		if ($form['query_fields']) {
 			$query_fields = [];
@@ -483,6 +522,117 @@ class CControllerItemEdit extends CController {
 			unset($preprocessing);
 		}
 
+		// Unset inherited tags.
+		if ($this->getInput('show_inherited_tags', 0) == 0) {
+			$tags = [];
+
+			foreach ($form['tags'] as $tag) {
+				if (!array_key_exists('type', $tag) || ($tag['type'] & ZBX_PROPERTY_OWN)) {
+					$tags[] = [
+						'tag' => $tag['tag'],
+						'value' => $tag['value']
+					];
+				}
+
+				$form['tags'] = $tags;
+			}
+		}
+
 		return $form;
+	}
+
+	/**
+	 * Add item inherited tags to $data['tags'] array of item tags.
+	 * Copy of function getItemFormData, file forms.inc.php, part to get inherited tags.
+	 *
+	 * @param array $data
+	 */
+	protected function getInheritedTags(array $data): array {
+		if ($data['item']['discoveryRule']) {
+			$items = [$data['item']['discoveryRule']];
+			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_RULE)['templates'];
+		}
+		else {
+			$items = [[
+				'templateid' => $data['item']['templateid'],
+				'itemid' => $data['itemid']
+			]];
+			$parent_templates = getItemParentTemplates($items, ZBX_FLAG_DISCOVERY_NORMAL)['templates'];
+		}
+		unset($parent_templates[0]);
+
+		$db_templates = $parent_templates
+			? API::Template()->get([
+				'output' => ['templateid'],
+				'selectTags' => ['tag', 'value'],
+				'templateids' => array_keys($parent_templates),
+				'preservekeys' => true
+			])
+			: [];
+
+		$inherited_tags = [];
+
+		// Make list of template tags.
+		foreach ($parent_templates as $templateid => $template) {
+			if (array_key_exists($templateid, $db_templates)) {
+				foreach ($db_templates[$templateid]['tags'] as $tag) {
+					if (array_key_exists($tag['tag'], $inherited_tags)
+							&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+						$inherited_tags[$tag['tag']][$tag['value']]['parent_templates'] += [
+							$templateid => $template
+						];
+					}
+					else {
+						$inherited_tags[$tag['tag']][$tag['value']] = $tag + [
+							'parent_templates' => [$templateid => $template],
+							'type' => ZBX_PROPERTY_INHERITED
+						];
+					}
+				}
+			}
+		}
+
+		$db_hosts = API::Host()->get([
+			'output' => ['hostid', 'name'],
+			'selectTags' => ['tag', 'value'],
+			'hostids' => $data['hostid'],
+			'templated_hosts' => true
+		]);
+
+		// Overwrite and attach host level tags.
+		if ($db_hosts) {
+			foreach ($db_hosts[0]['tags'] as $tag) {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag;
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_INHERITED;
+			}
+		}
+
+		// Overwrite and attach item's own tags.
+		foreach ($data['tags'] as $tag) {
+			if (array_key_exists($tag['tag'], $inherited_tags)
+					&& array_key_exists($tag['value'], $inherited_tags[$tag['tag']])) {
+				$inherited_tags[$tag['tag']][$tag['value']]['type'] = ZBX_PROPERTY_BOTH;
+			}
+			else {
+				$inherited_tags[$tag['tag']][$tag['value']] = $tag + ['type' => ZBX_PROPERTY_OWN];
+			}
+		}
+
+		$data['tags'] = [];
+
+		foreach ($inherited_tags as $tag) {
+			foreach ($tag as $value) {
+				$data['tags'][] = $value;
+			}
+		}
+
+		if (!$data['tags']) {
+			$data['tags'] = [['tag' => '', 'value' => '']];
+		}
+		else {
+			CArrayHelper::sort($data['tags'], ['tag', 'value']);
+		}
+
+		return $data['tags'];
 	}
 }

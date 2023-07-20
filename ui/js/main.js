@@ -948,7 +948,7 @@ function getConditionFormula(conditions, evalType) {
 				},
 				removeRows: (filter) => {
 					for (const row of $(options.row, table)) {
-						if (typeof filter !== 'function' || filter(row)) {
+						if (filter === undefined || filter(row)) {
 							removeRow(table, row, options);
 						}
 					}

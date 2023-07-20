@@ -431,9 +431,9 @@ $formgrid = (new CFormGrid())
 	]);
 
 if ($data['form']['context'] === 'host') {
-	$interface = $data['host_interfaces'][$data['form']['interfaceid']] ?? [];
+	$interface = $data['form']['interfaceid'] && $data['host']['interfaces'][$data['form']['interfaceid']] ?? [];
 
-	if ($data['discovered']) {
+	if ($data['readonly']) {
 		$required = $interface && $interface['type'] != INTERFACE_TYPE_OPT;
 		$select_interface = (new CTextBox('interface', $interface ? getHostInterface($interface) : _('None'), true))
 			->setAttribute('disabled', 'disabled');
@@ -441,7 +441,7 @@ if ($data['form']['context'] === 'host') {
 	}
 	else {
 		$required = true;
-		$select_interface = getInterfaceSelect($data['host_interfaces'])
+		$select_interface = getInterfaceSelect($data['host']['interfaces'])
 			->setId('interface-select')
 			->setValue($data['form']['interfaceid'])
 			->addClass(ZBX_STYLE_ZSELECT_HOST_INTERFACE)
