@@ -34,6 +34,45 @@ class testDiscoveryRules extends CIntegrationTest {
 	private static $discoveryActionId;
 	private static $discoveredHostId;
 
+	private function waitForDiscovery($expectedTags, $notExpectedTags = []) {
+		$max_attempts = 10;
+		$sleep_time = 2;
+
+		for ($i = 0; $i < $max_attempts; $i++) {
+			try {
+				$response = $this->call('host.get', [
+					'selectTags' => ['tag', 'value'],
+				]);
+
+				$this->assertArrayHasKey('result', $response, 'Failed to discover host before timeout');
+				$this->assertCount(1, $response['result'], 'Failed to discover host before timeout');
+				$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to discover host before timeout');
+
+				$discoveredHost = $response['result'][0];
+				$this->assertArrayHasKey('hostid', $discoveredHost, 'Failed to get host ID of the discovered host');
+				self::$discoveredHostId = $discoveredHost['hostid'];
+
+				$tags = $discoveredHost['tags'];
+				$this->assertCount(count($expectedTags), $tags, 'Unexpected tags count was detected');
+
+				foreach($expectedTags as $expectedTag) {
+					$this->assertContains($expectedTag, $tags, 'Expected tag was not found after discovery');
+				}
+
+				foreach($notExpectedTags as $notExpectedTag) {
+					$this->assertNotContains($notExpectedTag, $tags, 'Unexpected tag was found after discovery');
+				}
+
+				break;
+			} catch (Exception $e) {
+				if ($i == $max_attempts - 1)
+					throw $e;
+				else
+					sleep($sleep_time);
+			}
+		}
+	}
+
 	/**
 	 * @inheritdoc
 	 */
@@ -76,7 +115,7 @@ class testDiscoveryRules extends CIntegrationTest {
 					[
 						'conditiontype' => CONDITION_TYPE_DRULE,
 						'operator' => CONDITION_OPERATOR_EQUAL,
-						'value' => strval(self::$discoveryRuleId)
+						'value' => self::$discoveryRuleId
 					],
 					[
 						'conditiontype' => CONDITION_TYPE_DSTATUS,
@@ -123,37 +162,10 @@ class testDiscoveryRules extends CIntegrationTest {
 
 	public function testDiscoveryRules_opAddHostTags()
 	{
-		$max_attempts = 10;
-		$sleep_time = 2;
-
-		for ($i = 0; $i < $max_attempts; $i++) {
-			try {
-				$response = $this->call('host.get', [
-					'selectTags' => ['tag', 'value'],
-				]);
-
-				$this->assertArrayHasKey('result', $response, 'Failed to discover host before timeout');
-				$this->assertCount(1, $response['result'], 'Failed to discover host before timeout');
-				$this->assertArrayHasKey('tags', $response['result'][0], 'Failed to discover host before timeout');
-
-				$discoveredHost = $response['result'][0];
-				$this->assertArrayHasKey('hostid', $discoveredHost, 'Failed to get host ID of the discovered host');
-				self::$discoveredHostId = $discoveredHost['hostid'];
-
-				$tags = $discoveredHost['tags'];
-				$this->assertCount(2, $tags, 'Unexpected tags count was detected');
-
-				$this->assertContains(['tag' => 'add_tag1', 'value' => 'add_value1'], $tags);
-				$this->assertContains(['tag' => 'add_tag2', 'value' => 'add_value2'], $tags);
-
-				break;
-			} catch (Exception $e) {
-				if ($i == $max_attempts - 1)
-					throw $e;
-				else
-					sleep($sleep_time);
-			}
-		}
+		$this->waitForDiscovery([
+			['tag' => 'add_tag1', 'value' => 'add_value1'],
+			['tag' => 'add_tag2', 'value' => 'add_value2']
+		]);
 	}
 
 	/**
@@ -163,7 +175,7 @@ class testDiscoveryRules extends CIntegrationTest {
 	{
 		/* Replace tags at the discovered host */
 		$this->call('host.update', [
-			'hostid' => strval(self::$discoveredHostId),
+			'hostid' => self::$discoveredHostId,
 			'tags' => [
 				[
 					'tag' => 'del_tag3',
@@ -225,39 +237,13 @@ class testDiscoveryRules extends CIntegrationTest {
 			]
 		]);
 
-		$max_attempts = 10;
-		$sleep_time = 2;
-
-		for ($i = 0; $i < $max_attempts; $i++) {
-			try {
-				$response = $this->call('host.get', [
-					'selectTags' => ["tag", "value"],
-
-				]);
-
-				$this->assertArrayHasKey('result', $response, 'Unexpected error during network discovery');
-				$this->assertCount(1, $response['result'], 'Unexpected error during network discovery');
-				$this->assertArrayHasKey('tags', $response['result'][0], 'Unexpected error during network discovery');
-
-
-				$discoveredHost = $response['result'][0];
-				$this->assertArrayHasKey('hostid', $discoveredHost, 'Unexpected error during network discovery');
-				self::$discoveredHostId = $discoveredHost['hostid'];
-
-				$tags = $discoveredHost['tags'];
-				$this->assertCount(2, $tags, 'Unexpected tags count was detected');
-				$this->assertContains(['tag' => 'add_tag1', 'value' => 'add_value1'], $tags);
-				$this->assertContains(['tag' => 'add_tag2', 'value' => 'add_value2'], $tags);
-				$this->assertNotContains(['tag' => 'del_tag3', 'value' => 'del_value3'], $tags);
-				$this->assertNotContains(['tag' => 'del_tag4', 'value' => 'del_value4'], $tags);
-
-				break;
-			} catch (Exception $e) {
-				if ($i == $max_attempts - 1)
-					throw $e;
-				else
-					sleep($sleep_time);
-			}
-		}
+		$this->waitForDiscovery([
+			['tag' => 'add_tag1', 'value' => 'add_value1'],
+			['tag' => 'add_tag2', 'value' => 'add_value2']
+		],
+		[
+			['tag' => 'del_tag3', 'value' => 'del_value3'],
+			['tag' => 'del_tag4', 'value' => 'del_value4']
+		]);
 	}
 }

@@ -35,8 +35,7 @@ class testAutoregistration extends CIntegrationTest {
 
 	public static $HOST_METADATA = self::HOST_METADATA1;
 
-	private function waitForAutoreg($expectedTags)
-	{
+	private function waitForAutoreg($expectedTags) {
 		$max_attempts = 5;
 		$sleep_time = 2;
 
@@ -109,6 +108,7 @@ class testAutoregistration extends CIntegrationTest {
 		$this->assertCount(0, $response['result'], 'Failed to clear existing hosts during test setup');
 
 		$response = $this->call('action.create', [
+		[
 			'name' => self::AUTOREG_ACTION_NAME1,
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
@@ -157,13 +157,8 @@ class testAutoregistration extends CIntegrationTest {
 					]
 				]
 			]
-		]);
-		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
-		$this->assertArrayHasKey('actionids', $response['result'],
-				'Failed to create an autoregistration action');
-		$this->assertCount(1, $response['result'], 'Failed to create an autoregistration action');
-
-		$response = $this->call('action.create', [
+		],
+		[
 			'name' => self::AUTOREG_ACTION_NAME2,
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
@@ -177,7 +172,7 @@ class testAutoregistration extends CIntegrationTest {
 					[
 						'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 						'operator' => CONDITION_OPERATOR_LIKE,
-						'value' => strval(self::HOST_METADATA2)
+						'value' => self::HOST_METADATA2
 					],
 				],
 				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
@@ -212,36 +207,16 @@ class testAutoregistration extends CIntegrationTest {
 					]
 				]
 			]
-		]);
+		]]);
 		$this->assertArrayHasKey('result', $response, 'Failed to create an autoregistration action');
 		$this->assertArrayHasKey('actionids', $response['result'],
 				'Failed to create an autoregistration action');
-		$this->assertCount(1, $response['result'], 'Failed to create an autoregistration action');
-
-		$response = $this->call('action.get', [
-			'filter' => [
-				'name' => [self::AUTOREG_ACTION_NAME1]
-			]
-		]);
-
-		$this->assertArrayHasKey('result', $response, 'Failed to retrieve the autoregistration action');
-		$this->assertCount(1, $response['result'], 'Failed to retrieve the autoregistration action');
-		$autoregAction = $response['result'][0];
-		$this->assertArrayHasKey('actionid', $autoregAction, 'Failed to get actionid of the discovery action');
-
-		$response = $this->call('action.get', [
-			'filter' => [
-				'name' => [self::AUTOREG_ACTION_NAME1]
-			]
-		]);
-
-		$this->assertArrayHasKey('result', $response, 'Failed to retrieve the autoregistration action');
-		$this->assertCount(1, $response['result'], 'Failed to retrieve the autoregistration action');
-		$autoregAction = $response['result'][0];
-		$this->assertArrayHasKey('actionid', $autoregAction, 'Failed to get actionid of the discovery action');
+		$actionids = $response['result']['actionids'];
+		$this->assertCount(2, $actionids, 'Failed to create an autoregistration action');
 	}
 
 	/**
+	 * @required-components agent
 	 * @configurationDataProvider agentConfigurationProvider
 	 */
 	public function testAutoregistration_autoregHost1FirstTime()
@@ -255,6 +230,7 @@ class testAutoregistration extends CIntegrationTest {
 	}
 
 	/**
+	 * @required-components agent
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @depends testAutoregistration_autoregHost1FirstTime
 	 */
@@ -269,6 +245,7 @@ class testAutoregistration extends CIntegrationTest {
 	}
 
 	/**
+	 * @required-components agent
 	 * @configurationDataProvider agentConfigurationProvider
 	 * @depends testAutoregistration_autoregHost2
 	 */
