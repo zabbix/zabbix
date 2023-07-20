@@ -25,6 +25,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @backup hosts,drules,actions,operations,optag,host_tag
+ * @backup auditlog,changelog,config,ha_node,ids
  */
 class testDiscoveryRules extends CIntegrationTest {
 	const DRULE_NAME = 'Test discovery rule';
