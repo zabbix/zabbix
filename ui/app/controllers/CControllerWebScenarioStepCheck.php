@@ -141,7 +141,9 @@ class CControllerWebScenarioStepCheck extends CController {
 						$ret = false;
 					}
 
-					$unique_variables[$pair['name']] = true;
+					if ($pair['name'] !== '') {
+						$unique_variables[$pair['name']] = true;
+					}
 				}
 			}
 		}
