@@ -282,7 +282,7 @@ class CHostInterface extends CApiService {
 
 		$dbHosts = API::Host()->get([
 			'output' => ['host'],
-			'hostids' => array_collumn($interfaces, 'hostid'),
+			'hostids' => array_column($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
 		]);
