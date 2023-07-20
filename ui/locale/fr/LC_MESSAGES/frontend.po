@@ -1350,6 +1350,10 @@ msgstr "Et"
 msgid "And/Or"
 msgstr "Et/Ou"
 
+#: widgets/gauge/includes/WidgetForm.php:173
+msgid "Angle"
+msgstr ""
+
 #: app/views/popup.sla.edit.php:78 include/classes/helpers/CSlaHelper.php:43
 msgid "Annually"
 msgstr "Annuellement"
@@ -1424,6 +1428,19 @@ msgstr "Avr"
 #: include/func.inc.php:103 include/func.inc.php:256 jsLoader.php:236
 msgid "April"
 msgstr "Avril"
+
+#: widgets/gauge/includes/WidgetForm.php:221
+msgid "Arc"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:240
+msgid "Arc background"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:232
+#: widgets/gauge/includes/WidgetForm.php:305
+msgid "Arc size"
+msgstr ""
 
 #: app/views/popup.tabfilter.edit.php:76
 msgid "Are you sure you want to delete this filter?"
@@ -4581,6 +4598,10 @@ msgstr "La couleur \"%1$s\" n'est pas correcte : code couleur hexadécimal atte
 msgid "Color (OK)"
 msgstr "Couleur (OK)"
 
+#: widgets/gauge/views/widget.edit.php:81
+msgid "Colors"
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetForm.php:71
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:114
 msgid "Columns"
@@ -6668,6 +6689,10 @@ msgstr "Le groupe d'utilisateurs déprovisionnés ne peut pas être activé."
 #: include/views/inventory.host.view.php:129
 msgid "Description"
 msgstr "Description"
+
+#: widgets/gauge/includes/WidgetForm.php:195
+msgid "Description size"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1167
 msgid "Detailed listing of installed packages. Returns text in JSON format"
@@ -8766,6 +8791,10 @@ msgstr "GUI"
 #: include/classes/user/CWebUser.php:63 index_sso.php:260
 msgid "GUI access disabled."
 msgstr "Accès GUI désactivé."
+
+#: widgets/gauge/Widget.php:39
+msgid "Gauge"
+msgstr ""
 
 #: include/classes/helpers/CMenuHelper.php:245
 #: include/classes/helpers/CRoleHelper.php:422
@@ -14048,6 +14077,11 @@ msgstr "Naviguer vers la vue par défaut"
 msgid "Navigate to initial view"
 msgstr "Naviguer vers la vue initiale"
 
+#: widgets/gauge/includes/WidgetForm.php:271
+#: widgets/gauge/views/widget.edit.php:186
+msgid "Needle"
+msgstr ""
+
 #: app/views/administration.housekeeping.edit.php:77
 msgid "Network discovery data storage period"
 msgstr "Période de stockage des données de découverte réseau"
@@ -17580,6 +17614,10 @@ msgstr "Retourne le nombre de sockets TCP qui correspondent aux paramètres. Ret
 msgid "Returns number of UDP sockets that match parameters. Returns integer"
 msgstr "Retourne le nombre de sockets UDP qui correspondent aux paramètres. Retourne un entier"
 
+#: include/classes/data/CItemData.php:2839
+msgid "Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased."
+msgstr ""
+
 #: include/classes/data/CItemData.php:850
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retourne le pourcentage de paquets ICMP ping perdus."
@@ -18025,6 +18063,15 @@ msgstr "Sauvegarder les modifications"
 #, c-format
 msgid "Save it as \"%1$s\""
 msgstr "L'enregistrer sous \"%1$s\""
+
+#: widgets/gauge/includes/WidgetForm.php:277
+#: widgets/gauge/views/widget.edit.php:198
+msgid "Scale"
+msgstr ""
+
+#: widgets/gauge/includes/WidgetForm.php:288
+msgid "Scale size"
+msgstr ""
 
 #: app/views/administration.module.list.php:35
 msgid "Scan directory"
@@ -18719,6 +18766,10 @@ msgstr "Raccourci"
 msgid "Show"
 msgstr "Afficher"
 
+#: widgets/gauge/includes/WidgetForm.php:302
+msgid "Show arc"
+msgstr ""
+
 #: widgets/hostavail/includes/WidgetForm.php:61
 #: widgets/web/includes/WidgetForm.php:65
 msgid "Show data in maintenance"
@@ -18738,6 +18789,10 @@ msgstr "Afficher l'en-tête"
 #: include/classes/widgets/forms/CWidgetFormWeb.php:84
 msgid "Show hosts in maintenance"
 msgstr "Afficher les hôtes en maintenance"
+
+#: widgets/gauge/includes/WidgetForm.php:299
+msgid "Show labels"
+msgstr ""
 
 #: include/classes/widgets/forms/CWidgetFormGraph.php:78
 #: include/classes/widgets/forms/CWidgetFormGraphPrototype.php:78
@@ -18830,6 +18885,10 @@ msgstr "Afficher les non-acquittés seulement"
 #: include/classes/widgets/forms/CWidgetFormNavTree.php:51
 msgid "Show unavailable maps"
 msgstr "Afficher les cartes indisponibles"
+
+#: widgets/gauge/includes/WidgetForm.php:292
+msgid "Show units"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:110
 msgid "Show warning if Zabbix server is down"
@@ -19128,6 +19187,10 @@ msgstr "Moment du démarrage du serveur Zabbix, timestamp Unix."
 msgid "State"
 msgstr "État"
 
+#: include/classes/data/CItemData.php:2832
+msgid "State of proxy memory buffer."
+msgstr ""
+
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:155
 #: include/classes/widgets/forms/CWidgetFormSvgGraph.php:227
 msgctxt "history source selection method"
@@ -19137,6 +19200,10 @@ msgstr "Statique"
 #: include/classes/data/CItemData.php:1706
 msgid "Statistics and availability of Zabbix write cache. Cache - one of values (modes: all, float, uint, str, log, text, not supported), history (modes: pfree, free, total, used, pused), index (modes: pfree, free, total, used, pused), trend (modes: pfree, free, total, used, pused)."
 msgstr "Statistiques et disponibilité du cache en écriture Zabbix. Cache - une des valeurs (modes : all, float, uint, str, log, text, not supported), historique (modes : pfree, free, total, used, pused), index (modes : pfree, free, total, used , pused), tendance (modes : pfree, free, total, used, pused)."
+
+#: include/classes/data/CItemData.php:2825
+msgid "Statistics and availability of proxy memory buffer. Mode (modes: pfree, free, total, used, pused)."
+msgstr ""
 
 #: app/controllers/CControllerPopupGeneric.php:179
 #: app/controllers/CControllerPopupGeneric.php:193
@@ -21179,6 +21246,10 @@ msgstr "Erreur de serveur inattendue."
 msgid "Units"
 msgstr "Unités"
 
+#: widgets/gauge/includes/WidgetForm.php:253
+msgid "Units size"
+msgstr ""
+
 #: app/controllers/CControllerPopupMediatypeTestSend.php:177
 #: app/views/administration.token.list.php:169
 #: app/views/monitoring.widget.hostavail.view.php:34
@@ -22723,6 +22794,10 @@ msgstr "La valeur \"%1$s\" est invalide pour le paramètre \"grid_show\". Les ch
 msgid "Value \"%1$s\" is too long for field \"%2$s\" - %3$d characters. Allowed length is %4$d characters."
 msgstr "La valeur \"%1$s\" est trop longue pour le champ \"%2$s\" - %3$d caractères. La longueur autorisée est de %4$d caractères."
 
+#: widgets/gauge/includes/WidgetForm.php:237
+msgid "Value arc"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1694
 msgid "Value cache effectiveness. Valid parameters are: requests, hits and misses."
 msgstr "Efficacité du cache de valeurs. Les paramètres valides sont : requests, hits et misses."
@@ -22792,6 +22867,10 @@ msgstr "Valeur de l'ancien tag d'événement"
 #: include/actions.inc.php:352
 msgid "Value of tag"
 msgstr "Valeur du tag"
+
+#: widgets/gauge/includes/WidgetForm.php:225
+msgid "Value size"
+msgstr ""
 
 #: include/classes/graphdraw/CPieGraphDraw.php:318
 msgid "Value: no data"
@@ -26001,6 +26080,11 @@ msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] "la valeur doit être vide ou %1$s"
 msgstr[1] "la valeur doit être vide ou une des valeurs %1$s"
+
+#: widgets/gauge/includes/WidgetForm.php:136
+#, c-format
+msgid "value must be greater than \"%1$s\""
+msgstr ""
 
 #: include/classes/validators/CNewValidator.php:220
 #, c-format

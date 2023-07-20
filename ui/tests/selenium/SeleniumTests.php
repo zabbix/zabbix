@@ -50,6 +50,7 @@ require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
+require_once dirname(__FILE__).'/dashboard/testDashboardGaugeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
@@ -327,6 +328,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
 		$suite->addTestSuite('testDashboardForm');
+		$suite->addTestSuite('testDashboardGaugeWidget');
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');

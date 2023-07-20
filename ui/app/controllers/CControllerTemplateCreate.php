@@ -212,46 +212,12 @@ class CControllerTemplateCreate extends CController {
 	 */
 	private function copyFromCloneSourceTemplate(string $src_templateid, string $templateid): bool {
 		// First copy web scenarios with web items, so that later regular items can use web item as their master item.
-		if (!copyHttpTests($src_templateid, $templateid)) {
+		if (!copyHttpTests($src_templateid, $templateid)
+				|| !CItemHelper::cloneTemplateItems($src_templateid, $templateid)
+				|| !CTriggerHelper::cloneTemplateTriggers($src_templateid, $templateid)
+				|| !CGraphHelper::cloneTemplateGraphs($src_templateid, $templateid)
+				|| !CLldRuleHelper::cloneTemplateItems($src_templateid, $templateid)) {
 			return false;
-		}
-
-		if (!copyItemsToHosts('templateids', [$src_templateid], true, [$templateid])) {
-			return false;
-		}
-
-		// Copy triggers.
-		if (!copyTriggersToHosts([$templateid], $src_templateid)) {
-			return false;
-		}
-
-		// Copy graphs.
-		$db_graphs = API::Graph()->get([
-			'output' => ['graphid'],
-			'hostids' => $src_templateid,
-			'inherited' => false
-		]);
-
-		foreach ($db_graphs as $db_graph) {
-			copyGraphToHost($db_graph['graphid'], $templateid);
-		}
-
-		// Copy discovery rules.
-		$db_discovery_rules = API::DiscoveryRule()->get([
-			'output' => ['itemid'],
-			'hostids' => $src_templateid,
-			'inherited' => false
-		]);
-
-		if ($db_discovery_rules) {
-			$copy_discovery_rules = API::DiscoveryRule()->copy([
-				'discoveryids' => array_column($db_discovery_rules, 'itemid'),
-				'hostids' => [$templateid]
-			]);
-
-			if (!$copy_discovery_rules) {
-				return false;
-			}
 		}
 
 		// Copy template dashboards.

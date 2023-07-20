@@ -30,7 +30,8 @@
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}'),
+					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck(),
 				new CInput('hidden', 'macros[#{rowNum}][inherited_type]', ZBX_PROPERTY_OWN),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
@@ -81,7 +82,8 @@
 				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-					->setAttribute('placeholder', '{$MACRO}'),
+					->setAttribute('placeholder', '{$MACRO}')
+					->disableSpellcheck(),
 				new CInput('hidden', 'macros[#{rowNum}][discovery_state]',
 					CControllerHostMacrosList::DISCOVERY_STATE_MANUAL
 				)

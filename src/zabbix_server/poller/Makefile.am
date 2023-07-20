@@ -32,6 +32,12 @@ libzbxpoller_a_SOURCES = \
 	telnet_run.h \
 	checks_telnet.c \
 	checks_telnet.h \
+	async_poller.c \
+	async_poller.h \
+	async_agent.h \
+	async_agent.c \
+	async_httpagent.h \
+	async_httpagent.c \
 	poller.c \
 	poller.h
 
@@ -60,7 +66,8 @@ libzbxpoller_a_CFLAGS = \
 	$(SSH2_CFLAGS) \
 	$(SSH_CFLAGS) \
 	$(LIBXML2_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(LIBEVENT_CFLAGS)
 
 libzbxpoller_server_a_CFLAGS = \
 	-I$(top_srcdir)/src/libs/zbxcacheconfig \

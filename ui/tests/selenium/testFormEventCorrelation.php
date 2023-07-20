@@ -612,6 +612,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 
 	public static function formulaValidation() {
 		return [
+			// #0
 			[
 				[
 					'name' => 'Test create with empty expression',
@@ -629,6 +630,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'error_message' => 'Invalid parameter "/1/filter/formula": cannot be empty.'
 				]
 			],
+			// #1
 			[
 				[
 					'name' => 'Test create with missing argument',
@@ -652,6 +654,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
 				]
 			],
+			// #2
 			[
 				[
 					'name' => 'Test create with extra argument',
@@ -675,6 +678,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 					'error_message' => 'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
 				]
 			],
+			// #3
 			[
 				[
 					'name' => 'Test create with wrong formula',
@@ -695,9 +699,10 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						]
 					],
 					'formula'=> 'Wrong formula',
-					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Wrong formula".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Wrong formula".'
 				]
 			],
+			// #4
 			[
 				[
 					'name' => 'Check case sensitive of operator in formula',
@@ -712,9 +717,10 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						]
 					],
 					'formula'=> 'A and Not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from "Not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B".'
 				]
 			],
+			// #5
 			[
 				[
 					'name' => 'Check case sensitive of first operator in formula',
@@ -729,9 +735,10 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						]
 					],
 					'formula'=> 'NOT A and not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " A and not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
 				]
 			],
+			// #6
 			[
 				[
 					'name' => 'Test create with only NOT in formula',
@@ -746,7 +753,7 @@ class testFormEventCorrelation extends CLegacyWebTest {
 						]
 					],
 					'formula'=> 'not A not B',
-					'error_message' => 'Invalid parameter "/1/filter/formula": check expression starting from " not B".'
+					'error_message' => 'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
 				]
 			]
 		];

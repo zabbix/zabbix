@@ -707,7 +707,7 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
-		if (!$options['countOutput'] && $options['expandDescription'] !== null) {
+		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
 			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
 		}
 
