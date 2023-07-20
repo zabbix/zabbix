@@ -65,15 +65,15 @@ class CControllerItemEdit extends CController {
 			'parameters'			=> 'array',
 			'query_fields'			=> 'array',
 			'headers'				=> 'array',
+			'delay_flex'			=> 'array',
 			'form_refresh'			=> 'in 1'
 		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$tag_fields = array_fill_keys(['tag', 'value'], '');
 			foreach ($this->getInput('tags', []) as $tag) {
-				if (array_diff_key($tag_fields, $tag)) {
+				if (!array_key_exists('tag', $tag) || !array_key_exists('value', $tag)) {
 					$ret = false;
 					break;
 				}
@@ -101,6 +101,18 @@ class CControllerItemEdit extends CController {
 			$ret = array_key_exists('sortorder', $headers)
 				&& array_key_exists('name', $headers)
 				&& array_key_exists('value', $headers);
+		}
+
+		$delay_flex = $this->getInput('delay_flex', []);
+
+		if ($ret && $delay_flex) {
+			foreach ($delay_flex as $interval) {
+				if (!array_key_exists('type', $interval)
+						|| ($interval['type'] != ITEM_DELAY_FLEXIBLE && $interval['type'] != ITEM_DELAY_SCHEDULING)) {
+					$ret = false;
+					break;
+				};
+			}
 		}
 
 		if (!$ret) {
@@ -310,6 +322,49 @@ class CControllerItemEdit extends CController {
 				break;
 		}
 
+		$item['delay_flex'] = [];
+		$update_interval_parser = new CUpdateIntervalParser([
+			'usermacros' => true,
+			'lldmacros' => false // TODO: for prototypes should be true
+		]);
+
+		if ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
+			$item['delay'] = $update_interval_parser->getDelay();
+
+			if ($item['delay'][0] !== '{') {
+				$delay = timeUnitToSeconds($item['delay']);
+
+				if ($delay == 0 && ($item['type'] == ITEM_TYPE_TRAPPER || $item['type'] == ITEM_TYPE_SNMPTRAP
+						|| $item['type'] == ITEM_TYPE_DEPENDENT || ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+							&& strncmp($item['key'], 'mqtt.get', 8) === 0))) {
+					$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+				}
+			}
+
+			foreach ($update_interval_parser->getIntervals() as $interval) {
+				if ($interval['type'] == ITEM_DELAY_FLEXIBLE) {
+					$item['delay_flex'][] = [
+						'delay' => $interval['update_interval'],
+						'period' => $interval['time_period'],
+						'type' => ITEM_DELAY_FLEXIBLE
+					];
+				}
+				else {
+					$item['delay_flex'][] = [
+						'schedule' => $interval['interval'],
+						'type' => ITEM_DELAY_SCHEDULING
+					];
+				}
+			}
+		}
+		else {
+			$item['delay'] = ZBX_ITEM_DELAY_DEFAULT;
+		}
+
+		if (!$item['delay_flex']) {
+			$item['delay_flex'] = [['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEXIBLE]];
+		}
+
 		if (!$item['parameters']) {
 			$item['parameters'] = [['name' => '', 'value' => '']];
 		}
@@ -386,7 +441,8 @@ class CControllerItemEdit extends CController {
 			'show_inherited_tags' => 0,
 			'tags' => [],
 			'preprocessing' => [],
-			'headers' => []
+			'headers' => [],
+			'delay_flex' => []
 		];
 		$this->getInputs($form, array_keys($form));
 		// TODO: item with preprocessing trigger undefined index for error_handler, error_handler_params

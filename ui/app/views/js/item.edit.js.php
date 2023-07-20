@@ -23,8 +23,11 @@
  * @var CView $this
  */
 
-?><script>((config) => {
+?><script>
+((config) => {
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
+const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
+const ITEM_DELAY_SCHEDULING = <?= ITEM_DELAY_SCHEDULING ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
 const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
@@ -117,6 +120,17 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 			template: '#header-row-tmpl',
 			rows: this.form_data.headers
 		});
+		jQuery('#delay-flex-table').dynamicRows({
+			template: '#delay-flex-row-tmpl',
+			rows: this.form_data.delay_flex
+		});
+		this.form.querySelectorAll('#delay-flex-table .form_row')?.forEach(row => {
+			const flexible = row.querySelector('[name$="[type]"]:checked').value == ITEM_DELAY_FLEXIBLE;
+
+			row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
+			row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
+			row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
+		});
 	}
 
 	#showErrorDialog(body, trigger_element) {
@@ -135,8 +149,8 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', e => this.#keyChangeHandler());
-		this.field.key.addEventListener('keyup', e => this.#keyChangeHandler());
+		this.field.key.addEventListener('help_items.paste', e => this.#keyChangeHandler(e));
+		this.field.key.addEventListener('keyup', e => this.#keyChangeHandler(e));
 		this.field.key_button?.addEventListener('click', e => this.#keySelectClickHandler(e));
 		this.field.type.addEventListener('click', e => this.#typeChangeHandler(e));
 		this.field.value_type.addEventListener('change', e => this.#valueTypeChangeHandler(e));
@@ -180,6 +194,7 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 					break;
 			}
 		});
+		this.form.querySelector('#delay-flex-table').addEventListener('click', e => this.#intervalTypeChangeHandler(e));
 
 		// Tags tab events.
 		this.form.querySelectorAll('[name="show_inherited_tags"]')
@@ -247,23 +262,8 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		const username_required = type == ITEM_TYPE_SSH || type == ITEM_TYPE_TELNET;
 		const interface_optional = this.optional_interfaces.indexOf(type) != -1;
 
-		if (type == ITEM_TYPE_ZABBIX_ACTIVE) {
-			// const toggle_fields = [
-			// 	'delay',
-			// 	'js-item-delay-label',
-			// 	'js-item-delay-field',
-			// 	'js-item-flex-intervals-label',
-			// 	'js-item-flex-intervals-field'
-			// ];
-			// const set_hidden = (key.substr(0, 8) === 'mqtt.get'),
-			// 	object_switcher = globalAllObjForViewSwitcher['type'];
-
-			// toggle_fields.forEach((element_id) =>
-			// 	object_switcher[set_hidden ? 'hideObj' : 'showObj']({id: element_id})
-			// );
-		}
-
 		this.updateActionButtons();
+		this.#updateCustomIntervalVisibility();
 		this.#updateValueTypeHintVisibility();
 		this.field.key_button.toggleAttribute('disabled', this.type_with_key_select.indexOf(type) == -1);
 		this.label.username.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, username_required);
@@ -271,6 +271,21 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.label.interfaceid.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, !interface_optional);
 		this.field.interfaceid.toggleAttribute('aria-required', !interface_optional);
 		organizeInterfaces(this.type_interfaceids, this.interface_types, parseInt(this.field.type.value, 10));
+	}
+
+	#updateCustomIntervalVisibility() {
+		if (parseInt(this.field.type.value, 10) != ITEM_TYPE_ZABBIX_ACTIVE) {
+			return;
+		}
+
+		const fields = ['delay', 'js-item-delay-label', 'js-item-delay-field', 'js-item-flex-intervals-label',
+			'js-item-flex-intervals-field'
+		];
+
+		const action = (this.field.key.value.substr(0, 8) === 'mqtt.get') ? 'hideObj' : 'showObj';
+		const switcher = globalAllObjForViewSwitcher['type'];
+
+		fields.forEach(id => switcher[action]({id}));
 	}
 
 	#updateValueTypeHintVisibility() {
@@ -312,6 +327,21 @@ const ZBX_STYLE_FIELD_LABEL_ASTERISK = <?= json_encode(ZBX_STYLE_FIELD_LABEL_AST
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.updateFieldsVisibility();
+	}
+
+	#intervalTypeChangeHandler(e) {
+		const target = e.target;
+
+		if (!target.matches('[name$="[type]"]')) {
+			return;
+		}
+
+		const row = target.closest('.form_row');
+		const flexible = target.value == ITEM_DELAY_FLEXIBLE;
+
+		row.querySelector('[name$="[delay]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
+		row.querySelector('[name$="[period]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, !flexible);
+		row.querySelector('[name$="[schedule]"]').classList.toggle(ZBX_STYLE_DISPLAY_NONE, flexible);
 	}
 
 	#valueTypeChangeHandler(e) {

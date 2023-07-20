@@ -603,14 +603,40 @@ $formgrid
 		))->setId('js-item-delay-field')
 	])
 	->addItem([
-		(new CLabel(_('Custom intervals')))->setId('js-item-flex-intervals-label'),
-		(new CFormField((new CDiv((new CTable())
-				->setId('delayFlexTable')
-				->setHeader([
-					_('Type'), _('Interval'), _('Period'), $data['discovered'] ? null : _('Action')
-				])
-				->setAttribute('style', 'width: 100%;')
-			))
+		(new CLabel(_('Custom intervals'), 'delay-flex-table'))->setId('js-item-flex-intervals-label'),
+		(new CFormField(
+			(new CDiv([
+				(new CTable())
+					->setId('delay-flex-table')
+					->setHeader([
+						_('Type'), _('Interval'), _('Period'), $data['discovered'] ? null : _('Action')
+					])
+					->setFooter((new CCol(
+						(new CButtonLink(_('Add')))
+							->addClass('element-table-add')
+							->setEnabled(!$data['readonly'])
+						))->setColSpan($data['discovered'] ? 3 : 4)
+					),
+				new CTemplateTag('delay-flex-row-tmpl', (new CRow([
+						(new CRadioButtonList('delay_flex[#{rowNum}][type]', ITEM_DELAY_FLEXIBLE))
+							->addValue(_('Flexible'), ITEM_DELAY_FLEXIBLE)
+							->addValue(_('Scheduling'), ITEM_DELAY_SCHEDULING)
+							->setReadonly($data['readonly'])
+							->setModern(true),
+						[
+							(new CTextBox('delay_flex[#{rowNum}][delay]', '#{delay}', $data['readonly']))
+								->setAttribute('placeholder', ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT),
+							(new CTextBox('delay_flex[#{rowNum}][schedule]', '#{schedule}', $data['readonly']))
+								->addClass(ZBX_STYLE_DISPLAY_NONE)
+								->setAttribute('placeholder', ZBX_ITEM_SCHEDULING_DEFAULT)
+						],
+						(new CTextBox('delay_flex[#{rowNum}][period]', '#{period}', $data['readonly']))
+							->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL),
+						(new CButtonLink(_('Remove')))
+							->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
+			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		))->setId('js-item-flex-intervals-field')
